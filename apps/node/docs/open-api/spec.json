@@ -743,7 +743,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/did/DidDocument"
+									"$ref": "https://schema.twindev.org/w3c-did/DidDocument"
 								},
 								"examples": {
 									"identityResolveResponseExample": {
@@ -834,7 +834,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/did/DidDocument"
+									"$ref": "https://schema.twindev.org/w3c-did/DidDocument"
 								},
 								"examples": {
 									"identityCreateResponseExample": {
@@ -964,7 +964,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/did/DidDocumentVerificationMethod"
+									"$ref": "https://schema.twindev.org/w3c-did/DidDocumentVerificationMethod"
 								},
 								"examples": {
 									"identityVerificationMethodCreateResponseExample": {
@@ -1196,7 +1196,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/did/DidService"
+									"$ref": "https://schema.twindev.org/w3c-did/DidService"
 								},
 								"examples": {
 									"identityServiceCreateResponseExample": {
@@ -2122,7 +2122,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/did/Proof"
+									"$ref": "https://schema.twindev.org/w3c-did/Proof"
 								},
 								"examples": {
 									"identityProofCreateResponseExample": {
@@ -13989,7 +13989,7 @@
 				"type": "object",
 				"properties": {
 					"proofType": {
-						"$ref": "https://schema.twindev.org/did/ProofTypes"
+						"$ref": "https://schema.twindev.org/w3c-did/ProofTypes"
 					},
 					"document": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
@@ -14009,7 +14009,7 @@
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					},
 					"proof": {
-						"$ref": "https://schema.twindev.org/did/Proof"
+						"$ref": "https://schema.twindev.org/w3c-did/Proof"
 					}
 				},
 				"required": [
@@ -14105,7 +14105,7 @@
 				"type": "object",
 				"properties": {
 					"verifiableCredential": {
-						"$ref": "https://schema.twindev.org/did/DidVerifiableCredential"
+						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
 					},
 					"jwt": {
 						"type": "string",
@@ -14127,7 +14127,7 @@
 						"description": "Has the credential been revoked."
 					},
 					"verifiableCredential": {
-						"$ref": "https://schema.twindev.org/did/DidVerifiableCredential"
+						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
 					}
 				},
 				"required": [
@@ -14172,7 +14172,7 @@
 										"type": "string"
 									},
 									{
-										"$ref": "https://schema.twindev.org/did/DidVerifiableCredential"
+										"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
 									}
 								]
 							}
@@ -14193,7 +14193,7 @@
 				"type": "object",
 				"properties": {
 					"verifiablePresentation": {
-						"$ref": "https://schema.twindev.org/did/DidVerifiablePresentation"
+						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiablePresentation"
 					},
 					"jwt": {
 						"type": "string",
@@ -14215,14 +14215,14 @@
 						"description": "Has the presentation been revoked."
 					},
 					"verifiablePresentation": {
-						"$ref": "https://schema.twindev.org/did/DidVerifiablePresentation"
+						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiablePresentation"
 					},
 					"issuers": {
 						"type": "array",
 						"description": "The issuers of the presentation.",
 						"prefixItems": [
 							{
-								"$ref": "https://schema.twindev.org/did/DidDocument"
+								"$ref": "https://schema.twindev.org/w3c-did/DidDocument"
 							}
 						]
 					}
@@ -14237,7 +14237,7 @@
 				"type": "object",
 				"properties": {
 					"verificationMethodType": {
-						"$ref": "https://schema.twindev.org/did/DidVerificationMethodType"
+						"$ref": "https://schema.twindev.org/w3c-did/DidVerificationMethodType"
 					},
 					"verificationMethodId": {
 						"type": "string",

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 export * from "./bootstrap";
 export * from "./builders/engineEnvBuilder";
+export * from "./builders/engineServerEnvBuilder";
 export * from "./models/IEngineEnvironmentVariables";
 export * from "./models/IEngineServerEnvironmentVariables";
 export * from "./models/INodeEnvironmentVariables";

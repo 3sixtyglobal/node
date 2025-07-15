@@ -25,6 +25,7 @@
 - [bootstrapBlobEncryption](functions/bootstrapBlobEncryption.md)
 - [bootstrapAuth](functions/bootstrapAuth.md)
 - [buildEngineConfiguration](functions/buildEngineConfiguration.md)
+- [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [run](functions/run.md)
 - [buildConfiguration](functions/buildConfiguration.md)
 - [start](functions/start.md)
