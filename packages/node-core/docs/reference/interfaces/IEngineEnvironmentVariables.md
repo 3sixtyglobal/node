@@ -36,7 +36,24 @@ The name of the state file.
 
 > `optional` **entityStorageConnectorType**: `string`
 
-The type of the default entity storage: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql.
+The type of the entity storage to create, comma separate for more than one connector.
+values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
+
+***
+
+### entityStorageConnectorDefault?
+
+> `optional` **entityStorageConnectorDefault**: `string`
+
+The default entity storage connector to use, defaults to the first one in the list.
+
+***
+
+### entityStorageConnectorDecentralised?
+
+> `optional` **entityStorageConnectorDecentralised**: `string`
+
+Entity storage connector for decentralized storage
 
 ***
 
@@ -45,22 +62,6 @@ The type of the default entity storage: file, memory, aws-dynamodb, azure-cosmos
 > `optional` **entityStorageTablePrefix**: `string`
 
 A prefix for all the table in entity-storage, can be empty.
-
-***
-
-### entityFileEnable?
-
-> `optional` **entityFileEnable**: `string`
-
-Enable the file entity storage connector.
-
-***
-
-### entityMemoryEnable?
-
-> `optional` **entityMemoryEnable**: `string`
-
-Enable the memory entity storage connector.
 
 ***
 
@@ -189,6 +190,14 @@ ScyllaDB keyspace.
 > `optional` **scylladbLocalDataCenter**: `string`
 
 ScyllaDB local data center.
+
+***
+
+### scylladbPort?
+
+> `optional` **scylladbPort**: `string`
+
+ScyllaDB port.
 
 ***
 
@@ -332,7 +341,24 @@ The url for accessing IPFS API.
 
 > `optional` **blobStorageConnectorType**: `string`
 
-The type of the default blob storage: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
+The type of the entity storage to create, comma separate for more than one connector.
+values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
+
+***
+
+### blobStorageConnectorDefault?
+
+> `optional` **blobStorageConnectorDefault**: `string`
+
+The default blob storage connector to use, defaults to the first one in the list.
+
+***
+
+### blobStorageConnectorDecentralised?
+
+> `optional` **blobStorageConnectorDecentralised**: `string`
+
+Blog storage connector for decentralized storage
 
 ***
 
@@ -357,22 +383,6 @@ The encryption key for the blob storage.
 > `optional` **blobStoragePrefix**: `string`
 
 A prefix for all the blobs in blob-storage, can be empty.
-
-***
-
-### blobFileEnable?
-
-> `optional` **blobFileEnable**: `string`
-
-Enable the file blob storage connector.
-
-***
-
-### blobMemoryEnable?
-
-> `optional` **blobMemoryEnable**: `string`
-
-Enable the memory blob storage connector.
 
 ***
 

@@ -126,19 +126,15 @@ function configureEntityStorage(
 	coreConfig.types ??= {};
 	coreConfig.types.entityStorageConnector ??= [];
 
-	if (
-		(Coerce.boolean(envVars.entityMemoryEnable) ?? false) ||
-		envVars.entityStorageConnectorType === EntityStorageConnectorType.Memory
-	) {
+	const entityStorageConnectorTypes = envVars.entityStorageConnectorType?.split(",") ?? [];
+
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Memory)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.Memory
 		});
 	}
 
-	if (
-		(Coerce.boolean(envVars.entityFileEnable) ?? false) ||
-		envVars.entityStorageConnectorType === EntityStorageConnectorType.File
-	) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.File)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.File,
 			options: {
@@ -148,7 +144,7 @@ function configureEntityStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.awsDynamodbAccessKeyId)) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.AwsDynamoDb)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.AwsDynamoDb,
 			options: {
@@ -163,7 +159,7 @@ function configureEntityStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.azureCosmosdbKey)) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.AzureCosmosDb)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.AzureCosmosDb,
 			options: {
@@ -178,7 +174,7 @@ function configureEntityStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.gcpFirestoreCredentials)) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.GcpFirestoreDb)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.GcpFirestoreDb,
 			options: {
@@ -194,27 +190,28 @@ function configureEntityStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.scylladbHosts)) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.ScyllaDb)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.ScyllaDb,
 			options: {
 				config: {
-					hosts: envVars.scylladbHosts.split(",") ?? "",
+					hosts: envVars.scylladbHosts?.split(",") ?? [],
 					localDataCenter: envVars.scylladbLocalDataCenter ?? "",
-					keyspace: envVars.scylladbKeyspace ?? ""
+					keyspace: envVars.scylladbKeyspace ?? "",
+					port: Coerce.integer(envVars.scylladbPort)
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
 		});
 	}
 
-	if (Is.stringValue(envVars.mySqlHost)) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.MySqlDb)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.MySqlDb,
 			options: {
 				config: {
-					host: envVars.mySqlHost,
-					port: envVars.mySqlPort ?? 3306,
+					host: envVars.mySqlHost ?? "",
+					port: Coerce.integer(envVars.mySqlPort),
 					user: envVars.mySqlUser ?? "",
 					password: envVars.mySqlPassword ?? "",
 					database: envVars.mySqlDatabase ?? ""
@@ -224,29 +221,13 @@ function configureEntityStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.mySqlHost)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.MySqlDb,
-			options: {
-				config: {
-					host: envVars.mySqlHost,
-					port: envVars.mySqlPort ?? 3306,
-					user: envVars.mySqlUser ?? "",
-					password: envVars.mySqlPassword ?? "",
-					database: envVars.mySqlDatabase ?? ""
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (Is.stringValue(envVars.mongoDbHost)) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.MongoDb)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.MongoDb,
 			options: {
 				config: {
-					host: envVars.mongoDbHost,
-					port: envVars.mongoDbPort,
+					host: envVars.mongoDbHost ?? "",
+					port: Coerce.integer(envVars.mongoDbPort),
 					user: envVars.mongoDbUser ?? "",
 					password: envVars.mongoDbPassword ?? "",
 					database: envVars.mongoDbDatabase ?? ""
@@ -256,13 +237,13 @@ function configureEntityStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.postgreSqlHost)) {
+	if (entityStorageConnectorTypes) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.PostgreSql,
 			options: {
 				config: {
-					host: envVars.postgreSqlHost,
-					port: envVars.postgreSqlPort,
+					host: envVars.postgreSqlHost ?? "",
+					port: Coerce.integer(envVars.postgreSqlPort),
 					user: envVars.postgreSqlUser ?? "",
 					password: envVars.postgreSqlPassword ?? "",
 					database: envVars.postgreSqlDatabase ?? ""
@@ -272,11 +253,13 @@ function configureEntityStorage(
 		});
 	}
 
-	const defaultStorageConnector = envVars.entityStorageConnectorType;
-	if (Is.stringValue(defaultStorageConnector)) {
+	if (Is.arrayValue(entityStorageConnectorTypes)) {
+		const defaultStorageConnectorType =
+			envVars.entityStorageConnectorDefault ?? entityStorageConnectorTypes[0];
 		for (const config of coreConfig.types.entityStorageConnector) {
-			if (config.type === defaultStorageConnector) {
+			if (config.type === defaultStorageConnectorType) {
 				config.isDefault = true;
+				break;
 			}
 		}
 	}
@@ -293,19 +276,15 @@ function configureBlobStorage(
 ): void {
 	coreConfig.types.blobStorageConnector ??= [];
 
-	if (
-		(Coerce.boolean(envVars.blobMemoryEnable) ?? false) ||
-		envVars.blobStorageConnectorType === BlobStorageConnectorType.Memory
-	) {
+	const blobStorageConnectorTypes = envVars.blobStorageConnectorType?.split(",") ?? [];
+
+	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.Memory)) {
 		coreConfig.types.blobStorageConnector.push({
 			type: BlobStorageConnectorType.Memory
 		});
 	}
 
-	if (
-		(Coerce.boolean(envVars.blobFileEnable) ?? false) ||
-		envVars.blobStorageConnectorType === BlobStorageConnectorType.File
-	) {
+	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.File)) {
 		coreConfig.types.blobStorageConnector.push({
 			type: BlobStorageConnectorType.File,
 			options: {
@@ -319,19 +298,19 @@ function configureBlobStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.ipfsApiUrl)) {
+	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.Ipfs)) {
 		coreConfig.types.blobStorageConnector.push({
 			type: BlobStorageConnectorType.Ipfs,
 			options: {
 				config: {
-					apiUrl: envVars.ipfsApiUrl,
+					apiUrl: envVars.ipfsApiUrl ?? "",
 					bearerToken: envVars.ipfsBearerToken
 				}
 			}
 		});
 	}
 
-	if (Is.stringValue(envVars.awsS3AccessKeyId)) {
+	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.AwsS3)) {
 		coreConfig.types.blobStorageConnector.push({
 			type: BlobStorageConnectorType.AwsS3,
 			options: {
@@ -347,7 +326,7 @@ function configureBlobStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.azureStorageAccountKey)) {
+	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.AzureStorage)) {
 		coreConfig.types.blobStorageConnector.push({
 			type: BlobStorageConnectorType.AzureStorage,
 			options: {
@@ -362,7 +341,7 @@ function configureBlobStorage(
 		});
 	}
 
-	if (Is.stringValue(envVars.gcpStorageCredentials)) {
+	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.GcpStorage)) {
 		coreConfig.types.blobStorageConnector.push({
 			type: BlobStorageConnectorType.GcpStorage,
 			options: {
@@ -377,11 +356,13 @@ function configureBlobStorage(
 		});
 	}
 
-	const defaultStorageConnectorType = envVars.blobStorageConnectorType;
-	if (Is.stringValue(defaultStorageConnectorType)) {
+	if (Is.arrayValue(blobStorageConnectorTypes)) {
+		const defaultStorageConnectorType =
+			envVars.blobStorageConnectorDefault ?? blobStorageConnectorTypes[0];
 		for (const config of coreConfig.types.blobStorageConnector) {
 			if (config.type === defaultStorageConnectorType) {
 				config.isDefault = true;
+				break;
 			}
 		}
 	}

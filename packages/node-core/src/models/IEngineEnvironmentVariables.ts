@@ -21,24 +21,25 @@ export interface IEngineEnvironmentVariables {
 	stateFilename?: string;
 
 	/**
-	 * The type of the default entity storage: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql.
+	 * The type of the entity storage to create, comma separate for more than one connector.
+	 * values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 	 */
 	entityStorageConnectorType?: string;
+
+	/**
+	 * The default entity storage connector to use, defaults to the first one in the list.
+	 */
+	entityStorageConnectorDefault?: string;
+
+	/**
+	 * Entity storage connector for decentralized storage
+	 */
+	entityStorageConnectorDecentralised?: string;
 
 	/**
 	 * A prefix for all the table in entity-storage, can be empty.
 	 */
 	entityStorageTablePrefix?: string;
-
-	/**
-	 * Enable the file entity storage connector.
-	 */
-	entityFileEnable?: string;
-
-	/**
-	 * Enable the memory entity storage connector.
-	 */
-	entityMemoryEnable?: string;
 
 	/**
 	 * AWS Dynamo DB access key id.
@@ -119,6 +120,11 @@ export interface IEngineEnvironmentVariables {
 	 * ScyllaDB local data center.
 	 */
 	scylladbLocalDataCenter?: string;
+
+	/**
+	 * ScyllaDB port.
+	 */
+	scylladbPort?: string;
 
 	/**
 	 * MySQL host.
@@ -206,9 +212,20 @@ export interface IEngineEnvironmentVariables {
 	ipfsApiUrl?: string;
 
 	/**
-	 * The type of the default blob storage: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
+	 * The type of the entity storage to create, comma separate for more than one connector.
+	 * values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
 	 */
 	blobStorageConnectorType?: string;
+
+	/**
+	 * The default blob storage connector to use, defaults to the first one in the list.
+	 */
+	blobStorageConnectorDefault?: string;
+
+	/**
+	 * Blog storage connector for decentralized storage
+	 */
+	blobStorageConnectorDecentralised?: string;
 
 	/**
 	 * Enable encryption for the blob storage.
@@ -224,16 +241,6 @@ export interface IEngineEnvironmentVariables {
 	 * A prefix for all the blobs in blob-storage, can be empty.
 	 */
 	blobStoragePrefix?: string;
-
-	/**
-	 * Enable the file blob storage connector.
-	 */
-	blobFileEnable?: string;
-
-	/**
-	 * Enable the memory blob storage connector.
-	 */
-	blobMemoryEnable?: string;
 
 	/**
 	 * AWS S3 access key id.

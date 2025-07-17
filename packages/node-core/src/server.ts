@@ -32,9 +32,12 @@ export async function start(
 > {
 	envVars.storageFileRoot ??= "";
 
+	const entityStorageConnectorType = envVars.entityStorageConnectorType?.split(",") ?? [];
+	const blobStorageConnectorType = envVars.blobStorageConnectorType?.split(",") ?? [];
+
 	if (
-		(envVars.entityStorageConnectorType === EntityStorageConnectorType.File ||
-			envVars.blobStorageConnectorType === BlobStorageConnectorType.File ||
+		(entityStorageConnectorType.includes(EntityStorageConnectorType.File) ||
+			blobStorageConnectorType.includes(BlobStorageConnectorType.File) ||
 			Is.empty(nodeOptions?.stateStorage)) &&
 		!Is.stringValue(envVars.storageFileRoot)
 	) {

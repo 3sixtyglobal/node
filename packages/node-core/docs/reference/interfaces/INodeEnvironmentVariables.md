@@ -48,11 +48,36 @@ The name of the state file.
 
 > `optional` **entityStorageConnectorType**: `string`
 
-The type of the default entity storage: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql.
+The type of the entity storage to create, comma separate for more than one connector.
+values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityStorageConnectorType`](IEngineEnvironmentVariables.md#entitystorageconnectortype)
+
+***
+
+### entityStorageConnectorDefault?
+
+> `optional` **entityStorageConnectorDefault**: `string`
+
+The default entity storage connector to use, defaults to the first one in the list.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityStorageConnectorDefault`](IEngineEnvironmentVariables.md#entitystorageconnectordefault)
+
+***
+
+### entityStorageConnectorDecentralised?
+
+> `optional` **entityStorageConnectorDecentralised**: `string`
+
+Entity storage connector for decentralized storage
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityStorageConnectorDecentralised`](IEngineEnvironmentVariables.md#entitystorageconnectordecentralised)
 
 ***
 
@@ -65,30 +90,6 @@ A prefix for all the table in entity-storage, can be empty.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityStorageTablePrefix`](IEngineEnvironmentVariables.md#entitystoragetableprefix)
-
-***
-
-### entityFileEnable?
-
-> `optional` **entityFileEnable**: `string`
-
-Enable the file entity storage connector.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityFileEnable`](IEngineEnvironmentVariables.md#entityfileenable)
-
-***
-
-### entityMemoryEnable?
-
-> `optional` **entityMemoryEnable**: `string`
-
-Enable the memory entity storage connector.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityMemoryEnable`](IEngineEnvironmentVariables.md#entitymemoryenable)
 
 ***
 
@@ -281,6 +282,18 @@ ScyllaDB local data center.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`scylladbLocalDataCenter`](IEngineEnvironmentVariables.md#scylladblocaldatacenter)
+
+***
+
+### scylladbPort?
+
+> `optional` **scylladbPort**: `string`
+
+ScyllaDB port.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`scylladbPort`](IEngineEnvironmentVariables.md#scylladbport)
 
 ***
 
@@ -492,11 +505,36 @@ The url for accessing IPFS API.
 
 > `optional` **blobStorageConnectorType**: `string`
 
-The type of the default blob storage: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
+The type of the entity storage to create, comma separate for more than one connector.
+values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
 
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobStorageConnectorType`](IEngineEnvironmentVariables.md#blobstorageconnectortype)
+
+***
+
+### blobStorageConnectorDefault?
+
+> `optional` **blobStorageConnectorDefault**: `string`
+
+The default blob storage connector to use, defaults to the first one in the list.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobStorageConnectorDefault`](IEngineEnvironmentVariables.md#blobstorageconnectordefault)
+
+***
+
+### blobStorageConnectorDecentralised?
+
+> `optional` **blobStorageConnectorDecentralised**: `string`
+
+Blog storage connector for decentralized storage
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobStorageConnectorDecentralised`](IEngineEnvironmentVariables.md#blobstorageconnectordecentralised)
 
 ***
 
@@ -533,30 +571,6 @@ A prefix for all the blobs in blob-storage, can be empty.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobStoragePrefix`](IEngineEnvironmentVariables.md#blobstorageprefix)
-
-***
-
-### blobFileEnable?
-
-> `optional` **blobFileEnable**: `string`
-
-Enable the file blob storage connector.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobFileEnable`](IEngineEnvironmentVariables.md#blobfileenable)
-
-***
-
-### blobMemoryEnable?
-
-> `optional` **blobMemoryEnable**: `string`
-
-Enable the memory blob storage connector.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobMemoryEnable`](IEngineEnvironmentVariables.md#blobmemoryenable)
 
 ***
 
