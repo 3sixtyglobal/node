@@ -1,5 +1,5 @@
 {
-	"openapi": "3.1.0",
+	"openapi": "3.1.1",
 	"info": {
 		"title": "TWIN TWIN Node Server",
 		"description": "REST API for TWIN - API Server.",
@@ -12256,7 +12256,7 @@
 															"@context": [
 																"https://www.w3.org/ns/odrl/2/",
 																{
-																	"twin": "https://schema.twindev.org/odrl/",
+																	"twin": "https://schema.twindev.org/w3c-odrl/",
 																	"jsonPathSelector": "twin:jsonPathSelector"
 																}
 															],
@@ -12411,7 +12411,7 @@
 													"@context": [
 														"https://www.w3.org/ns/odrl/2/",
 														{
-															"twin": "https://schema.twindev.org/odrl/",
+															"twin": "https://schema.twindev.org/w3c-odrl/",
 															"jsonPathSelector": "twin:jsonPathSelector"
 														}
 													],
@@ -13212,6 +13212,7 @@
 					},
 					"aliases": {
 						"type": "array",
+						"items": false,
 						"description": "Alternative aliases that can be used to identify the vertex.",
 						"prefixItems": [
 							{
@@ -13236,6 +13237,7 @@
 					},
 					"resources": {
 						"type": "array",
+						"items": false,
 						"description": "The resources attached to the vertex.",
 						"prefixItems": [
 							{
@@ -13254,6 +13256,7 @@
 					},
 					"edges": {
 						"type": "array",
+						"items": false,
 						"description": "The edges connected to the vertex.",
 						"prefixItems": [
 							{
@@ -13292,6 +13295,7 @@
 					},
 					"aliases": {
 						"type": "array",
+						"items": false,
 						"description": "Alternative aliases that can be used to identify the vertex.",
 						"prefixItems": [
 							{
@@ -13316,6 +13320,7 @@
 					},
 					"resources": {
 						"type": "array",
+						"items": false,
 						"description": "The resources attached to the vertex.",
 						"prefixItems": [
 							{
@@ -13334,6 +13339,7 @@
 					},
 					"edges": {
 						"type": "array",
+						"items": false,
 						"description": "The edges connected to the vertex.",
 						"prefixItems": [
 							{
@@ -13385,6 +13391,7 @@
 					},
 					"entries": {
 						"type": "array",
+						"items": false,
 						"description": "The entries for the stream.",
 						"prefixItems": [
 							{
@@ -13557,6 +13564,7 @@
 				"properties": {
 					"conflicts": {
 						"type": "array",
+						"items": false,
 						"description": "The conflicting items.",
 						"prefixItems": [
 							{
@@ -13652,6 +13660,7 @@
 				"properties": {
 					"entities": {
 						"type": "array",
+						"items": false,
 						"description": "The entities, which can be partial if a limited keys list was provided.",
 						"prefixItems": [
 							{
@@ -13679,6 +13688,7 @@
 					},
 					"rules": {
 						"type": "array",
+						"items": false,
 						"description": "The rules.",
 						"prefixItems": [
 							{
@@ -13717,6 +13727,7 @@
 					},
 					"auditableItemGraphEdges": {
 						"type": "array",
+						"items": false,
 						"description": "The auditable item graph vertices to connect the document to.",
 						"prefixItems": [
 							{
@@ -13771,6 +13782,7 @@
 					},
 					"auditableItemGraphEdges": {
 						"type": "array",
+						"items": false,
 						"description": "The auditable item graph vertices to connect the document to.",
 						"prefixItems": [
 							{
@@ -13840,6 +13852,7 @@
 					},
 					"components": {
 						"type": "array",
+						"items": false,
 						"description": "The status of the components.",
 						"prefixItems": [
 							{
@@ -13941,6 +13954,7 @@
 				"properties": {
 					"items": {
 						"type": "array",
+						"items": false,
 						"description": "The identities.",
 						"prefixItems": [
 							{
@@ -14046,6 +14060,7 @@
 							},
 							{
 								"type": "array",
+								"items": false,
 								"prefixItems": [
 									{
 										"type": "string"
@@ -14062,6 +14077,7 @@
 							},
 							{
 								"type": "array",
+								"items": false,
 								"prefixItems": [
 									{
 										"type": "string"
@@ -14153,6 +14169,7 @@
 							},
 							{
 								"type": "array",
+								"items": false,
 								"prefixItems": [
 									{
 										"type": "string"
@@ -14164,6 +14181,7 @@
 					},
 					"verifiableCredentials": {
 						"type": "array",
+						"items": false,
 						"description": "The verifiable credentials to include in the presentation.",
 						"prefixItems": [
 							{
@@ -14219,6 +14237,7 @@
 					},
 					"issuers": {
 						"type": "array",
+						"items": false,
 						"description": "The issuers of the presentation.",
 						"prefixItems": [
 							{
@@ -14314,6 +14333,7 @@
 				"properties": {
 					"entities": {
 						"type": "array",
+						"items": false,
 						"description": "The entities, which can be partial if a limited keys list was provided.",
 						"prefixItems": [
 							{
@@ -14571,6 +14591,7 @@
 					},
 					"rules": {
 						"type": "array",
+						"items": false,
 						"description": "The rules.",
 						"prefixItems": [
 							{
@@ -14677,6 +14698,7 @@
 				"properties": {
 					"entities": {
 						"type": "array",
+						"items": false,
 						"description": "The metrics.",
 						"prefixItems": [
 							{
@@ -14785,6 +14807,7 @@
 					},
 					"entities": {
 						"type": "array",
+						"items": false,
 						"description": "The metric values.",
 						"prefixItems": [
 							{
@@ -18049,6 +18072,7 @@
 					},
 					"allowList": {
 						"type": "array",
+						"items": false,
 						"description": "The list of identities that are allowed to modify the item.",
 						"prefixItems": [
 							{
@@ -18119,6 +18143,7 @@
 					},
 					"allowList": {
 						"type": "array",
+						"items": false,
 						"description": "The list of identities that are allowed to modify the item.",
 						"prefixItems": [
 							{
@@ -18142,6 +18167,7 @@
 					},
 					"allowList": {
 						"type": "array",
+						"items": false,
 						"description": "An updated list of identities that are allowed to modify the item, send an empty list to remove all entries.",
 						"prefixItems": [
 							{
