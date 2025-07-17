@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.2](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.1...node-core-v0.0.2-next.2) (2025-07-17)
+
+
+### Features
+
+* support multiple entity and blob storage connectors ([a489f79](https://github.com/twinfoundation/node/commit/a489f7907544aef5708d5111e9f72985e1377bae))
+
 ## [0.0.2-next.1](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.0...node-core-v0.0.2-next.1) (2025-07-15)
 
 
