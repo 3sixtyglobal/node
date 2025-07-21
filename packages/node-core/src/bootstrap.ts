@@ -206,7 +206,7 @@ async function finaliseWallet(
 
 	// If we are using entity storage for wallet the identity associated with the
 	// address will be wrong, so fix it
-	if (engineDefaultTypes.walletConnector === "entity-storage") {
+	if (engineDefaultTypes.walletConnector === WalletConnectorType.EntityStorage) {
 		const walletAddress = EntityStorageConnectorFactory.get<IEntityStorageConnector<WalletAddress>>(
 			StringHelper.kebabCase(nameof<WalletAddress>())
 		);
@@ -296,7 +296,7 @@ export async function bootstrapNodeUser(
 	if (features.includes(NodeFeatures.NodeUser)) {
 		const engineDefaultTypes = engineCore.getDefaultTypes();
 		if (
-			engineDefaultTypes.authenticationComponent === "authentication-entity-storage" &&
+			engineDefaultTypes.authenticationComponent === "entity-storage-authentication-service" &&
 			Is.stringValue(context.state.nodeIdentity)
 		) {
 			const authUserEntityStorage = EntityStorageConnectorFactory.get<
@@ -575,7 +575,7 @@ export async function bootstrapAuth(
 ): Promise<void> {
 	const engineDefaultTypes = engineCore.getDefaultTypes();
 	if (
-		engineDefaultTypes.authenticationComponent === "authentication-entity-storage" &&
+		engineDefaultTypes.authenticationComponent === "entity-storage-authentication-service" &&
 		Is.stringValue(context.state.nodeIdentity)
 	) {
 		// Create a new JWT signing key and a user login for the node

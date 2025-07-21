@@ -71,7 +71,7 @@ describe("node-core", () => {
 			version: "0.0.0"
 		});
 
-		expect(ComponentFactory.names()).toEqual(["logging", "information"]);
+		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -133,27 +133,27 @@ describe("node-core", () => {
 		});
 
 		expect(ComponentFactory.names()).toEqual([
-			"logging",
-			"task-scheduler",
-			"telemetry",
-			"blob",
-			"verifiable",
-			"identity",
-			"identity-resolver",
-			"identity-profile",
-			"nft",
-			"immutable-proof",
-			"attestation",
-			"aig",
-			"ais",
-			"data-processing",
-			"documents",
-			"fedcat",
-			"pap",
-			"rights-management",
-			"authentication-admin-entity-storage",
-			"authentication-entity-storage",
-			"information"
+			"logging-service",
+			"task-scheduler-service",
+			"telemetry-service",
+			"blob-storage-service",
+			"verifiable-storage-service",
+			"identity-service",
+			"identity-resolver-service",
+			"identity-profile-service",
+			"nft-service",
+			"immutable-proof-service",
+			"attestation-service",
+			"auditable-item-graph-service",
+			"auditable-item-stream-service",
+			"data-processing-service",
+			"document-management-service",
+			"federated-catalogue-service",
+			"policy-administration-point-service",
+			"rights-management-service",
+			"entity-storage-authentication-admin-service",
+			"entity-storage-authentication-service",
+			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -478,7 +478,7 @@ describe("node-core", () => {
 		expect(extendEngineCalled).toBe(true);
 		expect(extendEngineServerCalled).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["logging", "information"]);
+		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -530,7 +530,7 @@ describe("node-core", () => {
 
 		expect(engineServerConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["logging", "information"]);
+		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -580,7 +580,11 @@ describe("node-core", () => {
 
 		expect(engineServerConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["logging", "task-scheduler", "information"]);
+		expect(ComponentFactory.names()).toEqual([
+			"logging-service",
+			"task-scheduler-service",
+			"information-service"
+		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([

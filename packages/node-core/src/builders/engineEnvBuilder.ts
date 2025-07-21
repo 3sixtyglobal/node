@@ -1003,7 +1003,7 @@ function configureTaskScheduler(
 	if (Coerce.boolean(envVars.taskSchedulerEnabled) ?? true) {
 		coreConfig.types.taskSchedulerComponent ??= [];
 		coreConfig.types.taskSchedulerComponent.push({
-			type: TaskSchedulerComponentType.Default
+			type: TaskSchedulerComponentType.Service
 		});
 	}
 }
