@@ -104,6 +104,7 @@
 		"IEndpoint": "https://schema.twindev.org/gaia-x/Endpoint",
 		"IParticipant": "https://schema.twindev.org/gaia-x/Participant",
 		"IRegistrationNumber": "https://schema.twindev.org/gaia-x/RegistrationNumber",
-		"IServiceOffering": "https://schema.twindev.org/gaia-x/ServiceOffering"
+		"IServiceOffering": "https://schema.twindev.org/gaia-x/ServiceOffering",
+		"Unece(.*)": "https://schema.twindev.org/unece/Unece$1"
 	}
 }
