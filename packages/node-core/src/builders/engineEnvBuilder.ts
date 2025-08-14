@@ -39,6 +39,7 @@ import {
 	NftConnectorType,
 	RightsManagementComponentType,
 	RightsManagementPapComponentType,
+	SynchronisedStorageComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
@@ -64,7 +65,9 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	envVars.attestationVerificationMethodId ??= "attestation-assertion";
 	envVars.immutableProofVerificationMethodId ??= "immutable-proof-assertion";
 	envVars.blobStorageEnableEncryption ??= "false";
-	envVars.blobStorageEncryptionKey ??= "blob-encryption";
+	envVars.blobStorageEncryptionKeyId ??= "blob-encryption";
+	envVars.synchronisedStorageBlobStorageEncryptionKeyId ??= "synchronised-storage-blob-encryption";
+	envVars.synchronisedStorageVerificationMethodId ??= "synchronised-storage-assertion";
 
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
@@ -95,9 +98,10 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	configureAuditableItemGraph(coreConfig, envVars);
 	configureAuditableItemStream(coreConfig, envVars);
 	configureDocumentManagement(coreConfig, envVars);
-	configureFederatedCatalogue(coreConfig, envVars);
 	configureRightsManagement(coreConfig, envVars);
 	configureTaskScheduler(coreConfig, envVars);
+	configureSynchronisedStorage(coreConfig, envVars);
+	configureFederatedCatalogue(coreConfig, envVars);
 
 	return coreConfig;
 }
@@ -237,7 +241,7 @@ function configureEntityStorage(
 		});
 	}
 
-	if (entityStorageConnectorTypes) {
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.PostgreSql)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.PostgreSql,
 			options: {
@@ -253,11 +257,22 @@ function configureEntityStorage(
 		});
 	}
 
+	const defaultEntityStorageConnectorType =
+		envVars.entityStorageConnectorDefault ?? entityStorageConnectorTypes[0];
+
+	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Synchronised)) {
+		// For synchronised storage we use the default connector as the one we wrap for real DB operations
+		coreConfig.types.entityStorageConnector.push({
+			type: EntityStorageConnectorType.Synchronised,
+			options: {
+				entityStorageConnectorType: defaultEntityStorageConnectorType
+			}
+		});
+	}
+
 	if (Is.arrayValue(entityStorageConnectorTypes)) {
-		const defaultStorageConnectorType =
-			envVars.entityStorageConnectorDefault ?? entityStorageConnectorTypes[0];
 		for (const config of coreConfig.types.entityStorageConnector) {
-			if (config.type === defaultStorageConnectorType) {
+			if (config.type === defaultEntityStorageConnectorType) {
 				config.isDefault = true;
 				break;
 			}
@@ -362,6 +377,15 @@ function configureBlobStorage(
 		for (const config of coreConfig.types.blobStorageConnector) {
 			if (config.type === defaultStorageConnectorType) {
 				config.isDefault = true;
+			}
+			// If this blob storage connector is the one to use for public access
+			// then add it as a feature
+			if (
+				Is.stringValue(envVars.blobStorageConnectorPublic) &&
+				config.type === envVars.blobStorageConnectorPublic
+			) {
+				config.features ??= [];
+				config.features.push("public");
 				break;
 			}
 		}
@@ -375,7 +399,7 @@ function configureBlobStorage(
 				config: {
 					vaultKeyId:
 						(envVars.blobStorageEnableEncryption ?? false)
-							? envVars.blobStorageEncryptionKey
+							? envVars.blobStorageEncryptionKeyId
 							: undefined
 				}
 			}
@@ -946,30 +970,6 @@ function configureDocumentManagement(
 }
 
 /**
- * Configures the federated catalogue.
- * @param coreConfig The core config.
- * @param envVars The environment variables.
- */
-function configureFederatedCatalogue(
-	coreConfig: IEngineConfig,
-	envVars: IEngineEnvironmentVariables
-): void {
-	if (Is.arrayValue(coreConfig.types.identityResolverComponent)) {
-		coreConfig.types.federatedCatalogueComponent ??= [];
-		coreConfig.types.federatedCatalogueComponent.push({
-			type: FederatedCatalogueComponentType.Service,
-			options: {
-				config: {
-					subResourceCacheTtlMs: Coerce.number(envVars.federatedCatalogueCacheTtlMs),
-					clearingHouseApproverList:
-						Coerce.object<string[]>(envVars.federatedCatalogueClearingHouseApproverList) ?? []
-				}
-			}
-		});
-	}
-}
-
-/**
  * Configures the rights management.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -1000,10 +1000,92 @@ function configureTaskScheduler(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	if (Coerce.boolean(envVars.taskSchedulerEnabled) ?? true) {
+	if (Coerce.boolean(envVars.taskSchedulerEnabled) ?? false) {
 		coreConfig.types.taskSchedulerComponent ??= [];
 		coreConfig.types.taskSchedulerComponent.push({
 			type: TaskSchedulerComponentType.Service
+		});
+	}
+}
+
+/**
+ * Configures the synchronised storage.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+function configureSynchronisedStorage(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): void {
+	if (
+		Is.arrayValue(coreConfig.types.identityResolverComponent) &&
+		(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false)
+	) {
+		// Check if the config provides a custom verifiable storage key id
+		let verifiableStorageKeyId = Coerce.string(envVars.synchronisedStorageVerifiableStorageKeyId);
+
+		if (!Is.stringValue(verifiableStorageKeyId)) {
+			// No custom key so default to the network setting
+			verifiableStorageKeyId = envVars.iotaNetwork;
+		}
+		coreConfig.types.synchronisedStorageComponent ??= [];
+		coreConfig.types.synchronisedStorageComponent.push({
+			type: SynchronisedStorageComponentType.Service,
+			options: {
+				config: {
+					verifiableStorageKeyId: verifiableStorageKeyId ?? "",
+					synchronisedStorageMethodId: envVars.synchronisedStorageVerificationMethodId,
+					blobStorageEncryptionKeyId: envVars.synchronisedStorageBlobStorageEncryptionKeyId,
+					entityUpdateIntervalMinutes: Coerce.number(
+						envVars.synchronisedStorageEntityUpdateIntervalMinutes
+					),
+					consolidationIntervalMinutes: Coerce.number(
+						envVars.synchronisedStorageConsolidationIntervalMinutes
+					),
+					consolidationBatchSize: Coerce.number(envVars.synchronisedStorageConsolidationBatchSize),
+					maxConsolidations: Coerce.number(envVars.synchronisedStorageMaxConsolidations)
+				}
+			}
+		});
+
+		// If there is a trusted url set, we need to add a client
+		// and give it a feature of trusted so that when the synchronised
+		// storage is created it can pickup the correct component
+		if (Is.stringValue(envVars.synchronisedStorageTrustedUrl)) {
+			coreConfig.types.synchronisedStorageComponent.push({
+				type: SynchronisedStorageComponentType.RestClient,
+				options: {
+					endpoint: envVars.synchronisedStorageTrustedUrl
+				},
+				features: ["trusted"]
+			});
+		}
+	}
+}
+
+/**
+ * Configures the federated catalogue.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+function configureFederatedCatalogue(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): void {
+	if (
+		Is.arrayValue(coreConfig.types.identityResolverComponent) &&
+		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false)
+	) {
+		coreConfig.types.federatedCatalogueComponent ??= [];
+		coreConfig.types.federatedCatalogueComponent.push({
+			type: FederatedCatalogueComponentType.Service,
+			options: {
+				config: {
+					subResourceCacheTtlMs: Coerce.number(envVars.federatedCatalogueCacheTtlMs),
+					clearingHouseApproverList:
+						Coerce.object<string[]>(envVars.federatedCatalogueClearingHouseApproverList) ?? []
+				}
+			}
 		});
 	}
 }

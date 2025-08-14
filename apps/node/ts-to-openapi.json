@@ -64,6 +64,9 @@
 			"package": "@twin.org/document-management-service"
 		},
 		{
+			"package": "@twin.org/synchronised-storage-service"
+		},
+		{
 			"package": "@twin.org/federated-catalogue-service"
 		}
 	],

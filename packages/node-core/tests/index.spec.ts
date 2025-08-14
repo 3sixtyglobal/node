@@ -12,6 +12,8 @@ import {
 	BackgroundTaskConnectorType,
 	BlobStorageConnectorType,
 	EntityStorageConnectorType,
+	EventBusComponentType,
+	EventBusConnectorType,
 	FaucetConnectorType,
 	IdentityConnectorType,
 	IdentityProfileConnectorType,
@@ -42,9 +44,7 @@ describe("node-core", () => {
 
 	test("Can start and bootstrap the server with minimal config in memory", async () => {
 		const envVars: { [id: string]: string } = {
-			TWIN_NODE_DEBUG: "true",
-			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_NODE_TASK_SCHEDULER_ENABLED: "false"
+			TWIN_NODE_DEBUG: "true"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -88,8 +88,10 @@ describe("node-core", () => {
 
 	test("Can start and bootstrap the server in memory", async () => {
 		const envVars: { [id: string]: string } = {
+			TWIN_NODE_DEBUG: "true",
 			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_NODE_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
+			TWIN_NODE_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
 			TWIN_NODE_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_NODE_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
 			TWIN_NODE_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
@@ -102,13 +104,19 @@ describe("node-core", () => {
 			TWIN_NODE_ATTESTATION_CONNECTOR: AttestationConnectorType.Nft,
 			TWIN_NODE_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
 			TWIN_NODE_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
+			TWIN_NODE_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
+			TWIN_NODE_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
 			TWIN_NODE_DATA_CONVERTER_CONNECTORS: "json,xml",
 			TWIN_NODE_DATA_EXTRACTOR_CONNECTORS: "json-path",
 			TWIN_NODE_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_NODE_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_NODE_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_NODE_FEATURES: "node-identity,node-user",
-			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true"
+			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
+			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
+			TWIN_NODE_FEDERATED_CATALOGUE_ENABLED: "true",
+			TWIN_NODE_SYNCHRONISED_STORAGE_ENABLED: "true",
+			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -135,6 +143,7 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"logging-service",
 			"task-scheduler-service",
+			"event-bus-service",
 			"telemetry-service",
 			"blob-storage-service",
 			"verifiable-storage-service",
@@ -148,9 +157,10 @@ describe("node-core", () => {
 			"auditable-item-stream-service",
 			"data-processing-service",
 			"document-management-service",
-			"federated-catalogue-service",
 			"policy-administration-point-service",
 			"rights-management-service",
+			"synchronised-storage-service",
+			"federated-catalogue-service",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
 			"information-service"
@@ -245,6 +255,13 @@ describe("node-core", () => {
 			"/documents/:auditableItemGraphDocumentId/:revision",
 			"/documents/:auditableItemGraphDocumentId/:revision",
 			"/documents",
+			"/rights-management/pap",
+			"/rights-management/pap/:id",
+			"/rights-management/pap/:id",
+			"/rights-management/pap/:id",
+			"/rights-management/pap/query",
+			"/synchronised-storage/sync-changeset",
+			"/synchronised-storage/decryption-key",
 			"/federated-catalogue/participant-credentials",
 			"/federated-catalogue/service-offering-credentials",
 			"/federated-catalogue/data-resource-credentials",
@@ -256,12 +273,7 @@ describe("node-core", () => {
 			"/federated-catalogue/data-resources",
 			"/federated-catalogue/data-resources/:id",
 			"/federated-catalogue/data-space-connectors",
-			"/federated-catalogue/data-space-connectors/:id",
-			"/rights-management/pap",
-			"/rights-management/pap/:id",
-			"/rights-management/pap/:id",
-			"/rights-management/pap/:id",
-			"/rights-management/pap/query"
+			"/federated-catalogue/data-space-connectors/:id"
 		]);
 
 		if (startResult?.engine) {
@@ -275,7 +287,7 @@ describe("node-core", () => {
 
 			expect(identityDocumentStore.length).toEqual(1);
 			expect(identityDocumentStore[0].id).toEqual(memory?.nodeIdentity);
-			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(2);
+			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(3);
 
 			const vaultSecretStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
@@ -288,13 +300,16 @@ describe("node-core", () => {
 			const vaultKeyStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultKey>>("vault-key");
 			const keyStore = vaultKeyStorage.getStore();
-			expect(keyStore.length).toEqual(5);
+			expect(keyStore.length).toEqual(6);
 
 			expect(keyStore[0].id).toEqual(`${identityDocumentStore[0].id}/did`);
 			expect(keyStore[1].id).toEqual(`${identityDocumentStore[0].id}/auth-signing`);
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
+			expect(keyStore[5].id).toEqual(
+				`${identityDocumentStore[0].id}/synchronised-storage-assertion`
+			);
 
 			const authenticationUserEntityStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AuthenticationUser>>(
@@ -580,11 +595,7 @@ describe("node-core", () => {
 
 		expect(engineServerConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual([
-			"logging-service",
-			"task-scheduler-service",
-			"information-service"
-		]);
+		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([

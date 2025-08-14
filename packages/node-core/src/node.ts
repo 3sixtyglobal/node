@@ -109,7 +109,8 @@ export async function buildConfiguration(
 
 	if (Is.arrayValue(options?.envFilenames)) {
 		const output = dotenv.config({
-			path: options?.envFilenames
+			path: options?.envFilenames,
+			quiet: true
 		});
 
 		// We don't want to throw an error if the default environment file is not found.

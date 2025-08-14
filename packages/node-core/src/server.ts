@@ -30,11 +30,11 @@ export async function start(
 	  }
 	| undefined
 > {
-	envVars.storageFileRoot ??= "";
-
 	const entityStorageConnectorType = envVars.entityStorageConnectorType?.split(",") ?? [];
 	const blobStorageConnectorType = envVars.blobStorageConnectorType?.split(",") ?? [];
 
+	// If the blob storage or entity storage is configured with file connectors
+	// then we need to make sure the storageFileRoot is set
 	if (
 		(entityStorageConnectorType.includes(EntityStorageConnectorType.File) ||
 			blobStorageConnectorType.includes(BlobStorageConnectorType.File) ||
@@ -46,7 +46,7 @@ export async function start(
 		});
 	}
 
-	// Create the engine instance using file state storage and custom bootstrap.
+	// Create the engine instance using file state storage unless one is configured in options
 	const engine = new Engine<IEngineServerConfig, IEngineState>({
 		config: engineServerConfig,
 		stateStorage: nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""),

@@ -4,7 +4,10 @@ import { PasswordHelper, type AuthenticationUser } from "@twin.org/api-auth-enti
 import { Coerce, Converter, I18n, Is, RandomHelper, StringHelper, Urn } from "@twin.org/core";
 import { Bip39, PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore, IEngineCoreContext, IEngineState } from "@twin.org/engine-models";
-import type { IEngineServerConfig } from "@twin.org/engine-server-types";
+import {
+	AuthenticationComponentType,
+	type IEngineServerConfig
+} from "@twin.org/engine-server-types";
 import { IdentityConnectorType, WalletConnectorType } from "@twin.org/engine-types";
 import {
 	EntityStorageConnectorFactory,
@@ -44,8 +47,22 @@ export async function bootstrap(
 	await bootstrapNodeUser(engineCore, context, envVars, features);
 	await bootstrapAuth(engineCore, context, envVars, features);
 	await bootstrapBlobEncryption(engineCore, context, envVars, features);
-	await bootstrapAttestationMethod(engineCore, context, envVars, features);
-	await bootstrapImmutableProofMethod(engineCore, context, envVars, features);
+
+	await addVerificationMethod(
+		engineCore,
+		context,
+		"attestation",
+		envVars.attestationVerificationMethodId
+	);
+
+	await addVerificationMethod(
+		engineCore,
+		context,
+		"immutable proof",
+		envVars.immutableProofVerificationMethodId
+	);
+
+	await bootstrapSynchronisedStorage(engineCore, context, envVars, features);
 }
 
 /**
@@ -66,34 +83,32 @@ export async function bootstrapNodeIdentity(
 		// But we have a chicken and egg problem in that we can't create the identity
 		// to store the mnemonic in the vault without an identity. We use a temporary identity
 		// and then replace it with the new identity later in the process.
-		const engineDefaultTypes = engineCore.getDefaultTypes();
-		if (!Is.empty(engineDefaultTypes.vaultConnector)) {
-			const vaultConnector = VaultConnectorFactory.get(engineDefaultTypes.vaultConnector);
+		const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
+		const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
-			const workingIdentity =
-				envVars.identity ??
-				context.state.nodeIdentity ??
-				`bootstrap-temp-${Converter.bytesToHex(RandomHelper.generate(16))}`;
+		const workingIdentity =
+			envVars.identity ??
+			context.state.nodeIdentity ??
+			`bootstrap-temp-${Converter.bytesToHex(RandomHelper.generate(16))}`;
 
-			await bootstrapMnemonic(engineCore, envVars, features, vaultConnector, workingIdentity);
+		await bootstrapMnemonic(engineCore, envVars, features, vaultConnector, workingIdentity);
 
-			const addresses = await bootstrapWallet(engineCore, envVars, features, workingIdentity);
+		const addresses = await bootstrapWallet(engineCore, envVars, features, workingIdentity);
 
-			const finalIdentity = await bootstrapIdentity(engineCore, envVars, features, workingIdentity);
+		const finalIdentity = await bootstrapIdentity(engineCore, envVars, features, workingIdentity);
 
-			await finaliseWallet(engineCore, envVars, features, finalIdentity, addresses);
+		await finaliseWallet(engineCore, envVars, features, finalIdentity, addresses);
 
-			await finaliseMnemonic(vaultConnector, workingIdentity, finalIdentity);
+		await finaliseMnemonic(vaultConnector, workingIdentity, finalIdentity);
 
-			context.state.nodeIdentity = finalIdentity;
-			context.stateDirty = true;
+		context.state.nodeIdentity = finalIdentity;
+		context.stateDirty = true;
 
-			engineCore.logInfo(
-				I18n.formatMessage("node.nodeIdentity", {
-					identity: context.state.nodeIdentity
-				})
-			);
-		}
+		engineCore.logInfo(
+			I18n.formatMessage("node.nodeIdentity", {
+				identity: context.state.nodeIdentity
+			})
+		);
 	}
 }
 
@@ -111,16 +126,20 @@ async function bootstrapIdentity(
 	features: NodeFeatures[],
 	nodeIdentity: string
 ): Promise<string> {
-	const engineDefaultTypes = engineCore.getDefaultTypes();
+	const defaultIdentityConnectorType = engineCore.getRegisteredInstanceType("identityConnector");
 
 	// Now create an identity for the node controlled by the address we just funded
-	const identityConnector = IdentityConnectorFactory.get(engineDefaultTypes.identityConnector);
+	const identityConnector = IdentityConnectorFactory.get(defaultIdentityConnectorType);
 
 	let identityDocument;
 
 	try {
+		const defaultIdentityResolverConnectorType = engineCore.getRegisteredInstanceType(
+			"identityResolverConnector"
+		);
+
 		const identityResolverConnector = IdentityResolverConnectorFactory.get(
-			engineDefaultTypes.identityResolverConnector
+			defaultIdentityResolverConnectorType
 		);
 		identityDocument = await identityResolverConnector.resolveDocument(nodeIdentity);
 		engineCore.logInfo(I18n.formatMessage("node.existingNodeIdentity", { identity: nodeIdentity }));
@@ -136,7 +155,7 @@ async function bootstrapIdentity(
 		);
 	}
 
-	if (engineDefaultTypes.identityConnector === IdentityConnectorType.Iota) {
+	if (defaultIdentityConnectorType.startsWith(IdentityConnectorType.Iota)) {
 		const didUrn = Urn.fromValidString(identityDocument.id);
 		const didParts = didUrn.parts();
 		const objectId = didParts[3];
@@ -164,27 +183,30 @@ async function bootstrapWallet(
 	features: NodeFeatures[],
 	nodeIdentity: string
 ): Promise<string[]> {
-	const engineDefaultTypes = engineCore.getDefaultTypes();
+	if (features.includes(NodeFeatures.NodeWallet)) {
+		const defaultWalletConnectorType = engineCore.getRegisteredInstanceType("walletConnector");
 
-	const walletConnector = WalletConnectorFactory.get(engineDefaultTypes.walletConnector);
-	const addresses = await walletConnector.getAddresses(nodeIdentity, 0, 0, 5);
+		const walletConnector = WalletConnectorFactory.get(defaultWalletConnectorType);
+		const addresses = await walletConnector.getAddresses(nodeIdentity, 0, 0, 5);
 
-	const balance = await walletConnector.getBalance(nodeIdentity, addresses[0]);
-	if (balance === 0n) {
-		let address0 = addresses[0];
+		const balance = await walletConnector.getBalance(nodeIdentity, addresses[0]);
+		if (balance === 0n) {
+			let address0 = addresses[0];
 
-		if (engineDefaultTypes.walletConnector === WalletConnectorType.Iota) {
-			address0 = `${envVars.iotaExplorerEndpoint}address/${address0}?network=${envVars.iotaNetwork}`;
+			if (defaultWalletConnectorType.startsWith(WalletConnectorType.Iota)) {
+				address0 = `${envVars.iotaExplorerEndpoint}address/${address0}?network=${envVars.iotaNetwork}`;
+			}
+
+			engineCore.logInfo(I18n.formatMessage("node.fundingWallet", { address: address0 }));
+
+			// Add some funds to the wallet from the faucet
+			await walletConnector.ensureBalance(nodeIdentity, addresses[0], 1000000000n);
+		} else {
+			engineCore.logInfo(I18n.formatMessage("node.fundedWallet"));
 		}
-
-		engineCore.logInfo(I18n.formatMessage("node.fundingWallet", { address: address0 }));
-
-		// Add some funds to the wallet from the faucet
-		await walletConnector.ensureBalance(nodeIdentity, addresses[0], 1000000000n);
-	} else {
-		engineCore.logInfo(I18n.formatMessage("node.fundedWallet"));
+		return addresses;
 	}
-	return addresses;
+	return [];
 }
 
 /**
@@ -202,18 +224,20 @@ async function finaliseWallet(
 	finalIdentity: string,
 	addresses: string[]
 ): Promise<void> {
-	const engineDefaultTypes = engineCore.getDefaultTypes();
+	if (features.includes(NodeFeatures.NodeWallet)) {
+		const defaultWalletConnectorType = engineCore.getRegisteredInstanceType("walletConnector");
 
-	// If we are using entity storage for wallet the identity associated with the
-	// address will be wrong, so fix it
-	if (engineDefaultTypes.walletConnector === WalletConnectorType.EntityStorage) {
-		const walletAddress = EntityStorageConnectorFactory.get<IEntityStorageConnector<WalletAddress>>(
-			StringHelper.kebabCase(nameof<WalletAddress>())
-		);
-		const addr = await walletAddress.get(addresses[0]);
-		if (!Is.empty(addr)) {
-			addr.identity = finalIdentity;
-			await walletAddress.set(addr);
+		// If we are using entity storage for wallet the identity associated with the
+		// address will be wrong, so fix it
+		if (defaultWalletConnectorType.startsWith(WalletConnectorType.EntityStorage)) {
+			const walletAddress = EntityStorageConnectorFactory.get<
+				IEntityStorageConnector<WalletAddress>
+			>(StringHelper.kebabCase(nameof<WalletAddress>()));
+			const addr = await walletAddress.get(addresses[0]);
+			if (!Is.empty(addr)) {
+				addr.identity = finalIdentity;
+				await walletAddress.set(addr);
+			}
 		}
 	}
 }
@@ -294,9 +318,10 @@ export async function bootstrapNodeUser(
 	features: NodeFeatures[]
 ): Promise<void> {
 	if (features.includes(NodeFeatures.NodeUser)) {
-		const engineDefaultTypes = engineCore.getDefaultTypes();
+		const defaultAuthenticationComponentType =
+			engineCore.getRegisteredInstanceType("authenticationComponent");
 		if (
-			engineDefaultTypes.authenticationComponent === "entity-storage-authentication-service" &&
+			defaultAuthenticationComponentType.startsWith(AuthenticationComponentType.EntityStorage) &&
 			Is.stringValue(context.state.nodeIdentity)
 		) {
 			const authUserEntityStorage = EntityStorageConnectorFactory.get<
@@ -358,8 +383,10 @@ export async function bootstrapNodeUser(
 			}
 
 			// We have create a node user, now we need to create a profile for the user
+			const defaultIdentityConnectorType =
+				engineCore.getRegisteredInstanceType("identityConnector");
 			const identityProfileConnector = IdentityProfileConnectorFactory.get(
-				engineDefaultTypes.identityProfileConnector
+				defaultIdentityConnectorType
 			);
 
 			if (identityProfileConnector) {
@@ -400,67 +427,6 @@ export async function bootstrapNodeUser(
 }
 
 /**
- * Bootstrap the attestation verification methods.
- * @param engineCore The engine core for the node.
- * @param context The context for the node.
- * @param envVars The environment variables for the node.
- * @param features The features that are enabled on the node.
- */
-export async function bootstrapAttestationMethod(
-	engineCore: IEngineCore,
-	context: IEngineCoreContext<IEngineServerConfig, IEngineState>,
-	envVars: INodeEnvironmentVariables,
-	features: NodeFeatures[]
-): Promise<void> {
-	if (
-		Is.stringValue(context.state.nodeIdentity) &&
-		Is.arrayValue(context.config.types.identityConnector) &&
-		Is.stringValue(envVars.attestationVerificationMethodId)
-	) {
-		const engineDefaultTypes = engineCore.getDefaultTypes();
-		const identityConnector = IdentityConnectorFactory.get(engineDefaultTypes.identityConnector);
-
-		const identityResolverConnector = IdentityResolverConnectorFactory.get(
-			engineDefaultTypes.identityResolverConnector
-		);
-
-		const identityDocument = await identityResolverConnector.resolveDocument(
-			context.state.nodeIdentity
-		);
-
-		const fullMethodId = `${identityDocument.id}#${envVars.attestationVerificationMethodId}`;
-
-		let createVm = true;
-		try {
-			DocumentHelper.getVerificationMethod(identityDocument, fullMethodId, "assertionMethod");
-			createVm = false;
-		} catch {}
-
-		if (createVm) {
-			// Add attestation verification method to DID, the correct node context is now in place
-			// so the keys for the verification method will be stored correctly
-			engineCore.logInfo(
-				I18n.formatMessage("node.addingAttestation", {
-					methodId: fullMethodId
-				})
-			);
-			await identityConnector.addVerificationMethod(
-				context.state.nodeIdentity,
-				context.state.nodeIdentity,
-				"assertionMethod",
-				envVars.attestationVerificationMethodId
-			);
-		} else {
-			engineCore.logInfo(
-				I18n.formatMessage("node.existingAttestation", {
-					methodId: fullMethodId
-				})
-			);
-		}
-	}
-}
-
-/**
  * Bootstrap the immutable proof verification methods.
  * @param engineCore The engine core for the node.
  * @param context The context for the node.
@@ -472,54 +438,7 @@ export async function bootstrapImmutableProofMethod(
 	context: IEngineCoreContext<IEngineServerConfig, IEngineState>,
 	envVars: INodeEnvironmentVariables,
 	features: NodeFeatures[]
-): Promise<void> {
-	const engineDefaultTypes = engineCore.getDefaultTypes();
-	if (
-		Is.stringValue(context.state.nodeIdentity) &&
-		Is.arrayValue(context.config.types.identityConnector) &&
-		Is.stringValue(envVars.immutableProofVerificationMethodId)
-	) {
-		const identityConnector = IdentityConnectorFactory.get(engineDefaultTypes.identityConnector);
-
-		const identityResolverConnector = IdentityResolverConnectorFactory.get(
-			engineDefaultTypes.identityResolverConnector
-		);
-
-		const identityDocument = await identityResolverConnector.resolveDocument(
-			context.state.nodeIdentity
-		);
-
-		const fullMethodId = `${identityDocument.id}#${envVars.immutableProofVerificationMethodId}`;
-
-		let createVm = true;
-		try {
-			DocumentHelper.getVerificationMethod(identityDocument, fullMethodId, "assertionMethod");
-			createVm = false;
-		} catch {}
-
-		if (createVm) {
-			// Add AIG verification method to DID, the correct node context is now in place
-			// so the keys for the verification method will be stored correctly
-			engineCore.logInfo(
-				I18n.formatMessage("node.addingImmutableProof", {
-					methodId: fullMethodId
-				})
-			);
-			await identityConnector.addVerificationMethod(
-				context.state.nodeIdentity,
-				context.state.nodeIdentity,
-				"assertionMethod",
-				envVars.immutableProofVerificationMethodId
-			);
-		} else {
-			engineCore.logInfo(
-				I18n.formatMessage("node.existingImmutableProof", {
-					methodId: fullMethodId
-				})
-			);
-		}
-	}
-}
+): Promise<void> {}
 
 /**
  * Bootstrap the keys for blob encryption.
@@ -538,12 +457,11 @@ export async function bootstrapBlobEncryption(
 		(Coerce.boolean(envVars.blobStorageEnableEncryption) ?? false) &&
 		Is.stringValue(context.state.nodeIdentity)
 	) {
-		const engineDefaultTypes = engineCore.getDefaultTypes();
-
 		// Create a new key for encrypting blobs
-		const vaultConnector = VaultConnectorFactory.get(engineDefaultTypes.vaultConnector);
+		const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
+		const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
-		const keyName = `${context.state.nodeIdentity}/${envVars.blobStorageEncryptionKey}`;
+		const keyName = `${context.state.nodeIdentity}/${envVars.blobStorageEncryptionKeyId}`;
 
 		let existingKey;
 
@@ -552,8 +470,23 @@ export async function bootstrapBlobEncryption(
 		} catch {}
 
 		if (Is.empty(existingKey)) {
-			engineCore.logInfo(I18n.formatMessage("node.creatingBlobEncryptionKey", { keyName }));
-			await vaultConnector.createKey(keyName, VaultKeyType.ChaCha20Poly1305);
+			if (Is.stringBase64(envVars.blobStorageSymmetricEncryptionKey)) {
+				engineCore.logInfo(I18n.formatMessage("node.addingBlobEncryptionKey", { keyName }));
+				await vaultConnector.addKey(
+					keyName,
+					VaultKeyType.ChaCha20Poly1305,
+					Converter.base64ToBytes(envVars.blobStorageSymmetricEncryptionKey)
+				);
+			} else {
+				engineCore.logInfo(I18n.formatMessage("node.creatingBlobEncryptionKey", { keyName }));
+				const key = await vaultConnector.createKey(keyName, VaultKeyType.ChaCha20Poly1305);
+				engineCore.logInfo(
+					I18n.formatMessage("node.createdBlobEncryptionKey", {
+						keyName,
+						keyValue: Converter.bytesToBase64(key)
+					})
+				);
+			}
 		} else {
 			engineCore.logInfo(I18n.formatMessage("node.existingBlobEncryptionKey", { keyName }));
 		}
@@ -573,13 +506,16 @@ export async function bootstrapAuth(
 	envVars: INodeEnvironmentVariables,
 	features: NodeFeatures[]
 ): Promise<void> {
-	const engineDefaultTypes = engineCore.getDefaultTypes();
+	const defaultAuthenticationComponentType =
+		engineCore.getRegisteredInstanceTypeOptional("authenticationComponent");
 	if (
-		engineDefaultTypes.authenticationComponent === "entity-storage-authentication-service" &&
+		Is.stringValue(defaultAuthenticationComponentType) &&
+		defaultAuthenticationComponentType.startsWith(AuthenticationComponentType.EntityStorage) &&
 		Is.stringValue(context.state.nodeIdentity)
 	) {
 		// Create a new JWT signing key and a user login for the node
-		const vaultConnector = VaultConnectorFactory.get(engineDefaultTypes.vaultConnector);
+		const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
+		const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
 		const keyName = `${context.state.nodeIdentity}/${envVars.authSigningKeyId}`;
 
@@ -593,6 +529,127 @@ export async function bootstrapAuth(
 			await vaultConnector.createKey(keyName, VaultKeyType.Ed25519);
 		} else {
 			engineCore.logInfo(I18n.formatMessage("node.existingAuthKey", { keyName }));
+		}
+	}
+}
+
+/**
+ * Bootstrap the synchronised storage blob encryption and verification methods.
+ * @param engineCore The engine core for the node.
+ * @param context The context for the node.
+ * @param envVars The environment variables for the node.
+ * @param features The features that are enabled on the node.
+ */
+export async function bootstrapSynchronisedStorage(
+	engineCore: IEngineCore,
+	context: IEngineCoreContext<IEngineServerConfig, IEngineState>,
+	envVars: INodeEnvironmentVariables,
+	features: NodeFeatures[]
+): Promise<void> {
+	if (Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) {
+		// Add the verification method to the identity if it doesn't exist
+		await addVerificationMethod(
+			engineCore,
+			context,
+			"synchronised storage",
+			envVars.synchronisedStorageVerificationMethodId
+		);
+
+		// If this is a trusted node we need to add the blob encryption key pair
+		if (
+			Is.stringValue(envVars.synchronisedStorageBlobStorageEncryptionKeyId) &&
+			Is.stringBase64(envVars.synchronisedStorageBlobStoragePrivateKey) &&
+			Is.stringBase64(envVars.synchronisedStorageBlobStoragePublicKey)
+		) {
+			const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
+			const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
+
+			const keyName = envVars.synchronisedStorageBlobStorageEncryptionKeyId;
+			let existingKey;
+
+			try {
+				existingKey = await vaultConnector.getKey(keyName);
+			} catch {}
+
+			if (Is.empty(existingKey)) {
+				engineCore.logInfo(
+					I18n.formatMessage("node.addingSynchronisedStorageBlobEncryptionKey", { keyName })
+				);
+				await vaultConnector.addKey(
+					keyName,
+					VaultKeyType.Rsa2048,
+					Converter.base64ToBytes(envVars.synchronisedStorageBlobStoragePrivateKey),
+					Converter.base64ToBytes(envVars.synchronisedStorageBlobStoragePublicKey)
+				);
+			} else {
+				engineCore.logInfo(
+					I18n.formatMessage("node.existingSynchronisedStorageBlobEncryptionKey", { keyName })
+				);
+			}
+		}
+	}
+}
+
+/**
+ * Add a verification method if it doesn't exist.
+ * @param engineCore The engine core for the node.
+ * @param context The context for the node.
+ * @param verificationMethodTitle The verification method title.
+ * @param verificationMethodId The verification method ID.
+ */
+async function addVerificationMethod(
+	engineCore: IEngineCore,
+	context: IEngineCoreContext<IEngineServerConfig, IEngineState>,
+	verificationMethodTitle: string,
+	verificationMethodId: string | undefined
+): Promise<void> {
+	if (
+		Is.stringValue(context.state.nodeIdentity) &&
+		Is.arrayValue(context.config.types.identityConnector) &&
+		Is.stringValue(verificationMethodId)
+	) {
+		const defaultIdentityConnectorType = engineCore.getRegisteredInstanceType("identityConnector");
+		const identityConnector = IdentityConnectorFactory.get(defaultIdentityConnectorType);
+
+		const defaultIdentityResolverConnectorType = engineCore.getRegisteredInstanceType(
+			"identityResolverConnector"
+		);
+		const identityResolverConnector = IdentityResolverConnectorFactory.get(
+			defaultIdentityResolverConnectorType
+		);
+
+		const identityDocument = await identityResolverConnector.resolveDocument(
+			context.state.nodeIdentity
+		);
+
+		const fullMethodId = `${identityDocument.id}#${verificationMethodId}`;
+
+		let exists = false;
+		try {
+			DocumentHelper.getVerificationMethod(identityDocument, fullMethodId, "assertionMethod");
+			exists = true;
+		} catch {}
+
+		if (!exists) {
+			engineCore.logInfo(
+				I18n.formatMessage("node.addingVerificationMethod", {
+					title: verificationMethodTitle,
+					methodId: fullMethodId
+				})
+			);
+			await identityConnector.addVerificationMethod(
+				context.state.nodeIdentity,
+				context.state.nodeIdentity,
+				"assertionMethod",
+				verificationMethodId
+			);
+		} else {
+			engineCore.logInfo(
+				I18n.formatMessage("node.existingVerificationMethod", {
+					title: verificationMethodTitle,
+					methodId: fullMethodId
+				})
+			);
 		}
 	}
 }

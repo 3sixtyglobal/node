@@ -14,7 +14,12 @@ export const NodeFeatures = {
 	/**
 	 * NodeUser - generates a user for the node if not provided in config.
 	 */
-	NodeUser: "node-user"
+	NodeUser: "node-user",
+
+	/**
+	 * NodeWallet - generates a wallet for the node and funds it when there is a faucet available.
+	 */
+	NodeWallet: "node-wallet"
 } as const;
 
 /**

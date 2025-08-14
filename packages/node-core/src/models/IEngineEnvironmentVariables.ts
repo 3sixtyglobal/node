@@ -32,11 +32,6 @@ export interface IEngineEnvironmentVariables {
 	entityStorageConnectorDefault?: string;
 
 	/**
-	 * Entity storage connector for decentralized storage
-	 */
-	entityStorageConnectorDecentralised?: string;
-
-	/**
 	 * A prefix for all the table in entity-storage, can be empty.
 	 */
 	entityStorageTablePrefix?: string;
@@ -223,9 +218,9 @@ export interface IEngineEnvironmentVariables {
 	blobStorageConnectorDefault?: string;
 
 	/**
-	 * Blog storage connector for decentralized storage
+	 * Blog storage connector which has public access.
 	 */
-	blobStorageConnectorDecentralised?: string;
+	blobStorageConnectorPublic?: string;
 
 	/**
 	 * Enable encryption for the blob storage.
@@ -233,9 +228,15 @@ export interface IEngineEnvironmentVariables {
 	blobStorageEnableEncryption?: string;
 
 	/**
-	 * The encryption key for the blob storage.
+	 * The id of the encryption key for the blob storage.
 	 */
-	blobStorageEncryptionKey?: string;
+	blobStorageEncryptionKeyId?: string;
+
+	/**
+	 * A symmetric encryption key for the blob storage, should be ChaCha20Poly1305 in base64 format.
+	 * If encryption is enabled but a key is not provided one will be generated.
+	 */
+	blobStorageSymmetricEncryptionKey?: string;
 
 	/**
 	 * A prefix for all the blobs in blob-storage, can be empty.
@@ -473,6 +474,76 @@ export interface IEngineEnvironmentVariables {
 	dataExtractorConnectors?: string;
 
 	/**
+	 * Is the synchronised storage enabled, defaults to false.
+	 */
+	synchronisedStorageEnabled?: string;
+
+	/**
+	 * Url which points to the api for a trusted synchronised storage node, not required if this is a trusted node.
+	 */
+	synchronisedStorageTrustedUrl?: string;
+
+	/**
+	 * The key for the smart contract which contains the verifiable storage pointer store for synchronised storage.
+	 * This only required if using a custom verifiable storage item, otherwise it will default the the network name.
+	 */
+	synchronisedStorageVerifiableStorageKeyId?: string;
+
+	/**
+	 * The identity verification method id to use with synchronised storage for signing/verifying changesets.
+	 * Defaults to synchronised-storage-assertion.
+	 */
+	synchronisedStorageVerificationMethodId?: string;
+
+	/**
+	 * The key from the vault which is used to encrypt the synchronised storage blobs.
+	 * Only required for trusted nodes, as regular nodes will request from the trusted nodes.
+	 * Defaults to synchronised-storage-blob-encryption
+	 */
+	synchronisedStorageBlobStorageEncryptionKeyId?: string;
+
+	/**
+	 * The private key used for blob encryption, should be RSA-2048 DER format encoded as base64.
+	 * Only required for trusted nodes, as regular nodes will not write encrypted data.
+	 */
+	synchronisedStorageBlobStoragePrivateKey?: string;
+
+	/**
+	 * The public key used for blob decryption, should be RSA-2048 DER format encoded as base64.
+	 * Only required for trusted nodes, as regular nodes will request the key from trusted nodes.
+	 */
+	synchronisedStorageBlobStoragePublicKey?: string;
+
+	/**
+	 * How often to check for entity updates in minutes.
+	 * @default 5
+	 */
+	synchronisedStorageEntityUpdateIntervalMinutes?: string;
+
+	/**
+	 * Interval to perform consolidation of changesets, only used if this is a trusted node.
+	 * @default 60
+	 */
+	synchronisedStorageConsolidationIntervalMinutes?: string;
+
+	/**
+	 * The number of entities to process in a single consolidation batch, only used if this is a trusted node.
+	 * @default 1000
+	 */
+	synchronisedStorageConsolidationBatchSize?: string;
+
+	/**
+	 * The maximum number of consolidations to keep in storage, only used if this is a trusted node.
+	 * @default 5
+	 */
+	synchronisedStorageMaxConsolidations?: string;
+
+	/**
+	 * Is the federated catalogue enabled, defaults to false.
+	 */
+	federatedCatalogueEnabled?: string;
+
+	/**
 	 * Federated catalog TTL for the cache.
 	 */
 	federatedCatalogueCacheTtlMs?: number;
@@ -488,7 +559,7 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementEnabled?: string;
 
 	/**
-	 * Is the task scheduler enabled, defaults to true.
+	 * Is the task scheduler enabled, defaults to false.
 	 */
 	taskSchedulerEnabled?: string;
 }
