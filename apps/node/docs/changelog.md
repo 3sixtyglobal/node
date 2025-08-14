@@ -1,5 +1,20 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.4](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.3...node-v0.0.2-next.4) (2025-08-14)
+
+
+### Features
+
+* add synchronised storage config ([e315869](https://github.com/twinfoundation/node/commit/e315869adbffcd7fe5d3ce151dd35f662f6134a9))
+* exclude unece codes from open api spec ([16b72f3](https://github.com/twinfoundation/node/commit/16b72f37af0d5aa107e5007741690a3fc043153a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.3 to 0.0.2-next.4
+
 ## [0.0.2-next.3](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.2...node-v0.0.2-next.3) (2025-07-21)
 
 
