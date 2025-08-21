@@ -1191,29 +1191,16 @@ Defaults to synchronised-storage-blob-encryption
 
 ***
 
-### synchronisedStorageBlobStoragePrivateKey?
+### synchronisedStorageBlobStorageKey?
 
-> `optional` **synchronisedStorageBlobStoragePrivateKey**: `string`
+> `optional` **synchronisedStorageBlobStorageKey**: `string`
 
-The private key used for blob encryption, should be RSA-2048 DER format encoded as base64.
+The key used for blob encryption, should be ChaCha20Poly1305 encoded as base64.
 Only required for trusted nodes, as regular nodes will not write encrypted data.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`synchronisedStorageBlobStoragePrivateKey`](IEngineEnvironmentVariables.md#synchronisedstorageblobstorageprivatekey)
-
-***
-
-### synchronisedStorageBlobStoragePublicKey?
-
-> `optional` **synchronisedStorageBlobStoragePublicKey**: `string`
-
-The public key used for blob decryption, should be RSA-2048 DER format encoded as base64.
-Only required for trusted nodes, as regular nodes will request the key from trusted nodes.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`synchronisedStorageBlobStoragePublicKey`](IEngineEnvironmentVariables.md#synchronisedstorageblobstoragepublickey)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`synchronisedStorageBlobStorageKey`](IEngineEnvironmentVariables.md#synchronisedstorageblobstoragekey)
 
 ***
 

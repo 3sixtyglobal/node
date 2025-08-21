@@ -558,8 +558,7 @@ export async function bootstrapSynchronisedStorage(
 		// If this is a trusted node we need to add the blob encryption key pair
 		if (
 			Is.stringValue(envVars.synchronisedStorageBlobStorageEncryptionKeyId) &&
-			Is.stringBase64(envVars.synchronisedStorageBlobStoragePrivateKey) &&
-			Is.stringBase64(envVars.synchronisedStorageBlobStoragePublicKey)
+			Is.stringBase64(envVars.synchronisedStorageBlobStorageKey)
 		) {
 			const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
 			const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
@@ -577,9 +576,8 @@ export async function bootstrapSynchronisedStorage(
 				);
 				await vaultConnector.addKey(
 					keyName,
-					VaultKeyType.Rsa2048,
-					Converter.base64ToBytes(envVars.synchronisedStorageBlobStoragePrivateKey),
-					Converter.base64ToBytes(envVars.synchronisedStorageBlobStoragePublicKey)
+					VaultKeyType.ChaCha20Poly1305,
+					Converter.base64ToBytes(envVars.synchronisedStorageBlobStorageKey)
 				);
 			} else {
 				engineCore.logInfo(

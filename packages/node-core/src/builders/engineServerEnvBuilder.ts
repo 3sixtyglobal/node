@@ -22,13 +22,15 @@ import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerE
  * @param coreEngineConfig The core engine config.
  * @param serverInfo The server information.
  * @param openApiSpecPath The path to the open api spec.
+ * @param favIconPath The path to the favicon.
  * @returns The the config for the core and the server.
  */
 export function buildEngineServerConfiguration(
 	envVars: IEngineServerEnvironmentVariables,
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
-	openApiSpecPath?: string
+	openApiSpecPath?: string,
+	favIconPath?: string
 ): IEngineServerConfig {
 	envVars.authSigningKeyId ??= "auth-signing";
 
@@ -58,7 +60,8 @@ export function buildEngineServerConfiguration(
 					options: {
 						config: {
 							serverInfo,
-							openApiSpecPath
+							openApiSpecPath,
+							favIconPath
 						}
 					}
 				}

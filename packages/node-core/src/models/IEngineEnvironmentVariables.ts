@@ -503,16 +503,10 @@ export interface IEngineEnvironmentVariables {
 	synchronisedStorageBlobStorageEncryptionKeyId?: string;
 
 	/**
-	 * The private key used for blob encryption, should be RSA-2048 DER format encoded as base64.
+	 * The key used for blob encryption, should be ChaCha20Poly1305 encoded as base64.
 	 * Only required for trusted nodes, as regular nodes will not write encrypted data.
 	 */
-	synchronisedStorageBlobStoragePrivateKey?: string;
-
-	/**
-	 * The public key used for blob decryption, should be RSA-2048 DER format encoded as base64.
-	 * Only required for trusted nodes, as regular nodes will request the key from trusted nodes.
-	 */
-	synchronisedStorageBlobStoragePublicKey?: string;
+	synchronisedStorageBlobStorageKey?: string;
 
 	/**
 	 * How often to check for entity updates in minutes.

@@ -43,12 +43,23 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 
 		if (Is.empty(nodeOptions?.openApiSpecFile)) {
 			const specFile = path.resolve(
-				path.join(nodeOptions.executionDirectory, "docs", "open-api", "spec.json")
+				path.join(nodeOptions.executionDirectory ?? "", "docs", "open-api", "spec.json")
 			);
 			console.info("Default OpenAPI Spec File:", specFile);
 			if (await fileExists(specFile)) {
 				nodeOptions ??= {};
 				nodeOptions.openApiSpecFile = specFile;
+			}
+		}
+
+		if (Is.empty(nodeOptions?.favIconFile)) {
+			const favIconFile = path.resolve(
+				path.join(nodeOptions.executionDirectory ?? "", "static", "favicon.png")
+			);
+			console.info("Default Favicon File:", favIconFile);
+			if (await fileExists(favIconFile)) {
+				nodeOptions ??= {};
+				nodeOptions.favIconFile = favIconFile;
 			}
 		}
 
@@ -153,7 +164,8 @@ export async function buildConfiguration(
 		envVars,
 		coreConfig,
 		serverInfo,
-		options?.openApiSpecFile
+		options?.openApiSpecFile,
+		options?.favIconFile
 	);
 
 	// Merge any custom configuration provided in the options.

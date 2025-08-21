@@ -76,6 +76,7 @@ describe("node-core", () => {
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
 			"/",
+			"/favicon.ico",
 			"/info",
 			"/health",
 			"/spec",
@@ -169,6 +170,7 @@ describe("node-core", () => {
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
 			"/",
+			"/favicon.ico",
 			"/info",
 			"/health",
 			"/spec",
@@ -192,6 +194,7 @@ describe("node-core", () => {
 			"/blob/:id",
 			"/blob",
 			"/identity",
+			"/identity/:identity",
 			"/identity/:identity/verification-method",
 			"/identity/:identity/verification-method/:verificationMethodId",
 			"/identity/:identity/service",
@@ -498,6 +501,7 @@ describe("node-core", () => {
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
 			"/",
+			"/favicon.ico",
 			"/info",
 			"/health",
 			"/spec",
@@ -550,6 +554,7 @@ describe("node-core", () => {
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
 			"/",
+			"/favicon.ico",
 			"/info",
 			"/health",
 			"/spec",
@@ -600,6 +605,7 @@ describe("node-core", () => {
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
 			"/",
+			"/favicon.ico",
 			"/info",
 			"/health",
 			"/spec",

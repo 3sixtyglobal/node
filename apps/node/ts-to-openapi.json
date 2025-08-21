@@ -95,6 +95,7 @@
 		"ParticipantList": "https://schema.twindev.org/federated-catalogue/ParticipantList",
 		"Odrl(.*)": "https://schema.twindev.org/w3c-odrl/Odrl$1",
 		"ActionType": "https://schema.twindev.org/w3c-odrl/ActionType",
+		"UriActionType": "https://schema.twindev.org/w3c-odrl/UriActionType",
 		"ConflictStrategyType": "https://schema.twindev.org/w3c-odrl/ConflictStrategyType",
 		"StatusType": "https://schema.twindev.org/w3c-odrl/StatusType",
 		"PolicyType": "https://schema.twindev.org/w3c-odrl/PolicyType",

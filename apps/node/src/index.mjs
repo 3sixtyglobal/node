@@ -4,5 +4,6 @@ import path from 'node:path';
 import { run } from '@twin.org/node-core';
 
 await run({
-	openApiSpecFile: path.resolve('docs/open-api/spec.json')
+	openApiSpecFile: path.resolve('docs/open-api/spec.json'),
+	favIconFile: path.resolve('static/favicon.ico')
 });

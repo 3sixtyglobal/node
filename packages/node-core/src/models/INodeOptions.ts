@@ -58,6 +58,11 @@ export interface INodeOptions {
 	openApiSpecFile?: string;
 
 	/**
+	 * The path to the favicon, defaults to static/favicon.png.
+	 */
+	favIconFile?: string;
+
+	/**
 	 * Method to extend the engine environment variables with any additional custom configuration.
 	 */
 	extendEnvVars?: (envVars: INodeEnvironmentVariables) => Promise<void>;
