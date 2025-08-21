@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.5](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.4...node-core-v0.0.2-next.5) (2025-08-21)
+
+
+### Features
+
+* update framework core ([8bd769a](https://github.com/twinfoundation/node/commit/8bd769a4451f5f1f6be3f115a5e94eeb05bce7f1))
+
 ## [0.0.2-next.4](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.3...node-core-v0.0.2-next.4) (2025-08-14)
 
 
