@@ -50,8 +50,7 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeIdentity: "bob",
-			componentStates: {}
+			nodeIdentity: "bob"
 		});
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage };
@@ -377,8 +376,7 @@ describe("node-core", () => {
 			const mem = await memoryStateStorage.load(startResult?.engine);
 
 			const memoryStateStorage2 = new MemoryStateStorage(false, {
-				nodeIdentity: mem?.nodeIdentity,
-				componentStates: {}
+				nodeIdentity: mem?.nodeIdentity
 			});
 
 			const startResult2 = await start(
@@ -450,8 +448,7 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeIdentity: "bob",
-			componentStates: {}
+			nodeIdentity: "bob"
 		});
 
 		let extendEnvVarsCalled = false;
@@ -522,8 +519,7 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeIdentity: "bob",
-			componentStates: {}
+			nodeIdentity: "bob"
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -573,8 +569,7 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeIdentity: "bob",
-			componentStates: {}
+			nodeIdentity: "bob"
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -624,8 +619,7 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeIdentity: "bob",
-			componentStates: {}
+			nodeIdentity: "bob"
 		});
 
 		const nodeOptions: INodeOptions = {
