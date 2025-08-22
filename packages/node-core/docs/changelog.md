@@ -1,5 +1,13 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.6](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.5...node-core-v0.0.2-next.6) (2025-08-22)
+
+
+### Features
+
+* add rights management ([78fba62](https://github.com/twinfoundation/node/commit/78fba62f82afdbe615d55dd90eca8ee70ea62fc0))
+* remove unused properties ([d8344b5](https://github.com/twinfoundation/node/commit/d8344b5aee5dc1c8104d75fad5093097f6530168))
+
 ## [0.0.2-next.5](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.4...node-core-v0.0.2-next.5) (2025-08-21)
 
 
