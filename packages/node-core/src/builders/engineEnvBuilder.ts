@@ -39,6 +39,11 @@ import {
 	NftConnectorType,
 	RightsManagementComponentType,
 	RightsManagementPapComponentType,
+	RightsManagementPdpComponentType,
+	RightsManagementPepComponentType,
+	RightsManagementPipComponentType,
+	RightsManagementPmpComponentType,
+	RightsManagementPxpComponentType,
 	SynchronisedStorageComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
@@ -982,6 +987,31 @@ function configureRightsManagement(
 		coreConfig.types.rightsManagementPapComponent ??= [];
 		coreConfig.types.rightsManagementPapComponent.push({
 			type: RightsManagementPapComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementPmpComponent ??= [];
+		coreConfig.types.rightsManagementPmpComponent.push({
+			type: RightsManagementPmpComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementPipComponent ??= [];
+		coreConfig.types.rightsManagementPipComponent.push({
+			type: RightsManagementPipComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementPxpComponent ??= [];
+		coreConfig.types.rightsManagementPxpComponent.push({
+			type: RightsManagementPxpComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementPdpComponent ??= [];
+		coreConfig.types.rightsManagementPdpComponent.push({
+			type: RightsManagementPdpComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementPepComponent ??= [];
+		coreConfig.types.rightsManagementPepComponent.push({
+			type: RightsManagementPepComponentType.Service
 		});
 
 		coreConfig.types.rightsManagementComponent ??= [];
