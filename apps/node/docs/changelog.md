@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.7](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.6...node-v0.0.2-next.7) (2025-08-26)
+
+
+### Features
+
+* add data space connector ([157e8b0](https://github.com/twinfoundation/node/commit/157e8b0a76e3a8a63c1991924f7f963eb83e27ae))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.6 to 0.0.2-next.7
+
 ## [0.0.2-next.6](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.5...node-v0.0.2-next.6) (2025-08-22)
 
 
