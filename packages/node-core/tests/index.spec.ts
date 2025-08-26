@@ -63,7 +63,7 @@ describe("node-core", () => {
 			}
 		];
 
-		await writeFile("./tests/apps/data-space-apps.json", JSON.stringify(appConfig, null, 2));
+		await writeFile("./tests/apps/data-space-apps.json", `${JSON.stringify(appConfig, null, "\t")}\n`);
 	});
 
 	beforeEach(() => {
