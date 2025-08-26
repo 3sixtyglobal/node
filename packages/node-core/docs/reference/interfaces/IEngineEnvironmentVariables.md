@@ -901,3 +901,20 @@ Is the rights management enabled, defaults to false.
 > `optional` **taskSchedulerEnabled**: `string`
 
 Is the task scheduler enabled, defaults to false.
+
+***
+
+### dataSpaceConnectorEnabled?
+
+> `optional` **dataSpaceConnectorEnabled**: `string`
+
+Is the data space connector enabled, defaults to false.
+
+***
+
+### dataSpaceConnectorApps?
+
+> `optional` **dataSpaceConnectorApps**: `string`
+
+The application configuration for the data space connector.
+Use the @json: prefix to specify the path to the JSON configuration file.

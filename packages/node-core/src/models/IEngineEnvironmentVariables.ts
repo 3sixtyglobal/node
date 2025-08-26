@@ -556,4 +556,15 @@ export interface IEngineEnvironmentVariables {
 	 * Is the task scheduler enabled, defaults to false.
 	 */
 	taskSchedulerEnabled?: string;
+
+	/**
+	 * Is the data space connector enabled, defaults to false.
+	 */
+	dataSpaceConnectorEnabled?: string;
+
+	/**
+	 * The application configuration for the data space connector.
+	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 */
+	dataSpaceConnectorApps?: string;
 }

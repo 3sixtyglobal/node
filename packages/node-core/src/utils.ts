@@ -45,12 +45,21 @@ export async function fileExists(filename: string): Promise<boolean> {
 }
 
 /**
+ * Load the text file.
+ * @param filename The filename of the text file to load.
+ * @returns The contents of the text file if it could not be loaded.
+ */
+export async function loadTextFile(filename: string): Promise<string> {
+	return readFile(filename, "utf8");
+}
+
+/**
  * Load the JSON file.
  * @param filename The filename of the JSON file to load.
  * @returns The contents of the JSON file or null if it could not be loaded.
  */
 export async function loadJsonFile<T>(filename: string): Promise<T> {
-	const content = await readFile(filename, "utf8");
+	const content = await loadTextFile(filename);
 	return JSON.parse(content) as T;
 }
 

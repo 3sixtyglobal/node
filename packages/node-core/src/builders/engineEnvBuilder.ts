@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
 import { Coerce, Is } from "@twin.org/core";
+import type { IDataSpaceConnectorAppDescriptor } from "@twin.org/data-space-connector-models";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import {
 	AttestationComponentType,
@@ -14,6 +15,7 @@ import {
 	DataConverterConnectorType,
 	DataExtractorConnectorType,
 	DataProcessingComponentType,
+	DataSpaceConnectorComponentType,
 	DltConfigType,
 	DocumentManagementComponentType,
 	EntityStorageConnectorType,
@@ -107,6 +109,7 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	configureTaskScheduler(coreConfig, envVars);
 	configureSynchronisedStorage(coreConfig, envVars);
 	configureFederatedCatalogue(coreConfig, envVars);
+	configureDataSpaceConnector(coreConfig, envVars);
 
 	return coreConfig;
 }
@@ -1102,10 +1105,7 @@ function configureFederatedCatalogue(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	if (
-		Is.arrayValue(coreConfig.types.identityResolverComponent) &&
-		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false)
-	) {
+	if (Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) {
 		coreConfig.types.federatedCatalogueComponent ??= [];
 		coreConfig.types.federatedCatalogueComponent.push({
 			type: FederatedCatalogueComponentType.Service,
@@ -1114,6 +1114,32 @@ function configureFederatedCatalogue(
 					subResourceCacheTtlMs: Coerce.number(envVars.federatedCatalogueCacheTtlMs),
 					clearingHouseApproverList:
 						Coerce.object<string[]>(envVars.federatedCatalogueClearingHouseApproverList) ?? []
+				}
+			}
+		});
+	}
+}
+
+/**
+ * Configures the data space connector.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+function configureDataSpaceConnector(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): void {
+	if (Coerce.boolean(envVars.dataSpaceConnectorEnabled) ?? false) {
+		coreConfig.types.dataSpaceConnectorComponent ??= [];
+		coreConfig.types.dataSpaceConnectorComponent.push({
+			type: DataSpaceConnectorComponentType.Service,
+			options: {
+				config: {
+					dataSpaceConnectorAppDescriptors: Is.arrayValue<IDataSpaceConnectorAppDescriptor>(
+						envVars.dataSpaceConnectorApps
+					)
+						? envVars.dataSpaceConnectorApps
+						: undefined
 				}
 			}
 		});

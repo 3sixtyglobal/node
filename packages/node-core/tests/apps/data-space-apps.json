@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://twin.example.org/app1",
+    "initialiserName": "appInitialiser",
+    "moduleName": "file://D:\\Workarea\\TWIN\\workspace\\node\\packages\\node-core\\tests\\apps\\test-app.mjs",
+    "activitiesHandled": [
+      {
+        "objectType": "https://vocabulary.uncefact.org/Consignment"
+      },
+      {
+        "activityType": "https://www.w3.org/ns/activitystreams#Add",
+        "objectType": "https://vocabulary.uncefact.org/Document",
+        "targetType": "https://vocabulary.uncefact.org/Consignment"
+      }
+    ]
+  }
+]

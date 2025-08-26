@@ -68,6 +68,9 @@
 		},
 		{
 			"package": "@twin.org/federated-catalogue-service"
+		},
+		{
+			"package": "@twin.org/data-space-connector-service"
 		}
 	],
 	"authMethods": ["jwtBearer"],

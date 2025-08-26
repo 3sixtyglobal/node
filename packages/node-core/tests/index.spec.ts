@@ -1,5 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
 import type { AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
@@ -37,7 +39,33 @@ import { buildConfiguration } from "../src/node";
 import { start } from "../src/server";
 import { initialiseLocales } from "../src/utils";
 
+let appConfig: unknown;
+
 describe("node-core", () => {
+	beforeAll(async () => {
+		const fullAppPath = path.resolve("tests/apps/test-app.mjs");
+
+		appConfig = [
+			{
+				id: "https://twin.example.org/app1",
+				initialiserName: "appInitialiser",
+				moduleName: process.platform === "win32" ? `file://${fullAppPath}` : fullAppPath,
+				activitiesHandled: [
+					{
+						objectType: "https://vocabulary.uncefact.org/Consignment"
+					},
+					{
+						activityType: "https://www.w3.org/ns/activitystreams#Add",
+						objectType: "https://vocabulary.uncefact.org/Document",
+						targetType: "https://vocabulary.uncefact.org/Consignment"
+					}
+				]
+			}
+		];
+
+		await writeFile("./tests/apps/data-space-apps.json", JSON.stringify(appConfig, null, 2));
+	});
+
 	beforeEach(() => {
 		Factory.clearFactories();
 	});
@@ -116,7 +144,9 @@ describe("node-core", () => {
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_NODE_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_NODE_SYNCHRONISED_STORAGE_ENABLED: "true",
-			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key"
+			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
+			TWIN_NODE_DATA_SPACE_CONNECTOR_ENABLED: "true",
+			TWIN_NODE_DATA_SPACE_CONNECTOR_APPS: "@json:tests/apps/data-space-apps.json"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -166,6 +196,7 @@ describe("node-core", () => {
 			"rights-management-service",
 			"synchronised-storage-service",
 			"federated-catalogue-service",
+			"data-space-connector-service",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
 			"information-service"
@@ -281,7 +312,16 @@ describe("node-core", () => {
 			"/federated-catalogue/data-resources",
 			"/federated-catalogue/data-resources/:id",
 			"/federated-catalogue/data-space-connectors",
-			"/federated-catalogue/data-space-connectors/:id"
+			"/federated-catalogue/data-space-connectors/:id",
+			"/data-space-connector/notify",
+			"/data-space-connector/activity-logs/:id"
+		]);
+
+		const buildSocketRoutes = startResult?.server?.getSocketRoutes() ?? [];
+		expect(buildSocketRoutes.map(r => r.path)).toEqual([
+			"event-bus/subscribe",
+			"event-bus/unsubscribe",
+			"data-space-connector/activity-logs/status"
 		]);
 
 		if (startResult?.engine) {
@@ -334,6 +374,10 @@ describe("node-core", () => {
 			const identityProfileStore = identityProfileEntityStorage.getStore();
 			expect(authUserStore.length).toEqual(1);
 			expect(identityProfileStore[0].identity).toEqual(identityDocumentStore[0].id);
+
+			const dataSpaceConnectorService = ComponentFactory.get("data-space-connector-service");
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((dataSpaceConnectorService as any)._initialDataSpaceConnectorApps).toEqual(appConfig);
 		}
 
 		await startResult?.server.stop();
@@ -357,6 +401,7 @@ describe("node-core", () => {
 			TWIN_NODE_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 			TWIN_NODE_DATA_CONVERTER_CONNECTORS: "json,xml",
 			TWIN_NODE_DATA_EXTRACTOR_CONNECTORS: "json-path",
+			TWIN_NODE_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_NODE_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_NODE_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_NODE_FEATURES: "node-identity,node-user",
@@ -375,6 +420,7 @@ describe("node-core", () => {
 		});
 
 		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		expect(startResult).toBeDefined();
 
 		await startResult?.server.stop();
 
@@ -617,9 +663,39 @@ describe("node-core", () => {
 		await startResult?.server.stop();
 	});
 
-	test("Can start a server and load an embedded config file", async () => {
+	test("Can start a server and load an embedded config text file", async () => {
 		const envVars: { [id: string]: string } = {
-			TWIN_NODE_TEST_EMBEDDED: "@file:tests/embedded.json"
+			TWIN_NODE_TEST_EMBEDDED: "@text:tests/embedded.txt"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "bob"
+		});
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage
+		};
+
+		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+
+		expect(startResult).toBeDefined();
+
+		expect(nodeEnvVars.testEmbedded).toEqual("Hello Node!");
+
+		await startResult?.server.stop();
+	});
+
+	test("Can start a server and load an embedded JSON file", async () => {
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_TEST_EMBEDDED: "@json:tests/embedded.json"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -645,5 +721,7 @@ describe("node-core", () => {
 		expect(nodeEnvVars.testEmbedded).toEqual({
 			foo: "bar"
 		});
+
+		await startResult?.server.stop();
 	});
 });

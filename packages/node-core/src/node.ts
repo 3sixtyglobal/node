@@ -11,7 +11,13 @@ import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilde
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
 import type { INodeOptions } from "./models/INodeOptions";
 import { start } from "./server";
-import { fileExists, getExecutionDirectory, initialiseLocales, loadJsonFile } from "./utils";
+import {
+	fileExists,
+	getExecutionDirectory,
+	initialiseLocales,
+	loadJsonFile,
+	loadTextFile
+} from "./utils";
 
 /**
  * Run the TWIN Node server.
@@ -143,12 +149,20 @@ export async function buildConfiguration(
 	// Expand any environment variables that use the @file: syntax
 	const keys = Object.keys(envVars);
 	for (const key of keys) {
-		if (Is.stringValue(envVars[key]) && envVars[key].startsWith("@file:")) {
+		if (
+			Is.stringValue(envVars[key]) &&
+			(envVars[key].startsWith("@text:") || envVars[key].startsWith("@json:"))
+		) {
 			const filePath = envVars[key].slice(6).trim();
 			const embeddedFile = path.resolve(path.join(options.executionDirectory ?? "", filePath));
-			console.info(`Expanding Environment Variable: ${key} from file: ${embeddedFile}`);
-			const fileContent = await loadJsonFile(embeddedFile);
-			envVars[key] = fileContent;
+
+			if (envVars[key].startsWith("@text:")) {
+				console.info(`Expanding Environment Variable: ${key} from text file: ${embeddedFile}`);
+				envVars[key] = await loadTextFile(embeddedFile);
+			} else if (envVars[key].startsWith("@json:")) {
+				console.info(`Expanding Environment Variable: ${key} from JSON file: ${embeddedFile}`);
+				envVars[key] = await loadJsonFile(embeddedFile);
+			}
 		}
 	}
 
