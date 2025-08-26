@@ -1,5 +1,14 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.7](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.6...node-core-v0.0.2-next.7) (2025-08-26)
+
+
+### Features
+
+* add data space connector ([5a57087](https://github.com/twinfoundation/node/commit/5a57087d938265d3a4a812ff7c83d130ea4e103c))
+* add data space connector ([f7a3644](https://github.com/twinfoundation/node/commit/f7a364477ec664e333e5ad018795acec6ee61edc))
+* add data space connector ([157e8b0](https://github.com/twinfoundation/node/commit/157e8b0a76e3a8a63c1991924f7f963eb83e27ae))
+
 ## [0.0.2-next.6](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.5...node-core-v0.0.2-next.6) (2025-08-22)
 
 
