@@ -44,6 +44,7 @@
 		"@twin.org/entity": "next",
 		"@twin.org/entity-storage-models": "next",
 		"@twin.org/identity-models": "next",
+		"@twin.org/modules": "next",
 		"@twin.org/vault-models": "next",
 		"@twin.org/wallet-models": "next",
 		"dotenv": "17.2.1",

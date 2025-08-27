@@ -1,7 +1,5 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
 import type { AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
@@ -35,40 +33,12 @@ import type {
 } from "@twin.org/identity-connector-entity-storage";
 import type { VaultKey, VaultSecret } from "@twin.org/vault-connector-entity-storage";
 import type { INodeOptions } from "../src/models/INodeOptions";
-import { buildConfiguration } from "../src/node";
+import { buildConfiguration, overrideModuleImport } from "../src/node";
 import { start } from "../src/server";
 import { initialiseLocales } from "../src/utils";
-
-let appConfig: unknown;
+import appConfig from "./apps/data-space-apps.json";
 
 describe("node-core", () => {
-	beforeAll(async () => {
-		const fullAppPath = path.resolve("tests/apps/test-app.mjs");
-
-		appConfig = [
-			{
-				id: "https://twin.example.org/app1",
-				initialiserName: "appInitialiser",
-				moduleName: process.platform === "win32" ? `file://${fullAppPath}` : fullAppPath,
-				activitiesHandled: [
-					{
-						objectType: "https://vocabulary.uncefact.org/Consignment"
-					},
-					{
-						activityType: "https://www.w3.org/ns/activitystreams#Add",
-						objectType: "https://vocabulary.uncefact.org/Document",
-						targetType: "https://vocabulary.uncefact.org/Consignment"
-					}
-				]
-			}
-		];
-
-		await writeFile(
-			"./tests/apps/data-space-apps.json",
-			`${JSON.stringify(appConfig, null, "\t")}\n`
-		);
-	});
-
 	beforeEach(() => {
 		Factory.clearFactories();
 	});
@@ -157,6 +127,8 @@ describe("node-core", () => {
 		const memoryStateStorage = new MemoryStateStorage();
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage };
+
+		overrideModuleImport(process.cwd());
 
 		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
@@ -566,7 +538,7 @@ describe("node-core", () => {
 
 	test("Can start a server and load a custom env file", async () => {
 		const envVars: { [id: string]: string } = {
-			TWIN_NODE_DEBUG: "false",
+			TWIN_NODE_DEBUG: "true",
 			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "false"
 		};
@@ -618,7 +590,7 @@ describe("node-core", () => {
 
 	test("Can start a server and load a custom config file", async () => {
 		const envVars: { [id: string]: string } = {
-			TWIN_NODE_DEBUG: "false"
+			TWIN_NODE_DEBUG: "true"
 		};
 
 		await initialiseLocales("./dist/locales/");

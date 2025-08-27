@@ -5,6 +5,7 @@ import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { EnvHelper, ErrorHelper, Is } from "@twin.org/core";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
+import { ModuleHelper } from "@twin.org/modules";
 import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder";
@@ -71,6 +72,8 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 
 		nodeOptions.envPrefix ??= "TWIN_NODE_";
 		console.info("Environment Prefix:", nodeOptions.envPrefix);
+
+		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
 		const { engineServerConfig, nodeEnvVars: envVars } = await buildConfiguration(
 			process.env as {
@@ -203,4 +206,44 @@ export async function buildConfiguration(
 		await options.extendConfig(engineServerConfig);
 	}
 	return { engineServerConfig, nodeEnvVars: envVars };
+}
+
+/**
+ * Override module imports to use local files where possible.
+ * @param executionDirectory The execution directory for resolving local module paths.
+ */
+export function overrideModuleImport(executionDirectory: string): void {
+	ModuleHelper.overrideImport(async moduleName => {
+		// If the module path for example when dynamically loading
+		// modules looks like a local file then we try to resolve
+		// using the local file system
+		const isLocal = ModuleHelper.isLocalModule(moduleName);
+		if (isLocal) {
+			// See if we can just resolve the filename locally
+			let localFilename = path.resolve(moduleName);
+
+			let exists = await fileExists(localFilename);
+			if (!exists) {
+				// Doesn't exist in the current directory, try the execution directory
+				localFilename = path.resolve(executionDirectory, moduleName);
+				exists = await fileExists(localFilename);
+			}
+
+			if (exists) {
+				// If the module exists then we can load it, otherwise
+				// we fallback to regular handling to see if that can import it
+				return {
+					module: await import(
+						process.platform === "win32" ? `file://${localFilename}` : localFilename
+					),
+					useDefault: false
+				};
+			}
+		}
+
+		// The filename doesn't look like a local module, so just use default handling
+		return {
+			useDefault: true
+		};
+	});
 }
