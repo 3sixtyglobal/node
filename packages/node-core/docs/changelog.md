@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.8](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.7...node-core-v0.0.2-next.8) (2025-08-27)
+
+
+### Features
+
+* add module override for better local import resolution ([ba00d17](https://github.com/twinfoundation/node/commit/ba00d17beea0a9a1851c89ad7c6a33256051c818))
+
 ## [0.0.2-next.7](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.6...node-core-v0.0.2-next.7) (2025-08-26)
 
 
