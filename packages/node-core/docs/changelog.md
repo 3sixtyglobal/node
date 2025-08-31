@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.9](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.8...node-core-v0.0.2-next.9) (2025-08-31)
+
+
+### Features
+
+* eslint migration to flat config ([080db74](https://github.com/twinfoundation/node/commit/080db746390230f78725d214bc957da2efee9eb1))
+
 ## [0.0.2-next.8](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.7...node-core-v0.0.2-next.8) (2025-08-27)
 
 
