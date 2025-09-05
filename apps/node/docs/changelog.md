@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.10](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.9...node-v0.0.2-next.10) (2025-09-05)
+
+
+### Features
+
+* add rights management components ([0fc6293](https://github.com/twinfoundation/node/commit/0fc629332db24494bd73003625c7bf3f939a2597))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.9 to 0.0.2-next.10
+
 ## [0.0.2-next.9](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.8...node-v0.0.2-next.9) (2025-08-31)
 
 
