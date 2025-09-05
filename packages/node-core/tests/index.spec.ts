@@ -115,6 +115,10 @@ describe("node-core", () => {
 			TWIN_NODE_FEATURES: "node-identity,node-user",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
+			TWIN_NODE_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
+				"@json:tests/rights-management-information-sources.json",
+			TWIN_NODE_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
+				"@json:tests/rights-management-execution-actions.json",
 			TWIN_NODE_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_NODE_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
@@ -168,7 +172,9 @@ describe("node-core", () => {
 			"policy-information-point-service",
 			"policy-decision-point-service",
 			"policy-enforcement-point-service",
-			"rights-management-service",
+			"policy-negotiation-admin-point-service",
+			"policy-negotiation-point-service",
+			"policy-negotiation-request-point-service",
 			"synchronised-storage-service",
 			"federated-catalogue-service",
 			"data-space-connector-service",
@@ -274,6 +280,13 @@ describe("node-core", () => {
 			"/rights-management/pap/:id",
 			"/rights-management/pap/query",
 			"/rights-management/pep/intercept",
+			"/rights-management/pnp/negotiate",
+			"/rights-management/pnp/:policyId",
+			"/rights-management/pnp/:policyId",
+			"/rights-management/pnap/:policyId",
+			"/rights-management/pnap/:policyId",
+			"/rights-management/pnap/:policyId",
+			"/rights-management/pnap",
 			"/synchronised-storage/sync-changeset",
 			"/synchronised-storage/decryption-key",
 			"/federated-catalogue/participant-credentials",
@@ -310,7 +323,7 @@ describe("node-core", () => {
 
 			expect(identityDocumentStore.length).toEqual(1);
 			expect(identityDocumentStore[0].id).toEqual(memory?.nodeIdentity);
-			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(3);
+			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(4);
 
 			const vaultSecretStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
@@ -323,14 +336,15 @@ describe("node-core", () => {
 			const vaultKeyStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultKey>>("vault-key");
 			const keyStore = vaultKeyStorage.getStore();
-			expect(keyStore.length).toEqual(6);
+			expect(keyStore.length).toEqual(7);
 
 			expect(keyStore[0].id).toEqual(`${identityDocumentStore[0].id}/did`);
 			expect(keyStore[1].id).toEqual(`${identityDocumentStore[0].id}/auth-signing`);
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
-			expect(keyStore[5].id).toEqual(
+			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/policy-negotiation-assertion`);
+			expect(keyStore[6].id).toEqual(
 				`${identityDocumentStore[0].id}/synchronised-storage-assertion`
 			);
 
@@ -353,6 +367,14 @@ describe("node-core", () => {
 			const dataSpaceConnectorService = ComponentFactory.get("data-space-connector-service");
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((dataSpaceConnectorService as any)._initialDataSpaceConnectorApps).toEqual(appConfig);
+
+			const pip = ComponentFactory.get("policy-information-point-service");
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((pip as any)._sources.length).toEqual(2);
+
+			const pxp = ComponentFactory.get("policy-execution-point-service");
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			expect((pxp as any)._executionActions.before.length).toEqual(1);
 		}
 
 		await startResult?.server.stop();
@@ -380,6 +402,7 @@ describe("node-core", () => {
 			TWIN_NODE_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_NODE_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_NODE_FEATURES: "node-identity,node-user",
+			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true"
 		};
 
@@ -426,7 +449,7 @@ describe("node-core", () => {
 
 			expect(identityDocumentStore.length).toEqual(1);
 			expect(identityDocumentStore[0].id).toEqual(memory?.nodeIdentity);
-			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(2);
+			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(3);
 
 			const vaultSecretStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
@@ -439,13 +462,14 @@ describe("node-core", () => {
 			const vaultKeyStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultKey>>("vault-key");
 			const keyStore = vaultKeyStorage.getStore();
-			expect(keyStore.length).toEqual(5);
+			expect(keyStore.length).toEqual(6);
 
 			expect(keyStore[0].id).toEqual(`${identityDocumentStore[0].id}/did`);
 			expect(keyStore[1].id).toEqual(`${identityDocumentStore[0].id}/auth-signing`);
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
+			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/policy-negotiation-assertion`);
 
 			const authenticationUserEntityStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AuthenticationUser>>(

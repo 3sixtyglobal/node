@@ -1,0 +1,13 @@
+[
+	{
+		"id": "logging",
+		"moduleName": "@twin.org/rights-management-pxp-service",
+		"className": "LoggingPolicyExecutionAction",
+		"dependencies": [
+			{
+				"propertyName": "loggingComponentType",
+				"componentName": "loggingComponent"
+			}
+		]
+	}
+]

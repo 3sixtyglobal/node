@@ -4,6 +4,7 @@ import path from "node:path";
 import { Coerce, Is } from "@twin.org/core";
 import type { IDataSpaceConnectorAppDescriptor } from "@twin.org/data-space-connector-models";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
+import type { IEngineModuleConfig } from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -39,13 +40,15 @@ import {
 	MessagingSmsConnectorType,
 	NftComponentType,
 	NftConnectorType,
-	RightsManagementComponentType,
 	RightsManagementPapComponentType,
 	RightsManagementPdpComponentType,
 	RightsManagementPepComponentType,
 	RightsManagementPipComponentType,
 	RightsManagementPmpComponentType,
 	RightsManagementPxpComponentType,
+	RightsManagementPnpComponentType,
+	RightsManagementPnapComponentType,
+	RightsManagementPnrpComponentType,
 	SynchronisedStorageComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
@@ -55,6 +58,7 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
+import { PolicyNegotiationPointClient } from "@twin.org/rights-management-rest-client";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables";
 
 /**
@@ -75,6 +79,7 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	envVars.blobStorageEncryptionKeyId ??= "blob-encryption";
 	envVars.synchronisedStorageBlobStorageEncryptionKeyId ??= "synchronised-storage-blob-encryption";
 	envVars.synchronisedStorageVerificationMethodId ??= "synchronised-storage-assertion";
+	envVars.rightsManagementNegotiationMethodId ??= "policy-negotiation-assertion";
 
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
@@ -88,6 +93,7 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 
 	configureLogging(coreConfig, envVars);
 	configureBackgroundTask(coreConfig, envVars);
+	configureTaskScheduler(coreConfig, envVars);
 	configureEventBus(coreConfig, envVars);
 	configureTelemetry(coreConfig, envVars);
 	configureMessaging(coreConfig, envVars);
@@ -106,7 +112,6 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	configureAuditableItemStream(coreConfig, envVars);
 	configureDocumentManagement(coreConfig, envVars);
 	configureRightsManagement(coreConfig, envVars);
-	configureTaskScheduler(coreConfig, envVars);
 	configureSynchronisedStorage(coreConfig, envVars);
 	configureFederatedCatalogue(coreConfig, envVars);
 	configureDataSpaceConnector(coreConfig, envVars);
@@ -999,12 +1004,26 @@ function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPipComponent ??= [];
 		coreConfig.types.rightsManagementPipComponent.push({
-			type: RightsManagementPipComponentType.Service
+			type: RightsManagementPipComponentType.Service,
+			options: {
+				informationModulesConfig: Is.arrayValue<IEngineModuleConfig>(
+					envVars.rightsManagementInformationSources
+				)
+					? envVars.rightsManagementInformationSources
+					: undefined
+			}
 		});
 
 		coreConfig.types.rightsManagementPxpComponent ??= [];
 		coreConfig.types.rightsManagementPxpComponent.push({
-			type: RightsManagementPxpComponentType.Service
+			type: RightsManagementPxpComponentType.Service,
+			options: {
+				actionModulesConfig: Is.arrayValue<IEngineModuleConfig>(
+					envVars.rightsManagementExecutionActions
+				)
+					? envVars.rightsManagementExecutionActions
+					: undefined
+			}
 		});
 
 		coreConfig.types.rightsManagementPdpComponent ??= [];
@@ -1014,12 +1033,43 @@ function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPepComponent ??= [];
 		coreConfig.types.rightsManagementPepComponent.push({
-			type: RightsManagementPepComponentType.Service
+			type: RightsManagementPepComponentType.Service,
+			options: {
+				processorModulesConfig: Is.arrayValue<IEngineModuleConfig>(
+					envVars.rightsManagementEnforcementProcessors
+				)
+					? envVars.rightsManagementEnforcementProcessors
+					: undefined
+			}
 		});
 
-		coreConfig.types.rightsManagementComponent ??= [];
-		coreConfig.types.rightsManagementComponent.push({
-			type: RightsManagementComponentType.Service
+		coreConfig.types.rightsManagementPnpComponent ??= [];
+		coreConfig.types.rightsManagementPnpComponent.push({
+			type: RightsManagementPnpComponentType.Service,
+			options: {
+				negotiatorModulesConfig: Is.arrayValue<IEngineModuleConfig>(
+					envVars.rightsManagementNegotiators
+				)
+					? envVars.rightsManagementNegotiators
+					: undefined
+			}
+		});
+
+		coreConfig.types.rightsManagementPnapComponent ??= [];
+		coreConfig.types.rightsManagementPnapComponent.push({
+			type: RightsManagementPnapComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementPnrpComponent ??= [];
+		coreConfig.types.rightsManagementPnrpComponent.push({
+			type: RightsManagementPnrpComponentType.Service,
+			options: {
+				config: {
+					negotiationMethodId: envVars.rightsManagementNegotiationMethodId ?? "",
+					negotiationComponentCreator: async url =>
+						new PolicyNegotiationPointClient({ endpoint: url })
+				}
+			}
 		});
 	}
 }

@@ -1,0 +1,28 @@
+[
+	{
+		"id": "static",
+		"moduleName": "@twin.org/rights-management-pip-service",
+		"className": "StaticPolicyInformationSource",
+		"dependencies": [
+			{
+				"propertyName": "loggingComponentType",
+				"componentName": "loggingComponent"
+			}
+		]
+	},
+	{
+		"id": "identity",
+		"moduleName": "@twin.org/rights-management-pip-service",
+		"className": "IdentityPolicyInformationSource",
+		"dependencies": [
+			{
+				"propertyName": "loggingComponentType",
+				"componentName": "loggingComponent"
+			},
+			{
+				"propertyName": "identityResolverComponentType",
+				"componentName": "identityResolverComponent"
+			}
+		]
+	}
+]

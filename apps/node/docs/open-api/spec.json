@@ -14059,62 +14059,6 @@
 				},
 				"description": "A W3C Activity from Activity Streams"
 			},
-			"ActivityHandler": {
-				"type": "object",
-				"additionalProperties": false,
-				"description": "Activity Handler."
-			},
-			"ActivityLogDates": {
-				"type": "object",
-				"properties": {
-					"startDate": {
-						"type": "string",
-						"description": "Task processing start timestamp"
-					},
-					"endDate": {
-						"type": "string",
-						"description": "Task processing end timestamp"
-					}
-				},
-				"required": [
-					"startDate"
-				],
-				"additionalProperties": false,
-				"description": "Activity log dates."
-			},
-			"ActivityLogDetails": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "string",
-						"description": "The Id of the Activity Log entry."
-					},
-					"activityId": {
-						"type": "string",
-						"description": "The activity Id that this entry refers to."
-					},
-					"generator": {
-						"type": "string",
-						"description": "The identity of the Activity's generator."
-					},
-					"dateCreated": {
-						"type": "string",
-						"description": "The creation date of this object."
-					},
-					"dateModified": {
-						"type": "string",
-						"description": "The last update date of this object."
-					}
-				},
-				"required": [
-					"id",
-					"generator",
-					"dateCreated",
-					"dateModified"
-				],
-				"additionalProperties": false,
-				"description": "The details related to the processing of an Activity"
-			},
 			"ActivityLogEntry": {
 				"type": "object",
 				"properties": {
@@ -14264,84 +14208,6 @@
 				"additionalProperties": false,
 				"description": "The details related to the processing of an Activity"
 			},
-			"ActivityLogStatusNotification": {
-				"type": "object",
-				"properties": {
-					"activityLogEntryId": {
-						"type": "string",
-						"description": "The activity log entry id."
-					},
-					"activityId": {
-						"type": "string",
-						"description": "The activity Id."
-					},
-					"taskProcessingStatus": {
-						"type": "object",
-						"properties": {
-							"taskId": {
-								"type": "string",
-								"description": "The task reported."
-							},
-							"dataSpaceConnectorAppId": {
-								"type": "string",
-								"description": "The Data Space Connector App."
-							},
-							"taskStatus": {
-								"$ref": "#/components/schemas/TaskStatus"
-							}
-						},
-						"required": [
-							"taskId",
-							"dataSpaceConnectorAppId",
-							"taskStatus"
-						],
-						"additionalProperties": false,
-						"description": "The activity processing status through the associated tasks."
-					}
-				},
-				"required": [
-					"activityLogEntryId",
-					"taskProcessingStatus"
-				],
-				"additionalProperties": false,
-				"description": "The status supplied to clients of the Data Space Connector"
-			},
-			"ActivityLogStatusNotificationPayload": {
-				"type": "object",
-				"properties": {
-					"body": {
-						"$ref": "#/components/schemas/ActivityLogStatusNotification"
-					}
-				},
-				"required": [
-					"body"
-				],
-				"additionalProperties": false,
-				"description": "The status supplied to clients of the Data Space Connector"
-			},
-			"ActivityLogStatusRequest": {
-				"type": "object",
-				"properties": {
-					"operation": {
-						"type": "string",
-						"enum": [
-							"subscribe",
-							"unsubscribe"
-						],
-						"description": "The operation to perform."
-					},
-					"subscriptionId": {
-						"type": "string",
-						"description": "The subscription Id."
-					}
-				},
-				"required": [
-					"operation",
-					"subscriptionId"
-				],
-				"additionalProperties": false,
-				"description": "Empty body."
-			},
 			"ActivityProcessingStatus": {
 				"anyOf": [
 					{
@@ -14371,28 +14237,6 @@
 					}
 				],
 				"description": "Activity processing statuses.   The type exported."
-			},
-			"ActivityQuery": {
-				"type": "object",
-				"properties": {
-					"activityType": {
-						"type": "string",
-						"description": "FQN of the Activity type."
-					},
-					"objectType": {
-						"type": "string",
-						"description": "FQN of the Object Type."
-					},
-					"targetType": {
-						"type": "string",
-						"description": "FQN of the target type."
-					}
-				},
-				"required": [
-					"objectType"
-				],
-				"additionalProperties": false,
-				"description": "(Activity,Object,Target) query for denoting combinations to be handled by a DS Connector App."
 			},
 			"ActivityStreamsContextType": {
 				"anyOf": [
@@ -14462,31 +14306,6 @@
 					}
 				],
 				"description": "The types concerning Activity Streams.   The types concerning Activity."
-			},
-			"ActivityTask": {
-				"type": "object",
-				"properties": {
-					"activityLogEntryId": {
-						"type": "string",
-						"description": "The activity log entry."
-					},
-					"associatedTasks": {
-						"type": "array",
-						"items": false,
-						"description": "The associated tasks",
-						"prefixItems": [
-							{
-								"$ref": "#/components/schemas/TaskApp"
-							}
-						]
-					}
-				},
-				"required": [
-					"activityLogEntryId",
-					"associatedTasks"
-				],
-				"additionalProperties": false,
-				"description": "Denotes a task associated with an Activity"
 			},
 			"AttestationCreateRequest": {
 				"type": "object",
@@ -15854,11 +15673,6 @@
 				],
 				"description": "The body which contains the error."
 			},
-			"ProofSignerVerifier": {
-				"type": "object",
-				"additionalProperties": false,
-				"description": "Interface describing a proof signer and verifier."
-			},
 			"RefreshTokenResponse": {
 				"type": "object",
 				"properties": {
@@ -16103,36 +15917,6 @@
 				],
 				"additionalProperties": false,
 				"description": "Denotes a task associated with a Data Space Connector App"
-			},
-			"TaskStatus": {
-				"anyOf": [
-					{
-						"type": "string",
-						"const": "pending",
-						"description": "Pending."
-					},
-					{
-						"type": "string",
-						"const": "processing",
-						"description": "Processing."
-					},
-					{
-						"type": "string",
-						"const": "success",
-						"description": "Success."
-					},
-					{
-						"type": "string",
-						"const": "failed",
-						"description": "Failed."
-					},
-					{
-						"type": "string",
-						"const": "cancelled",
-						"description": "Cancelled."
-					}
-				],
-				"description": "Task statuses."
 			},
 			"TelemetryAddMetricValueRequest": {
 				"type": "object",

@@ -553,6 +553,36 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementEnabled?: string;
 
 	/**
+	 * The rights management verification method id to use when signing/verifying negotiation requests.
+	 * Defaults to policy-negotiation-assertion.
+	 */
+	rightsManagementNegotiationMethodId?: string;
+
+	/**
+	 * The rights management configuration which includes the negotiator modules to load.
+	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 */
+	rightsManagementNegotiators?: string;
+
+	/**
+	 * The rights management configuration which includes the information sources modules to load.
+	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 */
+	rightsManagementInformationSources?: string;
+
+	/**
+	 * The rights management configuration which includes the execution actions modules to load.
+	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 */
+	rightsManagementExecutionActions?: string;
+
+	/**
+	 * The rights management configuration which includes the enforcement processor modules to load.
+	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 */
+	rightsManagementEnforcementProcessors?: string;
+
+	/**
 	 * Is the task scheduler enabled, defaults to false.
 	 */
 	taskSchedulerEnabled?: string;

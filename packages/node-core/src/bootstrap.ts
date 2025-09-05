@@ -62,6 +62,15 @@ export async function bootstrap(
 		envVars.immutableProofVerificationMethodId
 	);
 
+	if (Coerce.boolean(envVars.rightsManagementEnabled) ?? false) {
+		await addVerificationMethod(
+			engineCore,
+			context,
+			"rights management",
+			envVars.rightsManagementNegotiationMethodId
+		);
+	}
+
 	await bootstrapSynchronisedStorage(engineCore, context, envVars, features);
 }
 

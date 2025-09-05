@@ -896,6 +896,51 @@ Is the rights management enabled, defaults to false.
 
 ***
 
+### rightsManagementNegotiationMethodId?
+
+> `optional` **rightsManagementNegotiationMethodId**: `string`
+
+The rights management verification method id to use when signing/verifying negotiation requests.
+Defaults to policy-negotiation-assertion.
+
+***
+
+### rightsManagementNegotiators?
+
+> `optional` **rightsManagementNegotiators**: `string`
+
+The rights management configuration which includes the negotiator modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### rightsManagementInformationSources?
+
+> `optional` **rightsManagementInformationSources**: `string`
+
+The rights management configuration which includes the information sources modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### rightsManagementExecutionActions?
+
+> `optional` **rightsManagementExecutionActions**: `string`
+
+The rights management configuration which includes the execution actions modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### rightsManagementEnforcementProcessors?
+
+> `optional` **rightsManagementEnforcementProcessors**: `string`
+
+The rights management configuration which includes the enforcement processor modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
 ### taskSchedulerEnabled?
 
 > `optional` **taskSchedulerEnabled**: `string`

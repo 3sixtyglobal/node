@@ -1324,6 +1324,71 @@ Is the rights management enabled, defaults to false.
 
 ***
 
+### rightsManagementNegotiationMethodId?
+
+> `optional` **rightsManagementNegotiationMethodId**: `string`
+
+The rights management verification method id to use when signing/verifying negotiation requests.
+Defaults to policy-negotiation-assertion.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementNegotiationMethodId`](IEngineEnvironmentVariables.md#rightsmanagementnegotiationmethodid)
+
+***
+
+### rightsManagementNegotiators?
+
+> `optional` **rightsManagementNegotiators**: `string`
+
+The rights management configuration which includes the negotiator modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementNegotiators`](IEngineEnvironmentVariables.md#rightsmanagementnegotiators)
+
+***
+
+### rightsManagementInformationSources?
+
+> `optional` **rightsManagementInformationSources**: `string`
+
+The rights management configuration which includes the information sources modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementInformationSources`](IEngineEnvironmentVariables.md#rightsmanagementinformationsources)
+
+***
+
+### rightsManagementExecutionActions?
+
+> `optional` **rightsManagementExecutionActions**: `string`
+
+The rights management configuration which includes the execution actions modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementExecutionActions`](IEngineEnvironmentVariables.md#rightsmanagementexecutionactions)
+
+***
+
+### rightsManagementEnforcementProcessors?
+
+> `optional` **rightsManagementEnforcementProcessors**: `string`
+
+The rights management configuration which includes the enforcement processor modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementEnforcementProcessors`](IEngineEnvironmentVariables.md#rightsmanagementenforcementprocessors)
+
+***
+
 ### taskSchedulerEnabled?
 
 > `optional` **taskSchedulerEnabled**: `string`
