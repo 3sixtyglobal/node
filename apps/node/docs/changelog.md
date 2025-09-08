@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.11](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.10...node-v0.0.2-next.11) (2025-09-08)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.10 to 0.0.2-next.11
+
 ## [0.0.2-next.10](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.9...node-v0.0.2-next.10) (2025-09-05)
 
 

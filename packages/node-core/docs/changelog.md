@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.11](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.10...node-core-v0.0.2-next.11) (2025-09-08)
+
+
+### Features
+
+* update rights management dependencies ([97ad02e](https://github.com/twinfoundation/node/commit/97ad02e4b74cfe5e722f74da2fc2229bbf004c0a))
+
 ## [0.0.2-next.10](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.9...node-core-v0.0.2-next.10) (2025-09-05)
 
 
