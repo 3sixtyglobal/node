@@ -67,7 +67,7 @@ export async function bootstrap(
 			engineCore,
 			context,
 			"rights management",
-			envVars.rightsManagementNegotiationMethodId
+			envVars.rightsManagementVerificationMethodId
 		);
 	}
 

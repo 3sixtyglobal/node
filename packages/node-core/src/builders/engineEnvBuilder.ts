@@ -48,7 +48,6 @@ import {
 	RightsManagementPxpComponentType,
 	RightsManagementPnpComponentType,
 	RightsManagementPnapComponentType,
-	RightsManagementPnrpComponentType,
 	SynchronisedStorageComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
@@ -56,9 +55,15 @@ import {
 	VaultConnectorType,
 	VerifiableStorageComponentType,
 	VerifiableStorageConnectorType,
-	WalletConnectorType
+	WalletConnectorType,
+	RightsManagementDapComponentType,
+	RightsManagementDarpComponentType
 } from "@twin.org/engine-types";
-import { PolicyNegotiationPointClient } from "@twin.org/rights-management-rest-client";
+import {
+	DataAccessPointClient,
+	PolicyNegotiationPointClient
+} from "@twin.org/rights-management-rest-client";
+import type { IOdrlOffer } from "@twin.org/standards-w3c-odrl";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables";
 
 /**
@@ -79,7 +84,7 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	envVars.blobStorageEncryptionKeyId ??= "blob-encryption";
 	envVars.synchronisedStorageBlobStorageEncryptionKeyId ??= "synchronised-storage-blob-encryption";
 	envVars.synchronisedStorageVerificationMethodId ??= "synchronised-storage-assertion";
-	envVars.rightsManagementNegotiationMethodId ??= "policy-negotiation-assertion";
+	envVars.rightsManagementVerificationMethodId ??= "rights-management-assertion";
 
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
@@ -1028,7 +1033,12 @@ function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPdpComponent ??= [];
 		coreConfig.types.rightsManagementPdpComponent.push({
-			type: RightsManagementPdpComponentType.Service
+			type: RightsManagementPdpComponentType.Service,
+			options: {
+				arbiterModulesConfig: Is.arrayValue<IEngineModuleConfig>(envVars.rightsManagementArbiters)
+					? envVars.rightsManagementArbiters
+					: undefined
+			}
 		});
 
 		coreConfig.types.rightsManagementPepComponent ??= [];
@@ -1051,7 +1061,21 @@ function configureRightsManagement(
 					envVars.rightsManagementNegotiators
 				)
 					? envVars.rightsManagementNegotiators
-					: undefined
+					: undefined,
+				requesterModulesConfig: Is.arrayValue<IEngineModuleConfig>(
+					envVars.rightsManagementRequesters
+				)
+					? envVars.rightsManagementRequesters
+					: undefined,
+				config: {
+					baseCallbackUrl: envVars.rightsManagementBaseCallbackUrl ?? "",
+					rightsManagementMethodId: envVars.rightsManagementVerificationMethodId ?? "",
+					offers: Is.arrayValue<IOdrlOffer>(envVars.rightsManagementOffers)
+						? envVars.rightsManagementOffers
+						: [],
+					negotiationComponentCreator: async url =>
+						new PolicyNegotiationPointClient({ endpoint: url })
+				}
 			}
 		});
 
@@ -1060,14 +1084,18 @@ function configureRightsManagement(
 			type: RightsManagementPnapComponentType.Service
 		});
 
-		coreConfig.types.rightsManagementPnrpComponent ??= [];
-		coreConfig.types.rightsManagementPnrpComponent.push({
-			type: RightsManagementPnrpComponentType.Service,
+		coreConfig.types.rightsManagementDapComponent ??= [];
+		coreConfig.types.rightsManagementDapComponent.push({
+			type: RightsManagementDapComponentType.Service
+		});
+
+		coreConfig.types.rightsManagementDarpComponent ??= [];
+		coreConfig.types.rightsManagementDarpComponent.push({
+			type: RightsManagementDarpComponentType.Service,
 			options: {
 				config: {
-					negotiationMethodId: envVars.rightsManagementNegotiationMethodId ?? "",
-					negotiationComponentCreator: async url =>
-						new PolicyNegotiationPointClient({ endpoint: url })
+					rightsManagementMethodId: envVars.rightsManagementVerificationMethodId ?? "",
+					dataAccessComponentCreator: async url => new DataAccessPointClient({ endpoint: url })
 				}
 			}
 		});

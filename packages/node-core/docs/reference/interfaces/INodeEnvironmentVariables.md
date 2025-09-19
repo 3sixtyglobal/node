@@ -1324,16 +1324,41 @@ Is the rights management enabled, defaults to false.
 
 ***
 
-### rightsManagementNegotiationMethodId?
+### rightsManagementBaseCallbackUrl?
 
-> `optional` **rightsManagementNegotiationMethodId**: `string`
+> `optional` **rightsManagementBaseCallbackUrl**: `string`
 
-The rights management verification method id to use when signing/verifying negotiation requests.
-Defaults to policy-negotiation-assertion.
+What is the base callback url for rights management negotiations e.g. https://my-node/rights-management.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementNegotiationMethodId`](IEngineEnvironmentVariables.md#rightsmanagementnegotiationmethodid)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementBaseCallbackUrl`](IEngineEnvironmentVariables.md#rightsmanagementbasecallbackurl)
+
+***
+
+### rightsManagementVerificationMethodId?
+
+> `optional` **rightsManagementVerificationMethodId**: `string`
+
+The rights management verification method id to use when signing/verifying negotiation requests.
+Defaults to rights-management-assertion.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementVerificationMethodId`](IEngineEnvironmentVariables.md#rightsmanagementverificationmethodid)
+
+***
+
+### rightsManagementInformationSources?
+
+> `optional` **rightsManagementInformationSources**: `string`
+
+The rights management configuration which includes the information sources modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementInformationSources`](IEngineEnvironmentVariables.md#rightsmanagementinformationsources)
 
 ***
 
@@ -1350,16 +1375,16 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 
 ***
 
-### rightsManagementInformationSources?
+### rightsManagementRequesters?
 
-> `optional` **rightsManagementInformationSources**: `string`
+> `optional` **rightsManagementRequesters**: `string`
 
-The rights management configuration which includes the information sources modules to load.
+The rights management configuration which includes the requester modules to load.
 Use the @json: prefix to specify the path to the JSON configuration file.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementInformationSources`](IEngineEnvironmentVariables.md#rightsmanagementinformationsources)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementRequesters`](IEngineEnvironmentVariables.md#rightsmanagementrequesters)
 
 ***
 
@@ -1386,6 +1411,32 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementEnforcementProcessors`](IEngineEnvironmentVariables.md#rightsmanagementenforcementprocessors)
+
+***
+
+### rightsManagementArbiters?
+
+> `optional` **rightsManagementArbiters**: `string`
+
+The rights management configuration which includes the arbiter modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementArbiters`](IEngineEnvironmentVariables.md#rightsmanagementarbiters)
+
+***
+
+### rightsManagementOffers?
+
+> `optional` **rightsManagementOffers**: `string`
+
+The rights management configuration which includes the offer modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementOffers`](IEngineEnvironmentVariables.md#rightsmanagementoffers)
 
 ***
 

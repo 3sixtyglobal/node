@@ -896,12 +896,29 @@ Is the rights management enabled, defaults to false.
 
 ***
 
-### rightsManagementNegotiationMethodId?
+### rightsManagementBaseCallbackUrl?
 
-> `optional` **rightsManagementNegotiationMethodId**: `string`
+> `optional` **rightsManagementBaseCallbackUrl**: `string`
+
+What is the base callback url for rights management negotiations e.g. https://my-node/rights-management.
+
+***
+
+### rightsManagementVerificationMethodId?
+
+> `optional` **rightsManagementVerificationMethodId**: `string`
 
 The rights management verification method id to use when signing/verifying negotiation requests.
-Defaults to policy-negotiation-assertion.
+Defaults to rights-management-assertion.
+
+***
+
+### rightsManagementInformationSources?
+
+> `optional` **rightsManagementInformationSources**: `string`
+
+The rights management configuration which includes the information sources modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
 
 ***
 
@@ -914,11 +931,11 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 
 ***
 
-### rightsManagementInformationSources?
+### rightsManagementRequesters?
 
-> `optional` **rightsManagementInformationSources**: `string`
+> `optional` **rightsManagementRequesters**: `string`
 
-The rights management configuration which includes the information sources modules to load.
+The rights management configuration which includes the requester modules to load.
 Use the @json: prefix to specify the path to the JSON configuration file.
 
 ***
@@ -937,6 +954,24 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 > `optional` **rightsManagementEnforcementProcessors**: `string`
 
 The rights management configuration which includes the enforcement processor modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### rightsManagementArbiters?
+
+> `optional` **rightsManagementArbiters**: `string`
+
+The rights management configuration which includes the arbiter modules to load.
+Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### rightsManagementOffers?
+
+> `optional` **rightsManagementOffers**: `string`
+
+The rights management configuration which includes the offer modules to load.
 Use the @json: prefix to specify the path to the JSON configuration file.
 
 ***

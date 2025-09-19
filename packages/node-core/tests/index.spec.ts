@@ -115,6 +115,7 @@ describe("node-core", () => {
 			TWIN_NODE_FEATURES: "node-identity,node-user",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
+			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management",
 			TWIN_NODE_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
 				"@json:tests/rights-management-information-sources.json",
 			TWIN_NODE_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
@@ -174,7 +175,8 @@ describe("node-core", () => {
 			"policy-enforcement-point-service",
 			"policy-negotiation-admin-point-service",
 			"policy-negotiation-point-service",
-			"policy-negotiation-request-point-service",
+			"data-access-point-service",
+			"data-access-request-point-service",
 			"synchronised-storage-service",
 			"federated-catalogue-service",
 			"data-space-connector-service",
@@ -274,18 +276,29 @@ describe("node-core", () => {
 			"/documents/:auditableItemGraphDocumentId/:revision",
 			"/documents/:auditableItemGraphDocumentId/:revision",
 			"/documents",
-			"/rights-management/pap",
-			"/rights-management/pap/:id",
-			"/rights-management/pap/:id",
-			"/rights-management/pap/:id",
-			"/rights-management/pap/query",
-			"/rights-management/pnp/negotiate",
-			"/rights-management/pnp/:policyId",
-			"/rights-management/pnp/:policyId",
-			"/rights-management/pnap/:policyId",
-			"/rights-management/pnap/:policyId",
-			"/rights-management/pnap/:policyId",
-			"/rights-management/pnap",
+			"/rights-management/policy/admin",
+			"/rights-management/policy/admin/:id",
+			"/rights-management/policy/admin/:id",
+			"/rights-management/policy/admin/:id",
+			"/rights-management/policy/admin",
+			"/rights-management/negotiations/:id",
+			"/rights-management/negotiations/request",
+			"/rights-management/negotiations/:id/request",
+			"/rights-management/negotiations/:id/events",
+			"/rights-management/negotiations/:id/agreement/verification",
+			"/rights-management/negotiations/:id/termination",
+			"/rights-management/negotiations/offers",
+			"/rights-management/negotiations/:id/offers",
+			"/rights-management/negotiations/:id/agreement",
+			"/rights-management/negotiations/admin/:policyId",
+			"/rights-management/negotiations/admin/:policyId",
+			"/rights-management/negotiations/admin/:policyId",
+			"/rights-management/negotiations/admin",
+			"/rights-management/data/:assetType",
+			"/rights-management/data/:assetType/:id",
+			"/rights-management/data/:assetType/:id",
+			"/rights-management/data/:assetType/:id",
+			"/rights-management/data/:assetType/query",
 			"/synchronised-storage/sync-changeset",
 			"/synchronised-storage/decryption-key",
 			"/federated-catalogue/participant-credentials",
@@ -342,7 +355,7 @@ describe("node-core", () => {
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
-			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/policy-negotiation-assertion`);
+			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/rights-management-assertion`);
 			expect(keyStore[6].id).toEqual(
 				`${identityDocumentStore[0].id}/synchronised-storage-assertion`
 			);
@@ -402,7 +415,8 @@ describe("node-core", () => {
 			TWIN_NODE_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_NODE_FEATURES: "node-identity,node-user",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
-			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true"
+			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
+			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -468,7 +482,7 @@ describe("node-core", () => {
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
-			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/policy-negotiation-assertion`);
+			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/rights-management-assertion`);
 
 			const authenticationUserEntityStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AuthenticationUser>>(
