@@ -335,7 +335,7 @@ describe("node-core", () => {
 
 			expect(identityDocumentStore.length).toEqual(1);
 			expect(identityDocumentStore[0].id).toEqual(memory?.nodeIdentity);
-			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(4);
+			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(3);
 
 			const vaultSecretStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
@@ -348,16 +348,15 @@ describe("node-core", () => {
 			const vaultKeyStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultKey>>("vault-key");
 			const keyStore = vaultKeyStorage.getStore();
-			expect(keyStore.length).toEqual(7);
+			expect(keyStore.length).toEqual(6);
 
 			expect(keyStore[0].id).toEqual(`${identityDocumentStore[0].id}/did`);
 			expect(keyStore[1].id).toEqual(`${identityDocumentStore[0].id}/auth-signing`);
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
-			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/rights-management-assertion`);
-			expect(keyStore[6].id).toEqual(
-				`${identityDocumentStore[0].id}/synchronised-storage-assertion`
+			expect(keyStore[5].id).toEqual(
+				`${identityDocumentStore[0].id}/node-authentication-assertion`
 			);
 
 			const authenticationUserEntityStorage =
@@ -482,7 +481,9 @@ describe("node-core", () => {
 			expect(keyStore[2].id).toEqual(`${identityDocumentStore[0].id}/blob-encryption`);
 			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/attestation-assertion`);
 			expect(keyStore[4].id).toEqual(`${identityDocumentStore[0].id}/immutable-proof-assertion`);
-			expect(keyStore[5].id).toEqual(`${identityDocumentStore[0].id}/rights-management-assertion`);
+			expect(keyStore[5].id).toEqual(
+				`${identityDocumentStore[0].id}/node-authentication-assertion`
+			);
 
 			const authenticationUserEntityStorage =
 				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AuthenticationUser>>(

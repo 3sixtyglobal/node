@@ -116,6 +116,8 @@
 		"IServiceOffering": "https://schema.twindev.org/gaia-x/ServiceOffering",
 		"Unece(.*)": "https://schema.twindev.org/unece/Unece$1",
 		"DataAccess(.*)": "https://schema.twindev.org/rights-management/DataAccessQuery$1",
-		"IdsContract(.*)": "https://schema.twindev.org/ids-contract-negotiation/IdsContract$1"
+		"IdsContract(.*)": "https://schema.twindev.org/ids-contract-negotiation/IdsContract$1",
+		"ActivityStreams": "https://schema.twindev.org/w3c-activity-streams/ActivityStreams",
+		"ActivityStreamsTypes": "https://schema.twindev.org/w3c-activity-streams/ActivityStreamsTypes"
 	}
 }

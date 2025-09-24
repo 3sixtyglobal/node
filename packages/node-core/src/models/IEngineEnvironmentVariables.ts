@@ -490,12 +490,6 @@ export interface IEngineEnvironmentVariables {
 	synchronisedStorageVerifiableStorageKeyId?: string;
 
 	/**
-	 * The identity verification method id to use with synchronised storage for signing/verifying changesets.
-	 * Defaults to synchronised-storage-assertion.
-	 */
-	synchronisedStorageVerificationMethodId?: string;
-
-	/**
 	 * The key from the vault which is used to encrypt the synchronised storage blobs.
 	 * Only required for trusted nodes, as regular nodes will request from the trusted nodes.
 	 * Defaults to synchronised-storage-blob-encryption
@@ -558,12 +552,6 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementBaseCallbackUrl?: string;
 
 	/**
-	 * The rights management verification method id to use when signing/verifying negotiation requests.
-	 * Defaults to rights-management-assertion.
-	 */
-	rightsManagementVerificationMethodId?: string;
-
-	/**
 	 * The rights management configuration which includes the information sources modules to load.
 	 * Use the @json: prefix to specify the path to the JSON configuration file.
 	 */
@@ -620,4 +608,10 @@ export interface IEngineEnvironmentVariables {
 	 * Use the @json: prefix to specify the path to the JSON configuration file.
 	 */
 	dataSpaceConnectorApps?: string;
+
+	/**
+	 * Verifiable credential assertion for node to node communication.
+	 * Defaults to node-authentication-assertion.
+	 */
+	vcAuthenticationVerificationMethodId?: string;
 }

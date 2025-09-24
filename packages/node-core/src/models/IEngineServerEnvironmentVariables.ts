@@ -56,6 +56,11 @@ export interface IEngineServerEnvironmentVariables {
 	mimeTypeProcessors?: string;
 
 	/**
+	 * Enable to the route processor for verifiable credentials.
+	 */
+	enableVerifiableCredentialRouteProcessors?: string;
+
+	/**
 	 * Disable Node Identity route processors.
 	 */
 	disableNodeIdentity?: string;

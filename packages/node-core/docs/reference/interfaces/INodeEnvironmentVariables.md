@@ -1164,19 +1164,6 @@ This only required if using a custom verifiable storage item, otherwise it will 
 
 ***
 
-### synchronisedStorageVerificationMethodId?
-
-> `optional` **synchronisedStorageVerificationMethodId**: `string`
-
-The identity verification method id to use with synchronised storage for signing/verifying changesets.
-Defaults to synchronised-storage-assertion.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`synchronisedStorageVerificationMethodId`](IEngineEnvironmentVariables.md#synchronisedstorageverificationmethodid)
-
-***
-
 ### synchronisedStorageBlobStorageEncryptionKeyId?
 
 > `optional` **synchronisedStorageBlobStorageEncryptionKeyId**: `string`
@@ -1336,19 +1323,6 @@ What is the base callback url for rights management negotiations e.g. https://my
 
 ***
 
-### rightsManagementVerificationMethodId?
-
-> `optional` **rightsManagementVerificationMethodId**: `string`
-
-The rights management verification method id to use when signing/verifying negotiation requests.
-Defaults to rights-management-assertion.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementVerificationMethodId`](IEngineEnvironmentVariables.md#rightsmanagementverificationmethodid)
-
-***
-
 ### rightsManagementInformationSources?
 
 > `optional` **rightsManagementInformationSources**: `string`
@@ -1477,6 +1451,19 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 
 ***
 
+### vcAuthenticationVerificationMethodId?
+
+> `optional` **vcAuthenticationVerificationMethodId**: `string`
+
+Verifiable credential assertion for node to node communication.
+Defaults to node-authentication-assertion.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`vcAuthenticationVerificationMethodId`](IEngineEnvironmentVariables.md#vcauthenticationverificationmethodid)
+
+***
+
 ### port?
 
 > `optional` **port**: `string`
@@ -1594,6 +1581,18 @@ Additional MIME type processors to include, comma separated.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`mimeTypeProcessors`](IEngineServerEnvironmentVariables.md#mimetypeprocessors)
+
+***
+
+### enableVerifiableCredentialRouteProcessors?
+
+> `optional` **enableVerifiableCredentialRouteProcessors**: `string`
+
+Enable to the route processor for verifiable credentials.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`enableVerifiableCredentialRouteProcessors`](IEngineServerEnvironmentVariables.md#enableverifiablecredentialrouteprocessors)
 
 ***
 

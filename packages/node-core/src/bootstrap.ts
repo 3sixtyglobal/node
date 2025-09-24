@@ -62,14 +62,12 @@ export async function bootstrap(
 		envVars.immutableProofVerificationMethodId
 	);
 
-	if (Coerce.boolean(envVars.rightsManagementEnabled) ?? false) {
-		await addVerificationMethod(
-			engineCore,
-			context,
-			"rights management",
-			envVars.rightsManagementVerificationMethodId
-		);
-	}
+	await addVerificationMethod(
+		engineCore,
+		context,
+		"node to node authentication",
+		envVars.vcAuthenticationVerificationMethodId
+	);
 
 	await bootstrapSynchronisedStorage(engineCore, context, envVars, features);
 }
@@ -556,14 +554,6 @@ export async function bootstrapSynchronisedStorage(
 	features: NodeFeatures[]
 ): Promise<void> {
 	if (Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) {
-		// Add the verification method to the identity if it doesn't exist
-		await addVerificationMethod(
-			engineCore,
-			context,
-			"synchronised storage",
-			envVars.synchronisedStorageVerificationMethodId
-		);
-
 		// If this is a trusted node we need to add the blob encryption key pair
 		if (
 			Is.stringValue(envVars.synchronisedStorageBlobStorageEncryptionKeyId) &&

@@ -10,6 +10,7 @@ import {
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
+	AuthenticationGeneratorComponentType,
 	BackgroundTaskConnectorType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
@@ -40,14 +41,16 @@ import {
 	MessagingSmsConnectorType,
 	NftComponentType,
 	NftConnectorType,
+	RightsManagementDapComponentType,
+	RightsManagementDarpComponentType,
 	RightsManagementPapComponentType,
 	RightsManagementPdpComponentType,
 	RightsManagementPepComponentType,
 	RightsManagementPipComponentType,
 	RightsManagementPmpComponentType,
-	RightsManagementPxpComponentType,
-	RightsManagementPnpComponentType,
 	RightsManagementPnapComponentType,
+	RightsManagementPnpComponentType,
+	RightsManagementPxpComponentType,
 	SynchronisedStorageComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
@@ -55,9 +58,7 @@ import {
 	VaultConnectorType,
 	VerifiableStorageComponentType,
 	VerifiableStorageConnectorType,
-	WalletConnectorType,
-	RightsManagementDapComponentType,
-	RightsManagementDarpComponentType
+	WalletConnectorType
 } from "@twin.org/engine-types";
 import {
 	DataAccessPointClient,
@@ -83,8 +84,7 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	envVars.blobStorageEnableEncryption ??= "false";
 	envVars.blobStorageEncryptionKeyId ??= "blob-encryption";
 	envVars.synchronisedStorageBlobStorageEncryptionKeyId ??= "synchronised-storage-blob-encryption";
-	envVars.synchronisedStorageVerificationMethodId ??= "synchronised-storage-assertion";
-	envVars.rightsManagementVerificationMethodId ??= "rights-management-assertion";
+	envVars.vcAuthenticationVerificationMethodId ??= "node-authentication-assertion";
 
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
@@ -116,6 +116,7 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	configureAuditableItemGraph(coreConfig, envVars);
 	configureAuditableItemStream(coreConfig, envVars);
 	configureDocumentManagement(coreConfig, envVars);
+	configureNodeToNode(coreConfig, envVars);
 	configureRightsManagement(coreConfig, envVars);
 	configureSynchronisedStorage(coreConfig, envVars);
 	configureFederatedCatalogue(coreConfig, envVars);
@@ -988,6 +989,28 @@ function configureDocumentManagement(
 }
 
 /**
+ * Configures the node to node.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+function configureNodeToNode(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): void {
+	if (Is.arrayValue(coreConfig.types.identityComponent)) {
+		// Can only perform VC authentication if identity component is available
+		coreConfig.types.authenticationGeneratorComponent ??= [];
+		coreConfig.types.authenticationGeneratorComponent.push({
+			type: AuthenticationGeneratorComponentType.VerifiableCredential,
+			options: {
+				config: { verificationMethodId: envVars.vcAuthenticationVerificationMethodId ?? "" }
+			},
+			features: ["verifiable-credential"]
+		});
+	}
+}
+
+/**
  * Configures the rights management.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -1069,7 +1092,6 @@ function configureRightsManagement(
 					: undefined,
 				config: {
 					baseCallbackUrl: envVars.rightsManagementBaseCallbackUrl ?? "",
-					rightsManagementMethodId: envVars.rightsManagementVerificationMethodId ?? "",
 					offers: Is.arrayValue<IOdrlOffer>(envVars.rightsManagementOffers)
 						? envVars.rightsManagementOffers
 						: [],
@@ -1094,7 +1116,6 @@ function configureRightsManagement(
 			type: RightsManagementDarpComponentType.Service,
 			options: {
 				config: {
-					rightsManagementMethodId: envVars.rightsManagementVerificationMethodId ?? "",
 					dataAccessComponentCreator: async url => new DataAccessPointClient({ endpoint: url })
 				}
 			}
@@ -1145,7 +1166,6 @@ function configureSynchronisedStorage(
 			options: {
 				config: {
 					verifiableStorageKeyId: verifiableStorageKeyId ?? "",
-					synchronisedStorageMethodId: envVars.synchronisedStorageVerificationMethodId,
 					blobStorageEncryptionKeyId: envVars.synchronisedStorageBlobStorageEncryptionKeyId,
 					entityUpdateIntervalMinutes: Coerce.number(
 						envVars.synchronisedStorageEntityUpdateIntervalMinutes

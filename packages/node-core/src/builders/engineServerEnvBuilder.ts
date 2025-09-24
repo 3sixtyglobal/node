@@ -171,6 +171,15 @@ export function buildEngineServerConfiguration(
 		});
 	}
 
+	if (Coerce.boolean(envVars.enableVerifiableCredentialRouteProcessors) ?? false) {
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.AuthVerifiableCredential
+		});
+		serverConfig.types.socketRouteProcessor.push({
+			type: SocketRouteProcessorType.AuthVerifiableCredential
+		});
+	}
+
 	addDefaultRestPaths(serverConfig);
 	addDefaultSocketPaths(serverConfig);
 

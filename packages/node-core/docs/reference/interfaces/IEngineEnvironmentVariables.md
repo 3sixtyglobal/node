@@ -780,15 +780,6 @@ This only required if using a custom verifiable storage item, otherwise it will 
 
 ***
 
-### synchronisedStorageVerificationMethodId?
-
-> `optional` **synchronisedStorageVerificationMethodId**: `string`
-
-The identity verification method id to use with synchronised storage for signing/verifying changesets.
-Defaults to synchronised-storage-assertion.
-
-***
-
 ### synchronisedStorageBlobStorageEncryptionKeyId?
 
 > `optional` **synchronisedStorageBlobStorageEncryptionKeyId**: `string`
@@ -904,15 +895,6 @@ What is the base callback url for rights management negotiations e.g. https://my
 
 ***
 
-### rightsManagementVerificationMethodId?
-
-> `optional` **rightsManagementVerificationMethodId**: `string`
-
-The rights management verification method id to use when signing/verifying negotiation requests.
-Defaults to rights-management-assertion.
-
-***
-
 ### rightsManagementInformationSources?
 
 > `optional` **rightsManagementInformationSources**: `string`
@@ -998,3 +980,12 @@ Is the data space connector enabled, defaults to false.
 
 The application configuration for the data space connector.
 Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### vcAuthenticationVerificationMethodId?
+
+> `optional` **vcAuthenticationVerificationMethodId**: `string`
+
+Verifiable credential assertion for node to node communication.
+Defaults to node-authentication-assertion.
