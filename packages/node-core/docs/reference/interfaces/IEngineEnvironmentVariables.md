@@ -519,7 +519,7 @@ Hashicorp Vault endpoint.
 
 > `optional` **loggingConnector**: `string`
 
-The type of background task connector, can be a comma separated list: console, entity-storage.
+The type of logging task connector, can be a comma separated list: console, entity-storage.
 
 ***
 

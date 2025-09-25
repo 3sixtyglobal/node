@@ -97,11 +97,18 @@ export function buildEngineServerConfiguration(
 	}
 
 	if (!coreEngineConfig.silent) {
+		const includeBody = Coerce.boolean(envVars.routeLoggingIncludeBody) ?? coreEngineConfig.debug;
+		const fullBase64 = Coerce.boolean(envVars.routeLoggingFullBase64) ?? false;
+		const obfuscateProperties = Is.stringValue(envVars.routeLoggingObfuscateProperties)
+			? envVars.routeLoggingObfuscateProperties.split(",")
+			: undefined;
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Logging,
 			options: {
 				config: {
-					includeBody: coreEngineConfig.debug
+					includeBody,
+					fullBase64,
+					obfuscateProperties
 				}
 			}
 		});
@@ -109,7 +116,9 @@ export function buildEngineServerConfiguration(
 			type: SocketRouteProcessorType.Logging,
 			options: {
 				config: {
-					includeBody: coreEngineConfig.debug
+					includeBody,
+					fullBase64,
+					obfuscateProperties
 				}
 			}
 		});

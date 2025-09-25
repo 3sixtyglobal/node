@@ -64,4 +64,19 @@ export interface IEngineServerEnvironmentVariables {
 	 * Disable Node Identity route processors.
 	 */
 	disableNodeIdentity?: string;
+
+	/**
+	 * Include the body in the REST logging output, useful for debugging.
+	 */
+	routeLoggingIncludeBody?: string;
+
+	/**
+	 * Include the full base 64 output in the REST logging output, useful for debugging.
+	 */
+	routeLoggingFullBase64?: string;
+
+	/**
+	 * List of properties to obfuscate in the REST logging output, comma separated.
+	 */
+	routeLoggingObfuscateProperties?: string;
 }

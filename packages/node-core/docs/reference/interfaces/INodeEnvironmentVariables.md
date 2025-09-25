@@ -771,7 +771,7 @@ Hashicorp Vault endpoint.
 
 > `optional` **loggingConnector**: `string`
 
-The type of background task connector, can be a comma separated list: console, entity-storage.
+The type of logging task connector, can be a comma separated list: console, entity-storage.
 
 #### Inherited from
 
@@ -1605,6 +1605,42 @@ Disable Node Identity route processors.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`disableNodeIdentity`](IEngineServerEnvironmentVariables.md#disablenodeidentity)
+
+***
+
+### routeLoggingIncludeBody?
+
+> `optional` **routeLoggingIncludeBody**: `string`
+
+Include the body in the REST logging output, useful for debugging.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`routeLoggingIncludeBody`](IEngineServerEnvironmentVariables.md#routeloggingincludebody)
+
+***
+
+### routeLoggingFullBase64?
+
+> `optional` **routeLoggingFullBase64**: `string`
+
+Include the full base 64 output in the REST logging output, useful for debugging.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`routeLoggingFullBase64`](IEngineServerEnvironmentVariables.md#routeloggingfullbase64)
+
+***
+
+### routeLoggingObfuscateProperties?
+
+> `optional` **routeLoggingObfuscateProperties**: `string`
+
+List of properties to obfuscate in the REST logging output, comma separated.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`routeLoggingObfuscateProperties`](IEngineServerEnvironmentVariables.md#routeloggingobfuscateproperties)
 
 ***
 

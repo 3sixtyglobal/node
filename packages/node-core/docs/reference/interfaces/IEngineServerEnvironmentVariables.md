@@ -101,3 +101,27 @@ Enable to the route processor for verifiable credentials.
 > `optional` **disableNodeIdentity**: `string`
 
 Disable Node Identity route processors.
+
+***
+
+### routeLoggingIncludeBody?
+
+> `optional` **routeLoggingIncludeBody**: `string`
+
+Include the body in the REST logging output, useful for debugging.
+
+***
+
+### routeLoggingFullBase64?
+
+> `optional` **routeLoggingFullBase64**: `string`
+
+Include the full base 64 output in the REST logging output, useful for debugging.
+
+***
+
+### routeLoggingObfuscateProperties?
+
+> `optional` **routeLoggingObfuscateProperties**: `string`
+
+List of properties to obfuscate in the REST logging output, comma separated.
