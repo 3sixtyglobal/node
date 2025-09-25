@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.14](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.13...node-core-v0.0.2-next.14) (2025-09-25)
+
+
+### Features
+
+* additional route logging env vars ([7152c88](https://github.com/twinfoundation/node/commit/7152c887c3ba76778e2d9e68ba57198b8d81d802))
+
 ## [0.0.2-next.13](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.12...node-core-v0.0.2-next.13) (2025-09-24)
 
 
