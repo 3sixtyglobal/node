@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.15](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.14...node-core-v0.0.2-next.15) (2025-09-26)
+
+
+### Features
+
+* additional options for enabling components ([e13d772](https://github.com/twinfoundation/node/commit/e13d7721a0dd7143d456fff246622cbe63dbd0f1))
+
 ## [0.0.2-next.14](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.13...node-core-v0.0.2-next.14) (2025-09-25)
 
 
