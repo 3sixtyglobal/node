@@ -18,8 +18,10 @@ import {
 	DataExtractorConnectorType,
 	DataProcessingComponentType,
 	DataSpaceConnectorComponentType,
+	type DltConfig,
 	DltConfigType,
 	DocumentManagementComponentType,
+	EngineTypeHelper,
 	EntityStorageConnectorType,
 	EventBusComponentType,
 	EventBusConnectorType,
@@ -116,25 +118,13 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 	configureAuditableItemGraph(coreConfig, envVars);
 	configureAuditableItemStream(coreConfig, envVars);
 	configureDocumentManagement(coreConfig, envVars);
-	configureNodeToNode(coreConfig, envVars);
+	configureVerifiableCredentialAuthentication(coreConfig, envVars);
 	configureRightsManagement(coreConfig, envVars);
 	configureSynchronisedStorage(coreConfig, envVars);
 	configureFederatedCatalogue(coreConfig, envVars);
 	configureDataSpaceConnector(coreConfig, envVars);
 
 	return coreConfig;
-}
-
-/**
- * Helper function to get IOTA configuration from centralized dltConfig.
- * @param coreConfig The core config.
- * @returns The IOTA configuration if found, undefined otherwise.
- */
-function getIotaConfig(coreConfig: IEngineConfig): IIotaConfig | undefined {
-	const dltConfig = coreConfig.types.dltConfig?.find(
-		config => config.type === DltConfigType.Iota && config.isDefault
-	);
-	return dltConfig?.options?.config;
 }
 
 /**
@@ -649,14 +639,18 @@ function configureFaucet(coreConfig: IEngineConfig, envVars: IEngineEnvironmentV
 			type: FaucetConnectorType.EntityStorage
 		});
 	} else if (envVars.faucetConnector === FaucetConnectorType.Iota) {
-		const iotaConfig = getIotaConfig(coreConfig);
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
 		coreConfig.types.faucetConnector.push({
 			type: FaucetConnectorType.Iota,
 			options: {
 				config: {
 					endpoint: envVars.iotaFaucetEndpoint ?? "",
-					clientOptions: iotaConfig?.clientOptions ?? { url: "" },
-					network: iotaConfig?.network ?? ""
+					clientOptions: dltConfig?.options?.config?.clientOptions ?? { url: "" },
+					network: dltConfig?.options?.config?.network ?? ""
 				}
 			}
 		});
@@ -676,11 +670,15 @@ function configureWallet(coreConfig: IEngineConfig, envVars: IEngineEnvironmentV
 			type: WalletConnectorType.EntityStorage
 		});
 	} else if (envVars.walletConnector === WalletConnectorType.Iota) {
-		const iotaConfig = getIotaConfig(coreConfig);
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
 		coreConfig.types.walletConnector.push({
 			type: WalletConnectorType.Iota,
 			options: {
-				config: iotaConfig ?? ({} as IIotaConfig)
+				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
 			}
 		});
 	}
@@ -699,11 +697,15 @@ function configureNft(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVari
 			type: NftConnectorType.EntityStorage
 		});
 	} else if (envVars.nftConnector === NftConnectorType.Iota) {
-		const iotaConfig = getIotaConfig(coreConfig);
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
 		coreConfig.types.nftConnector.push({
 			type: NftConnectorType.Iota,
 			options: {
-				config: iotaConfig ?? ({} as IIotaConfig)
+				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
 			}
 		});
 	}
@@ -730,11 +732,15 @@ function configureVerifiableStorage(
 			type: VerifiableStorageConnectorType.EntityStorage
 		});
 	} else if (envVars.verifiableStorageConnector === VerifiableStorageConnectorType.Iota) {
-		const iotaConfig = getIotaConfig(coreConfig);
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
 		coreConfig.types.verifiableStorageConnector.push({
 			type: VerifiableStorageConnectorType.Iota,
 			options: {
-				config: iotaConfig ?? ({} as IIotaConfig)
+				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
 			}
 		});
 	}
@@ -754,16 +760,6 @@ function configureVerifiableStorage(
 				}
 			}
 		});
-
-		coreConfig.types.auditableItemGraphComponent ??= [];
-		coreConfig.types.auditableItemGraphComponent.push({
-			type: AuditableItemGraphComponentType.Service
-		});
-
-		coreConfig.types.auditableItemStreamComponent ??= [];
-		coreConfig.types.auditableItemStreamComponent.push({
-			type: AuditableItemStreamComponentType.Service
-		});
 	}
 }
 
@@ -780,11 +776,15 @@ function configureIdentity(coreConfig: IEngineConfig, envVars: IEngineEnvironmen
 			type: IdentityConnectorType.EntityStorage
 		});
 	} else if (envVars.identityConnector === IdentityConnectorType.Iota) {
-		const iotaConfig = getIotaConfig(coreConfig);
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
 		coreConfig.types.identityConnector.push({
 			type: IdentityConnectorType.Iota,
 			options: {
-				config: iotaConfig ?? ({} as IIotaConfig)
+				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
 			}
 		});
 	}
@@ -811,11 +811,15 @@ function configureIdentityResolver(
 			type: IdentityResolverConnectorType.EntityStorage
 		});
 	} else if (envVars.identityResolverConnector === IdentityResolverConnectorType.Iota) {
-		const iotaConfig = getIotaConfig(coreConfig);
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
 		coreConfig.types.identityResolverConnector.push({
 			type: IdentityResolverConnectorType.Iota,
 			options: {
-				config: iotaConfig ?? ({} as IIotaConfig)
+				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
 			}
 		});
 	} else if (envVars.identityResolverConnector === IdentityResolverConnectorType.Universal) {
@@ -899,7 +903,7 @@ function configureAuditableItemGraph(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	if (Is.arrayValue(coreConfig.types.verifiableStorageConnector)) {
+	if (Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) {
 		coreConfig.types.auditableItemGraphComponent ??= [];
 		coreConfig.types.auditableItemGraphComponent.push({
 			type: AuditableItemGraphComponentType.Service
@@ -916,7 +920,7 @@ function configureAuditableItemStream(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	if (Is.arrayValue(coreConfig.types.verifiableStorageConnector)) {
+	if (Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) {
 		coreConfig.types.auditableItemStreamComponent ??= [];
 		coreConfig.types.auditableItemStreamComponent.push({
 			type: AuditableItemStreamComponentType.Service
@@ -933,37 +937,34 @@ function configureDataProcessing(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	coreConfig.types.dataConverterConnector ??= [];
-	coreConfig.types.dataExtractorConnector ??= [];
-
-	const converterConnectors = envVars.dataConverterConnectors?.split(",") ?? [];
-	for (const converterConnector of converterConnectors) {
-		if (converterConnector === DataConverterConnectorType.Json) {
-			coreConfig.types.dataConverterConnector.push({
-				type: DataConverterConnectorType.Json
-			});
-		} else if (converterConnector === DataConverterConnectorType.Xml) {
-			coreConfig.types.dataConverterConnector.push({
-				type: DataConverterConnectorType.Xml
-			});
-		}
-	}
-
-	const extractorConnectors = envVars.dataExtractorConnectors?.split(",") ?? [];
-	for (const extractorConnector of extractorConnectors) {
-		if (extractorConnector === DataExtractorConnectorType.JsonPath) {
-			coreConfig.types.dataExtractorConnector.push({
-				type: DataExtractorConnectorType.JsonPath
-			});
-		}
-	}
-
-	if (
-		coreConfig.types.dataConverterConnector.length > 0 ||
-		coreConfig.types.dataExtractorConnector.length > 0
-	) {
+	if (Coerce.boolean(envVars.dataProcessingEnabled) ?? false) {
 		coreConfig.types.dataProcessingComponent ??= [];
 		coreConfig.types.dataProcessingComponent.push({ type: DataProcessingComponentType.Service });
+
+		coreConfig.types.dataConverterConnector ??= [];
+
+		const converterConnectors = envVars.dataConverterConnectors?.split(",") ?? [];
+		for (const converterConnector of converterConnectors) {
+			if (converterConnector === DataConverterConnectorType.Json) {
+				coreConfig.types.dataConverterConnector.push({
+					type: DataConverterConnectorType.Json
+				});
+			} else if (converterConnector === DataConverterConnectorType.Xml) {
+				coreConfig.types.dataConverterConnector.push({
+					type: DataConverterConnectorType.Xml
+				});
+			}
+		}
+
+		coreConfig.types.dataExtractorConnector ??= [];
+		const extractorConnectors = envVars.dataExtractorConnectors?.split(",") ?? [];
+		for (const extractorConnector of extractorConnectors) {
+			if (extractorConnector === DataExtractorConnectorType.JsonPath) {
+				coreConfig.types.dataExtractorConnector.push({
+					type: DataExtractorConnectorType.JsonPath
+				});
+			}
+		}
 	}
 }
 
@@ -976,11 +977,7 @@ function configureDocumentManagement(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	if (
-		Is.arrayValue(coreConfig.types.auditableItemGraphComponent) &&
-		Is.arrayValue(coreConfig.types.blobStorageComponent) &&
-		Is.arrayValue(coreConfig.types.attestationComponent)
-	) {
+	if (Coerce.boolean(envVars.documentManagementEnabled) ?? false) {
 		coreConfig.types.documentManagementComponent ??= [];
 		coreConfig.types.documentManagementComponent.push({
 			type: DocumentManagementComponentType.Service
@@ -989,15 +986,15 @@ function configureDocumentManagement(
 }
 
 /**
- * Configures the node to node.
+ * Configures the verifiable credential authentication.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureNodeToNode(
+function configureVerifiableCredentialAuthentication(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): void {
-	if (Is.arrayValue(coreConfig.types.identityComponent)) {
+	if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
 		// Can only perform VC authentication if identity component is available
 		coreConfig.types.authenticationGeneratorComponent ??= [];
 		coreConfig.types.authenticationGeneratorComponent.push({

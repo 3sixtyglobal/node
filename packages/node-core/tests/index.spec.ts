@@ -107,12 +107,16 @@ describe("node-core", () => {
 			TWIN_NODE_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 			TWIN_NODE_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
 			TWIN_NODE_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
+			TWIN_NODE_DATA_PROCESSING_ENABLED: "true",
 			TWIN_NODE_DATA_CONVERTER_CONNECTORS: "json,xml",
 			TWIN_NODE_DATA_EXTRACTOR_CONNECTORS: "json-path",
+			TWIN_NODE_AUDITABLE_ITEM_GRAPH_ENABLED: "true",
+			TWIN_NODE_AUDITABLE_ITEM_STREAM_ENABLED: "true",
 			TWIN_NODE_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_NODE_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_NODE_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_NODE_FEATURES: "node-identity,node-user",
+			TWIN_NODE_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management",
@@ -124,7 +128,8 @@ describe("node-core", () => {
 			TWIN_NODE_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 			TWIN_NODE_DATA_SPACE_CONNECTOR_ENABLED: "true",
-			TWIN_NODE_DATA_SPACE_CONNECTOR_APPS: "@json:tests/apps/data-space-apps.json"
+			TWIN_NODE_DATA_SPACE_CONNECTOR_APPS: "@json:tests/apps/data-space-apps.json",
+			TWIN_NODE_VC_AUTHENTICATION_ENABLED: "true"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -415,7 +420,8 @@ describe("node-core", () => {
 			TWIN_NODE_FEATURES: "node-identity,node-user",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
-			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management"
+			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management",
+			TWIN_NODE_VC_AUTHENTICATION_ENABLED: "true"
 		};
 
 		await initialiseLocales("./dist/locales/");

@@ -1,10 +1,11 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { IEngineEnvironmentVariables } from "./IEngineEnvironmentVariables";
 
 /**
  * The engine server environment variables.
  */
-export interface IEngineServerEnvironmentVariables {
+export interface IEngineServerEnvironmentVariables extends IEngineEnvironmentVariables {
 	/**
 	 * The port to serve the API from.
 	 */
@@ -54,11 +55,6 @@ export interface IEngineServerEnvironmentVariables {
 	 * Additional MIME type processors to include, comma separated.
 	 */
 	mimeTypeProcessors?: string;
-
-	/**
-	 * Enable to the route processor for verifiable credentials.
-	 */
-	enableVerifiableCredentialRouteProcessors?: string;
 
 	/**
 	 * Disable Node Identity route processors.

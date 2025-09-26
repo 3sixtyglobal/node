@@ -62,12 +62,14 @@ export async function bootstrap(
 		envVars.immutableProofVerificationMethodId
 	);
 
-	await addVerificationMethod(
-		engineCore,
-		context,
-		"node to node authentication",
-		envVars.vcAuthenticationVerificationMethodId
-	);
+	if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
+		await addVerificationMethod(
+			engineCore,
+			context,
+			"verifiable credential authentication",
+			envVars.vcAuthenticationVerificationMethodId
+		);
+	}
 
 	await bootstrapSynchronisedStorage(engineCore, context, envVars, features);
 }
@@ -390,10 +392,11 @@ export async function bootstrapNodeUser(
 			}
 
 			// We have create a node user, now we need to create a profile for the user
-			const defaultIdentityConnectorType =
-				engineCore.getRegisteredInstanceType("identityConnector");
+			const defaultIdentityProfileConnectorType = engineCore.getRegisteredInstanceType(
+				"identityProfileConnector"
+			);
 			const identityProfileConnector = IdentityProfileConnectorFactory.get(
-				defaultIdentityConnectorType
+				defaultIdentityProfileConnectorType
 			);
 
 			if (identityProfileConnector) {

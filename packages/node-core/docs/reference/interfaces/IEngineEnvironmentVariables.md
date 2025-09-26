@@ -4,7 +4,7 @@ The engine core environment variables.
 
 ## Extended by
 
-- [`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
+- [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md)
 
 ## Properties
 
@@ -739,6 +739,14 @@ The identity verification method id to use with attestation.
 
 ***
 
+### dataProcessingEnabled?
+
+> `optional` **dataProcessingEnabled**: `string`
+
+Is the data processing enabled, defaults to false.
+
+***
+
 ### dataConverterConnectors?
 
 > `optional` **dataConverterConnectors**: `string`
@@ -752,6 +760,30 @@ The type of the default data converters, can be a comma separated list: json, xm
 > `optional` **dataExtractorConnectors**: `string`
 
 The type of the default data extractor, can be a comma separated list: json-path.
+
+***
+
+### auditableItemGraphEnabled?
+
+> `optional` **auditableItemGraphEnabled**: `string`
+
+Is the auditable item graph enabled, defaults to false.
+
+***
+
+### auditableItemStreamEnabled?
+
+> `optional` **auditableItemStreamEnabled**: `string`
+
+Is the auditable item stream enabled, defaults to false.
+
+***
+
+### documentManagementEnabled?
+
+> `optional` **documentManagementEnabled**: `string`
+
+Is the document management enabled, defaults to false.
 
 ***
 
@@ -980,6 +1012,14 @@ Is the data space connector enabled, defaults to false.
 
 The application configuration for the data space connector.
 Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### vcAuthenticationEnabled?
+
+> `optional` **vcAuthenticationEnabled**: `string`
+
+Enable verifiable credential authentication for the API.
 
 ***
 

@@ -180,7 +180,7 @@ export function buildEngineServerConfiguration(
 		});
 	}
 
-	if (Coerce.boolean(envVars.enableVerifiableCredentialRouteProcessors) ?? false) {
+	if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.AuthVerifiableCredential
 		});

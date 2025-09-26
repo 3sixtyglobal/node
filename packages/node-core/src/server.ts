@@ -53,14 +53,14 @@ export async function start(
 		customBootstrap: async (core, engineContext) => bootstrap(core, engineContext, envVars)
 	});
 
+	// Construct the server with the engine.
+	const server = new EngineServer({ engineCore: engine });
+
 	// Extend the engine.
 	if (Is.function(nodeOptions?.extendEngine)) {
 		console.info("Extending Engine");
 		await nodeOptions.extendEngine(engine);
 	}
-
-	// Construct the server with the engine.
-	const server = new EngineServer({ engineCore: engine });
 
 	// Extend the engine server.
 	if (Is.function(nodeOptions?.extendEngineServer)) {

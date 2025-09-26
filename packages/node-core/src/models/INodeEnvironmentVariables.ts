@@ -1,14 +1,11 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineEnvironmentVariables } from "./IEngineEnvironmentVariables";
 import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironmentVariables";
 
 /**
  * The environment variables for the node.
  */
-export interface INodeEnvironmentVariables
-	extends IEngineEnvironmentVariables,
-		IEngineServerEnvironmentVariables {
+export interface INodeEnvironmentVariables extends IEngineServerEnvironmentVariables {
 	/**
 	 * The features that are enabled on the node.
 	 * @default [NodeFeatures.NodeIdentity]

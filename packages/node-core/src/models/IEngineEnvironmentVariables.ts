@@ -464,6 +464,11 @@ export interface IEngineEnvironmentVariables {
 	attestationVerificationMethodId?: string;
 
 	/**
+	 * Is the data processing enabled, defaults to false.
+	 */
+	dataProcessingEnabled?: string;
+
+	/**
 	 * The type of the default data converters, can be a comma separated list: json, xml.
 	 */
 	dataConverterConnectors?: string;
@@ -472,6 +477,21 @@ export interface IEngineEnvironmentVariables {
 	 * The type of the default data extractor, can be a comma separated list: json-path.
 	 */
 	dataExtractorConnectors?: string;
+
+	/**
+	 * Is the auditable item graph enabled, defaults to false.
+	 */
+	auditableItemGraphEnabled?: string;
+
+	/**
+	 * Is the auditable item stream enabled, defaults to false.
+	 */
+	auditableItemStreamEnabled?: string;
+
+	/**
+	 * Is the document management enabled, defaults to false.
+	 */
+	documentManagementEnabled?: string;
 
 	/**
 	 * Is the synchronised storage enabled, defaults to false.
@@ -608,6 +628,11 @@ export interface IEngineEnvironmentVariables {
 	 * Use the @json: prefix to specify the path to the JSON configuration file.
 	 */
 	dataSpaceConnectorApps?: string;
+
+	/**
+	 * Enable verifiable credential authentication for the API.
+	 */
+	vcAuthenticationEnabled?: string;
 
 	/**
 	 * Verifiable credential assertion for node to node communication.
