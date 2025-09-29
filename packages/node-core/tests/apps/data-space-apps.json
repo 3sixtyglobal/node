@@ -1,6 +1,6 @@
 [
 	{
-		"id": "https://twin.example.org/app1",
+		"id": "my-app",
 		"initialiserName": "appInitialiser",
 		"moduleName": "./tests/apps/test-app.mjs",
 		"activitiesHandled": [

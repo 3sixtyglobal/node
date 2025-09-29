@@ -31,6 +31,7 @@ import type {
 	IdentityDocument,
 	IdentityProfile
 } from "@twin.org/identity-connector-entity-storage";
+import type { IMessagingAdminComponent } from "@twin.org/messaging-models";
 import type { VaultKey, VaultSecret } from "@twin.org/vault-connector-entity-storage";
 import type { INodeOptions } from "../src/models/INodeOptions";
 import { buildConfiguration, overrideModuleImport } from "../src/node";
@@ -129,7 +130,9 @@ describe("node-core", () => {
 			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 			TWIN_NODE_DATA_SPACE_CONNECTOR_ENABLED: "true",
 			TWIN_NODE_DATA_SPACE_CONNECTOR_APPS: "@json:tests/apps/data-space-apps.json",
-			TWIN_NODE_VC_AUTHENTICATION_ENABLED: "true"
+			TWIN_NODE_VC_AUTHENTICATION_ENABLED: "true",
+			TWIN_NODE_MESSAGING_ENABLED: "true",
+			TWIN_NODE_MESSAGING_TEMPLATES: "@json:tests/templates.json"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -160,6 +163,8 @@ describe("node-core", () => {
 			"task-scheduler-service",
 			"event-bus-service",
 			"telemetry-service",
+			"messaging-admin-service",
+			"messaging-service",
 			"blob-storage-service",
 			"verifiable-storage-service",
 			"identity-service",
@@ -187,7 +192,8 @@ describe("node-core", () => {
 			"data-space-connector-service",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
-			"information-service"
+			"information-service",
+			"data-space-connector-app-my-app"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -391,6 +397,11 @@ describe("node-core", () => {
 			const pxp = ComponentFactory.get("policy-execution-point-service");
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((pxp as any)._executionActions.before.length).toEqual(1);
+
+			const messagingAdminService =
+				ComponentFactory.get<IMessagingAdminComponent>("messaging-admin-service");
+			expect(await messagingAdminService.getTemplate("my-template", "en")).toBeDefined();
+			expect(await messagingAdminService.getTemplate("my-template", "de")).toBeDefined();
 		}
 
 		await startResult?.server.stop();

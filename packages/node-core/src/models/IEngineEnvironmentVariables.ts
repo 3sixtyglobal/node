@@ -344,6 +344,42 @@ export interface IEngineEnvironmentVariables {
 	eventBusComponent?: string;
 
 	/**
+	 * Are the messaging components enabled, defaults to false.
+	 */
+	messagingEnabled?: string;
+
+	/**
+	 * An initial set of templates for the messages.
+	 * Use the @json: prefix to specify the path to the JSON file.
+	 */
+	messagingTemplates?: string;
+
+	/**
+	 * AWS SES secret access key.
+	 */
+	awsSesSecretAccessKey?: string;
+
+	/**
+	 * AWS SES access key id.
+	 */
+	awsSesAccessKeyId?: string;
+
+	/**
+	 * AWS SES region.
+	 */
+	awsSesRegion?: string;
+
+	/**
+	 * AWS SES endpoint.
+	 */
+	awsSesEndpoint?: string;
+
+	/**
+	 * The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
+	 */
+	awsMessagingPushNotificationApplications?: string;
+
+	/**
 	 * The type of messaging email connector: entity-storage, aws.
 	 */
 	messagingEmailConnector?: string;
@@ -357,16 +393,6 @@ export interface IEngineEnvironmentVariables {
 	 * The type of messaging push notification connector: entity-storage, aws.
 	 */
 	messagingPushNotificationConnector?: string;
-
-	/**
-	 * The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
-	 */
-	awsMessagingPushNotificationApplications?: string;
-
-	/**
-	 * The type of messaging component: service.
-	 */
-	messagingComponent?: string;
 
 	/**
 	 * The type of telemetry connector: entity-storage.

@@ -1,5 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { ComponentFactory } from '@twin.org/core';
+
 /**
  * Test Data Space Connector App initializer.
  * @param core The engine core.
@@ -10,7 +12,12 @@
  * @returns The name of the instance created.
  */
 export function appInitialiser(core, context, instanceConfig, overrideInstanceType) {
+	const componentName = 'data-space-connector-app-my-app';
+
 	// eslint-disable-next-line no-console
-	console.log('Loaded custom app module');
-	return '';
+	console.log('Loaded custom app module', componentName);
+
+	ComponentFactory.register(componentName, () => ({}));
+
+	return overrideInstanceType ?? componentName;
 }

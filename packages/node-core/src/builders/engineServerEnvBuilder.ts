@@ -25,13 +25,13 @@ import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerE
  * @param favIconPath The path to the favicon.
  * @returns The the config for the core and the server.
  */
-export function buildEngineServerConfiguration(
+export async function buildEngineServerConfiguration(
 	envVars: IEngineServerEnvironmentVariables,
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
 	openApiSpecPath?: string,
 	favIconPath?: string
-): IEngineServerConfig {
+): Promise<IEngineServerConfig> {
 	envVars.authSigningKeyId ??= "auth-signing";
 
 	const webServerOptions: IWebServerOptions = {

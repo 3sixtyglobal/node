@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 /* eslint-disable no-console */
-import { readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { I18n, Is, type ILocaleDictionary } from "@twin.org/core";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
@@ -41,6 +41,64 @@ export async function fileExists(filename: string): Promise<boolean> {
 		return stats.isFile();
 	} catch {
 		return false;
+	}
+}
+
+/**
+ * Does the specified directory exist.
+ * @param directory The directory to check for existence.
+ * @returns True if the directory exists.
+ */
+export async function directoryExists(directory: string): Promise<boolean> {
+	try {
+		const stats = await stat(directory);
+		return stats.isDirectory();
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Get the sub folders for the folder.
+ * @param directory The directory to get the sub folders.
+ * @returns The list of sub folders.
+ */
+export async function getSubFolders(directory: string): Promise<string[]> {
+	try {
+		const dir = await readdir(directory);
+		const folders: string[] = [];
+		for (const dirEntry of dir) {
+			const fullPath = path.join(directory, dirEntry);
+			const stats = await stat(fullPath);
+			if (stats.isDirectory()) {
+				folders.push(fullPath);
+			}
+		}
+		return folders;
+	} catch {
+		return [];
+	}
+}
+
+/**
+ * Get the files in the directory.
+ * @param directory The directory to get the files from.
+ * @returns The list of files in the directory.
+ */
+export async function getFiles(directory: string): Promise<string[]> {
+	try {
+		const dir = await readdir(directory);
+		const files: string[] = [];
+		for (const dirEntry of dir) {
+			const fullPath = path.join(directory, dirEntry);
+			const stats = await stat(fullPath);
+			if (stats.isFile()) {
+				files.push(fullPath);
+			}
+		}
+		return files;
+	} catch {
+		return [];
 	}
 }
 

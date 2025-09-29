@@ -37,6 +37,7 @@ import {
 	ImmutableProofComponentType,
 	LoggingComponentType,
 	LoggingConnectorType,
+	MessagingAdminComponentType,
 	MessagingComponentType,
 	MessagingEmailConnectorType,
 	MessagingPushNotificationConnectorType,
@@ -74,7 +75,9 @@ import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVa
  * @param envVars The environment variables.
  * @returns The config for the core.
  */
-export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): IEngineConfig {
+export async function buildEngineConfiguration(
+	envVars: IEngineEnvironmentVariables
+): Promise<IEngineConfig> {
 	if (Is.stringValue(envVars.storageFileRoot)) {
 		envVars.stateFilename ??= "engine-state.json";
 		envVars.storageFileRoot = path.resolve(envVars.storageFileRoot);
@@ -93,36 +96,36 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
 		types: {}
 	};
 
-	configureEntityStorage(coreConfig, envVars);
-	configureBlobStorage(coreConfig, envVars);
-	configureVault(coreConfig, envVars);
-	configureDlt(coreConfig, envVars);
+	await configureEntityStorage(coreConfig, envVars);
+	await configureBlobStorage(coreConfig, envVars);
+	await configureVault(coreConfig, envVars);
+	await configureDlt(coreConfig, envVars);
 
-	configureLogging(coreConfig, envVars);
-	configureBackgroundTask(coreConfig, envVars);
-	configureTaskScheduler(coreConfig, envVars);
-	configureEventBus(coreConfig, envVars);
-	configureTelemetry(coreConfig, envVars);
-	configureMessaging(coreConfig, envVars);
+	await configureLogging(coreConfig, envVars);
+	await configureBackgroundTask(coreConfig, envVars);
+	await configureTaskScheduler(coreConfig, envVars);
+	await configureEventBus(coreConfig, envVars);
+	await configureTelemetry(coreConfig, envVars);
+	await configureMessaging(coreConfig, envVars);
 
-	configureFaucet(coreConfig, envVars);
-	configureWallet(coreConfig, envVars);
-	configureNft(coreConfig, envVars);
-	configureVerifiableStorage(coreConfig, envVars);
-	configureIdentity(coreConfig, envVars);
-	configureIdentityResolver(coreConfig, envVars);
-	configureIdentityProfile(coreConfig, envVars);
-	configureAttestation(coreConfig, envVars);
-	configureDataProcessing(coreConfig, envVars);
+	await configureFaucet(coreConfig, envVars);
+	await configureWallet(coreConfig, envVars);
+	await configureNft(coreConfig, envVars);
+	await configureVerifiableStorage(coreConfig, envVars);
+	await configureIdentity(coreConfig, envVars);
+	await configureIdentityResolver(coreConfig, envVars);
+	await configureIdentityProfile(coreConfig, envVars);
+	await configureAttestation(coreConfig, envVars);
+	await configureDataProcessing(coreConfig, envVars);
 
-	configureAuditableItemGraph(coreConfig, envVars);
-	configureAuditableItemStream(coreConfig, envVars);
-	configureDocumentManagement(coreConfig, envVars);
-	configureVerifiableCredentialAuthentication(coreConfig, envVars);
-	configureRightsManagement(coreConfig, envVars);
-	configureSynchronisedStorage(coreConfig, envVars);
-	configureFederatedCatalogue(coreConfig, envVars);
-	configureDataSpaceConnector(coreConfig, envVars);
+	await configureAuditableItemGraph(coreConfig, envVars);
+	await configureAuditableItemStream(coreConfig, envVars);
+	await configureDocumentManagement(coreConfig, envVars);
+	await configureVerifiableCredentialAuthentication(coreConfig, envVars);
+	await configureRightsManagement(coreConfig, envVars);
+	await configureSynchronisedStorage(coreConfig, envVars);
+	await configureFederatedCatalogue(coreConfig, envVars);
+	await configureDataSpaceConnector(coreConfig, envVars);
 
 	return coreConfig;
 }
@@ -132,10 +135,10 @@ export function buildEngineConfiguration(envVars: IEngineEnvironmentVariables): 
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureEntityStorage(
+async function configureEntityStorage(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types ??= {};
 	coreConfig.types.entityStorageConnector ??= [];
 
@@ -294,10 +297,10 @@ function configureEntityStorage(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureBlobStorage(
+async function configureBlobStorage(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types.blobStorageConnector ??= [];
 
 	const blobStorageConnectorTypes = envVars.blobStorageConnectorType?.split(",") ?? [];
@@ -421,7 +424,10 @@ function configureBlobStorage(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureLogging(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureLogging(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.loggingConnector ??= [];
 
 	const loggingConnectors = (envVars.loggingConnector ?? "").split(",");
@@ -466,7 +472,10 @@ function configureLogging(coreConfig: IEngineConfig, envVars: IEngineEnvironment
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureVault(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureVault(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.vaultConnector ??= [];
 
 	if (envVars.vaultConnector === VaultConnectorType.EntityStorage) {
@@ -491,10 +500,10 @@ function configureVault(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVa
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureBackgroundTask(
+async function configureBackgroundTask(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types.backgroundTaskConnector ??= [];
 
 	if (envVars.backgroundTaskConnector === BackgroundTaskConnectorType.EntityStorage) {
@@ -509,7 +518,10 @@ function configureBackgroundTask(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureEventBus(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureEventBus(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.eventBusConnector ??= [];
 
 	if (envVars.eventBusConnector === EventBusConnectorType.Local) {
@@ -529,7 +541,10 @@ function configureEventBus(coreConfig: IEngineConfig, envVars: IEngineEnvironmen
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureTelemetry(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureTelemetry(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.telemetryConnector ??= [];
 
 	if (envVars.telemetryConnector === TelemetryConnectorType.EntityStorage) {
@@ -549,78 +564,95 @@ function configureTelemetry(coreConfig: IEngineConfig, envVars: IEngineEnvironme
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureMessaging(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
-	coreConfig.types.messagingEmailConnector ??= [];
-	coreConfig.types.messagingSmsConnector ??= [];
-	coreConfig.types.messagingPushNotificationConnector ??= [];
+async function configureMessaging(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	if (Coerce.boolean(envVars.messagingEnabled) ?? false) {
+		coreConfig.types.messagingEmailConnector ??= [];
+		coreConfig.types.messagingSmsConnector ??= [];
+		coreConfig.types.messagingPushNotificationConnector ??= [];
 
-	if (envVars.messagingEmailConnector === MessagingEmailConnectorType.EntityStorage) {
-		coreConfig.types.messagingEmailConnector.push({
-			type: MessagingEmailConnectorType.EntityStorage
-		});
-	} else if (envVars.messagingEmailConnector === MessagingEmailConnectorType.Aws) {
-		coreConfig.types.messagingEmailConnector.push({
-			type: MessagingEmailConnectorType.Aws,
+		if (envVars.messagingEmailConnector === MessagingEmailConnectorType.EntityStorage) {
+			coreConfig.types.messagingEmailConnector.push({
+				type: MessagingEmailConnectorType.EntityStorage
+			});
+		} else if (envVars.messagingEmailConnector === MessagingEmailConnectorType.Aws) {
+			coreConfig.types.messagingEmailConnector.push({
+				type: MessagingEmailConnectorType.Aws,
+				options: {
+					config: {
+						region: envVars.awsS3Region ?? "",
+						accessKeyId: envVars.awsS3AccessKeyId ?? "",
+						secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
+						endpoint: envVars.awsS3Endpoint ?? ""
+					}
+				}
+			});
+		}
+
+		if (envVars.messagingSmsConnector === MessagingSmsConnectorType.EntityStorage) {
+			coreConfig.types.messagingSmsConnector.push({
+				type: MessagingSmsConnectorType.EntityStorage
+			});
+		} else if (envVars.messagingSmsConnector === MessagingSmsConnectorType.Aws) {
+			coreConfig.types.messagingSmsConnector.push({
+				type: MessagingSmsConnectorType.Aws,
+				options: {
+					config: {
+						region: envVars.awsS3Region ?? "",
+						accessKeyId: envVars.awsS3AccessKeyId ?? "",
+						secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
+						endpoint: envVars.awsS3Endpoint ?? ""
+					}
+				}
+			});
+		}
+
+		if (
+			envVars.messagingPushNotificationConnector ===
+			MessagingPushNotificationConnectorType.EntityStorage
+		) {
+			coreConfig.types.messagingPushNotificationConnector.push({
+				type: MessagingPushNotificationConnectorType.EntityStorage
+			});
+		} else if (
+			envVars.messagingPushNotificationConnector === MessagingPushNotificationConnectorType.Aws
+		) {
+			coreConfig.types.messagingPushNotificationConnector.push({
+				type: MessagingPushNotificationConnectorType.Aws,
+				options: {
+					config: {
+						region: envVars.awsSesRegion ?? "",
+						accessKeyId: envVars.awsSesAccessKeyId ?? "",
+						secretAccessKey: envVars.awsSesSecretAccessKey ?? "",
+						endpoint: envVars.awsSesEndpoint,
+						applicationsSettings: Is.json(envVars.awsMessagingPushNotificationApplications)
+							? JSON.parse(envVars.awsMessagingPushNotificationApplications)
+							: []
+					}
+				}
+			});
+		}
+
+		const templates = Is.arrayValue<{
+			templateId: string;
+			title: string;
+			content: { [locale: string]: string };
+		}>(envVars.messagingTemplates)
+			? envVars.messagingTemplates
+			: undefined;
+
+		coreConfig.types.messagingAdminComponent ??= [];
+		coreConfig.types.messagingAdminComponent.push({
+			type: MessagingAdminComponentType.Service,
 			options: {
 				config: {
-					region: envVars.awsS3Region ?? "",
-					accessKeyId: envVars.awsS3AccessKeyId ?? "",
-					secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
-					endpoint: envVars.awsS3Endpoint ?? ""
+					templates
 				}
 			}
 		});
-	}
 
-	if (envVars.messagingSmsConnector === MessagingSmsConnectorType.EntityStorage) {
-		coreConfig.types.messagingSmsConnector.push({
-			type: MessagingSmsConnectorType.EntityStorage
-		});
-	} else if (envVars.messagingSmsConnector === MessagingSmsConnectorType.Aws) {
-		coreConfig.types.messagingSmsConnector.push({
-			type: MessagingSmsConnectorType.Aws,
-			options: {
-				config: {
-					region: envVars.awsS3Region ?? "",
-					accessKeyId: envVars.awsS3AccessKeyId ?? "",
-					secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
-					endpoint: envVars.awsS3Endpoint ?? ""
-				}
-			}
-		});
-	}
-
-	if (
-		envVars.messagingPushNotificationConnector ===
-		MessagingPushNotificationConnectorType.EntityStorage
-	) {
-		coreConfig.types.messagingPushNotificationConnector.push({
-			type: MessagingPushNotificationConnectorType.EntityStorage
-		});
-	} else if (
-		envVars.messagingPushNotificationConnector === MessagingPushNotificationConnectorType.Aws
-	) {
-		coreConfig.types.messagingPushNotificationConnector.push({
-			type: MessagingPushNotificationConnectorType.Aws,
-			options: {
-				config: {
-					region: envVars.awsS3Region ?? "",
-					accessKeyId: envVars.awsS3AccessKeyId ?? "",
-					secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
-					endpoint: envVars.awsS3Endpoint ?? "",
-					applicationsSettings: Is.json(envVars.awsMessagingPushNotificationApplications)
-						? JSON.parse(envVars.awsMessagingPushNotificationApplications)
-						: []
-				}
-			}
-		});
-	}
-
-	if (
-		coreConfig.types.messagingEmailConnector.length > 0 ||
-		coreConfig.types.messagingSmsConnector.length > 0 ||
-		coreConfig.types.messagingPushNotificationConnector.length > 0
-	) {
 		coreConfig.types.messagingComponent ??= [];
 		coreConfig.types.messagingComponent.push({ type: MessagingComponentType.Service });
 	}
@@ -631,7 +663,10 @@ function configureMessaging(coreConfig: IEngineConfig, envVars: IEngineEnvironme
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureFaucet(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureFaucet(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.faucetConnector ??= [];
 
 	if (envVars.faucetConnector === FaucetConnectorType.EntityStorage) {
@@ -662,7 +697,10 @@ function configureFaucet(coreConfig: IEngineConfig, envVars: IEngineEnvironmentV
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureWallet(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureWallet(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.walletConnector ??= [];
 
 	if (envVars.walletConnector === WalletConnectorType.EntityStorage) {
@@ -689,7 +727,10 @@ function configureWallet(coreConfig: IEngineConfig, envVars: IEngineEnvironmentV
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureNft(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureNft(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.nftConnector ??= [];
 
 	if (envVars.nftConnector === NftConnectorType.EntityStorage) {
@@ -721,10 +762,10 @@ function configureNft(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVari
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureVerifiableStorage(
+async function configureVerifiableStorage(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types.verifiableStorageConnector ??= [];
 
 	if (envVars.verifiableStorageConnector === VerifiableStorageConnectorType.EntityStorage) {
@@ -768,7 +809,10 @@ function configureVerifiableStorage(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureIdentity(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureIdentity(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	coreConfig.types.identityConnector ??= [];
 
 	if (envVars.identityConnector === IdentityConnectorType.EntityStorage) {
@@ -800,10 +844,10 @@ function configureIdentity(coreConfig: IEngineConfig, envVars: IEngineEnvironmen
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureIdentityResolver(
+async function configureIdentityResolver(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types.identityResolverConnector ??= [];
 
 	if (envVars.identityResolverConnector === IdentityResolverConnectorType.EntityStorage) {
@@ -846,10 +890,10 @@ function configureIdentityResolver(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureIdentityProfile(
+async function configureIdentityProfile(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types.identityProfileConnector ??= [];
 
 	if (envVars.identityProfileConnector === IdentityConnectorType.EntityStorage) {
@@ -869,10 +913,10 @@ function configureIdentityProfile(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureAttestation(
+async function configureAttestation(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	coreConfig.types.attestationConnector ??= [];
 
 	if (envVars.attestationConnector === AttestationConnectorType.Nft) {
@@ -899,10 +943,10 @@ function configureAttestation(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureAuditableItemGraph(
+async function configureAuditableItemGraph(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) {
 		coreConfig.types.auditableItemGraphComponent ??= [];
 		coreConfig.types.auditableItemGraphComponent.push({
@@ -916,10 +960,10 @@ function configureAuditableItemGraph(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureAuditableItemStream(
+async function configureAuditableItemStream(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) {
 		coreConfig.types.auditableItemStreamComponent ??= [];
 		coreConfig.types.auditableItemStreamComponent.push({
@@ -933,10 +977,10 @@ function configureAuditableItemStream(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureDataProcessing(
+async function configureDataProcessing(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.dataProcessingEnabled) ?? false) {
 		coreConfig.types.dataProcessingComponent ??= [];
 		coreConfig.types.dataProcessingComponent.push({ type: DataProcessingComponentType.Service });
@@ -973,10 +1017,10 @@ function configureDataProcessing(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureDocumentManagement(
+async function configureDocumentManagement(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.documentManagementEnabled) ?? false) {
 		coreConfig.types.documentManagementComponent ??= [];
 		coreConfig.types.documentManagementComponent.push({
@@ -990,10 +1034,10 @@ function configureDocumentManagement(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureVerifiableCredentialAuthentication(
+async function configureVerifiableCredentialAuthentication(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
 		// Can only perform VC authentication if identity component is available
 		coreConfig.types.authenticationGeneratorComponent ??= [];
@@ -1012,10 +1056,10 @@ function configureVerifiableCredentialAuthentication(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureRightsManagement(
+async function configureRightsManagement(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.rightsManagementEnabled) ?? false) {
 		coreConfig.types.rightsManagementPapComponent ??= [];
 		coreConfig.types.rightsManagementPapComponent.push({
@@ -1125,10 +1169,10 @@ function configureRightsManagement(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureTaskScheduler(
+async function configureTaskScheduler(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.taskSchedulerEnabled) ?? false) {
 		coreConfig.types.taskSchedulerComponent ??= [];
 		coreConfig.types.taskSchedulerComponent.push({
@@ -1142,10 +1186,10 @@ function configureTaskScheduler(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureSynchronisedStorage(
+async function configureSynchronisedStorage(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (
 		Is.arrayValue(coreConfig.types.identityResolverComponent) &&
 		(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false)
@@ -1196,10 +1240,10 @@ function configureSynchronisedStorage(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureFederatedCatalogue(
+async function configureFederatedCatalogue(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) {
 		coreConfig.types.federatedCatalogueComponent ??= [];
 		coreConfig.types.federatedCatalogueComponent.push({
@@ -1220,10 +1264,10 @@ function configureFederatedCatalogue(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureDataSpaceConnector(
+async function configureDataSpaceConnector(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
-): void {
+): Promise<void> {
 	if (Coerce.boolean(envVars.dataSpaceConnectorEnabled) ?? false) {
 		coreConfig.types.dataSpaceConnectorComponent ??= [];
 		coreConfig.types.dataSpaceConnectorComponent.push({
@@ -1246,7 +1290,10 @@ function configureDataSpaceConnector(
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-function configureDlt(coreConfig: IEngineConfig, envVars: IEngineEnvironmentVariables): void {
+async function configureDlt(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
 	// Create centralized DLT configuration for IOTA if essential IOTA variables are set
 	if (Is.stringValue(envVars.iotaNodeEndpoint) && Is.stringValue(envVars.iotaNetwork)) {
 		coreConfig.types.dltConfig ??= [];

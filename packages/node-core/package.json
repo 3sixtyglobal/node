@@ -50,7 +50,7 @@
 		"@twin.org/standards-w3c-odrl": "next",
 		"@twin.org/vault-models": "next",
 		"@twin.org/wallet-models": "next",
-		"dotenv": "17.2.1",
+		"dotenv": "17.2.2",
 		"schema-dts": "1.1.5"
 	},
 	"devDependencies": {
@@ -63,10 +63,10 @@
 		"copyfiles": "2.4.1",
 		"nodemon": "3.1.10",
 		"rimraf": "6.0.1",
-		"rollup": "4.49.0",
+		"rollup": "4.52.3",
 		"ts-patch": "3.3.0",
-		"typedoc": "0.28.11",
-		"typedoc-plugin-markdown": "4.8.1",
+		"typedoc": "0.28.13",
+		"typedoc-plugin-markdown": "4.9.0",
 		"typescript": "5.9.2",
 		"vitest": "3.2.4"
 	},

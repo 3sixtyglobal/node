@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { PasswordHelper, type AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
-import { Coerce, Converter, I18n, Is, RandomHelper, StringHelper, Urn } from "@twin.org/core";
+import { Coerce, Converter, I18n, Is, RandomHelper, Urn } from "@twin.org/core";
 import { Bip39, PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore, IEngineCoreContext, IEngineState } from "@twin.org/engine-models";
 import {
@@ -19,7 +19,7 @@ import {
 	IdentityProfileConnectorFactory,
 	IdentityResolverConnectorFactory
 } from "@twin.org/identity-models";
-import { nameof } from "@twin.org/nameof";
+import { nameofKebabCase } from "@twin.org/nameof";
 import { VaultConnectorFactory, VaultKeyType, type IVaultConnector } from "@twin.org/vault-models";
 import type { WalletAddress } from "@twin.org/wallet-connector-entity-storage";
 import { WalletConnectorFactory } from "@twin.org/wallet-models";
@@ -239,9 +239,10 @@ async function finaliseWallet(
 		// If we are using entity storage for wallet the identity associated with the
 		// address will be wrong, so fix it
 		if (defaultWalletConnectorType.startsWith(WalletConnectorType.EntityStorage)) {
-			const walletAddress = EntityStorageConnectorFactory.get<
-				IEntityStorageConnector<WalletAddress>
-			>(StringHelper.kebabCase(nameof<WalletAddress>()));
+			const walletAddress =
+				EntityStorageConnectorFactory.get<IEntityStorageConnector<WalletAddress>>(
+					nameofKebabCase<WalletAddress>()
+				);
 			const addr = await walletAddress.get(addresses[0]);
 			if (!Is.empty(addr)) {
 				addr.identity = finalIdentity;
@@ -333,9 +334,10 @@ export async function bootstrapNodeUser(
 			defaultAuthenticationComponentType.startsWith(AuthenticationComponentType.EntityStorage) &&
 			Is.stringValue(context.state.nodeIdentity)
 		) {
-			const authUserEntityStorage = EntityStorageConnectorFactory.get<
-				IEntityStorageConnector<AuthenticationUser>
-			>(StringHelper.kebabCase(nameof<AuthenticationUser>()));
+			const authUserEntityStorage =
+				EntityStorageConnectorFactory.get<IEntityStorageConnector<AuthenticationUser>>(
+					nameofKebabCase<AuthenticationUser>()
+				);
 
 			const email = envVars.username ?? DEFAULT_NODE_USERNAME;
 

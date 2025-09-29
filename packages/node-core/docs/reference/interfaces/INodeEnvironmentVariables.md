@@ -815,6 +815,91 @@ The type of event bus component: service.
 
 ***
 
+### messagingEnabled?
+
+> `optional` **messagingEnabled**: `string`
+
+Are the messaging components enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`messagingEnabled`](IEngineServerEnvironmentVariables.md#messagingenabled)
+
+***
+
+### messagingTemplates?
+
+> `optional` **messagingTemplates**: `string`
+
+An initial set of templates for the messages.
+Use the @json: prefix to specify the path to the JSON file.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`messagingTemplates`](IEngineServerEnvironmentVariables.md#messagingtemplates)
+
+***
+
+### awsSesSecretAccessKey?
+
+> `optional` **awsSesSecretAccessKey**: `string`
+
+AWS SES secret access key.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`awsSesSecretAccessKey`](IEngineServerEnvironmentVariables.md#awssessecretaccesskey)
+
+***
+
+### awsSesAccessKeyId?
+
+> `optional` **awsSesAccessKeyId**: `string`
+
+AWS SES access key id.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`awsSesAccessKeyId`](IEngineServerEnvironmentVariables.md#awssesaccesskeyid)
+
+***
+
+### awsSesRegion?
+
+> `optional` **awsSesRegion**: `string`
+
+AWS SES region.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`awsSesRegion`](IEngineServerEnvironmentVariables.md#awssesregion)
+
+***
+
+### awsSesEndpoint?
+
+> `optional` **awsSesEndpoint**: `string`
+
+AWS SES endpoint.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`awsSesEndpoint`](IEngineServerEnvironmentVariables.md#awssesendpoint)
+
+***
+
+### awsMessagingPushNotificationApplications?
+
+> `optional` **awsMessagingPushNotificationApplications**: `string`
+
+The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`awsMessagingPushNotificationApplications`](IEngineServerEnvironmentVariables.md#awsmessagingpushnotificationapplications)
+
+***
+
 ### messagingEmailConnector?
 
 > `optional` **messagingEmailConnector**: `string`
@@ -848,30 +933,6 @@ The type of messaging push notification connector: entity-storage, aws.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`messagingPushNotificationConnector`](IEngineServerEnvironmentVariables.md#messagingpushnotificationconnector)
-
-***
-
-### awsMessagingPushNotificationApplications?
-
-> `optional` **awsMessagingPushNotificationApplications**: `string`
-
-The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`awsMessagingPushNotificationApplications`](IEngineServerEnvironmentVariables.md#awsmessagingpushnotificationapplications)
-
-***
-
-### messagingComponent?
-
-> `optional` **messagingComponent**: `string`
-
-The type of messaging component: service.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`messagingComponent`](IEngineServerEnvironmentVariables.md#messagingcomponent)
 
 ***
 

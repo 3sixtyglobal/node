@@ -1,6 +1,6 @@
 # Function: buildEngineServerConfiguration()
 
-> **buildEngineServerConfiguration**(`envVars`, `coreEngineConfig`, `serverInfo`, `openApiSpecPath?`, `favIconPath?`): `IEngineServerConfig`
+> **buildEngineServerConfiguration**(`envVars`, `coreEngineConfig`, `serverInfo`, `openApiSpecPath?`, `favIconPath?`): `Promise`\<`IEngineServerConfig`\>
 
 Handles the configuration of the server.
 
@@ -38,6 +38,6 @@ The path to the favicon.
 
 ## Returns
 
-`IEngineServerConfig`
+`Promise`\<`IEngineServerConfig`\>
 
 The the config for the core and the server.
