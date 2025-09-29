@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.16](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.15...node-v0.0.2-next.16) (2025-09-29)
+
+
+### Features
+
+* update framework components ([4bee2b9](https://github.com/twinfoundation/node/commit/4bee2b9d3651df09b8550a9ed226be1b46031854))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.15 to 0.0.2-next.16
+
 ## [0.0.2-next.15](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.14...node-v0.0.2-next.15) (2025-09-26)
 
 
