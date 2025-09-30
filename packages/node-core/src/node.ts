@@ -76,6 +76,8 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
 		const { engineServerConfig, nodeEnvVars: envVars } = await buildConfiguration(
+			// This is the only location in the code base that should access process.env directly
+			// eslint-disable-next-line no-restricted-syntax
 			process.env as {
 				[id: string]: string;
 			},
