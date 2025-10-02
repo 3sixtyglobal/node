@@ -3,9 +3,9 @@ name: TWIN Node Docker Image CI/CD
 on:
   workflow_dispatch:
     inputs:
-      # Which branch are we publishing the release from?
+      # Which branch are we publishing the image from?
       releaseType:
-        description: 'Branch to prepare the release from'
+        description: 'Branch to publish the image from'
         required: true
         type: choice
         options:
