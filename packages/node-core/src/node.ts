@@ -4,11 +4,12 @@
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { EnvHelper, ErrorHelper, Is } from "@twin.org/core";
-import type { IEngineServerConfig } from "@twin.org/engine-server-types";
 import { ModuleHelper } from "@twin.org/modules";
 import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder";
+import { extensionsConfiguration } from "./builders/extensionsBuilder";
+import type { INodeEngineConfig } from "./models/INodeEngineConfig";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
 import type { INodeOptions } from "./models/INodeOptions";
 import { start } from "./server";
@@ -75,7 +76,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
-		const { engineServerConfig, nodeEnvVars: envVars } = await buildConfiguration(
+		const { nodeEngineConfig, nodeEnvVars: envVars } = await buildConfiguration(
 			// This is the only location in the code base that should access process.env directly
 			// eslint-disable-next-line no-restricted-syntax
 			process.env as {
@@ -86,12 +87,12 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 		);
 
 		console.info();
-		const startResult = await start(nodeOptions, engineServerConfig, envVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, envVars);
 
 		if (!Is.empty(startResult)) {
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
 				process.on(signal, async () => {
-					await startResult.server.stop();
+					await startResult.shutdown();
 				});
 			}
 		}
@@ -118,7 +119,7 @@ export async function buildConfiguration(
 	serverInfo: IServerInfo
 ): Promise<{
 	nodeEnvVars: INodeEnvironmentVariables & { [id: string]: string | unknown };
-	engineServerConfig: IEngineServerConfig;
+	nodeEngineConfig: INodeEngineConfig;
 }> {
 	let defaultEnvOnly = false;
 	if (Is.empty(options?.envFilenames)) {
@@ -205,9 +206,12 @@ export async function buildConfiguration(
 	// Merge any custom configuration provided in the options.
 	if (Is.function(options?.extendConfig)) {
 		console.info("Extending Configuration");
-		await options.extendConfig(engineServerConfig);
+		await options.extendConfig(envVars, engineServerConfig);
 	}
-	return { engineServerConfig, nodeEnvVars: envVars };
+
+	const nodeEngineConfig = await extensionsConfiguration(envVars, engineServerConfig);
+
+	return { nodeEngineConfig, nodeEnvVars: envVars };
 }
 
 /**

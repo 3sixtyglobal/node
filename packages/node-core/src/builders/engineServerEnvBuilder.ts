@@ -14,6 +14,7 @@ import {
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
 import type { HttpMethod } from "@twin.org/web";
+import { AUTH_SIGNING_KEY_ID } from "../defaults";
 import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables";
 
 /**
@@ -23,7 +24,7 @@ import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerE
  * @param serverInfo The server information.
  * @param openApiSpecPath The path to the open api spec.
  * @param favIconPath The path to the favicon.
- * @returns The the config for the core and the server.
+ * @returns The config for the core and the server.
  */
 export async function buildEngineServerConfiguration(
 	envVars: IEngineServerEnvironmentVariables,
@@ -32,8 +33,6 @@ export async function buildEngineServerConfiguration(
 	openApiSpecPath?: string,
 	favIconPath?: string
 ): Promise<IEngineServerConfig> {
-	envVars.authSigningKeyId ??= "auth-signing";
-
 	const webServerOptions: IWebServerOptions = {
 		port: Coerce.number(envVars.port),
 		host: Coerce.string(envVars.host),
@@ -158,7 +157,7 @@ export async function buildEngineServerConfiguration(
 			type: AuthenticationComponentType.EntityStorage,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID
 				}
 			}
 		});
@@ -166,7 +165,7 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID
 				}
 			}
 		});
@@ -174,7 +173,7 @@ export async function buildEngineServerConfiguration(
 			type: SocketRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID
 				}
 			}
 		});

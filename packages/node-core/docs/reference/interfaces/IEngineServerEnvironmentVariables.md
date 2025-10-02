@@ -85,6 +85,18 @@ A prefix for all the table in entity-storage, can be empty.
 
 ***
 
+### awsDynamodbAuthMode?
+
+> `optional` **awsDynamodbAuthMode**: `string`
+
+AWS DynamoDB auth mode, either credentials or pod.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsDynamodbAuthMode`](IEngineEnvironmentVariables.md#awsdynamodbauthmode)
+
+***
+
 ### awsDynamodbAccessKeyId?
 
 > `optional` **awsDynamodbAccessKeyId**: `string`
@@ -579,15 +591,15 @@ A prefix for all the blobs in blob-storage, can be empty.
 
 ***
 
-### awsS3AccessKeyId?
+### awsS3Region?
 
-> `optional` **awsS3AccessKeyId**: `string`
+> `optional` **awsS3Region**: `string`
 
-AWS S3 access key id.
+AWS S3 region.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3AccessKeyId`](IEngineEnvironmentVariables.md#awss3accesskeyid)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3Region`](IEngineEnvironmentVariables.md#awss3region)
 
 ***
 
@@ -603,27 +615,27 @@ AWS S3 bucket name.
 
 ***
 
-### awsS3Endpoint?
+### awsS3AuthMode?
 
-> `optional` **awsS3Endpoint**: `string`
+> `optional` **awsS3AuthMode**: `string`
 
-AWS S3 endpoint.
+AWS S3 auth mode, either credentials or pod, defaults to credentials.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3Endpoint`](IEngineEnvironmentVariables.md#awss3endpoint)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3AuthMode`](IEngineEnvironmentVariables.md#awss3authmode)
 
 ***
 
-### awsS3Region?
+### awsS3AccessKeyId?
 
-> `optional` **awsS3Region**: `string`
+> `optional` **awsS3AccessKeyId**: `string`
 
-AWS S3 region.
+AWS S3 access key id.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3Region`](IEngineEnvironmentVariables.md#awss3region)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3AccessKeyId`](IEngineEnvironmentVariables.md#awss3accesskeyid)
 
 ***
 
@@ -636,6 +648,18 @@ AWS S3 secret access key.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3SecretAccessKey`](IEngineEnvironmentVariables.md#awss3secretaccesskey)
+
+***
+
+### awsS3Endpoint?
+
+> `optional` **awsS3Endpoint**: `string`
+
+AWS S3 endpoint.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsS3Endpoint`](IEngineEnvironmentVariables.md#awss3endpoint)
 
 ***
 
@@ -844,6 +868,30 @@ Use the @json: prefix to specify the path to the JSON file.
 
 ***
 
+### awsSesRegion?
+
+> `optional` **awsSesRegion**: `string`
+
+AWS SES region.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsSesRegion`](IEngineEnvironmentVariables.md#awssesregion)
+
+***
+
+### awsSesAuthMode?
+
+> `optional` **awsSesAuthMode**: `string`
+
+AWS SES auth mode, either credentials or pod, defaults to credentials.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsSesAuthMode`](IEngineEnvironmentVariables.md#awssesauthmode)
+
+***
+
 ### awsSesSecretAccessKey?
 
 > `optional` **awsSesSecretAccessKey**: `string`
@@ -865,18 +913,6 @@ AWS SES access key id.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsSesAccessKeyId`](IEngineEnvironmentVariables.md#awssesaccesskeyid)
-
-***
-
-### awsSesRegion?
-
-> `optional` **awsSesRegion**: `string`
-
-AWS SES region.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsSesRegion`](IEngineEnvironmentVariables.md#awssesregion)
 
 ***
 
@@ -1269,7 +1305,7 @@ Url which points to the api for a trusted synchronised storage node, not require
 > `optional` **synchronisedStorageVerifiableStorageKeyId**: `string`
 
 The key for the smart contract which contains the verifiable storage pointer store for synchronised storage.
-This only required if using a custom verifiable storage item, otherwise it will default the the network name.
+This only required if using a custom verifiable storage item, otherwise it will default to the network name.
 
 #### Inherited from
 
@@ -1551,16 +1587,39 @@ Is the data space connector enabled, defaults to false.
 
 ***
 
-### dataSpaceConnectorApps?
+### dataSpaceConnectorRetainActivityLogsFor?
 
-> `optional` **dataSpaceConnectorApps**: `string`
+> `optional` **dataSpaceConnectorRetainActivityLogsFor**: `string`
 
-The application configuration for the data space connector.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
+
+#### Default
+
+```ts
+10
+```
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataSpaceConnectorApps`](IEngineEnvironmentVariables.md#dataspaceconnectorapps)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataSpaceConnectorRetainActivityLogsFor`](IEngineEnvironmentVariables.md#dataspaceconnectorretainactivitylogsfor)
+
+***
+
+### dataSpaceConnectorActivityLogsCleanUpInterval?
+
+> `optional` **dataSpaceConnectorActivityLogsCleanUpInterval**: `string`
+
+The interval for cleaning up the activity logs.
+
+#### Default
+
+```ts
+60
+```
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataSpaceConnectorActivityLogsCleanUpInterval`](IEngineEnvironmentVariables.md#dataspaceconnectoractivitylogscleanupinterval)
 
 ***
 
@@ -1586,6 +1645,18 @@ Defaults to node-authentication-assertion.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`vcAuthenticationVerificationMethodId`](IEngineEnvironmentVariables.md#vcauthenticationverificationmethodid)
+
+***
+
+### extensions?
+
+> `optional` **extensions**: `string`
+
+A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`extensions`](IEngineEnvironmentVariables.md#extensions)
 
 ***
 

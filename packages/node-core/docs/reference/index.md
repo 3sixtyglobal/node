@@ -4,15 +4,25 @@
 
 - [IEngineEnvironmentVariables](interfaces/IEngineEnvironmentVariables.md)
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
+- [INodeEngineConfig](interfaces/INodeEngineConfig.md)
 - [INodeEnvironmentVariables](interfaces/INodeEnvironmentVariables.md)
 - [INodeOptions](interfaces/INodeOptions.md)
 
 ## Type Aliases
 
+- [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
+- [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
+- [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
 - [NodeFeatures](type-aliases/NodeFeatures.md)
 
 ## Variables
 
+- [ATTESTATION\_VERIFICATION\_METHOD\_ID](variables/ATTESTATION_VERIFICATION_METHOD_ID.md)
+- [IMMUTABLE\_PROOF\_VERIFICATION\_METHOD\_ID](variables/IMMUTABLE_PROOF_VERIFICATION_METHOD_ID.md)
+- [BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
+- [SYNCHRONISED\_STORAGE\_BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
+- [VC\_AUTHENTICATION\_VERIFICATION\_METHOD\_ID](variables/VC_AUTHENTICATION_VERIFICATION_METHOD_ID.md)
+- [AUTH\_SIGNING\_KEY\_ID](variables/AUTH_SIGNING_KEY_ID.md)
 - [NodeFeatures](variables/NodeFeatures.md)
 
 ## Functions
@@ -26,6 +36,10 @@
 - [bootstrapSynchronisedStorage](functions/bootstrapSynchronisedStorage.md)
 - [buildEngineConfiguration](functions/buildEngineConfiguration.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
+- [extensionsConfiguration](functions/extensionsConfiguration.md)
+- [extensionsInitialiseEngine](functions/extensionsInitialiseEngine.md)
+- [extensionsInitialiseEngineServer](functions/extensionsInitialiseEngineServer.md)
+- [shutdownExtensions](functions/shutdownExtensions.md)
 - [run](functions/run.md)
 - [buildConfiguration](functions/buildConfiguration.md)
 - [overrideModuleImport](functions/overrideModuleImport.md)

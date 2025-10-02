@@ -40,4 +40,4 @@ The path to the favicon.
 
 `Promise`\<`IEngineServerConfig`\>
 
-The the config for the core and the server.
+The config for the core and the server.

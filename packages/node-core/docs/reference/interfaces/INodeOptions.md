@@ -113,15 +113,19 @@ Method to extend the engine environment variables with any additional custom con
 
 ### extendConfig()?
 
-> `optional` **extendConfig**: (`config`) => `Promise`\<`void`\>
+> `optional` **extendConfig**: (`envVars`, `config`) => `Promise`\<`void`\>
 
 Method to extend the engine configuration with any additional custom configuration.
 
 #### Parameters
 
+##### envVars
+
+[`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
+
 ##### config
 
-`IEngineConfig`
+[`INodeEngineConfig`](INodeEngineConfig.md)
 
 #### Returns
 

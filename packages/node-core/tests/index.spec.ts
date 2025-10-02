@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
 import { ComponentFactory, Factory } from "@twin.org/core";
+import { DataSpaceConnectorAppFactory } from "@twin.org/data-space-connector-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
 	AuthenticationAdminComponentType,
@@ -37,16 +38,21 @@ import type { INodeOptions } from "../src/models/INodeOptions";
 import { buildConfiguration, overrideModuleImport } from "../src/node";
 import { start } from "../src/server";
 import { initialiseLocales } from "../src/utils";
-import appConfig from "./apps/data-space-apps.json";
+
+const basePort = Math.floor(Math.random() * 1000);
+let port = 3000 + basePort;
 
 describe("node-core", () => {
 	beforeEach(() => {
+		port++;
+
 		Factory.clearFactories();
 	});
 
 	test("Can start and bootstrap the server with minimal config in memory", async () => {
 		const envVars: { [id: string]: string } = {
-			TWIN_NODE_DEBUG: "true"
+			TWIN_NODE_DEBUG: "true",
+			TWIN_NODE_PORT: port.toString()
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -57,16 +63,19 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage };
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
-		const res = await fetch("http://localhost:3000/info");
+		// Wait a second for the server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
 			name: "foo",
 			version: "0.0.0"
@@ -85,12 +94,14 @@ describe("node-core", () => {
 			"/logging"
 		]);
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 	});
 
 	test("Can start and bootstrap the server in memory", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_NODE_DEBUG: "true",
+			TWIN_NODE_SILENT: "true",
+			TWIN_NODE_PORT: port.toString(),
 			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_NODE_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 			TWIN_NODE_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
@@ -120,7 +131,7 @@ describe("node-core", () => {
 			TWIN_NODE_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
-			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management",
+			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
 			TWIN_NODE_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
 				"@json:tests/rights-management-information-sources.json",
 			TWIN_NODE_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
@@ -129,10 +140,10 @@ describe("node-core", () => {
 			TWIN_NODE_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_NODE_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 			TWIN_NODE_DATA_SPACE_CONNECTOR_ENABLED: "true",
-			TWIN_NODE_DATA_SPACE_CONNECTOR_APPS: "@json:tests/apps/data-space-apps.json",
 			TWIN_NODE_VC_AUTHENTICATION_ENABLED: "true",
 			TWIN_NODE_MESSAGING_ENABLED: "true",
-			TWIN_NODE_MESSAGING_TEMPLATES: "@json:tests/templates.json"
+			TWIN_NODE_MESSAGING_TEMPLATES: "@json:tests/templates.json",
+			TWIN_NODE_EXTENSIONS: "./tests/apps/test-app.mjs"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -143,16 +154,19 @@ describe("node-core", () => {
 
 		overrideModuleImport(process.cwd());
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
-		const res = await fetch("http://localhost:3000/info");
+		// Wait a second for the server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
 			name: "foo",
 			version: "0.0.0"
@@ -192,9 +206,10 @@ describe("node-core", () => {
 			"data-space-connector-service",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
-			"information-service",
-			"data-space-connector-app-my-app"
+			"information-service"
 		]);
+
+		expect(DataSpaceConnectorAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -252,13 +267,13 @@ describe("node-core", () => {
 			"/verifiable/:id",
 			"/verifiable/:id",
 			"/verifiable/:id",
+			"/immutable-proof",
+			"/immutable-proof/:id",
+			"/immutable-proof/:id/verify",
 			"/attestation",
 			"/attestation/:id",
 			"/attestation/:id/transfer",
 			"/attestation/:id",
-			"/immutable-proof",
-			"/immutable-proof/:id",
-			"/immutable-proof/:id/verify",
 			"/aig",
 			"/aig/:id",
 			"/aig/:id",
@@ -388,7 +403,9 @@ describe("node-core", () => {
 
 			const dataSpaceConnectorService = ComponentFactory.get("data-space-connector-service");
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			expect((dataSpaceConnectorService as any)._initialDataSpaceConnectorApps).toEqual(appConfig);
+			expect((dataSpaceConnectorService as any)._apps[0].appId).toEqual(
+				"https://twin.example.org/app1"
+			);
 
 			const pip = ComponentFactory.get("policy-information-point-service");
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -404,11 +421,12 @@ describe("node-core", () => {
 			expect(await messagingAdminService.getTemplate("my-template", "de")).toBeDefined();
 		}
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 	});
 
 	test("Can start and bootstrap the server in memory, and restart with existing data", async () => {
 		const envVars: { [key: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
 			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_NODE_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 			TWIN_NODE_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
@@ -431,7 +449,7 @@ describe("node-core", () => {
 			TWIN_NODE_FEATURES: "node-identity,node-user",
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_NODE_RIGHTS_MANAGEMENT_ENABLED: "true",
-			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: "https://localhost:3000/rights-management",
+			TWIN_NODE_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
 			TWIN_NODE_VC_AUTHENTICATION_ENABLED: "true"
 		};
 
@@ -441,15 +459,15 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage };
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 		expect(startResult).toBeDefined();
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 
 		if (startResult?.engine) {
 			const mem = await memoryStateStorage.load(startResult?.engine);
@@ -460,7 +478,7 @@ describe("node-core", () => {
 
 			const startResult2 = await start(
 				{ envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage2 },
-				engineServerConfig,
+				nodeEngineConfig,
 				nodeEnvVars
 			);
 
@@ -523,6 +541,7 @@ describe("node-core", () => {
 	test("Can start a server and intercept custom callbacks", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_NODE_DEBUG: "true",
+			TWIN_NODE_PORT: port.toString(),
 			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "false"
 		};
@@ -555,16 +574,19 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
-		const res = await fetch("http://localhost:3000/info");
+		// Wait a second for the server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
 			name: "foo",
 			version: "0.0.0"
@@ -588,12 +610,13 @@ describe("node-core", () => {
 			"/logging"
 		]);
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 	});
 
 	test("Can start a server and load a custom env file", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_NODE_DEBUG: "true",
+			TWIN_NODE_PORT: port.toString(),
 			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_NODE_TASK_SCHEDULER_ENABLED: "false"
 		};
@@ -610,22 +633,25 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
-		const res = await fetch("http://localhost:3000/info");
+		// Wait a second for the server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		expect(engineServerConfig.debug).toBe(true);
+		expect(nodeEngineConfig.debug).toBe(true);
 
 		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
 
@@ -640,12 +666,13 @@ describe("node-core", () => {
 			"/logging"
 		]);
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 	});
 
 	test("Can start a server and load a custom config file", async () => {
 		const envVars: { [id: string]: string } = {
-			TWIN_NODE_DEBUG: "true"
+			TWIN_NODE_DEBUG: "true",
+			TWIN_NODE_PORT: port.toString()
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -660,22 +687,25 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
-		const res = await fetch("http://localhost:3000/info");
+		// Wait a second for the server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		expect(engineServerConfig.debug).toBe(true);
+		expect(nodeEngineConfig.debug).toBe(true);
 
 		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
 
@@ -690,11 +720,12 @@ describe("node-core", () => {
 			"/logging"
 		]);
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 	});
 
 	test("Can start a server and load an embedded config text file", async () => {
 		const envVars: { [id: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
 			TWIN_NODE_TEST_EMBEDDED: "@text:tests/embedded.txt"
 		};
 
@@ -709,18 +740,18 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
 		expect(nodeEnvVars.testEmbedded).toEqual("Hello Node!");
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
 	});
 
 	test("Can start a server and load an embedded JSON file", async () => {
@@ -739,12 +770,12 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { engineServerConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
-		const startResult = await start(nodeOptions, engineServerConfig, nodeEnvVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
 
@@ -752,6 +783,55 @@ describe("node-core", () => {
 			foo: "bar"
 		});
 
-		await startResult?.server.stop();
+		await startResult?.shutdown();
+	});
+
+	test("Can start the server with an extension", async () => {
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_DEBUG: "true",
+			TWIN_NODE_PORT: port.toString(),
+			TWIN_NODE_EXTENSIONS: "./tests/extensions/my-extension.mjs"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "bob"
+		});
+
+		const nodeOptions: INodeOptions = { envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage };
+
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+
+		expect(startResult).toBeDefined();
+
+		// Wait a second for the server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await fetch(`http://localhost:${port}/info`);
+		expect(await res.json()).toEqual({
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
+
+		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
+		expect(buildRestRoutes.map(r => r.path)).toEqual([
+			"/",
+			"/favicon.ico",
+			"/info",
+			"/health",
+			"/spec",
+			"/logging",
+			"/logging"
+		]);
+
+		await startResult?.shutdown();
 	});
 });

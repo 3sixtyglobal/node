@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
 import { Coerce, Is } from "@twin.org/core";
-import type { IDataSpaceConnectorAppDescriptor } from "@twin.org/data-space-connector-models";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import type { IEngineModuleConfig } from "@twin.org/engine-models";
 import {
@@ -68,6 +67,13 @@ import {
 	PolicyNegotiationPointClient
 } from "@twin.org/rights-management-rest-client";
 import type { IOdrlOffer } from "@twin.org/standards-w3c-odrl";
+import {
+	ATTESTATION_VERIFICATION_METHOD_ID,
+	BLOB_STORAGE_ENCRYPTION_KEY_ID,
+	IMMUTABLE_PROOF_VERIFICATION_METHOD_ID,
+	SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
+	VC_AUTHENTICATION_VERIFICATION_METHOD_ID
+} from "../defaults";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables";
 
 /**
@@ -83,13 +89,6 @@ export async function buildEngineConfiguration(
 		envVars.storageFileRoot = path.resolve(envVars.storageFileRoot);
 		envVars.stateFilename = path.join(envVars.storageFileRoot, envVars.stateFilename);
 	}
-
-	envVars.attestationVerificationMethodId ??= "attestation-assertion";
-	envVars.immutableProofVerificationMethodId ??= "immutable-proof-assertion";
-	envVars.blobStorageEnableEncryption ??= "false";
-	envVars.blobStorageEncryptionKeyId ??= "blob-encryption";
-	envVars.synchronisedStorageBlobStorageEncryptionKeyId ??= "synchronised-storage-blob-encryption";
-	envVars.vcAuthenticationVerificationMethodId ??= "node-authentication-assertion";
 
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
@@ -166,9 +165,10 @@ async function configureEntityStorage(
 			options: {
 				config: {
 					region: envVars.awsDynamodbRegion ?? "",
-					accessKeyId: envVars.awsDynamodbAccessKeyId ?? "",
-					secretAccessKey: envVars.awsDynamodbSecretAccessKey ?? "",
-					endpoint: envVars.awsDynamodbEndpoint ?? ""
+					authMode: envVars.awsDynamodbAuthMode as "credentials" | "pod",
+					accessKeyId: envVars.awsDynamodbAccessKeyId,
+					secretAccessKey: envVars.awsDynamodbSecretAccessKey,
+					endpoint: envVars.awsDynamodbEndpoint
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -344,9 +344,10 @@ async function configureBlobStorage(
 				config: {
 					region: envVars.awsS3Region ?? "",
 					bucketName: envVars.awsS3BucketName ?? "",
-					accessKeyId: envVars.awsS3AccessKeyId ?? "",
-					secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
-					endpoint: envVars.awsS3Endpoint ?? ""
+					authMode: envVars.awsS3AuthMode as "credentials" | "pod",
+					accessKeyId: envVars.awsS3AccessKeyId,
+					secretAccessKey: envVars.awsS3SecretAccessKey,
+					endpoint: envVars.awsS3Endpoint
 				},
 				storagePrefix: envVars.blobStoragePrefix
 			}
@@ -411,7 +412,7 @@ async function configureBlobStorage(
 				config: {
 					vaultKeyId:
 						(envVars.blobStorageEnableEncryption ?? false)
-							? envVars.blobStorageEncryptionKeyId
+							? (envVars.blobStorageEncryptionKeyId ?? BLOB_STORAGE_ENCRYPTION_KEY_ID)
 							: undefined
 				}
 			}
@@ -582,10 +583,11 @@ async function configureMessaging(
 				type: MessagingEmailConnectorType.Aws,
 				options: {
 					config: {
-						region: envVars.awsS3Region ?? "",
-						accessKeyId: envVars.awsS3AccessKeyId ?? "",
-						secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
-						endpoint: envVars.awsS3Endpoint ?? ""
+						region: envVars.awsSesRegion ?? "",
+						authMode: envVars.awsSesAuthMode as "credentials" | "pod",
+						accessKeyId: envVars.awsSesAccessKeyId,
+						secretAccessKey: envVars.awsSesSecretAccessKey,
+						endpoint: envVars.awsSesEndpoint
 					}
 				}
 			});
@@ -600,10 +602,11 @@ async function configureMessaging(
 				type: MessagingSmsConnectorType.Aws,
 				options: {
 					config: {
-						region: envVars.awsS3Region ?? "",
-						accessKeyId: envVars.awsS3AccessKeyId ?? "",
-						secretAccessKey: envVars.awsS3SecretAccessKey ?? "",
-						endpoint: envVars.awsS3Endpoint ?? ""
+						region: envVars.awsSesRegion ?? "",
+						authMode: envVars.awsSesAuthMode as "credentials" | "pod",
+						accessKeyId: envVars.awsSesAccessKeyId,
+						secretAccessKey: envVars.awsSesSecretAccessKey,
+						endpoint: envVars.awsSesEndpoint
 					}
 				}
 			});
@@ -624,8 +627,9 @@ async function configureMessaging(
 				options: {
 					config: {
 						region: envVars.awsSesRegion ?? "",
-						accessKeyId: envVars.awsSesAccessKeyId ?? "",
-						secretAccessKey: envVars.awsSesSecretAccessKey ?? "",
+						authMode: envVars.awsSesAuthMode as "credentials" | "pod",
+						accessKeyId: envVars.awsSesAccessKeyId,
+						secretAccessKey: envVars.awsSesSecretAccessKey,
 						endpoint: envVars.awsSesEndpoint,
 						applicationsSettings: Is.json(envVars.awsMessagingPushNotificationApplications)
 							? JSON.parse(envVars.awsMessagingPushNotificationApplications)
@@ -797,7 +801,8 @@ async function configureVerifiableStorage(
 			type: ImmutableProofComponentType.Service,
 			options: {
 				config: {
-					verificationMethodId: envVars.immutableProofVerificationMethodId
+					verificationMethodId:
+						envVars.immutableProofVerificationMethodId ?? IMMUTABLE_PROOF_VERIFICATION_METHOD_ID
 				}
 			}
 		});
@@ -931,7 +936,8 @@ async function configureAttestation(
 			type: AttestationComponentType.Service,
 			options: {
 				config: {
-					verificationMethodId: envVars.attestationVerificationMethodId
+					verificationMethodId:
+						envVars.attestationVerificationMethodId ?? ATTESTATION_VERIFICATION_METHOD_ID
 				}
 			}
 		});
@@ -1044,7 +1050,10 @@ async function configureVerifiableCredentialAuthentication(
 		coreConfig.types.authenticationGeneratorComponent.push({
 			type: AuthenticationGeneratorComponentType.VerifiableCredential,
 			options: {
-				config: { verificationMethodId: envVars.vcAuthenticationVerificationMethodId ?? "" }
+				config: {
+					verificationMethodId:
+						envVars.vcAuthenticationVerificationMethodId ?? VC_AUTHENTICATION_VERIFICATION_METHOD_ID
+				}
 			},
 			features: ["verifiable-credential"]
 		});
@@ -1207,7 +1216,9 @@ async function configureSynchronisedStorage(
 			options: {
 				config: {
 					verifiableStorageKeyId: verifiableStorageKeyId ?? "",
-					blobStorageEncryptionKeyId: envVars.synchronisedStorageBlobStorageEncryptionKeyId,
+					blobStorageEncryptionKeyId:
+						envVars.synchronisedStorageBlobStorageEncryptionKeyId ??
+						SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
 					entityUpdateIntervalMinutes: Coerce.number(
 						envVars.synchronisedStorageEntityUpdateIntervalMinutes
 					),
@@ -1274,11 +1285,10 @@ async function configureDataSpaceConnector(
 			type: DataSpaceConnectorComponentType.Service,
 			options: {
 				config: {
-					dataSpaceConnectorAppDescriptors: Is.arrayValue<IDataSpaceConnectorAppDescriptor>(
-						envVars.dataSpaceConnectorApps
+					retainActivityLogsFor: Coerce.number(envVars.dataSpaceConnectorRetainActivityLogsFor),
+					activityLogsCleanUpInterval: Coerce.number(
+						envVars.dataSpaceConnectorActivityLogsCleanUpInterval
 					)
-						? envVars.dataSpaceConnectorApps
-						: undefined
 				}
 			}
 		});

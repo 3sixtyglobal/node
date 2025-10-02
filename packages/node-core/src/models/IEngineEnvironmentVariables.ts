@@ -37,6 +37,11 @@ export interface IEngineEnvironmentVariables {
 	entityStorageTablePrefix?: string;
 
 	/**
+	 * AWS DynamoDB auth mode, either credentials or pod.
+	 */
+	awsDynamodbAuthMode?: string;
+
+	/**
 	 * AWS Dynamo DB access key id.
 	 */
 	awsDynamodbAccessKeyId?: string;
@@ -244,9 +249,9 @@ export interface IEngineEnvironmentVariables {
 	blobStoragePrefix?: string;
 
 	/**
-	 * AWS S3 access key id.
+	 * AWS S3 region.
 	 */
-	awsS3AccessKeyId?: string;
+	awsS3Region?: string;
 
 	/**
 	 * AWS S3 bucket name.
@@ -254,19 +259,24 @@ export interface IEngineEnvironmentVariables {
 	awsS3BucketName?: string;
 
 	/**
-	 * AWS S3 endpoint.
+	 * AWS S3 auth mode, either credentials or pod, defaults to credentials.
 	 */
-	awsS3Endpoint?: string;
+	awsS3AuthMode?: string;
 
 	/**
-	 * AWS S3 region.
+	 * AWS S3 access key id.
 	 */
-	awsS3Region?: string;
+	awsS3AccessKeyId?: string;
 
 	/**
 	 * AWS S3 secret access key.
 	 */
 	awsS3SecretAccessKey?: string;
+
+	/**
+	 * AWS S3 endpoint.
+	 */
+	awsS3Endpoint?: string;
 
 	/**
 	 * Azure Storage account key.
@@ -355,6 +365,16 @@ export interface IEngineEnvironmentVariables {
 	messagingTemplates?: string;
 
 	/**
+	 * AWS SES region.
+	 */
+	awsSesRegion?: string;
+
+	/**
+	 * AWS SES auth mode, either credentials or pod, defaults to credentials.
+	 */
+	awsSesAuthMode?: string;
+
+	/**
 	 * AWS SES secret access key.
 	 */
 	awsSesSecretAccessKey?: string;
@@ -363,11 +383,6 @@ export interface IEngineEnvironmentVariables {
 	 * AWS SES access key id.
 	 */
 	awsSesAccessKeyId?: string;
-
-	/**
-	 * AWS SES region.
-	 */
-	awsSesRegion?: string;
 
 	/**
 	 * AWS SES endpoint.
@@ -531,7 +546,7 @@ export interface IEngineEnvironmentVariables {
 
 	/**
 	 * The key for the smart contract which contains the verifiable storage pointer store for synchronised storage.
-	 * This only required if using a custom verifiable storage item, otherwise it will default the the network name.
+	 * This only required if using a custom verifiable storage item, otherwise it will default to the network name.
 	 */
 	synchronisedStorageVerifiableStorageKeyId?: string;
 
@@ -650,10 +665,16 @@ export interface IEngineEnvironmentVariables {
 	dataSpaceConnectorEnabled?: string;
 
 	/**
-	 * The application configuration for the data space connector.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
+	 * @default 10
 	 */
-	dataSpaceConnectorApps?: string;
+	dataSpaceConnectorRetainActivityLogsFor?: string;
+
+	/**
+	 * The interval for cleaning up the activity logs.
+	 * @default 60
+	 */
+	dataSpaceConnectorActivityLogsCleanUpInterval?: string;
 
 	/**
 	 * Enable verifiable credential authentication for the API.
@@ -665,4 +686,9 @@ export interface IEngineEnvironmentVariables {
 	 * Defaults to node-authentication-assertion.
 	 */
 	vcAuthenticationVerificationMethodId?: string;
+
+	/**
+	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
+	 */
+	extensions?: string;
 }

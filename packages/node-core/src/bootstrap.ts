@@ -24,6 +24,14 @@ import { VaultConnectorFactory, VaultKeyType, type IVaultConnector } from "@twin
 import type { WalletAddress } from "@twin.org/wallet-connector-entity-storage";
 import { WalletConnectorFactory } from "@twin.org/wallet-models";
 import type { Person, WithContext } from "schema-dts";
+import {
+	ATTESTATION_VERIFICATION_METHOD_ID,
+	AUTH_SIGNING_KEY_ID,
+	BLOB_STORAGE_ENCRYPTION_KEY_ID,
+	IMMUTABLE_PROOF_VERIFICATION_METHOD_ID,
+	SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
+	VC_AUTHENTICATION_VERIFICATION_METHOD_ID
+} from "./defaults";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
 import { NodeFeatures } from "./models/nodeFeatures";
 import { getFeatures } from "./utils";
@@ -48,26 +56,35 @@ export async function bootstrap(
 	await bootstrapAuth(engineCore, context, envVars, features);
 	await bootstrapBlobEncryption(engineCore, context, envVars, features);
 
-	await addVerificationMethod(
-		engineCore,
-		context,
-		"attestation",
-		envVars.attestationVerificationMethodId
-	);
+	const defaultAttestationConnectorType =
+		engineCore.getRegisteredInstanceTypeOptional("attestationConnector");
+	if (!Is.empty(defaultAttestationConnectorType)) {
+		await addVerificationMethod(
+			engineCore,
+			context,
+			"attestation",
+			envVars.attestationVerificationMethodId ?? ATTESTATION_VERIFICATION_METHOD_ID
+		);
+	}
 
-	await addVerificationMethod(
-		engineCore,
-		context,
-		"immutable proof",
-		envVars.immutableProofVerificationMethodId
-	);
+	const defaultImmutableProofComponentType =
+		engineCore.getRegisteredInstanceTypeOptional("immutableProofComponent");
+
+	if (!Is.empty(defaultImmutableProofComponentType)) {
+		await addVerificationMethod(
+			engineCore,
+			context,
+			"immutable proof",
+			envVars.immutableProofVerificationMethodId ?? IMMUTABLE_PROOF_VERIFICATION_METHOD_ID
+		);
+	}
 
 	if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
 		await addVerificationMethod(
 			engineCore,
 			context,
 			"verifiable credential authentication",
-			envVars.vcAuthenticationVerificationMethodId
+			envVars.vcAuthenticationVerificationMethodId ?? VC_AUTHENTICATION_VERIFICATION_METHOD_ID
 		);
 	}
 
@@ -473,7 +490,7 @@ export async function bootstrapBlobEncryption(
 		const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
 		const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
-		const keyName = `${context.state.nodeIdentity}/${envVars.blobStorageEncryptionKeyId}`;
+		const keyName = `${context.state.nodeIdentity}/${envVars.blobStorageEncryptionKeyId ?? BLOB_STORAGE_ENCRYPTION_KEY_ID}`;
 
 		let existingKey;
 
@@ -529,7 +546,7 @@ export async function bootstrapAuth(
 		const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
 		const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
-		const keyName = `${context.state.nodeIdentity}/${envVars.authSigningKeyId}`;
+		const keyName = `${context.state.nodeIdentity}/${envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID}`;
 
 		let existingKey;
 		try {
@@ -560,14 +577,13 @@ export async function bootstrapSynchronisedStorage(
 ): Promise<void> {
 	if (Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) {
 		// If this is a trusted node we need to add the blob encryption key pair
-		if (
-			Is.stringValue(envVars.synchronisedStorageBlobStorageEncryptionKeyId) &&
-			Is.stringBase64(envVars.synchronisedStorageBlobStorageKey)
-		) {
+		if (Is.stringBase64(envVars.synchronisedStorageBlobStorageKey)) {
 			const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
 			const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
-			const keyName = envVars.synchronisedStorageBlobStorageEncryptionKeyId;
+			const keyName =
+				envVars.synchronisedStorageBlobStorageEncryptionKeyId ??
+				SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID;
 			let existingKey;
 
 			try {

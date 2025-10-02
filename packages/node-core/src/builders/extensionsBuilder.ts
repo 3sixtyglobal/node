@@ -1,0 +1,135 @@
+// Copyright 2024 IOTA Stiftung.
+// SPDX-License-Identifier: Apache-2.0.
+/* eslint-disable no-console */
+import { Is } from "@twin.org/core";
+import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
+import { ModuleHelper } from "@twin.org/modules";
+import type { INodeEngineConfig } from "../models/INodeEngineConfig";
+import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables";
+import type {
+	NodeExtensionInitialiseMethod,
+	NodeExtensionInitialiseEngineMethod,
+	NodeExtensionInitialiseEngineServerMethod
+} from "../models/nodeExtensionMethods";
+
+/**
+ * Handles the configuration of the extensions.
+ * @param envVars The environment variables for the node.
+ * @param nodeEngineConfig The node engine config.
+ * @returns The config for the core and the server.
+ */
+export async function extensionsConfiguration(
+	envVars: INodeEnvironmentVariables,
+	nodeEngineConfig: INodeEngineConfig
+): Promise<INodeEngineConfig> {
+	if (Is.stringValue(envVars.extensions)) {
+		const extensions = envVars.extensions.split(",");
+
+		for (const extension of extensions) {
+			let initialiseConfigMethod: NodeExtensionInitialiseMethod | undefined;
+			try {
+				console.info(`Loading extension "${extension}"`);
+
+				initialiseConfigMethod = await ModuleHelper.getModuleMethod<NodeExtensionInitialiseMethod>(
+					extension,
+					"extensionInitialise"
+				);
+			} catch (err) {
+				console.error(`Failed to load extension "${extension}":`, err);
+			}
+
+			if (Is.function(initialiseConfigMethod)) {
+				await initialiseConfigMethod(envVars, nodeEngineConfig);
+			}
+		}
+	}
+
+	return nodeEngineConfig;
+}
+
+/**
+ * Handles the initialisation of the extensions when the engine has been constructed.
+ * @param envVars The environment variables for the node.
+ * @param engineCore The engine core instance.
+ * @returns Nothing.
+ */
+export async function extensionsInitialiseEngine(
+	envVars: INodeEnvironmentVariables,
+	engineCore: IEngineCore
+): Promise<void> {
+	if (Is.stringValue(envVars.extensions)) {
+		const extensions = envVars.extensions.split(",");
+
+		for (const extension of extensions) {
+			let initialiseEngineMethod: NodeExtensionInitialiseEngineMethod | undefined;
+			try {
+				initialiseEngineMethod =
+					await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineMethod>(
+						extension,
+						"extensionInitialiseEngine"
+					);
+			} catch {}
+
+			if (Is.function(initialiseEngineMethod)) {
+				await initialiseEngineMethod(engineCore);
+			}
+		}
+	}
+}
+
+/**
+ * Handles the initialisation of the extensions when the engine server has been constructed.
+ * @param envVars The environment variables for the node.
+ * @param engineCore The engine core instance.
+ * @param engineServer The engine server instance.
+ * @returns Nothing.
+ */
+export async function extensionsInitialiseEngineServer(
+	envVars: INodeEnvironmentVariables,
+	engineCore: IEngineCore,
+	engineServer: IEngineServer
+): Promise<void> {
+	if (Is.stringValue(envVars.extensions)) {
+		const extensions = envVars.extensions.split(",");
+
+		for (const extension of extensions) {
+			let initialiseEngineServerMethod: NodeExtensionInitialiseEngineServerMethod | undefined;
+			try {
+				initialiseEngineServerMethod =
+					await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineServerMethod>(
+						extension,
+						"extensionInitialiseEngineServer"
+					);
+			} catch {}
+
+			if (Is.function(initialiseEngineServerMethod)) {
+				await initialiseEngineServerMethod(engineCore, engineServer);
+			}
+		}
+	}
+}
+
+/**
+ * Handles the shutdown of the extensions.
+ * @param envVars The environment variables for the node.
+ * @returns Nothing.
+ */
+export async function shutdownExtensions(envVars: INodeEnvironmentVariables): Promise<void> {
+	if (Is.stringValue(envVars.extensions)) {
+		const extensions = envVars.extensions.split(",");
+
+		for (const extension of extensions) {
+			let shutdownMethod: (() => Promise<void>) | undefined;
+			try {
+				shutdownMethod = await ModuleHelper.getModuleMethod<() => Promise<void>>(
+					extension,
+					"extensionShutdown"
+				);
+			} catch {}
+
+			if (Is.function(shutdownMethod)) {
+				await shutdownMethod();
+			}
+		}
+	}
+}

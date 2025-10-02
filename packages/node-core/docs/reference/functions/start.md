@@ -1,6 +1,6 @@
 # Function: start()
 
-> **start**(`nodeOptions`, `engineServerConfig`, `envVars`): `Promise`\<`undefined` \| \{ `engine`: `Engine`\<`IEngineServerConfig`, `IEngineState`\>; `server`: `EngineServer`; \}\>
+> **start**(`nodeOptions`, `nodeEngineConfig`, `envVars`): `Promise`\<`undefined` \| \{ `engine`: `Engine`\<`IEngineServerConfig`, `IEngineState`\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \}\>
 
 Start the engine server.
 
@@ -12,9 +12,9 @@ Optional run options for the engine server.
 
 `undefined` | [`INodeOptions`](../interfaces/INodeOptions.md)
 
-### engineServerConfig
+### nodeEngineConfig
 
-`IEngineServerConfig`
+[`INodeEngineConfig`](../interfaces/INodeEngineConfig.md)
 
 The configuration for the engine server.
 
@@ -26,6 +26,6 @@ The environment variables.
 
 ## Returns
 
-`Promise`\<`undefined` \| \{ `engine`: `Engine`\<`IEngineServerConfig`, `IEngineState`\>; `server`: `EngineServer`; \}\>
+`Promise`\<`undefined` \| \{ `engine`: `Engine`\<`IEngineServerConfig`, `IEngineState`\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \}\>
 
 The engine server.

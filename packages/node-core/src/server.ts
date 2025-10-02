@@ -9,24 +9,31 @@ import { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
 import { BlobStorageConnectorType, EntityStorageConnectorType } from "@twin.org/engine-types";
 import { bootstrap } from "./bootstrap";
+import {
+	extensionsInitialiseEngine,
+	extensionsInitialiseEngineServer,
+	shutdownExtensions
+} from "./builders/extensionsBuilder";
+import type { INodeEngineConfig } from "./models/INodeEngineConfig";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
 import type { INodeOptions } from "./models/INodeOptions";
 
 /**
  * Start the engine server.
  * @param nodeOptions Optional run options for the engine server.
- * @param engineServerConfig The configuration for the engine server.
+ * @param nodeEngineConfig The configuration for the engine server.
  * @param envVars The environment variables.
  * @returns The engine server.
  */
 export async function start(
 	nodeOptions: INodeOptions | undefined,
-	engineServerConfig: IEngineServerConfig,
+	nodeEngineConfig: INodeEngineConfig,
 	envVars: INodeEnvironmentVariables
 ): Promise<
 	| {
 			engine: Engine<IEngineServerConfig, IEngineState>;
 			server: EngineServer;
+			shutdown: () => Promise<void>;
 	  }
 	| undefined
 > {
@@ -48,7 +55,7 @@ export async function start(
 
 	// Create the engine instance using file state storage unless one is configured in options
 	const engine = new Engine<IEngineServerConfig, IEngineState>({
-		config: engineServerConfig,
+		config: nodeEngineConfig,
 		stateStorage: nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""),
 		customBootstrap: async (core, engineContext) => bootstrap(core, engineContext, envVars)
 	});
@@ -62,11 +69,15 @@ export async function start(
 		await nodeOptions.extendEngine(engine);
 	}
 
+	await extensionsInitialiseEngine(envVars, engine);
+
 	// Extend the engine server.
 	if (Is.function(nodeOptions?.extendEngineServer)) {
 		console.info("Extending Engine Server");
 		await nodeOptions?.extendEngineServer(server);
 	}
+
+	await extensionsInitialiseEngineServer(envVars, engine, server);
 
 	// Need to register the engine with the factory so that background tasks
 	// can clone it to spawn new instances.
@@ -78,7 +89,11 @@ export async function start(
 	if (canContinue) {
 		return {
 			engine,
-			server
+			server,
+			shutdown: async () => {
+				await server.stop();
+				await shutdownExtensions(envVars);
+			}
 		};
 	}
 }
