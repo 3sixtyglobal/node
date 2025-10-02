@@ -103,5 +103,6 @@ jobs:
         with:
           context: ./apps/node
           file: ./apps/node/deploy/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: false
           tags: ${{ steps.docker-tags.outputs.tags }}
