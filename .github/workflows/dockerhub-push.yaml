@@ -43,6 +43,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }} # Use the built-in token for GitHub Actions
           ref: ${{ steps.set-branch.outputs.branch }} # Checkout the calculated branch
 
+      # Extract version from node-core/package.json so we can use in the tags
       - name: Extract version from node-core/package.json
         id: package-version
         run: |
@@ -50,6 +51,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
+      # Determine Docker tags based on branch and version
       - name: Determine Docker tags
         id: docker-tags
         run: |
@@ -66,25 +68,6 @@ jobs:
 
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
           echo "Docker tags: $TAGS"
-
-      # Install dependencies with retry
-      - name: Install dependencies
-        run: |
-          for i in {1..3}; do
-            npm ci && break || {
-              if [ $i -eq 3 ]; then
-                echo "npm ci failed after 3 attempts"
-                exit 1
-              fi
-              echo "npm ci failed, retrying in 30 seconds (attempt $i/3)..."
-              sleep 30
-            }
-          done
-
-      # Build the packages
-      - name: Run Dist
-        run: |
-          npm run dist
 
       # Set up Docker Buildx
       - name: Set up Docker Buildx

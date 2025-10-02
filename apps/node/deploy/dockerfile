@@ -7,11 +7,17 @@ WORKDIR /app
 # Copy the package.json
 COPY package.json .
 
-# Install only the production dependencies
-RUN npm install --omit=dev --ignore-scripts
+# Install dependencies including dev dependencies needed for merge-locales
+RUN npm install --ignore-scripts
 
 # Copy the rest of the files to the image
 COPY . .
+
+# Compile translation messages
+RUN npm run merge-locales
+
+# Remove dev dependencies to reduce image size
+RUN npm prune --omit=dev
 
 # Expose the port the app runs on
 EXPOSE 3000
