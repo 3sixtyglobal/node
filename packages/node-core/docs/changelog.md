@@ -1,5 +1,13 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.17](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.16...node-core-v0.0.2-next.17) (2025-10-02)
+
+
+### Features
+
+* add extensions support ([476d5a8](https://github.com/twinfoundation/node/commit/476d5a864026a2f78e5b02bc9eb81359777a4a45))
+* updating linting ([feacd17](https://github.com/twinfoundation/node/commit/feacd178bb025bcd29a0ae6e4b8e79f23a989169))
+
 ## [0.0.2-next.16](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.15...node-core-v0.0.2-next.16) (2025-09-29)
 
 

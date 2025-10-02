@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.17](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.16...node-v0.0.2-next.17) (2025-10-02)
+
+
+### Features
+
+* add extensions support ([476d5a8](https://github.com/twinfoundation/node/commit/476d5a864026a2f78e5b02bc9eb81359777a4a45))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.16 to 0.0.2-next.17
+
 ## [0.0.2-next.16](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.15...node-v0.0.2-next.16) (2025-09-29)
 
 
