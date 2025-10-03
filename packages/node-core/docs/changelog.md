@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.19](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.18...node-core-v0.0.2-next.19) (2025-10-03)
+
+
+### Features
+
+* use features instead of disableNodeIdentity ([2e6109b](https://github.com/twinfoundation/node/commit/2e6109bd1de825e0f5396fc120d99ad7b3929852))
+
 ## [0.0.2-next.18](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.17...node-core-v0.0.2-next.18) (2025-10-03)
 
 
