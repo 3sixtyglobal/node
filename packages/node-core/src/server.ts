@@ -1,7 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-/* eslint-disable no-console */
-import { GeneralError, Is } from "@twin.org/core";
+import { GeneralError, I18n, Is } from "@twin.org/core";
 import { Engine } from "@twin.org/engine";
 import { FileStateStorage } from "@twin.org/engine-core";
 import { EngineCoreFactory, type IEngineState } from "@twin.org/engine-models";
@@ -65,7 +64,7 @@ export async function start(
 
 	// Extend the engine.
 	if (Is.function(nodeOptions?.extendEngine)) {
-		console.info("Extending Engine");
+		engine.logInfo(I18n.formatMessage("node.extendingEngine"));
 		await nodeOptions.extendEngine(engine);
 	}
 
@@ -73,7 +72,7 @@ export async function start(
 
 	// Extend the engine server.
 	if (Is.function(nodeOptions?.extendEngineServer)) {
-		console.info("Extending Engine Server");
+		engine.logInfo(I18n.formatMessage("node.extendingEngineServer"));
 		await nodeOptions?.extendEngineServer(server);
 	}
 
@@ -92,7 +91,7 @@ export async function start(
 			server,
 			shutdown: async () => {
 				await server.stop();
-				await shutdownExtensions(envVars);
+				await shutdownExtensions(envVars, engine);
 			}
 		};
 	}

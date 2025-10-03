@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-/* eslint-disable no-console */
-import { Is } from "@twin.org/core";
+import { CLIDisplay } from "@twin.org/cli-core";
+import { GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { ModuleHelper } from "@twin.org/modules";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig";
@@ -9,7 +9,8 @@ import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariab
 import type {
 	NodeExtensionInitialiseMethod,
 	NodeExtensionInitialiseEngineMethod,
-	NodeExtensionInitialiseEngineServerMethod
+	NodeExtensionInitialiseEngineServerMethod,
+	NodeExtensionShutdownMethod
 } from "../models/nodeExtensionMethods";
 
 /**
@@ -28,14 +29,14 @@ export async function extensionsConfiguration(
 		for (const extension of extensions) {
 			let initialiseConfigMethod: NodeExtensionInitialiseMethod | undefined;
 			try {
-				console.info(`Loading extension "${extension}"`);
+				CLIDisplay.value(I18n.formatMessage("node.extensionLoading"), extension);
 
 				initialiseConfigMethod = await ModuleHelper.getModuleMethod<NodeExtensionInitialiseMethod>(
 					extension,
 					"extensionInitialise"
 				);
 			} catch (err) {
-				console.error(`Failed to load extension "${extension}":`, err);
+				throw new GeneralError("node", "extensionLoadingError", { extension }, err);
 			}
 
 			if (Is.function(initialiseConfigMethod)) {
@@ -63,6 +64,7 @@ export async function extensionsInitialiseEngine(
 		for (const extension of extensions) {
 			let initialiseEngineMethod: NodeExtensionInitialiseEngineMethod | undefined;
 			try {
+				engineCore.logInfo(I18n.formatMessage("node.extensionInitialisingEngine", { extension }));
 				initialiseEngineMethod =
 					await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineMethod>(
 						extension,
@@ -95,6 +97,9 @@ export async function extensionsInitialiseEngineServer(
 		for (const extension of extensions) {
 			let initialiseEngineServerMethod: NodeExtensionInitialiseEngineServerMethod | undefined;
 			try {
+				engineCore.logInfo(
+					I18n.formatMessage("node.extensionInitialisingEngineServer", { extension })
+				);
 				initialiseEngineServerMethod =
 					await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineServerMethod>(
 						extension,
@@ -112,16 +117,21 @@ export async function extensionsInitialiseEngineServer(
 /**
  * Handles the shutdown of the extensions.
  * @param envVars The environment variables for the node.
+ * @param engineCore The engine core instance.
  * @returns Nothing.
  */
-export async function shutdownExtensions(envVars: INodeEnvironmentVariables): Promise<void> {
+export async function shutdownExtensions(
+	envVars: INodeEnvironmentVariables,
+	engineCore: IEngineCore
+): Promise<void> {
 	if (Is.stringValue(envVars.extensions)) {
 		const extensions = envVars.extensions.split(",");
 
 		for (const extension of extensions) {
-			let shutdownMethod: (() => Promise<void>) | undefined;
+			let shutdownMethod: NodeExtensionShutdownMethod | undefined;
 			try {
-				shutdownMethod = await ModuleHelper.getModuleMethod<() => Promise<void>>(
+				engineCore.logInfo(I18n.formatMessage("node.extensionShutdown", { extension }));
+				shutdownMethod = await ModuleHelper.getModuleMethod<NodeExtensionShutdownMethod>(
 					extension,
 					"extensionShutdown"
 				);

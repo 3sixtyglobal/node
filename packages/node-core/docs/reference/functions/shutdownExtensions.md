@@ -1,6 +1,6 @@
 # Function: shutdownExtensions()
 
-> **shutdownExtensions**(`envVars`): `Promise`\<`void`\>
+> **shutdownExtensions**(`envVars`, `engineCore`): `Promise`\<`void`\>
 
 Handles the shutdown of the extensions.
 
@@ -11,6 +11,12 @@ Handles the shutdown of the extensions.
 [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
 
 The environment variables for the node.
+
+### engineCore
+
+`IEngineCore`
+
+The engine core instance.
 
 ## Returns
 

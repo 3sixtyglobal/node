@@ -31,3 +31,9 @@ export type NodeExtensionInitialiseEngineServerMethod = (
 	engineCore: IEngineCore,
 	engineServer: IEngineServer
 ) => Promise<void>;
+
+/**
+ * The type for the shutdown method of an extension module.
+ * This is called when the engine is shutting down.
+ */
+export type NodeExtensionShutdownMethod = () => Promise<void>;

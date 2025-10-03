@@ -1,9 +1,9 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-/* eslint-disable no-console */
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
-import { EnvHelper, ErrorHelper, Is } from "@twin.org/core";
+import { CLIDisplay } from "@twin.org/cli-core";
+import { EnvHelper, Is } from "@twin.org/core";
 import { ModuleHelper } from "@twin.org/modules";
 import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder";
@@ -35,44 +35,48 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 			version: nodeOptions?.serverVersion ?? "0.0.2-next.17" // x-release-please-version
 		};
 
-		console.log(`\u001B[4m🌩️  ${serverInfo.name} v${serverInfo.version}\u001B[24m\n`);
+		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
 
 		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
 			nodeOptions.executionDirectory = getExecutionDirectory();
 		}
-		console.info("Execution Directory:", nodeOptions.executionDirectory);
+		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
 
 		nodeOptions.localesDirectory =
 			nodeOptions?.localesDirectory ??
 			path.resolve(path.join(nodeOptions.executionDirectory, "dist", "locales"));
+		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
 
-		console.info("Locales Directory:", nodeOptions.localesDirectory);
 		await initialiseLocales(nodeOptions.localesDirectory);
 
 		if (Is.empty(nodeOptions?.openApiSpecFile)) {
 			const specFile = path.resolve(
 				path.join(nodeOptions.executionDirectory ?? "", "docs", "open-api", "spec.json")
 			);
-			console.info("Default OpenAPI Spec File:", specFile);
+			CLIDisplay.value("Default OpenAPI Spec File", specFile);
 			if (await fileExists(specFile)) {
 				nodeOptions ??= {};
 				nodeOptions.openApiSpecFile = specFile;
 			}
+		} else {
+			CLIDisplay.value("OpenAPI Spec File", nodeOptions.openApiSpecFile);
 		}
 
 		if (Is.empty(nodeOptions?.favIconFile)) {
 			const favIconFile = path.resolve(
 				path.join(nodeOptions.executionDirectory ?? "", "static", "favicon.png")
 			);
-			console.info("Default Favicon File:", favIconFile);
+			CLIDisplay.value("Default Favicon File", favIconFile);
 			if (await fileExists(favIconFile)) {
 				nodeOptions ??= {};
 				nodeOptions.favIconFile = favIconFile;
 			}
+		} else {
+			CLIDisplay.value("Favicon File", nodeOptions.favIconFile);
 		}
 
 		nodeOptions.envPrefix ??= "TWIN_NODE_";
-		console.info("Environment Prefix:", nodeOptions.envPrefix);
+		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
@@ -86,7 +90,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 			serverInfo
 		);
 
-		console.info();
+		CLIDisplay.break();
 		const startResult = await start(nodeOptions, nodeEngineConfig, envVars);
 
 		if (!Is.empty(startResult)) {
@@ -97,7 +101,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 			}
 		}
 	} catch (err) {
-		console.error(ErrorHelper.formatErrors(err).join("\n"));
+		CLIDisplay.error(err);
 		// eslint-disable-next-line unicorn/no-process-exit
 		process.exit(1);
 	}
@@ -124,7 +128,7 @@ export async function buildConfiguration(
 	let defaultEnvOnly = false;
 	if (Is.empty(options?.envFilenames)) {
 		const envFile = path.resolve(path.join(options.executionDirectory ?? "", ".env"));
-		console.info("Default Environment File:", envFile);
+		CLIDisplay.value("Default Environment File", envFile);
 		options ??= {};
 		options.envFilenames = [envFile];
 		defaultEnvOnly = true;
@@ -163,10 +167,10 @@ export async function buildConfiguration(
 			const embeddedFile = path.resolve(path.join(options.executionDirectory ?? "", filePath));
 
 			if (envVars[key].startsWith("@text:")) {
-				console.info(`Expanding Environment Variable: ${key} from text file: ${embeddedFile}`);
+				CLIDisplay.value(`Expanding Environment Variable: ${key} from text file`, embeddedFile);
 				envVars[key] = await loadTextFile(embeddedFile);
 			} else if (envVars[key].startsWith("@json:")) {
-				console.info(`Expanding Environment Variable: ${key} from JSON file: ${embeddedFile}`);
+				CLIDisplay.value(`Expanding Environment Variable: ${key} from JSON file`, embeddedFile);
 				envVars[key] = await loadJsonFile(embeddedFile);
 			}
 		}
@@ -174,7 +178,7 @@ export async function buildConfiguration(
 
 	// Extend the environment variables with any additional custom configuration.
 	if (Is.function(options?.extendEnvVars)) {
-		console.info("Extending Environment Variables");
+		CLIDisplay.task("Extending Environment Variables");
 		await options.extendEnvVars(envVars);
 	}
 
@@ -191,7 +195,7 @@ export async function buildConfiguration(
 	// Merge any custom configuration provided in the options.
 	if (Is.arrayValue(options?.configFilenames)) {
 		for (const configFile of options.configFilenames) {
-			console.info("Loading Configuration File:", configFile);
+			CLIDisplay.value("Loading Configuration File", configFile);
 			const configFilePath = path.resolve(path.join(options.executionDirectory ?? "", configFile));
 			const config = await loadJsonFile(configFilePath);
 			Object.assign(engineServerConfig, config);
@@ -199,13 +203,13 @@ export async function buildConfiguration(
 	}
 
 	if (Is.objectValue(options?.config)) {
-		console.info("Merging Custom Configuration");
+		CLIDisplay.task("Merging Custom Configuration");
 		Object.assign(engineServerConfig, options.config);
 	}
 
 	// Merge any custom configuration provided in the options.
 	if (Is.function(options?.extendConfig)) {
-		console.info("Extending Configuration");
+		CLIDisplay.task("Extending Configuration");
 		await options.extendConfig(envVars, engineServerConfig);
 	}
 

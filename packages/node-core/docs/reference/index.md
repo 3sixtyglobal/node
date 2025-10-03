@@ -13,6 +13,7 @@
 - [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
+- [NodeExtensionShutdownMethod](type-aliases/NodeExtensionShutdownMethod.md)
 - [NodeFeatures](type-aliases/NodeFeatures.md)
 
 ## Variables

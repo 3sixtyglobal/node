@@ -1,8 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-/* eslint-disable no-console */
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { CLIDisplay } from "@twin.org/cli-core";
 import { I18n, Is, type ILocaleDictionary } from "@twin.org/core";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
 import { NodeFeatures } from "./models/nodeFeatures";
@@ -13,12 +13,12 @@ import { NodeFeatures } from "./models/nodeFeatures";
  */
 export async function initialiseLocales(localesDirectory: string): Promise<void> {
 	const localesFile = path.resolve(path.join(localesDirectory, "en.json"));
-	console.info("Locales File:", localesFile);
+	CLIDisplay.value("Locales File", localesFile);
 	if (await fileExists(localesFile)) {
 		const enLangContent = await readFile(localesFile, "utf8");
 		I18n.addDictionary("en", JSON.parse(enLangContent) as ILocaleDictionary);
 	} else {
-		console.warn(`Locales file not found: ${localesFile}`);
+		CLIDisplay.error(`Locales file not found: ${localesFile}`);
 	}
 }
 

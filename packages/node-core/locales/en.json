@@ -1,7 +1,8 @@
 {
 	"error": {
 		"node": {
-			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file"
+			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
+			"extensionLoadingError": "Failed to load extension \"{extension}\""
 		}
 	},
 	"node": {
@@ -31,6 +32,12 @@
 		"existingUserProfile": "User profile already exists \"{identity}\"",
 		"nodeIdentity": "Node identity \"{identity}\"",
 		"nodeAdminUserEmail": "Node Admin User Email \"{email}\"",
-		"nodeAdminUserPassword": "Node Admin User Password \"{password}\""
+		"nodeAdminUserPassword": "Node Admin User Password \"{password}\"",
+		"extensionLoading": "Loading Extension",
+		"extensionInitialisingEngine": "Initialising engine for extension \"{extension}\"",
+		"extensionInitialisingEngineServer": "Initialising engine server for extension \"{extension}\"",
+		"extensionShutdown": "Shutdown extension \"{extension}\"",
+		"extendingEngine": "Extending Engine",
+		"extendingEngineServer": "Extending Engine Server"
 	}
 }
