@@ -16,6 +16,8 @@ import {
 import type { HttpMethod } from "@twin.org/web";
 import { AUTH_SIGNING_KEY_ID } from "../defaults";
 import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables";
+import { NodeFeatures } from "../models/nodeFeatures";
+import { getFeatures } from "../utils";
 
 /**
  * Handles the configuration of the server.
@@ -84,9 +86,10 @@ export async function buildEngineServerConfiguration(
 	serverConfig.types.restRouteProcessor ??= [];
 	serverConfig.types.socketRouteProcessor ??= [];
 
-	const disableNodeIdentity = Coerce.boolean(envVars.disableNodeIdentity);
+	const features = getFeatures(envVars);
+	const hasNodeIdentity = features.includes(NodeFeatures.NodeIdentity);
 
-	if (!disableNodeIdentity) {
+	if (hasNodeIdentity) {
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.NodeIdentity
 		});

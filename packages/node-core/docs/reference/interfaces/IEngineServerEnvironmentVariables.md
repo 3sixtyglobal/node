@@ -1740,14 +1740,6 @@ Additional MIME type processors to include, comma separated.
 
 ***
 
-### disableNodeIdentity?
-
-> `optional` **disableNodeIdentity**: `string`
-
-Disable Node Identity route processors.
-
-***
-
 ### routeLoggingIncludeBody?
 
 > `optional` **routeLoggingIncludeBody**: `string`

@@ -1776,18 +1776,6 @@ Additional MIME type processors to include, comma separated.
 
 ***
 
-### disableNodeIdentity?
-
-> `optional` **disableNodeIdentity**: `string`
-
-Disable Node Identity route processors.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`disableNodeIdentity`](IEngineServerEnvironmentVariables.md#disablenodeidentity)
-
-***
-
 ### routeLoggingIncludeBody?
 
 > `optional` **routeLoggingIncludeBody**: `string`

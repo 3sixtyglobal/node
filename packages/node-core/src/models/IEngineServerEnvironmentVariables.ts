@@ -57,11 +57,6 @@ export interface IEngineServerEnvironmentVariables extends IEngineEnvironmentVar
 	mimeTypeProcessors?: string;
 
 	/**
-	 * Disable Node Identity route processors.
-	 */
-	disableNodeIdentity?: string;
-
-	/**
 	 * Include the body in the REST logging output, useful for debugging.
 	 */
 	routeLoggingIncludeBody?: string;
