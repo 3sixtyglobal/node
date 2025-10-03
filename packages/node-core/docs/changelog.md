@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.18](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.17...node-core-v0.0.2-next.18) (2025-10-03)
+
+
+### Features
+
+* improve error handling for extensions and logging ([bd84fde](https://github.com/twinfoundation/node/commit/bd84fde67e5a9db6ac66730397992401ca52e88c))
+
 ## [0.0.2-next.17](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.16...node-core-v0.0.2-next.17) (2025-10-02)
 
 
