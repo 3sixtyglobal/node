@@ -81,7 +81,7 @@ describe("node-core", () => {
 			version: "0.0.0"
 		});
 
-		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -89,9 +89,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/health",
-			"/spec",
-			"/logging",
-			"/logging"
+			"/spec"
 		]);
 
 		await startResult?.shutdown();
@@ -173,6 +171,7 @@ describe("node-core", () => {
 		});
 
 		expect(ComponentFactory.names()).toEqual([
+			"engine-logging-service",
 			"logging-service",
 			"task-scheduler-service",
 			"event-bus-service",
@@ -597,7 +596,7 @@ describe("node-core", () => {
 		expect(extendEngineCalled).toBe(true);
 		expect(extendEngineServerCalled).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -605,9 +604,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/health",
-			"/spec",
-			"/logging",
-			"/logging"
+			"/spec"
 		]);
 
 		await startResult?.shutdown();
@@ -653,7 +650,7 @@ describe("node-core", () => {
 
 		expect(nodeEngineConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -661,9 +658,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/health",
-			"/spec",
-			"/logging",
-			"/logging"
+			"/spec"
 		]);
 
 		await startResult?.shutdown();
@@ -707,7 +702,7 @@ describe("node-core", () => {
 
 		expect(nodeEngineConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -715,9 +710,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/health",
-			"/spec",
-			"/logging",
-			"/logging"
+			"/spec"
 		]);
 
 		await startResult?.shutdown();
@@ -819,7 +812,7 @@ describe("node-core", () => {
 			version: "0.0.0"
 		});
 
-		expect(ComponentFactory.names()).toEqual(["logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -827,9 +820,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/health",
-			"/spec",
-			"/logging",
-			"/logging"
+			"/spec"
 		]);
 
 		await startResult?.shutdown();

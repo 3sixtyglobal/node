@@ -15,11 +15,11 @@
 	},
 	"scripts": {
 		"clean": "rimraf dist coverage docs/reference",
-		"build": "tsc",
+		"build": "tspc",
 		"dev": "nodemon --watch src --ext ts --exec \"npm run build && npm run bundle:esm\"",
 		"merge-locales": "merge-locales",
 		"test": "vitest --run --config ./vitest.config.ts --no-cache",
-		"test:build": "tsc -p ./tests/tsconfig.json --noEmit",
+		"test:build": "tspc -p ./tests/tsconfig.json --noEmit",
 		"coverage": "vitest --run --coverage --config ./vitest.config.ts --no-cache",
 		"bundle:esm": "rollup --config rollup.config.mjs --environment MODULE:esm",
 		"bundle:cjs": "rollup --config rollup.config.mjs --environment MODULE:cjs",
@@ -28,8 +28,7 @@
 		"docs:generate": "typedoc",
 		"docs": "npm run docs:clean && npm run docs:generate",
 		"dist": "npm run clean && npm run build && npm run merge-locales && npm run test:build && npm run test && npm run bundle && npm run docs",
-		"dist:no-test": "npm run clean && npm run build && npm run merge-locales && npm run bundle && npm run docs",
-		"prepare": "ts-patch install -s"
+		"dist:no-test": "npm run clean && npm run build && npm run merge-locales && npm run bundle && npm run docs"
 	},
 	"dependencies": {
 		"@twin.org/api-auth-entity-storage-service": "next",

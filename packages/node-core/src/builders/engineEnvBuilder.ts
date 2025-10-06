@@ -3,7 +3,7 @@
 import path from "node:path";
 import { Coerce, Is } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import type { IEngineModuleConfig } from "@twin.org/engine-models";
+import type { IEngineCoreTypeConfig, IEngineModuleConfig } from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -35,6 +35,7 @@ import {
 	type IEngineConfig,
 	ImmutableProofComponentType,
 	LoggingComponentType,
+	type LoggingConnectorConfig,
 	LoggingConnectorType,
 	MessagingAdminComponentType,
 	MessagingComponentType,
@@ -431,23 +432,24 @@ async function configureLogging(
 ): Promise<void> {
 	coreConfig.types.loggingConnector ??= [];
 
-	const loggingConnectors = (envVars.loggingConnector ?? "").split(",");
-	for (const loggingConnector of loggingConnectors) {
+	const loggingConnectorTypes = (envVars.loggingConnector ?? "").split(",");
+
+	const loggingConnectors: IEngineCoreTypeConfig<LoggingConnectorConfig>[] = [];
+
+	for (const loggingConnector of loggingConnectorTypes) {
 		if (loggingConnector === LoggingConnectorType.Console) {
-			coreConfig.types.loggingConnector?.push({
+			loggingConnectors.push({
 				type: LoggingConnectorType.Console,
 				options: {
 					config: {
 						translateMessages: true,
 						hideGroups: true
 					}
-				},
-				isDefault: loggingConnectors.length === 1
+				}
 			});
 		} else if (loggingConnector === LoggingConnectorType.EntityStorage) {
-			coreConfig.types.loggingConnector?.push({
-				type: LoggingConnectorType.EntityStorage,
-				isDefault: loggingConnectors.length === 1
+			loggingConnectors.push({
+				type: LoggingConnectorType.EntityStorage
 			});
 		}
 	}
@@ -455,16 +457,20 @@ async function configureLogging(
 	if (loggingConnectors.length > 1) {
 		coreConfig.types.loggingConnector?.push({
 			type: LoggingConnectorType.Multi,
-			isDefault: true,
 			options: {
-				loggingConnectorTypes: loggingConnectors
+				loggingConnectorTypes: loggingConnectors.map(l => l.type)
 			}
 		});
 	}
 
 	if (loggingConnectors.length > 0) {
+		coreConfig.types.loggingConnector ??= [];
+		coreConfig.types.loggingConnector.push(...loggingConnectors);
+
 		coreConfig.types.loggingComponent ??= [];
-		coreConfig.types.loggingComponent.push({ type: LoggingComponentType.Service });
+		// We set the isDefault flag so that other components will get this service by default
+		// and not the generic one from the engine core
+		coreConfig.types.loggingComponent.push({ type: LoggingComponentType.Service, isDefault: true });
 	}
 }
 
