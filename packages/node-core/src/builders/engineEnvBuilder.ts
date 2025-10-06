@@ -3,7 +3,7 @@
 import path from "node:path";
 import { Coerce, Is } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import type { IEngineCoreTypeConfig, IEngineModuleConfig } from "@twin.org/engine-models";
+import type { IEngineModuleConfig } from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -35,7 +35,6 @@ import {
 	type IEngineConfig,
 	ImmutableProofComponentType,
 	LoggingComponentType,
-	type LoggingConnectorConfig,
 	LoggingConnectorType,
 	MessagingAdminComponentType,
 	MessagingComponentType,
@@ -433,12 +432,11 @@ async function configureLogging(
 	coreConfig.types.loggingConnector ??= [];
 
 	const loggingConnectorTypes = (envVars.loggingConnector ?? "").split(",");
-
-	const loggingConnectors: IEngineCoreTypeConfig<LoggingConnectorConfig>[] = [];
+	let additionalConnectorCount = 0;
 
 	for (const loggingConnector of loggingConnectorTypes) {
 		if (loggingConnector === LoggingConnectorType.Console) {
-			loggingConnectors.push({
+			coreConfig.types.loggingConnector.push({
 				type: LoggingConnectorType.Console,
 				options: {
 					config: {
@@ -447,26 +445,25 @@ async function configureLogging(
 					}
 				}
 			});
+			additionalConnectorCount++;
 		} else if (loggingConnector === LoggingConnectorType.EntityStorage) {
-			loggingConnectors.push({
+			coreConfig.types.loggingConnector.push({
 				type: LoggingConnectorType.EntityStorage
 			});
+			additionalConnectorCount++;
 		}
 	}
 
-	if (loggingConnectors.length > 1) {
+	if (additionalConnectorCount > 1) {
 		coreConfig.types.loggingConnector?.push({
 			type: LoggingConnectorType.Multi,
 			options: {
-				loggingConnectorTypes: loggingConnectors.map(l => l.type)
+				loggingConnectorTypes
 			}
 		});
 	}
 
-	if (loggingConnectors.length > 0) {
-		coreConfig.types.loggingConnector ??= [];
-		coreConfig.types.loggingConnector.push(...loggingConnectors);
-
+	if (additionalConnectorCount > 0) {
 		coreConfig.types.loggingComponent ??= [];
 		// We set the isDefault flag so that other components will get this service by default
 		// and not the generic one from the engine core
