@@ -1,5 +1,13 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.20](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.19...node-core-v0.0.2-next.20) (2025-10-06)
+
+
+### Features
+
+* improve node logging ([63d6ea6](https://github.com/twinfoundation/node/commit/63d6ea661c2c76985d98addb8d905ad6f0c7f164))
+* improve node logging ([c25b9c6](https://github.com/twinfoundation/node/commit/c25b9c6779bdb76f341df072c39b4c2fae4565a3))
+
 ## [0.0.2-next.19](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.18...node-core-v0.0.2-next.19) (2025-10-03)
 
 

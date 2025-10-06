@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.20](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.19...node-v0.0.2-next.20) (2025-10-06)
+
+
+### Features
+
+* improve node logging ([c25b9c6](https://github.com/twinfoundation/node/commit/c25b9c6779bdb76f341df072c39b4c2fae4565a3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.19 to 0.0.2-next.20
+
 ## [0.0.2-next.19](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.18...node-v0.0.2-next.19) (2025-10-03)
 
 

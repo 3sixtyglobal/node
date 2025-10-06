@@ -32,7 +32,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node Server",
-			version: nodeOptions?.serverVersion ?? "0.0.2-next.19" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.0.2-next.20" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
