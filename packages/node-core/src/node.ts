@@ -1,5 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
@@ -20,6 +21,8 @@ import {
 	loadJsonFile,
 	loadTextFile
 } from "./utils";
+
+const moduleCache: { [id: string]: unknown } = {};
 
 /**
  * Run the TWIN Node server.
@@ -226,6 +229,13 @@ export async function buildConfiguration(
  */
 export function overrideModuleImport(executionDirectory: string): void {
 	ModuleHelper.overrideImport(async moduleName => {
+		if (moduleCache[moduleName]) {
+			return {
+				module: moduleCache[moduleName],
+				useDefault: false
+			};
+		}
+
 		// If the module path for example when dynamically loading
 		// modules looks like a local file then we try to resolve
 		// using the local file system
@@ -244,16 +254,45 @@ export function overrideModuleImport(executionDirectory: string): void {
 			if (exists) {
 				// If the module exists then we can load it, otherwise
 				// we fallback to regular handling to see if that can import it
+				const module = await import(
+					process.platform === "win32" ? `file://${localFilename}` : localFilename
+				);
+				moduleCache[moduleName] = module;
 				return {
-					module: await import(
-						process.platform === "win32" ? `file://${localFilename}` : localFilename
-					),
+					module,
 					useDefault: false
 				};
 			}
 		}
 
-		// The filename doesn't look like a local module, so just use default handling
+		try {
+			// Try and load from node_modules manually
+			// This is needed for some environments where
+			// the module resolution doesn't work as expected
+			const npmRoot = execSync("npm root").toString().trim().replace(/\\/g, "/");
+			const packageJson = await loadJsonFile<{ module?: string; main?: string }>(
+				path.resolve(npmRoot, moduleName, "package.json")
+			);
+			const mainFile = packageJson?.module ?? packageJson?.main ?? "index.js";
+			const modulePath = path.resolve(npmRoot, moduleName, mainFile);
+			const exists = await fileExists(modulePath);
+			if (exists) {
+				const module = await import(
+					process.platform === "win32" ? `file://${modulePath}` : modulePath
+				);
+				moduleCache[moduleName] = module;
+				return {
+					module,
+					useDefault: false
+				};
+			}
+		} catch {
+			// We just fallback to default handling if not possible
+		}
+
+		// We don't appear to be able to manually resolve this module
+		// So we let the default handling take care of it
+		// This will allow built-in modules and regular node_modules to load as normal
 		return {
 			useDefault: true
 		};
