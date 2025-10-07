@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.21](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.20...node-core-v0.0.2-next.21) (2025-10-07)
+
+
+### Features
+
+* update engine dependency ([3494c31](https://github.com/twinfoundation/node/commit/3494c3144fd5ce6d3a9f2936c7890ab36795aeaa))
+
 ## [0.0.2-next.20](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.19...node-core-v0.0.2-next.20) (2025-10-06)
 
 
