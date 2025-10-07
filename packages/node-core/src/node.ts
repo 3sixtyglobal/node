@@ -82,6 +82,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 
 		const { nodeEngineConfig, nodeEnvVars: envVars } = await buildConfiguration(
 			// This is the only location in the code base that should access process.env directly
+			// So we can safely disable the linting rule here.
 			// eslint-disable-next-line no-restricted-syntax
 			process.env as {
 				[id: string]: string;
