@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.23](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.22...node-core-v0.0.2-next.23) (2025-10-07)
+
+
+### Features
+
+* add module cache and improve resolution ([482be05](https://github.com/twinfoundation/node/commit/482be056c37a598033250ea8a7288a33cf3470b4))
+
 ## [0.0.2-next.22](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.21...node-core-v0.0.2-next.22) (2025-10-07)
 
 

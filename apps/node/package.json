@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node",
-	"version": "0.0.2-next.22",
+	"version": "0.0.2-next.23",
 	"description": "TWIN Node serving APIs using the specified configuration",
 	"private": true,
 	"repository": {
@@ -30,7 +30,7 @@
 		"start": "node src/index.mjs"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "0.0.2-next.22"
+		"@twin.org/node-core": "0.0.2-next.23"
 	},
 	"devDependencies": {
 		"@twin.org/entity-storage-connector-memory": "next",
