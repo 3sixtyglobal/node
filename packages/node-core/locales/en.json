@@ -6,7 +6,6 @@
 		}
 	},
 	"node": {
-		"terminateSignal": "Server terminating",
 		"generatingMnemonic": "Generating mnemonic \"{mnemonic}\"",
 		"storingMnemonic": "Storing mnemonic",
 		"existingMnemonic": "Mnemonic already exists",

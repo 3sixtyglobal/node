@@ -252,6 +252,10 @@ const tsRestrictedSyntax = [
 	{
 		selector: 'TSEnumDeclaration',
 		message: 'Do not use enums, instead use iterable union types'
+	},
+	{
+		selector: 'MethodDefinition[static=true] ThisExpression',
+		message: 'Do not use "this" in static methods'
 	}
 ];
 

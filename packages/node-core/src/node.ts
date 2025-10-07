@@ -96,6 +96,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 		if (!Is.empty(startResult)) {
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
 				process.on(signal, async () => {
+					CLIDisplay.value("Terminate Signal", signal);
 					await startResult.shutdown();
 				});
 			}
