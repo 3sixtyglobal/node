@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.24](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.23...node-core-v0.0.2-next.24) (2025-10-08)
+
+
+### Features
+
+* add isDefault flag to logging connectors ([358e839](https://github.com/twinfoundation/node/commit/358e8394819dab9832d3a9ebfac74b897b7d5f40))
+
 ## [0.0.2-next.23](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.22...node-core-v0.0.2-next.23) (2025-10-07)
 
 
