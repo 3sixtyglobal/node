@@ -454,13 +454,20 @@ async function configureLogging(
 		}
 	}
 
+	// If more than one logging connector, then we need to add a multi connector
+	// and set it as the default one
 	if (additionalConnectorCount > 1) {
-		coreConfig.types.loggingConnector?.push({
+		coreConfig.types.loggingConnector.push({
 			type: LoggingConnectorType.Multi,
 			options: {
 				loggingConnectorTypes
-			}
+			},
+			isDefault: true
 		});
+	} else if (additionalConnectorCount > 0) {
+		// If only one connector, then we set it as the default one
+		coreConfig.types.loggingConnector[coreConfig.types.loggingConnector.length - 1].isDefault =
+			true;
 	}
 
 	if (additionalConnectorCount > 0) {
