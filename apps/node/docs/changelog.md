@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.2-next.25](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.24...node-v0.0.2-next.25) (2025-10-09)
+
+
+### Features
+
+* add validate-locales ([1a19dcb](https://github.com/twinfoundation/node/commit/1a19dcb005c2f0e3103e290db28c48a3464094cb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.2-next.24 to 0.0.2-next.25
+
 ## [0.0.2-next.24](https://github.com/twinfoundation/node/compare/node-v0.0.2-next.23...node-v0.0.2-next.24) (2025-10-08)
 
 
