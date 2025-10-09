@@ -15,7 +15,7 @@ export class TestDataSpaceConnectorApp {
 	/**
 	 * Runtime name for the class.
 	 */
-	CLASS_NAME = 'TestDataSpaceConnectorApp';
+	static CLASS_NAME = 'TestDataSpaceConnectorApp';
 
 	/**
 	 * Data space connector component.
@@ -88,12 +88,12 @@ export class TestDataSpaceConnectorApp {
 	async handleActivity(activity) {
 		await this._loggingService?.log({
 			level: 'info',
-			source: this.CLASS_NAME,
+			source: TestDataSpaceConnectorApp.CLASS_NAME,
 			message: `App Called: ${TestDataSpaceConnectorApp.APP_ID}`
 		});
 		await this._loggingService?.log({
 			level: 'info',
-			source: this.CLASS_NAME,
+			source: TestDataSpaceConnectorApp.CLASS_NAME,
 			message: `Node Identity: ${this._nodeIdentity ?? ''}`
 		});
 		await new Promise(resolve => setTimeout(resolve, 500));

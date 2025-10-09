@@ -140,7 +140,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -161,7 +161,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -200,7 +200,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -221,7 +221,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -269,7 +269,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -290,7 +290,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -381,7 +381,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -402,7 +402,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -451,7 +451,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -472,7 +472,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -540,7 +540,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -561,7 +561,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -579,7 +579,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -623,7 +623,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -644,7 +644,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -709,7 +709,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -730,7 +730,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -748,7 +748,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -818,7 +818,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -839,7 +839,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -857,7 +857,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -924,7 +924,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -945,7 +945,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -993,7 +993,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1014,7 +1014,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1032,7 +1032,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1102,7 +1102,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1123,7 +1123,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1141,7 +1141,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1233,7 +1233,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1254,7 +1254,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1272,7 +1272,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1333,7 +1333,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1354,7 +1354,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1372,7 +1372,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1458,7 +1458,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1479,7 +1479,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1497,7 +1497,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1558,7 +1558,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1579,7 +1579,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1597,7 +1597,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1708,7 +1708,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1729,7 +1729,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1747,7 +1747,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1827,7 +1827,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1848,7 +1848,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1909,7 +1909,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -1930,7 +1930,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1948,7 +1948,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2009,7 +2009,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2030,7 +2030,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2048,7 +2048,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2148,7 +2148,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2169,7 +2169,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2187,7 +2187,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2260,7 +2260,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2281,7 +2281,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2391,7 +2391,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2412,7 +2412,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2430,7 +2430,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2521,7 +2521,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2542,7 +2542,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2608,7 +2608,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2629,7 +2629,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2647,7 +2647,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "ConflictError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"conflicts": [
 													"1"
@@ -2670,7 +2670,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2746,7 +2746,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2767,7 +2767,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2785,7 +2785,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -2806,7 +2806,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2870,7 +2870,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2891,7 +2891,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2909,7 +2909,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -2930,7 +2930,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -2965,7 +2965,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -2986,7 +2986,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3004,7 +3004,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -3025,7 +3025,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3105,7 +3105,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -3126,7 +3126,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -3147,7 +3147,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3193,15 +3193,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
+						"name": "limit",
 						"description": "Number of items to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					}
 				],
@@ -3250,7 +3247,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -3271,7 +3268,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3289,7 +3286,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3357,7 +3354,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -3378,7 +3375,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3396,7 +3393,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3444,15 +3441,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The number of entries to return per page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -3574,7 +3568,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -3595,7 +3589,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3613,7 +3607,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -3634,7 +3628,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3787,7 +3781,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -3808,7 +3802,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3826,7 +3820,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -3847,7 +3841,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3917,7 +3911,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -3938,7 +3932,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3956,7 +3950,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4004,7 +3998,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4025,7 +4019,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4043,7 +4037,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -4064,7 +4058,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4128,7 +4122,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4149,7 +4143,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4167,7 +4161,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -4188,7 +4182,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4255,7 +4249,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4276,7 +4270,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4294,7 +4288,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4329,15 +4323,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					}
 				],
@@ -4389,7 +4380,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4410,7 +4401,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4428,7 +4419,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4503,7 +4494,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4524,7 +4515,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4542,7 +4533,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4608,7 +4599,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4629,7 +4620,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4647,7 +4638,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4695,7 +4686,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4716,7 +4707,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4734,7 +4725,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4815,7 +4806,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -4836,7 +4827,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4854,7 +4845,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4915,15 +4906,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					}
 				],
@@ -4979,7 +4967,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5000,7 +4988,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5018,7 +5006,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5091,7 +5079,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5112,7 +5100,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5130,7 +5118,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5199,15 +5187,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					}
 				],
@@ -5253,7 +5238,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5274,7 +5259,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5292,7 +5277,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5363,7 +5348,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5384,7 +5369,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5402,7 +5387,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5476,7 +5461,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5497,7 +5482,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5515,7 +5500,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5563,7 +5548,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5584,7 +5569,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5602,7 +5587,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5670,7 +5655,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5691,7 +5676,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5709,7 +5694,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5781,7 +5766,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5802,7 +5787,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5820,7 +5805,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5889,7 +5874,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -5910,7 +5895,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -5928,7 +5913,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6104,7 +6089,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6125,7 +6110,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6173,7 +6158,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6194,7 +6179,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6212,7 +6197,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6281,7 +6266,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6302,7 +6287,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6320,7 +6305,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6401,7 +6386,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6422,7 +6407,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6440,7 +6425,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6523,7 +6508,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6544,7 +6529,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6562,7 +6547,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6641,7 +6626,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6662,7 +6647,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6680,7 +6665,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6728,7 +6713,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6749,7 +6734,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6767,7 +6752,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6834,7 +6819,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -6855,7 +6840,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -6873,7 +6858,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -6894,7 +6879,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7022,7 +7007,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7043,7 +7028,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7061,7 +7046,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -7082,7 +7067,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7165,7 +7150,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7186,7 +7171,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7204,7 +7189,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -7225,7 +7210,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7300,7 +7285,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7321,7 +7306,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7339,7 +7324,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7409,7 +7394,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7430,7 +7415,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7448,7 +7433,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7496,7 +7481,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7517,7 +7502,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7535,7 +7520,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7605,7 +7590,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7626,7 +7611,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7644,7 +7629,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7713,7 +7698,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7734,7 +7719,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7752,7 +7737,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7816,7 +7801,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7837,7 +7822,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7855,7 +7840,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7927,7 +7912,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -7948,7 +7933,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -7966,7 +7951,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8072,7 +8057,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -8093,7 +8078,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8111,7 +8096,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8184,7 +8169,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -8205,7 +8190,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8223,7 +8208,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8357,7 +8342,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -8378,7 +8363,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8396,7 +8381,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -8417,7 +8402,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8544,7 +8529,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -8565,7 +8550,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8583,7 +8568,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -8604,7 +8589,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8663,7 +8648,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -8684,7 +8669,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8702,7 +8687,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -8723,7 +8708,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8850,7 +8835,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -8871,7 +8856,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8889,7 +8874,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8996,15 +8981,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -9137,7 +9119,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -9158,7 +9140,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9176,7 +9158,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9353,7 +9335,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -9374,7 +9356,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9392,7 +9374,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9524,7 +9506,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -9545,7 +9527,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9563,7 +9545,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9640,7 +9622,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -9661,7 +9643,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9679,7 +9661,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9745,15 +9727,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -9880,7 +9859,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -9901,7 +9880,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9919,7 +9898,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -9940,7 +9919,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10152,7 +10131,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10173,7 +10152,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10191,7 +10170,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -10212,7 +10191,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10282,7 +10261,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10303,7 +10282,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10321,7 +10300,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -10342,7 +10321,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10390,7 +10369,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10411,7 +10390,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10429,7 +10408,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -10450,7 +10429,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10529,7 +10508,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10550,7 +10529,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10568,7 +10547,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10712,7 +10691,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10733,7 +10712,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10751,7 +10730,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -10772,7 +10751,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10831,7 +10810,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10852,7 +10831,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10870,7 +10849,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -10891,7 +10870,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -10972,7 +10951,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -10993,7 +10972,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11011,7 +10990,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -11032,7 +11011,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11110,7 +11089,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -11131,7 +11110,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11149,7 +11128,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -11170,7 +11149,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11242,7 +11221,7 @@
 						}
 					},
 					{
-						"name": "pageSize",
+						"name": "limit",
 						"description": "How many entries to return.",
 						"in": "query",
 						"required": false,
@@ -11382,7 +11361,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -11403,7 +11382,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11421,7 +11400,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -11442,7 +11421,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11502,15 +11481,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
+						"name": "limit",
 						"description": "How many entries to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -11583,7 +11559,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -11604,7 +11580,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11622,7 +11598,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "NotFoundError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"notFoundId": "1"
 											}
@@ -11643,7 +11619,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11678,7 +11654,7 @@
 							"type": "string"
 						},
 						"style": "simple",
-						"example": "z3Vcuh2BP9ShC.z3Vcuh2BP9ShC.z3Vcuh2BP9ShC"
+						"example": "z3V32BP9ShC...z3V32BP9ShC"
 					}
 				],
 				"requestBody": {
@@ -11729,7 +11705,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -11750,7 +11726,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11807,7 +11783,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -11828,7 +11804,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11846,7 +11822,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11899,7 +11875,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -11920,7 +11896,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11938,7 +11914,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnprocessableError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -11956,7 +11932,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12009,7 +11985,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12030,7 +12006,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12048,7 +12024,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnprocessableError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12066,7 +12042,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12119,7 +12095,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12140,7 +12116,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12158,7 +12134,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnprocessableError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12176,7 +12152,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12229,7 +12205,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12250,7 +12226,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12268,7 +12244,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnprocessableError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12286,7 +12262,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12342,15 +12318,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -12429,7 +12402,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12450,7 +12423,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12468,7 +12441,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12563,7 +12536,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12584,7 +12557,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12602,7 +12575,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12649,15 +12622,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -12764,7 +12734,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12785,7 +12755,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12803,7 +12773,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12917,7 +12887,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -12938,7 +12908,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -12956,7 +12926,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13003,15 +12973,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -13102,7 +13069,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13123,7 +13090,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13141,7 +13108,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13239,7 +13206,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13260,7 +13227,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13278,7 +13245,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13325,15 +13292,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The maximum number of entities in a page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -13427,7 +13391,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13448,7 +13412,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13466,7 +13430,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13567,7 +13531,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13588,7 +13552,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13606,7 +13570,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13671,7 +13635,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13692,7 +13656,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13710,7 +13674,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnprocessableError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13728,7 +13692,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13805,7 +13769,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13826,7 +13790,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13844,7 +13808,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13914,7 +13878,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -13935,7 +13899,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13953,7 +13917,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -13979,15 +13943,12 @@
 						}
 					},
 					{
-						"name": "pageSize",
-						"description": "The number of entries to return per page.",
+						"name": "limit",
+						"description": "Limit the number of entities to return.",
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -14048,7 +14009,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14069,7 +14030,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14087,7 +14048,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14163,7 +14124,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14184,7 +14145,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14202,7 +14163,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14272,7 +14233,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14293,7 +14254,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14311,7 +14272,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14359,7 +14320,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14380,7 +14341,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14398,7 +14359,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14481,7 +14442,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14502,7 +14463,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14600,7 +14561,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14621,7 +14582,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14699,7 +14660,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14720,7 +14681,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14814,7 +14775,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14835,7 +14796,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -14928,7 +14889,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -14949,7 +14910,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15042,7 +15003,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15063,7 +15024,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15161,7 +15122,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15182,7 +15143,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15271,7 +15232,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15292,7 +15253,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15392,7 +15353,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15413,7 +15374,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15480,7 +15441,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15501,7 +15462,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15519,7 +15480,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15588,7 +15549,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15609,7 +15570,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15627,7 +15588,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15675,7 +15636,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15696,7 +15657,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15714,7 +15675,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15795,7 +15756,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15816,7 +15777,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "UnauthorizedError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15834,7 +15795,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -15932,7 +15893,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -15953,7 +15914,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -16045,7 +16006,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -16066,7 +16027,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -16165,7 +16126,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -16186,7 +16147,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -16260,7 +16221,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -16281,7 +16242,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -16388,7 +16349,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "GeneralError",
-											"message": "component.error",
+											"message": "errorMessage",
 											"properties": {
 												"foo": "bar"
 											}
@@ -16409,7 +16370,7 @@
 									"exampleResponse": {
 										"value": {
 											"name": "InternalServerError",
-											"message": "component.error"
+											"message": "errorMessage"
 										}
 									}
 								}

@@ -63,8 +63,8 @@ import {
 	WalletConnectorType
 } from "@twin.org/engine-types";
 import {
-	DataAccessPointClient,
-	PolicyNegotiationPointClient
+	DataAccessPointRestClient,
+	PolicyNegotiationPointRestClient
 } from "@twin.org/rights-management-rest-client";
 import type { IOdrlOffer } from "@twin.org/standards-w3c-odrl";
 import {
@@ -1156,7 +1156,7 @@ async function configureRightsManagement(
 						? envVars.rightsManagementOffers
 						: [],
 					negotiationComponentCreator: async url =>
-						new PolicyNegotiationPointClient({ endpoint: url })
+						new PolicyNegotiationPointRestClient({ endpoint: url })
 				}
 			}
 		});
@@ -1176,7 +1176,7 @@ async function configureRightsManagement(
 			type: RightsManagementDarpComponentType.Service,
 			options: {
 				config: {
-					dataAccessComponentCreator: async url => new DataAccessPointClient({ endpoint: url })
+					dataAccessComponentCreator: async url => new DataAccessPointRestClient({ endpoint: url })
 				}
 			}
 		});

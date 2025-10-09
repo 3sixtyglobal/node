@@ -230,6 +230,11 @@ const tsRestrictedSyntaxCommon = [
 		selector: "MemberExpression[object.name='process'][property.name='env']",
 		message:
 			'Direct access to process.env is not allowed. Use environment variable helpers or configuration instead.'
+	},
+	{
+		selector: 'BinaryExpression[operator="instanceof"]',
+		message:
+			'instanceof is disallowed. For checking Error types use the BaseError methods. Use type guards or other type checking methods instead.'
 	}
 ];
 

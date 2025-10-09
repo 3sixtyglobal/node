@@ -21,11 +21,12 @@
 		"merge-locales": "merge-locales",
 		"test": "vitest --run --config ./vitest.config.ts --no-cache",
 		"test:build": "tspc -p ./tests/tsconfig.json --noEmit",
+		"validate-locales": "validate-locales",
 		"coverage": "vitest --run --coverage --config ./vitest.config.ts --no-cache",
 		"docs:clean": "rimraf docs/open-api",
 		"docs:api": "ts-to-openapi ./ts-to-openapi.json ./docs/open-api/spec.json",
 		"docs": "npm run docs:clean && npm run docs:api",
-		"dist": "npm run clean && npm run build && npm run merge-locales && npm run test:build && npm run test && npm run docs",
+		"dist": "npm run clean && npm run build && npm run merge-locales && npm run validate-locales && npm run test:build && npm run test && npm run docs",
 		"dist:no-test": "npm run clean && npm run build && npm run merge-locales && npm run docs",
 		"start": "node src/index.mjs"
 	},
@@ -37,18 +38,23 @@
 		"@twin.org/merge-locales": "next",
 		"@twin.org/nameof-transformer": "next",
 		"@twin.org/nameof-vitest-plugin": "next",
+		"@twin.org/validate-locales": "next",
 		"@twin.org/ts-to-openapi": "next",
-		"@types/node": "24.5.2",
+		"@types/node": "24.7.0",
 		"@vitest/coverage-v8": "3.2.4",
 		"concurrently": "9.2.1",
 		"copyfiles": "2.4.1",
-		"cross-env": "10.0.0",
+		"cross-env": "10.1.0",
 		"nodemon": "3.1.10",
 		"rimraf": "6.0.1",
 		"ts-patch": "3.3.0",
 		"typedoc": "0.28.13",
 		"typedoc-plugin-markdown": "4.9.0",
-		"typescript": "5.9.2",
+		"typescript": "5.9.3",
 		"vitest": "3.2.4"
-	}
+	},
+	"bugs": {
+		"url": "git+https://github.com/twinfoundation/node/issues"
+	},
+	"homepage": "https://twindev.org"
 }
