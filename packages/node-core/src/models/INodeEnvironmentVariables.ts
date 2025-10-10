@@ -32,4 +32,34 @@ export interface INodeEnvironmentVariables extends IEngineServerEnvironmentVaria
 	 * If the node-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
 	 */
 	password?: string;
+
+	/**
+	 * Maximum size in MB for HTTPS extensions downloads.
+	 * @default 10
+	 */
+	extensionsMaxSizeMb?: number;
+
+	/**
+	 * Whether to clear the extensions cache on startup.
+	 * @default false
+	 */
+	extensionsClearCache?: boolean;
+
+	/**
+	 * Custom directory for extensions cache storage.
+	 * @default ".tmp"
+	 */
+	extensionsCacheDirectory?: string;
+
+	/**
+	 * TTL in hours for HTTPS extensions cache.
+	 * @default 24
+	 */
+	extensionsCacheTtlHours?: number;
+
+	/**
+	 * Force refresh of all cached extensions.
+	 * @default false
+	 */
+	extensionsForceRefresh?: boolean;
 }

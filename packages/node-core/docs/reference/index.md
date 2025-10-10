@@ -2,14 +2,18 @@
 
 ## Interfaces
 
+- [ICacheMetadata](interfaces/ICacheMetadata.md)
 - [IEngineEnvironmentVariables](interfaces/IEngineEnvironmentVariables.md)
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
+- [IModuleProtocol](interfaces/IModuleProtocol.md)
 - [INodeEngineConfig](interfaces/INodeEngineConfig.md)
 - [INodeEnvironmentVariables](interfaces/INodeEnvironmentVariables.md)
 - [INodeOptions](interfaces/INodeOptions.md)
+- [IProtocolHandlerResult](interfaces/IProtocolHandlerResult.md)
 
 ## Type Aliases
 
+- [ModuleProtocol](type-aliases/ModuleProtocol.md)
 - [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
@@ -24,6 +28,7 @@
 - [SYNCHRONISED\_STORAGE\_BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
 - [VC\_AUTHENTICATION\_VERIFICATION\_METHOD\_ID](variables/VC_AUTHENTICATION_VERIFICATION_METHOD_ID.md)
 - [AUTH\_SIGNING\_KEY\_ID](variables/AUTH_SIGNING_KEY_ID.md)
+- [ModuleProtocol](variables/ModuleProtocol.md)
 - [NodeFeatures](variables/NodeFeatures.md)
 
 ## Functions
@@ -54,3 +59,11 @@
 - [loadTextFile](functions/loadTextFile.md)
 - [loadJsonFile](functions/loadJsonFile.md)
 - [getFeatures](functions/getFeatures.md)
+- [parseModuleProtocol](functions/parseModuleProtocol.md)
+- [hashUrl](functions/hashUrl.md)
+- [getExtensionsCacheDir](functions/getExtensionsCacheDir.md)
+- [handleNpmProtocol](functions/handleNpmProtocol.md)
+- [isCacheExpired](functions/isCacheExpired.md)
+- [handleHttpsProtocol](functions/handleHttpsProtocol.md)
+- [resolvePackageEntryPoint](functions/resolvePackageEntryPoint.md)
+- [createModuleImportUrl](functions/createModuleImportUrl.md)

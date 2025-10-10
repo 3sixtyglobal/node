@@ -1,5 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { rm, writeFile } from "node:fs/promises";
 import type { AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { DataSpaceConnectorAppFactory } from "@twin.org/data-space-connector-models";
@@ -96,6 +97,8 @@ describe("node-core", () => {
 	});
 
 	test("Can start and bootstrap the server in memory", async () => {
+		port++;
+
 		const envVars: { [id: string]: string } = {
 			TWIN_NODE_DEBUG: "true",
 			TWIN_NODE_SILENT: "true",
@@ -148,15 +151,22 @@ describe("node-core", () => {
 
 		const memoryStateStorage = new MemoryStateStorage();
 
-		const nodeOptions: INodeOptions = { envPrefix: "TWIN_NODE_", stateStorage: memoryStateStorage };
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage,
+			executionDirectory: process.cwd()
+		};
 
-		overrideModuleImport(process.cwd());
+		// Call overrideModuleImport first to match the real application flow
+		overrideModuleImport(nodeOptions.executionDirectory ?? "", undefined);
 
+		// Use buildConfiguration to get the proper nodeEngineConfig structure
 		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
 
+		// Use the start function which handles the correct flow automatically
 		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
@@ -799,6 +809,9 @@ describe("node-core", () => {
 			version: "0.0.0"
 		});
 
+		// Call overrideModuleImport after buildConfiguration to match real code flow
+		overrideModuleImport(process.cwd(), nodeEnvVars);
+
 		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 
 		expect(startResult).toBeDefined();
@@ -825,4 +838,402 @@ describe("node-core", () => {
 
 		await startResult?.shutdown();
 	});
+
+	test("should reject insecure HTTP protocol extensions", async () => {
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
+			TWIN_NODE_EXTENSIONS: "http://example.com/insecure-extension.mjs"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "bob"
+		});
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage
+		};
+
+		await expect(async () => {
+			overrideModuleImport(process.cwd(), {
+				port: port.toString(),
+				storageFileRoot: "./.local-data",
+				extensions: "http://example.com/insecure-extension.mjs"
+			});
+			const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+				name: "foo",
+				version: "0.0.0"
+			});
+			await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+		}).rejects.toThrow();
+	});
+
+	test("should load multiple extensions in correct order", async () => {
+		// Write first extension
+		await writeFile(
+			"./tests/extensions/first-extension.mjs",
+			`
+			export async function extensionInitialise() {
+				global.extensionCallOrder = global.extensionCallOrder || [];
+				global.extensionCallOrder.push("first-init");
+			}
+
+			export async function extensionInitialiseEngine() {
+				global.extensionCallOrder.push("first-engine");
+			}
+
+			export async function extensionInitialiseEngineServer() {
+				global.extensionCallOrder.push("first-server");
+			}
+
+			export async function extensionShutdown() {
+				global.extensionCallOrder.push("first-shutdown");
+			}
+			`
+		);
+
+		// Write second extension
+		await writeFile(
+			"./tests/extensions/second-extension.mjs",
+			`
+			export async function extensionInitialise() {
+				global.extensionCallOrder = global.extensionCallOrder || [];
+				global.extensionCallOrder.push("second-init");
+			}
+
+			export async function extensionInitialiseEngine() {
+				global.extensionCallOrder.push("second-engine");
+			}
+
+			export async function extensionInitialiseEngineServer() {
+				global.extensionCallOrder.push("second-server");
+			}
+
+			export async function extensionShutdown() {
+				global.extensionCallOrder.push("second-shutdown");
+			}
+			`
+		);
+
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
+			TWIN_NODE_EXTENSIONS:
+				"./tests/extensions/first-extension.mjs,./tests/extensions/second-extension.mjs"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "bob"
+		});
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage
+		};
+
+		// Clear any previous call order
+		(global as typeof globalThis & { extensionCallOrder?: string[] }).extensionCallOrder = [];
+
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+
+		expect(startResult).toBeDefined();
+
+		// Wait for server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		// Verify extensions loaded
+		const res = await fetch(`http://localhost:${port}/info`);
+		expect(await res.json()).toEqual({
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		await startResult?.shutdown();
+
+		// Verify call order
+		const callOrder = (global as typeof globalThis & { extensionCallOrder?: string[] })
+			.extensionCallOrder;
+		expect(callOrder).toEqual([
+			"first-init",
+			"second-init",
+			"first-engine",
+			"second-engine",
+			"first-server",
+			"second-server",
+			"first-shutdown",
+			"second-shutdown"
+		]);
+
+		// Cleanup
+		await rm("./tests/extensions/first-extension.mjs", { force: true });
+		await rm("./tests/extensions/second-extension.mjs", { force: true });
+	});
+
+	test("should execute all extension lifecycle hooks in correct sequence", async () => {
+		// Write extension that tracks all lifecycle hooks
+		await writeFile(
+			"./tests/extensions/lifecycle-test.mjs",
+			`
+			export async function extensionInitialise(config) {
+				global.lifecycleOrder = global.lifecycleOrder || [];
+				global.lifecycleOrder.push("initialise");
+				global.lifecycleConfig = config;
+			}
+
+			export async function extensionInitialiseEngine(engine) {
+				global.lifecycleOrder.push("engine");
+				global.lifecycleEngine = engine;
+			}
+
+			export async function extensionInitialiseEngineServer(server) {
+				global.lifecycleOrder.push("server");
+				global.lifecycleServer = server;
+			}
+
+			export async function extensionShutdown() {
+				global.lifecycleOrder.push("shutdown");
+			}
+			`
+		);
+
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
+			TWIN_NODE_EXTENSIONS: "./tests/extensions/lifecycle-test.mjs"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "bob"
+		});
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage
+		};
+
+		// Clear previous lifecycle data
+		(global as typeof globalThis & { lifecycleOrder?: string[] }).lifecycleOrder = [];
+
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+
+		expect(startResult).toBeDefined();
+
+		// Wait for server
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		// Verify server is running
+		const res = await fetch(`http://localhost:${port}/info`);
+		expect(await res.json()).toEqual({
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		await startResult?.shutdown();
+
+		// Verify lifecycle order
+		const order = (global as typeof globalThis & { lifecycleOrder?: string[] }).lifecycleOrder;
+		expect(order).toEqual(["initialise", "engine", "server", "shutdown"]);
+
+		// Verify each hook received appropriate parameters
+		const config = (global as typeof globalThis & { lifecycleConfig?: unknown }).lifecycleConfig;
+		const engine = (global as typeof globalThis & { lifecycleEngine?: unknown }).lifecycleEngine;
+		const server = (global as typeof globalThis & { lifecycleServer?: unknown }).lifecycleServer;
+
+		expect(config).toBeDefined();
+		expect(engine).toBeDefined();
+		expect(server).toBeDefined();
+
+		// Cleanup
+		await rm("./tests/extensions/lifecycle-test.mjs", { force: true });
+	});
+
+	test("should handle extension initialization failure gracefully", async () => {
+		// Write extension that throws error
+		await writeFile(
+			"./tests/extensions/failing-extension.mjs",
+			`
+			export async function extensionInitialise() {
+				throw new Error("Extension initialization failed");
+			}
+			`
+		);
+
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
+			TWIN_NODE_EXTENSIONS: "./tests/extensions/failing-extension.mjs"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "bob"
+		});
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage
+		};
+
+		// Extension failure should cause start to fail
+		await expect(async () => {
+			const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+				name: "foo",
+				version: "0.0.0"
+			});
+			await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+		}).rejects.toThrow();
+
+		// Cleanup
+		await rm("./tests/extensions/failing-extension.mjs", { force: true });
+	});
+
+	test("should use custom cache directory when configured", async () => {
+		port++;
+
+		// Write test extension
+		await writeFile(
+			"./tests/extensions/cache-test.mjs",
+			`
+export async function extensionInitialise() {
+	global.cacheTestCalled = true;
+}
+`
+		);
+
+		const customCacheDir = "custom-cache";
+		const envVars = {
+			TWIN_NODE_PORT: port.toString(),
+			TWIN_NODE_STORAGE_FILE_ROOT: "./.local-data",
+			TWIN_NODE_STORAGE_ENTITY_STORAGE_CONNECTOR: "memory",
+			TWIN_NODE_EXTENSIONS: "./tests/extensions/cache-test.mjs",
+			TWIN_NODE_EXTENSIONS_CACHE_DIRECTORY: customCacheDir
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage();
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage,
+			executionDirectory: process.cwd()
+		};
+
+		// Clear any previous state BEFORE loading extensions
+		(global as typeof globalThis & { cacheTestCalled?: boolean }).cacheTestCalled = false;
+
+		// Call overrideModuleImport first to match the real application flow
+		overrideModuleImport(nodeOptions.executionDirectory ?? "");
+
+		// Use buildConfiguration to get the proper nodeEngineConfig structure
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+
+		expect(startResult).toBeDefined();
+
+		// Wait for server to start
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		// Verify server is running
+		const res = await fetch(`http://localhost:${port}/info`);
+		expect(await res.json()).toEqual({
+			name: "foo",
+			version: "0.0.0"
+		});
+
+		// Verify extension was called
+		expect((global as typeof globalThis & { cacheTestCalled?: boolean }).cacheTestCalled).toBe(
+			true
+		);
+
+		await startResult?.shutdown();
+
+		// Cleanup
+		await rm("./tests/extensions/cache-test.mjs", { force: true });
+	});
+
+	test("should start node with real TWIN extension from npm protocol", async () => {
+		const envVars: { [id: string]: string } = {
+			TWIN_NODE_PORT: port.toString(),
+			// Use npm protocol to download real TWIN extension
+			TWIN_NODE_EXTENSIONS: "npm:@twin.org/data-space-connector-test-app@0.0.1-next.7",
+			TWIN_NODE_DATA_SPACE_CONNECTOR_ENABLED: "true",
+			TWIN_NODE_ENTITY_STORAGE_CONNECTOR_TYPE: "memory",
+			TWIN_NODE_ENTITY_STORAGE_TYPES: JSON.stringify({
+				"activity-log-details": "memory",
+				"activity-task": "memory"
+			}),
+			TWIN_NODE_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
+			TWIN_NODE_TASK_SCHEDULER_ENABLED: "true"
+		};
+
+		await initialiseLocales("./dist/locales/");
+
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeIdentity: "alice"
+		});
+
+		const nodeOptions: INodeOptions = {
+			envPrefix: "TWIN_NODE_",
+			stateStorage: memoryStateStorage
+		};
+
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			name: "twin-node-with-real-extension",
+			version: "1.0.0"
+		});
+
+		// This will trigger the npm protocol handler to download and install the extension
+		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
+
+		// Verify node started successfully with extension
+		expect(startResult).toBeDefined();
+
+		if (!startResult) {
+			throw new Error("Node failed to start with npm extension");
+		}
+
+		expect(startResult.engine).toBeDefined();
+		expect(startResult.server).toBeDefined();
+
+		// Wait for server to be fully ready
+		await new Promise(resolve => setTimeout(resolve, 3000));
+
+		// Verify server is running
+		const res = await fetch(`http://localhost:${port}/info`);
+		expect(res.status).toBe(200);
+		expect(await res.json()).toEqual({
+			name: "twin-node-with-real-extension",
+			version: "1.0.0"
+		});
+
+		// Verify engine is running (this means the extension loaded successfully)
+		expect(startResult.engine.isStarted()).toBe(true);
+
+		const testAppType = startResult.engine.getRegisteredInstanceTypeOptional("testAppComponent");
+
+		// If extension loaded correctly, this component type should be registered
+		expect(testAppType).toBeDefined();
+
+		// Graceful shutdown
+		await startResult.shutdown();
+	}, 120000); // 2 minute timeout for npm download + node startup
 });

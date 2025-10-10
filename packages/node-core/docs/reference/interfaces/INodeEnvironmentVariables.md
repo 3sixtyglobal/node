@@ -1861,3 +1861,73 @@ admin@node
 > `optional` **password**: `string`
 
 If the node-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
+
+***
+
+### extensionsMaxSizeMb?
+
+> `optional` **extensionsMaxSizeMb**: `number`
+
+Maximum size in MB for HTTPS extensions downloads.
+
+#### Default
+
+```ts
+10
+```
+
+***
+
+### extensionsClearCache?
+
+> `optional` **extensionsClearCache**: `boolean`
+
+Whether to clear the extensions cache on startup.
+
+#### Default
+
+```ts
+false
+```
+
+***
+
+### extensionsCacheDirectory?
+
+> `optional` **extensionsCacheDirectory**: `string`
+
+Custom directory for extensions cache storage.
+
+#### Default
+
+```ts
+".tmp"
+```
+
+***
+
+### extensionsCacheTtlHours?
+
+> `optional` **extensionsCacheTtlHours**: `number`
+
+TTL in hours for HTTPS extensions cache.
+
+#### Default
+
+```ts
+24
+```
+
+***
+
+### extensionsForceRefresh?
+
+> `optional` **extensionsForceRefresh**: `boolean`
+
+Force refresh of all cached extensions.
+
+#### Default
+
+```ts
+false
+```

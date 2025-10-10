@@ -1,6 +1,6 @@
 # TWIN Node Core
 
-TWIN Node Core for serving APIs using the specified configuration
+Core components for running TWIN nodes with dynamic extension loading and protocol-based module resolution.
 
 ## Installation
 
@@ -8,14 +8,28 @@ TWIN Node Core for serving APIs using the specified configuration
 npm install @twin.org/node-core
 ```
 
-## Examples
+## Quick Start
 
-Usage of the APIs is shown in the examples [docs/examples.md](docs/examples.md)
+```javascript
+import { start } from '@twin.org/node-core';
 
-## Reference
+// Start a TWIN node
+await start({
+  extensions: ['./my-extension.mjs']
+});
+```
 
-Detailed reference documentation for the API can be found in [docs/reference/index.md](docs/reference/index.md)
+## Key Features
 
-## Changelog
+- **Protocol-based extension loading** - Load from local files, npm packages, or HTTPS URLs
+- **Dynamic module resolution** - Automatic installation and caching
+- **Extension lifecycle hooks** - Customize node behavior at different stages
+- **Security controls** - Size limits, HTTPS-only, and cache TTL
 
-The changes between each version can be found in [docs/changelog.md](docs/changelog.md)
+## Documentation
+
+For detailed documentation, configuration options, and examples, see [docs/detailed-guide.md](docs/detailed-guide.md).
+
+## License
+
+Apache-2.0

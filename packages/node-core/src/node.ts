@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { EnvHelper, Is } from "@twin.org/core";
+import { Coerce, EnvHelper, GeneralError, Is } from "@twin.org/core";
 import { ModuleHelper } from "@twin.org/modules";
 import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder";
@@ -13,13 +13,20 @@ import { extensionsConfiguration } from "./builders/extensionsBuilder";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
 import type { INodeOptions } from "./models/INodeOptions";
+import { ModuleProtocol } from "./models/moduleProtocol";
 import { start } from "./server";
 import {
+	createModuleImportUrl,
 	fileExists,
 	getExecutionDirectory,
+	handleHttpsProtocol,
+	handleNpmProtocol,
 	initialiseLocales,
 	loadJsonFile,
-	loadTextFile
+	loadTextFile,
+	parseModuleProtocol,
+	getExtensionsCacheDir,
+	resolvePackageEntryPoint
 } from "./utils";
 
 const moduleCache: { [id: string]: unknown } = {};
@@ -224,10 +231,17 @@ export async function buildConfiguration(
 }
 
 /**
- * Override module imports to use local files where possible.
+ * Override module imports to support protocol-based loading (npm:, https:) and local files.
  * @param executionDirectory The execution directory for resolving local module paths.
+ * @param envVars The environment variables containing extension configuration (optional, uses defaults if not provided).
  */
-export function overrideModuleImport(executionDirectory: string): void {
+export function overrideModuleImport(
+	executionDirectory: string,
+	envVars?: INodeEnvironmentVariables
+): void {
+	const maxSizeMb = Coerce.number(envVars?.extensionsMaxSizeMb) ?? 10;
+	const cacheDirectory = envVars?.extensionsCacheDirectory;
+
 	ModuleHelper.overrideImport(async moduleName => {
 		if (moduleCache[moduleName]) {
 			return {
@@ -236,64 +250,100 @@ export function overrideModuleImport(executionDirectory: string): void {
 			};
 		}
 
-		// If the module path for example when dynamically loading
-		// modules looks like a local file then we try to resolve
-		// using the local file system
-		const isLocal = ModuleHelper.isLocalModule(moduleName);
-		if (isLocal) {
-			// See if we can just resolve the filename locally
-			let localFilename = path.resolve(moduleName);
+		const parsed = parseModuleProtocol(moduleName);
+		let resolvedPath: string | undefined;
 
-			let exists = await fileExists(localFilename);
-			if (!exists) {
-				// Doesn't exist in the current directory, try the execution directory
-				localFilename = path.resolve(executionDirectory, moduleName);
-				exists = await fileExists(localFilename);
+		switch (parsed.protocol) {
+			case ModuleProtocol.Npm: {
+				const result = await handleNpmProtocol(
+					parsed.identifier,
+					executionDirectory,
+					cacheDirectory
+				);
+				resolvedPath = result.resolvedPath;
+				break;
 			}
 
-			if (exists) {
-				// If the module exists then we can load it, otherwise
-				// we fallback to regular handling to see if that can import it
-				const module = await import(
-					process.platform === "win32" ? `file://${localFilename}` : localFilename
+			case ModuleProtocol.Https: {
+				const result = await handleHttpsProtocol(
+					parsed.identifier,
+					executionDirectory,
+					maxSizeMb,
+					cacheDirectory,
+					envVars?.extensionsCacheTtlHours,
+					envVars?.extensionsForceRefresh
 				);
-				moduleCache[moduleName] = module;
-				return {
-					module,
-					useDefault: false
-				};
+				resolvedPath = result.resolvedPath;
+				break;
+			}
+
+			case ModuleProtocol.Http: {
+				throw new GeneralError("node", "insecureProtocol", { protocol: ModuleProtocol.Http });
+			}
+
+			case ModuleProtocol.Local: {
+				let localFilename = path.resolve(moduleName);
+
+				let exists = await fileExists(localFilename);
+				if (!exists) {
+					localFilename = path.resolve(executionDirectory, moduleName);
+					exists = await fileExists(localFilename);
+				}
+
+				if (exists) {
+					resolvedPath = localFilename;
+				}
+				break;
+			}
+
+			case ModuleProtocol.Default: {
+				try {
+					const npmRoot = execSync("npm root").toString().trim().replace(/\\/g, "/");
+					const packagePath = path.resolve(npmRoot, moduleName);
+					const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
+					const modulePath = path.resolve(packagePath, mainFile);
+					const exists = await fileExists(modulePath);
+					if (exists) {
+						resolvedPath = modulePath;
+						break;
+					}
+				} catch {
+					// Continue to fallback resolution
+				}
+
+				// Fallback: resolve from npm protocol cache directory (installed via handleNpmProtocol)
+				try {
+					const cacheNpmRoot = path.resolve(
+						getExtensionsCacheDir(executionDirectory, ModuleProtocol.Npm, cacheDirectory),
+						"node_modules"
+					);
+
+					const packagePath = path.resolve(cacheNpmRoot, moduleName);
+					const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
+					const modulePath = path.resolve(packagePath, mainFile);
+					const exists = await fileExists(modulePath);
+					if (exists) {
+						resolvedPath = modulePath;
+					}
+				} catch {
+					// No cached resolution either; fall through
+				}
+				break;
 			}
 		}
 
-		try {
-			// Try and load from node_modules manually
-			// This is needed for some environments where
-			// the module resolution doesn't work as expected
-			const npmRoot = execSync("npm root").toString().trim().replace(/\\/g, "/");
-			const packageJson = await loadJsonFile<{ module?: string; main?: string }>(
-				path.resolve(npmRoot, moduleName, "package.json")
-			);
-			const mainFile = packageJson?.module ?? packageJson?.main ?? "index.js";
-			const modulePath = path.resolve(npmRoot, moduleName, mainFile);
-			const exists = await fileExists(modulePath);
-			if (exists) {
-				const module = await import(
-					process.platform === "win32" ? `file://${modulePath}` : modulePath
-				);
-				moduleCache[moduleName] = module;
-				return {
-					module,
-					useDefault: false
-				};
-			}
-		} catch {
-			// We just fallback to default handling if not possible
+		// Common module loading and caching logic
+		if (resolvedPath) {
+			const module = await import(createModuleImportUrl(resolvedPath));
+			moduleCache[moduleName] = module;
+			return {
+				module,
+				useDefault: false
+			};
 		}
 
-		// We don't appear to be able to manually resolve this module
-		// So we let the default handling take care of it
-		// This will allow built-in modules and regular node_modules to load as normal
 		return {
+			module: undefined,
 			useDefault: true
 		};
 	});

@@ -4,7 +4,7 @@ This mono-repository contains the TWIN Node packages which let you run TWIN as a
 
 ## Packages
 
-- [node-core](pacakges/node-core/README.md) - A REST server implementation support the routes from various packages.
+- [node-core](packages/node-core/README.md) - A REST server implementation support the routes from various packages.
 
 ## Apps
 

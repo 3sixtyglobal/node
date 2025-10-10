@@ -2,7 +2,11 @@
 	"error": {
 		"node": {
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
-			"extensionLoadingError": "Failed to load extension \"{extension}\""
+			"extensionLoadingError": "Failed to load extension \"{extension}\"",
+			"insecureProtocol": "Cannot load extension from insecure protocol: {protocol}. Only HTTPS is allowed for remote extensions.",
+			"extensionDownloadFailed": "Failed to download extension from {url}",
+			"extensionNpmInstallFailed": "Failed to install npm extension: {package}",
+			"extensionSizeLimitExceeded": "Extension download size exceeds limit: {size} bytes > {limit} bytes"
 		}
 	},
 	"node": {
@@ -37,6 +41,11 @@
 		"extensionInitialisingEngineServer": "Initialising engine server for extension \"{extension}\"",
 		"extensionShutdown": "Shutdown extension \"{extension}\"",
 		"extendingEngine": "Extending Engine",
-		"extendingEngineServer": "Extending Engine Server"
+		"extendingEngineServer": "Extending Engine Server",
+		"extensionSecurityWarning": "SECURITY WARNING: Loading extension from external URL: {url}",
+		"extensionNpmInstalling": "Installing npm extension",
+		"extensionHttpsDownloading": "Downloading HTTPS extension",
+		"extensionCacheExpired": "Cache expired for extension: {url}",
+		"extensionForceRefresh": "Force refresh enabled for extension: {url}"
 	}
 }
