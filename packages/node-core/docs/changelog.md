@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.2-next.26](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.25...node-core-v0.0.2-next.26) (2025-10-10)
+
+
+### Features
+
+* adding npm and https protocols to load extensions ([#45](https://github.com/twinfoundation/node/issues/45)) ([33940b7](https://github.com/twinfoundation/node/commit/33940b7e771a0c5af32c18d442deb26a8631fd02))
+
 ## [0.0.2-next.25](https://github.com/twinfoundation/node/compare/node-core-v0.0.2-next.24...node-core-v0.0.2-next.25) (2025-10-09)
 
 
