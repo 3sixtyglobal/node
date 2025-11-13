@@ -5,44 +5,55 @@ import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { Coerce, EnvHelper, GeneralError, Is } from "@twin.org/core";
+import type { Engine } from "@twin.org/engine";
+import type { EngineServer } from "@twin.org/engine-server";
+import type { IEngineServerConfig } from "@twin.org/engine-server-types";
 import { ModuleHelper } from "@twin.org/modules";
 import * as dotenv from "dotenv";
-import { buildEngineConfiguration } from "./builders/engineEnvBuilder";
-import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder";
-import { extensionsConfiguration } from "./builders/extensionsBuilder";
-import type { INodeEngineConfig } from "./models/INodeEngineConfig";
-import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
-import type { INodeOptions } from "./models/INodeOptions";
-import { ModuleProtocol } from "./models/moduleProtocol";
-import { start } from "./server";
+import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
+import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
+import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
+import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
+import type { INodeEngineState } from "./models/INodeEngineState.js";
+import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
+import type { INodeOptions } from "./models/INodeOptions.js";
+import { ModuleProtocol } from "./models/moduleProtocol.js";
+import { start } from "./server.js";
 import {
 	createModuleImportUrl,
 	fileExists,
 	getExecutionDirectory,
+	getExtensionsCacheDir,
 	handleHttpsProtocol,
 	handleNpmProtocol,
 	initialiseLocales,
 	loadJsonFile,
 	loadTextFile,
 	parseModuleProtocol,
-	getExtensionsCacheDir,
 	resolvePackageEntryPoint
-} from "./utils";
+} from "./utils.js";
 
 const moduleCache: { [id: string]: unknown } = {};
 
 /**
  * Run the TWIN Node server.
  * @param nodeOptions Optional configuration options for running the server.
- * @returns A promise that resolves when the server is started.
+ * @returns A promise that resolves when the server is started containing a shutdown method.
  */
-export async function run(nodeOptions?: INodeOptions): Promise<void> {
+export async function run(nodeOptions?: INodeOptions): Promise<
+	| {
+			engine: Engine<IEngineServerConfig, INodeEngineState>;
+			server: EngineServer;
+			shutdown: () => Promise<void>;
+	  }
+	| undefined
+> {
 	try {
 		nodeOptions ??= {};
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node Server",
-			version: nodeOptions?.serverVersion ?? "0.0.2-next.26" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.0.3-next.0" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
@@ -85,24 +96,34 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 			CLIDisplay.value("Favicon File", nodeOptions.favIconFile);
 		}
 
-		nodeOptions.envPrefix ??= "TWIN_NODE_";
+		nodeOptions.envPrefix ??= "TWIN_";
 		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
-		const { nodeEngineConfig, nodeEnvVars: envVars } = await buildConfiguration(
-			// This is the only location in the code base that should access process.env directly
-			// So we can safely disable the linting rule here.
+		// This is the only location in the code base that should access process.env directly
+		// So we can safely disable the linting rule here.
+		let finalEnvVars =
 			// eslint-disable-next-line no-restricted-syntax
 			process.env as {
 				[id: string]: string;
-			},
-			nodeOptions,
-			serverInfo
-		);
+			};
+
+		if (Is.objectValue(nodeOptions?.envVars)) {
+			finalEnvVars = {
+				...finalEnvVars,
+				...nodeOptions.envVars
+			};
+		}
+
+		const {
+			nodeEngineConfig,
+			nodeEnvVars: envVars,
+			contextIdKeys
+		} = await buildConfiguration(finalEnvVars, nodeOptions, serverInfo);
 
 		CLIDisplay.break();
-		const startResult = await start(nodeOptions, nodeEngineConfig, envVars);
+		const startResult = await start(nodeOptions, nodeEngineConfig, envVars, contextIdKeys);
 
 		if (!Is.empty(startResult)) {
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
@@ -112,7 +133,12 @@ export async function run(nodeOptions?: INodeOptions): Promise<void> {
 				});
 			}
 		}
+
+		return startResult;
 	} catch (err) {
+		if (nodeOptions?.disableProcessExitOnFailure ?? false) {
+			throw err;
+		}
 		CLIDisplay.error(err);
 		// eslint-disable-next-line unicorn/no-process-exit
 		process.exit(1);
@@ -136,7 +162,10 @@ export async function buildConfiguration(
 ): Promise<{
 	nodeEnvVars: INodeEnvironmentVariables & { [id: string]: string | unknown };
 	nodeEngineConfig: INodeEngineConfig;
+	contextIdKeys: string[];
 }> {
+	const contextIdKeys: string[] = [];
+
 	let defaultEnvOnly = false;
 	if (Is.empty(options?.envFilenames)) {
 		const envFile = path.resolve(path.join(options.executionDirectory ?? "", ".env"));
@@ -195,9 +224,10 @@ export async function buildConfiguration(
 	}
 
 	// Build the engine configuration from the environment variables.
-	const coreConfig = await buildEngineConfiguration(envVars);
+	const coreConfig = await buildEngineConfiguration(envVars, contextIdKeys);
 	const engineServerConfig = await buildEngineServerConfiguration(
 		envVars,
+		contextIdKeys,
 		coreConfig,
 		serverInfo,
 		options?.openApiSpecFile,
@@ -227,7 +257,7 @@ export async function buildConfiguration(
 
 	const nodeEngineConfig = await extensionsConfiguration(envVars, engineServerConfig);
 
-	return { nodeEngineConfig, nodeEnvVars: envVars };
+	return { nodeEngineConfig, nodeEnvVars: envVars, contextIdKeys };
 }
 
 /**

@@ -1,6 +1,6 @@
 # Function: buildEngineConfiguration()
 
-> **buildEngineConfiguration**(`envVars`): `Promise`\<`IEngineConfig`\>
+> **buildEngineConfiguration**(`envVars`, `contextIdKeys`): `Promise`\<`IEngineConfig`\>
 
 Build the engine core configuration from environment variables.
 
@@ -11,6 +11,12 @@ Build the engine core configuration from environment variables.
 [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md)
 
 The environment variables.
+
+### contextIdKeys
+
+`string`[]
+
+The context ID keys.
 
 ## Returns
 

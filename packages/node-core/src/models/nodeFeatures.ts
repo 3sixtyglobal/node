@@ -7,17 +7,17 @@
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const NodeFeatures = {
 	/**
-	 * NodeIdentity - generates an identity for the node if not provided in config.
+	 * NodeId - generates an identity for the node if not provided in config.
 	 */
-	NodeIdentity: "node-identity",
+	NodeId: "node-identity",
 
 	/**
-	 * NodeUser - generates a user for the node if not provided in config.
+	 * NodeAdminUser - generates an admin user for the node if not provided in config.
 	 */
-	NodeUser: "node-user",
+	NodeAdminUser: "node-admin-user",
 
 	/**
-	 * NodeWallet - generates a wallet for the node and funds it when there is a faucet available.
+	 * NodeWallet - generates wallets for any identities that need them.
 	 */
 	NodeWallet: "node-wallet"
 } as const;

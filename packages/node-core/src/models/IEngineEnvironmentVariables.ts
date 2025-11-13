@@ -21,6 +21,21 @@ export interface IEngineEnvironmentVariables {
 	stateFilename?: string;
 
 	/**
+	 * Is multi-tenant support enabled, defaults to false.
+	 */
+	tenantEnabled?: string;
+
+	/**
+	 * A tenant id to use as a default for the node.
+	 */
+	tenantId?: string;
+
+	/**
+	 * A tenant api key to use as a default for the node.
+	 */
+	tenantApiKey?: string;
+
+	/**
 	 * The type of the entity storage to create, comma separate for more than one connector.
 	 * values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 	 */
@@ -357,12 +372,6 @@ export interface IEngineEnvironmentVariables {
 	 * Are the messaging components enabled, defaults to false.
 	 */
 	messagingEnabled?: string;
-
-	/**
-	 * An initial set of templates for the messages.
-	 * Use the @json: prefix to specify the path to the JSON file.
-	 */
-	messagingTemplates?: string;
 
 	/**
 	 * AWS SES region.

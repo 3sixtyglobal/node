@@ -48,6 +48,42 @@ The name of the state file.
 
 ***
 
+### tenantEnabled?
+
+> `optional` **tenantEnabled**: `string`
+
+Is multi-tenant support enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`tenantEnabled`](IEngineEnvironmentVariables.md#tenantenabled)
+
+***
+
+### tenantId?
+
+> `optional` **tenantId**: `string`
+
+A tenant id to use as a default for the node.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`tenantId`](IEngineEnvironmentVariables.md#tenantid)
+
+***
+
+### tenantApiKey?
+
+> `optional` **tenantApiKey**: `string`
+
+A tenant api key to use as a default for the node.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`tenantApiKey`](IEngineEnvironmentVariables.md#tenantapikey)
+
+***
+
 ### entityStorageConnectorType?
 
 > `optional` **entityStorageConnectorType**: `string`
@@ -852,19 +888,6 @@ Are the messaging components enabled, defaults to false.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`messagingEnabled`](IEngineEnvironmentVariables.md#messagingenabled)
-
-***
-
-### messagingTemplates?
-
-> `optional` **messagingTemplates**: `string`
-
-An initial set of templates for the messages.
-Use the @json: prefix to specify the path to the JSON file.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`messagingTemplates`](IEngineEnvironmentVariables.md#messagingtemplates)
 
 ***
 

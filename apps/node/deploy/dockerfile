@@ -23,9 +23,9 @@ RUN npm prune --omit=dev
 EXPOSE 3000
 
 # Set the environment variables that will override the .env file in the package
-ENV TWIN_NODE_HOST=0.0.0.0
-ENV TWIN_NODE_PORT=3000
-ENV TWIN_NODE_STORAGE_FILE_ROOT=/twin-node/data
+ENV TWIN_HOST=0.0.0.0
+ENV TWIN_PORT=3000
+ENV TWIN_STORAGE_FILE_ROOT=/twin-node/data
 
 # Start the server
-CMD ["node", "src/index.mjs"]
+CMD ["node", "src/index.js"]

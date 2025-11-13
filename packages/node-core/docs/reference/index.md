@@ -7,6 +7,7 @@
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
 - [IModuleProtocol](interfaces/IModuleProtocol.md)
 - [INodeEngineConfig](interfaces/INodeEngineConfig.md)
+- [INodeEngineState](interfaces/INodeEngineState.md)
 - [INodeEnvironmentVariables](interfaces/INodeEnvironmentVariables.md)
 - [INodeOptions](interfaces/INodeOptions.md)
 - [IProtocolHandlerResult](interfaces/IProtocolHandlerResult.md)
@@ -34,8 +35,10 @@
 ## Functions
 
 - [bootstrap](functions/bootstrap.md)
-- [bootstrapNodeIdentity](functions/bootstrapNodeIdentity.md)
-- [bootstrapNodeUser](functions/bootstrapNodeUser.md)
+- [bootstrapContextIdHandlers](functions/bootstrapContextIdHandlers.md)
+- [bootstrapNodeId](functions/bootstrapNodeId.md)
+- [bootstrapTenantId](functions/bootstrapTenantId.md)
+- [bootstrapNodeAdminUser](functions/bootstrapNodeAdminUser.md)
 - [bootstrapImmutableProofMethod](functions/bootstrapImmutableProofMethod.md)
 - [bootstrapBlobEncryption](functions/bootstrapBlobEncryption.md)
 - [bootstrapAuth](functions/bootstrapAuth.md)

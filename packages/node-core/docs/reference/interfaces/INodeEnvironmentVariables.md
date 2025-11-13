@@ -44,6 +44,42 @@ The name of the state file.
 
 ***
 
+### tenantEnabled?
+
+> `optional` **tenantEnabled**: `string`
+
+Is multi-tenant support enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`tenantEnabled`](IEngineServerEnvironmentVariables.md#tenantenabled)
+
+***
+
+### tenantId?
+
+> `optional` **tenantId**: `string`
+
+A tenant id to use as a default for the node.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`tenantId`](IEngineServerEnvironmentVariables.md#tenantid)
+
+***
+
+### tenantApiKey?
+
+> `optional` **tenantApiKey**: `string`
+
+A tenant api key to use as a default for the node.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`tenantApiKey`](IEngineServerEnvironmentVariables.md#tenantapikey)
+
+***
+
 ### entityStorageConnectorType?
 
 > `optional` **entityStorageConnectorType**: `string`
@@ -848,19 +884,6 @@ Are the messaging components enabled, defaults to false.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`messagingEnabled`](IEngineServerEnvironmentVariables.md#messagingenabled)
-
-***
-
-### messagingTemplates?
-
-> `optional` **messagingTemplates**: `string`
-
-An initial set of templates for the messages.
-Use the @json: prefix to specify the path to the JSON file.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`messagingTemplates`](IEngineServerEnvironmentVariables.md#messagingtemplates)
 
 ***
 
@@ -1821,32 +1844,64 @@ The features that are enabled on the node.
 #### Default
 
 ```ts
-[NodeFeatures.NodeIdentity]
+[]
 ```
 
 ***
 
-### identity?
+### nodeIdentity?
 
-> `optional` **identity**: `string`
+> `optional` **nodeIdentity**: `string`
 
 The identity of the node which, if empty and node-identity feature is enabled it will be generated.
 
 ***
 
-### mnemonic?
+### nodeMnemonic?
 
-> `optional` **mnemonic**: `string`
+> `optional` **nodeMnemonic**: `string`
 
 The mnemonic for the identity, if empty and node-identity feature is enabled it will be randomly generated.
 
 ***
 
-### username?
+### organizationIdentity?
 
-> `optional` **username**: `string`
+> `optional` **organizationIdentity**: `string`
 
-If the node-user feature is enabled, this will be the name of the user.
+If the node-admin-user feature is enabled, this will be the organization of the user, if one is not provided it will be generated
+
+***
+
+### organizationMnemonic?
+
+> `optional` **organizationMnemonic**: `string`
+
+The mnemonic for the organization, if empty and node-admin-user feature is enabled it will be randomly generated.
+
+***
+
+### adminUserIdentity?
+
+> `optional` **adminUserIdentity**: `string`
+
+If the node-admin-user feature is enabled, this will be the identity of the user, if one is not provided it will be generated
+
+***
+
+### adminUserMnemonic?
+
+> `optional` **adminUserMnemonic**: `string`
+
+The mnemonic for the admin user, if empty and node-admin-user feature is enabled it will be randomly generated.
+
+***
+
+### adminUserName?
+
+> `optional` **adminUserName**: `string`
+
+If the node-admin-user feature is enabled, this will be the name of the user.
 
 #### Default
 
@@ -1856,11 +1911,11 @@ admin@node
 
 ***
 
-### password?
+### adminUserPassword?
 
-> `optional` **password**: `string`
+> `optional` **adminUserPassword**: `string`
 
-If the node-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
+If the node-admin-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
 
 ***
 

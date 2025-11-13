@@ -57,6 +57,7 @@ import {
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
+	TenantAdminComponentType,
 	VaultConnectorType,
 	VerifiableStorageComponentType,
 	VerifiableStorageConnectorType,
@@ -73,16 +74,18 @@ import {
 	IMMUTABLE_PROOF_VERIFICATION_METHOD_ID,
 	SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
 	VC_AUTHENTICATION_VERIFICATION_METHOD_ID
-} from "../defaults";
-import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables";
+} from "../defaults.js";
+import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
 /**
  * Build the engine core configuration from environment variables.
  * @param envVars The environment variables.
+ * @param contextIdKeys The context ID keys.
  * @returns The config for the core.
  */
 export async function buildEngineConfiguration(
-	envVars: IEngineEnvironmentVariables
+	envVars: IEngineEnvironmentVariables,
+	contextIdKeys: string[]
 ): Promise<IEngineConfig> {
 	if (Is.stringValue(envVars.storageFileRoot)) {
 		envVars.stateFilename ??= "engine-state.json";
@@ -94,6 +97,8 @@ export async function buildEngineConfiguration(
 		debug: Coerce.boolean(envVars.debug) ?? false,
 		types: {}
 	};
+
+	await configureTenant(coreConfig, envVars);
 
 	await configureEntityStorage(coreConfig, envVars);
 	await configureBlobStorage(coreConfig, envVars);
@@ -571,6 +576,26 @@ async function configureTelemetry(
 }
 
 /**
+ * Configures the tenant.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureTenant(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+		coreConfig.types.tenantAdminComponent ??= [];
+		coreConfig.types.tenantAdminComponent.push({
+			type: TenantAdminComponentType.Service
+		});
+
+		coreConfig.types.tenantComponent ??= [];
+		coreConfig.types.tenantComponent.push({ type: TenantAdminComponentType.Service });
+	}
+}
+
+/**
  * Configures the messaging.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -649,22 +674,9 @@ async function configureMessaging(
 			});
 		}
 
-		const templates = Is.arrayValue<{
-			templateId: string;
-			title: string;
-			content: { [locale: string]: string };
-		}>(envVars.messagingTemplates)
-			? envVars.messagingTemplates
-			: undefined;
-
 		coreConfig.types.messagingAdminComponent ??= [];
 		coreConfig.types.messagingAdminComponent.push({
-			type: MessagingAdminComponentType.Service,
-			options: {
-				config: {
-					templates
-				}
-			}
+			type: MessagingAdminComponentType.Service
 		});
 
 		coreConfig.types.messagingComponent ??= [];

@@ -1,19 +1,19 @@
-# TWIN Node Core - Detailed Documentation
+# TWIN Node - Detailed Documentation
 
 ## Overview
 
-TWIN Node Core provides the foundational components for running TWIN nodes, including dynamic extension loading, protocol-based module resolution, and lifecycle management.
+TWIN Node provides the foundational components for running TWIN nodes, including dynamic extension loading, protocol-based module resolution, and lifecycle management.
 
 ## Protocol-Based Extension Loading
 
-The TWIN Node Core supports dynamic extension loading from multiple sources:
+The TWIN Node supports dynamic extension loading from multiple sources:
 
 ### Local Files
 
 Load extensions from your filesystem:
 
 ```bash
-TWIN_NODE_EXTENSIONS="./my-extension.mjs"
+TWIN_EXTENSIONS="./my-extension.mjs"
 ```
 
 ### NPM Packages
@@ -21,7 +21,7 @@ TWIN_NODE_EXTENSIONS="./my-extension.mjs"
 Automatically install and load npm packages:
 
 ```bash
-TWIN_NODE_EXTENSIONS="npm:@twin.org/package"
+TWIN_EXTENSIONS="npm:@twin.org/package"
 ```
 
 ### HTTPS URLs
@@ -29,7 +29,7 @@ TWIN_NODE_EXTENSIONS="npm:@twin.org/package"
 Download and cache remote extensions:
 
 ```bash
-TWIN_NODE_EXTENSIONS="https://example.com/extension.mjs"
+TWIN_EXTENSIONS="https://example.com/extension.mjs"
 ```
 
 ## Extension Lifecycle Hooks
@@ -69,14 +69,14 @@ export function extensionShutdown() {
 
 ### Cache Management
 
-- `TWIN_NODE_EXTENSIONS_CACHE_TTL_HOURS` - TTL for HTTPS extensions cache (default: 24)
-- `TWIN_NODE_EXTENSIONS_FORCE_REFRESH` - Force refresh all cached extensions (default: false)
-- `TWIN_NODE_EXTENSIONS_CACHE_DIRECTORY` - Custom cache directory (default: ".tmp")
+- `TWIN_EXTENSIONS_CACHE_TTL_HOURS` - TTL for HTTPS extensions cache (default: 24)
+- `TWIN_EXTENSIONS_FORCE_REFRESH` - Force refresh all cached extensions (default: false)
+- `TWIN_EXTENSIONS_CACHE_DIRECTORY` - Custom cache directory (default: ".tmp")
 
 ### Security
 
-- `TWIN_NODE_EXTENSIONS_MAX_SIZE_MB` - Maximum size for HTTPS downloads (default: 10)
-- `TWIN_NODE_EXTENSIONS_CLEAR_CACHE` - Clear cache on startup (default: false)
+- `TWIN_EXTENSIONS_MAX_SIZE_MB` - Maximum size for HTTPS downloads (default: 10)
+- `TWIN_EXTENSIONS_CLEAR_CACHE` - Clear cache on startup (default: false)
 
 ## API Reference
 
@@ -111,7 +111,7 @@ Handles download and caching of HTTPS extensions.
 ## Security Considerations
 
 - **HTTPS Only**: Remote extensions must use HTTPS protocol
-- **Size Limits**: Downloads are limited by `TWIN_NODE_EXTENSIONS_MAX_SIZE_MB`
+- **Size Limits**: Downloads are limited by `TWIN_EXTENSIONS_MAX_SIZE_MB`
 - **Cache TTL**: Extensions are automatically refreshed based on TTL
 - **Security Warnings**: Warnings are displayed when loading remote extensions
 
@@ -120,8 +120,8 @@ Handles download and caching of HTTPS extensions.
 ### Common Issues
 
 1. **Extension not found**: Check that the path/URL is correct and accessible
-2. **Cache issues**: Use `TWIN_NODE_EXTENSIONS_FORCE_REFRESH=true` to force refresh
-3. **Size limit exceeded**: Increase `TWIN_NODE_EXTENSIONS_MAX_SIZE_MB` if needed
+2. **Cache issues**: Use `TWIN_EXTENSIONS_FORCE_REFRESH=true` to force refresh
+3. **Size limit exceeded**: Increase `TWIN_EXTENSIONS_MAX_SIZE_MB` if needed
 4. **Network issues**: Ensure HTTPS URLs are accessible and not blocked by firewall
 
 ### Debug Mode

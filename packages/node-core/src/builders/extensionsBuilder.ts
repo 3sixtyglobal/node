@@ -4,14 +4,14 @@ import { CLIDisplay } from "@twin.org/cli-core";
 import { GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { ModuleHelper } from "@twin.org/modules";
-import type { INodeEngineConfig } from "../models/INodeEngineConfig";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables";
+import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
+import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 import type {
 	NodeExtensionInitialiseMethod,
 	NodeExtensionInitialiseEngineMethod,
 	NodeExtensionInitialiseEngineServerMethod,
 	NodeExtensionShutdownMethod
-} from "../models/nodeExtensionMethods";
+} from "../models/nodeExtensionMethods.js";
 
 /**
  * Handles the configuration of the extensions.

@@ -1,8 +1,8 @@
-# Function: bootstrapNodeIdentity()
+# Function: bootstrapNodeAdminUser()
 
-> **bootstrapNodeIdentity**(`engineCore`, `context`, `envVars`, `features`): `Promise`\<`void`\>
+> **bootstrapNodeAdminUser**(`engineCore`, `context`, `envVars`, `features`): `Promise`\<`void`\>
 
-Bootstrap the node creating any necessary resources.
+Bootstrap the user.
 
 ## Parameters
 
@@ -14,7 +14,7 @@ The engine core for the node.
 
 ### context
 
-`IEngineCoreContext`\<`IEngineServerConfig`, `IEngineState`\>
+`IEngineCoreContext`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>
 
 The context for the node.
 
@@ -28,7 +28,7 @@ The environment variables for the node.
 
 [`NodeFeatures`](../type-aliases/NodeFeatures.md)[]
 
-The features that are enabled on the node. The features that are enabled on the node.
+The features that are enabled on the node.
 
 ## Returns
 

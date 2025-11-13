@@ -15,12 +15,13 @@
 		"existingMnemonic": "Mnemonic already exists",
 		"fundingWallet": "Funding wallet \"{address}\"",
 		"fundedWallet": "Wallet already funded",
-		"generatingNodeIdentity": "Generating node identity",
-		"existingNodeIdentity": "Node identity already exists \"{identity}\"",
-		"createdNodeIdentity": "Node identity created \"{identity}\"",
+		"processingIdentity": "Processing identity of type \"{identityType}\"",
+		"generatingIdentity": "Generating identity of type \"{identityType}\"",
+		"existingIdentity": "Identity already exists \"{identity}\"",
+		"createdIdentity": "Identity created \"{identity}\"",
 		"identityExplorer": "Identity explorer \"{url}\"",
-		"creatingNodeUser": "Creating node user \"{email}\"",
-		"existingNodeUser": "Node user already exists \"{email}\"",
+		"creatingUser": "Creating user \"{email}\"",
+		"existingUser": "User already exists \"{email}\"",
 		"creatingAuthKey": "Creating authentication key \"{keyName}\"",
 		"existingAuthKey": "Authentication key already exists \"{keyName}\"",
 		"addingVerificationMethod": "Adding {title} verification method \"{methodId}\"",
@@ -33,7 +34,7 @@
 		"existingSynchronisedStorageBlobEncryptionKey": "Synchronised storage blob encryption key already exists \"{keyName}\"",
 		"creatingUserProfile": "Creating user profile \"{identity}\"",
 		"existingUserProfile": "User profile already exists \"{identity}\"",
-		"nodeIdentity": "Node identity \"{identity}\"",
+		"nodeId": "Node identity \"{identity}\"",
 		"nodeAdminUserEmail": "Node Admin User Email \"{email}\"",
 		"nodeAdminUserPassword": "Node Admin User Password \"{password}\"",
 		"extensionLoading": "Loading Extension",
@@ -46,6 +47,8 @@
 		"extensionNpmInstalling": "Installing npm extension",
 		"extensionHttpsDownloading": "Downloading HTTPS extension",
 		"extensionCacheExpired": "Cache expired for extension: {url}",
-		"extensionForceRefresh": "Force refresh enabled for extension: {url}"
+		"extensionForceRefresh": "Force refresh enabled for extension: {url}",
+		"createdTenantId": "Created tenant id \"{identity}\" with api key \"{apiKey}\"",
+		"existingTenantId": "Existing tenant id \"{identity}\""
 	}
 }

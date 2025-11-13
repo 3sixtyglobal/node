@@ -15,12 +15,12 @@ import {
 } from "@twin.org/core";
 import { Sha256 } from "@twin.org/crypto";
 import { ModuleHelper } from "@twin.org/modules";
-import type { ICacheMetadata } from "./models/ICacheMetadata";
-import type { IModuleProtocol } from "./models/IModuleProtocol";
-import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables";
-import type { IProtocolHandlerResult } from "./models/IProtocolHandlerResult";
-import { ModuleProtocol } from "./models/moduleProtocol";
-import { NodeFeatures } from "./models/nodeFeatures";
+import type { ICacheMetadata } from "./models/ICacheMetadata.js";
+import type { IModuleProtocol } from "./models/IModuleProtocol.js";
+import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
+import type { IProtocolHandlerResult } from "./models/IProtocolHandlerResult.js";
+import { ModuleProtocol } from "./models/moduleProtocol.js";
+import { NodeFeatures } from "./models/nodeFeatures.js";
 
 /**
  * Initialise the locales for the application.

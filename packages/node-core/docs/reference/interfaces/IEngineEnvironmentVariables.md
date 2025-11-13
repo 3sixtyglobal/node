@@ -32,6 +32,30 @@ The name of the state file.
 
 ***
 
+### tenantEnabled?
+
+> `optional` **tenantEnabled**: `string`
+
+Is multi-tenant support enabled, defaults to false.
+
+***
+
+### tenantId?
+
+> `optional` **tenantId**: `string`
+
+A tenant id to use as a default for the node.
+
+***
+
+### tenantApiKey?
+
+> `optional` **tenantApiKey**: `string`
+
+A tenant api key to use as a default for the node.
+
+***
+
 ### entityStorageConnectorType?
 
 > `optional` **entityStorageConnectorType**: `string`
@@ -568,15 +592,6 @@ The type of event bus component: service.
 > `optional` **messagingEnabled**: `string`
 
 Are the messaging components enabled, defaults to false.
-
-***
-
-### messagingTemplates?
-
-> `optional` **messagingTemplates**: `string`
-
-An initial set of templates for the messages.
-Use the @json: prefix to specify the path to the JSON file.
 
 ***
 

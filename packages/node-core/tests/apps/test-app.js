@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { DataSpaceConnectorAppFactory } from '@twin.org/data-space-connector-models';
-import { TestDataSpaceConnectorApp } from './test-data-space-connector-app.mjs';
+import { TestDataSpaceConnectorApp } from './test-data-space-connector-app.js';
 
 /**
  * Initialise the  extension.
@@ -16,7 +16,6 @@ export async function extensionInitialise(envVars, nodeEngineConfig) {
 		}
 	];
 }
-
 /**
  * Initialise the engine for the extension.
  * @param engineCore The engine core instance.
@@ -24,7 +23,6 @@ export async function extensionInitialise(envVars, nodeEngineConfig) {
 export async function extensionInitialiseEngine(engineCore) {
 	engineCore.addTypeInitialiser('testAppComponent', import.meta.url, 'testAppInitialiser');
 }
-
 /**
  * Initialise the engine server for the extension.
  * @param engineCore The engine core instance.
@@ -33,7 +31,6 @@ export async function extensionInitialiseEngine(engineCore) {
 export async function extensionInitialiseEngineServer(engineCore, engineServer) {
 	engineServer.addRestRouteGenerator('testAppComponent', import.meta.url, 'generateRestRoutes');
 }
-
 /**
  * Test Data Space Connector App initializer.
  * @param engineCore The engine core.
@@ -46,7 +43,6 @@ export async function extensionInitialiseEngineServer(engineCore, engineServer) 
 export async function testAppInitialiser(engineCore, context, instanceConfig) {
 	let component;
 	let instanceType;
-
 	if (instanceConfig.type === 'service') {
 		component = new TestDataSpaceConnectorApp({
 			dataSpaceConnectorComponentType: engineCore.getRegisteredInstanceType(
@@ -57,14 +53,12 @@ export async function testAppInitialiser(engineCore, context, instanceConfig) {
 		});
 		instanceType = TestDataSpaceConnectorApp.APP_ID;
 	}
-
 	return {
 		instanceType,
 		factory: DataSpaceConnectorAppFactory,
 		component
 	};
 }
-
 /**
  * Generate the rest routes for the component.
  * @param baseRouteName The base route name.

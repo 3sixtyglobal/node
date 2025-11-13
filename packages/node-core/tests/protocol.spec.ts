@@ -4,14 +4,14 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { ModuleProtocol } from "../src/models/moduleProtocol";
+import { ModuleProtocol } from "../src/models/moduleProtocol.js";
 import {
 	createModuleImportUrl,
 	getExtensionsCacheDir,
 	hashUrl,
 	isCacheExpired,
 	parseModuleProtocol
-} from "../src/utils";
+} from "../src/utils.js";
 
 describe("Protocol Parsing Utilities", () => {
 	describe("parseModuleProtocol", () => {
@@ -32,43 +32,43 @@ describe("Protocol Parsing Utilities", () => {
 		});
 
 		test("should parse https: protocol correctly", () => {
-			const result = parseModuleProtocol("https://example.com/module.mjs");
+			const result = parseModuleProtocol("https://example.com/module.js");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Https);
-			expect(result.identifier).toEqual("https://example.com/module.mjs");
-			expect(result.original).toEqual("https://example.com/module.mjs");
+			expect(result.identifier).toEqual("https://example.com/module.js");
+			expect(result.original).toEqual("https://example.com/module.js");
 		});
 
 		test("should parse http: protocol correctly", () => {
-			const result = parseModuleProtocol("http://example.com/module.mjs");
+			const result = parseModuleProtocol("http://example.com/module.js");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Http);
-			expect(result.identifier).toEqual("http://example.com/module.mjs");
-			expect(result.original).toEqual("http://example.com/module.mjs");
+			expect(result.identifier).toEqual("http://example.com/module.js");
+			expect(result.original).toEqual("http://example.com/module.js");
 		});
 
 		test("should parse file: protocol as local correctly", () => {
-			const result = parseModuleProtocol("file:///path/to/extension.mjs");
+			const result = parseModuleProtocol("file:///path/to/extension.js");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Local);
-			expect(result.identifier).toEqual("file:///path/to/extension.mjs");
-			expect(result.original).toEqual("file:///path/to/extension.mjs");
+			expect(result.identifier).toEqual("file:///path/to/extension.js");
+			expect(result.original).toEqual("file:///path/to/extension.js");
 		});
 
 		test("should parse local relative path correctly", () => {
-			const result = parseModuleProtocol("./my-extension.mjs");
+			const result = parseModuleProtocol("./my-extension.js");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Local);
-			expect(result.identifier).toEqual("./my-extension.mjs");
-			expect(result.original).toEqual("./my-extension.mjs");
+			expect(result.identifier).toEqual("./my-extension.js");
+			expect(result.original).toEqual("./my-extension.js");
 		});
 
 		test("should parse local absolute path correctly", () => {
-			const result = parseModuleProtocol("/absolute/path/extension.mjs");
+			const result = parseModuleProtocol("/absolute/path/extension.js");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Local);
-			expect(result.identifier).toEqual("/absolute/path/extension.mjs");
-			expect(result.original).toEqual("/absolute/path/extension.mjs");
+			expect(result.identifier).toEqual("/absolute/path/extension.js");
+			expect(result.original).toEqual("/absolute/path/extension.js");
 		});
 
 		test("should parse default npm package correctly", () => {
@@ -95,39 +95,37 @@ describe("Protocol Parsing Utilities", () => {
 		});
 
 		test("should handle module name with path after protocol", () => {
-			const result = parseModuleProtocol(
-				"https://cdn.example.com/path/to/module.mjs?version=1.0.0"
-			);
+			const result = parseModuleProtocol("https://cdn.example.com/path/to/module.js?version=1.0.0");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Https);
-			expect(result.identifier).toEqual("https://cdn.example.com/path/to/module.mjs?version=1.0.0");
+			expect(result.identifier).toEqual("https://cdn.example.com/path/to/module.js?version=1.0.0");
 		});
 	});
 
 	describe("hashUrl", () => {
 		test("should generate consistent hash for same URL", () => {
-			const url = "https://example.com/module.mjs";
+			const url = "https://example.com/module.js";
 			const hash1 = hashUrl(url);
 			const hash2 = hashUrl(url);
 
 			expect(hash1).toEqual(hash2);
-			expect(hash1).toMatch(/^[\da-f]{64}\.mjs$/);
+			expect(hash1).toMatch(/^[\da-f]{64}\.js$/);
 		});
 
 		test("should generate different hashes for different URLs", () => {
-			const hash1 = hashUrl("https://example.com/module1.mjs");
-			const hash2 = hashUrl("https://example.com/module2.mjs");
+			const hash1 = hashUrl("https://example.com/module1.js");
+			const hash2 = hashUrl("https://example.com/module2.js");
 
 			expect(hash1).not.toEqual(hash2);
 		});
 
 		test("should preserve file extension from URL", () => {
 			const jsHash = hashUrl("https://example.com/module.js");
-			const mjsHash = hashUrl("https://example.com/module.mjs");
+			const mjsHash = hashUrl("https://example.com/module.js");
 			const tsHash = hashUrl("https://example.com/module.ts");
 
 			expect(jsHash).toMatch(/\.js$/);
-			expect(mjsHash).toMatch(/\.mjs$/);
+			expect(mjsHash).toMatch(/\.js$/);
 			expect(tsHash).toMatch(/\.ts$/);
 		});
 
@@ -138,15 +136,15 @@ describe("Protocol Parsing Utilities", () => {
 		});
 
 		test("should handle URL with query parameters", () => {
-			const hash = hashUrl("https://example.com/module.mjs?version=1.0.0");
+			const hash = hashUrl("https://example.com/module.js?version=1.0.0");
 
-			expect(hash).toMatch(/^[\da-f]{64}\.mjs$/);
+			expect(hash).toMatch(/^[\da-f]{64}\.js$/);
 		});
 
 		test("should handle URL with hash fragment", () => {
-			const hash = hashUrl("https://example.com/module.mjs#section");
+			const hash = hashUrl("https://example.com/module.js#section");
 
-			expect(hash).toMatch(/^[\da-f]{64}\.mjs$/);
+			expect(hash).toMatch(/^[\da-f]{64}\.js$/);
 		});
 	});
 
@@ -325,7 +323,7 @@ describe("Protocol Parsing Utilities", () => {
 				value: "win32"
 			});
 
-			const filePath = "C:\\Users\\user\\project\\module.mjs";
+			const filePath = "C:\\Users\\user\\project\\module.js";
 			const result = createModuleImportUrl(filePath);
 
 			expect(result).toEqual(`file://${filePath}`);
@@ -343,7 +341,7 @@ describe("Protocol Parsing Utilities", () => {
 				value: "linux"
 			});
 
-			const filePath = "/home/user/project/module.mjs";
+			const filePath = "/home/user/project/module.js";
 			const result = createModuleImportUrl(filePath);
 
 			expect(result).toEqual(filePath);
@@ -362,7 +360,7 @@ describe("Protocol Parsing Utilities", () => {
 				value: "win32"
 			});
 
-			const windowsPath = "C:\\Program Files\\Node\\module.mjs";
+			const windowsPath = "C:\\Program Files\\Node\\module.js";
 			const windowsResult = createModuleImportUrl(windowsPath);
 			expect(windowsResult).toEqual(`file://${windowsPath}`);
 
@@ -371,7 +369,7 @@ describe("Protocol Parsing Utilities", () => {
 				value: "darwin"
 			});
 
-			const unixPath = "/usr/local/lib/node_modules/module.mjs";
+			const unixPath = "/usr/local/lib/node_modules/module.js";
 			const unixResult = createModuleImportUrl(unixPath);
 			expect(unixResult).toEqual(unixPath);
 

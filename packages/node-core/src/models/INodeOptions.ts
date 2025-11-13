@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IEngineCore, IEngineServer, IEngineStateStorage } from "@twin.org/engine-models";
 import type { IEngineConfig } from "@twin.org/engine-types";
-import type { INodeEngineConfig } from "./INodeEngineConfig";
-import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables";
+import type { INodeEngineConfig } from "./INodeEngineConfig.js";
+import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
 
 /**
  * The options when running the node.
@@ -21,12 +21,17 @@ export interface INodeOptions {
 	serverVersion?: string;
 
 	/**
+	 * Additional environment variables to set.
+	 */
+	envVars?: { [key: string]: string };
+
+	/**
 	 * Additional environment variable filenames to load, defaults to .env.
 	 */
 	envFilenames?: string[];
 
 	/**
-	 * The prefix for environment variables, defaults to "TWIN_NODE_".
+	 * The prefix for environment variables, defaults to "TWIN_".
 	 */
 	envPrefix?: string;
 
@@ -88,4 +93,9 @@ export interface INodeOptions {
 	 * If not provided, a default file-based state storage will be used.
 	 */
 	stateStorage?: IEngineStateStorage;
+
+	/**
+	 * Disables process.exit calls on fatal errors and throws instead.
+	 */
+	disableProcessExitOnFailure?: boolean;
 }

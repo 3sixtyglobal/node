@@ -1,8 +1,8 @@
-# Function: bootstrapAuth()
+# Function: bootstrapContextIdHandlers()
 
-> **bootstrapAuth**(`engineCore`, `context`, `envVars`, `features`): `Promise`\<`void`\>
+> **bootstrapContextIdHandlers**(`engineCore`, `context`, `envVars`, `features`): `Promise`\<`void`\>
 
-Bootstrap the JWT signing key.
+Bootstrap the context id handlers creating any necessary resources.
 
 ## Parameters
 
@@ -28,7 +28,7 @@ The environment variables for the node.
 
 [`NodeFeatures`](../type-aliases/NodeFeatures.md)[]
 
-The features that are enabled on the node.
+The features that are enabled on the node. The features that are enabled on the node.
 
 ## Returns
 

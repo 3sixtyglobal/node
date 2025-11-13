@@ -1,8 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
-import type { INodeEngineConfig } from "./INodeEngineConfig";
-import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables";
+import type { INodeEngineConfig } from "./INodeEngineConfig.js";
+import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
 
 /**
  * The type for the initialise method of an extension module.

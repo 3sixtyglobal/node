@@ -1,6 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IServerInfo, IWebServerOptions } from "@twin.org/api-models";
+import { ContextIdKeys } from "@twin.org/context";
 import { Coerce, Is } from "@twin.org/core";
 import type { IEngineCoreConfig } from "@twin.org/engine-models";
 import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
@@ -14,14 +15,15 @@ import {
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
 import type { HttpMethod } from "@twin.org/web";
-import { AUTH_SIGNING_KEY_ID } from "../defaults";
-import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables";
-import { NodeFeatures } from "../models/nodeFeatures";
-import { getFeatures } from "../utils";
+import { AUTH_SIGNING_KEY_ID } from "../defaults.js";
+import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables.js";
+import { NodeFeatures } from "../models/nodeFeatures.js";
+import { getFeatures } from "../utils.js";
 
 /**
  * Handles the configuration of the server.
  * @param envVars The environment variables for the engine server.
+ * @param contextIdKeys The context ID keys.
  * @param coreEngineConfig The core engine config.
  * @param serverInfo The server information.
  * @param openApiSpecPath The path to the open api spec.
@@ -30,6 +32,7 @@ import { getFeatures } from "../utils";
  */
 export async function buildEngineServerConfiguration(
 	envVars: IEngineServerEnvironmentVariables,
+	contextIdKeys: string[],
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
 	openApiSpecPath?: string,
@@ -49,6 +52,14 @@ export async function buildEngineServerConfiguration(
 			: undefined,
 		corsOrigins: Is.stringValue(envVars.corsOrigins) ? envVars.corsOrigins.split(",") : undefined
 	};
+
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+	if (tenantEnabled) {
+		webServerOptions.allowedHeaders ??= [];
+		if (!webServerOptions.allowedHeaders.includes("x-api-key")) {
+			webServerOptions.allowedHeaders.push("x-api-key");
+		}
+	}
 
 	const serverConfig: IEngineServerConfig = {
 		...coreEngineConfig,
@@ -87,14 +98,37 @@ export async function buildEngineServerConfiguration(
 	serverConfig.types.socketRouteProcessor ??= [];
 
 	const features = getFeatures(envVars);
-	const hasNodeIdentity = features.includes(NodeFeatures.NodeIdentity);
+	const hasNodeId = features.includes(NodeFeatures.NodeId);
 
-	if (hasNodeIdentity) {
+	if (hasNodeId) {
+		contextIdKeys.push(ContextIdKeys.Node);
+
 		serverConfig.types.restRouteProcessor.push({
-			type: RestRouteProcessorType.NodeIdentity
+			type: RestRouteProcessorType.ContextId,
+			options: {
+				config: {
+					key: ContextIdKeys.Node
+				}
+			}
 		});
 		serverConfig.types.socketRouteProcessor.push({
-			type: SocketRouteProcessorType.NodeIdentity
+			type: SocketRouteProcessorType.ContextId,
+			options: {
+				config: {
+					key: ContextIdKeys.Node
+				}
+			}
+		});
+	}
+
+	if (tenantEnabled) {
+		contextIdKeys.push(ContextIdKeys.Tenant);
+
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.Tenant
+		});
+		serverConfig.types.socketRouteProcessor.push({
+			type: SocketRouteProcessorType.Tenant
 		});
 	}
 
@@ -155,6 +189,9 @@ export async function buildEngineServerConfiguration(
 
 	const authProcessorType = envVars.authProcessorType;
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
+		contextIdKeys.push(ContextIdKeys.Organization);
+		contextIdKeys.push(ContextIdKeys.User);
+
 		serverConfig.types.authenticationComponent ??= [];
 		serverConfig.types.authenticationComponent.push({
 			type: AuthenticationComponentType.EntityStorage,

@@ -1,6 +1,6 @@
 # Function: buildEngineServerConfiguration()
 
-> **buildEngineServerConfiguration**(`envVars`, `coreEngineConfig`, `serverInfo`, `openApiSpecPath?`, `favIconPath?`): `Promise`\<`IEngineServerConfig`\>
+> **buildEngineServerConfiguration**(`envVars`, `contextIdKeys`, `coreEngineConfig`, `serverInfo`, `openApiSpecPath?`, `favIconPath?`): `Promise`\<`IEngineServerConfig`\>
 
 Handles the configuration of the server.
 
@@ -11,6 +11,12 @@ Handles the configuration of the server.
 [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md)
 
 The environment variables for the engine server.
+
+### contextIdKeys
+
+`string`[]
+
+The context ID keys.
 
 ### coreEngineConfig
 

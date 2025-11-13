@@ -30,9 +30,9 @@ RUN npm prune --omit=dev
 EXPOSE 3000
 
 # Set the environment variables that will override the .env file in the package
-ENV TWIN_NODE_HOST=0.0.0.0
-ENV TWIN_NODE_PORT=3000
-ENV TWIN_NODE_STORAGE_FILE_ROOT=/twin-node/data
+ENV TWIN_HOST=0.0.0.0
+ENV TWIN_PORT=3000
+ENV TWIN_STORAGE_FILE_ROOT=/twin-node/data
 
 # Start the server
 CMD ["node", "src/index.mjs"]
@@ -56,7 +56,7 @@ Whenever the server starts it bootstraps all the components. If you have any ent
 docker run -t -i -v /home/twin-node/data:/twin-node/data -p 3000:3000 twin-node
 ```
 
-This example will map the local directory `/home/twin-node/data` and make it available in the docker container as `/twin-node/data` which is used to configure file entity storage using the environment variable `TWIN_NODE_STORAGE_FILE_ROOT`.
+This example will map the local directory `/home/twin-node/data` and make it available in the docker container as `/twin-node/data` which is used to configure file entity storage using the environment variable `TWIN_STORAGE_FILE_ROOT`.
 
 The output from the docker container should be something like the following.
 
@@ -68,7 +68,7 @@ Locales Directory: /app/dist/locales
 Locales File: /app/dist/locales/en.json
 OpenAPI Spec File: /app/docs/open-api/spec.json
 Favicon File: /app/static/favicon.ico
-Environment Variable Prefix: TWIN_NODE_
+Environment Variable Prefix: TWIN_
 Default Environment File: /app/.env
 
 INFO [2025-10-03T01:23:42.634Z] EngineCore Engine is starting
@@ -132,7 +132,7 @@ Locales Directory: /app/dist/locales
 Locales File: /app/dist/locales/en.json
 OpenAPI Spec File: /app/docs/open-api/spec.json
 Favicon File: /app/static/favicon.ico
-Environment Variable Prefix: TWIN_NODE_
+Environment Variable Prefix: TWIN_
 Default Environment File: /app/.env
 
 INFO [2025-10-03T01:23:42.634Z] EngineCore Engine is starting

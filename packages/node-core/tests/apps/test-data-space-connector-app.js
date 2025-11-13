@@ -1,8 +1,28 @@
-// Copyright 2024 IOTA Stiftung.
+// Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/context';
 import { ComponentFactory } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
 
+// Dummy Data
+const id = 'urn:ucr:24PLP051219453I002610799053311';
+const entities = [
+	{
+		'@context': 'https://vocabulary.uncefact.org/unece-context-D23B.jsonld',
+		type: 'Consignment',
+		id,
+		destinationCountry: {
+			type: 'Country',
+			countryId: 'unece:CountryId#GB'
+		}
+	},
+	{
+		'@context': 'https://vocabulary.uncefact.org/unece-context-D23B.jsonld',
+		type: 'Document',
+		id: 'urn:document:a3456fddaa56',
+		documentTypeCode: 'unece:DocumentCodeList#853'
+	}
+];
 /**
  * Test App Activity Handler.
  */
@@ -33,7 +53,7 @@ export class TestDataSpaceConnectorApp {
 	 * Node Identity
 	 * @internal
 	 */
-	_nodeIdentity;
+	_nodeId;
 
 	/**
 	 * Create a new instance of TestDataSpaceConnectorApp.
@@ -47,12 +67,37 @@ export class TestDataSpaceConnectorApp {
 	}
 
 	/**
+	 * Returns the class name of the component.
+	 * @returns The class name of the component.
+	 */
+	className() {
+		return TestDataSpaceConnectorApp.CLASS_NAME;
+	}
+
+	/**
+	 * Data Services handled.
+	 * @returns Ids.
+	 */
+	dataServicesHandled() {
+		return [{ serviceId: 'https://twin.example.org/data-service-1' }];
+	}
+
+	/**
+	 * Supported query types.
+	 * @returns Types.
+	 */
+	supportedQueryTypes() {
+		return ['TestQueryType'];
+	}
+
+	/**
 	 * Start method.
-	 * @param nodeIdentity the identity of the node where this application lives.
 	 * @param nodeLoggingComponentType the logging component type of such a node.
 	 */
-	async start(nodeIdentity, nodeLoggingComponentType) {
-		this._nodeIdentity = nodeIdentity;
+	async start(nodeLoggingComponentType) {
+		const contextIds = await ContextIdStore.getContextIds();
+		ContextIdHelper.guard(contextIds, ContextIdKeys.Node);
+		this._nodeId = contextIds[ContextIdKeys.Node];
 		await this._dataSpaceConnectorComponent.registerApp(TestDataSpaceConnectorApp.APP_ID, this);
 		DataTypeHandlerFactory.register('https://twin.example.org/MyCreate', () => ({
 			context: 'https://twin.example.org/',
@@ -94,9 +139,34 @@ export class TestDataSpaceConnectorApp {
 		await this._loggingService?.log({
 			level: 'info',
 			source: TestDataSpaceConnectorApp.CLASS_NAME,
-			message: `Node Identity: ${this._nodeIdentity ?? ''}`
+			message: `Node Identity: ${this._nodeId ?? ''}`
 		});
 		await new Promise(resolve => setTimeout(resolve, 500));
 		return '1234';
+	}
+
+	/**
+	 * Handles the Data Request.
+	 * @param dataRequest The data request
+	 * @returns the Data.
+	 */
+	async handleDataRequest(dataRequest) {
+		switch (dataRequest.type) {
+			case 'DataAssetEntities': {
+				if (dataRequest.entitySet.entityType === 'https://vocabulary.uncefact.org/Consignment') {
+					return {
+						data: [entities[0]]
+					};
+				}
+				if (dataRequest.entitySet.entityId?.includes(id)) {
+					return {
+						data: entities[0]
+					};
+				}
+				return { data: [] };
+			}
+			case 'QueryDataAsset':
+				return { data: entities };
+		}
 	}
 }

@@ -26,6 +26,18 @@ The version of the server, defaults to the current version.
 
 ***
 
+### envVars?
+
+> `optional` **envVars**: `object`
+
+Additional environment variables to set.
+
+#### Index Signature
+
+\[`key`: `string`\]: `string`
+
+***
+
 ### envFilenames?
 
 > `optional` **envFilenames**: `string`[]
@@ -38,7 +50,7 @@ Additional environment variable filenames to load, defaults to .env.
 
 > `optional` **envPrefix**: `string`
 
-The prefix for environment variables, defaults to "TWIN_NODE_".
+The prefix for environment variables, defaults to "TWIN_".
 
 ***
 
@@ -175,3 +187,11 @@ Method to extend the engine server with any additional options.
 
 The state storage to use for the engine.
 If not provided, a default file-based state storage will be used.
+
+***
+
+### disableProcessExitOnFailure?
+
+> `optional` **disableProcessExitOnFailure**: `boolean`
+
+Disables process.exit calls on fatal errors and throws instead.

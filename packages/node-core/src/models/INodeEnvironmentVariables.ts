@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironmentVariables";
+import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironmentVariables.js";
 
 /**
  * The environment variables for the node.
@@ -8,30 +8,50 @@ import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironme
 export interface INodeEnvironmentVariables extends IEngineServerEnvironmentVariables {
 	/**
 	 * The features that are enabled on the node.
-	 * @default [NodeFeatures.NodeIdentity]
+	 * @default []
 	 */
 	features?: string;
 
 	/**
 	 * The identity of the node which, if empty and node-identity feature is enabled it will be generated.
 	 */
-	identity?: string;
+	nodeIdentity?: string;
 
 	/**
 	 * The mnemonic for the identity, if empty and node-identity feature is enabled it will be randomly generated.
 	 */
-	mnemonic?: string;
+	nodeMnemonic?: string;
 
 	/**
-	 * If the node-user feature is enabled, this will be the name of the user.
+	 * If the node-admin-user feature is enabled, this will be the organization of the user, if one is not provided it will be generated
+	 */
+	organizationIdentity?: string;
+
+	/**
+	 * The mnemonic for the organization, if empty and node-admin-user feature is enabled it will be randomly generated.
+	 */
+	organizationMnemonic?: string;
+
+	/**
+	 * If the node-admin-user feature is enabled, this will be the identity of the user, if one is not provided it will be generated
+	 */
+	adminUserIdentity?: string;
+
+	/**
+	 * The mnemonic for the admin user, if empty and node-admin-user feature is enabled it will be randomly generated.
+	 */
+	adminUserMnemonic?: string;
+
+	/**
+	 * If the node-admin-user feature is enabled, this will be the name of the user.
 	 * @default admin@node
 	 */
-	username?: string;
+	adminUserName?: string;
 
 	/**
-	 * If the node-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
+	 * If the node-admin-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
 	 */
-	password?: string;
+	adminUserPassword?: string;
 
 	/**
 	 * Maximum size in MB for HTTPS extensions downloads.

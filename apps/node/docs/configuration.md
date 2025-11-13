@@ -6,7 +6,7 @@ The TWIN Node supports loading extensions dynamically to extend its functionalit
 
 ### Extension Loading Syntax
 
-Extensions are configured via the `TWIN_NODE_EXTENSIONS` environment variable. Multiple extensions can be specified as a comma-separated list.
+Extensions are configured via the `TWIN_EXTENSIONS` environment variable. Multiple extensions can be specified as a comma-separated list.
 
 #### Local File Extensions
 
@@ -14,10 +14,10 @@ Load extensions from the local filesystem:
 
 ```bash
 # Relative path
-TWIN_NODE_EXTENSIONS="./my-extension.mjs"
+TWIN_EXTENSIONS="./my-extension.mjs"
 
 # Absolute path
-TWIN_NODE_EXTENSIONS="/path/to/extension.mjs"
+TWIN_EXTENSIONS="/path/to/extension.mjs"
 ```
 
 #### NPM Package Extensions
@@ -26,10 +26,10 @@ Load extensions from npm packages. The package will be automatically downloaded 
 
 ```bash
 # Basic npm package
-TWIN_NODE_EXTENSIONS="npm:@twin.org/identity-management-service"
+TWIN_EXTENSIONS="npm:@twin.org/identity-management-service"
 
 # Scoped package
-TWIN_NODE_EXTENSIONS="npm:@org/custom-extension"
+TWIN_EXTENSIONS="npm:@org/custom-extension"
 ```
 
 **Note:** Version pinning (e.g., `npm:@twin.org/pkg@1.2.3`) is planned for a future release. Currently, the latest version is installed.
@@ -39,7 +39,7 @@ TWIN_NODE_EXTENSIONS="npm:@org/custom-extension"
 Load extensions from remote HTTPS URLs:
 
 ```bash
-TWIN_NODE_EXTENSIONS="https://example.twin.org/extensions/my-module.mjs"
+TWIN_EXTENSIONS="https://example.twin.org/extensions/my-module.mjs"
 ```
 
 **⚠️ SECURITY WARNING:** Loading code from HTTPS URLs introduces security risks. Only load extensions from trusted sources that you control or verify.
@@ -56,7 +56,7 @@ Security features:
 Load multiple extensions from different sources:
 
 ```bash
-TWIN_NODE_EXTENSIONS="@twin.org/identity-management-service,npm:@twin.org/custom-service,./local-extension.mjs,https://example.com/remote.mjs"
+TWIN_EXTENSIONS="@twin.org/identity-management-service,npm:@twin.org/custom-service,./local-extension.mjs,https://example.com/remote.mjs"
 ```
 
 ### Extension Configuration Options
@@ -66,7 +66,7 @@ TWIN_NODE_EXTENSIONS="@twin.org/identity-management-service,npm:@twin.org/custom
 Configure the maximum size (in MB) for HTTPS extension downloads:
 
 ```bash
-TWIN_NODE_EXTENSIONS_MAX_SIZE_MB=10  # Default is 10 MB
+TWIN_EXTENSIONS_MAX_SIZE_MB=10  # Default is 10 MB
 ```
 
 #### Cache Management
@@ -74,7 +74,7 @@ TWIN_NODE_EXTENSIONS_MAX_SIZE_MB=10  # Default is 10 MB
 By default, downloaded extensions are cached in `.tmp/extensions/` directory to speed up subsequent startups. To clear the cache on each startup:
 
 ```bash
-TWIN_NODE_EXTENSIONS_CLEAR_CACHE=true  # Default is false
+TWIN_EXTENSIONS_CLEAR_CACHE=true  # Default is false
 ```
 
 #### Custom Cache Directory
@@ -82,7 +82,7 @@ TWIN_NODE_EXTENSIONS_CLEAR_CACHE=true  # Default is false
 You can configure a custom directory for extension caching:
 
 ```bash
-TWIN_NODE_EXTENSIONS_CACHE_DIRECTORY="cache"  # Default is ".tmp"
+TWIN_EXTENSIONS_CACHE_DIRECTORY="cache"  # Default is ".tmp"
 ```
 
 This allows you to:
@@ -184,13 +184,13 @@ Downloaded extensions are stored in:
 Where `<cache-directory>` is:
 
 - `.tmp` by default
-- Configurable via `TWIN_NODE_EXTENSIONS_CACHE_DIRECTORY`
+- Configurable via `TWIN_EXTENSIONS_CACHE_DIRECTORY`
 
 Examples:
 
 - Default: `./.tmp/extensions/`
-- Custom: `./cache/extensions/` (if `TWIN_NODE_EXTENSIONS_CACHE_DIRECTORY="cache"`)
-- Absolute: `/var/cache/twin-node/extensions/` (if `TWIN_NODE_EXTENSIONS_CACHE_DIRECTORY="/var/cache/twin-node"`)
+- Custom: `./cache/extensions/` (if `TWIN_EXTENSIONS_CACHE_DIRECTORY="cache"`)
+- Absolute: `/var/cache/twin-node/extensions/` (if `TWIN_EXTENSIONS_CACHE_DIRECTORY="/var/cache/twin-node"`)
 
 ### Security Best Practices
 
