@@ -13,6 +13,8 @@ import type {
 	NodeExtensionShutdownMethod
 } from "../models/nodeExtensionMethods.js";
 
+const extensionState: { [id: string]: { initialised: boolean } } = {};
+
 /**
  * Handles the configuration of the extensions.
  * @param envVars The environment variables for the node.
@@ -62,18 +64,24 @@ export async function extensionsInitialiseEngine(
 		const extensions = envVars.extensions.split(",");
 
 		for (const extension of extensions) {
-			let initialiseEngineMethod: NodeExtensionInitialiseEngineMethod | undefined;
-			try {
-				engineCore.logInfo(I18n.formatMessage("node.extensionInitialisingEngine", { extension }));
-				initialiseEngineMethod =
-					await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineMethod>(
-						extension,
-						"extensionInitialiseEngine"
-					);
-			} catch {}
+			extensionState[extension] ??= { initialised: false };
 
-			if (Is.function(initialiseEngineMethod)) {
-				await initialiseEngineMethod(engineCore);
+			if (!extensionState[extension].initialised) {
+				extensionState[extension].initialised = true;
+
+				let initialiseEngineMethod: NodeExtensionInitialiseEngineMethod | undefined;
+				try {
+					engineCore.logInfo(I18n.formatMessage("node.extensionInitialisingEngine", { extension }));
+					initialiseEngineMethod =
+						await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineMethod>(
+							extension,
+							"extensionInitialiseEngine"
+						);
+				} catch {}
+
+				if (Is.function(initialiseEngineMethod)) {
+					await initialiseEngineMethod(engineCore);
+				}
 			}
 		}
 	}
@@ -128,17 +136,22 @@ export async function shutdownExtensions(
 		const extensions = envVars.extensions.split(",");
 
 		for (const extension of extensions) {
-			let shutdownMethod: NodeExtensionShutdownMethod | undefined;
-			try {
-				engineCore.logInfo(I18n.formatMessage("node.extensionShutdown", { extension }));
-				shutdownMethod = await ModuleHelper.getModuleMethod<NodeExtensionShutdownMethod>(
-					extension,
-					"extensionShutdown"
-				);
-			} catch {}
+			extensionState[extension] ??= { initialised: false };
 
-			if (Is.function(shutdownMethod)) {
-				await shutdownMethod();
+			if (extensionState[extension].initialised) {
+				extensionState[extension].initialised = false;
+				let shutdownMethod: NodeExtensionShutdownMethod | undefined;
+				try {
+					engineCore.logInfo(I18n.formatMessage("node.extensionShutdown", { extension }));
+					shutdownMethod = await ModuleHelper.getModuleMethod<NodeExtensionShutdownMethod>(
+						extension,
+						"extensionShutdown"
+					);
+				} catch {}
+
+				if (Is.function(shutdownMethod)) {
+					await shutdownMethod();
+				}
 			}
 		}
 	}

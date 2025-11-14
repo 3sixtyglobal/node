@@ -18,6 +18,8 @@ import type { INodeEngineState } from "./models/INodeEngineState.js";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
 
+let isStarted = false;
+
 /**
  * Start the engine server.
  * @param nodeOptions Optional run options for the engine server.
@@ -93,15 +95,18 @@ export async function start(
 	EngineCoreFactory.register("engine", () => engine);
 
 	// Start the server, which also starts the engine.
-	const canContinue = await server.start();
+	isStarted = await server.start();
 
-	if (canContinue) {
+	if (isStarted) {
 		return {
 			engine,
 			server,
 			shutdown: async () => {
-				await server.stop();
-				await shutdownExtensions(envVars, engine);
+				if (isStarted) {
+					isStarted = false;
+					await shutdownExtensions(envVars, engine);
+					await server.stop();
+				}
 			}
 		};
 	}
