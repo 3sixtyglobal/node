@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.2](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.1...node-core-v0.0.3-next.2) (2025-11-14)
+
+
+### Features
+
+* additional stop interlock ([b3a2757](https://github.com/twinfoundation/node/commit/b3a2757325af0e7b258a9f97f1b52e86087e6301))
+
 ## [0.0.3-next.1](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.0...node-core-v0.0.3-next.1) (2025-11-13)
 
 
