@@ -29,13 +29,14 @@
 - [SYNCHRONISED\_STORAGE\_BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
 - [VC\_AUTHENTICATION\_VERIFICATION\_METHOD\_ID](variables/VC_AUTHENTICATION_VERIFICATION_METHOD_ID.md)
 - [AUTH\_SIGNING\_KEY\_ID](variables/AUTH_SIGNING_KEY_ID.md)
+- [CONTEXT\_ID\_HANDLER\_FEATURE\_DID](variables/CONTEXT_ID_HANDLER_FEATURE_DID.md)
+- [CONTEXT\_ID\_HANDLER\_FEATURE\_TENANT](variables/CONTEXT_ID_HANDLER_FEATURE_TENANT.md)
 - [ModuleProtocol](variables/ModuleProtocol.md)
 - [NodeFeatures](variables/NodeFeatures.md)
 
 ## Functions
 
 - [bootstrap](functions/bootstrap.md)
-- [bootstrapContextIdHandlers](functions/bootstrapContextIdHandlers.md)
 - [bootstrapNodeId](functions/bootstrapNodeId.md)
 - [bootstrapTenantId](functions/bootstrapTenantId.md)
 - [bootstrapNodeAdminUser](functions/bootstrapNodeAdminUser.md)

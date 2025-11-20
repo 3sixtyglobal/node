@@ -13,6 +13,7 @@ import {
 	BackgroundTaskConnectorType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
+	ContextIdHandlerComponentType,
 	DataConverterConnectorType,
 	DataExtractorConnectorType,
 	DataProcessingComponentType,
@@ -71,6 +72,8 @@ import type { IOdrlOffer } from "@twin.org/standards-w3c-odrl";
 import {
 	ATTESTATION_VERIFICATION_METHOD_ID,
 	BLOB_STORAGE_ENCRYPTION_KEY_ID,
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT,
 	IMMUTABLE_PROOF_VERIFICATION_METHOD_ID,
 	SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
 	VC_AUTHENTICATION_VERIFICATION_METHOD_ID
@@ -85,7 +88,7 @@ import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVa
  */
 export async function buildEngineConfiguration(
 	envVars: IEngineEnvironmentVariables,
-	contextIdKeys: string[]
+	contextIdKeys: { key: string; componentFeatures: string[] }[]
 ): Promise<IEngineConfig> {
 	if (Is.stringValue(envVars.storageFileRoot)) {
 		envVars.stateFilename ??= "engine-state.json";
@@ -99,6 +102,7 @@ export async function buildEngineConfiguration(
 	};
 
 	await configureTenant(coreConfig, envVars);
+	await configureContextIdHandlers(coreConfig, envVars);
 
 	await configureEntityStorage(coreConfig, envVars);
 	await configureBlobStorage(coreConfig, envVars);
@@ -592,6 +596,28 @@ async function configureTenant(
 
 		coreConfig.types.tenantComponent ??= [];
 		coreConfig.types.tenantComponent.push({ type: TenantAdminComponentType.Service });
+	}
+}
+
+/**
+ * Configures the context id handlers.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureContextIdHandlers(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.contextIdHandlerComponent ??= [];
+	coreConfig.types.contextIdHandlerComponent.push({
+		type: ContextIdHandlerComponentType.Did,
+		features: [CONTEXT_ID_HANDLER_FEATURE_DID]
+	});
+	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+		coreConfig.types.contextIdHandlerComponent.push({
+			type: ContextIdHandlerComponentType.Tenant,
+			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
+		});
 	}
 }
 

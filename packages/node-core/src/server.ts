@@ -25,14 +25,14 @@ let isStarted = false;
  * @param nodeOptions Optional run options for the engine server.
  * @param nodeEngineConfig The configuration for the engine server.
  * @param envVars The environment variables.
- * @param contextIdKeys The context ID keys.
+ * @param availableContextIdKeys The context ID keys available for operation.
  * @returns The engine server.
  */
 export async function start(
 	nodeOptions: INodeOptions | undefined,
 	nodeEngineConfig: INodeEngineConfig,
 	envVars: INodeEnvironmentVariables,
-	contextIdKeys?: string[]
+	availableContextIdKeys?: { key: string; componentFeatures: string[] }[]
 ): Promise<
 	| {
 			engine: Engine<IEngineServerConfig, INodeEngineState>;
@@ -64,10 +64,13 @@ export async function start(
 		customBootstrap: async (core, engineContext) => bootstrap(core, engineContext, envVars)
 	});
 
-	if (Is.arrayValue(contextIdKeys)) {
-		const uniqueContextIdKeys = Array.from(new Set(contextIdKeys));
-		for (const contextIdKey of uniqueContextIdKeys) {
-			engine.addContextIdKey(contextIdKey);
+	if (Is.arrayValue(availableContextIdKeys)) {
+		const added: string[] = [];
+		for (const availableContextIdKey of availableContextIdKeys) {
+			if (!added.includes(availableContextIdKey.key)) {
+				engine.addContextIdKey(availableContextIdKey.key, availableContextIdKey.componentFeatures);
+				added.push(availableContextIdKey.key);
+			}
 		}
 	}
 

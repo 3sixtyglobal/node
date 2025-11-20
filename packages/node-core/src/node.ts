@@ -119,11 +119,11 @@ export async function run(nodeOptions?: INodeOptions): Promise<
 		const {
 			nodeEngineConfig,
 			nodeEnvVars: envVars,
-			contextIdKeys
+			availableContextIdKeys
 		} = await buildConfiguration(finalEnvVars, nodeOptions, serverInfo);
 
 		CLIDisplay.break();
-		const startResult = await start(nodeOptions, nodeEngineConfig, envVars, contextIdKeys);
+		const startResult = await start(nodeOptions, nodeEngineConfig, envVars, availableContextIdKeys);
 
 		if (!Is.empty(startResult)) {
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
@@ -162,9 +162,9 @@ export async function buildConfiguration(
 ): Promise<{
 	nodeEnvVars: INodeEnvironmentVariables & { [id: string]: string | unknown };
 	nodeEngineConfig: INodeEngineConfig;
-	contextIdKeys: string[];
+	availableContextIdKeys: { key: string; componentFeatures: string[] }[];
 }> {
-	const contextIdKeys: string[] = [];
+	const availableContextIdKeys: { key: string; componentFeatures: string[] }[] = [];
 
 	let defaultEnvOnly = false;
 	if (Is.empty(options?.envFilenames)) {
@@ -224,10 +224,10 @@ export async function buildConfiguration(
 	}
 
 	// Build the engine configuration from the environment variables.
-	const coreConfig = await buildEngineConfiguration(envVars, contextIdKeys);
+	const coreConfig = await buildEngineConfiguration(envVars, availableContextIdKeys);
 	const engineServerConfig = await buildEngineServerConfiguration(
 		envVars,
-		contextIdKeys,
+		availableContextIdKeys,
 		coreConfig,
 		serverInfo,
 		options?.openApiSpecFile,
@@ -257,7 +257,7 @@ export async function buildConfiguration(
 
 	const nodeEngineConfig = await extensionsConfiguration(envVars, engineServerConfig);
 
-	return { nodeEngineConfig, nodeEnvVars: envVars, contextIdKeys };
+	return { nodeEngineConfig, nodeEnvVars: envVars, availableContextIdKeys };
 }
 
 /**

@@ -14,7 +14,7 @@ The environment variables.
 
 ### contextIdKeys
 
-`string`[]
+`object`[]
 
 The context ID keys.
 

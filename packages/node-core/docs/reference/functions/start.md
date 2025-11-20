@@ -1,6 +1,6 @@
 # Function: start()
 
-> **start**(`nodeOptions`, `nodeEngineConfig`, `envVars`, `contextIdKeys?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
+> **start**(`nodeOptions`, `nodeEngineConfig`, `envVars`, `availableContextIdKeys?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
 
 Start the engine server.
 
@@ -24,11 +24,11 @@ The configuration for the engine server.
 
 The environment variables.
 
-### contextIdKeys?
+### availableContextIdKeys?
 
-`string`[]
+`object`[]
 
-The context ID keys.
+The context ID keys available for operation.
 
 ## Returns
 

@@ -1,12 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { PasswordHelper, type AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
-import {
-	TenantIdContextIdHandler,
-	TenantIdHelper,
-	type ITenantAdminComponent
-} from "@twin.org/api-tenant-processor";
-import { ContextIdHandlerFactory, ContextIdKeys, ContextIdStore } from "@twin.org/context";
+import { TenantIdHelper, type ITenantAdminComponent } from "@twin.org/api-tenant-processor";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, Converter, I18n, Is, RandomHelper } from "@twin.org/core";
 import { PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore, IEngineCoreContext } from "@twin.org/engine-models";
@@ -19,7 +15,6 @@ import {
 	type IEntityStorageConnector
 } from "@twin.org/entity-storage-models";
 import {
-	DidContextIdHandler,
 	DocumentHelper,
 	IdentityConnectorFactory,
 	IdentityProfileConnectorFactory,
@@ -56,8 +51,6 @@ export async function bootstrap(
 	envVars: INodeEnvironmentVariables
 ): Promise<void> {
 	const features = getFeatures(envVars);
-
-	await bootstrapContextIdHandlers(engineCore, context, envVars, features);
 
 	await bootstrapNodeId(engineCore, context, envVars, features);
 
@@ -114,25 +107,6 @@ export async function bootstrap(
 
 		await bootstrapSynchronisedStorage(engineCore, context, envVars, features);
 	});
-}
-
-/**
- * Bootstrap the context id handlers creating any necessary resources.
- * @param engineCore The engine core for the node.
- * @param context The context for the node.
- * @param envVars The environment variables for the node.
- * @param features The features that are enabled on the node. The features that are enabled on the node.
- */
-export async function bootstrapContextIdHandlers(
-	engineCore: IEngineCore,
-	context: IEngineCoreContext<IEngineServerConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
-	features: NodeFeatures[]
-): Promise<void> {
-	ContextIdHandlerFactory.register(ContextIdKeys.Node, () => new DidContextIdHandler());
-	ContextIdHandlerFactory.register(ContextIdKeys.Tenant, () => new TenantIdContextIdHandler());
-	ContextIdHandlerFactory.register(ContextIdKeys.Organization, () => new DidContextIdHandler());
-	ContextIdHandlerFactory.register(ContextIdKeys.User, () => new DidContextIdHandler());
 }
 
 /**

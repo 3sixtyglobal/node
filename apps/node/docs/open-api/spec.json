@@ -1894,10 +1894,10 @@
 						"in": "path",
 						"required": true,
 						"schema": {
-							"type": "number"
+							"type": "string"
 						},
 						"style": "simple",
-						"example": 5
+						"example": "5"
 					}
 				],
 				"security": [
@@ -1994,10 +1994,10 @@
 						"in": "path",
 						"required": true,
 						"schema": {
-							"type": "number"
+							"type": "string"
 						},
 						"style": "simple",
-						"example": 5
+						"example": "5"
 					}
 				],
 				"security": [
@@ -14100,7 +14100,7 @@
 							"examples": {
 								"papCreateRequestExample": {
 									"value": {
-										"@context": "https://www.w3.org/ns/odrl/2/",
+										"@context": "http://www.w3.org/ns/odrl/2/",
 										"@type": "Set",
 										"permission": [
 											{
@@ -14240,7 +14240,7 @@
 											"cursor": "next-page-cursor",
 											"policies": [
 												{
-													"@context": "https://www.w3.org/ns/odrl/2/",
+													"@context": "http://www.w3.org/ns/odrl/2/",
 													"@type": "Set",
 													"uid": "urn:rights-management:abc123def456",
 													"permission": [
@@ -14353,7 +14353,7 @@
 							"examples": {
 								"papUpdateRequestExample": {
 									"value": {
-										"@context": "https://www.w3.org/ns/odrl/2/",
+										"@context": "http://www.w3.org/ns/odrl/2/",
 										"@type": "Set",
 										"uid": "urn:rights-management:abc123def456",
 										"permission": [
@@ -14466,7 +14466,7 @@
 								"examples": {
 									"papGetResponseExample": {
 										"value": {
-											"@context": "https://www.w3.org/ns/odrl/2/",
+											"@context": "http://www.w3.org/ns/odrl/2/",
 											"@type": "Set",
 											"uid": "urn:rights-management:abc123def456",
 											"permission": [
@@ -14679,7 +14679,7 @@
 								"examples": {
 									"pnpGetNegotiationResponseExample": {
 										"value": {
-											"@context": "https://w3id.org/dspace/2024/1/context.json",
+											"@context": "https://w3id.org/dspace/2025/1/context.json",
 											"@type": "ContractNegotiation",
 											"providerPid": "urn:contract-negotiation:002aa11bb.......ffff",
 											"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
@@ -14772,11 +14772,11 @@
 							"examples": {
 								"pnpNegotiationRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "https://www.w3.org/ns/odrl/2/",
+											"@context": "http://www.w3.org/ns/odrl/2/",
 											"@type": "Offer",
 											"uid": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
@@ -14798,7 +14798,7 @@
 								"examples": {
 									"IPnpNegotiationRequestResponseExample": {
 										"value": {
-											"@context": "https://w3id.org/dspace/2024/1/context.json",
+											"@context": "https://w3id.org/dspace/2025/1/context.json",
 											"@type": "ContractNegotiation",
 											"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 											"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
@@ -14882,11 +14882,11 @@
 							"examples": {
 								"pnpNegotiationProviderRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "https://www.w3.org/ns/odrl/2/",
+											"@context": "http://www.w3.org/ns/odrl/2/",
 											"@type": "Offer",
 											"uid": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
@@ -15001,7 +15001,7 @@
 							"examples": {
 								"pnpNegotiationEventsRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
@@ -15116,7 +15116,7 @@
 							"examples": {
 								"pnpNegotiationAgreementVerificationRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
@@ -15230,7 +15230,7 @@
 							"examples": {
 								"pnpNegotiationTerminationRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
@@ -15333,12 +15333,12 @@
 							"examples": {
 								"pnpNegotiationOfferRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "https://www.w3.org/ns/odrl/2/",
+											"@context": "http://www.w3.org/ns/odrl/2/",
 											"@type": "Offer",
 											"uid": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
@@ -15360,7 +15360,7 @@
 								"examples": {
 									"pnpNegotiationOfferResponseExample": {
 										"value": {
-											"@context": "https://w3id.org/dspace/2024/1/context.json",
+											"@context": "https://w3id.org/dspace/2025/1/context.json",
 											"@type": "ContractRequestMessage",
 											"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 											"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
@@ -15443,12 +15443,12 @@
 							"examples": {
 								"pnpNegotiationConsumerOfferRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "https://www.w3.org/ns/odrl/2/",
+											"@context": "http://www.w3.org/ns/odrl/2/",
 											"@type": "Offer",
 											"uid": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
@@ -15470,7 +15470,7 @@
 								"examples": {
 									"pnpNegotiationConsumerOfferResponseExample": {
 										"value": {
-											"@context": "https://w3id.org/dspace/2024/1/context.json",
+											"@context": "https://w3id.org/dspace/2025/1/context.json",
 											"@type": "ContractNegotiation",
 											"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 											"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
@@ -15573,12 +15573,12 @@
 							"examples": {
 								"pnpNegotiationAgreementRequestExample": {
 									"value": {
-										"@context": "https://w3id.org/dspace/2024/1/context.json",
+										"@context": "https://w3id.org/dspace/2025/1/context.json",
 										"@type": "ContractRequestMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"agreement": {
-											"@context": "https://www.w3.org/ns/odrl/2/",
+											"@context": "http://www.w3.org/ns/odrl/2/",
 											"@type": "Agreement",
 											"uid": "urn:offer-1",
 											"assigner": "urn:provider:node:1",
@@ -17560,7 +17560,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17596,7 +17596,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17624,7 +17624,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17652,52 +17652,11 @@
 				"additionalProperties": false,
 				"description": "Interface for Dataspace Protocol Contract Agreement Messages. https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/2025-1/#ack-contract-negotiation"
 			},
-			"ContractNegotiationContextType": {
-				"anyOf": [
-					{
-						"type": "string",
-						"const": "https://w3id.org/dspace/2024/1/context.json"
-					},
-					{
-						"type": "array",
-						"minItems": 2,
-						"prefixItems": [
-							{
-								"type": "string",
-								"const": "https://w3id.org/dspace/2024/1/context.json"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
-							}
-						],
-						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
-						}
-					},
-					{
-						"type": "array",
-						"minItems": 2,
-						"prefixItems": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
-							},
-							{
-								"type": "string",
-								"const": "https://w3id.org/dspace/2024/1/context.json"
-							}
-						],
-						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
-						}
-					}
-				],
-				"description": "The Dataspace Protocol Contract Negotiation JSON-LD context type."
-			},
 			"ContractNegotiationError": {
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17767,7 +17726,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17854,7 +17813,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17891,7 +17850,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -17926,7 +17885,7 @@
 				"type": "object",
 				"properties": {
 					"@context": {
-						"$ref": "#/components/schemas/ContractNegotiationContextType"
+						"$ref": "#/components/schemas/DataspaceProtocolContextType"
 					},
 					"@type": {
 						"type": "string",
@@ -18126,6 +18085,47 @@
 				],
 				"additionalProperties": false,
 				"description": "The data to be used in the store."
+			},
+			"DataspaceProtocolContextType": {
+				"anyOf": [
+					{
+						"type": "string",
+						"const": "https://w3id.org/dspace/2025/1/context.json"
+					},
+					{
+						"type": "array",
+						"minItems": 2,
+						"prefixItems": [
+							{
+								"type": "string",
+								"const": "https://w3id.org/dspace/2025/1/context.json"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							}
+						],
+						"items": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+						}
+					},
+					{
+						"type": "array",
+						"minItems": 2,
+						"prefixItems": [
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							},
+							{
+								"type": "string",
+								"const": "https://w3id.org/dspace/2025/1/context.json"
+							}
+						],
+						"items": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+						}
+					}
+				],
+				"description": "The Dataspace Protocol Protocol JSON-LD context type."
 			},
 			"DocumentManagementCreateRequest": {
 				"type": "object",

@@ -15,7 +15,11 @@ import {
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
 import type { HttpMethod } from "@twin.org/web";
-import { AUTH_SIGNING_KEY_ID } from "../defaults.js";
+import {
+	AUTH_SIGNING_KEY_ID,
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT
+} from "../defaults.js";
 import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables.js";
 import { NodeFeatures } from "../models/nodeFeatures.js";
 import { getFeatures } from "../utils.js";
@@ -23,7 +27,7 @@ import { getFeatures } from "../utils.js";
 /**
  * Handles the configuration of the server.
  * @param envVars The environment variables for the engine server.
- * @param contextIdKeys The context ID keys.
+ * @param availableContextIdKeys The context ID keys.
  * @param coreEngineConfig The core engine config.
  * @param serverInfo The server information.
  * @param openApiSpecPath The path to the open api spec.
@@ -32,7 +36,7 @@ import { getFeatures } from "../utils.js";
  */
 export async function buildEngineServerConfiguration(
 	envVars: IEngineServerEnvironmentVariables,
-	contextIdKeys: string[],
+	availableContextIdKeys: { key: string; componentFeatures: string[] }[],
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
 	openApiSpecPath?: string,
@@ -101,7 +105,10 @@ export async function buildEngineServerConfiguration(
 	const hasNodeId = features.includes(NodeFeatures.NodeId);
 
 	if (hasNodeId) {
-		contextIdKeys.push(ContextIdKeys.Node);
+		availableContextIdKeys.push({
+			key: ContextIdKeys.Node,
+			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		});
 
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.ContextId,
@@ -122,7 +129,10 @@ export async function buildEngineServerConfiguration(
 	}
 
 	if (tenantEnabled) {
-		contextIdKeys.push(ContextIdKeys.Tenant);
+		availableContextIdKeys.push({
+			key: ContextIdKeys.Tenant,
+			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
+		});
 
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Tenant
@@ -189,8 +199,14 @@ export async function buildEngineServerConfiguration(
 
 	const authProcessorType = envVars.authProcessorType;
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
-		contextIdKeys.push(ContextIdKeys.Organization);
-		contextIdKeys.push(ContextIdKeys.User);
+		availableContextIdKeys.push({
+			key: ContextIdKeys.Organization,
+			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		});
+		availableContextIdKeys.push({
+			key: ContextIdKeys.User,
+			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		});
 
 		serverConfig.types.authenticationComponent ??= [];
 		serverConfig.types.authenticationComponent.push({

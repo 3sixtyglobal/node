@@ -228,7 +228,7 @@ describe("node-core", () => {
 				apiKey: expect.any(String),
 				label: "node-tenant",
 				dateCreated: expect.any(String),
-				partitionId: Converter.bytesToBase64(
+				partitionId: Converter.bytesToBase64Url(
 					Converter.hexToBytes(HexHelper.stripPrefix(Did.parse(identityDocumentStore[0].id).id))
 				)
 			}
@@ -270,7 +270,11 @@ describe("node-core", () => {
 			version: "0.0.0"
 		});
 
-		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual([
+			"engine-logging-service",
+			"did-context-id-handler",
+			"information-service"
+		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -398,6 +402,7 @@ describe("node-core", () => {
 			"synchronised-storage-service",
 			"federated-catalogue-service",
 			"data-space-connector-service",
+			"did-context-id-handler",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
 			"information-service"
@@ -805,7 +810,11 @@ describe("node-core", () => {
 		expect(extendEngineCalled).toBe(true);
 		expect(extendEngineServerCalled).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual([
+			"engine-logging-service",
+			"did-context-id-handler",
+			"information-service"
+		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -859,7 +868,11 @@ describe("node-core", () => {
 
 		expect(nodeEngineConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual([
+			"engine-logging-service",
+			"did-context-id-handler",
+			"information-service"
+		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -911,7 +924,11 @@ describe("node-core", () => {
 
 		expect(nodeEngineConfig.debug).toBe(true);
 
-		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual([
+			"engine-logging-service",
+			"did-context-id-handler",
+			"information-service"
+		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -1024,7 +1041,11 @@ describe("node-core", () => {
 			version: "0.0.0"
 		});
 
-		expect(ComponentFactory.names()).toEqual(["engine-logging-service", "information-service"]);
+		expect(ComponentFactory.names()).toEqual([
+			"engine-logging-service",
+			"did-context-id-handler",
+			"information-service"
+		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => r.path)).toEqual([
@@ -1367,7 +1388,6 @@ describe("node-core", () => {
 		await rm("./tests/extensions/cache-test.js", { force: true });
 	});
 
-	// Disabled until a compatible TWIN extension is published to npm
 	// test("should start node with real TWIN extension from npm protocol", async () => {
 	// 	const envVars: { [id: string]: string } = {
 	// 		TWIN_DEBUG: "true",
