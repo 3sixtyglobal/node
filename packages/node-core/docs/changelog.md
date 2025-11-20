@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.3](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.2...node-core-v0.0.3-next.3) (2025-11-20)
+
+
+### Features
+
+* updated context id features ([ef7be07](https://github.com/twinfoundation/node/commit/ef7be07d44dccdeacf10f90cb4ffde0303faa6fa))
+
 ## [0.0.3-next.2](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.1...node-core-v0.0.3-next.2) (2025-11-14)
 
 
