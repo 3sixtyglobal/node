@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.4](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.3...node-core-v0.0.3-next.4) (2025-11-24)
+
+
+### Bug Fixes
+
+* org identity verification methods ([18f158b](https://github.com/twinfoundation/node/commit/18f158b2f63930e20e94437c17ed43421771a458))
+
 ## [0.0.3-next.3](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.2...node-core-v0.0.3-next.3) (2025-11-20)
 
 

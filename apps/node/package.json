@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node",
-	"version": "0.0.3-next.3",
+	"version": "0.0.3-next.4",
 	"description": "TWIN Node serving APIs using the specified configuration",
 	"private": true,
 	"repository": {
@@ -31,7 +31,7 @@
 		"start": "node src/index.js"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "0.0.3-next.3"
+		"@twin.org/node-core": "0.0.3-next.4"
 	},
 	"devDependencies": {
 		"@twin.org/entity-storage-connector-memory": "next",
