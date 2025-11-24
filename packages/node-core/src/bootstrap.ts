@@ -233,30 +233,34 @@ export async function bootstrapNodeAdminUser(
 					nameofKebabCase<AuthenticationUser>()
 				);
 
-			// If we don't have an organization identity, create one
-			if (!Is.stringValue(context.state.nodeOrganizationId)) {
-				context.state.nodeOrganizationId = await createIdentity(
-					engineCore,
-					envVars,
-					context.state.nodeOrganizationId,
-					envVars.organizationMnemonic,
-					context.state.nodeId,
-					"organization",
-					features.includes(NodeFeatures.NodeWallet)
-				);
+			const existingOrganizationId =
+				envVars.organizationIdentity ?? context.state.nodeOrganizationId;
+
+			const orgId = await createIdentity(
+				engineCore,
+				envVars,
+				existingOrganizationId,
+				envVars.organizationMnemonic,
+				existingOrganizationId,
+				"organization",
+				features.includes(NodeFeatures.NodeWallet)
+			);
+			if (context.state.nodeOrganizationId !== orgId) {
+				context.state.nodeOrganizationId = orgId;
 				context.stateDirty = true;
 			}
 
-			if (!Is.stringValue(context.state.nodeAdminUserId)) {
-				context.state.nodeAdminUserId = await createIdentity(
-					engineCore,
-					envVars,
-					context.state.nodeAdminUserId,
-					envVars.adminUserMnemonic,
-					context.state.nodeOrganizationId,
-					"user",
-					false
-				);
+			const userId = await createIdentity(
+				engineCore,
+				envVars,
+				context.state.nodeAdminUserId,
+				envVars.adminUserMnemonic,
+				context.state.nodeOrganizationId,
+				"user",
+				false
+			);
+			if (context.state.nodeAdminUserId !== userId) {
+				context.state.nodeAdminUserId = userId;
 				context.stateDirty = true;
 			}
 
@@ -282,9 +286,13 @@ export async function bootstrapNodeAdminUser(
 				};
 
 				engineCore.logInfo(I18n.formatMessage("node.nodeAdminUserEmail", { email: adminEmail }));
-				engineCore.logInfo(
-					I18n.formatMessage("node.nodeAdminUserPassword", { password: generatedPassword })
-				);
+
+				const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
+				const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
+				const vaultKey = `${context.state.nodeAdminUserId}/admin-password`;
+				await vaultConnector.setSecret<string>(vaultKey, generatedPassword);
+
+				engineCore.logInfo(I18n.formatMessage("node.nodeAdminUserPassword", { vaultKey }));
 
 				await authUserEntityStorage.set(nodeAdminUser);
 			} else {

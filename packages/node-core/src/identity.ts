@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Converter, I18n, Is, RandomHelper, Urn } from "@twin.org/core";
+import { Converter, I18n, Is, RandomHelper, StringHelper, Urn } from "@twin.org/core";
 import { Bip39 } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { IdentityConnectorType, WalletConnectorType } from "@twin.org/engine-types";
@@ -50,7 +50,12 @@ export async function createIdentity(
 		configIdentity ?? `bootstrap-temp-${Converter.bytesToHex(RandomHelper.generate(16))}`;
 	const workingController = controller ?? workingIdentity;
 
-	await bootstrapMnemonic(engineCore, vaultConnector, workingIdentity, configMnemonic);
+	const mnemonicStored = await bootstrapMnemonic(
+		engineCore,
+		vaultConnector,
+		workingIdentity,
+		configMnemonic
+	);
 
 	const addresses = addWallet ? await generateWallet(engineCore, envVars, workingIdentity) : [];
 
@@ -61,6 +66,12 @@ export async function createIdentity(
 		workingIdentity,
 		identityType
 	);
+
+	if (mnemonicStored) {
+		engineCore.logInfo(
+			I18n.formatMessage("node.finalMnemonic", { vaultKey: `${finalIdentity}/mnemonic` })
+		);
+	}
 
 	await finaliseWallet(engineCore, envVars, finalIdentity, addresses);
 
@@ -75,20 +86,27 @@ export async function createIdentity(
  * @param vaultConnector The vault connector to use.
  * @param identity The identity of the node.
  * @param existingMnemonic An existing mnemonic to use.
+ * @returns Whether the mnemonic was stored.
  */
 async function bootstrapMnemonic(
 	engineCore: IEngineCore,
 	vaultConnector: IVaultConnector,
 	identity: string,
 	existingMnemonic?: string
-): Promise<void> {
+): Promise<boolean> {
 	let mnemonic = existingMnemonic;
 	let storeMnemonic = false;
 
+	const mnemonicKey = `${identity}/mnemonic`;
+
 	try {
-		const storedMnemonic = await vaultConnector.getSecret<string>(`${identity}/mnemonic`);
-		storeMnemonic = storedMnemonic !== mnemonic;
-		mnemonic = storedMnemonic;
+		const storedMnemonic = await vaultConnector.getSecret<string>(mnemonicKey);
+		if (Is.stringValue(storedMnemonic)) {
+			storeMnemonic = storedMnemonic !== mnemonic && !Is.empty(mnemonic);
+			mnemonic = storedMnemonic;
+		} else {
+			storeMnemonic = true;
+		}
 	} catch {
 		storeMnemonic = true;
 	}
@@ -97,16 +115,17 @@ async function bootstrapMnemonic(
 	if (Is.empty(mnemonic)) {
 		mnemonic = Bip39.randomMnemonic();
 		storeMnemonic = true;
-		engineCore.logInfo(I18n.formatMessage("node.generatingMnemonic", { mnemonic }));
 	}
 
 	// If there is no mnemonic stored in the vault then we need to store it
 	if (storeMnemonic) {
 		engineCore.logInfo(I18n.formatMessage("node.storingMnemonic"));
-		await vaultConnector.setSecret(`${identity}/mnemonic`, mnemonic);
+		await vaultConnector.setSecret(mnemonicKey, mnemonic);
 	} else {
 		engineCore.logInfo(I18n.formatMessage("node.existingMnemonic"));
 	}
+
+	return storeMnemonic;
 }
 
 /**
@@ -182,8 +201,11 @@ async function generateWallet(
 	if (balance === 0n) {
 		let address0 = addresses[0];
 
-		if (defaultWalletConnectorType.startsWith(WalletConnectorType.Iota)) {
-			address0 = `${envVars.iotaExplorerEndpoint}address/${address0}?network=${envVars.iotaNetwork}`;
+		if (
+			defaultWalletConnectorType.startsWith(WalletConnectorType.Iota) &&
+			Is.stringValue(envVars.iotaExplorerEndpoint)
+		) {
+			address0 = `${StringHelper.trimTrailingSlashes(envVars.iotaExplorerEndpoint)}/address/${address0}?network=${envVars.iotaNetwork}`;
 		}
 
 		engineCore.logInfo(I18n.formatMessage("node.fundingWallet", { address: address0 }));
@@ -246,11 +268,13 @@ async function generateIdentity(
 		const didParts = didUrn.parts();
 		const objectId = didParts[3];
 
-		engineCore.logInfo(
-			I18n.formatMessage("node.identityExplorer", {
-				url: `${envVars.iotaExplorerEndpoint}object/${objectId}?network=${envVars.iotaNetwork}`
-			})
-		);
+		if (Is.stringValue(envVars.iotaExplorerEndpoint)) {
+			engineCore.logInfo(
+				I18n.formatMessage("node.identityExplorer", {
+					url: `${StringHelper.trimTrailingSlashes(envVars.iotaExplorerEndpoint)}/object/${objectId}?network=${envVars.iotaNetwork}`
+				})
+			);
+		}
 	}
 	return identityDocument.id;
 }
