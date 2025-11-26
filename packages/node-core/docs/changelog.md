@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.5](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.4...node-core-v0.0.3-next.5) (2025-11-26)
+
+
+### Features
+
+* add support for dynamodb connection timeout ([63051b0](https://github.com/twinfoundation/node/commit/63051b0d22138079115dfac921e7f0c45eaad34e))
+
 ## [0.0.3-next.4](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.3...node-core-v0.0.3-next.4) (2025-11-24)
 
 
