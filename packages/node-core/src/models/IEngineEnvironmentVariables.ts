@@ -77,6 +77,11 @@ export interface IEngineEnvironmentVariables {
 	awsDynamodbSecretAccessKey?: string;
 
 	/**
+	 * AWS Dynamo DB connection timeout.
+	 */
+	awsDynamodbConnectionTimeoutMs?: string;
+
+	/**
 	 * Azure Cosmos DB key.
 	 */
 	azureCosmosdbKey?: string;

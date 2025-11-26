@@ -181,6 +181,18 @@ AWS Dynamo DB secret access key.
 
 ***
 
+### awsDynamodbConnectionTimeoutMs?
+
+> `optional` **awsDynamodbConnectionTimeoutMs**: `string`
+
+AWS Dynamo DB connection timeout.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`awsDynamodbConnectionTimeoutMs`](IEngineEnvironmentVariables.md#awsdynamodbconnectiontimeoutms)
+
+***
+
 ### azureCosmosdbKey?
 
 > `optional` **azureCosmosdbKey**: `string`

@@ -177,7 +177,8 @@ async function configureEntityStorage(
 					authMode: envVars.awsDynamodbAuthMode as "credentials" | "pod",
 					accessKeyId: envVars.awsDynamodbAccessKeyId,
 					secretAccessKey: envVars.awsDynamodbSecretAccessKey,
-					endpoint: envVars.awsDynamodbEndpoint
+					endpoint: envVars.awsDynamodbEndpoint,
+					connectionTimeoutMs: Coerce.integer(envVars.awsDynamodbConnectionTimeoutMs)
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
