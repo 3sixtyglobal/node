@@ -851,18 +851,6 @@ The type of logging task connector, can be a comma separated list: console, enti
 
 ***
 
-### backgroundTaskConnector?
-
-> `optional` **backgroundTaskConnector**: `string`
-
-The type of background task connector: entity-storage.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`backgroundTaskConnector`](IEngineServerEnvironmentVariables.md#backgroundtaskconnector)
-
-***
-
 ### eventBusConnector?
 
 > `optional` **eventBusConnector**: `string`
@@ -1455,27 +1443,15 @@ Is the federated catalogue enabled, defaults to false.
 
 ***
 
-### federatedCatalogueCacheTtlMs?
+### federatedCatalogueFilters?
 
-> `optional` **federatedCatalogueCacheTtlMs**: `number`
+> `optional` **federatedCatalogueFilters**: `string`
 
-Federated catalog TTL for the cache.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`federatedCatalogueCacheTtlMs`](IEngineServerEnvironmentVariables.md#federatedcataloguecachettlms)
-
-***
-
-### federatedCatalogueClearingHouseApproverList?
-
-> `optional` **federatedCatalogueClearingHouseApproverList**: `string`
-
-Federated catalog clearing house approver list, stringified array of DIDs.
+Federated catalog filters, command separated list of filters to add.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`federatedCatalogueClearingHouseApproverList`](IEngineServerEnvironmentVariables.md#federatedcatalogueclearinghouseapproverlist)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`federatedCatalogueFilters`](IEngineServerEnvironmentVariables.md#federatedcataloguefilters)
 
 ***
 
@@ -1591,6 +1567,18 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementOffers`](IEngineServerEnvironmentVariables.md#rightsmanagementoffers)
+
+***
+
+### backgroundTasksEnabled?
+
+> `optional` **backgroundTasksEnabled**: `string`
+
+Are background tasks enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`backgroundTasksEnabled`](IEngineServerEnvironmentVariables.md#backgroundtasksenabled)
 
 ***
 

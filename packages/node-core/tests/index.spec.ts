@@ -12,7 +12,6 @@ import {
 } from "@twin.org/engine-server-types";
 import {
 	AttestationConnectorType,
-	BackgroundTaskConnectorType,
 	BlobStorageConnectorType,
 	EntityStorageConnectorType,
 	EventBusComponentType,
@@ -30,6 +29,7 @@ import {
 } from "@twin.org/engine-types";
 import type { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@twin.org/entity-storage-models";
+import { FederatedCatalogueFilterFactory } from "@twin.org/federated-catalogue-models";
 import type {
 	IdentityDocument,
 	IdentityProfile
@@ -75,7 +75,6 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
-				TWIN_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -96,6 +95,7 @@ describe("node-core", () => {
 				TWIN_FEATURES: "",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
+				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true"
 			}
@@ -117,7 +117,6 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
-				TWIN_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -140,6 +139,7 @@ describe("node-core", () => {
 				TWIN_FEATURES: "node-identity",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
+				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
 				TWIN_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
@@ -147,6 +147,7 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
 					"@json:tests/rights-management-execution-actions.json",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "FilterByExample",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
@@ -173,7 +174,6 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
-				TWIN_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -196,6 +196,7 @@ describe("node-core", () => {
 				TWIN_FEATURES: "node-identity",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
+				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
 				TWIN_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
@@ -203,6 +204,7 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
 					"@json:tests/rights-management-execution-actions.json",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "FilterByExample",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
@@ -298,7 +300,6 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
 			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
-			TWIN_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
 			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -321,6 +322,7 @@ describe("node-core", () => {
 			TWIN_FEATURES: "node-identity,node-admin-user",
 			TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
+			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
 			TWIN_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
@@ -328,6 +330,7 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
 				"@json:tests/rights-management-execution-actions.json",
 			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
+			TWIN_FEDERATED_CATALOGUE_FILTERS: "FilterByExample",
 			TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 			TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
@@ -372,6 +375,7 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"logging-service",
+			"background-task-service",
 			"task-scheduler-service",
 			"event-bus-service",
 			"telemetry-service",
@@ -526,18 +530,8 @@ describe("node-core", () => {
 			"/rights-management/data/:assetType/query",
 			"/synchronised-storage/sync-changeset",
 			"/synchronised-storage/decryption-key",
-			"/federated-catalogue/participant-credentials",
-			"/federated-catalogue/service-offering-credentials",
-			"/federated-catalogue/data-resource-credentials",
-			"/federated-catalogue/data-space-connector-credentials",
-			"/federated-catalogue/participants",
-			"/federated-catalogue/participants/:id",
-			"/federated-catalogue/service-offerings",
-			"/federated-catalogue/service-offerings/:id",
-			"/federated-catalogue/data-resources",
-			"/federated-catalogue/data-resources/:id",
-			"/federated-catalogue/data-space-connectors",
-			"/federated-catalogue/data-space-connectors/:id",
+			"/federated-catalogue/request",
+			"/federated-catalogue/datasets/:datasetId",
 			"/data-space-connector/notify",
 			"/data-space-connector/activity-logs/:id",
 			"/data-space-connector/entities",
@@ -622,6 +616,8 @@ describe("node-core", () => {
 			const pxp = ComponentFactory.get("policy-execution-point-service");
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((pxp as any)._executionActions.before.length).toEqual(1);
+
+			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
 		}
 
 		await startResult?.shutdown();
@@ -634,7 +630,6 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
-			TWIN_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
 			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -651,6 +646,7 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_FEATURES: "node-identity,node-admin-user",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
+			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
 			TWIN_VC_AUTHENTICATION_ENABLED: "true"
@@ -1403,7 +1399,7 @@ describe("node-core", () => {
 	// 			"activity-log-details": "memory",
 	// 			"activity-task": "memory"
 	// 		}),
-	// 		TWIN_BACKGROUND_TASK_CONNECTOR: BackgroundTaskConnectorType.EntityStorage,
+	// 		TWIN_BACKGROUND_TASKS_ENABLED: "true",
 	// 		TWIN_TASK_SCHEDULER_ENABLED: "true"
 	// 	};
 

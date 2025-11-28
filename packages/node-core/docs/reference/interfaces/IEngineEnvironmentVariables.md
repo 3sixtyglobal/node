@@ -571,14 +571,6 @@ The type of logging task connector, can be a comma separated list: console, enti
 
 ***
 
-### backgroundTaskConnector?
-
-> `optional` **backgroundTaskConnector**: `string`
-
-The type of background task connector: entity-storage.
-
-***
-
 ### eventBusConnector?
 
 > `optional` **eventBusConnector**: `string`
@@ -983,19 +975,11 @@ Is the federated catalogue enabled, defaults to false.
 
 ***
 
-### federatedCatalogueCacheTtlMs?
+### federatedCatalogueFilters?
 
-> `optional` **federatedCatalogueCacheTtlMs**: `number`
+> `optional` **federatedCatalogueFilters**: `string`
 
-Federated catalog TTL for the cache.
-
-***
-
-### federatedCatalogueClearingHouseApproverList?
-
-> `optional` **federatedCatalogueClearingHouseApproverList**: `string`
-
-Federated catalog clearing house approver list, stringified array of DIDs.
+Federated catalog filters, command separated list of filters to add.
 
 ***
 
@@ -1075,6 +1059,14 @@ Use the @json: prefix to specify the path to the JSON configuration file.
 
 The rights management configuration which includes the offer modules to load.
 Use the @json: prefix to specify the path to the JSON configuration file.
+
+***
+
+### backgroundTasksEnabled?
+
+> `optional` **backgroundTasksEnabled**: `string`
+
+Are background tasks enabled, defaults to false.
 
 ***
 

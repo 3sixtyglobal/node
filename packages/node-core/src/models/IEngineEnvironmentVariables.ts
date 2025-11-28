@@ -359,11 +359,6 @@ export interface IEngineEnvironmentVariables {
 	loggingConnector?: string;
 
 	/**
-	 * The type of background task connector: entity-storage.
-	 */
-	backgroundTaskConnector?: string;
-
-	/**
 	 * The type of event bus connector: local.
 	 */
 	eventBusConnector?: string;
@@ -607,14 +602,9 @@ export interface IEngineEnvironmentVariables {
 	federatedCatalogueEnabled?: string;
 
 	/**
-	 * Federated catalog TTL for the cache.
+	 * Federated catalog filters, command separated list of filters to add.
 	 */
-	federatedCatalogueCacheTtlMs?: number;
-
-	/**
-	 * Federated catalog clearing house approver list, stringified array of DIDs.
-	 */
-	federatedCatalogueClearingHouseApproverList?: string;
+	federatedCatalogueFilters?: string;
 
 	/**
 	 * Is the rights management enabled, defaults to false.
@@ -667,6 +657,11 @@ export interface IEngineEnvironmentVariables {
 	 * Use the @json: prefix to specify the path to the JSON configuration file.
 	 */
 	rightsManagementOffers?: string;
+
+	/**
+	 * Are background tasks enabled, defaults to false.
+	 */
+	backgroundTasksEnabled?: string;
 
 	/**
 	 * Is the task scheduler enabled, defaults to false.

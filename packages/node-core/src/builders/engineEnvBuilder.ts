@@ -10,7 +10,7 @@ import {
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
 	AuthenticationGeneratorComponentType,
-	BackgroundTaskConnectorType,
+	BackgroundTaskComponentType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
 	ContextIdHandlerComponentType,
@@ -27,6 +27,7 @@ import {
 	EventBusConnectorType,
 	FaucetConnectorType,
 	FederatedCatalogueComponentType,
+	FederatedCatalogueFilterComponentType,
 	IdentityComponentType,
 	IdentityConnectorType,
 	IdentityProfileComponentType,
@@ -525,11 +526,11 @@ async function configureBackgroundTask(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	coreConfig.types.backgroundTaskConnector ??= [];
+	coreConfig.types.backgroundTaskComponent ??= [];
 
-	if (envVars.backgroundTaskConnector === BackgroundTaskConnectorType.EntityStorage) {
-		coreConfig.types.backgroundTaskConnector.push({
-			type: BackgroundTaskConnectorType.EntityStorage
+	if (Coerce.boolean(envVars.backgroundTasksEnabled) ?? false) {
+		coreConfig.types.backgroundTaskComponent.push({
+			type: BackgroundTaskComponentType.Service
 		});
 	}
 }
@@ -1308,14 +1309,27 @@ async function configureFederatedCatalogue(
 		coreConfig.types.federatedCatalogueComponent ??= [];
 		coreConfig.types.federatedCatalogueComponent.push({
 			type: FederatedCatalogueComponentType.Service,
-			options: {
-				config: {
-					subResourceCacheTtlMs: Coerce.number(envVars.federatedCatalogueCacheTtlMs),
-					clearingHouseApproverList:
-						Coerce.object<string[]>(envVars.federatedCatalogueClearingHouseApproverList) ?? []
-				}
-			}
+			options: {}
 		});
+
+		coreConfig.types.federatedCatalogueFilterComponent ??= [];
+		const filters = (envVars.federatedCatalogueFilters ?? "")
+			.split(",")
+			.map(filter => filter.trim())
+			.filter(filter => filter.length > 0);
+
+		for (const filter of filters) {
+			const type =
+				FederatedCatalogueFilterComponentType[
+					filter as keyof typeof FederatedCatalogueFilterComponentType
+				];
+			if (type) {
+				coreConfig.types.federatedCatalogueFilterComponent.push({
+					type,
+					options: {}
+				});
+			}
+		}
 	}
 }
 
