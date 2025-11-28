@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.6](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.5...node-core-v0.0.3-next.6) (2025-11-28)
+
+
+### Features
+
+* update background tasks and add fedcat filters ([1fd297e](https://github.com/twinfoundation/node/commit/1fd297e29f60b5bb3909638b68e326c5b0e2d77d))
+
 ## [0.0.3-next.5](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.4...node-core-v0.0.3-next.5) (2025-11-26)
 
 
