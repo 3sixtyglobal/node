@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.7](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.6...node-v0.0.3-next.7) (2025-12-04)
+
+
+### Features
+
+* add trust and rights management plugin support ([cdeb504](https://github.com/twinfoundation/node/commit/cdeb504ee5986a347466162b9afa781645b4a54c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.6 to 0.0.3-next.7
+
 ## [0.0.3-next.6](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.5...node-v0.0.3-next.6) (2025-11-28)
 
 

@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.7](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.6...node-core-v0.0.3-next.7) (2025-12-04)
+
+
+### Features
+
+* add trust and rights management plugin support ([cdeb504](https://github.com/twinfoundation/node/commit/cdeb504ee5986a347466162b9afa781645b4a54c))
+
 ## [0.0.3-next.6](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.5...node-core-v0.0.3-next.6) (2025-11-28)
 
 
