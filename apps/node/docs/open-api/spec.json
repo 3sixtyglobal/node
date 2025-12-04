@@ -17843,7 +17843,7 @@
 						}
 					}
 				],
-				"description": "The Dataspace Protocol Protocol JSON-LD context type."
+				"description": "The Dataspace Protocol JSON-LD context type."
 			},
 			"DateTimeType": {
 				"type": "string",
@@ -18126,7 +18126,7 @@
 						"description": "The format of the document identifier."
 					},
 					"documentCode": {
-						"$ref": "https://schema.twindev.org/unece/UneceDocumentCodes"
+						"$ref": "https://schema.twindev.org/documents/DocumentCodeList"
 					},
 					"blob": {
 						"type": "string",

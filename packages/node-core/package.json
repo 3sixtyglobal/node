@@ -48,6 +48,7 @@
 		"@twin.org/modules": "next",
 		"@twin.org/rights-management-rest-client": "next",
 		"@twin.org/standards-w3c-odrl": "next",
+		"@twin.org/trust-models": "next",
 		"@twin.org/vault-models": "next",
 		"@twin.org/wallet-models": "next",
 		"dotenv": "17.2.3",

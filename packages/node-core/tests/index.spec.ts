@@ -35,6 +35,16 @@ import type {
 	IdentityProfile
 } from "@twin.org/identity-connector-entity-storage";
 import { Did } from "@twin.org/identity-models";
+import {
+	DataAccessHandlerFactory,
+	PolicyArbiterFactory,
+	PolicyEnforcementProcessorFactory,
+	PolicyExecutionActionFactory,
+	PolicyInformationSourceFactory,
+	PolicyNegotiatorFactory,
+	PolicyRequesterFactory
+} from "@twin.org/rights-management-models";
+import { TrustGeneratorFactory, TrustVerifierFactory } from "@twin.org/trust-models";
 import type { VaultKey, VaultSecret } from "@twin.org/vault-connector-entity-storage";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
@@ -140,14 +150,20 @@ describe("node-core", () => {
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
+				TWIN_TRUST_ENABLED: "true",
+				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
+				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
-				TWIN_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
-					"@json:tests/rights-management-information-sources.json",
-				TWIN_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
-					"@json:tests/rights-management-execution-actions.json",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
-				TWIN_FEDERATED_CATALOGUE_FILTERS: "FilterByExample",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
@@ -197,14 +213,20 @@ describe("node-core", () => {
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
+				TWIN_TRUST_ENABLED: "true",
+				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
+				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
-				TWIN_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
-					"@json:tests/rights-management-information-sources.json",
-				TWIN_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
-					"@json:tests/rights-management-execution-actions.json",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
-				TWIN_FEDERATED_CATALOGUE_FILTERS: "FilterByExample",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
@@ -323,14 +345,20 @@ describe("node-core", () => {
 			TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_BACKGROUND_TASKS_ENABLED: "true",
+			TWIN_TRUST_ENABLED: "true",
+			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
+			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
-			TWIN_RIGHTS_MANAGEMENT_INFORMATION_SOURCES:
-				"@json:tests/rights-management-information-sources.json",
-			TWIN_RIGHTS_MANAGEMENT_EXECUTION_ACTIONS:
-				"@json:tests/rights-management-execution-actions.json",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
-			TWIN_FEDERATED_CATALOGUE_FILTERS: "FilterByExample",
+			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 			TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 			TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
@@ -393,6 +421,7 @@ describe("node-core", () => {
 			"auditable-item-stream-service",
 			"data-processing-service",
 			"document-management-service",
+			"trust-service",
 			"policy-administration-point-service",
 			"policy-management-point-service",
 			"policy-execution-point-service",
@@ -609,15 +638,23 @@ describe("node-core", () => {
 				"https://twin.example.org/app1"
 			);
 
-			const pip = ComponentFactory.get("policy-information-point-service");
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			expect((pip as any)._sources.length).toEqual(2);
-
-			const pxp = ComponentFactory.get("policy-execution-point-service");
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			expect((pxp as any)._executionActions.before.length).toEqual(1);
-
 			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
+
+			expect(DataAccessHandlerFactory.names()).toEqual(["example-data-access-handler"]);
+			expect(PolicyArbiterFactory.names()).toEqual(["example-policy-arbiter"]);
+			expect(PolicyEnforcementProcessorFactory.names()).toEqual([
+				"example-policy-enforcement-processor"
+			]);
+			expect(PolicyExecutionActionFactory.names()).toEqual(["logging-policy-execution-action"]);
+			expect(PolicyInformationSourceFactory.names()).toEqual([
+				"static-policy-information-source",
+				"identity-policy-information-source"
+			]);
+			expect(PolicyNegotiatorFactory.names()).toEqual(["example-policy-negotiator"]);
+			expect(PolicyRequesterFactory.names()).toEqual(["example-policy-requester"]);
+
+			expect(TrustGeneratorFactory.names()).toEqual(["jwt-verifiable-credential-generator"]);
+			expect(TrustVerifierFactory.names()).toEqual(["jwt-verifiable-credential-verifier"]);
 		}
 
 		await startResult?.shutdown();
@@ -647,8 +684,18 @@ describe("node-core", () => {
 			TWIN_FEATURES: "node-identity,node-admin-user",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_BACKGROUND_TASKS_ENABLED: "true",
+			TWIN_TRUST_ENABLED: "true",
+			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
+			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
+			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 			TWIN_VC_AUTHENTICATION_ENABLED: "true"
 		};
 

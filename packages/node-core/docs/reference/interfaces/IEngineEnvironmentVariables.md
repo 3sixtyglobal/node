@@ -983,6 +983,39 @@ Federated catalog filters, command separated list of filters to add.
 
 ***
 
+### trustEnabled?
+
+> `optional` **trustEnabled**: `string`
+
+Is the trust management enabled, defaults to false.
+
+***
+
+### trustGenerators?
+
+> `optional` **trustGenerators**: `string`
+
+The trust generators to add to the factory, comma separated list.
+
+***
+
+### trustVerifiers?
+
+> `optional` **trustVerifiers**: `string`
+
+The trust verifiers to add to the factory, comma separated list.
+
+***
+
+### trustVerificationMethodId?
+
+> `optional` **trustVerificationMethodId**: `string`
+
+The verification method to use for trust identities.
+Defaults to node-authentication-assertion.
+
+***
+
 ### rightsManagementEnabled?
 
 > `optional` **rightsManagementEnabled**: `string`
@@ -999,66 +1032,59 @@ What is the base callback url for rights management negotiations e.g. https://my
 
 ***
 
-### rightsManagementInformationSources?
+### rightsManagementPolicyInformationSources?
 
-> `optional` **rightsManagementInformationSources**: `string`
+> `optional` **rightsManagementPolicyInformationSources**: `string`
 
-The rights management configuration which includes the information sources modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
-
-***
-
-### rightsManagementNegotiators?
-
-> `optional` **rightsManagementNegotiators**: `string`
-
-The rights management configuration which includes the negotiator modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy information sources to add to the factory.
 
 ***
 
-### rightsManagementRequesters?
+### rightsManagementPolicyNegotiators?
 
-> `optional` **rightsManagementRequesters**: `string`
+> `optional` **rightsManagementPolicyNegotiators**: `string`
 
-The rights management configuration which includes the requester modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
-
-***
-
-### rightsManagementExecutionActions?
-
-> `optional` **rightsManagementExecutionActions**: `string`
-
-The rights management configuration which includes the execution actions modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy negotiators sources to add to the factory.
 
 ***
 
-### rightsManagementEnforcementProcessors?
+### rightsManagementPolicyRequesters?
 
-> `optional` **rightsManagementEnforcementProcessors**: `string`
+> `optional` **rightsManagementPolicyRequesters**: `string`
 
-The rights management configuration which includes the enforcement processor modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
-
-***
-
-### rightsManagementArbiters?
-
-> `optional` **rightsManagementArbiters**: `string`
-
-The rights management configuration which includes the arbiter modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy requesters to add to the factory.
 
 ***
 
-### rightsManagementOffers?
+### rightsManagementPolicyExecutionActions?
 
-> `optional` **rightsManagementOffers**: `string`
+> `optional` **rightsManagementPolicyExecutionActions**: `string`
 
-The rights management configuration which includes the offer modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy execution actions to add to the factory.
+
+***
+
+### rightsManagementPolicyEnforcementProcessors?
+
+> `optional` **rightsManagementPolicyEnforcementProcessors**: `string`
+
+The rights management policy enforcement processors to add to the factory.
+
+***
+
+### rightsManagementPolicyArbiters?
+
+> `optional` **rightsManagementPolicyArbiters**: `string`
+
+The rights management policy arbiters to add to the factory.
+
+***
+
+### rightsManagementDataAccessHandlers?
+
+> `optional` **rightsManagementDataAccessHandlers**: `string`
+
+The rights management data access handlers to add to the factory.
 
 ***
 

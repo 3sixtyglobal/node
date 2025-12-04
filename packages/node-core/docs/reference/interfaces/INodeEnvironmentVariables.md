@@ -1455,6 +1455,55 @@ Federated catalog filters, command separated list of filters to add.
 
 ***
 
+### trustEnabled?
+
+> `optional` **trustEnabled**: `string`
+
+Is the trust management enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustEnabled`](IEngineServerEnvironmentVariables.md#trustenabled)
+
+***
+
+### trustGenerators?
+
+> `optional` **trustGenerators**: `string`
+
+The trust generators to add to the factory, comma separated list.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustGenerators`](IEngineServerEnvironmentVariables.md#trustgenerators)
+
+***
+
+### trustVerifiers?
+
+> `optional` **trustVerifiers**: `string`
+
+The trust verifiers to add to the factory, comma separated list.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustVerifiers`](IEngineServerEnvironmentVariables.md#trustverifiers)
+
+***
+
+### trustVerificationMethodId?
+
+> `optional` **trustVerificationMethodId**: `string`
+
+The verification method to use for trust identities.
+Defaults to node-authentication-assertion.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustVerificationMethodId`](IEngineServerEnvironmentVariables.md#trustverificationmethodid)
+
+***
+
 ### rightsManagementEnabled?
 
 > `optional` **rightsManagementEnabled**: `string`
@@ -1479,94 +1528,87 @@ What is the base callback url for rights management negotiations e.g. https://my
 
 ***
 
-### rightsManagementInformationSources?
+### rightsManagementPolicyInformationSources?
 
-> `optional` **rightsManagementInformationSources**: `string`
+> `optional` **rightsManagementPolicyInformationSources**: `string`
 
-The rights management configuration which includes the information sources modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy information sources to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementInformationSources`](IEngineServerEnvironmentVariables.md#rightsmanagementinformationsources)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementPolicyInformationSources`](IEngineServerEnvironmentVariables.md#rightsmanagementpolicyinformationsources)
 
 ***
 
-### rightsManagementNegotiators?
+### rightsManagementPolicyNegotiators?
 
-> `optional` **rightsManagementNegotiators**: `string`
+> `optional` **rightsManagementPolicyNegotiators**: `string`
 
-The rights management configuration which includes the negotiator modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy negotiators sources to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementNegotiators`](IEngineServerEnvironmentVariables.md#rightsmanagementnegotiators)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementPolicyNegotiators`](IEngineServerEnvironmentVariables.md#rightsmanagementpolicynegotiators)
 
 ***
 
-### rightsManagementRequesters?
+### rightsManagementPolicyRequesters?
 
-> `optional` **rightsManagementRequesters**: `string`
+> `optional` **rightsManagementPolicyRequesters**: `string`
 
-The rights management configuration which includes the requester modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy requesters to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementRequesters`](IEngineServerEnvironmentVariables.md#rightsmanagementrequesters)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementPolicyRequesters`](IEngineServerEnvironmentVariables.md#rightsmanagementpolicyrequesters)
 
 ***
 
-### rightsManagementExecutionActions?
+### rightsManagementPolicyExecutionActions?
 
-> `optional` **rightsManagementExecutionActions**: `string`
+> `optional` **rightsManagementPolicyExecutionActions**: `string`
 
-The rights management configuration which includes the execution actions modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy execution actions to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementExecutionActions`](IEngineServerEnvironmentVariables.md#rightsmanagementexecutionactions)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementPolicyExecutionActions`](IEngineServerEnvironmentVariables.md#rightsmanagementpolicyexecutionactions)
 
 ***
 
-### rightsManagementEnforcementProcessors?
+### rightsManagementPolicyEnforcementProcessors?
 
-> `optional` **rightsManagementEnforcementProcessors**: `string`
+> `optional` **rightsManagementPolicyEnforcementProcessors**: `string`
 
-The rights management configuration which includes the enforcement processor modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy enforcement processors to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementEnforcementProcessors`](IEngineServerEnvironmentVariables.md#rightsmanagementenforcementprocessors)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementPolicyEnforcementProcessors`](IEngineServerEnvironmentVariables.md#rightsmanagementpolicyenforcementprocessors)
 
 ***
 
-### rightsManagementArbiters?
+### rightsManagementPolicyArbiters?
 
-> `optional` **rightsManagementArbiters**: `string`
+> `optional` **rightsManagementPolicyArbiters**: `string`
 
-The rights management configuration which includes the arbiter modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management policy arbiters to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementArbiters`](IEngineServerEnvironmentVariables.md#rightsmanagementarbiters)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementPolicyArbiters`](IEngineServerEnvironmentVariables.md#rightsmanagementpolicyarbiters)
 
 ***
 
-### rightsManagementOffers?
+### rightsManagementDataAccessHandlers?
 
-> `optional` **rightsManagementOffers**: `string`
+> `optional` **rightsManagementDataAccessHandlers**: `string`
 
-The rights management configuration which includes the offer modules to load.
-Use the @json: prefix to specify the path to the JSON configuration file.
+The rights management data access handlers to add to the factory.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementOffers`](IEngineServerEnvironmentVariables.md#rightsmanagementoffers)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementDataAccessHandlers`](IEngineServerEnvironmentVariables.md#rightsmanagementdataaccesshandlers)
 
 ***
 

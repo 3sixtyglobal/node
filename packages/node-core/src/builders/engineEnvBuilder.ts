@@ -3,7 +3,6 @@
 import path from "node:path";
 import { Coerce, Is } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import type { IEngineModuleConfig } from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -14,8 +13,8 @@ import {
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
 	ContextIdHandlerComponentType,
-	DataConverterConnectorType,
-	DataExtractorConnectorType,
+	type DataConverterConnectorType,
+	type DataExtractorConnectorType,
 	DataProcessingComponentType,
 	DataSpaceConnectorComponentType,
 	type DltConfig,
@@ -27,7 +26,7 @@ import {
 	EventBusConnectorType,
 	FaucetConnectorType,
 	FederatedCatalogueComponentType,
-	FederatedCatalogueFilterComponentType,
+	type FederatedCatalogueFilterComponentType,
 	IdentityComponentType,
 	IdentityConnectorType,
 	IdentityProfileComponentType,
@@ -47,6 +46,7 @@ import {
 	NftConnectorType,
 	RightsManagementDapComponentType,
 	RightsManagementDarpComponentType,
+	type RightsManagementDataAccessHandlerComponentType,
 	RightsManagementPapComponentType,
 	RightsManagementPdpComponentType,
 	RightsManagementPepComponentType,
@@ -54,12 +54,21 @@ import {
 	RightsManagementPmpComponentType,
 	RightsManagementPnapComponentType,
 	RightsManagementPnpComponentType,
+	type RightsManagementPolicyArbiterComponentType,
+	type RightsManagementPolicyEnforcementProcessorComponentType,
+	type RightsManagementPolicyExecutionActionComponentType,
+	type RightsManagementPolicyInformationSourceComponentType,
+	type RightsManagementPolicyNegotiatorComponentType,
+	type RightsManagementPolicyRequesterComponentType,
 	RightsManagementPxpComponentType,
 	SynchronisedStorageComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
 	TenantAdminComponentType,
+	TrustComponentType,
+	type TrustGeneratorComponentType,
+	type TrustVerifierComponentType,
 	VaultConnectorType,
 	VerifiableStorageComponentType,
 	VerifiableStorageConnectorType,
@@ -69,7 +78,6 @@ import {
 	DataAccessPointRestClient,
 	PolicyNegotiationPointRestClient
 } from "@twin.org/rights-management-rest-client";
-import type { IOdrlOffer } from "@twin.org/standards-w3c-odrl";
 import {
 	ATTESTATION_VERIFICATION_METHOD_ID,
 	BLOB_STORAGE_ENCRYPTION_KEY_ID,
@@ -131,6 +139,7 @@ export async function buildEngineConfiguration(
 	await configureAuditableItemStream(coreConfig, envVars);
 	await configureDocumentManagement(coreConfig, envVars);
 	await configureVerifiableCredentialAuthentication(coreConfig, envVars);
+	await configureTrust(coreConfig, envVars);
 	await configureRightsManagement(coreConfig, envVars);
 	await configureSynchronisedStorage(coreConfig, envVars);
 	await configureFederatedCatalogue(coreConfig, envVars);
@@ -151,7 +160,9 @@ async function configureEntityStorage(
 	coreConfig.types ??= {};
 	coreConfig.types.entityStorageConnector ??= [];
 
-	const entityStorageConnectorTypes = envVars.entityStorageConnectorType?.split(",") ?? [];
+	const entityStorageConnectorTypes = commaSeparatedListToArray<EntityStorageConnectorType>(
+		envVars.entityStorageConnectorType
+	);
 
 	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Memory)) {
 		coreConfig.types.entityStorageConnector.push({
@@ -222,7 +233,7 @@ async function configureEntityStorage(
 			type: EntityStorageConnectorType.ScyllaDb,
 			options: {
 				config: {
-					hosts: envVars.scylladbHosts?.split(",") ?? [],
+					hosts: commaSeparatedListToArray(envVars.scylladbHosts),
 					localDataCenter: envVars.scylladbLocalDataCenter ?? "",
 					keyspace: envVars.scylladbKeyspace ?? "",
 					port: Coerce.integer(envVars.scylladbPort)
@@ -314,7 +325,7 @@ async function configureBlobStorage(
 ): Promise<void> {
 	coreConfig.types.blobStorageConnector ??= [];
 
-	const blobStorageConnectorTypes = envVars.blobStorageConnectorType?.split(",") ?? [];
+	const blobStorageConnectorTypes = commaSeparatedListToArray(envVars.blobStorageConnectorType);
 
 	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.Memory)) {
 		coreConfig.types.blobStorageConnector.push({
@@ -442,7 +453,9 @@ async function configureLogging(
 ): Promise<void> {
 	coreConfig.types.loggingConnector ??= [];
 
-	const loggingConnectorTypes = (envVars.loggingConnector ?? "").split(",");
+	const loggingConnectorTypes = commaSeparatedListToArray<LoggingConnectorType>(
+		envVars.loggingConnector
+	);
 	let additionalConnectorCount = 0;
 
 	for (const loggingConnector of loggingConnectorTypes) {
@@ -1043,27 +1056,19 @@ async function configureDataProcessing(
 
 		coreConfig.types.dataConverterConnector ??= [];
 
-		const converterConnectors = envVars.dataConverterConnectors?.split(",") ?? [];
+		const converterConnectors = commaSeparatedListToArray(envVars.dataConverterConnectors);
 		for (const converterConnector of converterConnectors) {
-			if (converterConnector === DataConverterConnectorType.Json) {
-				coreConfig.types.dataConverterConnector.push({
-					type: DataConverterConnectorType.Json
-				});
-			} else if (converterConnector === DataConverterConnectorType.Xml) {
-				coreConfig.types.dataConverterConnector.push({
-					type: DataConverterConnectorType.Xml
-				});
-			}
+			coreConfig.types.dataConverterConnector.push({
+				type: converterConnector as DataConverterConnectorType
+			});
 		}
 
 		coreConfig.types.dataExtractorConnector ??= [];
-		const extractorConnectors = envVars.dataExtractorConnectors?.split(",") ?? [];
+		const extractorConnectors = commaSeparatedListToArray(envVars.dataExtractorConnectors);
 		for (const extractorConnector of extractorConnectors) {
-			if (extractorConnector === DataExtractorConnectorType.JsonPath) {
-				coreConfig.types.dataExtractorConnector.push({
-					type: DataExtractorConnectorType.JsonPath
-				});
-			}
+			coreConfig.types.dataExtractorConnector.push({
+				type: extractorConnector as DataExtractorConnectorType
+			});
 		}
 	}
 }
@@ -1111,6 +1116,45 @@ async function configureVerifiableCredentialAuthentication(
 }
 
 /**
+ * Configures the trust components.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureTrust(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	if (Coerce.boolean(envVars.trustEnabled) ?? false) {
+		coreConfig.types.trustComponent ??= [];
+		coreConfig.types.trustComponent.push({
+			type: TrustComponentType.Service
+		});
+
+		coreConfig.types.trustGeneratorComponent ??= [];
+		const trustGeneratorTypes = commaSeparatedListToArray(envVars.trustGenerators);
+		for (const trustGeneratorType of trustGeneratorTypes) {
+			coreConfig.types.trustGeneratorComponent.push({
+				type: trustGeneratorType as TrustGeneratorComponentType,
+				options: {
+					config: {
+						verificationMethodId:
+							envVars.trustVerificationMethodId ?? VC_AUTHENTICATION_VERIFICATION_METHOD_ID
+					}
+				}
+			});
+		}
+
+		coreConfig.types.trustVerifierComponent ??= [];
+		const trustVerifierTypes = commaSeparatedListToArray(envVars.trustVerifiers);
+		for (const trustVerifierType of trustVerifierTypes) {
+			coreConfig.types.trustVerifierComponent.push({
+				type: trustVerifierType as TrustVerifierComponentType
+			});
+		}
+	}
+}
+
+/**
  * Configures the rights management.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -1132,69 +1176,30 @@ async function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPipComponent ??= [];
 		coreConfig.types.rightsManagementPipComponent.push({
-			type: RightsManagementPipComponentType.Service,
-			options: {
-				informationModulesConfig: Is.arrayValue<IEngineModuleConfig>(
-					envVars.rightsManagementInformationSources
-				)
-					? envVars.rightsManagementInformationSources
-					: undefined
-			}
+			type: RightsManagementPipComponentType.Service
 		});
 
 		coreConfig.types.rightsManagementPxpComponent ??= [];
 		coreConfig.types.rightsManagementPxpComponent.push({
-			type: RightsManagementPxpComponentType.Service,
-			options: {
-				actionModulesConfig: Is.arrayValue<IEngineModuleConfig>(
-					envVars.rightsManagementExecutionActions
-				)
-					? envVars.rightsManagementExecutionActions
-					: undefined
-			}
+			type: RightsManagementPxpComponentType.Service
 		});
 
 		coreConfig.types.rightsManagementPdpComponent ??= [];
 		coreConfig.types.rightsManagementPdpComponent.push({
-			type: RightsManagementPdpComponentType.Service,
-			options: {
-				arbiterModulesConfig: Is.arrayValue<IEngineModuleConfig>(envVars.rightsManagementArbiters)
-					? envVars.rightsManagementArbiters
-					: undefined
-			}
+			type: RightsManagementPdpComponentType.Service
 		});
 
 		coreConfig.types.rightsManagementPepComponent ??= [];
 		coreConfig.types.rightsManagementPepComponent.push({
-			type: RightsManagementPepComponentType.Service,
-			options: {
-				processorModulesConfig: Is.arrayValue<IEngineModuleConfig>(
-					envVars.rightsManagementEnforcementProcessors
-				)
-					? envVars.rightsManagementEnforcementProcessors
-					: undefined
-			}
+			type: RightsManagementPepComponentType.Service
 		});
 
 		coreConfig.types.rightsManagementPnpComponent ??= [];
 		coreConfig.types.rightsManagementPnpComponent.push({
 			type: RightsManagementPnpComponentType.Service,
 			options: {
-				negotiatorModulesConfig: Is.arrayValue<IEngineModuleConfig>(
-					envVars.rightsManagementNegotiators
-				)
-					? envVars.rightsManagementNegotiators
-					: undefined,
-				requesterModulesConfig: Is.arrayValue<IEngineModuleConfig>(
-					envVars.rightsManagementRequesters
-				)
-					? envVars.rightsManagementRequesters
-					: undefined,
 				config: {
 					baseCallbackUrl: envVars.rightsManagementBaseCallbackUrl ?? "",
-					offers: Is.arrayValue<IOdrlOffer>(envVars.rightsManagementOffers)
-						? envVars.rightsManagementOffers
-						: [],
 					negotiationComponentCreator: async url =>
 						new PolicyNegotiationPointRestClient({ endpoint: url })
 				}
@@ -1220,6 +1225,74 @@ async function configureRightsManagement(
 				}
 			}
 		});
+
+		coreConfig.types.rightsManagementDataAccessHandlerComponent ??= [];
+		const dataAccessHandlerTypes = commaSeparatedListToArray(
+			envVars.rightsManagementDataAccessHandlers
+		);
+		for (const dataAccessHandlerType of dataAccessHandlerTypes) {
+			coreConfig.types.rightsManagementDataAccessHandlerComponent.push({
+				type: dataAccessHandlerType as RightsManagementDataAccessHandlerComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyArbiterComponent ??= [];
+		const policyArbiterTypes = commaSeparatedListToArray(envVars.rightsManagementPolicyArbiters);
+		for (const policyArbiterType of policyArbiterTypes) {
+			coreConfig.types.rightsManagementPolicyArbiterComponent.push({
+				type: policyArbiterType as RightsManagementPolicyArbiterComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyEnforcementProcessorComponent ??= [];
+		const policyEnforcementProcessTypes = commaSeparatedListToArray(
+			envVars.rightsManagementPolicyEnforcementProcessors
+		);
+		for (const policyEnforcementProcessorType of policyEnforcementProcessTypes) {
+			coreConfig.types.rightsManagementPolicyEnforcementProcessorComponent.push({
+				type: policyEnforcementProcessorType as RightsManagementPolicyEnforcementProcessorComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyExecutionActionComponent ??= [];
+		const policyExecutionActionTypes = commaSeparatedListToArray(
+			envVars.rightsManagementPolicyExecutionActions
+		);
+		for (const policyExecutionActionType of policyExecutionActionTypes) {
+			coreConfig.types.rightsManagementPolicyExecutionActionComponent.push({
+				type: policyExecutionActionType as RightsManagementPolicyExecutionActionComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyInformationSourceComponent ??= [];
+		const policyInformationSourceTypes = commaSeparatedListToArray(
+			envVars.rightsManagementPolicyInformationSources
+		);
+		for (const policyInformationSourceType of policyInformationSourceTypes) {
+			coreConfig.types.rightsManagementPolicyInformationSourceComponent.push({
+				type: policyInformationSourceType as RightsManagementPolicyInformationSourceComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyRequesterComponent ??= [];
+		const policyRequesterTypes = commaSeparatedListToArray(
+			envVars.rightsManagementPolicyRequesters
+		);
+		for (const policyRequesterType of policyRequesterTypes) {
+			coreConfig.types.rightsManagementPolicyRequesterComponent.push({
+				type: policyRequesterType as RightsManagementPolicyRequesterComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyNegotiatorComponent ??= [];
+		const policyNegotiatorTypes = commaSeparatedListToArray(
+			envVars.rightsManagementPolicyNegotiators
+		);
+		for (const policyNegotiatorType of policyNegotiatorTypes) {
+			coreConfig.types.rightsManagementPolicyNegotiatorComponent.push({
+				type: policyNegotiatorType as RightsManagementPolicyNegotiatorComponentType
+			});
+		}
 	}
 }
 
@@ -1313,22 +1386,13 @@ async function configureFederatedCatalogue(
 		});
 
 		coreConfig.types.federatedCatalogueFilterComponent ??= [];
-		const filters = (envVars.federatedCatalogueFilters ?? "")
-			.split(",")
-			.map(filter => filter.trim())
-			.filter(filter => filter.length > 0);
+		const filters = commaSeparatedListToArray(envVars.federatedCatalogueFilters);
 
 		for (const filter of filters) {
-			const type =
-				FederatedCatalogueFilterComponentType[
-					filter as keyof typeof FederatedCatalogueFilterComponentType
-				];
-			if (type) {
-				coreConfig.types.federatedCatalogueFilterComponent.push({
-					type,
-					options: {}
-				});
-			}
+			coreConfig.types.federatedCatalogueFilterComponent.push({
+				type: filter as FederatedCatalogueFilterComponentType,
+				options: {}
+			});
 		}
 	}
 }
@@ -1395,4 +1459,16 @@ async function configureDlt(
 			}
 		});
 	}
+}
+
+/**
+ * Converts a comma separated list to an array.
+ * @param value The comma separated list.
+ * @returns The array.
+ */
+function commaSeparatedListToArray<T>(value: string | undefined): T[] {
+	return (value ?? "")
+		.split(",")
+		.map(item => item.trim())
+		.filter(item => item.length > 0) as T[];
 }

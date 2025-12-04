@@ -607,6 +607,27 @@ export interface IEngineEnvironmentVariables {
 	federatedCatalogueFilters?: string;
 
 	/**
+	 * Is the trust management enabled, defaults to false.
+	 */
+	trustEnabled?: string;
+
+	/**
+	 * The trust generators to add to the factory, comma separated list.
+	 */
+	trustGenerators?: string;
+
+	/**
+	 * The trust verifiers to add to the factory, comma separated list.
+	 */
+	trustVerifiers?: string;
+
+	/**
+	 * The verification method to use for trust identities.
+	 * Defaults to node-authentication-assertion.
+	 */
+	trustVerificationMethodId?: string;
+
+	/**
 	 * Is the rights management enabled, defaults to false.
 	 */
 	rightsManagementEnabled?: string;
@@ -617,46 +638,39 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementBaseCallbackUrl?: string;
 
 	/**
-	 * The rights management configuration which includes the information sources modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management policy information sources to add to the factory.
 	 */
-	rightsManagementInformationSources?: string;
+	rightsManagementPolicyInformationSources?: string;
 
 	/**
-	 * The rights management configuration which includes the negotiator modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management policy negotiators sources to add to the factory.
 	 */
-	rightsManagementNegotiators?: string;
+	rightsManagementPolicyNegotiators?: string;
 
 	/**
-	 * The rights management configuration which includes the requester modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management policy requesters to add to the factory.
 	 */
-	rightsManagementRequesters?: string;
+	rightsManagementPolicyRequesters?: string;
 
 	/**
-	 * The rights management configuration which includes the execution actions modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management policy execution actions to add to the factory.
 	 */
-	rightsManagementExecutionActions?: string;
+	rightsManagementPolicyExecutionActions?: string;
 
 	/**
-	 * The rights management configuration which includes the enforcement processor modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management policy enforcement processors to add to the factory.
 	 */
-	rightsManagementEnforcementProcessors?: string;
+	rightsManagementPolicyEnforcementProcessors?: string;
 
 	/**
-	 * The rights management configuration which includes the arbiter modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management policy arbiters to add to the factory.
 	 */
-	rightsManagementArbiters?: string;
+	rightsManagementPolicyArbiters?: string;
 
 	/**
-	 * The rights management configuration which includes the offer modules to load.
-	 * Use the @json: prefix to specify the path to the JSON configuration file.
+	 * The rights management data access handlers to add to the factory.
 	 */
-	rightsManagementOffers?: string;
+	rightsManagementDataAccessHandlers?: string;
 
 	/**
 	 * Are background tasks enabled, defaults to false.
