@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.8](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.7...node-v0.0.3-next.8) (2026-01-05)
+
+
+### Features
+
+* update for livez endpoint ([9fc2e6a](https://github.com/twinfoundation/node/commit/9fc2e6ade38b3ec9591399a633d02b1e5fe07910))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.7 to 0.0.3-next.8
+
 ## [0.0.3-next.7](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.6...node-v0.0.3-next.7) (2025-12-04)
 
 
