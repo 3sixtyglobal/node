@@ -4,5 +4,5 @@ content-type: application/json
 
 {
 	"email": "admin@node",
-	"password": "P1jg#+Cqh8&?SY£F"
+	"password": "m?MY£1CN4nLm5*p%"
 }

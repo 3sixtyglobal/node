@@ -305,6 +305,7 @@ describe("node-core", () => {
 			"/",
 			"/favicon.ico",
 			"/info",
+			"/livez",
 			"/health",
 			"/spec"
 		]);
@@ -448,6 +449,7 @@ describe("node-core", () => {
 			"/",
 			"/favicon.ico",
 			"/info",
+			"/livez",
 			"/health",
 			"/spec",
 			"/authentication/login",
@@ -864,6 +866,7 @@ describe("node-core", () => {
 			"/",
 			"/favicon.ico",
 			"/info",
+			"/livez",
 			"/health",
 			"/spec"
 		]);
@@ -922,6 +925,7 @@ describe("node-core", () => {
 			"/",
 			"/favicon.ico",
 			"/info",
+			"/livez",
 			"/health",
 			"/spec"
 		]);
@@ -978,6 +982,7 @@ describe("node-core", () => {
 			"/",
 			"/favicon.ico",
 			"/info",
+			"/livez",
 			"/health",
 			"/spec"
 		]);
@@ -1095,6 +1100,7 @@ describe("node-core", () => {
 			"/",
 			"/favicon.ico",
 			"/info",
+			"/livez",
 			"/health",
 			"/spec"
 		]);

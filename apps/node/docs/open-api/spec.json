@@ -127,6 +127,14 @@
 									}
 								}
 							}
+						},
+						"headers": {
+							"content-type": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. text/plain"
+							}
 						}
 					},
 					"400": {
@@ -255,6 +263,84 @@
 										}
 									}
 								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/livez": {
+			"get": {
+				"operationId": "serverLivez",
+				"summary": "Get the livez status for the server",
+				"tags": [
+					"Info"
+				],
+				"responses": {
+					"200": {
+						"description": "The livez of the server.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/ServerLivezResponse"
+								},
+								"examples": {
+									"livezResponseOK": {
+										"summary": "The response for the liveness request.",
+										"value": "ok"
+									},
+									"livezResponseFailure": {
+										"summary": "The response for the liveness request with errors.",
+										"value": "failed"
+									}
+								}
+							}
+						},
+						"headers": {
+							"content-type": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. text/plain"
 							}
 						}
 					},
@@ -521,7 +607,6 @@
 									"loginResponseExample": {
 										"summary": "The response for the login request.",
 										"value": {
-											"token": "eyJhbGciOiJIU...sw5c",
 											"expiry": 1722514341067
 										}
 									}
@@ -690,7 +775,6 @@
 									"refreshTokenResponseExample": {
 										"summary": "The response for the refresh token request.",
 										"value": {
-											"token": "eyJhbGciOiJIU...sw5c",
 											"expiry": 1722514341067
 										}
 									}
@@ -18319,6 +18403,28 @@
 				],
 				"description": "The FOAF JSON-LD context type."
 			},
+			"HealthComponentInfo": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The name of the component."
+					},
+					"status": {
+						"$ref": "#/components/schemas/HealthStatus"
+					},
+					"details": {
+						"type": "string",
+						"description": "The details for the status."
+					}
+				},
+				"required": [
+					"name",
+					"status"
+				],
+				"additionalProperties": false,
+				"description": "The health component information."
+			},
 			"HealthInfo": {
 				"type": "object",
 				"properties": {
@@ -18328,25 +18434,7 @@
 					"components": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"name": {
-									"type": "string",
-									"description": "The name of the component."
-								},
-								"status": {
-									"$ref": "#/components/schemas/HealthStatus"
-								},
-								"details": {
-									"type": "string",
-									"description": "The details for the status."
-								}
-							},
-							"required": [
-								"name",
-								"status"
-							],
-							"additionalProperties": false
+							"$ref": "#/components/schemas/HealthComponentInfo"
 						},
 						"description": "The status of the components."
 					}
@@ -19017,10 +19105,6 @@
 			"LoginResponse": {
 				"type": "object",
 				"properties": {
-					"token": {
-						"type": "string",
-						"description": "The access token, if it uses a mechanism with public access."
-					},
 					"expiry": {
 						"type": "number",
 						"description": "The expiry time of the token."
@@ -19794,10 +19878,6 @@
 			"RefreshTokenResponse": {
 				"type": "object",
 				"properties": {
-					"token": {
-						"type": "string",
-						"description": "The refreshed token, if it uses a mechanism with public access."
-					},
 					"expiry": {
 						"type": "number",
 						"description": "The expiry time of the token."
@@ -20326,6 +20406,14 @@
 				],
 				"additionalProperties": false,
 				"description": "The information about the server."
+			},
+			"ServerLivezResponse": {
+				"type": "string",
+				"enum": [
+					"ok",
+					"failed"
+				],
+				"description": "The livez information for the server."
 			},
 			"ServerRootResponse": {
 				"type": "string",
