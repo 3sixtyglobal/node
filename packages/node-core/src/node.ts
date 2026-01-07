@@ -130,6 +130,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<
 				process.on(signal, async () => {
 					CLIDisplay.value("Terminate Signal", signal);
 					await startResult.shutdown();
+					process.exit(0);
 				});
 			}
 		}

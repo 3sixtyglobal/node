@@ -1,0 +1,10 @@
+### Create Immutable Proof
+POST http://localhost:3000/immutable-proof
+cookie: access_token=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZW50aXR5LXN0b3JhZ2U6MHg5MjM4ZmMxNDI0MWZkMzU5YTA3MmQ0NDk0NWUwMzc2MTZiMDk2MTRjNzA5NjRhMWI1OWZmOTE3YTcyNjAxYTk4Iiwib3JnIjoiZGlkOmVudGl0eS1zdG9yYWdlOjB4MTg5OTU2MDZlMzM3ODYyMDg0MjVlMzc4ZDE5NGFhMmU1NDJhMjg0ZDZiNmFhNjUyMTNiMTNkMzAxMTFiNDEwZSIsImV4cCI6MTc2Nzc1OTY1OX0.TaEgOnhSXTwL3-vze-AuCXtdf9NLjspRmtBjpCa-zVBGxUi3L-kqCg696-_kK22H6X5WWECC56LNFzNIYDWmCQ
+content-type: application/json
+
+{
+	"document": {
+		
+	}
+}

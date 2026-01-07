@@ -101,23 +101,17 @@
 		"ParticipantList": "https://schema.twindev.org/federated-catalogue/ParticipantList",
 		"Odrl(.*)": "https://schema.twindev.org/w3c-odrl/Odrl$1",
 		"ActionType": "https://schema.twindev.org/w3c-odrl/ActionType",
+		"UriActionType": "https://schema.twindev.org/w3c-odrl/UriActionType",
 		"ConflictStrategyType": "https://schema.twindev.org/w3c-odrl/ConflictStrategyType",
 		"StatusType": "https://schema.twindev.org/w3c-odrl/StatusType",
 		"PolicyType": "https://schema.twindev.org/w3c-odrl/PolicyType",
 		"OperatorType": "https://schema.twindev.org/w3c-odrl/OperatorType",
 		"LeftOperandType": "https://schema.twindev.org/w3c-odrl/LeftOperandType",
 		"RightOperandType": "https://schema.twindev.org/w3c-odrl/RightOperandType",
-		"IAddress": "https://schema.twindev.org/gaia-x/Address",
-		"IDataResource": "https://schema.twindev.org/gaia-x/DataResource",
-		"IDataExchangeComponent": "https://schema.twindev.org/gaia-x/DataExchangeComponent",
-		"IEndpoint": "https://schema.twindev.org/gaia-x/Endpoint",
-		"IParticipant": "https://schema.twindev.org/gaia-x/Participant",
-		"IRegistrationNumber": "https://schema.twindev.org/gaia-x/RegistrationNumber",
-		"IServiceOffering": "https://schema.twindev.org/gaia-x/ServiceOffering",
 		"Unece(.*)": "https://schema.twindev.org/unece/Unece$1",
-		"DataAccess(.*)": "https://schema.twindev.org/rights-management/DataAccessQuery$1",
-		"IdsContract(.*)": "https://schema.twindev.org/ids-contract-negotiation/IdsContract$1",
-		"ActivityStreams": "https://schema.twindev.org/w3c-activity-streams/ActivityStreams",
-		"ActivityStreamsTypes": "https://schema.twindev.org/w3c-activity-streams/ActivityStreamsTypes"
+		"DataspaceProtocol(.*?)": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocol$1",
+		"Dcat(.*?)": "https://schema.twindev.org/dcat/Dcat$1",
+		"DublinCore(.*?)": "https://schema.twindev.org/dublin-core/DublinCore$1",
+		"Foaf(.*?)": "https://schema.twindev.org/foaf/Foaf$1"
 	}
 }

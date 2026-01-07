@@ -3,7 +3,7 @@
 import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/context';
 import { ComponentFactory } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
-
+import { DcatClasses } from '@twin.org/standards-w3c-dcat';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
 const entities = [
@@ -75,11 +75,33 @@ export class TestDataSpaceConnectorApp {
 	}
 
 	/**
-	 * Data Services handled.
-	 * @returns Ids.
+	 * Datasets handled by the App.
+	 * @returns DS Protocol compliant datasets
 	 */
-	dataServicesHandled() {
-		return [{ serviceId: 'https://twin.example.org/data-service-1' }];
+	datasetsHandled() {
+		return [
+			{
+				'@id': 'https://twin.example.org/data-service-1',
+				'@type': DcatClasses.Dataset,
+				'odrl:hasPolicy': [
+					{
+						'@context': 'http://www.w3.org/ns/odrl.jsonld',
+						'@type': 'Offer',
+						'@id': 'urn:uuid:test-policy-offer-1',
+						uid: 'urn:uuid:test-policy-offer-1',
+						assigner: 'https://twin.example.org',
+						permission: []
+					}
+				],
+				'dcat:distribution': {
+					'@id': 'https://twin.example.org/distribution-1',
+					'@type': 'Distribution',
+					'dcat:accessService': 'https://twin.example.org/data-service-1',
+					'dcterms:format': 'Http-Pull-Query-Format'
+				},
+				'dcterms:type': 'https://vocabulary.uncefact.org/Consignment'
+			}
+		];
 	}
 
 	/**

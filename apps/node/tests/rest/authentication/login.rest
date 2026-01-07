@@ -1,8 +1,8 @@
 ### Login
-POST http://localhost:3000/authentication/login
+POST http://localhost:3000/authentication/login?x-api-key=12345
 content-type: application/json
 
 {
 	"email": "admin@node",
-	"password": "m?MY£1CN4nLm5*p%"
+	"password": "Gt9&M%=}PcKcyjc4"
 }

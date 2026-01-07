@@ -48,7 +48,7 @@
 		"extensionHttpsDownloading": "Downloading HTTPS extension",
 		"extensionCacheExpired": "Cache expired for extension: {url}",
 		"extensionForceRefresh": "Force refresh enabled for extension: {url}",
-		"createdTenantId": "Created tenant id \"{identity}\" with api key \"{apiKey}\"",
-		"existingTenantId": "Existing tenant id \"{identity}\""
+		"createdTenantId": "Created tenant id \"{tenantId}\" with api key \"{apiKey}\"",
+		"existingTenantId": "Existing tenant id \"{tenantId}\""
 	}
 }

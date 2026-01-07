@@ -125,7 +125,7 @@ export async function bootstrapNodeId(
 	if (features.includes(NodeFeatures.NodeId)) {
 		const existingNodeId = envVars.nodeIdentity ?? context.state.nodeId;
 
-		context.state.nodeId = await createIdentity(
+		const nodeId = await createIdentity(
 			engineCore,
 			envVars,
 			existingNodeId,
@@ -134,11 +134,15 @@ export async function bootstrapNodeId(
 			"node",
 			features.includes(NodeFeatures.NodeWallet)
 		);
-		context.stateDirty = true;
+
+		if (nodeId !== context.state.nodeId) {
+			context.stateDirty = true;
+		}
+		context.state.nodeId = nodeId;
 
 		engineCore.logInfo(
 			I18n.formatMessage("node.nodeId", {
-				identity: context.state.nodeId
+				identity: nodeId
 			})
 		);
 
@@ -163,21 +167,39 @@ export async function bootstrapTenantId(
 	// so that services such a logging have a default tenant context id
 	// this will get overwritten by any incoming API requests with the tenant context id
 	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
-		let tenantId = envVars.tenantId ?? context.state.nodeTenantId;
+		const configuredTenantId = envVars.tenantId ?? context.state.nodeTenantId;
 
-		if (!Is.stringValue(tenantId)) {
-			const tenantAdminServiceComponentType =
-				engineCore.getRegisteredInstanceType("tenantAdminComponent");
+		let exists = false;
 
-			const tenantAdminService = ComponentFactory.get<ITenantAdminComponent>(
-				tenantAdminServiceComponentType
-			);
+		const tenantAdminServiceComponentType =
+			engineCore.getRegisteredInstanceType("tenantAdminComponent");
 
-			tenantId = TenantIdHelper.generateTenantId();
+		const tenantAdminService = ComponentFactory.get<ITenantAdminComponent>(
+			tenantAdminServiceComponentType
+		);
+
+		let finalTenantId;
+		if (Is.stringValue(configuredTenantId)) {
+			try {
+				const tenant = await tenantAdminService.get(configuredTenantId);
+				if (!Is.empty(tenant)) {
+					engineCore.logInfo(
+						I18n.formatMessage("node.existingTenantId", {
+							tenantId: configuredTenantId
+						})
+					);
+					exists = true;
+					finalTenantId = configuredTenantId;
+				}
+			} catch {}
+		}
+
+		if (!exists) {
 			const apiKey = envVars.tenantApiKey ?? TenantIdHelper.generateApiKey();
+			finalTenantId = configuredTenantId ?? TenantIdHelper.generateTenantId();
 
 			await tenantAdminService.set({
-				id: tenantId,
+				id: finalTenantId,
 				apiKey,
 				dateCreated: new Date(Date.now()).toISOString(),
 				label: "node-tenant"
@@ -185,22 +207,20 @@ export async function bootstrapTenantId(
 
 			engineCore.logInfo(
 				I18n.formatMessage("node.createdTenantId", {
-					identity: tenantId,
+					tenantId: finalTenantId,
 					apiKey
-				})
-			);
-		} else {
-			engineCore.logInfo(
-				I18n.formatMessage("node.existingTenantId", {
-					identity: context.state.nodeTenantId
 				})
 			);
 		}
 
-		context.state.nodeTenantId = tenantId;
-		context.stateDirty = true;
+		if (Is.stringValue(finalTenantId)) {
+			if (finalTenantId !== context.state.nodeTenantId) {
+				context.state.nodeTenantId = finalTenantId;
+				context.stateDirty = true;
+			}
 
-		engineCore.addContextId(ContextIdKeys.Tenant, context.state.nodeTenantId);
+			engineCore.addContextId(ContextIdKeys.Tenant, context.state.nodeTenantId);
+		}
 	}
 }
 
