@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.9](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.8...node-core-v0.0.3-next.9) (2026-01-07)
+
+
+### Features
+
+* improve bootstrapping and shutdown behaviour ([#66](https://github.com/twinfoundation/node/issues/66)) ([65b3452](https://github.com/twinfoundation/node/commit/65b345240334bfff48b52e136cc486cd7ac7f290))
+
 ## [0.0.3-next.8](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.7...node-core-v0.0.3-next.8) (2026-01-05)
 
 

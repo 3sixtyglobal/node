@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.9](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.8...node-v0.0.3-next.9) (2026-01-07)
+
+
+### Features
+
+* improve bootstrapping and shutdown behaviour ([#66](https://github.com/twinfoundation/node/issues/66)) ([65b3452](https://github.com/twinfoundation/node/commit/65b345240334bfff48b52e136cc486cd7ac7f290))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.8 to 0.0.3-next.9
+
 ## [0.0.3-next.8](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.7...node-v0.0.3-next.8) (2026-01-05)
 
 
