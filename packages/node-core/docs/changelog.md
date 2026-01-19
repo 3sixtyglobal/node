@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.11](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.10...node-core-v0.0.3-next.11) (2026-01-19)
+
+
+### Bug Fixes
+
+* improve calculation of execution directory ([106d65d](https://github.com/twinfoundation/node/commit/106d65d7ad5524e2e147b681d68f9476c024cfaa))
+
 ## [0.0.3-next.10](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.9...node-core-v0.0.3-next.10) (2026-01-19)
 
 
