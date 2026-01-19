@@ -73,6 +73,14 @@ This will be merged with any configuration loaded from the environment variables
 
 ***
 
+### scriptDirectory?
+
+> `optional` **scriptDirectory**: `string`
+
+The directory to override the script location, defaults to location of index.js.
+
+***
+
 ### executionDirectory?
 
 > `optional` **executionDirectory**: `string`

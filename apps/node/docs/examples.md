@@ -4,7 +4,7 @@
 
 To run the command from the package either:
 
-Install `@twin.org/node` and use the following command:
+Install `@twin.org/node@next` and use the following command:
 
 ```shell
 twin-node --help
@@ -13,7 +13,7 @@ twin-node --help
 or
 
 ```shell
-npx "@twin.org/node" --help
+npx "@twin.org/node@next" --help
 ```
 
 ### Display help listing all commands

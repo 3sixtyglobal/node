@@ -1,16 +1,8 @@
 # Function: getExecutionDirectory()
 
-> **getExecutionDirectory**(`args?`): `string`
+> **getExecutionDirectory**(): `string`
 
 Get the directory where the application is being executed.
-
-## Parameters
-
-### args?
-
-`string`[]
-
-The command line arguments.
 
 ## Returns
 

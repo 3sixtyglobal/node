@@ -50,13 +50,18 @@ export async function start(
 	const entityStorageConnectorType = envVars.entityStorageConnectorType?.split(",") ?? [];
 	const blobStorageConnectorType = envVars.blobStorageConnectorType?.split(",") ?? [];
 
+	const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
+	const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;
+	const requiresTenantId = cliCommand?.definition?.requiresTenantId ?? true;
+
 	// If the blob storage or entity storage is configured with file connectors
 	// then we need to make sure the storageFileRoot is set
 	if (
 		(entityStorageConnectorType.includes(EntityStorageConnectorType.File) ||
 			blobStorageConnectorType.includes(BlobStorageConnectorType.File) ||
 			Is.empty(nodeOptions?.stateStorage)) &&
-		!Is.stringValue(envVars.storageFileRoot)
+		!Is.stringValue(envVars.storageFileRoot) &&
+		requiresEngineStarted
 	) {
 		throw new GeneralError("node", "storageFileRootNotSet", {
 			storageFileRoot: `${nodeOptions?.envPrefix ?? ""}STORAGE_FILE_ROOT`
@@ -66,11 +71,10 @@ export async function start(
 	// Create the engine instance using file state storage unless one is configured in options
 	const engine = new Engine<IEngineServerConfig, INodeEngineState>({
 		config: nodeEngineConfig,
-		stateStorage: nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""),
+		stateStorage: requiresEngineStarted
+			? (nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""))
+			: undefined,
 		customBootstrap: async (engineCore, context) => {
-			const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
-			const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;
-			const requiresTenantId = cliCommand?.definition?.requiresTenantId ?? true;
 			configureContextIds(
 				engineCore,
 				envVars,

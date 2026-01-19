@@ -49,6 +49,11 @@ export interface INodeOptions {
 	config?: IEngineConfig;
 
 	/**
+	 * The directory to override the script location, defaults to location of index.js.
+	 */
+	scriptDirectory?: string;
+
+	/**
 	 * The directory to override the execution location, defaults to process directory.
 	 */
 	executionDirectory?: string;

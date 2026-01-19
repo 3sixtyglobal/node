@@ -26,6 +26,7 @@ import {
 	fileExists,
 	getExecutionDirectory,
 	getExtensionsCacheDir,
+	getScriptDirectory,
 	handleHttpsProtocol,
 	handleNpmProtocol,
 	initialiseLocales,
@@ -54,7 +55,7 @@ export async function run(
 	  }
 	| undefined
 > {
-	let isSilent = true;
+	let showErrorDetails = true;
 	try {
 		nodeOptions ??= {};
 
@@ -66,17 +67,20 @@ export async function run(
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
 
 		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
-			nodeOptions.executionDirectory = getExecutionDirectory(args);
+			nodeOptions.executionDirectory = getExecutionDirectory();
+		}
+
+		if (!Is.stringValue(nodeOptions?.scriptDirectory)) {
+			nodeOptions.scriptDirectory = getScriptDirectory(args);
 		}
 
 		nodeOptions.localesDirectory =
 			nodeOptions?.localesDirectory ??
-			path.resolve(path.join(nodeOptions.executionDirectory, "dist", "locales"));
+			path.resolve(path.join(nodeOptions.scriptDirectory, "dist", "locales"));
 
 		await initialiseLocales(nodeOptions.localesDirectory);
 
 		nodeOptions.envPrefix ??= "TWIN_";
-		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
@@ -100,17 +104,19 @@ export async function run(
 			...finalEnvVars
 		};
 
+		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
+		CLIDisplay.value("Script Directory", nodeOptions.scriptDirectory);
+		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
+		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
+
 		const cliCommand = initCli(finalEnvVars, args);
 
 		if (cliCommand) {
 			finalEnvVars[`${nodeOptions.envPrefix}SILENT`] ??= "true";
 		} else {
-			CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
-			CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
-
 			if (Is.empty(nodeOptions?.openApiSpecFile)) {
 				const specFile = path.resolve(
-					path.join(nodeOptions.executionDirectory ?? "", "docs", "open-api", "spec.json")
+					path.join(nodeOptions.scriptDirectory ?? "", "docs", "open-api", "spec.json")
 				);
 				if (await fileExists(specFile)) {
 					nodeOptions ??= {};
@@ -123,7 +129,7 @@ export async function run(
 
 			if (Is.empty(nodeOptions?.favIconFile)) {
 				const favIconFile = path.resolve(
-					path.join(nodeOptions.executionDirectory ?? "", "static", "favicon.png")
+					path.join(nodeOptions.scriptDirectory ?? "", "static", "favicon.png")
 				);
 				if (await fileExists(favIconFile)) {
 					nodeOptions ??= {};
@@ -141,8 +147,6 @@ export async function run(
 			serverInfo
 		);
 
-		isSilent = Coerce.boolean(nodeEnvVars.silent) ?? false;
-
 		CLIDisplay.break();
 
 		const startResult = await start(
@@ -154,6 +158,8 @@ export async function run(
 		);
 
 		if (!Is.empty(startResult)) {
+			showErrorDetails = false;
+
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
 				process.on(signal, async () => {
 					CLIDisplay.value("Terminate Signal", signal);
@@ -169,7 +175,7 @@ export async function run(
 			throw err;
 		}
 
-		if (isSilent) {
+		if (showErrorDetails) {
 			const baseError = BaseError.fromError(err);
 			if (baseError.source === "node") {
 				ObjectHelper.propertyDelete(err, "stack");

@@ -37,10 +37,18 @@ export async function initialiseLocales(localesDirectory: string): Promise<void>
 
 /**
  * Get the directory where the application is being executed.
+ * @returns The execution directory.
+ */
+export function getExecutionDirectory(): string {
+	return process.cwd();
+}
+
+/**
+ * Get the directory where the script is located.
  * @param args The command line arguments.
  * @returns The execution directory.
  */
-export function getExecutionDirectory(args?: string[]): string {
+export function getScriptDirectory(args?: string[]): string {
 	if (Is.array<string>(args) && args.length >= 2 && args[1].includes("index.js")) {
 		return path.resolve(path.join(path.dirname(args[1]), ".."));
 	}

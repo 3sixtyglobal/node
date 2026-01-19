@@ -59,6 +59,7 @@
 - [start](functions/start.md)
 - [initialiseLocales](functions/initialiseLocales.md)
 - [getExecutionDirectory](functions/getExecutionDirectory.md)
+- [getScriptDirectory](functions/getScriptDirectory.md)
 - [fileExists](functions/fileExists.md)
 - [directoryExists](functions/directoryExists.md)
 - [getSubFolders](functions/getSubFolders.md)
