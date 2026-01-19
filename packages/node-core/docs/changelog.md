@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.12](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.11...node-core-v0.0.3-next.12) (2026-01-19)
+
+
+### Features
+
+* separate script directory from exec directory ([f6bb4db](https://github.com/twinfoundation/node/commit/f6bb4dbea1f1e200e0640fa154c6997ef99c99b4))
+
 ## [0.0.3-next.11](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.10...node-core-v0.0.3-next.11) (2026-01-19)
 
 
