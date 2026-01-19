@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.13](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.12...node-v0.0.3-next.13) (2026-01-19)
+
+
+### Features
+
+* add trust ttl ([#73](https://github.com/twinfoundation/node/issues/73)) ([911cee7](https://github.com/twinfoundation/node/commit/911cee771bba490143bb1574ca8360f7cf8baa1a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.12 to 0.0.3-next.13
+
 ## [0.0.3-next.12](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.11...node-v0.0.3-next.12) (2026-01-19)
 
 

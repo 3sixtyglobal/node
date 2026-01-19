@@ -1,5 +1,14 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.13](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.12...node-core-v0.0.3-next.13) (2026-01-19)
+
+
+### Features
+
+* add trust ttl ([#73](https://github.com/twinfoundation/node/issues/73)) ([911cee7](https://github.com/twinfoundation/node/commit/911cee771bba490143bb1574ca8360f7cf8baa1a))
+* update order of logging ([2161938](https://github.com/twinfoundation/node/commit/2161938c969b18e4678459a69090287e5ccdb404))
+* update order of logging ([b295f31](https://github.com/twinfoundation/node/commit/b295f315f7c5b611d229d9e5314d414da05828b9))
+
 ## [0.0.3-next.12](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.11...node-core-v0.0.3-next.12) (2026-01-19)
 
 
