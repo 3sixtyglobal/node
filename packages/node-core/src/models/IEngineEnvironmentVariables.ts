@@ -11,6 +11,11 @@ export interface IEngineEnvironmentVariables {
 	debug?: string;
 
 	/**
+	 * Start the engine in silent mode.
+	 */
+	silent?: string;
+
+	/**
 	 * The root directory for storing items like state file.
 	 */
 	storageFileRoot?: string;
@@ -21,19 +26,14 @@ export interface IEngineEnvironmentVariables {
 	stateFilename?: string;
 
 	/**
+	 * Does the node have a unique ID, defaults to true.
+	 */
+	nodeIdentityEnabled?: string;
+
+	/**
 	 * Is multi-tenant support enabled, defaults to false.
 	 */
 	tenantEnabled?: string;
-
-	/**
-	 * A tenant id to use as a default for the node.
-	 */
-	tenantId?: string;
-
-	/**
-	 * A tenant api key to use as a default for the node.
-	 */
-	tenantApiKey?: string;
 
 	/**
 	 * The type of the entity storage to create, comma separate for more than one connector.
@@ -258,12 +258,6 @@ export interface IEngineEnvironmentVariables {
 	blobStorageEncryptionKeyId?: string;
 
 	/**
-	 * A symmetric encryption key for the blob storage, should be ChaCha20Poly1305 in base64 format.
-	 * If encryption is enabled but a key is not provided one will be generated.
-	 */
-	blobStorageSymmetricEncryptionKey?: string;
-
-	/**
 	 * A prefix for all the blobs in blob-storage, can be empty.
 	 */
 	blobStoragePrefix?: string;
@@ -442,6 +436,11 @@ export interface IEngineEnvironmentVariables {
 	 * The type of identity connector: entity-storage, iota.
 	 */
 	identityConnector?: string;
+
+	/**
+	 * The index of the wallet address to use, defaults to 0.
+	 */
+	identityWalletAddressIndex?: string;
 
 	/**
 	 * The type of identity resolver connector: entity-storage, iota.

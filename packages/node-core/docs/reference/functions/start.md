@@ -1,6 +1,6 @@
 # Function: start()
 
-> **start**(`nodeOptions`, `nodeEngineConfig`, `envVars`, `availableContextIdKeys?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
+> **start**(`nodeOptions`, `nodeEngineConfig`, `envVars`, `cliCommand?`, `availableContextIdKeys?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
 
 Start the engine server.
 
@@ -23,6 +23,12 @@ The configuration for the engine server.
 [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
 
 The environment variables.
+
+### cliCommand?
+
+[`ICliCommand`](../interfaces/ICliCommand.md)
+
+The constructed CLI command (optional).
 
 ### availableContextIdKeys?
 

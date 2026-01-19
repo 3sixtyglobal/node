@@ -1,6 +1,6 @@
 # Function: run()
 
-> **run**(`nodeOptions?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
+> **run**(`nodeOptions?`, `args?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
 
 Run the TWIN Node server.
 
@@ -11,6 +11,12 @@ Run the TWIN Node server.
 [`INodeOptions`](../interfaces/INodeOptions.md)
 
 Optional configuration options for running the server.
+
+### args?
+
+`string`[]
+
+Optional command line arguments.
 
 ## Returns
 

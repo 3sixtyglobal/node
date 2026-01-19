@@ -78,15 +78,7 @@ import {
 	DataAccessPointRestClient,
 	PolicyNegotiationPointRestClient
 } from "@twin.org/rights-management-rest-client";
-import {
-	ATTESTATION_VERIFICATION_METHOD_ID,
-	BLOB_STORAGE_ENCRYPTION_KEY_ID,
-	CONTEXT_ID_HANDLER_FEATURE_DID,
-	CONTEXT_ID_HANDLER_FEATURE_TENANT,
-	IMMUTABLE_PROOF_VERIFICATION_METHOD_ID,
-	SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
-	VC_AUTHENTICATION_VERIFICATION_METHOD_ID
-} from "../defaults.js";
+import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
 /**
@@ -97,7 +89,7 @@ import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVa
  */
 export async function buildEngineConfiguration(
 	envVars: IEngineEnvironmentVariables,
-	contextIdKeys: { key: string; componentFeatures: string[] }[]
+	contextIdKeys: { key: string; requiredHandlerFeatures: string[] }[]
 ): Promise<IEngineConfig> {
 	if (Is.stringValue(envVars.storageFileRoot)) {
 		envVars.stateFilename ??= "engine-state.json";
@@ -107,6 +99,7 @@ export async function buildEngineConfiguration(
 
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
+		silent: Coerce.boolean(envVars.silent) ?? false,
 		types: {}
 	};
 
@@ -434,7 +427,7 @@ async function configureBlobStorage(
 				config: {
 					vaultKeyId:
 						(envVars.blobStorageEnableEncryption ?? false)
-							? (envVars.blobStorageEncryptionKeyId ?? BLOB_STORAGE_ENCRYPTION_KEY_ID)
+							? envVars.blobStorageEncryptionKeyId
 							: undefined
 				}
 			}
@@ -864,8 +857,7 @@ async function configureVerifiableStorage(
 			type: ImmutableProofComponentType.Service,
 			options: {
 				config: {
-					verificationMethodId:
-						envVars.immutableProofVerificationMethodId ?? IMMUTABLE_PROOF_VERIFICATION_METHOD_ID
+					verificationMethodId: envVars.immutableProofVerificationMethodId
 				}
 			}
 		});
@@ -896,7 +888,10 @@ async function configureIdentity(
 		coreConfig.types.identityConnector.push({
 			type: IdentityConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config: {
+					...(dltConfig?.options?.config ?? ({} as IIotaConfig)),
+					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0
+				}
 			}
 		});
 	}
@@ -999,8 +994,7 @@ async function configureAttestation(
 			type: AttestationComponentType.Service,
 			options: {
 				config: {
-					verificationMethodId:
-						envVars.attestationVerificationMethodId ?? ATTESTATION_VERIFICATION_METHOD_ID
+					verificationMethodId: envVars.attestationVerificationMethodId
 				}
 			}
 		});
@@ -1106,8 +1100,7 @@ async function configureVerifiableCredentialAuthentication(
 			type: AuthenticationGeneratorComponentType.VerifiableCredential,
 			options: {
 				config: {
-					verificationMethodId:
-						envVars.vcAuthenticationVerificationMethodId ?? VC_AUTHENTICATION_VERIFICATION_METHOD_ID
+					verificationMethodId: envVars.vcAuthenticationVerificationMethodId ?? ""
 				}
 			},
 			features: ["verifiable-credential"]
@@ -1137,8 +1130,7 @@ async function configureTrust(
 				type: trustGeneratorType as TrustGeneratorComponentType,
 				options: {
 					config: {
-						verificationMethodId:
-							envVars.trustVerificationMethodId ?? VC_AUTHENTICATION_VERIFICATION_METHOD_ID
+						verificationMethodId: envVars.trustVerificationMethodId ?? ""
 					}
 				}
 			});
@@ -1339,9 +1331,7 @@ async function configureSynchronisedStorage(
 			options: {
 				config: {
 					verifiableStorageKeyId: verifiableStorageKeyId ?? "",
-					blobStorageEncryptionKeyId:
-						envVars.synchronisedStorageBlobStorageEncryptionKeyId ??
-						SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
+					blobStorageEncryptionKeyId: envVars.synchronisedStorageBlobStorageEncryptionKeyId,
 					entityUpdateIntervalMinutes: Coerce.number(
 						envVars.synchronisedStorageEntityUpdateIntervalMinutes
 					),

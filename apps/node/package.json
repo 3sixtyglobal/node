@@ -2,7 +2,6 @@
 	"name": "@twin.org/node",
 	"version": "0.0.3-next.9",
 	"description": "TWIN Node serving APIs using the specified configuration",
-	"private": true,
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/twinfoundation/node.git",
@@ -56,5 +55,22 @@
 	"bugs": {
 		"url": "git+https://github.com/twinfoundation/node/issues"
 	},
-	"homepage": "https://twindev.org"
+	"homepage": "https://twindev.org",
+	"main": "./src/index.js",
+	"exports": {
+		".": {
+			"import": "./src/index.js",
+			"default": "./src/index.js"
+		}
+	},
+	"files": [
+		"bin",
+		"dist/locales",
+		"src/index.js",
+		"locales",
+		"docs"
+	],
+	"bin": {
+		"twin-node": "bin/index.js"
+	}
 }

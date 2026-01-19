@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { Coerce, EnvHelper, GeneralError, Is } from "@twin.org/core";
+import { BaseError, Coerce, EnvHelper, GeneralError, Is, ObjectHelper } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
@@ -13,12 +13,14 @@ import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
+import { initCli } from "./cli.js";
+import { getEnvDefaults } from "./defaults.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
 import { ModuleProtocol } from "./models/moduleProtocol.js";
-import { start } from "./server.js";
+import { start } from "./start.js";
 import {
 	createModuleImportUrl,
 	fileExists,
@@ -38,9 +40,13 @@ const moduleCache: { [id: string]: unknown } = {};
 /**
  * Run the TWIN Node server.
  * @param nodeOptions Optional configuration options for running the server.
+ * @param args Optional command line arguments.
  * @returns A promise that resolves when the server is started containing a shutdown method.
  */
-export async function run(nodeOptions?: INodeOptions): Promise<
+export async function run(
+	nodeOptions?: INodeOptions,
+	args?: string[]
+): Promise<
 	| {
 			engine: Engine<IEngineServerConfig, INodeEngineState>;
 			server: EngineServer;
@@ -48,6 +54,7 @@ export async function run(nodeOptions?: INodeOptions): Promise<
 	  }
 	| undefined
 > {
+	let isSilent = true;
 	try {
 		nodeOptions ??= {};
 
@@ -61,40 +68,12 @@ export async function run(nodeOptions?: INodeOptions): Promise<
 		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
 			nodeOptions.executionDirectory = getExecutionDirectory();
 		}
-		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
 
 		nodeOptions.localesDirectory =
 			nodeOptions?.localesDirectory ??
 			path.resolve(path.join(nodeOptions.executionDirectory, "dist", "locales"));
-		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
 
 		await initialiseLocales(nodeOptions.localesDirectory);
-
-		if (Is.empty(nodeOptions?.openApiSpecFile)) {
-			const specFile = path.resolve(
-				path.join(nodeOptions.executionDirectory ?? "", "docs", "open-api", "spec.json")
-			);
-			CLIDisplay.value("Default OpenAPI Spec File", specFile);
-			if (await fileExists(specFile)) {
-				nodeOptions ??= {};
-				nodeOptions.openApiSpecFile = specFile;
-			}
-		} else {
-			CLIDisplay.value("OpenAPI Spec File", nodeOptions.openApiSpecFile);
-		}
-
-		if (Is.empty(nodeOptions?.favIconFile)) {
-			const favIconFile = path.resolve(
-				path.join(nodeOptions.executionDirectory ?? "", "static", "favicon.png")
-			);
-			CLIDisplay.value("Default Favicon File", favIconFile);
-			if (await fileExists(favIconFile)) {
-				nodeOptions ??= {};
-				nodeOptions.favIconFile = favIconFile;
-			}
-		} else {
-			CLIDisplay.value("Favicon File", nodeOptions.favIconFile);
-		}
 
 		nodeOptions.envPrefix ??= "TWIN_";
 		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
@@ -116,14 +95,63 @@ export async function run(nodeOptions?: INodeOptions): Promise<
 			};
 		}
 
-		const {
-			nodeEngineConfig,
-			nodeEnvVars: envVars,
-			availableContextIdKeys
-		} = await buildConfiguration(finalEnvVars, nodeOptions, serverInfo);
+		finalEnvVars = {
+			...getEnvDefaults(nodeOptions.envPrefix),
+			...finalEnvVars
+		};
+
+		const cliCommand = initCli(finalEnvVars, args);
+
+		if (cliCommand) {
+			finalEnvVars[`${nodeOptions.envPrefix}SILENT`] ??= "true";
+		} else {
+			CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
+			CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
+
+			if (Is.empty(nodeOptions?.openApiSpecFile)) {
+				const specFile = path.resolve(
+					path.join(nodeOptions.executionDirectory ?? "", "docs", "open-api", "spec.json")
+				);
+				if (await fileExists(specFile)) {
+					nodeOptions ??= {};
+					nodeOptions.openApiSpecFile = specFile;
+				}
+			}
+			if (Is.stringValue(nodeOptions.openApiSpecFile)) {
+				CLIDisplay.value("OpenAPI Spec File", nodeOptions.openApiSpecFile);
+			}
+
+			if (Is.empty(nodeOptions?.favIconFile)) {
+				const favIconFile = path.resolve(
+					path.join(nodeOptions.executionDirectory ?? "", "static", "favicon.png")
+				);
+				if (await fileExists(favIconFile)) {
+					nodeOptions ??= {};
+					nodeOptions.favIconFile = favIconFile;
+				}
+			}
+			if (Is.stringValue(nodeOptions.favIconFile)) {
+				CLIDisplay.value("Favicon File", nodeOptions.favIconFile);
+			}
+		}
+
+		const { nodeEngineConfig, nodeEnvVars, availableContextIdKeys } = await buildConfiguration(
+			finalEnvVars,
+			nodeOptions,
+			serverInfo
+		);
+
+		isSilent = Coerce.boolean(nodeEnvVars.silent) ?? false;
 
 		CLIDisplay.break();
-		const startResult = await start(nodeOptions, nodeEngineConfig, envVars, availableContextIdKeys);
+
+		const startResult = await start(
+			nodeOptions,
+			nodeEngineConfig,
+			nodeEnvVars,
+			cliCommand,
+			availableContextIdKeys
+		);
 
 		if (!Is.empty(startResult)) {
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
@@ -140,7 +168,15 @@ export async function run(nodeOptions?: INodeOptions): Promise<
 		if (nodeOptions?.disableProcessExitOnFailure ?? false) {
 			throw err;
 		}
-		CLIDisplay.error(err);
+
+		if (isSilent) {
+			const baseError = BaseError.fromError(err);
+			if (baseError.source === "node") {
+				ObjectHelper.propertyDelete(err, "stack");
+			}
+			CLIDisplay.error(err);
+		}
+
 		// eslint-disable-next-line unicorn/no-process-exit
 		process.exit(1);
 	}
@@ -163,9 +199,9 @@ export async function buildConfiguration(
 ): Promise<{
 	nodeEnvVars: INodeEnvironmentVariables & { [id: string]: string | unknown };
 	nodeEngineConfig: INodeEngineConfig;
-	availableContextIdKeys: { key: string; componentFeatures: string[] }[];
+	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[];
 }> {
-	const availableContextIdKeys: { key: string; componentFeatures: string[] }[] = [];
+	const availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
 
 	let defaultEnvOnly = false;
 	if (Is.empty(options?.envFilenames)) {

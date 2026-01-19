@@ -16,6 +16,14 @@ Start the engine in debug mode.
 
 ***
 
+### silent?
+
+> `optional` **silent**: `string`
+
+Start the engine in silent mode.
+
+***
+
 ### storageFileRoot?
 
 > `optional` **storageFileRoot**: `string`
@@ -32,27 +40,19 @@ The name of the state file.
 
 ***
 
+### nodeIdentityEnabled?
+
+> `optional` **nodeIdentityEnabled**: `string`
+
+Does the node have a unique ID, defaults to true.
+
+***
+
 ### tenantEnabled?
 
 > `optional` **tenantEnabled**: `string`
 
 Is multi-tenant support enabled, defaults to false.
-
-***
-
-### tenantId?
-
-> `optional` **tenantId**: `string`
-
-A tenant id to use as a default for the node.
-
-***
-
-### tenantApiKey?
-
-> `optional` **tenantApiKey**: `string`
-
-A tenant api key to use as a default for the node.
 
 ***
 
@@ -410,15 +410,6 @@ The id of the encryption key for the blob storage.
 
 ***
 
-### blobStorageSymmetricEncryptionKey?
-
-> `optional` **blobStorageSymmetricEncryptionKey**: `string`
-
-A symmetric encryption key for the blob storage, should be ChaCha20Poly1305 in base64 format.
-If encryption is enabled but a key is not provided one will be generated.
-
-***
-
 ### blobStoragePrefix?
 
 > `optional` **blobStoragePrefix**: `string`
@@ -704,6 +695,14 @@ The type of NFT connector: entity-storage, iota.
 > `optional` **identityConnector**: `string`
 
 The type of identity connector: entity-storage, iota.
+
+***
+
+### identityWalletAddressIndex?
+
+> `optional` **identityWalletAddressIndex**: `string`
+
+The index of the wallet address to use, defaults to 0.
 
 ***
 

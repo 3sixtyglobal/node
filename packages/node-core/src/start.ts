@@ -1,30 +1,35 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { GeneralError, I18n, Is } from "@twin.org/core";
+import { ContextIdKeys } from "@twin.org/context";
+import { Coerce, GeneralError, I18n, Is } from "@twin.org/core";
 import { Engine } from "@twin.org/engine";
 import { FileStateStorage } from "@twin.org/engine-core";
-import { EngineCoreFactory } from "@twin.org/engine-models";
+import {
+	EngineCoreFactory,
+	type IEngineCore,
+	type IEngineCoreConfig
+} from "@twin.org/engine-models";
 import { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
 import { BlobStorageConnectorType, EntityStorageConnectorType } from "@twin.org/engine-types";
-import { bootstrap } from "./bootstrap.js";
 import {
 	extensionsInitialiseEngine,
 	extensionsInitialiseEngineServer,
 	shutdownExtensions
 } from "./builders/extensionsBuilder.js";
+import { executeCommand } from "./cli.js";
+import type { ICliCommand } from "./models/ICliCommand.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
-
-let isStarted = false;
 
 /**
  * Start the engine server.
  * @param nodeOptions Optional run options for the engine server.
  * @param nodeEngineConfig The configuration for the engine server.
  * @param envVars The environment variables.
+ * @param cliCommand The constructed CLI command (optional).
  * @param availableContextIdKeys The context ID keys available for operation.
  * @returns The engine server.
  */
@@ -32,7 +37,8 @@ export async function start(
 	nodeOptions: INodeOptions | undefined,
 	nodeEngineConfig: INodeEngineConfig,
 	envVars: INodeEnvironmentVariables,
-	availableContextIdKeys?: { key: string; componentFeatures: string[] }[]
+	cliCommand?: ICliCommand,
+	availableContextIdKeys?: { key: string; requiredHandlerFeatures: string[] }[]
 ): Promise<
 	| {
 			engine: Engine<IEngineServerConfig, INodeEngineState>;
@@ -61,18 +67,20 @@ export async function start(
 	const engine = new Engine<IEngineServerConfig, INodeEngineState>({
 		config: nodeEngineConfig,
 		stateStorage: nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""),
-		customBootstrap: async (core, engineContext) => bootstrap(core, engineContext, envVars)
-	});
-
-	if (Is.arrayValue(availableContextIdKeys)) {
-		const added: string[] = [];
-		for (const availableContextIdKey of availableContextIdKeys) {
-			if (!added.includes(availableContextIdKey.key)) {
-				engine.addContextIdKey(availableContextIdKey.key, availableContextIdKey.componentFeatures);
-				added.push(availableContextIdKey.key);
-			}
+		customBootstrap: async (engineCore, context) => {
+			const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
+			const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;
+			const requiresTenantId = cliCommand?.definition?.requiresTenantId ?? true;
+			configureContextIds(
+				engineCore,
+				envVars,
+				requiresEngineStarted,
+				requiresNodeIdentity,
+				requiresTenantId,
+				availableContextIdKeys
+			);
 		}
-	}
+	});
 
 	// Construct the server with the engine.
 	const server = new EngineServer({ engineCore: engine });
@@ -97,20 +105,80 @@ export async function start(
 	// can clone it to spawn new instances.
 	EngineCoreFactory.register("engine", () => engine);
 
-	// Start the server, which also starts the engine.
-	isStarted = await server.start();
+	if (Is.objectValue(cliCommand)) {
+		await executeCommand(engine, envVars, cliCommand);
+	} else {
+		try {
+			// Start the server, which also starts the engine.
+			await server.start();
 
-	if (isStarted) {
-		return {
-			engine,
-			server,
-			shutdown: async () => {
-				if (isStarted) {
-					isStarted = false;
+			return {
+				engine,
+				server,
+				shutdown: async () => {
 					await shutdownExtensions(envVars, engine);
 					await server.stop();
 				}
+			};
+		} catch (err) {
+			await shutdownExtensions(envVars, engine);
+			throw err;
+		}
+	}
+}
+
+/**
+ * Configure the context IDs for the engine.
+ * @param engine The engine to configure.
+ * @param envVars The environment variables.
+ * @param requiresEngineStarted Whether the engine is required to be started.
+ * @param requiresNodeIdentity Whether the node identity is required.
+ * @param requiresTenantId Whether the tenant id is required.
+ * @param availableContextIdKeys The available context ID keys.
+ * @throws GeneralError Throws if the node identity or tenant is required but not set.
+ */
+function configureContextIds(
+	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
+	envVars: INodeEnvironmentVariables,
+	requiresEngineStarted: boolean,
+	requiresNodeIdentity: boolean,
+	requiresTenantId: boolean,
+	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] | undefined
+): void {
+	const state = engine.getState();
+
+	if (requiresEngineStarted && requiresNodeIdentity) {
+		const nodeIdentityEnabled = Coerce.boolean(envVars.nodeIdentityEnabled) ?? true;
+		if (nodeIdentityEnabled) {
+			if (Is.stringValue(state.nodeId)) {
+				engine.addContextId(ContextIdKeys.Node, state.nodeId);
+			} else {
+				throw new GeneralError("node", "nodeIdentityNotSet");
 			}
-		};
+		}
+	}
+
+	if (requiresEngineStarted && requiresTenantId) {
+		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+		if (tenantEnabled) {
+			if (Is.stringValue(state.nodeTenantId)) {
+				engine.addContextId(ContextIdKeys.Tenant, state.nodeTenantId);
+			} else {
+				throw new GeneralError("node", "nodeTenantNotSet");
+			}
+		}
+	}
+
+	if (Is.arrayValue(availableContextIdKeys)) {
+		const added: string[] = [];
+		for (const availableContextIdKey of availableContextIdKeys) {
+			if (!added.includes(availableContextIdKey.key)) {
+				engine.addContextIdKey(
+					availableContextIdKey.key,
+					availableContextIdKey.requiredHandlerFeatures
+				);
+				added.push(availableContextIdKey.key);
+			}
+		}
 	}
 }

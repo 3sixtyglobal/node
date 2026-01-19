@@ -15,14 +15,8 @@ import {
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
 import type { HttpMethod } from "@twin.org/web";
-import {
-	AUTH_SIGNING_KEY_ID,
-	CONTEXT_ID_HANDLER_FEATURE_DID,
-	CONTEXT_ID_HANDLER_FEATURE_TENANT
-} from "../defaults.js";
+import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables.js";
-import { NodeFeatures } from "../models/nodeFeatures.js";
-import { getFeatures } from "../utils.js";
 
 /**
  * Handles the configuration of the server.
@@ -36,7 +30,7 @@ import { getFeatures } from "../utils.js";
  */
 export async function buildEngineServerConfiguration(
 	envVars: IEngineServerEnvironmentVariables,
-	availableContextIdKeys: { key: string; componentFeatures: string[] }[],
+	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[],
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
 	openApiSpecPath?: string,
@@ -57,6 +51,7 @@ export async function buildEngineServerConfiguration(
 		corsOrigins: Is.stringValue(envVars.corsOrigins) ? envVars.corsOrigins.split(",") : undefined
 	};
 
+	const nodeIdentityEnabled = Coerce.boolean(envVars.nodeIdentityEnabled) ?? true;
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (tenantEnabled) {
 		webServerOptions.allowedHeaders ??= [];
@@ -101,13 +96,10 @@ export async function buildEngineServerConfiguration(
 	serverConfig.types.restRouteProcessor ??= [];
 	serverConfig.types.socketRouteProcessor ??= [];
 
-	const features = getFeatures(envVars);
-	const hasNodeId = features.includes(NodeFeatures.NodeId);
-
-	if (hasNodeId) {
+	if (nodeIdentityEnabled) {
 		availableContextIdKeys.push({
 			key: ContextIdKeys.Node,
-			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
 		});
 
 		serverConfig.types.restRouteProcessor.push({
@@ -131,7 +123,7 @@ export async function buildEngineServerConfiguration(
 	if (tenantEnabled) {
 		availableContextIdKeys.push({
 			key: ContextIdKeys.Tenant,
-			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
 		});
 
 		serverConfig.types.restRouteProcessor.push({
@@ -201,11 +193,11 @@ export async function buildEngineServerConfiguration(
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
 		availableContextIdKeys.push({
 			key: ContextIdKeys.Organization,
-			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
 		});
 		availableContextIdKeys.push({
 			key: ContextIdKeys.User,
-			componentFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
 		});
 
 		serverConfig.types.authenticationComponent ??= [];
@@ -213,7 +205,7 @@ export async function buildEngineServerConfiguration(
 			type: AuthenticationComponentType.EntityStorage,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID
+					signingKeyName: envVars.authSigningKeyId
 				}
 			}
 		});
@@ -221,7 +213,7 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID
+					signingKeyName: envVars.authSigningKeyId
 				}
 			}
 		});
@@ -229,7 +221,7 @@ export async function buildEngineServerConfiguration(
 			type: SocketRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId ?? AUTH_SIGNING_KEY_ID
+					signingKeyName: envVars.authSigningKeyId
 				}
 			}
 		});

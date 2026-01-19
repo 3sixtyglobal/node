@@ -3,7 +3,7 @@
 import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/context';
 import { ComponentFactory } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
-import { DcatClasses } from '@twin.org/standards-w3c-dcat';
+import { DataspaceProtocolContexts } from '@twin.org/standards-dataspace-protocol';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
 const entities = [
@@ -81,23 +81,27 @@ export class TestDataSpaceConnectorApp {
 	datasetsHandled() {
 		return [
 			{
+				'@context': [DataspaceProtocolContexts.JsonLdContext],
 				'@id': 'https://twin.example.org/data-service-1',
-				'@type': DcatClasses.Dataset,
-				'odrl:hasPolicy': [
+				'@type': 'Dataset',
+				hasPolicy: [
 					{
-						'@context': 'http://www.w3.org/ns/odrl.jsonld',
 						'@type': 'Offer',
 						'@id': 'urn:uuid:test-policy-offer-1',
 						uid: 'urn:uuid:test-policy-offer-1',
 						assigner: 'https://twin.example.org',
-						permission: []
+						permission: [
+							{
+								action: 'read'
+							}
+						]
 					}
 				],
-				'dcat:distribution': {
+				distribution: {
 					'@id': 'https://twin.example.org/distribution-1',
 					'@type': 'Distribution',
-					'dcat:accessService': 'https://twin.example.org/data-service-1',
-					'dcterms:format': 'Http-Pull-Query-Format'
+					accessService: 'https://twin.example.org/data-service-1',
+					format: 'Http-Pull-Query-Format'
 				},
 				'dcterms:type': 'https://vocabulary.uncefact.org/Consignment'
 			}
@@ -122,7 +126,7 @@ export class TestDataSpaceConnectorApp {
 		this._nodeId = contextIds[ContextIdKeys.Node];
 		await this._dataSpaceConnectorComponent.registerApp(TestDataSpaceConnectorApp.APP_ID, this);
 		DataTypeHandlerFactory.register('https://twin.example.org/MyCreate', () => ({
-			context: 'https://twin.example.org/',
+			namespace: 'https://twin.example.org/',
 			type: 'MyCreate',
 			defaultValue: {},
 			jsonSchema: async () => ({
@@ -130,7 +134,7 @@ export class TestDataSpaceConnectorApp {
 			})
 		}));
 		DataTypeHandlerFactory.register('https://vocabulary.uncefact.org/Consignment', () => ({
-			context: 'https://vocabulary.uncefact.org/',
+			namespace: 'https://vocabulary.uncefact.org/',
 			type: 'Consignment',
 			defaultValue: {},
 			jsonSchema: async () => ({
@@ -192,3 +196,4 @@ export class TestDataSpaceConnectorApp {
 		}
 	}
 }
+// # sourceMappingURL=testDataSpaceConnectorApp.js.map

@@ -1,3 +1,3 @@
 # Variable: VC\_AUTHENTICATION\_VERIFICATION\_METHOD\_ID
 
-> `const` **VC\_AUTHENTICATION\_VERIFICATION\_METHOD\_ID**: `"node-authentication-assertion"` = `"node-authentication-assertion"`
+> `const` **VC\_AUTHENTICATION\_VERIFICATION\_METHOD\_ID**: `"vc-authentication-assertion"` = `"vc-authentication-assertion"`

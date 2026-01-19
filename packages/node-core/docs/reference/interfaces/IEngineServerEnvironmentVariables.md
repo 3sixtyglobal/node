@@ -24,6 +24,18 @@ Start the engine in debug mode.
 
 ***
 
+### silent?
+
+> `optional` **silent**: `string`
+
+Start the engine in silent mode.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`silent`](IEngineEnvironmentVariables.md#silent)
+
+***
+
 ### storageFileRoot?
 
 > `optional` **storageFileRoot**: `string`
@@ -48,6 +60,18 @@ The name of the state file.
 
 ***
 
+### nodeIdentityEnabled?
+
+> `optional` **nodeIdentityEnabled**: `string`
+
+Does the node have a unique ID, defaults to true.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`nodeIdentityEnabled`](IEngineEnvironmentVariables.md#nodeidentityenabled)
+
+***
+
 ### tenantEnabled?
 
 > `optional` **tenantEnabled**: `string`
@@ -57,30 +81,6 @@ Is multi-tenant support enabled, defaults to false.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`tenantEnabled`](IEngineEnvironmentVariables.md#tenantenabled)
-
-***
-
-### tenantId?
-
-> `optional` **tenantId**: `string`
-
-A tenant id to use as a default for the node.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`tenantId`](IEngineEnvironmentVariables.md#tenantid)
-
-***
-
-### tenantApiKey?
-
-> `optional` **tenantApiKey**: `string`
-
-A tenant api key to use as a default for the node.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`tenantApiKey`](IEngineEnvironmentVariables.md#tenantapikey)
 
 ***
 
@@ -614,19 +614,6 @@ The id of the encryption key for the blob storage.
 
 ***
 
-### blobStorageSymmetricEncryptionKey?
-
-> `optional` **blobStorageSymmetricEncryptionKey**: `string`
-
-A symmetric encryption key for the blob storage, should be ChaCha20Poly1305 in base64 format.
-If encryption is enabled but a key is not provided one will be generated.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`blobStorageSymmetricEncryptionKey`](IEngineEnvironmentVariables.md#blobstoragesymmetricencryptionkey)
-
-***
-
 ### blobStoragePrefix?
 
 > `optional` **blobStoragePrefix**: `string`
@@ -1056,6 +1043,18 @@ The type of identity connector: entity-storage, iota.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`identityConnector`](IEngineEnvironmentVariables.md#identityconnector)
+
+***
+
+### identityWalletAddressIndex?
+
+> `optional` **identityWalletAddressIndex**: `string`
+
+The index of the wallet address to use, defaults to 0.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`identityWalletAddressIndex`](IEngineEnvironmentVariables.md#identitywalletaddressindex)
 
 ***
 

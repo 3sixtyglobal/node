@@ -20,6 +20,18 @@ Start the engine in debug mode.
 
 ***
 
+### silent?
+
+> `optional` **silent**: `string`
+
+Start the engine in silent mode.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`silent`](IEngineServerEnvironmentVariables.md#silent)
+
+***
+
 ### storageFileRoot?
 
 > `optional` **storageFileRoot**: `string`
@@ -44,6 +56,18 @@ The name of the state file.
 
 ***
 
+### nodeIdentityEnabled?
+
+> `optional` **nodeIdentityEnabled**: `string`
+
+Does the node have a unique ID, defaults to true.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`nodeIdentityEnabled`](IEngineServerEnvironmentVariables.md#nodeidentityenabled)
+
+***
+
 ### tenantEnabled?
 
 > `optional` **tenantEnabled**: `string`
@@ -53,30 +77,6 @@ Is multi-tenant support enabled, defaults to false.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`tenantEnabled`](IEngineServerEnvironmentVariables.md#tenantenabled)
-
-***
-
-### tenantId?
-
-> `optional` **tenantId**: `string`
-
-A tenant id to use as a default for the node.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`tenantId`](IEngineServerEnvironmentVariables.md#tenantid)
-
-***
-
-### tenantApiKey?
-
-> `optional` **tenantApiKey**: `string`
-
-A tenant api key to use as a default for the node.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`tenantApiKey`](IEngineServerEnvironmentVariables.md#tenantapikey)
 
 ***
 
@@ -610,19 +610,6 @@ The id of the encryption key for the blob storage.
 
 ***
 
-### blobStorageSymmetricEncryptionKey?
-
-> `optional` **blobStorageSymmetricEncryptionKey**: `string`
-
-A symmetric encryption key for the blob storage, should be ChaCha20Poly1305 in base64 format.
-If encryption is enabled but a key is not provided one will be generated.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`blobStorageSymmetricEncryptionKey`](IEngineServerEnvironmentVariables.md#blobstoragesymmetricencryptionkey)
-
-***
-
 ### blobStoragePrefix?
 
 > `optional` **blobStoragePrefix**: `string`
@@ -1052,6 +1039,18 @@ The type of identity connector: entity-storage, iota.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`identityConnector`](IEngineServerEnvironmentVariables.md#identityconnector)
+
+***
+
+### identityWalletAddressIndex?
+
+> `optional` **identityWalletAddressIndex**: `string`
+
+The index of the wallet address to use, defaults to 0.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`identityWalletAddressIndex`](IEngineServerEnvironmentVariables.md#identitywalletaddressindex)
 
 ***
 
@@ -1874,90 +1873,6 @@ List of properties to obfuscate in the REST logging output, comma separated.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`routeLoggingObfuscateProperties`](IEngineServerEnvironmentVariables.md#routeloggingobfuscateproperties)
-
-***
-
-### features?
-
-> `optional` **features**: `string`
-
-The features that are enabled on the node.
-
-#### Default
-
-```ts
-[]
-```
-
-***
-
-### nodeIdentity?
-
-> `optional` **nodeIdentity**: `string`
-
-The identity of the node which, if empty and node-identity feature is enabled it will be generated.
-
-***
-
-### nodeMnemonic?
-
-> `optional` **nodeMnemonic**: `string`
-
-The mnemonic for the identity, if empty and node-identity feature is enabled it will be randomly generated.
-
-***
-
-### organizationIdentity?
-
-> `optional` **organizationIdentity**: `string`
-
-If the node-admin-user feature is enabled, this will be the organization of the user, if one is not provided it will be generated
-
-***
-
-### organizationMnemonic?
-
-> `optional` **organizationMnemonic**: `string`
-
-The mnemonic for the organization, if empty and node-admin-user feature is enabled it will be randomly generated.
-
-***
-
-### adminUserIdentity?
-
-> `optional` **adminUserIdentity**: `string`
-
-If the node-admin-user feature is enabled, this will be the identity of the user, if one is not provided it will be generated
-
-***
-
-### adminUserMnemonic?
-
-> `optional` **adminUserMnemonic**: `string`
-
-The mnemonic for the admin user, if empty and node-admin-user feature is enabled it will be randomly generated.
-
-***
-
-### adminUserName?
-
-> `optional` **adminUserName**: `string`
-
-If the node-admin-user feature is enabled, this will be the name of the user.
-
-#### Default
-
-```ts
-admin@node
-```
-
-***
-
-### adminUserPassword?
-
-> `optional` **adminUserPassword**: `string`
-
-If the node-admin-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
 
 ***
 

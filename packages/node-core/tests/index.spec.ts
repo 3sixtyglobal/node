@@ -1,9 +1,7 @@
-// Copyright 2024 IOTA Stiftung.
+// Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { rm, writeFile } from "node:fs/promises";
-import type { AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
-import type { Tenant } from "@twin.org/api-tenant-processor";
-import { ComponentFactory, Converter, Factory, HexHelper } from "@twin.org/core";
+import { ComponentFactory, Factory } from "@twin.org/core";
 import { DataSpaceConnectorAppFactory } from "@twin.org/data-space-connector-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
@@ -27,14 +25,7 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import type { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
-import { EntityStorageConnectorFactory } from "@twin.org/entity-storage-models";
 import { FederatedCatalogueFilterFactory } from "@twin.org/federated-catalogue-models";
-import type {
-	IdentityDocument,
-	IdentityProfile
-} from "@twin.org/identity-connector-entity-storage";
-import { Did } from "@twin.org/identity-models";
 import {
 	DataAccessHandlerFactory,
 	PolicyArbiterFactory,
@@ -45,12 +36,16 @@ import {
 	PolicyRequesterFactory
 } from "@twin.org/rights-management-models";
 import { TrustGeneratorFactory, TrustVerifierFactory } from "@twin.org/trust-models";
-import type { VaultKey, VaultSecret } from "@twin.org/vault-connector-entity-storage";
+import { getEnvDefaults } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
 import { buildConfiguration, overrideModuleImport, run } from "../src/node.js";
-import { start } from "../src/server.js";
+import { start } from "../src/start.js";
 import { initialiseLocales } from "../src/utils.js";
+
+const TEST_NODE_ID =
+	"did:iota:testnet:0x8f7b71cedde408974606e404bce76980fd17a570d03ec319788fefd5eabbe9e8";
+const TEST_NODE_TENANT_ID = "4cfc10fd12d2a206f681ea9b01b306c0";
 
 const basePort = Math.floor(Math.random() * 1000);
 let port = 3000 + basePort;
@@ -67,7 +62,14 @@ describe("node-core", () => {
 	});
 
 	test("Can run the node with minimal config and shut it down", async () => {
-		const result = await run({ stateStorage: new MemoryStateStorage(false, {}) });
+		const result = await run({
+			stateStorage: new MemoryStateStorage(false, {}),
+			envVars: {
+				TWIN_DEBUG: "true",
+				TWIN_SILENT: "true",
+				TWIN_NODE_IDENTITY_ENABLED: "false"
+			}
+		});
 		expect(result).toBeDefined();
 		expect(result?.shutdown).toBeInstanceOf(Function);
 		await result?.shutdown();
@@ -79,6 +81,7 @@ describe("node-core", () => {
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
+				TWIN_NODE_IDENTITY_ENABLED: "false",
 				TWIN_PORT: port.toString(),
 				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
@@ -102,7 +105,6 @@ describe("node-core", () => {
 				TWIN_AUDITABLE_ITEM_GRAPH_ENABLED: "true",
 				TWIN_AUDITABLE_ITEM_STREAM_ENABLED: "true",
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
-				TWIN_FEATURES: "",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
@@ -115,9 +117,11 @@ describe("node-core", () => {
 		await result?.shutdown();
 	});
 
-	test("Can run the node with config and node id enabled, but no user", async () => {
+	test("Can run the node with config and node id enabled", async () => {
 		const result = await run({
-			stateStorage: new MemoryStateStorage(false, {}),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID
+			}),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
@@ -146,7 +150,6 @@ describe("node-core", () => {
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
-				TWIN_FEATURES: "node-identity",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
@@ -168,8 +171,7 @@ describe("node-core", () => {
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true",
-				TWIN_EXTENSIONS: "./tests/apps/test-app.js"
+				TWIN_MESSAGING_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -177,9 +179,12 @@ describe("node-core", () => {
 		await result?.shutdown();
 	});
 
-	test("Can run the node with config and node id enabled and multi tenant enabled, but no user", async () => {
+	test("Can run the node with config and node id enabled and multi tenant enabled", async () => {
 		const result = await run({
-			stateStorage: new MemoryStateStorage(false, {}),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeTenantId: TEST_NODE_TENANT_ID
+			}),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
@@ -209,7 +214,6 @@ describe("node-core", () => {
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
-				TWIN_FEATURES: "node-identity",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
@@ -231,33 +235,10 @@ describe("node-core", () => {
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true",
-				TWIN_EXTENSIONS: "./tests/apps/test-app.js"
+				TWIN_MESSAGING_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
-
-		const identityDocumentEntityStorage =
-			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<IdentityDocument>>(
-				"identity-document"
-			);
-		const identityDocumentStore = identityDocumentEntityStorage.getStore();
-
-		const tenantAdminEntityStorage =
-			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<Tenant>>("tenant");
-		const tenantStore = tenantAdminEntityStorage.getStore();
-		expect(tenantStore).toEqual([
-			{
-				id: expect.any(String),
-				apiKey: expect.any(String),
-				label: "node-tenant",
-				dateCreated: expect.any(String),
-				partitionId: Converter.bytesToBase64Url(
-					Converter.hexToBytes(HexHelper.stripPrefix(Did.parse(identityDocumentStore[0].id).id))
-				)
-			}
-		]);
-
 		expect(result?.shutdown).toBeInstanceOf(Function);
 		await result?.shutdown();
 	});
@@ -265,6 +246,7 @@ describe("node-core", () => {
 	test("Can start and bootstrap the server with minimal config in memory", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString()
 		};
 
@@ -342,7 +324,6 @@ describe("node-core", () => {
 			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
-			TWIN_FEATURES: "node-identity,node-admin-user",
 			TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_BACKGROUND_TASKS_ENABLED: "true",
@@ -370,7 +351,9 @@ describe("node-core", () => {
 
 		await initialiseLocales("./dist/locales/");
 
-		const memoryStateStorage = new MemoryStateStorage<INodeEngineState>();
+		const memoryStateStorage = new MemoryStateStorage<INodeEngineState>(false, {
+			nodeId: TEST_NODE_ID
+		});
 
 		const nodeOptions: INodeOptions = {
 			envPrefix: "TWIN_",
@@ -382,10 +365,17 @@ describe("node-core", () => {
 		overrideModuleImport(nodeOptions.executionDirectory ?? "", undefined);
 
 		// Use buildConfiguration to get the proper nodeEngineConfig structure
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
-			name: "foo",
-			version: "0.0.0"
-		});
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(
+			{
+				...getEnvDefaults("TWIN_"),
+				...envVars
+			},
+			nodeOptions,
+			{
+				name: "foo",
+				version: "0.0.0"
+			}
+		);
 
 		// Use the start function which handles the correct flow automatically
 		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
@@ -577,63 +567,6 @@ describe("node-core", () => {
 		]);
 
 		if (startResult?.engine) {
-			const memory = await memoryStateStorage.load(startResult?.engine);
-
-			const identityDocumentEntityStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<IdentityDocument>>(
-					"identity-document"
-				);
-			const identityDocumentStore = identityDocumentEntityStorage.getStore();
-
-			expect(identityDocumentStore.length).toEqual(3);
-			expect(identityDocumentStore[0].id).toEqual(memory?.nodeId);
-			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(1);
-			expect(identityDocumentStore[1].id).toEqual(memory?.nodeOrganizationId);
-			expect(identityDocumentStore[1].document.assertionMethod?.length).toEqual(2);
-			expect(identityDocumentStore[2].id).toEqual(memory?.nodeAdminUserId);
-			expect(identityDocumentStore[2].document.assertionMethod).toBeUndefined();
-
-			const vaultSecretStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
-					"vault-secret"
-				);
-			const secretStore = vaultSecretStorage.getStore();
-			expect(secretStore[0].id).toBeDefined();
-			expect((secretStore[0].data as string).split(" ").length).toEqual(24);
-
-			const vaultKeyStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultKey>>("vault-key");
-			const keyStore = vaultKeyStorage.getStore();
-			expect(keyStore.length).toEqual(8);
-
-			expect(keyStore[0].id).toEqual(`${identityDocumentStore[0].id}/did`);
-			expect(keyStore[1].id).toEqual(`${identityDocumentStore[1].id}/did`);
-			expect(keyStore[2].id).toEqual(`${identityDocumentStore[2].id}/did`);
-			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/auth-signing`);
-			expect(keyStore[4].id).toEqual(`${identityDocumentStore[1].id}/blob-encryption`);
-			expect(keyStore[5].id).toEqual(`${identityDocumentStore[1].id}/attestation-assertion`);
-			expect(keyStore[6].id).toEqual(`${identityDocumentStore[1].id}/immutable-proof-assertion`);
-			expect(keyStore[7].id).toEqual(
-				`${identityDocumentStore[0].id}/node-authentication-assertion`
-			);
-
-			const authenticationUserEntityStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AuthenticationUser>>(
-					"authentication-user"
-				);
-			const authUserStore = authenticationUserEntityStorage.getStore();
-			expect(authUserStore.length).toEqual(1);
-			expect(authUserStore[0].identity).toEqual(identityDocumentStore[2].id);
-			expect(authUserStore[0].organization).toEqual(identityDocumentStore[1].id);
-
-			const identityProfileEntityStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<IdentityProfile>>(
-					"identity-profile"
-				);
-			const identityProfileStore = identityProfileEntityStorage.getStore();
-			expect(identityProfileStore.length).toEqual(1);
-			expect(identityProfileStore[0].identity).toEqual(identityDocumentStore[2].id);
-
 			const dataSpaceConnectorService = ComponentFactory.get("data-space-connector-service");
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((dataSpaceConnectorService as any)._apps[0].appId).toEqual(
@@ -664,6 +597,8 @@ describe("node-core", () => {
 
 	test("Can start and bootstrap the server in memory, and restart with existing data", async () => {
 		const envVars: { [key: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
@@ -683,7 +618,6 @@ describe("node-core", () => {
 			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
-			TWIN_FEATURES: "node-identity,node-admin-user",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_TRUST_ENABLED: "true",
@@ -703,14 +637,23 @@ describe("node-core", () => {
 
 		await initialiseLocales("./dist/locales/");
 
-		const memoryStateStorage = new MemoryStateStorage<INodeEngineState>();
+		const memoryStateStorage = new MemoryStateStorage<INodeEngineState>(false, {
+			nodeId: TEST_NODE_ID
+		});
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
-			name: "foo",
-			version: "0.0.0"
-		});
+		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(
+			{
+				...getEnvDefaults("TWIN_"),
+				...envVars
+			},
+			nodeOptions,
+			{
+				name: "foo",
+				version: "0.0.0"
+			}
+		);
 
 		const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 		expect(startResult).toBeDefined();
@@ -721,10 +664,7 @@ describe("node-core", () => {
 			const mem = await memoryStateStorage.load(startResult?.engine);
 
 			const memoryStateStorage2 = new MemoryStateStorage<INodeEngineState>(false, {
-				nodeId: mem?.nodeId,
-				nodeTenantId: mem?.nodeTenantId,
-				nodeAdminUserId: mem?.nodeAdminUserId,
-				nodeOrganizationId: mem?.nodeOrganizationId
+				nodeId: mem?.nodeId
 			});
 
 			const startResult2 = await start(
@@ -739,66 +679,16 @@ describe("node-core", () => {
 
 			const memory = await memoryStateStorage.load(startResult?.engine);
 
-			const identityDocumentEntityStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<IdentityDocument>>(
-					"identity-document"
-				);
-			const identityDocumentStore = identityDocumentEntityStorage.getStore();
-
-			expect(identityDocumentStore.length).toEqual(3);
-			expect(identityDocumentStore[0].id).toEqual(memory?.nodeId);
-			expect(identityDocumentStore[0].document.assertionMethod?.length).toEqual(1);
-			expect(identityDocumentStore[1].id).toEqual(memory?.nodeOrganizationId);
-			expect(identityDocumentStore[1].document.assertionMethod?.length).toEqual(2);
-			expect(identityDocumentStore[2].id).toEqual(memory?.nodeAdminUserId);
-			expect(identityDocumentStore[2].document.assertionMethod).toBeUndefined();
-
-			const vaultSecretStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
-					"vault-secret"
-				);
-			const secretStore = vaultSecretStorage.getStore();
-			expect(secretStore[0].id).toBeDefined();
-			expect((secretStore[0].data as string).split(" ").length).toEqual(24);
-
-			const vaultKeyStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultKey>>("vault-key");
-			const keyStore = vaultKeyStorage.getStore();
-			expect(keyStore.length).toEqual(8);
-
-			expect(keyStore[0].id).toEqual(`${identityDocumentStore[0].id}/did`);
-			expect(keyStore[1].id).toEqual(`${identityDocumentStore[1].id}/did`);
-			expect(keyStore[2].id).toEqual(`${identityDocumentStore[2].id}/did`);
-			expect(keyStore[3].id).toEqual(`${identityDocumentStore[0].id}/auth-signing`);
-			expect(keyStore[4].id).toEqual(`${identityDocumentStore[1].id}/blob-encryption`);
-			expect(keyStore[5].id).toEqual(`${identityDocumentStore[1].id}/attestation-assertion`);
-			expect(keyStore[6].id).toEqual(`${identityDocumentStore[1].id}/immutable-proof-assertion`);
-			expect(keyStore[7].id).toEqual(
-				`${identityDocumentStore[0].id}/node-authentication-assertion`
-			);
-
-			const authenticationUserEntityStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AuthenticationUser>>(
-					"authentication-user"
-				);
-			const authUserStore = authenticationUserEntityStorage.getStore();
-			expect(authUserStore.length).toEqual(1);
-			expect(authUserStore[0].identity).toEqual(identityDocumentStore[2].id);
-			expect(authUserStore[0].organization).toEqual(identityDocumentStore[1].id);
-
-			const identityProfileEntityStorage =
-				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<IdentityProfile>>(
-					"identity-profile"
-				);
-			const identityProfileStore = identityProfileEntityStorage.getStore();
-			expect(identityProfileStore.length).toEqual(1);
-			expect(identityProfileStore[0].identity).toEqual(identityDocumentStore[2].id);
+			expect(memory).toEqual({
+				nodeId: TEST_NODE_ID
+			});
 		}
 	});
 
 	test("Can start a server and intercept custom callbacks", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_TASK_SCHEDULER_ENABLED: "false"
@@ -877,6 +767,7 @@ describe("node-core", () => {
 	test("Can start a server and load a custom env file", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_TASK_SCHEDULER_ENABLED: "false"
@@ -936,6 +827,7 @@ describe("node-core", () => {
 	test("Can start a server and load a custom config file", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString()
 		};
 
@@ -992,6 +884,8 @@ describe("node-core", () => {
 
 	test("Can start a server and load an embedded config text file", async () => {
 		const envVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_TEST_EMBEDDED: "@text:tests/embedded.txt"
 		};
@@ -1023,6 +917,8 @@ describe("node-core", () => {
 
 	test("Can start a server and load an embedded JSON file", async () => {
 		const envVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_TEST_EMBEDDED: "@json:tests/embedded.json"
 		};
 
@@ -1056,6 +952,7 @@ describe("node-core", () => {
 	test("Can start the server with an extension", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_EXTENSIONS: "./tests/extensions/my-extension.js"
 		};
@@ -1110,6 +1007,8 @@ describe("node-core", () => {
 
 	test("should reject insecure HTTP protocol extensions", async () => {
 		const envVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_EXTENSIONS: "http://example.com/insecure-extension.js"
 		};
@@ -1187,6 +1086,8 @@ describe("node-core", () => {
 		);
 
 		const envVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_EXTENSIONS:
 				"./tests/extensions/first-extension.js,./tests/extensions/second-extension.js"
@@ -1274,6 +1175,8 @@ describe("node-core", () => {
 		);
 
 		const envVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_EXTENSIONS: "./tests/extensions/lifecycle-test.js"
 		};
@@ -1342,6 +1245,8 @@ describe("node-core", () => {
 		);
 
 		const envVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_EXTENSIONS: "./tests/extensions/failing-extension.js"
 		};
@@ -1383,6 +1288,8 @@ describe("node-core", () => {
 
 		const customCacheDir = "custom-cache";
 		const envVars = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_STORAGE_FILE_ROOT: "./.local-data",
 			TWIN_STORAGE_ENTITY_STORAGE_CONNECTOR: "memory",
@@ -1392,7 +1299,7 @@ describe("node-core", () => {
 
 		await initialiseLocales("./dist/locales/");
 
-		const memoryStateStorage = new MemoryStateStorage();
+		const memoryStateStorage = new MemoryStateStorage(false, { nodeId: TEST_NODE_ID });
 
 		const nodeOptions: INodeOptions = {
 			envPrefix: "TWIN_",
@@ -1436,72 +1343,4 @@ describe("node-core", () => {
 		// Cleanup
 		await rm("./tests/extensions/cache-test.js", { force: true });
 	});
-
-	// test("should start node with real TWIN extension from npm protocol", async () => {
-	// 	const envVars: { [id: string]: string } = {
-	// 		TWIN_DEBUG: "true",
-	// 		TWIN_PORT: port.toString(),
-	// 		// Use npm protocol to download real TWIN extension
-	// 		TWIN_EXTENSIONS: "npm:@twin.org/data-space-connector-test-app@0.0.1-next.7",
-	// 		TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
-	// 		TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
-	// 		TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
-	// 		TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
-	// 		TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: "memory",
-	// 		TWIN_ENTITY_STORAGE_TYPES: JSON.stringify({
-	// 			"activity-log-details": "memory",
-	// 			"activity-task": "memory"
-	// 		}),
-	// 		TWIN_BACKGROUND_TASKS_ENABLED: "true",
-	// 		TWIN_TASK_SCHEDULER_ENABLED: "true"
-	// 	};
-
-	// 	await initialiseLocales("./dist/locales/");
-
-	// 	const memoryStateStorage = new MemoryStateStorage(false, {
-	// 		nodeId: "alice"
-	// 	});
-
-	// 	const nodeOptions: INodeOptions = {
-	// 		envPrefix: "TWIN_",
-	// 		stateStorage: memoryStateStorage
-	// 	};
-
-	// 	const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
-	// 		name: "twin-node-with-real-extension",
-	// 		version: "1.0.0"
-	// 	});
-
-	// 	// This will trigger the npm protocol handler to download and install the extension
-	// 	const startResult = await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
-
-	// 	// Verify node started successfully with extension
-	// 	expect(startResult).toBeDefined();
-
-	// 	if (!startResult) {
-	// 		throw new Error("Node failed to start with npm extension");
-	// 	}
-
-	// 	// Wait for server to be fully ready
-	// 	await new Promise(resolve => setTimeout(resolve, 3000));
-
-	// 	// Verify server is running
-	// 	const res = await fetch(`http://localhost:${port}/info`);
-	// 	expect(res.status).toBe(200);
-	// 	expect(await res.json()).toEqual({
-	// 		name: "twin-node-with-real-extension",
-	// 		version: "1.0.0"
-	// 	});
-
-	// 	// Verify engine is running (this means the extension loaded successfully)
-	// 	expect(startResult.engine.isStarted()).toBe(true);
-
-	// 	const testAppType = startResult.engine.getRegisteredInstanceTypeOptional("testAppComponent");
-
-	// 	// If extension loaded correctly, this component type should be registered
-	// 	expect(testAppType).toBeDefined();
-
-	// 	// Graceful shutdown
-	// 	await startResult.shutdown();
-	// }, 120000); // 2 minute timeout for npm download + node startup
 });

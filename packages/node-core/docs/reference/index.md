@@ -3,6 +3,10 @@
 ## Interfaces
 
 - [ICacheMetadata](interfaces/ICacheMetadata.md)
+- [ICliArgs](interfaces/ICliArgs.md)
+- [ICliCommand](interfaces/ICliCommand.md)
+- [ICliCommandDefinition](interfaces/ICliCommandDefinition.md)
+- [ICliCommandDefinitionParam](interfaces/ICliCommandDefinitionParam.md)
 - [IEngineEnvironmentVariables](interfaces/IEngineEnvironmentVariables.md)
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
 - [IModuleProtocol](interfaces/IModuleProtocol.md)
@@ -14,12 +18,12 @@
 
 ## Type Aliases
 
+- [CliCommandParamType](type-aliases/CliCommandParamType.md)
 - [ModuleProtocol](type-aliases/ModuleProtocol.md)
 - [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
 - [NodeExtensionShutdownMethod](type-aliases/NodeExtensionShutdownMethod.md)
-- [NodeFeatures](type-aliases/NodeFeatures.md)
 
 ## Variables
 
@@ -32,24 +36,23 @@
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_DID](variables/CONTEXT_ID_HANDLER_FEATURE_DID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_TENANT](variables/CONTEXT_ID_HANDLER_FEATURE_TENANT.md)
 - [ModuleProtocol](variables/ModuleProtocol.md)
-- [NodeFeatures](variables/NodeFeatures.md)
 
 ## Functions
 
-- [bootstrap](functions/bootstrap.md)
-- [bootstrapNodeId](functions/bootstrapNodeId.md)
-- [bootstrapTenantId](functions/bootstrapTenantId.md)
-- [bootstrapNodeAdminUser](functions/bootstrapNodeAdminUser.md)
-- [bootstrapImmutableProofMethod](functions/bootstrapImmutableProofMethod.md)
-- [bootstrapBlobEncryption](functions/bootstrapBlobEncryption.md)
-- [bootstrapAuth](functions/bootstrapAuth.md)
-- [bootstrapSynchronisedStorage](functions/bootstrapSynchronisedStorage.md)
 - [buildEngineConfiguration](functions/buildEngineConfiguration.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)
 - [extensionsInitialiseEngine](functions/extensionsInitialiseEngine.md)
 - [extensionsInitialiseEngineServer](functions/extensionsInitialiseEngineServer.md)
 - [shutdownExtensions](functions/shutdownExtensions.md)
+- [initCli](functions/initCli.md)
+- [parseCommandLineArgs](functions/parseCommandLineArgs.md)
+- [constructCliCommand](functions/constructCliCommand.md)
+- [executeCommand](functions/executeCommand.md)
+- [processEnvOptions](functions/processEnvOptions.md)
+- [substituteEnvOptions](functions/substituteEnvOptions.md)
+- [registerCommands](functions/registerCommands.md)
+- [getEnvDefaults](functions/getEnvDefaults.md)
 - [run](functions/run.md)
 - [buildConfiguration](functions/buildConfiguration.md)
 - [overrideModuleImport](functions/overrideModuleImport.md)
@@ -62,7 +65,6 @@
 - [getFiles](functions/getFiles.md)
 - [loadTextFile](functions/loadTextFile.md)
 - [loadJsonFile](functions/loadJsonFile.md)
-- [getFeatures](functions/getFeatures.md)
 - [parseModuleProtocol](functions/parseModuleProtocol.md)
 - [hashUrl](functions/hashUrl.md)
 - [getExtensionsCacheDir](functions/getExtensionsCacheDir.md)

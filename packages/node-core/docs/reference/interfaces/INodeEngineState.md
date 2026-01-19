@@ -21,19 +21,3 @@ The identity for the node.
 > `optional` **nodeTenantId**: `string`
 
 The tenant id for the node.
-
-***
-
-### nodeOrganizationId?
-
-> `optional` **nodeOrganizationId**: `string`
-
-The identity for the organization.
-
-***
-
-### nodeAdminUserId?
-
-> `optional` **nodeAdminUserId**: `string`
-
-The identity for the admin user.

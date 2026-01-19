@@ -5,22 +5,13 @@ import { mkdir, readdir, readFile, rename, stat, writeFile } from "node:fs/promi
 import { get as httpsGet } from "node:https";
 import path from "node:path";
 import { CLIDisplay } from "@twin.org/cli-core";
-import {
-	BaseError,
-	Converter,
-	GeneralError,
-	I18n,
-	Is,
-	type ILocaleDictionary
-} from "@twin.org/core";
+import { BaseError, Converter, GeneralError, I18n, type ILocaleDictionary } from "@twin.org/core";
 import { Sha256 } from "@twin.org/crypto";
 import { ModuleHelper } from "@twin.org/modules";
 import type { ICacheMetadata } from "./models/ICacheMetadata.js";
 import type { IModuleProtocol } from "./models/IModuleProtocol.js";
-import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 import type { IProtocolHandlerResult } from "./models/IProtocolHandlerResult.js";
 import { ModuleProtocol } from "./models/moduleProtocol.js";
-import { NodeFeatures } from "./models/nodeFeatures.js";
 
 /**
  * Initialise the locales for the application.
@@ -134,30 +125,6 @@ export async function loadTextFile(filename: string): Promise<string> {
 export async function loadJsonFile<T>(filename: string): Promise<T> {
 	const content = await loadTextFile(filename);
 	return JSON.parse(content) as T;
-}
-
-/**
- * Get the features that are enabled on the node.
- * @param env The environment variables for the node.
- * @returns The features that are enabled on the node.
- */
-export function getFeatures(env: INodeEnvironmentVariables): NodeFeatures[] {
-	if (Is.empty(env.features)) {
-		return [];
-	}
-
-	const features: NodeFeatures[] = [];
-	const allFeatures = Object.values(NodeFeatures);
-
-	const splitFeatures = env.features.split(",");
-	for (const feature of splitFeatures) {
-		const featureTrimmed = feature.trim() as NodeFeatures;
-		if (allFeatures.includes(featureTrimmed)) {
-			features.push(featureTrimmed);
-		}
-	}
-
-	return features;
 }
 
 /**
