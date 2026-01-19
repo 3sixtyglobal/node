@@ -69,15 +69,18 @@ export async function run(
 		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
 			nodeOptions.executionDirectory = getExecutionDirectory();
 		}
+		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
 
 		if (!Is.stringValue(nodeOptions?.scriptDirectory)) {
 			nodeOptions.scriptDirectory = getScriptDirectory(args);
 		}
+		CLIDisplay.value("Script Directory", nodeOptions.scriptDirectory);
 
 		nodeOptions.localesDirectory =
 			nodeOptions?.localesDirectory ??
 			path.resolve(path.join(nodeOptions.scriptDirectory, "dist", "locales"));
 
+		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
 		await initialiseLocales(nodeOptions.localesDirectory);
 
 		nodeOptions.envPrefix ??= "TWIN_";
@@ -104,10 +107,6 @@ export async function run(
 			...finalEnvVars
 		};
 
-		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
-		CLIDisplay.value("Script Directory", nodeOptions.scriptDirectory);
-		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
-		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		const cliCommand = initCli(finalEnvVars, args);
 
@@ -140,6 +139,8 @@ export async function run(
 				CLIDisplay.value("Favicon File", nodeOptions.favIconFile);
 			}
 		}
+
+		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		const { nodeEngineConfig, nodeEnvVars, availableContextIdKeys } = await buildConfiguration(
 			finalEnvVars,
