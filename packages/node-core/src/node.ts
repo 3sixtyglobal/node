@@ -107,7 +107,6 @@ export async function run(
 			...finalEnvVars
 		};
 
-
 		const cliCommand = initCli(finalEnvVars, args);
 
 		if (cliCommand) {
