@@ -2,7 +2,7 @@
 
 > **buildConfiguration**(`processEnv`, `options`, `serverInfo`): `Promise`\<\{ `nodeEnvVars`: [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & `object`; `nodeEngineConfig`: [`INodeEngineConfig`](../interfaces/INodeEngineConfig.md); `availableContextIdKeys`: `object`[]; \}\>
 
-Build the configuration for the TWIN Node server.
+Build the configuration for the TWIN Node.
 
 ## Parameters
 

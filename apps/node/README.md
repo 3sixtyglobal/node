@@ -1,8 +1,6 @@
-# TWIN Node Server
+# TWIN Node
 
 A REST server implementation support the routes from various packages.
-
-A deployment of this API can be found here [https://node-api.twindev.org/info](https://node-api.twindev.org/info)
 
 The OpenAPI Spec can be found here [TWIN Node OpenAPI Spec](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/twinfoundation/node/refs/heads/next/apps/node/docs/open-api/spec.json)
 

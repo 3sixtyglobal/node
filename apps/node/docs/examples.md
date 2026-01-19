@@ -7,13 +7,13 @@ To run the command from the package either:
 Install `@twin.org/node` and use the following command:
 
 ```shell
-twin-node
+twin-node --help
 ```
 
 or
 
 ```shell
-npx "@twin.org/node"
+npx "@twin.org/node" --help
 ```
 
 ### Display help listing all commands

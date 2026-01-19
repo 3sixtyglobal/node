@@ -49,6 +49,7 @@ async function executeCliCommand(
 	const stateStorage = new MemoryStateStorage(false, state);
 	await run(
 		{
+			localesDirectory: "./dist/locales/",
 			stateStorage,
 			envVars: {
 				TWIN_DEBUG: "true",

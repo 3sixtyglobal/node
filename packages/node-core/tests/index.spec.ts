@@ -58,11 +58,14 @@ describe("node-core", () => {
 	});
 
 	test("Can fail to run the node with no config as default is for file storage and this requires a storageFileRoot", async () => {
-		await expect(run({ disableProcessExitOnFailure: true })).rejects.toThrow();
+		await expect(
+			run({ disableProcessExitOnFailure: true, localesDirectory: "./dist/locales/" })
+		).rejects.toThrow();
 	});
 
 	test("Can run the node with minimal config and shut it down", async () => {
 		const result = await run({
+			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, {}),
 			envVars: {
 				TWIN_DEBUG: "true",
@@ -77,6 +80,7 @@ describe("node-core", () => {
 
 	test("Can run the node with config with no node id", async () => {
 		const result = await run({
+			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, {}),
 			envVars: {
 				TWIN_DEBUG: "true",
@@ -119,6 +123,7 @@ describe("node-core", () => {
 
 	test("Can run the node with config and node id enabled", async () => {
 		const result = await run({
+			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: TEST_NODE_ID
 			}),
@@ -181,6 +186,7 @@ describe("node-core", () => {
 
 	test("Can run the node with config and node id enabled and multi tenant enabled", async () => {
 		const result = await run({
+			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: TEST_NODE_ID,
 				nodeTenantId: TEST_NODE_TENANT_ID

@@ -40,7 +40,7 @@ nginx -v
 
 ## Configuring nginx
 
-We need to configure nginx to use the certificate and reverse proxy https traffic to the node server.
+We need to configure nginx to use the certificate and reverse proxy https traffic to the node.
 
 ```shell
 sudo nano /etc/nginx/nginx.conf
@@ -130,7 +130,7 @@ You might need to modify the location for the node version, you can find this ou
 
 ```shell
 [Unit]
-Description=TWIN Node Server
+Description=TWIN Node
 After=network.target
 
 [Service]

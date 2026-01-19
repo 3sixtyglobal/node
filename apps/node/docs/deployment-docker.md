@@ -61,7 +61,7 @@ This example will map the local directory `/home/twin-node/data` and make it ava
 The output from the docker container should be something like the following.
 
 ```shell
-🌩️  TWIN Node Server v1.0.0
+🌩️  TWIN Node v1.0.0
 
 Execution Directory: /app
 Locales Directory: /app/dist/locales
@@ -125,7 +125,7 @@ docker run -t -i -v /home/twin-node/data:/twin-node/data -p 3000:3000 twin-node
 You should now see output similar to the following:
 
 ```shell
-🌩️  TWIN Node Server v1.0.0
+🌩️  TWIN Node v1.0.0
 
 Execution Directory: /app
 Locales Directory: /app/dist/locales
@@ -174,7 +174,7 @@ On successfully communicating with the server you should see something similar t
 
 ```json
 {
-  "name": "TWIN Node Server",
+  "name": "TWIN Node",
   "version": "1.0.0"
 }
 ```
@@ -183,7 +183,7 @@ The logging in the docker container should also show the request and response.
 
 ```shell
 INFO [2024-07-24T08:46:25.283Z] ===> GET /info
-INFO [2024-07-24T08:46:25.287Z] <=== 200 GET /info duration: 3987µs {"name":"TWIN Node Server","version":"1.0.0"}
+INFO [2024-07-24T08:46:25.287Z] <=== 200 GET /info duration: 3987µs {"name":"TWIN Node","version":"1.0.0"}
 ```
 
 The API server responds to the correct terminate signals so that when the docker container is stopped the server will also stop gracefully.

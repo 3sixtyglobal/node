@@ -1,7 +1,7 @@
 {
 	"openapi": "3.1.1",
 	"info": {
-		"title": "TWIN TWIN Node Server",
+		"title": "TWIN Node",
 		"description": "REST API for TWIN - API Server.",
 		"version": "1.0.0",
 		"license": {

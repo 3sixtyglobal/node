@@ -2,7 +2,7 @@
 
 > **run**(`nodeOptions?`, `args?`): `Promise`\<\{ `engine`: `Engine`\<`IEngineServerConfig`, [`INodeEngineState`](../interfaces/INodeEngineState.md)\>; `server`: `EngineServer`; `shutdown`: () => `Promise`\<`void`\>; \} \| `undefined`\>
 
-Run the TWIN Node server.
+Run the TWIN Node.
 
 ## Parameters
 

@@ -10,8 +10,8 @@ import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
  */
 export interface INodeOptions {
 	/**
-	 * The name of the server, defaults to "TWIN Node Server".
-	 * @default "TWIN Node Server"
+	 * The name of the server, defaults to "TWIN Node".
+	 * @default "TWIN Node"
 	 */
 	serverName?: string;
 

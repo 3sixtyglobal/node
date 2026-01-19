@@ -5,7 +5,14 @@ import { mkdir, readdir, readFile, rename, stat, writeFile } from "node:fs/promi
 import { get as httpsGet } from "node:https";
 import path from "node:path";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { BaseError, Converter, GeneralError, I18n, type ILocaleDictionary } from "@twin.org/core";
+import {
+	BaseError,
+	Converter,
+	GeneralError,
+	I18n,
+	Is,
+	type ILocaleDictionary
+} from "@twin.org/core";
 import { Sha256 } from "@twin.org/crypto";
 import { ModuleHelper } from "@twin.org/modules";
 import type { ICacheMetadata } from "./models/ICacheMetadata.js";
@@ -30,9 +37,13 @@ export async function initialiseLocales(localesDirectory: string): Promise<void>
 
 /**
  * Get the directory where the application is being executed.
+ * @param args The command line arguments.
  * @returns The execution directory.
  */
-export function getExecutionDirectory(): string {
+export function getExecutionDirectory(args?: string[]): string {
+	if (Is.array<string>(args) && args.length >= 2 && args[1].includes("index.js")) {
+		return path.resolve(path.join(path.dirname(args[1]), ".."));
+	}
 	return process.cwd();
 }
 

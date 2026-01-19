@@ -38,7 +38,7 @@ import {
 const moduleCache: { [id: string]: unknown } = {};
 
 /**
- * Run the TWIN Node server.
+ * Run the TWIN Node.
  * @param nodeOptions Optional configuration options for running the server.
  * @param args Optional command line arguments.
  * @returns A promise that resolves when the server is started containing a shutdown method.
@@ -59,14 +59,14 @@ export async function run(
 		nodeOptions ??= {};
 
 		const serverInfo: IServerInfo = {
-			name: nodeOptions?.serverName ?? "TWIN Node Server",
+			name: nodeOptions?.serverName ?? "TWIN Node",
 			version: nodeOptions?.serverVersion ?? "0.0.3-next.10" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
 
 		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
-			nodeOptions.executionDirectory = getExecutionDirectory();
+			nodeOptions.executionDirectory = getExecutionDirectory(args);
 		}
 
 		nodeOptions.localesDirectory =
@@ -183,7 +183,7 @@ export async function run(
 }
 
 /**
- * Build the configuration for the TWIN Node server.
+ * Build the configuration for the TWIN Node.
  * @param processEnv The environment variables from the process.
  * @param options The options for running the server.
  * @param serverInfo The server information.
