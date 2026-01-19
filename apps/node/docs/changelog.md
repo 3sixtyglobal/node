@@ -1,5 +1,20 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.10](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.9...node-v0.0.3-next.10) (2026-01-19)
+
+
+### Features
+
+* add CLI commands and remove automated bootstrap code ([#69](https://github.com/twinfoundation/node/issues/69)) ([6e40933](https://github.com/twinfoundation/node/commit/6e40933d8bb820b380e1074fc88feeedca0ef7d9))
+* update docs ([409126a](https://github.com/twinfoundation/node/commit/409126a1325998face4634426b71682944c6a504))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.9 to 0.0.3-next.10
+
 ## [0.0.3-next.9](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.8...node-v0.0.3-next.9) (2026-01-07)
 
 
