@@ -8,7 +8,6 @@ import {
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
-	AuthenticationGeneratorComponentType,
 	BackgroundTaskComponentType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
@@ -131,7 +130,6 @@ export async function buildEngineConfiguration(
 	await configureAuditableItemGraph(coreConfig, envVars);
 	await configureAuditableItemStream(coreConfig, envVars);
 	await configureDocumentManagement(coreConfig, envVars);
-	await configureVerifiableCredentialAuthentication(coreConfig, envVars);
 	await configureTrust(coreConfig, envVars);
 	await configureRightsManagement(coreConfig, envVars);
 	await configureSynchronisedStorage(coreConfig, envVars);
@@ -1085,30 +1083,6 @@ async function configureDocumentManagement(
 }
 
 /**
- * Configures the verifiable credential authentication.
- * @param coreConfig The core config.
- * @param envVars The environment variables.
- */
-async function configureVerifiableCredentialAuthentication(
-	coreConfig: IEngineConfig,
-	envVars: IEngineEnvironmentVariables
-): Promise<void> {
-	if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
-		// Can only perform VC authentication if identity component is available
-		coreConfig.types.authenticationGeneratorComponent ??= [];
-		coreConfig.types.authenticationGeneratorComponent.push({
-			type: AuthenticationGeneratorComponentType.VerifiableCredential,
-			options: {
-				config: {
-					verificationMethodId: envVars.vcAuthenticationVerificationMethodId ?? ""
-				}
-			},
-			features: ["verifiable-credential"]
-		});
-	}
-}
-
-/**
  * Configures the trust components.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -1130,7 +1104,8 @@ async function configureTrust(
 				type: trustGeneratorType as TrustGeneratorComponentType,
 				options: {
 					config: {
-						verificationMethodId: envVars.trustVerificationMethodId ?? ""
+						verificationMethodId: envVars.trustVerificationMethodId ?? "",
+						tokenTtlInSeconds: Coerce.integer(envVars.trustJwtTtlSeconds)
 					}
 				}
 			});

@@ -18355,9 +18355,9 @@
 						},
 						"description": "The verifiable credentials to include in the presentation."
 					},
-					"expiresInMinutes": {
-						"type": "number",
-						"description": "The expiration time for the presentation."
+					"expirationDate": {
+						"type": "string",
+						"description": "The expiration date/time for the presentation."
 					}
 				},
 				"required": [

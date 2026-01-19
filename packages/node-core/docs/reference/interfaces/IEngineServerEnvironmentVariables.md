@@ -1499,11 +1499,24 @@ The trust verifiers to add to the factory, comma separated list.
 > `optional` **trustVerificationMethodId**: `string`
 
 The verification method to use for trust identities.
-Defaults to node-authentication-assertion.
+Defaults to trust-assertion.
 
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`trustVerificationMethodId`](IEngineEnvironmentVariables.md#trustverificationmethodid)
+
+***
+
+### trustJwtTtlSeconds?
+
+> `optional` **trustJwtTtlSeconds**: `string`
+
+The trust time to live for generating JWTs.
+Defaults to undefined for never expiring.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`trustJwtTtlSeconds`](IEngineEnvironmentVariables.md#trustjwtttlseconds)
 
 ***
 
@@ -1684,31 +1697,6 @@ The interval for cleaning up the activity logs.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataSpaceConnectorActivityLogsCleanUpInterval`](IEngineEnvironmentVariables.md#dataspaceconnectoractivitylogscleanupinterval)
-
-***
-
-### vcAuthenticationEnabled?
-
-> `optional` **vcAuthenticationEnabled**: `string`
-
-Enable verifiable credential authentication for the API.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`vcAuthenticationEnabled`](IEngineEnvironmentVariables.md#vcauthenticationenabled)
-
-***
-
-### vcAuthenticationVerificationMethodId?
-
-> `optional` **vcAuthenticationVerificationMethodId**: `string`
-
-Verifiable credential assertion for node to node communication.
-Defaults to node-authentication-assertion.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`vcAuthenticationVerificationMethodId`](IEngineEnvironmentVariables.md#vcauthenticationverificationmethodid)
 
 ***
 

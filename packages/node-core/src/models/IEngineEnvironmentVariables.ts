@@ -622,9 +622,15 @@ export interface IEngineEnvironmentVariables {
 
 	/**
 	 * The verification method to use for trust identities.
-	 * Defaults to node-authentication-assertion.
+	 * Defaults to trust-assertion.
 	 */
 	trustVerificationMethodId?: string;
+
+	/**
+	 * The trust time to live for generating JWTs.
+	 * Defaults to undefined for never expiring.
+	 */
+	trustJwtTtlSeconds?: string;
 
 	/**
 	 * Is the rights management enabled, defaults to false.
@@ -697,17 +703,6 @@ export interface IEngineEnvironmentVariables {
 	 * @default 60
 	 */
 	dataSpaceConnectorActivityLogsCleanUpInterval?: string;
-
-	/**
-	 * Enable verifiable credential authentication for the API.
-	 */
-	vcAuthenticationEnabled?: string;
-
-	/**
-	 * Verifiable credential assertion for node to node communication.
-	 * Defaults to node-authentication-assertion.
-	 */
-	vcAuthenticationVerificationMethodId?: string;
 
 	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.

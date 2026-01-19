@@ -124,10 +124,10 @@ twin-node identity-verifiable-credential-create --load-env="organization-identit
 twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --controller=!NODE_DID --verification-method-id=!TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID --output-json="organization-immutable-proof.json" --output-env="organization-immutable-proof.env"
 ```
 
-### Add a verification method to the organization identity for verifiable credential authentication
+### Add a verification method to the organization identity for trust verification
 
 ```shell
-twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --controller=!NODE_DID --verification-method-id=!TWIN_VC_AUTHENTICATION_VERIFICATION_METHOD_ID --output-json="organization-vc-authentication.json" --output-env="organization-vc-authentication.env"
+twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --controller=!NODE_DID --verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID --output-json="organization-trust.json" --output-env="organization-trust.env"
 ```
 
 ### Add a key associated with the organization to be used for blob encryption

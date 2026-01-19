@@ -152,16 +152,18 @@ export async function bootstrapLegacy(
 			keyId: envVars.authSigningKeyId
 		});
 
-		if (Coerce.boolean(envVars.vcAuthenticationEnabled) ?? false) {
+		if (Coerce.boolean(envVars.trustEnabled) ?? false) {
 			CLIDisplay.break();
 			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.vcAuthenticationMethodCreate")
+				I18n.formatMessage(
+					"node.cli.commands.bootstrap-legacy.labels.trustVerificationMethodCreate"
+				)
 			);
 
 			await identityVerificationMethodCreate(engineCore, envVars, {
 				identity: nodeIdentity.did,
 				verificationMethodType: "assertionMethod",
-				verificationMethodId: envVars.vcAuthenticationVerificationMethodId,
+				verificationMethodId: envVars.trustVerificationMethodId,
 				overwriteMode: "skip"
 			});
 		}

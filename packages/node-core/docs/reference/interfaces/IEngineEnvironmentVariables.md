@@ -1011,7 +1011,16 @@ The trust verifiers to add to the factory, comma separated list.
 > `optional` **trustVerificationMethodId**: `string`
 
 The verification method to use for trust identities.
-Defaults to node-authentication-assertion.
+Defaults to trust-assertion.
+
+***
+
+### trustJwtTtlSeconds?
+
+> `optional` **trustJwtTtlSeconds**: `string`
+
+The trust time to live for generating JWTs.
+Defaults to undefined for never expiring.
 
 ***
 
@@ -1136,23 +1145,6 @@ The interval for cleaning up the activity logs.
 ```ts
 60
 ```
-
-***
-
-### vcAuthenticationEnabled?
-
-> `optional` **vcAuthenticationEnabled**: `string`
-
-Enable verifiable credential authentication for the API.
-
-***
-
-### vcAuthenticationVerificationMethodId?
-
-> `optional` **vcAuthenticationVerificationMethodId**: `string`
-
-Verifiable credential assertion for node to node communication.
-Defaults to node-authentication-assertion.
 
 ***
 

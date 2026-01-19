@@ -432,21 +432,21 @@ describe("node-core", () => {
 				`--load-env=${OUTPUT_TMP_DIR}node-identity.env,${OUTPUT_TMP_DIR}organization-identity.env`,
 				"--identity=!ORGANIZATION_DID",
 				"--controller=!NODE_DID",
-				"--verification-method-id=!TWIN_VC_AUTHENTICATION_VERIFICATION_METHOD_ID",
-				`--output-json=${OUTPUT_TMP_DIR}organization-vc-authentication.json`,
-				`--output-env=${OUTPUT_TMP_DIR}organization-vc-authentication.env`
+				"--verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID",
+				`--output-json=${OUTPUT_TMP_DIR}organization-trust.json`,
+				`--output-env=${OUTPUT_TMP_DIR}organization-trust.env`
 			],
 			{}
 		);
 
 		const organizationVcAuthenticationJson = await CLIUtils.readJsonFile<any>(
-			`${OUTPUT_TMP_DIR}organization-vc-authentication.json`
+			`${OUTPUT_TMP_DIR}organization-trust.json`
 		);
 		const organizationVcAuthenticationEnv = await CLIUtils.readLinesFile(
-			`${OUTPUT_TMP_DIR}organization-vc-authentication.env`
+			`${OUTPUT_TMP_DIR}organization-trust.env`
 		);
 		expect(organizationVcAuthenticationJson?.verificationMethodId).toEqual(
-			`${organizationIdentityJson.did}#vc-authentication-assertion`
+			`${organizationIdentityJson.did}#trust-assertion`
 		);
 		expect(organizationVcAuthenticationJson?.verificationMethodId).toEqual(
 			valueFromEnv(organizationVcAuthenticationEnv?.[0])
