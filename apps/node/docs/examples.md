@@ -31,7 +31,7 @@ twin-node command --help
 ### Bootstrap legacy mode **will be deprecated in future versions**
 
 ```shell
-twin-node bootstrap-legacy
+twin-node bootstrap-legacy --load-env=".env.bootstrap-legacy"
 ```
 
 ### Create the identity for the node
