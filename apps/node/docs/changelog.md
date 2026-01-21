@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.14](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.13...node-v0.0.3-next.14) (2026-01-21)
+
+
+### Features
+
+* add vault prefix configuration ([#75](https://github.com/twinfoundation/node/issues/75)) ([1d4afb1](https://github.com/twinfoundation/node/commit/1d4afb1b1a8aa60795898eeb9e7f5153c279527d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.13 to 0.0.3-next.14
+
 ## [0.0.3-next.13](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.12...node-v0.0.3-next.13) (2026-01-19)
 
 

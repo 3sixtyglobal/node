@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.14](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.13...node-core-v0.0.3-next.14) (2026-01-21)
+
+
+### Features
+
+* add vault prefix configuration ([#75](https://github.com/twinfoundation/node/issues/75)) ([1d4afb1](https://github.com/twinfoundation/node/commit/1d4afb1b1a8aa60795898eeb9e7f5153c279527d))
+
 ## [0.0.3-next.13](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.12...node-core-v0.0.3-next.13) (2026-01-19)
 
 
