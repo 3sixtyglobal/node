@@ -506,7 +506,12 @@ async function configureVault(
 
 	if (envVars.vaultConnector === VaultConnectorType.EntityStorage) {
 		coreConfig.types.vaultConnector.push({
-			type: VaultConnectorType.EntityStorage
+			type: VaultConnectorType.EntityStorage,
+			options: {
+				config: {
+					prefix: envVars.vaultPrefix
+				}
+			}
 		});
 	} else if (envVars.vaultConnector === VaultConnectorType.Hashicorp) {
 		coreConfig.types.vaultConnector.push({
@@ -514,7 +519,8 @@ async function configureVault(
 			options: {
 				config: {
 					endpoint: envVars.hashicorpVaultEndpoint ?? "",
-					token: envVars.hashicorpVaultToken ?? ""
+					token: envVars.hashicorpVaultToken ?? "",
+					prefix: envVars.vaultPrefix
 				}
 			}
 		});

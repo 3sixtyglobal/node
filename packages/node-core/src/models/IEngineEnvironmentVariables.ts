@@ -338,6 +338,11 @@ export interface IEngineEnvironmentVariables {
 	vaultConnector?: string;
 
 	/**
+	 * Prefix to prepend to entries in the vault.
+	 */
+	vaultPrefix?: string;
+
+	/**
 	 * Hashicorp Vault token.
 	 */
 	hashicorpVaultToken?: string;

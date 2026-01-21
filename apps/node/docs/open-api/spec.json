@@ -3602,7 +3602,7 @@
 									"blobStorageListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/"
 											],
@@ -3612,7 +3612,7 @@
 													"@context": [
 														"https://schema.twindev.org/blob-storage/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "BlobStorageEntry",
 													"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -3641,7 +3641,7 @@
 									"blobStorageListResponseJsonLdExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/"
 											],
@@ -3651,7 +3651,7 @@
 													"@context": [
 														"https://schema.twindev.org/blob-storage/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "BlobStorageEntry",
 													"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -3831,7 +3831,7 @@
 											"@context": [
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "BlobStorageEntry",
 											"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -3860,7 +3860,7 @@
 											"@context": [
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "BlobStorageEntry",
 											"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -6077,7 +6077,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -6103,7 +6103,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -6137,7 +6137,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -6163,7 +6163,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -8090,7 +8090,7 @@
 									"DocumentManagementQueryResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/aig/"
 											],
 											"type": [
@@ -8360,7 +8360,7 @@
 									"DocumentManagementGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/"
 											],
@@ -8370,7 +8370,7 @@
 													"@context": [
 														"https://schema.twindev.org/documents/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "Document",
 													"id": "2721000:0",
@@ -8402,7 +8402,7 @@
 									"DocumentManagementGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/"
 											],
@@ -8412,7 +8412,7 @@
 													"@context": [
 														"https://schema.twindev.org/documents/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "Document",
 													"id": "2721000:0",
@@ -8569,7 +8569,7 @@
 											"@context": [
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "Document",
 											"id": "2721000:0",
@@ -8601,7 +8601,7 @@
 											"@context": [
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "Document",
 											"id": "2721000:0",
@@ -9123,7 +9123,7 @@
 									"auditableItemGraphListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9136,7 +9136,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "AuditableItemGraphVertex",
 													"id": "0101010101010101010101010101010101010101010101010101010101010101",
@@ -9146,7 +9146,7 @@
 															"@context": [
 																"https://schema.twindev.org/aig/",
 																"https://schema.twindev.org/common/",
-																"https://schema.org"
+																"https://schema.org/"
 															],
 															"type": "AuditableItemGraphAlias",
 															"id": "foo4",
@@ -9168,7 +9168,7 @@
 									"auditableItemGraphJsonLdListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9181,7 +9181,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "AuditableItemGraphVertex",
 													"id": "0101010101010101010101010101010101010101010101010101010101010101",
@@ -9191,7 +9191,7 @@
 															"@context": [
 																"https://schema.twindev.org/aig/",
 																"https://schema.twindev.org/common/",
-																"https://schema.org"
+																"https://schema.org/"
 															],
 															"type": "AuditableItemGraphAlias",
 															"id": "foo4",
@@ -9351,7 +9351,7 @@
 											"@context": [
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "AuditableItemGraphVertex",
 											"id": "aig:1234567890",
@@ -9367,7 +9367,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "AuditableItemGraphAlias",
 													"id": "tst:1234567890",
@@ -9388,7 +9388,7 @@
 											"@context": [
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org"
+												"https://schema.org/"
 											],
 											"type": "AuditableItemGraphVertex",
 											"id": "aig:1234567890",
@@ -9404,7 +9404,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org"
+														"https://schema.org/"
 													],
 													"type": "AuditableItemGraphAlias",
 													"dateCreated": "2024-08-22T11:55:16.271Z",
@@ -9863,7 +9863,7 @@
 									"auditableItemStreamListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9904,7 +9904,7 @@
 									"auditableItemStreamJsonLdListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11341,7 +11341,7 @@
 									"auditableItemStreamListEntriesResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11381,7 +11381,7 @@
 									"auditableItemStreamJsonLdListEntriesResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11595,7 +11595,7 @@
 									"auditableItemStreamListEntryObjectsResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org",
+												"https://schema.org/",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],

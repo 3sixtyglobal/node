@@ -3,6 +3,7 @@
 import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/context';
 import { ComponentFactory } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
+import { DataRequestType } from '@twin.org/data-space-connector-models';
 import { DataspaceProtocolContexts } from '@twin.org/standards-dataspace-protocol';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
@@ -38,12 +39,6 @@ export class TestDataSpaceConnectorApp {
 	static CLASS_NAME = 'TestDataSpaceConnectorApp';
 
 	/**
-	 * Data space connector component.
-	 * @internal
-	 */
-	_dataSpaceConnectorComponent;
-
-	/**
 	 * Logging service.
 	 * @internal
 	 */
@@ -60,9 +55,6 @@ export class TestDataSpaceConnectorApp {
 	 * @param options The constructor options.
 	 */
 	constructor(options) {
-		this._dataSpaceConnectorComponent = ComponentFactory.get(
-			options?.dataSpaceConnectorComponentType ?? 'data-space-connector'
-		);
 		this._loggingService = ComponentFactory.getIfExists(options?.loggingComponentType ?? 'logging');
 	}
 
@@ -124,7 +116,6 @@ export class TestDataSpaceConnectorApp {
 		const contextIds = await ContextIdStore.getContextIds();
 		ContextIdHelper.guard(contextIds, ContextIdKeys.Node);
 		this._nodeId = contextIds[ContextIdKeys.Node];
-		await this._dataSpaceConnectorComponent.registerApp(TestDataSpaceConnectorApp.APP_ID, this);
 		DataTypeHandlerFactory.register('https://twin.example.org/MyCreate', () => ({
 			namespace: 'https://twin.example.org/',
 			type: 'MyCreate',
@@ -174,11 +165,13 @@ export class TestDataSpaceConnectorApp {
 	/**
 	 * Handles the Data Request.
 	 * @param dataRequest The data request
+	 * @param cursor Cursor that points to the next item in the result set.
+	 * @param limit Maximum number of entries retrieved or to be retrieved.
 	 * @returns the Data.
 	 */
-	async handleDataRequest(dataRequest) {
+	async handleDataRequest(dataRequest, cursor, limit) {
 		switch (dataRequest.type) {
-			case 'DataAssetEntities': {
+			case DataRequestType.DataAssetEntities: {
 				if (dataRequest.entitySet.entityType === 'https://vocabulary.uncefact.org/Consignment') {
 					return {
 						data: [entities[0]]
@@ -191,7 +184,7 @@ export class TestDataSpaceConnectorApp {
 				}
 				return { data: [] };
 			}
-			case 'QueryDataAsset':
+			case DataRequestType.QueryDataAsset:
 				return { data: entities };
 		}
 	}

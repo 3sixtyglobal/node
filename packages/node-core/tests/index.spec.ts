@@ -573,11 +573,7 @@ describe("node-core", () => {
 		]);
 
 		if (startResult?.engine) {
-			const dataSpaceConnectorService = ComponentFactory.get("data-space-connector-service");
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			expect((dataSpaceConnectorService as any)._apps[0].appId).toEqual(
-				"https://twin.example.org/app1"
-			);
+			expect(DataSpaceConnectorAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
 
 			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
 

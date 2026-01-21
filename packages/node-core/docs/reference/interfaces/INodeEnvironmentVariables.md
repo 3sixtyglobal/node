@@ -802,6 +802,18 @@ The type of the default vault connector: entity-storage, hashicorp.
 
 ***
 
+### vaultPrefix?
+
+> `optional` **vaultPrefix**: `string`
+
+Prefix to prepend to entries in the vault.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`vaultPrefix`](IEngineServerEnvironmentVariables.md#vaultprefix)
+
+***
+
 ### hashicorpVaultToken?
 
 > `optional` **hashicorpVaultToken**: `string`
