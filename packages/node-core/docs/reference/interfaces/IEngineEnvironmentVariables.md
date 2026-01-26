@@ -1040,11 +1040,11 @@ Is the rights management enabled, defaults to false.
 
 ***
 
-### rightsManagementBaseCallbackUrl?
+### rightsManagementCallbackPath?
 
-> `optional` **rightsManagementBaseCallbackUrl**: `string`
+> `optional` **rightsManagementCallbackPath**: `string`
 
-What is the base callback url for rights management negotiations e.g. https://my-node/rights-management.
+What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
 
 ***
 

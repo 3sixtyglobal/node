@@ -12,7 +12,8 @@
 			"cliCommandMissing": "CLI command \"{command}\" is not recognised",
 			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
-			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist"
+			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
+			"invalidPublicOrigin": "The public origin \"{publicOrigin}\" is not a valid origin URL, it should be in the format \"protocol://host[:port]\"."
 		},
 		"bootstrapLegacy": {
 			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled."
@@ -36,12 +37,23 @@
 		"tenantImport": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
+		"tenantUpdate": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
+			"tenantNotFound": "The tenant with ID \"{notFoundId}\" was not found in the system."
+		},
 		"userCreate": {
 			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
 			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\"."
 		},
 		"vaultKeyCreate": {
 			"vaultKeyAlreadyExists": "The vault key with ID already exists and overwriteMode is set to \"error\"."
+		},
+		"nodeSetTenant": {
+			"tenantNotFound": "The tenant with ID \"{notFoundId}\" was not found in the system.",
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"nodeSetIdentity": {
+			"identityNotFound": "The identity with DID \"{notFoundId}\" was not found in the system."
 		}
 	},
 	"node": {
@@ -294,12 +306,13 @@
 						}
 					},
 					"labels": {
+						"resolvingIdentity": "Resolving identity",
 						"stored": "The node identity has been stored"
 					}
 				},
 				"tenant-create": {
 					"description": "Create a tenant with associated api key",
-					"example": "tenant-create --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\"",
+					"example": "tenant-create --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
 						"tenant-id": {
 							"description": "The tenant ID to add. If not provided a random tenant id will be generated."
@@ -309,6 +322,9 @@
 						},
 						"label": {
 							"description": "A descriptive label for the tenant."
+						},
+						"public-origin": {
+							"description": "The public URL origin for the tenant e.g. https://example.com:1234"
 						},
 						"load-env": {
 							"description": "Comma separated list of paths to .env files to read input parameters from."
@@ -327,12 +343,13 @@
 						"creating": "Creating tenant",
 						"tenantId": "Tenant ID",
 						"apiKey": "API Key",
-						"label": "Label"
+						"label": "Label",
+						"publicOrigin": "Public Origin"
 					}
 				},
 				"tenant-import": {
 					"description": "Import a tenant with associated api key",
-					"example": "tenant-import --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\"",
+					"example": "tenant-import --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
 						"tenant-id": {
 							"description": "The tenant ID to import."
@@ -343,6 +360,9 @@
 						"label": {
 							"description": "A descriptive label for the tenant."
 						},
+						"public-origin": {
+							"description": "The public URL origin for the tenant e.g. https://example.com:1234"
+						},
 						"load-env": {
 							"description": "Comma separated list of paths to .env files to read input parameters from."
 						}
@@ -350,6 +370,31 @@
 					"labels": {
 						"importing": "Importing tenant",
 						"imported": "Imported tenant"
+					}
+				},
+				"tenant-update": {
+					"description": "Update a tenant with associated api key",
+					"example": "tenant-update --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
+					"params": {
+						"tenant-id": {
+							"description": "The tenant ID to update."
+						},
+						"api-key": {
+							"description": "The API key to associate with the tenant id."
+						},
+						"label": {
+							"description": "A descriptive label for the tenant."
+						},
+						"public-origin": {
+							"description": "The public URL origin for the tenant e.g. https://example.com:1234"
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating tenant",
+						"updated": "Updated tenant"
 					}
 				},
 				"node-set-tenant": {

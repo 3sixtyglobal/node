@@ -162,7 +162,7 @@ describe("node-core", () => {
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
-				TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
+				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
@@ -227,7 +227,7 @@ describe("node-core", () => {
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
-				TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
+				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
@@ -285,7 +285,8 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"did-context-id-handler",
-			"information-service"
+			"information-service",
+			"hosting-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -337,7 +338,7 @@ describe("node-core", () => {
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
-			TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
+			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
@@ -435,7 +436,8 @@ describe("node-core", () => {
 			"did-context-id-handler",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
-			"information-service"
+			"information-service",
+			"hosting-service"
 		]);
 
 		expect(DataSpaceConnectorAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
@@ -626,7 +628,7 @@ describe("node-core", () => {
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
-			TWIN_RIGHTS_MANAGEMENT_BASE_CALLBACK_URL: `https://localhost:${port}/rights-management`,
+			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
@@ -750,7 +752,8 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"did-context-id-handler",
-			"information-service"
+			"information-service",
+			"hosting-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -810,7 +813,8 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"did-context-id-handler",
-			"information-service"
+			"information-service",
+			"hosting-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -868,7 +872,8 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"did-context-id-handler",
-			"information-service"
+			"information-service",
+			"hosting-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -991,7 +996,8 @@ describe("node-core", () => {
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"did-context-id-handler",
-			"information-service"
+			"information-service",
+			"hosting-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];

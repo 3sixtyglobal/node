@@ -643,9 +643,9 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementEnabled?: string;
 
 	/**
-	 * What is the base callback url for rights management negotiations e.g. https://my-node/rights-management.
+	 * What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
 	 */
-	rightsManagementBaseCallbackUrl?: string;
+	rightsManagementCallbackPath?: string;
 
 	/**
 	 * The rights management policy information sources to add to the factory.

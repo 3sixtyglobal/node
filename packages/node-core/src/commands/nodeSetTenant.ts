@@ -1,7 +1,8 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { Guards, I18n } from "@twin.org/core";
+import { ComponentFactory, GeneralError, Guards, I18n, Is, NotFoundError } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -62,10 +63,39 @@ export async function nodeSetTenant(
 	Guards.stringHexLength("nodeSetTenant", "tenant-id", params.tenantId, 32);
 
 	const state = engineCore.getState();
-	state.nodeTenantId = params.tenantId;
-	engineCore.setStateDirty();
 
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-set-tenant.labels.stored"));
+	if (state.nodeTenantId !== params.tenantId) {
+		const defaultTenantAdminComponentType =
+			engineCore.getRegisteredInstanceType("tenantAdminComponent");
+
+		if (!Is.stringValue(defaultTenantAdminComponentType)) {
+			throw new GeneralError("nodeSetTenant", "tenantAdminComponentNotRegistered");
+		}
+
+		const tenantAdminComponent = ComponentFactory.get<ITenantAdminComponent>(
+			defaultTenantAdminComponentType
+		);
+
+		const tenant = await tenantAdminComponent.get(params.tenantId);
+
+		if (Is.empty(tenant)) {
+			throw new NotFoundError("nodeSetTenant", "tenantNotFound", params.tenantId);
+		}
+
+		const currentNodeTenants = await tenantAdminComponent.query({ isNodeTenant: true });
+		for (const currentNodeTenant of currentNodeTenants.tenants) {
+			currentNodeTenant.isNodeTenant = false;
+			await tenantAdminComponent.set(currentNodeTenant);
+		}
+
+		tenant.isNodeTenant = true;
+		await tenantAdminComponent.set(tenant);
+
+		state.nodeTenantId = params.tenantId;
+		engineCore.setStateDirty();
+
+		CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-set-tenant.labels.stored"));
+	}
 
 	CLIDisplay.done();
 }

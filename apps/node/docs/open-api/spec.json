@@ -3602,7 +3602,7 @@
 									"blobStorageListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/"
 											],
@@ -3612,7 +3612,7 @@
 													"@context": [
 														"https://schema.twindev.org/blob-storage/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "BlobStorageEntry",
 													"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -3641,7 +3641,7 @@
 									"blobStorageListResponseJsonLdExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/"
 											],
@@ -3651,7 +3651,7 @@
 													"@context": [
 														"https://schema.twindev.org/blob-storage/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "BlobStorageEntry",
 													"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -3831,7 +3831,7 @@
 											"@context": [
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "BlobStorageEntry",
 											"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -3860,7 +3860,7 @@
 											"@context": [
 												"https://schema.twindev.org/blob-storage/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "BlobStorageEntry",
 											"id": "blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
@@ -6077,7 +6077,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -6103,7 +6103,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -6137,7 +6137,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -6163,7 +6163,7 @@
 											"@context": [
 												"https://schema.twindev.org/attestation/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -8090,7 +8090,7 @@
 									"DocumentManagementQueryResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/aig/"
 											],
 											"type": [
@@ -8360,7 +8360,7 @@
 									"DocumentManagementGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/"
 											],
@@ -8370,7 +8370,7 @@
 													"@context": [
 														"https://schema.twindev.org/documents/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "Document",
 													"id": "2721000:0",
@@ -8402,7 +8402,7 @@
 									"DocumentManagementGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/"
 											],
@@ -8412,7 +8412,7 @@
 													"@context": [
 														"https://schema.twindev.org/documents/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "Document",
 													"id": "2721000:0",
@@ -8569,7 +8569,7 @@
 											"@context": [
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "Document",
 											"id": "2721000:0",
@@ -8601,7 +8601,7 @@
 											"@context": [
 												"https://schema.twindev.org/documents/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "Document",
 											"id": "2721000:0",
@@ -9123,7 +9123,7 @@
 									"auditableItemGraphListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9136,7 +9136,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "AuditableItemGraphVertex",
 													"id": "0101010101010101010101010101010101010101010101010101010101010101",
@@ -9146,7 +9146,7 @@
 															"@context": [
 																"https://schema.twindev.org/aig/",
 																"https://schema.twindev.org/common/",
-																"https://schema.org/"
+																"https://schema.org"
 															],
 															"type": "AuditableItemGraphAlias",
 															"id": "foo4",
@@ -9154,8 +9154,7 @@
 														}
 													]
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -9168,7 +9167,7 @@
 									"auditableItemGraphJsonLdListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9181,7 +9180,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "AuditableItemGraphVertex",
 													"id": "0101010101010101010101010101010101010101010101010101010101010101",
@@ -9191,7 +9190,7 @@
 															"@context": [
 																"https://schema.twindev.org/aig/",
 																"https://schema.twindev.org/common/",
-																"https://schema.org/"
+																"https://schema.org"
 															],
 															"type": "AuditableItemGraphAlias",
 															"id": "foo4",
@@ -9199,8 +9198,7 @@
 														}
 													]
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -9351,7 +9349,7 @@
 											"@context": [
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "AuditableItemGraphVertex",
 											"id": "aig:1234567890",
@@ -9367,7 +9365,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "AuditableItemGraphAlias",
 													"id": "tst:1234567890",
@@ -9388,7 +9386,7 @@
 											"@context": [
 												"https://schema.twindev.org/aig/",
 												"https://schema.twindev.org/common/",
-												"https://schema.org/"
+												"https://schema.org"
 											],
 											"type": "AuditableItemGraphVertex",
 											"id": "aig:1234567890",
@@ -9404,7 +9402,7 @@
 													"@context": [
 														"https://schema.twindev.org/aig/",
 														"https://schema.twindev.org/common/",
-														"https://schema.org/"
+														"https://schema.org"
 													],
 													"type": "AuditableItemGraphAlias",
 													"dateCreated": "2024-08-22T11:55:16.271Z",
@@ -9863,7 +9861,7 @@
 									"auditableItemStreamListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9890,8 +9888,7 @@
 													"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
 													"immutableInterval": 10
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -9904,7 +9901,7 @@
 									"auditableItemStreamJsonLdListResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -9931,8 +9928,7 @@
 													"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
 													"immutableInterval": 10
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -11341,7 +11337,7 @@
 									"auditableItemStreamListEntriesResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11367,8 +11363,7 @@
 														"description": "A description of the event"
 													}
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -11381,7 +11376,7 @@
 									"auditableItemStreamJsonLdListEntriesResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11407,8 +11402,7 @@
 														"description": "A description of the event"
 													}
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -11595,7 +11589,7 @@
 									"auditableItemStreamListEntryObjectsResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.org/",
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11610,8 +11604,7 @@
 													"startDate": "2011-04-09T20:00:00Z",
 													"description": "A description of the event"
 												}
-											],
-											"nextItem": "1"
+											]
 										}
 									}
 								}
@@ -13610,7 +13603,7 @@
 										"@context": [
 											"https://w3id.org/dspace/2025/1/context.jsonld"
 										],
-										"@type": "ContractRequestMessage",
+										"@type": "ContractNegotiationEventMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"event": "ACCEPTED"
@@ -13727,7 +13720,7 @@
 										"@context": [
 											"https://w3id.org/dspace/2025/1/context.jsonld"
 										],
-										"@type": "ContractRequestMessage",
+										"@type": "ContractAgreementVerificationMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
 									}
@@ -13843,7 +13836,7 @@
 										"@context": [
 											"https://w3id.org/dspace/2025/1/context.jsonld"
 										],
-										"@type": "ContractRequestMessage",
+										"@type": "ContractNegotiationTerminationMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
 									}
@@ -13948,7 +13941,7 @@
 										"@context": [
 											"https://w3id.org/dspace/2025/1/context.jsonld"
 										],
-										"@type": "ContractRequestMessage",
+										"@type": "ContractOfferMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
@@ -13977,7 +13970,7 @@
 											"@context": [
 												"https://w3id.org/dspace/2025/1/context.jsonld"
 											],
-											"@type": "ContractRequestMessage",
+											"@type": "ContractNegotiationError",
 											"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 											"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
 										}
@@ -14062,7 +14055,7 @@
 										"@context": [
 											"https://w3id.org/dspace/2025/1/context.jsonld"
 										],
-										"@type": "ContractRequestMessage",
+										"@type": "ContractOfferMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
@@ -14091,7 +14084,7 @@
 											"@context": [
 												"https://w3id.org/dspace/2025/1/context.jsonld"
 											],
-											"@type": "ContractNegotiation",
+											"@type": "ContractNegotiationError",
 											"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 											"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff"
 										}
@@ -14196,7 +14189,7 @@
 										"@context": [
 											"https://w3id.org/dspace/2025/1/context.jsonld"
 										],
-										"@type": "ContractRequestMessage",
+										"@type": "ContractAgreementMessage",
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"agreement": {
@@ -14737,7 +14730,7 @@
 							"examples": {
 								"dapCreateRequestExample": {
 									"value": {
-										"@context": "https://schema.twindev.org/rights-management",
+										"@context": "https://schema.twindev.org/rights-management/",
 										"type": "DataAccessRequestWithObject",
 										"assetType": "contacts",
 										"object": {
@@ -14978,7 +14971,7 @@
 							"examples": {
 								"dapUpdateRequestExample": {
 									"value": {
-										"@context": "https://schema.twindev.org/rights-management",
+										"@context": "https://schema.twindev.org/rights-management/",
 										"type": "DataAccessRequestWithObject",
 										"assetType": "contacts",
 										"object": {
@@ -15184,7 +15177,7 @@
 							"examples": {
 								"dapQueryRequestExample": {
 									"value": {
-										"@context": "https://schema.twindev.org/rights-management",
+										"@context": "https://schema.twindev.org/rights-management/",
 										"type": "DataAccessQuery",
 										"assetType": "contacts"
 									}
@@ -15204,7 +15197,7 @@
 								"examples": {
 									"IDapQueryResponseExample": {
 										"value": {
-											"@context": "https://schema.twindev.org/rights-management",
+											"@context": "https://schema.twindev.org/rights-management/",
 											"type": "DataAccessQueryResponse",
 											"items": [
 												{
@@ -15286,6 +15279,10 @@
 					"dateModified": {
 						"type": "string",
 						"description": "The last update date of this object."
+					},
+					"retryCount": {
+						"type": "number",
+						"description": "Number of times this activity has been retried."
 					},
 					"status": {
 						"$ref": "#/components/schemas/ActivityProcessingStatus"
@@ -15525,45 +15522,23 @@
 							}
 						]
 					},
-					"generator": {
+					"id": {
+						"type": "string",
+						"description": "Global identifier."
+					},
+					"name": {
 						"anyOf": [
 							{
 								"type": "string"
 							},
 							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
 							}
 						],
-						"description": "The generator of the Activity."
+						"description": "Natural language name."
 					},
-					"actor": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							}
-						],
-						"description": "The Actor behind the Activity."
-					},
-					"object": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					},
-					"target": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+					"nameMap": {
+						"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
 					},
 					"summary": {
 						"anyOf": [
@@ -15576,36 +15551,578 @@
 						],
 						"description": "Summary of the Activity."
 					},
-					"result": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+					"summaryMap": {
+						"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
 					},
-					"origin": {
+					"content": {
 						"anyOf": [
 							{
 								"type": "string"
 							},
 							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
+							}
+						],
+						"description": "Natural language content."
+					},
+					"contentMap": {
+						"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
+					},
+					"url": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
 							},
 							{
 								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
 							}
-						],
-						"description": "Activity's origin."
+						]
+					},
+					"image": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"icon": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"published": {
+						"type": "string",
+						"description": "Published date-time."
 					},
 					"updated": {
 						"type": "string",
 						"description": "The date and time at which the object was updated."
+					},
+					"startTime": {
+						"type": "string",
+						"description": "Start time."
+					},
+					"endTime": {
+						"type": "string",
+						"description": "End time."
+					},
+					"duration": {
+						"type": "string",
+						"description": "Duration."
+					},
+					"generator": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"attachment": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"attributedTo": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"audience": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"context": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"location": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"tag": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"inReplyTo": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"replies": {
+						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+					},
+					"preview": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"to": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"bto": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"cc": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"bcc": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"actor": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"object": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"target": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"result": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"origin": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
+					},
+					"instrument": {
+						"description": "Object or array data type",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+										}
+									]
+								}
+							}
+						]
 					}
 				},
 				"required": [
 					"@context",
-					"type",
-					"object",
-					"updated"
+					"type"
 				],
 				"additionalProperties": {
 					"anyOf": [
@@ -15632,7 +16149,7 @@
 						}
 					]
 				},
-				"description": "A W3C Activity from Activity Streams"
+				"description": "A W3C Activity from Activity Streams.\n\nAn `Activity` describes an action performed by an `actor` on an `object`, and can optionally include a `target`, `result`, `origin`, or `instrument`."
 			},
 			"ActivityStreamsContextType": {
 				"anyOf": [
@@ -15661,12 +16178,45 @@
 						"items": {
 							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
 						}
+					},
+					{
+						"type": "array",
+						"minItems": 1,
+						"prefixItems": [
+							{
+								"type": "string",
+								"const": "https://www.w3.org/ns/activitystreams"
+							}
+						],
+						"items": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+						}
 					}
 				],
 				"description": "The Activity Streams JSON-LD context type."
 			},
-			"ActivityStreamsTypes": {
+			"ActivityStreamsLinkTypes": {
 				"anyOf": [
+					{
+						"type": "string",
+						"const": "Link",
+						"description": "Link"
+					},
+					{
+						"type": "string",
+						"const": "Mention",
+						"description": "Mention"
+					}
+				],
+				"description": "The link types concerning Activity Streams."
+			},
+			"ActivityStreamsObjectTypes": {
+				"anyOf": [
+					{
+						"type": "string",
+						"const": "Object",
+						"description": "Object"
+					},
 					{
 						"type": "string",
 						"const": "Activity",
@@ -15674,143 +16224,268 @@
 					},
 					{
 						"type": "string",
+						"const": "IntransitiveActivity",
+						"description": "IntransitiveActivity"
+					},
+					{
+						"type": "string",
+						"const": "Collection",
+						"description": "Collection"
+					},
+					{
+						"type": "string",
+						"const": "OrderedCollection",
+						"description": "OrderedCollection"
+					},
+					{
+						"type": "string",
+						"const": "CollectionPage",
+						"description": "CollectionPage"
+					},
+					{
+						"type": "string",
+						"const": "OrderedCollectionPage",
+						"description": "OrderedCollectionPage"
+					},
+					{
+						"type": "string",
+						"const": "Actor",
+						"description": "Actor"
+					},
+					{
+						"type": "string",
+						"const": "Application",
+						"description": "Application"
+					},
+					{
+						"type": "string",
+						"const": "Group",
+						"description": "Group"
+					},
+					{
+						"type": "string",
+						"const": "Organization",
+						"description": "Organization"
+					},
+					{
+						"type": "string",
+						"const": "Person",
+						"description": "Person"
+					},
+					{
+						"type": "string",
+						"const": "Service",
+						"description": "Service"
+					},
+					{
+						"type": "string",
+						"const": "Article",
+						"description": "Article"
+					},
+					{
+						"type": "string",
+						"const": "Audio",
+						"description": "Audio"
+					},
+					{
+						"type": "string",
+						"const": "Document",
+						"description": "Document"
+					},
+					{
+						"type": "string",
+						"const": "Event",
+						"description": "Event"
+					},
+					{
+						"type": "string",
+						"const": "Image",
+						"description": "Image"
+					},
+					{
+						"type": "string",
+						"const": "Note",
+						"description": "Note"
+					},
+					{
+						"type": "string",
+						"const": "Page",
+						"description": "Page"
+					},
+					{
+						"type": "string",
+						"const": "Place",
+						"description": "Place"
+					},
+					{
+						"type": "string",
+						"const": "Profile",
+						"description": "Profile"
+					},
+					{
+						"type": "string",
+						"const": "Relationship",
+						"description": "Relationship"
+					},
+					{
+						"type": "string",
+						"const": "Tombstone",
+						"description": "Tombstone"
+					},
+					{
+						"type": "string",
+						"const": "Video",
+						"description": "Video"
+					}
+				],
+				"description": "The object types concerning Activity Streams."
+			},
+			"ActivityStreamsTypes": {
+				"anyOf": [
+					{
+						"type": "string",
+						"const": "Activity",
+						"description": "Activity.\n\nGeneric base type for activities (actions) in Activity Streams."
+					},
+					{
+						"type": "string",
 						"const": "Accept",
-						"description": "Accept"
+						"description": "Accept.\n\nIndicates that the actor accepts the object."
 					},
 					{
 						"type": "string",
 						"const": "Add",
-						"description": "Add"
+						"description": "Add.\n\nIndicates that the actor added the object to the target."
 					},
 					{
 						"type": "string",
 						"const": "Announce",
-						"description": "Announce"
+						"description": "Announce.\n\nIndicates that the actor is calling attention to the object."
 					},
 					{
 						"type": "string",
 						"const": "Arrive",
-						"description": "Arrive"
+						"description": "Arrive.\n\nIntransitive activity indicating that the actor arrived at a location."
 					},
 					{
 						"type": "string",
 						"const": "Block",
-						"description": "Block"
+						"description": "Block.\n\nIndicates that the actor is blocking the object (a stronger form of Ignore)."
 					},
 					{
 						"type": "string",
 						"const": "Create",
-						"description": "Create"
+						"description": "Create.\n\nIndicates that the actor has created the object."
 					},
 					{
 						"type": "string",
 						"const": "Delete",
-						"description": "Delete"
+						"description": "Delete.\n\nIndicates that the actor has deleted the object."
 					},
 					{
 						"type": "string",
 						"const": "Dislike",
-						"description": "Dislike"
+						"description": "Dislike.\n\nIndicates that the actor dislikes the object."
 					},
 					{
 						"type": "string",
 						"const": "Flag",
-						"description": "Flag"
+						"description": "Flag.\n\nIndicates that the actor is flagging the object (e.g., reporting it)."
 					},
 					{
 						"type": "string",
 						"const": "Follow",
-						"description": "Follow"
+						"description": "Follow.\n\nIndicates that the actor is following the object."
 					},
 					{
 						"type": "string",
 						"const": "Ignore",
-						"description": "Ignore"
+						"description": "Ignore.\n\nIndicates that the actor is ignoring the object."
 					},
 					{
 						"type": "string",
 						"const": "Invite",
-						"description": "Invite"
+						"description": "Invite.\n\nSpecialization of Offer in which the actor is extending an invitation."
 					},
 					{
 						"type": "string",
 						"const": "Join",
-						"description": "Join"
+						"description": "Join.\n\nIndicates that the actor has joined the object."
 					},
 					{
 						"type": "string",
 						"const": "Leave",
-						"description": "Leave"
+						"description": "Leave.\n\nIndicates that the actor has left the object."
 					},
 					{
 						"type": "string",
 						"const": "Like",
-						"description": "Like"
+						"description": "Like.\n\nIndicates that the actor likes, recommends, or endorses the object."
 					},
 					{
 						"type": "string",
 						"const": "Listen",
-						"description": "Listen"
+						"description": "Listen.\n\nIndicates that the actor has listened to the object."
 					},
 					{
 						"type": "string",
 						"const": "Move",
-						"description": "Move"
+						"description": "Move.\n\nIndicates that the actor has moved the object from `origin` to `target`."
 					},
 					{
 						"type": "string",
 						"const": "Offer",
-						"description": "Offer"
+						"description": "Offer.\n\nIndicates that the actor is offering the object (optionally to a target)."
 					},
 					{
 						"type": "string",
 						"const": "Question",
-						"description": "Question"
+						"description": "Question.\n\nIntransitive activity representing a question; can express options via `oneOf`/`anyOf`."
 					},
 					{
 						"type": "string",
 						"const": "Reject",
-						"description": "Reject"
+						"description": "Reject.\n\nIndicates that the actor is rejecting the object."
 					},
 					{
 						"type": "string",
 						"const": "Read",
-						"description": "Read"
+						"description": "Read.\n\nIndicates that the actor has read the object."
 					},
 					{
 						"type": "string",
 						"const": "Remove",
-						"description": "Remove"
+						"description": "Remove.\n\nIndicates that the actor is removing the object (optionally from an origin context)."
 					},
 					{
 						"type": "string",
 						"const": "TentativeReject",
-						"description": "TentativeReject"
+						"description": "TentativeReject.\n\nSpecialization of Reject indicating that the rejection is tentative."
 					},
 					{
 						"type": "string",
 						"const": "TentativeAccept",
-						"description": "TentativeAccept"
+						"description": "TentativeAccept.\n\nSpecialization of Accept indicating that the acceptance is tentative."
 					},
 					{
 						"type": "string",
 						"const": "Travel",
-						"description": "Travel"
+						"description": "Travel.\n\nIntransitive activity indicating that the actor is travelling to `target` from `origin`."
 					},
 					{
 						"type": "string",
 						"const": "Undo",
-						"description": "Undo"
+						"description": "Undo.\n\nIndicates that the actor is undoing a previous activity."
 					},
 					{
 						"type": "string",
 						"const": "Update",
-						"description": "Update"
+						"description": "Update.\n\nIndicates that the actor has updated the object."
 					},
 					{
 						"type": "string",
 						"const": "View",
-						"description": "View"
+						"description": "View.\n\nIndicates that the actor has viewed the object."
 					}
 				],
 				"description": "The types concerning Activity Streams. Section 3.1 Activity Types: https://www.w3.org/TR/activitystreams-vocabulary/#activity-types   The types concerning Activity. Section 3.1 Activity Types: https://www.w3.org/TR/activitystreams-vocabulary/#activity-types"
@@ -16571,7 +17246,7 @@
 				"properties": {
 					"@context": {
 						"type": "string",
-						"const": "https://schema.twindev.org/rights-management",
+						"const": "https://schema.twindev.org/rights-management/",
 						"description": "The JSON-LD context."
 					},
 					"type": {
@@ -16606,7 +17281,7 @@
 				"properties": {
 					"@context": {
 						"type": "string",
-						"const": "https://schema.twindev.org/rights-management",
+						"const": "https://schema.twindev.org/rights-management/",
 						"description": "The JSON-LD context."
 					},
 					"type": {

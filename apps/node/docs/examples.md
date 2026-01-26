@@ -79,13 +79,19 @@ twin-node vault-key-import --load-env="node-identity.env,my-key.json" --identity
 Alternatively import existing details:
 
 ```shell
-twin-node tenant-create --output-json="node-tenant.json" --output-env="node-tenant.env" --label="node" --output-env-prefix=node
+twin-node tenant-create --label="node" --public-origin="https://api.example.com" --output-env-prefix=node --output-json="node-tenant.json" --output-env="node-tenant.env"
 ```
 
 ### Import a tenant to be used by the node
 
 ```shell
-twin-node tenant-import --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --label=!NODE_LABEL
+twin-node tenant-import --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --label=!NODE_LABEL --public-origin="https://api.example.com"
+```
+
+### Update a tenant to be used by the node
+
+```shell
+twin-node tenant-update --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --label="New Label"
 ```
 
 ### Associated the tenant with the node

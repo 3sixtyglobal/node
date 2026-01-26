@@ -37,6 +37,11 @@ export interface IEngineServerEnvironmentVariables extends IEngineEnvironmentVar
 	httpExposedHeaders?: string;
 
 	/**
+	 * The public origin URL for the API e.g. https://api.example.com:1234
+	 */
+	publicOrigin?: string;
+
+	/**
 	 * The type of auth admin processor to use on the API: entity-storage.
 	 */
 	authAdminProcessorType?: string;

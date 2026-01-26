@@ -1,8 +1,8 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { ITenantAdminComponent } from "@twin.org/api-tenant-processor";
+import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
+import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
@@ -47,6 +47,15 @@ export function getCommandDefinitionTenantImport(commandDefinitions: {
 				required: false
 			},
 			{
+				key: "public-origin",
+				type: "string",
+				extendedType: "url",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.public-origin.description"
+				),
+				required: false
+			},
+			{
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
@@ -67,6 +76,7 @@ export function getCommandDefinitionTenantImport(commandDefinitions: {
  * @param params.apiKey The api key to import.
  * @param params.tenantId The tenant ID to import the api key to.
  * @param params.label The label for the api key.
+ * @param params.publicOrigin The public URL origin for the tenant.
  */
 export async function tenantImport(
 	engineCore: IEngineCore,
@@ -75,10 +85,15 @@ export async function tenantImport(
 		apiKey?: string;
 		tenantId?: string;
 		label?: string;
+		publicOrigin?: string;
 	}
 ): Promise<void> {
 	Guards.stringHexLength("tenantImport", "tenant-id", params.tenantId, 32);
 	Guards.stringHexLength("tenantImport", "api-key", params.apiKey, 32);
+
+	if (Is.stringValue(params.publicOrigin)) {
+		Url.guard("tenantImport", "public-origin", params.publicOrigin);
+	}
 
 	const tenantAdminServiceComponentType =
 		engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
@@ -97,12 +112,14 @@ export async function tenantImport(
 	const apiKey = params.apiKey;
 	const tenantId = params.tenantId;
 	const label = params.label ?? "";
-
+	const publicOrigin = params.publicOrigin ?? "";
 	await tenantAdminService.set({
 		id: tenantId,
 		apiKey,
 		dateCreated: new Date(Date.now()).toISOString(),
-		label
+		label,
+		publicOrigin,
+		isNodeTenant: false
 	});
 	CLIDisplay.spinnerStop();
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-import.labels.imported"));

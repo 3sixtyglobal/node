@@ -76,7 +76,7 @@ async function executeCliCommand(
 let nodeIdentityJson: { mnemonic: string; did: string; walletAddress: string };
 let organizationIdentityJson: { mnemonic: string; did: string; walletAddress: string };
 let userIdentityJson: { mnemonic: string; did: string; walletAddress: string };
-let nodeTenantJson: { apiKey: string; tenantId: string; label: string };
+let nodeTenantJson: { apiKey: string; tenantId: string; label: string; publicOrigin: string };
 
 describe("node-core", () => {
 	beforeAll(async () => {
@@ -234,6 +234,7 @@ describe("node-core", () => {
 				`--output-json=${OUTPUT_TMP_DIR}node-tenant.json`,
 				`--output-env=${OUTPUT_TMP_DIR}node-tenant.env`,
 				"--label=node",
+				"--public-origin=https://api.example.com:1234",
 				"--output-env-prefix=node"
 			],
 			{ nodeId: nodeIdentityJson?.did }
@@ -244,6 +245,7 @@ describe("node-core", () => {
 		expect(nodeTenantJson?.apiKey).toEqual(valueFromEnv(nodeTenantEnv?.[0]));
 		expect(nodeTenantJson?.tenantId).toEqual(valueFromEnv(nodeTenantEnv?.[1]));
 		expect(nodeTenantJson?.label).toEqual(valueFromEnv(nodeTenantEnv?.[2]));
+		expect(nodeTenantJson?.publicOrigin).toEqual(valueFromEnv(nodeTenantEnv?.[3]));
 	});
 
 	test("Can import the tenant for the node", async () => {
@@ -252,7 +254,8 @@ describe("node-core", () => {
 				"tenant-import",
 				`--tenant-id=${nodeTenantJson?.tenantId}`,
 				`--api-key=${nodeTenantJson?.apiKey}`,
-				`--label=${nodeTenantJson?.label}`
+				`--label=${nodeTenantJson?.label}`,
+				`--public-origin=${nodeTenantJson?.publicOrigin}`
 			],
 			{ nodeId: nodeIdentityJson?.did }
 		);
@@ -548,10 +551,15 @@ describe("node-core", () => {
 	});
 
 	test("Can create the user account", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
 		await executeCliCommand(
 			[
 				"user-create",
-				`--load-env=${OUTPUT_TMP_DIR}organization-identity.env,${OUTPUT_TMP_DIR}user-identity.env,${OUTPUT_TMP_DIR}node-tenant.env`,
+				`--load-env=${envParts.join(",")}`,
 				"--user-identity=!USER_DID",
 				"--organization-identity=!ORGANIZATION_DID",
 				"--email=admin@node",

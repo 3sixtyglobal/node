@@ -1540,15 +1540,15 @@ Is the rights management enabled, defaults to false.
 
 ***
 
-### rightsManagementBaseCallbackUrl?
+### rightsManagementCallbackPath?
 
-> `optional` **rightsManagementBaseCallbackUrl**: `string`
+> `optional` **rightsManagementCallbackPath**: `string`
 
-What is the base callback url for rights management negotiations e.g. https://my-node/rights-management.
+What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementBaseCallbackUrl`](IEngineServerEnvironmentVariables.md#rightsmanagementbasecallbackurl)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`rightsManagementCallbackPath`](IEngineServerEnvironmentVariables.md#rightsmanagementcallbackpath)
 
 ***
 
@@ -1789,6 +1789,18 @@ The CORS headers to expose.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`httpExposedHeaders`](IEngineServerEnvironmentVariables.md#httpexposedheaders)
+
+***
+
+### publicOrigin?
+
+> `optional` **publicOrigin**: `string`
+
+The public origin URL for the API e.g. https://api.example.com:1234
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`publicOrigin`](IEngineServerEnvironmentVariables.md#publicorigin)
 
 ***
 

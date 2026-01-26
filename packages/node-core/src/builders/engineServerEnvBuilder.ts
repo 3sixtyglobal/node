@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IServerInfo, IWebServerOptions } from "@twin.org/api-models";
 import { ContextIdKeys } from "@twin.org/context";
-import { Coerce, Is } from "@twin.org/core";
+import { Coerce, GeneralError, Is, Url } from "@twin.org/core";
 import type { IEngineCoreConfig } from "@twin.org/engine-models";
 import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType,
+	HostingComponentType,
 	type IEngineServerConfig,
 	InformationComponentType,
 	type MimeTypeProcessorType,
@@ -51,6 +52,19 @@ export async function buildEngineServerConfiguration(
 		corsOrigins: Is.stringValue(envVars.corsOrigins) ? envVars.corsOrigins.split(",") : undefined
 	};
 
+	const localOrigin = `http://${webServerOptions.host ?? "localhost"}:${webServerOptions.port ?? 3000}`;
+
+	let publicOrigin;
+	if (Is.stringValue(envVars.publicOrigin)) {
+		const publicUrl = Url.tryParseExact(envVars.publicOrigin);
+		if (!Is.empty(publicUrl)) {
+			const urlParts = publicUrl.parts();
+			publicOrigin = `${urlParts.schema}://${urlParts.host}${Is.integer(urlParts.port) ? `:${urlParts.port}` : ""}`;
+		} else {
+			throw new GeneralError("node", "invalidPublicOrigin", { publicOrigin: envVars.publicOrigin });
+		}
+	}
+
 	const nodeIdentityEnabled = Coerce.boolean(envVars.nodeIdentityEnabled) ?? true;
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (tenantEnabled) {
@@ -73,6 +87,17 @@ export async function buildEngineServerConfiguration(
 							serverInfo,
 							openApiSpecPath,
 							favIconPath
+						}
+					}
+				}
+			],
+			hostingComponent: [
+				{
+					type: HostingComponentType.Service,
+					options: {
+						config: {
+							localOrigin,
+							publicOrigin
 						}
 					}
 				}

@@ -1172,7 +1172,7 @@ async function configureRightsManagement(
 			type: RightsManagementPnpComponentType.Service,
 			options: {
 				config: {
-					baseCallbackUrl: envVars.rightsManagementBaseCallbackUrl ?? "",
+					callbackPath: envVars.rightsManagementCallbackPath ?? "",
 					negotiationComponentCreator: async url =>
 						new PolicyNegotiationPointRestClient({ endpoint: url })
 				}

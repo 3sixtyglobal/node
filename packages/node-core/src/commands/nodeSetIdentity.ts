@@ -1,9 +1,9 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@twin.org/cli-core";
-import { I18n } from "@twin.org/core";
+import { I18n, Is, NotFoundError } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
-import { Did } from "@twin.org/identity-models";
+import { Did, IdentityResolverConnectorFactory } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
@@ -62,6 +62,22 @@ export async function nodeSetIdentity(
 	}
 ): Promise<void> {
 	Did.guard("nodeSetIdentity", "identity", params.identity);
+
+	CLIDisplay.task(
+		I18n.formatMessage("node.cli.commands.node-set-identity.labels.resolvingIdentity")
+	);
+	const defaultIdentityResolverConnectorType = engineCore.getRegisteredInstanceType(
+		"identityResolverConnector"
+	);
+
+	const identityResolverConnector = IdentityResolverConnectorFactory.get(
+		defaultIdentityResolverConnectorType
+	);
+
+	const identityDocument = await identityResolverConnector.resolveDocument(params.identity);
+	if (Is.empty(identityDocument)) {
+		throw new NotFoundError("nodeSetIdentity", "identityNotFound", params.identity);
+	}
 
 	const state = engineCore.getState();
 	state.nodeId = params.identity;
