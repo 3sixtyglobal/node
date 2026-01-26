@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.15](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.14...node-v0.0.3-next.15) (2026-01-26)
+
+
+### Features
+
+* support public origin and hosting service ([#77](https://github.com/twinfoundation/node/issues/77)) ([3b9039f](https://github.com/twinfoundation/node/commit/3b9039fcba7f7038c06f8fd6a5ccc9fdbbf535b3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.14 to 0.0.3-next.15
+
 ## [0.0.3-next.14](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.13...node-v0.0.3-next.14) (2026-01-21)
 
 

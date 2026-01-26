@@ -1,5 +1,13 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.15](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.14...node-core-v0.0.3-next.15) (2026-01-26)
+
+
+### Features
+
+* support public origin and hosting service ([#77](https://github.com/twinfoundation/node/issues/77)) ([3b9039f](https://github.com/twinfoundation/node/commit/3b9039fcba7f7038c06f8fd6a5ccc9fdbbf535b3))
+* update context usage ([2215440](https://github.com/twinfoundation/node/commit/2215440801dea3955885b6579ad9b98b7a5d87ea))
+
 ## [0.0.3-next.14](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.13...node-core-v0.0.3-next.14) (2026-01-21)
 
 
