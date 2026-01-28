@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.16](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.15...node-core-v0.0.3-next.16) (2026-01-28)
+
+
+### Features
+
+* remove dap and darp ([36c3ffb](https://github.com/twinfoundation/node/commit/36c3ffb31af65a0e3025859dab675efeee043155))
+
 ## [0.0.3-next.15](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.14...node-core-v0.0.3-next.15) (2026-01-26)
 
 

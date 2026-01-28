@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.16](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.15...node-v0.0.3-next.16) (2026-01-28)
+
+
+### Features
+
+* remove dap and darp ([36c3ffb](https://github.com/twinfoundation/node/commit/36c3ffb31af65a0e3025859dab675efeee043155))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.15 to 0.0.3-next.16
+
 ## [0.0.3-next.15](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.14...node-v0.0.3-next.15) (2026-01-26)
 
 
