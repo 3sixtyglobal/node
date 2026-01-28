@@ -27,7 +27,6 @@ import {
 } from "@twin.org/engine-types";
 import { FederatedCatalogueFilterFactory } from "@twin.org/federated-catalogue-models";
 import {
-	DataAccessHandlerFactory,
 	PolicyArbiterFactory,
 	PolicyEnforcementProcessorFactory,
 	PolicyExecutionActionFactory,
@@ -169,7 +168,6 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
-				TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
@@ -234,7 +232,6 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
-				TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
@@ -345,7 +342,6 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
-			TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 			TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
@@ -428,8 +424,6 @@ describe("node-core", () => {
 			"policy-enforcement-point-service",
 			"policy-negotiation-admin-point-service",
 			"policy-negotiation-point-service",
-			"data-access-point-service",
-			"data-access-request-point-service",
 			"synchronised-storage-service",
 			"federated-catalogue-service",
 			"data-space-connector-service",
@@ -552,11 +546,6 @@ describe("node-core", () => {
 			"/rights-management/negotiations/admin/:policyId",
 			"/rights-management/negotiations/admin/:policyId",
 			"/rights-management/negotiations/admin",
-			"/rights-management/data/:assetType",
-			"/rights-management/data/:assetType/:id",
-			"/rights-management/data/:assetType/:id",
-			"/rights-management/data/:assetType/:id",
-			"/rights-management/data/:assetType/query",
 			"/synchronised-storage/sync-changeset",
 			"/synchronised-storage/decryption-key",
 			"/federated-catalogue/request",
@@ -579,7 +568,6 @@ describe("node-core", () => {
 
 			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
 
-			expect(DataAccessHandlerFactory.names()).toEqual(["example-data-access-handler"]);
 			expect(PolicyArbiterFactory.names()).toEqual(["example-policy-arbiter"]);
 			expect(PolicyEnforcementProcessorFactory.names()).toEqual([
 				"example-policy-enforcement-processor"
@@ -635,7 +623,6 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
-			TWIN_RIGHTS_MANAGEMENT_DATA_ACCESS_HANDLERS: "example",
 			TWIN_VC_AUTHENTICATION_ENABLED: "true"
 		};
 

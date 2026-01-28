@@ -43,9 +43,6 @@ import {
 	MessagingSmsConnectorType,
 	NftComponentType,
 	NftConnectorType,
-	RightsManagementDapComponentType,
-	RightsManagementDarpComponentType,
-	type RightsManagementDataAccessHandlerComponentType,
 	RightsManagementPapComponentType,
 	RightsManagementPdpComponentType,
 	RightsManagementPepComponentType,
@@ -73,10 +70,7 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import {
-	DataAccessPointRestClient,
-	PolicyNegotiationPointRestClient
-} from "@twin.org/rights-management-rest-client";
+import { PolicyNegotiationPointRestClient } from "@twin.org/rights-management-rest-client";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
@@ -1183,31 +1177,6 @@ async function configureRightsManagement(
 		coreConfig.types.rightsManagementPnapComponent.push({
 			type: RightsManagementPnapComponentType.Service
 		});
-
-		coreConfig.types.rightsManagementDapComponent ??= [];
-		coreConfig.types.rightsManagementDapComponent.push({
-			type: RightsManagementDapComponentType.Service
-		});
-
-		coreConfig.types.rightsManagementDarpComponent ??= [];
-		coreConfig.types.rightsManagementDarpComponent.push({
-			type: RightsManagementDarpComponentType.Service,
-			options: {
-				config: {
-					dataAccessComponentCreator: async url => new DataAccessPointRestClient({ endpoint: url })
-				}
-			}
-		});
-
-		coreConfig.types.rightsManagementDataAccessHandlerComponent ??= [];
-		const dataAccessHandlerTypes = commaSeparatedListToArray(
-			envVars.rightsManagementDataAccessHandlers
-		);
-		for (const dataAccessHandlerType of dataAccessHandlerTypes) {
-			coreConfig.types.rightsManagementDataAccessHandlerComponent.push({
-				type: dataAccessHandlerType as RightsManagementDataAccessHandlerComponentType
-			});
-		}
 
 		coreConfig.types.rightsManagementPolicyArbiterComponent ??= [];
 		const policyArbiterTypes = commaSeparatedListToArray(envVars.rightsManagementPolicyArbiters);

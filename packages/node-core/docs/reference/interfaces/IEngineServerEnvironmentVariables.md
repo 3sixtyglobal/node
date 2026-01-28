@@ -1628,18 +1628,6 @@ The rights management policy arbiters to add to the factory.
 
 ***
 
-### rightsManagementDataAccessHandlers?
-
-> `optional` **rightsManagementDataAccessHandlers**: `string`
-
-The rights management data access handlers to add to the factory.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementDataAccessHandlers`](IEngineEnvironmentVariables.md#rightsmanagementdataaccesshandlers)
-
-***
-
 ### backgroundTasksEnabled?
 
 > `optional` **backgroundTasksEnabled**: `string`

@@ -98,10 +98,6 @@
 		{
 			"name": "Policy Negotiation Administration Point",
 			"description": "Endpoints for managing ODRL policies in the Policy Negotiation Administration Point"
-		},
-		{
-			"name": "Data Access Point",
-			"description": "Endpoints for providing access to the Rights Management Data Access Point"
 		}
 	],
 	"paths": {
@@ -11736,7 +11732,7 @@
 										"id": "0909090909090909090909090909090909090909090909090909090909090909",
 										"dateCreated": "2025-05-29T01:00:00.000Z",
 										"dateModified": "2025-05-29T01:00:00.000Z",
-										"nodeId": "did:entity-storage:0xd2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2",
+										"nodeIdentity": "did:entity-storage:0xd2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2",
 										"changes": [
 											{
 												"entity": {
@@ -14678,581 +14674,6 @@
 					}
 				}
 			}
-		},
-		"/rights-management/data/{assetType}": {
-			"post": {
-				"operationId": "dapCreate",
-				"summary": "Create a new item",
-				"tags": [
-					"Data Access Point"
-				],
-				"parameters": [
-					{
-						"name": "assetType",
-						"description": "The type of the item being created.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "contacts"
-					},
-					{
-						"name": "accept",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "application/ld+json"
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "z3Vcuh2BP9ShC.z3Vcuh2BP9ShC.z3Vcuh2BP9ShC"
-					}
-				],
-				"requestBody": {
-					"description": "The request structure for creating an item with the DAP.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/DataAccessRequestWithObject"
-							},
-							"examples": {
-								"dapCreateRequestExample": {
-									"value": {
-										"@context": "https://schema.twindev.org/rights-management/",
-										"type": "DataAccessRequestWithObject",
-										"assetType": "contacts",
-										"object": {
-											"@context": "https://schema.org",
-											"type": "Person",
-											"name": "Jane Doe"
-										}
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"201": {
-						"description": "The rest request ended in created response.",
-						"headers": {
-							"location": {
-								"schema": {
-									"type": "string"
-								},
-								"description": "e.g. urn:contacts:abc123def456"
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/rights-management/data/{assetType}/{id}": {
-			"get": {
-				"operationId": "dapGet",
-				"summary": "Get an existing item",
-				"tags": [
-					"Data Access Point"
-				],
-				"parameters": [
-					{
-						"name": "assetType",
-						"description": "The type of the item being requested.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "contacts"
-					},
-					{
-						"name": "id",
-						"description": "The id of the item being requested.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "urn:contacts:abc123def456"
-					},
-					{
-						"name": "accept",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "application/ld+json"
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "z3Vcuh2BP9ShC.z3Vcuh2BP9ShC.z3Vcuh2BP9ShC"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "The response structure for getting an item with the DAP.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								},
-								"examples": {
-									"IDapGetResponseExample": {
-										"value": {
-											"@context": "https://schema.org",
-											"type": "Person",
-											"name": "Jane Doe"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"put": {
-				"operationId": "dapUpdate",
-				"summary": "Update an existing item",
-				"tags": [
-					"Data Access Point"
-				],
-				"parameters": [
-					{
-						"name": "assetType",
-						"description": "The type of the item being updated.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "contacts"
-					},
-					{
-						"name": "id",
-						"description": "The id of the item being updated.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "urn:contacts:abc123def456"
-					},
-					{
-						"name": "accept",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "application/ld+json"
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "z3Vcuh2BP9ShC.z3Vcuh2BP9ShC.z3Vcuh2BP9ShC"
-					}
-				],
-				"requestBody": {
-					"description": "The request structure for updating an item with the DAP.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/DataAccessRequestWithObject"
-							},
-							"examples": {
-								"dapUpdateRequestExample": {
-									"value": {
-										"@context": "https://schema.twindev.org/rights-management/",
-										"type": "DataAccessRequestWithObject",
-										"assetType": "contacts",
-										"object": {
-											"@context": "https://schema.org",
-											"type": "Person",
-											"name": "Jane Doe"
-										}
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"204": {
-						"description": "The rest request ended in success with no data."
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"operationId": "dapRemove",
-				"summary": "Remove an existing item",
-				"tags": [
-					"Data Access Point"
-				],
-				"parameters": [
-					{
-						"name": "assetType",
-						"description": "The type of the item being removed.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "contacts"
-					},
-					{
-						"name": "id",
-						"description": "The id of the item being removed.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "urn:contacts:abc123def456"
-					},
-					{
-						"name": "accept",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "application/ld+json"
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "z3Vcuh2BP9ShC.z3Vcuh2BP9ShC.z3Vcuh2BP9ShC"
-					}
-				],
-				"responses": {
-					"204": {
-						"description": "The rest request ended in success with no data."
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/rights-management/data/{assetType}/query": {
-			"post": {
-				"operationId": "dapQuery",
-				"summary": "Query items",
-				"tags": [
-					"Data Access Point"
-				],
-				"parameters": [
-					{
-						"name": "assetType",
-						"description": "The type of the item being requested.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "contacts"
-					},
-					{
-						"name": "accept",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "application/ld+json"
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "z3Vcuh2BP9ShC.z3Vcuh2BP9ShC.z3Vcuh2BP9ShC"
-					}
-				],
-				"requestBody": {
-					"description": "The request structure for querying items with the DAP.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/DataAccessQuery"
-							},
-							"examples": {
-								"dapQueryRequestExample": {
-									"value": {
-										"@context": "https://schema.twindev.org/rights-management/",
-										"type": "DataAccessQuery",
-										"assetType": "contacts"
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "The response structure for querying item with the DAP.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/DataAccessQueryResponse"
-								},
-								"examples": {
-									"IDapQueryResponseExample": {
-										"value": {
-											"@context": "https://schema.twindev.org/rights-management/",
-											"type": "DataAccessQueryResponse",
-											"items": [
-												{
-													"@context": "https://schema.org",
-													"type": "Person",
-													"name": "Jane Doe"
-												}
-											]
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
 		}
 	},
 	"components": {
@@ -17106,98 +16527,6 @@
 				],
 				"description": "The types the extracted data can be coerced to."
 			},
-			"Comparator": {
-				"type": "object",
-				"properties": {
-					"property": {
-						"type": "string",
-						"description": "The name of the property in the object to check."
-					},
-					"value": {
-						"description": "The value of the property to check."
-					},
-					"comparison": {
-						"$ref": "#/components/schemas/ComparisonOperator"
-					}
-				},
-				"required": [
-					"property",
-					"value",
-					"comparison"
-				],
-				"additionalProperties": false,
-				"description": "Interface defining comparator operator."
-			},
-			"ComparatorGroup<JsonLdNodeObject>": {
-				"type": "object",
-				"properties": {
-					"conditions": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/EntityCondition<JsonLdNodeObject>"
-						},
-						"description": "The conditions to join in a group."
-					},
-					"logicalOperator": {
-						"$ref": "#/components/schemas/LogicalOperator"
-					}
-				},
-				"required": [
-					"conditions"
-				],
-				"additionalProperties": false,
-				"description": "Interface defining condition group operator."
-			},
-			"ComparisonOperator": {
-				"anyOf": [
-					{
-						"type": "string",
-						"const": "equals",
-						"description": "Equals."
-					},
-					{
-						"type": "string",
-						"const": "not-equals",
-						"description": "Not Equals."
-					},
-					{
-						"type": "string",
-						"const": "greater-than",
-						"description": "Greater Than."
-					},
-					{
-						"type": "string",
-						"const": "greater-than-or-equal",
-						"description": "Greater Than Or Equal."
-					},
-					{
-						"type": "string",
-						"const": "less-than",
-						"description": "Less Than."
-					},
-					{
-						"type": "string",
-						"const": "less-than-or-equal",
-						"description": "Less Than Or Equal."
-					},
-					{
-						"type": "string",
-						"const": "includes",
-						"description": "Includes. A string in a substring. A set contains an element. A list contains an element."
-					},
-					{
-						"type": "string",
-						"const": "not-includes",
-						"description": "Not Includes. A string not in a substring. A set does not contain an element. A list does not contain an element."
-					},
-					{
-						"type": "string",
-						"const": "in",
-						"description": "In. A element is in a set."
-					}
-				],
-				"description": "The types of comparisons."
-			},
 			"ConflictResponse": {
 				"type": "object",
 				"additionalProperties": false,
@@ -17240,70 +16569,6 @@
 					"name"
 				],
 				"description": "The body which contains the error."
-			},
-			"DataAccessQuery": {
-				"type": "object",
-				"properties": {
-					"@context": {
-						"type": "string",
-						"const": "https://schema.twindev.org/rights-management/",
-						"description": "The JSON-LD context."
-					},
-					"type": {
-						"type": "string",
-						"const": "DataAccessQuery",
-						"description": "The type of the request."
-					},
-					"assetType": {
-						"type": "string",
-						"description": "The asset type being requested."
-					},
-					"conditions": {
-						"$ref": "#/components/schemas/EntityCondition<JsonLdNodeObject>"
-					},
-					"cursor": {
-						"type": "string",
-						"description": "The cursor for pagination, if any."
-					},
-					"options": {
-						"description": "Additional options which might be supported by the handler."
-					}
-				},
-				"required": [
-					"@context",
-					"type"
-				],
-				"additionalProperties": false,
-				"description": "The JSON-LD definition for the data access request."
-			},
-			"DataAccessRequestWithObject": {
-				"type": "object",
-				"properties": {
-					"@context": {
-						"type": "string",
-						"const": "https://schema.twindev.org/rights-management/",
-						"description": "The JSON-LD context."
-					},
-					"type": {
-						"type": "string",
-						"const": "DataAccessRequestWithObject",
-						"description": "The type of the request."
-					},
-					"assetType": {
-						"type": "string",
-						"description": "The asset type being requested."
-					},
-					"object": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					}
-				},
-				"required": [
-					"@context",
-					"type",
-					"object"
-				],
-				"additionalProperties": false,
-				"description": "The JSON-LD definition for the data access request with object."
 			},
 			"DataAssetDescription": {
 				"type": "object",
@@ -18606,17 +17871,6 @@
 				"additionalProperties": false,
 				"description": "The body parameters."
 			},
-			"EntityCondition<JsonLdNodeObject>": {
-				"anyOf": [
-					{
-						"$ref": "#/components/schemas/Comparator"
-					},
-					{
-						"$ref": "#/components/schemas/ComparatorGroup<JsonLdNodeObject>"
-					}
-				],
-				"description": "Type defining condition for entities filtering."
-			},
 			"Error": {
 				"type": "object",
 				"properties": {
@@ -19198,21 +18452,6 @@
 				],
 				"additionalProperties": false,
 				"description": "The response payload."
-			},
-			"LogicalOperator": {
-				"anyOf": [
-					{
-						"type": "string",
-						"const": "and",
-						"description": "Logical operator AND."
-					},
-					{
-						"type": "string",
-						"const": "or",
-						"description": "Logical operator OR."
-					}
-				],
-				"description": "The logical operators for condition combining."
 			},
 			"LoginRequest": {
 				"type": "object",
@@ -20067,26 +19306,26 @@
 					},
 					"storageKey": {
 						"type": "string",
-						"description": "The storage key of the change set. This is used to identify the entities being synchronised."
+						"description": "The storage key of the change set. This is used to identify the entities being synchronised. json-ld type:schema:identifier"
 					},
 					"dateCreated": {
 						"type": "string",
-						"description": "The date the change set was created."
+						"description": "The date the change set was created. json-ld namespace:schema"
 					},
 					"dateModified": {
 						"type": "string",
-						"description": "The date the change set was last modified."
+						"description": "The date the change set was last modified. json-ld namespace:schema"
 					},
-					"nodeId": {
+					"nodeIdentity": {
 						"type": "string",
-						"description": "The identity of the node that created the change set."
+						"description": "The identity of the node that created the change set. json-ld namespace:twin-common"
 					},
 					"changes": {
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/SyncChange"
 						},
-						"description": "The changes to apply after a snapshot."
+						"description": "The changes to apply after a snapshot. json-ld type:json"
 					}
 				},
 				"required": [
@@ -20096,7 +19335,7 @@
 					"storageKey",
 					"dateCreated",
 					"dateModified",
-					"nodeId",
+					"nodeIdentity",
 					"changes"
 				],
 				"additionalProperties": false,
@@ -20121,7 +19360,7 @@
 				"properties": {
 					"dateModified": {
 						"type": "string",
-						"description": "The date the entry was modified."
+						"description": "The date the entry was modified. json-ld namespace:schema"
 					}
 				},
 				"required": [

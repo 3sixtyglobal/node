@@ -678,11 +678,6 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementPolicyArbiters?: string;
 
 	/**
-	 * The rights management data access handlers to add to the factory.
-	 */
-	rightsManagementDataAccessHandlers?: string;
-
-	/**
 	 * Are background tasks enabled, defaults to false.
 	 */
 	backgroundTasksEnabled?: string;
