@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.17](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.16...node-core-v0.0.3-next.17) (2026-02-02)
+
+
+### Features
+
+* update rights management ([5c992c6](https://github.com/twinfoundation/node/commit/5c992c6b0d72f3eeaa39ee267e096d9a3f477f4e))
+
 ## [0.0.3-next.16](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.15...node-core-v0.0.3-next.16) (2026-01-28)
 
 

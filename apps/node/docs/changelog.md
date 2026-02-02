@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.17](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.16...node-v0.0.3-next.17) (2026-02-02)
+
+
+### Features
+
+* update rights management ([5c992c6](https://github.com/twinfoundation/node/commit/5c992c6b0d72f3eeaa39ee267e096d9a3f477f4e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.16 to 0.0.3-next.17
+
 ## [0.0.3-next.16](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.15...node-v0.0.3-next.16) (2026-01-28)
 
 
