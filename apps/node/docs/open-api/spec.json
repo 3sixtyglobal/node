@@ -12780,6 +12780,42 @@
 				],
 				"parameters": [
 					{
+						"name": "assigner",
+						"description": "The assigner to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "assignee",
+						"description": "The assignee to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "action",
+						"description": "The action to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "target",
+						"description": "The target to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "conditions",
 						"description": "The condition for the query.",
 						"in": "query",
@@ -12823,22 +12859,19 @@
 								},
 								"examples": {
 									"papQueryResponseExample": {
-										"value": {
-											"cursor": "next-page-cursor",
-											"policies": [
-												{
-													"@context": "http://www.w3.org/ns/odrl.jsonld",
-													"@type": "Set",
-													"uid": "urn:rights-management:abc123def456",
-													"permission": [
-														{
-															"target": "http://example.com/asset/1",
-															"action": "use"
-														}
-													]
-												}
-											]
-										}
+										"value": [
+											{
+												"@context": "http://www.w3.org/ns/odrl.jsonld",
+												"@type": "Set",
+												"uid": "urn:rights-management:abc123def456",
+												"permission": [
+													{
+														"target": "http://example.com/asset/1",
+														"action": "use"
+													}
+												]
+											}
+										]
 									}
 								}
 							}
@@ -13154,6 +13187,345 @@
 				"responses": {
 					"204": {
 						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/rights-management/policy/admin/agreement/{id}": {
+			"get": {
+				"operationId": "papGetAgreement",
+				"summary": "Get a policy agreement",
+				"tags": [
+					"Policy Administration Point"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The ID of the agreement to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:rights-management:abc123def456"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response structure for getting an agreement.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAgreement"
+								},
+								"examples": {
+									"papGetResponseExample": {
+										"value": {
+											"@context": "http://www.w3.org/ns/odrl.jsonld",
+											"@type": "Agreement",
+											"uid": "urn:rights-management:abc123def456",
+											"permission": [
+												{
+													"target": "http://example.com/asset/1",
+													"action": "use"
+												}
+											],
+											"assignee": "did:example:receiver",
+											"assigner": "did:example:sender"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/rights-management/policy/admin/offer/{id}": {
+			"get": {
+				"operationId": "papGetOffer",
+				"summary": "Get a policy offer",
+				"tags": [
+					"Policy Administration Point"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The ID of the offer to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:rights-management:abc123def456"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response structure for getting an offer.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlOffer"
+								},
+								"examples": {
+									"papGetResponseExample": {
+										"value": {
+											"@context": "http://www.w3.org/ns/odrl.jsonld",
+											"@type": "Offer",
+											"uid": "urn:rights-management:abc123def456",
+											"permission": [
+												{
+													"target": "http://example.com/asset/1",
+													"action": "use"
+												}
+											],
+											"assignee": "did:example:receiver",
+											"assigner": "did:example:sender"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/rights-management/policy/admin/set/{id}": {
+			"get": {
+				"operationId": "papGetSet",
+				"summary": "Get a policy set",
+				"tags": [
+					"Policy Administration Point"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The ID of the set to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:rights-management:abc123def456"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response structure for getting a set.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlSet"
+								},
+								"examples": {
+									"papGetResponseExample": {
+										"value": {
+											"@context": "http://www.w3.org/ns/odrl.jsonld",
+											"@type": "Set",
+											"uid": "urn:rights-management:abc123def456",
+											"permission": [
+												{
+													"target": "http://example.com/asset/1",
+													"action": "use"
+												}
+											],
+											"assignee": "did:example:receiver",
+											"assigner": "did:example:sender"
+										}
+									}
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -14599,17 +14971,14 @@
 								},
 								"examples": {
 									"pnapQueryResponseExample": {
-										"value": {
-											"items": [
-												{
-													"id": "pid",
-													"correlationId": "cid",
-													"dateCreated": "2025-09-03T00:00:00.000Z",
-													"state": "REQUESTED"
-												}
-											],
-											"cursor": "next-cursor"
-										}
+										"value": [
+											{
+												"id": "pid",
+												"correlationId": "cid",
+												"dateCreated": "2025-09-03T00:00:00.000Z",
+												"state": "REQUESTED"
+											}
+										]
 									}
 								}
 							}
@@ -18954,45 +19323,17 @@
 				"description": "The body of the request - the policy to create (uid will be auto-generated)."
 			},
 			"PapQueryResponse": {
-				"type": "object",
-				"properties": {
-					"cursor": {
-						"type": "string",
-						"description": "The cursor for the next page of results, if there are more results available."
-					},
-					"policies": {
-						"type": "array",
-						"items": {
-							"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
-						},
-						"description": "The policies matching the query."
-					}
+				"type": "array",
+				"items": {
+					"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
 				},
-				"required": [
-					"policies"
-				],
-				"additionalProperties": false,
 				"description": "The body of the response."
 			},
 			"PnapQueryResponse": {
-				"type": "object",
-				"properties": {
-					"items": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/PolicyNegotiation"
-						},
-						"description": "The list of policy negotiations."
-					},
-					"cursor": {
-						"type": "string",
-						"description": "The cursor for pagination."
-					}
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/PolicyNegotiation"
 				},
-				"required": [
-					"items"
-				],
-				"additionalProperties": false,
 				"description": "The body of the response."
 			},
 			"PnpContractNegotiationResponse": {
@@ -19006,39 +19347,9 @@
 				],
 				"description": "The state of the policy or an error."
 			},
-			"PolicyInformation": {
-				"type": "object",
-				"additionalProperties": {
-					"$ref": "#/components/schemas/PolicyInformationItems"
-				},
-				"description": "Interface describing a Policy Information."
-			},
-			"PolicyInformationItems": {
-				"type": "array",
-				"items": {
-					"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-				},
-				"description": "Interface describing a Policy Information."
-			},
 			"PolicyNegotiation": {
 				"type": "object",
 				"properties": {
-					"assignee": {
-						"type": "string",
-						"description": "The assignee for the locator."
-					},
-					"action": {
-						"type": "string",
-						"description": "The action for the locator."
-					},
-					"assetType": {
-						"type": "string",
-						"description": "The asset type for the locator."
-					},
-					"resourceId": {
-						"type": "string",
-						"description": "A resource identifier for the locator."
-					},
 					"id": {
 						"type": "string",
 						"description": "The primary id used by the provider."
@@ -19072,8 +19383,8 @@
 					"agreement": {
 						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAgreement"
 					},
-					"information": {
-						"$ref": "#/components/schemas/PolicyInformation"
+					"trustVerificationInfo": {
+						"$ref": "#/components/schemas/TrustVerificationInfo"
 					},
 					"code": {
 						"type": "string",
@@ -19563,6 +19874,27 @@
 				],
 				"additionalProperties": false,
 				"description": "The response payload."
+			},
+			"TrustVerificationInfo": {
+				"type": "object",
+				"properties": {
+					"identity": {
+						"type": "string",
+						"description": "The identity associated with the payload."
+					},
+					"data": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						},
+						"description": "Additional JSON-LD node objects associated with the verification."
+					}
+				},
+				"required": [
+					"identity"
+				],
+				"additionalProperties": false,
+				"description": "Interface describing a trust verifier information."
 			},
 			"UpdatePasswordRequest": {
 				"type": "object",

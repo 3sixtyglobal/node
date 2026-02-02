@@ -163,11 +163,11 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
@@ -227,11 +227,11 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
@@ -337,11 +337,11 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 			TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
@@ -531,6 +531,9 @@ describe("node-core", () => {
 			"/rights-management/policy/admin",
 			"/rights-management/policy/admin/:id",
 			"/rights-management/policy/admin/:id",
+			"/rights-management/policy/admin/agreement/:id",
+			"/rights-management/policy/admin/offer/:id",
+			"/rights-management/policy/admin/set/:id",
 			"/rights-management/policy/admin/:id",
 			"/rights-management/policy/admin",
 			"/rights-management/negotiations/:id",
@@ -568,17 +571,17 @@ describe("node-core", () => {
 
 			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
 
-			expect(PolicyArbiterFactory.names()).toEqual(["example-policy-arbiter"]);
+			expect(PolicyArbiterFactory.names()).toEqual(["pass-through-policy-arbiter"]);
 			expect(PolicyEnforcementProcessorFactory.names()).toEqual([
-				"example-policy-enforcement-processor"
+				"pass-through-policy-enforcement-processor"
 			]);
 			expect(PolicyExecutionActionFactory.names()).toEqual(["logging-policy-execution-action"]);
 			expect(PolicyInformationSourceFactory.names()).toEqual([
 				"static-policy-information-source",
 				"identity-policy-information-source"
 			]);
-			expect(PolicyNegotiatorFactory.names()).toEqual(["example-policy-negotiator"]);
-			expect(PolicyRequesterFactory.names()).toEqual(["example-policy-requester"]);
+			expect(PolicyNegotiatorFactory.names()).toEqual(["pass-through-policy-negotiator"]);
+			expect(PolicyRequesterFactory.names()).toEqual(["pass-through-policy-requester"]);
 
 			expect(TrustGeneratorFactory.names()).toEqual(["jwt-verifiable-credential-generator"]);
 			expect(TrustVerifierFactory.names()).toEqual(["jwt-verifiable-credential-verifier"]);
@@ -618,11 +621,11 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "example",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "example",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "example",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 			TWIN_VC_AUTHENTICATION_ENABLED: "true"
 		};
 
