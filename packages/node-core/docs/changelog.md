@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.18](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.17...node-core-v0.0.3-next.18) (2026-02-04)
+
+
+### Features
+
+* env-prefix option and user-update cli command ([#83](https://github.com/twinfoundation/node/issues/83)) ([fc48efa](https://github.com/twinfoundation/node/commit/fc48efa7ad72173def048170c3afb5eeb9f1b292))
+
 ## [0.0.3-next.17](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.16...node-core-v0.0.3-next.17) (2026-02-02)
 
 
