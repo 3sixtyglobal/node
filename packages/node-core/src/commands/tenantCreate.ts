@@ -24,6 +24,14 @@ export function getCommandDefinitionTenantCreate(commandDefinitions: {
 		requiresTenantId: false,
 		params: [
 			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-create.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
 				key: "tenant-id",
 				type: "string",
 				extendedType: "hex(32)",
@@ -149,10 +157,9 @@ export async function tenantCreate(
 	const tenantId = params.tenantId ?? TenantIdHelper.generateTenantId();
 	const label = params.label ?? "";
 	const publicOrigin = params.publicOrigin ?? "";
-	await tenantAdminService.set({
+	await tenantAdminService.create({
 		id: tenantId,
 		apiKey,
-		dateCreated: new Date(Date.now()).toISOString(),
 		label,
 		publicOrigin,
 		isNodeTenant: false

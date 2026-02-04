@@ -18,6 +18,7 @@ import { getCommandDefinitionTenantCreate } from "./commands/tenantCreate.js";
 import { getCommandDefinitionTenantImport } from "./commands/tenantImport.js";
 import { getCommandDefinitionTenantUpdate } from "./commands/tenantUpdate.js";
 import { getCommandDefinitionUserCreate } from "./commands/userCreate.js";
+import { getCommandDefinitionUserUpdate } from "./commands/userUpdate.js";
 import { getCommandDefinitionVaultKeyCreate } from "./commands/vaultKeyCreate.js";
 import { getCommandDefinitionVaultKeyImport } from "./commands/vaultKeyImport.js";
 import type { CliCommandParamType } from "./models/cliCommandParamType.js";
@@ -27,30 +28,6 @@ import type { ICliCommandDefinition } from "./models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 
 const commandDefinitions: { [id: string]: ICliCommandDefinition } = {};
-
-/**
- * Initialise the CLI.
- * @param processEnv The environment variables from the process.
- * @param args The command line arguments.
- * @returns The constructed CLI command if there is one.
- * @throws GeneralError if the command is missing or invalid.
- */
-export function initCli(
-	processEnv: {
-		[id: string]: string;
-	},
-	args?: string[]
-): ICliCommand | undefined {
-	const commandLineArgs = parseCommandLineArgs(args);
-	let cliCommand;
-
-	if (Is.arrayValue(commandLineArgs.options)) {
-		registerCommands();
-		cliCommand = constructCliCommand(processEnv, commandLineArgs);
-	}
-
-	return cliCommand;
-}
 
 /**
  * Parse command line arguments.
@@ -122,6 +99,11 @@ export function constructCliCommand(
 				definition: commandDefinitions.help,
 				params: {}
 			};
+		}
+
+		// In cases where no command but env-prefix is provided, we just return
+		if (command.key === "env-prefix") {
+			return undefined;
 		}
 
 		if (!commandDefinitions[command.key]) {
@@ -325,6 +307,7 @@ export function registerCommands(): void {
 	getCommandDefinitionTenantImport(commandDefinitions);
 	getCommandDefinitionTenantUpdate(commandDefinitions);
 	getCommandDefinitionUserCreate(commandDefinitions);
+	getCommandDefinitionUserUpdate(commandDefinitions);
 	getCommandDefinitionVaultKeyCreate(commandDefinitions);
 	getCommandDefinitionVaultKeyImport(commandDefinitions);
 }

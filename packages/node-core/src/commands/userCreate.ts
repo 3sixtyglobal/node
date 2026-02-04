@@ -1,16 +1,14 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { type AuthenticationUser, PasswordHelper } from "@twin.org/api-auth-entity-storage-service";
+import type {
+	IAuthenticationAdminComponent,
+	IAuthenticationUser
+} from "@twin.org/api-auth-entity-storage-models";
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
-import { Converter, GeneralError, Guards, I18n, Is, RandomHelper } from "@twin.org/core";
+import { ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import { PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
-import {
-	EntityStorageConnectorFactory,
-	type IEntityStorageConnector
-} from "@twin.org/entity-storage-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
-import { nameofKebabCase } from "@twin.org/nameof";
 import type { Person, WithContext } from "schema-dts";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
@@ -29,6 +27,14 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.user-create.description"),
 		example: I18n.formatMessage("node.cli.commands.user-create.example"),
 		params: [
+			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.user-create.params.env-prefix.description"
+				),
+				required: false
+			},
 			{
 				key: "user-identity",
 				type: "string",
@@ -57,6 +63,12 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 				description: I18n.formatMessage(
 					"node.cli.commands.user-create.params.password.description"
 				),
+				required: false
+			},
+			{
+				key: "scope",
+				type: "string",
+				description: I18n.formatMessage("node.cli.commands.user-create.params.scope.description"),
 				required: false
 			},
 			{
@@ -131,6 +143,7 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
  * @param params.organizationIdentity The organization DID for the user.
  * @param params.email The email for the user.
  * @param params.password The password for the user.
+ * @param params.scope The scope for the user.
  * @param params.givenName The given name for the user.
  * @param params.familyName The family name for the user.
  * @param params.overwriteMode The mode to use when a user with the same identity already exists.
@@ -147,6 +160,7 @@ export async function userCreate(
 		organizationIdentity?: string;
 		email?: string;
 		password?: string;
+		scope?: string;
 		givenName?: string;
 		familyName?: string;
 		overwriteMode?: "skip" | "overwrite" | "error";
@@ -160,14 +174,15 @@ export async function userCreate(
 			organizationDid: string;
 			email: string;
 			password: string;
+			scope: string[];
 			givenName: string;
 			familyName: string;
 	  }
 	| undefined
 > {
+	Guards.email("userCreate", "email", params.email);
 	Did.guard("userCreate", "user-identity", params.userIdentity);
 	Did.guard("userCreate", "organization-identity", params.organizationIdentity);
-	Guards.email("userCreate", "email", params.email);
 
 	if (Is.stringValue(params.password) && params.password.length < 16) {
 		throw new GeneralError("userCreate", "passwordTooShort", { minLength: 16 });
@@ -180,16 +195,18 @@ export async function userCreate(
 		defaultIdentityProfileConnectorType
 	);
 
-	const authUserEntityStorage =
-		EntityStorageConnectorFactory.get<IEntityStorageConnector<AuthenticationUser>>(
-			nameofKebabCase<AuthenticationUser>()
-		);
+	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
+		"authenticationAdminComponent"
+	);
+	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
+		defaultAuthenticationAdminComponentType
+	);
 
 	let createUser = true;
 
 	let existingUser;
 	try {
-		existingUser = await authUserEntityStorage.get(params.userIdentity, "identity");
+		existingUser = await authenticationAdminComponent.get(params.email);
 	} catch {}
 
 	if (!Is.empty(existingUser)) {
@@ -200,8 +217,8 @@ export async function userCreate(
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.skipping"));
 		} else if (params.overwriteMode === "overwrite") {
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.overwriting"));
-			await authUserEntityStorage.remove(existingUser.email);
-			await identityProfileConnector.remove(existingUser.identity);
+			await authenticationAdminComponent.remove(existingUser.email);
+			await identityProfileConnector.remove(existingUser.userIdentity);
 		}
 	}
 
@@ -209,21 +226,21 @@ export async function userCreate(
 	if (createUser) {
 		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.creating"));
 
-		const generatedPassword = params.password ?? PasswordGenerator.generate(16);
-		const passwordBytes = Converter.utf8ToBytes(generatedPassword);
-		const saltBytes = RandomHelper.generate(16);
-		const hashedPassword = await PasswordHelper.hashPassword(passwordBytes, saltBytes);
-
-		const user: AuthenticationUser = {
+		const user: Omit<IAuthenticationUser, "salt"> = {
 			email: params.email,
-			password: hashedPassword,
-			salt: Converter.bytesToBase64(saltBytes),
-			identity: params.userIdentity,
-			organization: params.organizationIdentity
+			password: params.password ?? PasswordGenerator.generate(16),
+			userIdentity: params.userIdentity,
+			organizationIdentity: params.organizationIdentity,
+			scope: params.scope?.split(",").map(s => s.trim()) ?? []
 		};
 
 		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
-		await authUserEntityStorage.set(user);
+
+		if (existingUser) {
+			await authenticationAdminComponent.update(user);
+		} else {
+			await authenticationAdminComponent.create(user);
+		}
 
 		const name = `${params.givenName ?? ""} ${params.familyName ?? ""}`.trim();
 		const publicProfile: WithContext<Person> = {
@@ -244,13 +261,21 @@ export async function userCreate(
 
 		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.userCreated"));
 
+		CLIDisplay.value(I18n.formatMessage("node.cli.commands.user-create.labels.email"), user.email);
+
+		CLIDisplay.value(
+			I18n.formatMessage("node.cli.commands.user-create.labels.password"),
+			user.password
+		);
+
 		CLIDisplay.break();
 
 		json = {
 			did: params.userIdentity,
 			organizationDid: params.organizationIdentity,
 			email: params.email,
-			password: generatedPassword,
+			password: user.password,
+			scope: params.scope?.split(",").map(s => s.trim()) ?? [],
 			givenName: params.givenName ?? "",
 			familyName: params.familyName ?? ""
 		};
@@ -266,7 +291,8 @@ export async function userCreate(
 					`${params.outputEnvPrefix}DID="${params.userIdentity}"`,
 					`${params.outputEnvPrefix}ORGANIZATION_DID="${params.organizationIdentity}"`,
 					`${params.outputEnvPrefix}EMAIL="${params.email}"`,
-					`${params.outputEnvPrefix}PASSWORD="${generatedPassword}"`,
+					`${params.outputEnvPrefix}PASSWORD="${user.password}"`,
+					`${params.outputEnvPrefix}SCOPE="${params.scope ?? ""}"`,
 					`${params.outputEnvPrefix}GIVEN_NAME="${params.givenName ?? ""}"`,
 					`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`
 				],

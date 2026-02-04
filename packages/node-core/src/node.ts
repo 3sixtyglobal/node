@@ -13,7 +13,7 @@ import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
-import { initCli } from "./cli.js";
+import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
@@ -87,6 +87,15 @@ export async function run(
 
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
+		const commandLineArgs = parseCommandLineArgs(args);
+
+		const hasEnvPrefix = commandLineArgs.options?.find(option => option.key === "env-prefix");
+		if (hasEnvPrefix) {
+			nodeOptions.envPrefix = Coerce.string(hasEnvPrefix.value) ?? nodeOptions.envPrefix;
+		}
+
+		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
+
 		// This is the only location in the code base that should access process.env directly
 		// So we can safely disable the linting rule here.
 		let finalEnvVars =
@@ -107,9 +116,13 @@ export async function run(
 			...finalEnvVars
 		};
 
-		const cliCommand = initCli(finalEnvVars, args);
+		let cliCommand;
+		if (Is.arrayValue(commandLineArgs.options)) {
+			registerCommands();
+			cliCommand = constructCliCommand(finalEnvVars, commandLineArgs);
+		}
 
-		if (cliCommand) {
+		if (Is.object(cliCommand)) {
 			finalEnvVars[`${nodeOptions.envPrefix}SILENT`] ??= "true";
 		} else {
 			if (Is.empty(nodeOptions?.openApiSpecFile)) {
@@ -139,8 +152,6 @@ export async function run(
 			}
 		}
 
-		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
-
 		const { nodeEngineConfig, nodeEnvVars, availableContextIdKeys } = await buildConfiguration(
 			finalEnvVars,
 			nodeOptions,
@@ -164,7 +175,6 @@ export async function run(
 				process.on(signal, async () => {
 					CLIDisplay.value("Terminate Signal", signal);
 					await startResult.shutdown();
-					process.exit(0);
 				});
 			}
 		}

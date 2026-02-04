@@ -27,6 +27,14 @@ export function getCommandDefinitionVaultKeyCreate(commandDefinitions: {
 		requiresTenantId: false,
 		params: [
 			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.vault-key-create.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
 				key: "identity",
 				type: "string",
 				description: I18n.formatMessage(

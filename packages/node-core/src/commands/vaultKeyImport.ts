@@ -28,6 +28,14 @@ export function getCommandDefinitionVaultKeyImport(commandDefinitions: {
 		requiresTenantId: false,
 		params: [
 			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.vault-key-import.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
 				key: "identity",
 				type: "string",
 				description: I18n.formatMessage(

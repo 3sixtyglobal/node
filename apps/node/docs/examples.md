@@ -142,7 +142,7 @@ twin-node identity-verification-method-create --load-env="node-identity.env,orga
 twin-node vault-key-create --load-env="organization-identity.env" --identity=!ORGANIZATION_DID --key-id=!TWIN_BLOB_STORAGE_ENCRYPTION_KEY_ID --key-type=ChaCha20Poly1305 --output-json="organization-blob-encryption.json" --output-env="organization-blob-encryption.env"
 ```
 
-### Create a user identity associated with the organization
+### Create an identity associated with the organization
 
 ```shell
 twin-node identity-create --load-env="organization-identity.env" --controller=!ORGANIZATION_DID --output-json="user-identity.json" --output-env="user-identity.env" --output-env-prefix=user
@@ -151,5 +151,11 @@ twin-node identity-create --load-env="organization-identity.env" --controller=!O
 ### Create a user login associated with the user identity
 
 ```shell
-twin-node user-create --load-env="organization-identity.env,user-identity.env,node-tenant.env" --user-identity=!USER_DID --organization-identity=!ORGANIZATION_DID --tenant-id=!NODE_TENANT_ID --email="admin@node" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
+twin-node user-create --load-env="organization-identity.env,user-identity.env,node-tenant.env" --user-identity=!USER_DID --organization-identity=!ORGANIZATION_DID --email="admin@node" --scope="tenant-admin" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
+```
+
+### Update a user login associated with the user identity
+
+```shell
+twin-node user-update --load-env="organization-identity.env,user-identity.env,node-tenant.env" --email="admin@node" --scope="tenant-admin,foo"
 ```

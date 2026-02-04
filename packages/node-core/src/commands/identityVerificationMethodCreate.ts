@@ -36,6 +36,14 @@ export function getCommandDefinitionIdentityVerificationMethodCreate(commandDefi
 		requiresTenantId: false,
 		params: [
 			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
 				key: "identity",
 				type: "string",
 				description: I18n.formatMessage(

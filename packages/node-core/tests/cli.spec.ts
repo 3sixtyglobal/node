@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { rm } from "node:fs/promises";
 import { CLIUtils } from "@twin.org/cli-core";
-import { Factory } from "@twin.org/core";
+import { Converter, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import { AuthenticationAdminComponentType } from "@twin.org/engine-server-types";
 import {
@@ -21,9 +21,6 @@ import { run } from "../src/node.js";
 const basePort = Math.floor(Math.random() * 1000);
 let port = 3000 + basePort;
 const OUTPUT_TMP_DIR = "./tests/.tmp/";
-
-const TEST_NODE_ID =
-	"did:iota:testnet:0x8f7b71cedde408974606e404bce76980fd17a570d03ec319788fefd5eabbe9e8";
 
 /**
  * Get the value from an env line.
@@ -246,6 +243,14 @@ describe("node-core", () => {
 		expect(nodeTenantJson?.tenantId).toEqual(valueFromEnv(nodeTenantEnv?.[1]));
 		expect(nodeTenantJson?.label).toEqual(valueFromEnv(nodeTenantEnv?.[2]));
 		expect(nodeTenantJson?.publicOrigin).toEqual(valueFromEnv(nodeTenantEnv?.[3]));
+
+		const dbTable = await CLIUtils.readJsonFile<any>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		expect(dbTable?.[1]?.label).toEqual("node");
+		expect(dbTable?.[1]?.publicOrigin).toEqual("https://api.example.com:1234");
+
+		const nodeIdParts = nodeIdentityJson?.did.split(":");
+		const partitionId = Converter.bytesToBase64Url(Converter.hexToBytes(nodeIdParts[2]));
+		expect(dbTable?.[1]?.partitionId).toEqual(partitionId);
 	});
 
 	test("Can import the tenant for the node", async () => {
@@ -268,7 +273,7 @@ describe("node-core", () => {
 				`--load-env=${OUTPUT_TMP_DIR}node-tenant.env`,
 				"--tenant-id=!NODE_TENANT_ID"
 			],
-			{ nodeId: TEST_NODE_ID }
+			{ nodeId: nodeIdentityJson?.did }
 		);
 		expect(nodeState.nodeTenantId).toEqual(nodeTenantJson?.tenantId);
 	});
@@ -563,6 +568,7 @@ describe("node-core", () => {
 				"--user-identity=!USER_DID",
 				"--organization-identity=!ORGANIZATION_DID",
 				"--email=admin@node",
+				"--scope=tenant-admin,doo",
 				`--output-json=${OUTPUT_TMP_DIR}user-account-admin.json`,
 				`--output-env=${OUTPUT_TMP_DIR}user-account-admin.env`,
 				"--output-env-prefix=admin"
@@ -580,7 +586,22 @@ describe("node-core", () => {
 		expect(userAccountAdminJson?.organizationDid).toEqual(valueFromEnv(userAccountAdminEnv?.[1]));
 		expect(userAccountAdminJson?.email).toEqual(valueFromEnv(userAccountAdminEnv?.[2]));
 		expect(userAccountAdminJson?.password).toEqual(valueFromEnv(userAccountAdminEnv?.[3]));
-		expect(userAccountAdminJson?.givenName).toEqual(valueFromEnv(userAccountAdminEnv?.[4]));
-		expect(userAccountAdminJson?.familyName).toEqual(valueFromEnv(userAccountAdminEnv?.[5]));
+		expect(userAccountAdminJson?.scope.join(",")).toEqual(valueFromEnv(userAccountAdminEnv?.[4]));
+		expect(userAccountAdminJson?.givenName).toEqual(valueFromEnv(userAccountAdminEnv?.[5]));
+		expect(userAccountAdminJson?.familyName).toEqual(valueFromEnv(userAccountAdminEnv?.[6]));
+
+		const dbTable = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}db/authentication-user/store.json`
+		);
+		expect(dbTable?.[1]?.email).toEqual("admin@node");
+		expect(dbTable?.[1]?.scope).toEqual("tenant-admin,doo");
+
+		const nodeIdParts = nodeIdentityJson?.did.split(":");
+		const nodePartitionId = Converter.bytesToBase64Url(Converter.hexToBytes(nodeIdParts[2]));
+
+		const tenantPartitionId = Converter.bytesToBase64Url(
+			Converter.hexToBytes(nodeTenantJson?.tenantId)
+		);
+		expect(dbTable?.[1]?.partitionId).toEqual(`${nodePartitionId}/${tenantPartitionId}`);
 	});
 });

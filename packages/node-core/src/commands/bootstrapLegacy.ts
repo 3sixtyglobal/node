@@ -34,6 +34,14 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
 		requiresTenantId: false,
 		params: [
 			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.bootstrap-legacy.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
@@ -203,7 +211,8 @@ export async function bootstrapLegacy(
 				);
 				const tenantDetails = await tenantCreate(engineCore, envVars, {
 					tenantId: envVars.tenantId,
-					apiKey: envVars.tenantApiKey
+					apiKey: envVars.tenantApiKey,
+					label: "Node"
 				});
 
 				CLIDisplay.break();
@@ -297,6 +306,7 @@ export async function bootstrapLegacy(
 					organizationIdentity: organisation.did,
 					email: envVars.adminUserName ?? "admin@node",
 					password: envVars.adminUserPassword,
+					scope: "tenant-admin",
 					givenName: "Node",
 					familyName: "Admin"
 				});

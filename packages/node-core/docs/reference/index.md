@@ -45,7 +45,6 @@
 - [extensionsInitialiseEngine](functions/extensionsInitialiseEngine.md)
 - [extensionsInitialiseEngineServer](functions/extensionsInitialiseEngineServer.md)
 - [shutdownExtensions](functions/shutdownExtensions.md)
-- [initCli](functions/initCli.md)
 - [parseCommandLineArgs](functions/parseCommandLineArgs.md)
 - [constructCliCommand](functions/constructCliCommand.md)
 - [executeCommand](functions/executeCommand.md)

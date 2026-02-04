@@ -40,6 +40,14 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
 		requiresTenantId: false,
 		params: [
 			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.identity-create.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
 				key: "mnemonic",
 				type: "string",
 				description: I18n.formatMessage(

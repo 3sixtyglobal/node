@@ -80,11 +80,12 @@ export async function start(
 				envVars,
 				requiresEngineStarted,
 				requiresNodeIdentity,
-				requiresTenantId,
-				availableContextIdKeys
+				requiresTenantId
 			);
 		}
 	});
+
+	configureContextIdKeys(engine, availableContextIdKeys);
 
 	// Construct the server with the engine.
 	const server = new EngineServer({ engineCore: engine });
@@ -138,7 +139,6 @@ export async function start(
  * @param requiresEngineStarted Whether the engine is required to be started.
  * @param requiresNodeIdentity Whether the node identity is required.
  * @param requiresTenantId Whether the tenant id is required.
- * @param availableContextIdKeys The available context ID keys.
  * @throws GeneralError Throws if the node identity or tenant is required but not set.
  */
 function configureContextIds(
@@ -146,8 +146,7 @@ function configureContextIds(
 	envVars: INodeEnvironmentVariables,
 	requiresEngineStarted: boolean,
 	requiresNodeIdentity: boolean,
-	requiresTenantId: boolean,
-	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] | undefined
+	requiresTenantId: boolean
 ): void {
 	const state = engine.getState();
 
@@ -172,7 +171,18 @@ function configureContextIds(
 			}
 		}
 	}
+}
 
+/**
+ * Configure the context IDs for the engine.
+ * @param engine The engine to configure.
+ * @param availableContextIdKeys The available context ID keys.
+ * @throws GeneralError Throws if the node identity or tenant is required but not set.
+ */
+function configureContextIdKeys(
+	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
+	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] | undefined
+): void {
 	if (Is.arrayValue(availableContextIdKeys)) {
 		const added: string[] = [];
 		for (const availableContextIdKey of availableContextIdKeys) {

@@ -38,8 +38,7 @@
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
 		"tenantUpdate": {
-			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
-			"tenantNotFound": "The tenant with ID \"{notFoundId}\" was not found in the system."
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
 		"userCreate": {
 			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
@@ -49,7 +48,6 @@
 			"vaultKeyAlreadyExists": "The vault key with ID already exists and overwriteMode is set to \"error\"."
 		},
 		"nodeSetTenant": {
-			"tenantNotFound": "The tenant with ID \"{notFoundId}\" was not found in the system.",
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
 		"nodeSetIdentity": {
@@ -86,6 +84,9 @@
 					"description": "Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**",
 					"example": "bootstrap-legacy --load-env=\"./.env.bootstrap-legacy\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"load-env": {
 							"description": "Comma separated list of paths to .env files to read input parameters from."
 						}
@@ -110,6 +111,9 @@
 					"description": "Create an identity",
 					"example": "identity-create --mnemonic=\"...\" --fund-wallet=true",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"mnemonic": {
 							"description": "The mnemonic phrase to use for the identity. If not provided, a random mnemonic will be generated."
 						},
@@ -161,6 +165,9 @@
 					"description": "Import an identity",
 					"example": "identity-import --identity=\"did:iota:...\" --mnemonic=\"...\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The DID of the identity to import."
 						},
@@ -180,6 +187,9 @@
 					"description": "Create a verifiable credential",
 					"example": "identity-verifiable-credential-create --identity=\"did:iota:....\" --verification-method-id=\"my-id\" --subject-json=\"./subject.json\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The DID of the identity to use to create the credential."
 						},
@@ -221,6 +231,9 @@
 					"description": "Import an identity verification method",
 					"example": "identity-verification-method-import --identity=\"did:iota:....\" --verification-method-type=\"verificationMethod\" --verification-method-id=\"my-key-1\" ----private-key-hex=\"15...a2\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The DID of the identity to import the verification method to."
 						},
@@ -250,6 +263,9 @@
 					"description": "Create an identity verification method",
 					"example": "identity-verification-method-create --identity=\"did:iota:....\" --verification-method-type=\"verificationMethod\" --verification-method-id=\"my-key-1\" --controller=\"did:iota:....\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The DID of the identity to add the verification method to."
 						},
@@ -298,6 +314,9 @@
 					"description": "Set the node identity",
 					"example": "node-set-identity --identity=\"did:iota...\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The identity to set in the node."
 						},
@@ -314,6 +333,9 @@
 					"description": "Create a tenant with associated api key",
 					"example": "tenant-create --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"tenant-id": {
 							"description": "The tenant ID to add. If not provided a random tenant id will be generated."
 						},
@@ -351,6 +373,9 @@
 					"description": "Import a tenant with associated api key",
 					"example": "tenant-import --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"tenant-id": {
 							"description": "The tenant ID to import."
 						},
@@ -376,6 +401,9 @@
 					"description": "Update a tenant with associated api key",
 					"example": "tenant-update --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"tenant-id": {
 							"description": "The tenant ID to update."
 						},
@@ -401,6 +429,9 @@
 					"description": "Set the node tenant",
 					"example": "node-set-tenant --tenant-id=\"0011..aabb\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"tenant-id": {
 							"description": "The tenant ID to add. If not provided a random tenant id will be generated."
 						},
@@ -414,8 +445,11 @@
 				},
 				"user-create": {
 					"description": "Create a user",
-					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"user-identity": {
 							"description": "The DID to associate the user with."
 						},
@@ -427,6 +461,9 @@
 						},
 						"password": {
 							"description": "The password for the user."
+						},
+						"scope": {
+							"description": "List of scopes to associate with the user, comma separated."
 						},
 						"given-name": {
 							"description": "The given name of the user."
@@ -456,13 +493,54 @@
 						"storingProfile": "Storing profile",
 						"userCreated": "User created",
 						"skipping": "The user with ID already exists, skipping creation",
-						"overwriting": "Overwriting existing user with ID"
+						"overwriting": "Overwriting existing user with ID",
+						"email": "Email",
+						"password": "Password"
+					}
+				},
+				"user-update": {
+					"description": "Update a user",
+					"example": "user-update --email=\"bob@examples.com\" --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"user-identity": {
+							"description": "The DID to associate the user with."
+						},
+						"organization-identity": {
+							"description": "The organization DID to associate the user with."
+						},
+						"email": {
+							"description": "The email address of the user."
+						},
+						"scope": {
+							"description": "List of scopes to associate with the user, comma separated."
+						},
+						"given-name": {
+							"description": "The given name of the user."
+						},
+						"family-name": {
+							"description": "The family name of the user."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating user",
+						"storingUser": "Storing user",
+						"storingProfile": "Storing profile",
+						"userUpdated": "User updated"
 					}
 				},
 				"vault-key-create": {
 					"description": "Create a vault key for an identity",
 					"example": "vault-key-create --identity=\"did:iota:....\" --key-id=\"my-key\" --type=\"Ed25519\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The DID to associate the key with."
 						},
@@ -505,6 +583,9 @@
 					"description": "Import a vault key for an identity",
 					"example": "vault-key-import --identity=\"did:iota:....\" --key-id=\"my-key\" --key-type=Ed25519 --private-key-hex=\"15...a2\"",
 					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
 						"identity": {
 							"description": "The DID to associate the key with."
 						},

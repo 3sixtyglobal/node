@@ -2,15 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import {
-	ComponentFactory,
-	GeneralError,
-	Guards,
-	I18n,
-	Is,
-	NotFoundError,
-	Url
-} from "@twin.org/core";
+import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
@@ -30,6 +22,14 @@ export function getCommandDefinitionTenantUpdate(commandDefinitions: {
 		example: I18n.formatMessage("node.cli.commands.tenant-update.example"),
 		requiresTenantId: false,
 		params: [
+			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.env-prefix.description"
+				),
+				required: false
+			},
 			{
 				key: "tenant-id",
 				type: "string",
@@ -117,26 +117,14 @@ export async function tenantUpdate(
 		defaultTenantAdminComponentType
 	);
 
-	const tenant = await tenantAdminComponent.get(params.tenantId);
-
-	if (Is.empty(tenant)) {
-		throw new NotFoundError("tenantUpdate", "tenantNotFound", params.tenantId);
-	}
-
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-update.labels.updating"));
 	CLIDisplay.spinnerStart();
 
-	const apiKey = params.apiKey;
-	const tenantId = params.tenantId;
-	const label = params.label ?? "";
-	const publicOrigin = params.publicOrigin ?? "";
-	await tenantAdminComponent.set({
-		id: tenantId,
-		apiKey: Is.stringValue(apiKey) ? apiKey : tenant.apiKey,
-		dateCreated: tenant.dateCreated,
-		label: Is.stringValue(label) ? label : tenant.label,
-		publicOrigin: Is.stringValue(publicOrigin) ? publicOrigin : tenant.publicOrigin,
-		isNodeTenant: tenant.isNodeTenant
+	await tenantAdminComponent.update({
+		id: params.tenantId,
+		apiKey: params.apiKey,
+		label: params.label,
+		publicOrigin: params.publicOrigin
 	});
 	CLIDisplay.spinnerStop();
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-update.labels.updated"));
