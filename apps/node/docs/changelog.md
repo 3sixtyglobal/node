@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.19](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.18...node-v0.0.3-next.19) (2026-02-05)
+
+
+### Features
+
+* update dependencies ([351f777](https://github.com/twinfoundation/node/commit/351f777e001bf4183762657fc565b133a317600a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.18 to 0.0.3-next.19
+
 ## [0.0.3-next.18](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.17...node-v0.0.3-next.18) (2026-02-04)
 
 

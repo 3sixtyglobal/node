@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.19](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.18...node-core-v0.0.3-next.19) (2026-02-05)
+
+
+### Miscellaneous Chores
+
+* **node-core:** Synchronize repo versions
+
 ## [0.0.3-next.18](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.17...node-core-v0.0.3-next.18) (2026-02-04)
 
 
