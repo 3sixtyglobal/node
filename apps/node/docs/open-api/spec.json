@@ -24,6 +24,10 @@
 			"description": "Authentication endpoints for the REST server."
 		},
 		{
+			"name": "Authentication Admin",
+			"description": "Authentication Admin endpoints for the REST server."
+		},
+		{
 			"name": "Identity",
 			"description": "Service to provide all features related to digital identity."
 		},
@@ -838,25 +842,12 @@
 				}
 			}
 		},
-		"/authentication/{email}/password": {
+		"/authentication/password": {
 			"put": {
 				"operationId": "authenticationUpdatePassword",
-				"summary": "Update the user's password",
+				"summary": "Update the current user's password",
 				"tags": [
 					"Authentication"
-				],
-				"parameters": [
-					{
-						"name": "email",
-						"description": "The user email.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "john:example.com"
-					}
 				],
 				"security": [
 					{
@@ -864,7 +855,7 @@
 					}
 				],
 				"requestBody": {
-					"description": "Update a users password.",
+					"description": "Update the current user's password.",
 					"required": true,
 					"content": {
 						"application/json": {
@@ -873,7 +864,7 @@
 							},
 							"examples": {
 								"updatePasswordRequestExample": {
-									"summary": "The request to update the user's password.",
+									"summary": "The request to update the current user's password.",
 									"value": {
 										"currentPassword": "MyNewPassword123!",
 										"newPassword": "MyNewPassword123!"
@@ -886,6 +877,634 @@
 				"responses": {
 					"204": {
 						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/admin/users": {
+			"post": {
+				"operationId": "authenticationAdminCreateUser",
+				"summary": "Create a new user",
+				"tags": [
+					"Authentication Admin"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Create a new user as an admin.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthenticationUser"
+							},
+							"examples": {
+								"createUserRequestExample": {
+									"summary": "The request to create a new user.",
+									"value": {
+										"email": "user@example.com",
+										"password": "MyPassword123!",
+										"userIdentity": "did:example:123456789abcdefghi",
+										"organizationIdentity": "did:example:123456789abcdefghi",
+										"scope": [
+											"scope1",
+											"scope2"
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/admin/users/{email}": {
+			"put": {
+				"operationId": "authenticationAdminUpdateUser",
+				"summary": "Update an existing user",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The user email.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "user@example.com"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Update a user as an admin.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Partial<AuthenticationUser"
+							},
+							"examples": {
+								"updateUserRequestExample": {
+									"summary": "The request to update an existing user.",
+									"value": {
+										"userIdentity": "did:example:123456789abcdefghi",
+										"organizationIdentity": "did:example:123456789abcdefghi",
+										"scope": [
+											"scope1",
+											"scope2"
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "authenticationAdminGetUser",
+				"summary": "Get existing user",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The user email.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "user@example.com"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Get a user as an admin.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthenticationUser"
+								},
+								"examples": {
+									"getUserResponseExample": {
+										"summary": "The response to get an existing user.",
+										"value": {
+											"email": "user@example.com",
+											"userIdentity": "did:example:123456789abcdefghi",
+											"organizationIdentity": "did:example:123456789abcdefghi",
+											"scope": [
+												"scope1",
+												"scope2"
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "authenticationAdminRemoveUser",
+				"summary": "Remove existing user",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The user email.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "user@example.com"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/admin/users/{email}/password": {
+			"put": {
+				"operationId": "authenticationAdminUpdateUserPassword",
+				"summary": "Update an existing user password",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The user email.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "user@example.com"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Update a users password as an admin.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AdminUserUpdatePasswordRequest"
+							},
+							"examples": {
+								"updateUserPasswordRequestExample": {
+									"summary": "The request to update an existing user password.",
+									"value": {
+										"newPassword": "MyNewPassword123!"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/admin/users/identity/{identity}": {
+			"get": {
+				"operationId": "authenticationAdminGetByIdentityUser",
+				"summary": "Get existing user by identity",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "identity",
+						"description": "The user identity.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "did:example:123456789abcdefghi"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Get a user as an admin.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthenticationUser"
+								},
+								"examples": {
+									"getUserResponseExample": {
+										"summary": "The response to get an existing user.",
+										"value": {
+											"email": "user@example.com",
+											"userIdentity": "did:example:123456789abcdefghi",
+											"organizationIdentity": "did:example:123456789abcdefghi",
+											"scope": [
+												"scope1",
+												"scope2"
+											]
+										}
+									}
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -16279,6 +16898,24 @@
 					}
 				],
 				"description": "The types concerning Activity Streams. Section 3.1 Activity Types: https://www.w3.org/TR/activitystreams-vocabulary/#activity-types   The types concerning Activity. Section 3.1 Activity Types: https://www.w3.org/TR/activitystreams-vocabulary/#activity-types"
+			},
+			"AdminUserUpdatePasswordRequest": {
+				"type": "object",
+				"properties": {
+					"newPassword": {
+						"type": "string",
+						"description": "The new password for the user."
+					},
+					"currentPassword": {
+						"type": "string",
+						"description": "The current password for the user."
+					}
+				},
+				"required": [
+					"newPassword"
+				],
+				"additionalProperties": false,
+				"description": "The body of the request."
 			},
 			"AttestationCreateRequest": {
 				"type": "object",
