@@ -55,6 +55,7 @@ import {
 	type RightsManagementPolicyExecutionActionComponentType,
 	type RightsManagementPolicyInformationSourceComponentType,
 	type RightsManagementPolicyNegotiatorComponentType,
+	type RightsManagementPolicyObligationEnforcerComponentType,
 	type RightsManagementPolicyRequesterComponentType,
 	RightsManagementPxpComponentType,
 	SynchronisedStorageComponentType,
@@ -70,7 +71,6 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import { PolicyNegotiationPointRestClient } from "@twin.org/rights-management-rest-client";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
@@ -1162,13 +1162,23 @@ async function configureRightsManagement(
 		});
 
 		coreConfig.types.rightsManagementPnpComponent ??= [];
+
+		// We add a multi instance REST client for the remote negotiations
+		// use a dummy endpoint for now as the actual endpoint will be provided in the config
+		// of the policy negotiator when it is used for remote negotiations
+		coreConfig.types.rightsManagementPnpComponent.push({
+			type: RightsManagementPnpComponentType.RestClient,
+			options: {
+				endpoint: "http://localhost"
+			},
+			isMultiInstance: true,
+			features: ["remote"]
+		});
 		coreConfig.types.rightsManagementPnpComponent.push({
 			type: RightsManagementPnpComponentType.Service,
 			options: {
 				config: {
-					callbackPath: envVars.rightsManagementCallbackPath ?? "",
-					negotiationComponentCreator: async url =>
-						new PolicyNegotiationPointRestClient({ endpoint: url })
+					callbackPath: envVars.rightsManagementCallbackPath ?? ""
 				}
 			}
 		});
@@ -1183,6 +1193,16 @@ async function configureRightsManagement(
 		for (const policyArbiterType of policyArbiterTypes) {
 			coreConfig.types.rightsManagementPolicyArbiterComponent.push({
 				type: policyArbiterType as RightsManagementPolicyArbiterComponentType
+			});
+		}
+
+		coreConfig.types.rightsManagementPolicyObligationEnforcerComponent ??= [];
+		const policyObligationEnforcerTypes = commaSeparatedListToArray(
+			envVars.rightsManagementPolicyObligationEnforcers
+		);
+		for (const policyObligationEnforcerType of policyObligationEnforcerTypes) {
+			coreConfig.types.rightsManagementPolicyObligationEnforcerComponent.push({
+				type: policyObligationEnforcerType as RightsManagementPolicyObligationEnforcerComponentType
 			});
 		}
 

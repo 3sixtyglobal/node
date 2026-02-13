@@ -678,6 +678,11 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementPolicyArbiters?: string;
 
 	/**
+	 * The rights management policy obligation enforcers to add to the factory.
+	 */
+	rightsManagementPolicyObligationEnforcers?: string;
+
+	/**
 	 * Are background tasks enabled, defaults to false.
 	 */
 	backgroundTasksEnabled?: string;

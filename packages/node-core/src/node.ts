@@ -171,10 +171,15 @@ export async function run(
 		if (!Is.empty(startResult)) {
 			showErrorDetails = false;
 
+			let isShuttingDown = false;
 			for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
 				process.on(signal, async () => {
-					CLIDisplay.value("Terminate Signal", signal);
-					await startResult.shutdown();
+					if (!isShuttingDown) {
+						isShuttingDown = true;
+						CLIDisplay.value("Terminate Signal", signal);
+						await startResult.shutdown();
+						process.exit(0);
+					}
 				});
 			}
 		}

@@ -40,23 +40,24 @@ export async function extensionInitialiseEngineServer(engineCore, engineServer) 
  * @param instanceConfig.type The instance type.
  * @returns The instance created and the factory for it.
  */
-export async function testAppInitialiser(engineCore, context, instanceConfig) {
-	let component;
-	let instanceType;
+export function testAppInitialiser(engineCore, context, instanceConfig) {
+	let createComponent;
+	let instanceTypeName;
 	if (instanceConfig.type === 'service') {
-		component = new TestDataSpaceConnectorApp({
-			dataSpaceConnectorComponentType: engineCore.getRegisteredInstanceType(
-				'dataSpaceConnectorComponent'
-			),
-			loggingComponentType: engineCore.getRegisteredInstanceType('loggingComponent'),
-			...instanceConfig.options
-		});
-		instanceType = TestDataSpaceConnectorApp.APP_ID;
+		createComponent = createOptions =>
+			new TestDataSpaceConnectorApp({
+				dataSpaceConnectorComponentType: engineCore.getRegisteredInstanceType(
+					'dataSpaceConnectorComponent'
+				),
+				loggingComponentType: engineCore.getRegisteredInstanceType('loggingComponent'),
+				...createOptions.options
+			});
+		instanceTypeName = TestDataSpaceConnectorApp.APP_ID;
 	}
 	return {
-		instanceType,
+		instanceTypeName,
 		factory: DataSpaceConnectorAppFactory,
-		component
+		createComponent
 	};
 }
 /**

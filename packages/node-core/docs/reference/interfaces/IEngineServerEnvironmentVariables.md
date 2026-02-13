@@ -1628,6 +1628,18 @@ The rights management policy arbiters to add to the factory.
 
 ***
 
+### rightsManagementPolicyObligationEnforcers?
+
+> `optional` **rightsManagementPolicyObligationEnforcers**: `string`
+
+The rights management policy obligation enforcers to add to the factory.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementPolicyObligationEnforcers`](IEngineEnvironmentVariables.md#rightsmanagementpolicyobligationenforcers)
+
+***
+
 ### backgroundTasksEnabled?
 
 > `optional` **backgroundTasksEnabled**: `string`

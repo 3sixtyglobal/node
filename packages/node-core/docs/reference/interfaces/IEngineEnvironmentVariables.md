@@ -1096,6 +1096,14 @@ The rights management policy arbiters to add to the factory.
 
 ***
 
+### rightsManagementPolicyObligationEnforcers?
+
+> `optional` **rightsManagementPolicyObligationEnforcers**: `string`
+
+The rights management policy obligation enforcers to add to the factory.
+
+***
+
 ### backgroundTasksEnabled?
 
 > `optional` **backgroundTasksEnabled**: `string`
