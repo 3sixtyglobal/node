@@ -37,6 +37,7 @@ import {
 } from "./utils.js";
 
 const moduleCache: { [id: string]: unknown } = {};
+let npmRootCache: string | undefined;
 
 /**
  * Run the TWIN Node.
@@ -386,8 +387,7 @@ export function overrideModuleImport(
 
 			case ModuleProtocol.Default: {
 				try {
-					const npmRoot = execSync("npm root").toString().trim().replace(/\\/g, "/");
-					const packagePath = path.resolve(npmRoot, moduleName);
+					const packagePath = path.resolve(getNpmRootPath(), moduleName);
 					const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
 					const modulePath = path.resolve(packagePath, mainFile);
 					const exists = await fileExists(modulePath);
@@ -435,4 +435,13 @@ export function overrideModuleImport(
 			useDefault: true
 		};
 	});
+}
+
+/**
+ * Get the root path for npm modules by executing "npm root" command and cache it.
+ * @returns The root path for npm modules.
+ */
+function getNpmRootPath(): string {
+	npmRootCache ??= execSync("npm root").toString().trim().replace(/\\/g, "/");
+	return npmRootCache;
 }
