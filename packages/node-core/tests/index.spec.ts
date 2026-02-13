@@ -477,6 +477,7 @@ describe("node-core", () => {
 			"POST     /identity/:identity/service",
 			"DELETE   /identity/:identity/service/:serviceId",
 			"POST     /identity/:identity/verifiable-credential/:verificationMethodId",
+			"POST     /identity/verifiable-credential/verify/document",
 			"GET      /identity/verifiable-credential/verify",
 			"GET      /identity/:identity/verifiable-credential/revoke/:revocationIndex",
 			"GET      /identity/:identity/verifiable-credential/unrevoke/:revocationIndex",
