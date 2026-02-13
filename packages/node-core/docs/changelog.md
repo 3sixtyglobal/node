@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.21](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.20...node-core-v0.0.3-next.21) (2026-02-13)
+
+
+### Features
+
+* add obligation enforcers and multi instance support ([#89](https://github.com/twinfoundation/node/issues/89)) ([d81af99](https://github.com/twinfoundation/node/commit/d81af99b8c4db6e9a1370b7065bf6d9d222c71ed))
+
 ## [0.0.3-next.20](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.19...node-core-v0.0.3-next.20) (2026-02-06)
 
 
