@@ -1166,6 +1166,8 @@ async function configureRightsManagement(
 		// We add a multi instance REST client for the remote negotiations
 		// use a dummy endpoint for now as the actual endpoint will be provided in the config
 		// of the policy negotiator when it is used for remote negotiations
+		// We must add it before the service as the service needs to be able to request
+		// the REST client type from the engine core to be able to support remote negotiations
 		coreConfig.types.rightsManagementPnpComponent.push({
 			type: RightsManagementPnpComponentType.RestClient,
 			options: {
@@ -1180,7 +1182,8 @@ async function configureRightsManagement(
 				config: {
 					callbackPath: envVars.rightsManagementCallbackPath ?? ""
 				}
-			}
+			},
+			isDefault: true
 		});
 
 		coreConfig.types.rightsManagementPnapComponent ??= [];
