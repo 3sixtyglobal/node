@@ -1,5 +1,18 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.22](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.21...node-core-v0.0.3-next.22) (2026-02-23)
+
+
+### Features
+
+* cache the npm root to increase startup speed ([f10ea9e](https://github.com/twinfoundation/node/commit/f10ea9e22cc202f320df5fb21507b886c1f7345b))
+* update engine ([4b438e2](https://github.com/twinfoundation/node/commit/4b438e22c27d784ee6cc964b7cb4401e9699ab16))
+
+
+### Bug Fixes
+
+* test with latest dependencies ([91123b7](https://github.com/twinfoundation/node/commit/91123b71d0e7b51700a5d5452b2a0c9fc5c5256e))
+
 ## [0.0.3-next.21](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.20...node-core-v0.0.3-next.21) (2026-02-13)
 
 
