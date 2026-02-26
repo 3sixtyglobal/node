@@ -1180,7 +1180,8 @@ async function configureRightsManagement(
 			type: RightsManagementPnpComponentType.Service,
 			options: {
 				config: {
-					callbackPath: envVars.rightsManagementCallbackPath ?? ""
+					callbackPath: envVars.rightsManagementCallbackPath ?? "",
+					includeErrorDetails: coreConfig.debug ?? false
 				}
 			},
 			isDefault: true

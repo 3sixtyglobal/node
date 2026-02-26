@@ -4360,7 +4360,7 @@
 													"dateCreated": "2024-01-01T00:00:00Z",
 													"encodingFormat": "application/pdf",
 													"blobSize": 42,
-													"integrity": "sha256-c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
+													"integrity": "sha256-xX2UsIj0xtLLMt7QFIExDHhqoAE0yO4i+EseJUVgKnA=",
 													"fileExtension": "pdf",
 													"metadata": {
 														"@context": "https://schema.org",
@@ -4399,7 +4399,7 @@
 													"dateCreated": "2024-01-01T00:00:00Z",
 													"encodingFormat": "application/pdf",
 													"blobSize": 42,
-													"integrity": "sha256-c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
+													"integrity": "sha256-xX2UsIj0xtLLMt7QFIExDHhqoAE0yO4i+EseJUVgKnA=",
 													"fileExtension": "pdf",
 													"metadata": {
 														"@context": "https://schema.org",
@@ -4579,7 +4579,7 @@
 											"dateCreated": "2024-01-01T00:00:00Z",
 											"encodingFormat": "application/pdf",
 											"blobSize": 42,
-											"integrity": "sha256-c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
+											"integrity": "sha256-xX2UsIj0xtLLMt7QFIExDHhqoAE0yO4i+EseJUVgKnA=",
 											"fileExtension": "pdf",
 											"metadata": {
 												"@context": "https://schema.org",
@@ -4608,7 +4608,7 @@
 											"dateCreated": "2024-01-01T00:00:00Z",
 											"encodingFormat": "application/pdf",
 											"blobSize": 42,
-											"integrity": "sha256-c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70",
+											"integrity": "sha256-xX2UsIj0xtLLMt7QFIExDHhqoAE0yO4i+EseJUVgKnA=",
 											"fileExtension": "pdf",
 											"metadata": {
 												"@context": "https://schema.org",
@@ -13692,13 +13692,25 @@
 											"participantId": "did:example:node-identity-123",
 											"dataset": [
 												{
-													"@context": [
-														"https://w3id.org/dspace/2025/1/context.jsonld"
-													],
 													"@id": "urn:uuid:dataset-123",
 													"@type": "Dataset",
-													"title": "Energy Consumption Data",
-													"description": "Historical energy consumption data"
+													"dcterms:title": "Energy Consumption Data",
+													"dcterms:description": "Historical energy consumption data",
+													"hasPolicy": {
+														"@type": "Offer",
+														"uid": "urn:uuid:policy-456",
+														"assigner": "did:example:data-provider-789"
+													},
+													"distribution": {
+														"@id": "urn:uuid:distribution-789",
+														"@type": "Distribution",
+														"format": "application/json",
+														"accessService": {
+															"@id": "urn:uuid:access-service-321",
+															"@type": "DataService",
+															"endpointURL": "https://example.com/data-access"
+														}
+													}
 												}
 											]
 										}
@@ -16901,7 +16913,6 @@
 					"id",
 					"status"
 				],
-				"additionalProperties": false,
 				"description": "The details related to the processing of an Activity"
 			},
 			"ActivityProcessingStatus": {
@@ -16939,70 +16950,6 @@
 				"properties": {
 					"@context": {
 						"$ref": "#/components/schemas/ActivityStreamsContextType"
-					},
-					"@id": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"@included": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-					},
-					"@graph": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							}
-						]
-					},
-					"@nest": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdJsonObject"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdJsonObject"
-								}
-							}
-						]
-					},
-					"@type": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"@reverse": {
-						"type": "object",
-						"additionalProperties": {
-							"type": "string"
-						}
-					},
-					"@index": {
-						"type": "string"
 					},
 					"type": {
 						"description": "Object or array data type",
@@ -17481,6 +17428,10 @@
 							}
 						]
 					},
+					"mediaType": {
+						"type": "string",
+						"description": "MIME media type of the referenced resource."
+					},
 					"actor": {
 						"description": "Object or array data type",
 						"anyOf": [
@@ -17630,31 +17581,6 @@
 					"@context",
 					"type"
 				],
-				"additionalProperties": {
-					"anyOf": [
-						{
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-						},
-						{
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-						},
-						{
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-						},
-						{
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-						},
-						{
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-						},
-						{
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-						},
-						{
-							"type": "array"
-						}
-					]
-				},
 				"description": "A W3C Activity from Activity Streams.\n\nAn `Activity` describes an action performed by an `actor` on an `object`, and can optionally include a `target`, `result`, `origin`, or `instrument`."
 			},
 			"ActivityStreamsContextType": {
@@ -18011,7 +17937,6 @@
 				"required": [
 					"newPassword"
 				],
-				"additionalProperties": false,
 				"description": "The body of the request."
 			},
 			"AttestationCreateRequest": {
@@ -18028,7 +17953,6 @@
 				"required": [
 					"attestationObject"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the signing."
 			},
 			"AttestationTransferRequest": {
@@ -18047,7 +17971,6 @@
 					"holderIdentity",
 					"holderAddress"
 				],
-				"additionalProperties": false,
 				"description": "The parameters to be used in the transfer."
 			},
 			"AuditableItemGraphCreateRequest": {
@@ -18124,7 +18047,6 @@
 						"description": "The edges connected to the vertex."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data to be used in the vertex."
 			},
 			"AuditableItemGraphUpdateRequest": {
@@ -18204,7 +18126,6 @@
 						"description": "The edges connected to the vertex."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data to be used in the vertex."
 			},
 			"AuditableItemStreamCreateEntryRequest": {
@@ -18217,7 +18138,6 @@
 				"required": [
 					"entryObject"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the stream."
 			},
 			"AuditableItemStreamCreateRequest": {
@@ -18247,7 +18167,6 @@
 						"description": "After how many entries do we add immutable checks, defaults to service configured value. A value of 0 will disable immutable checks, 1 will be every item, or any other integer for an interval."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data to be used in the stream."
 			},
 			"AuditableItemStreamUpdateEntryRequest": {
@@ -18260,7 +18179,6 @@
 				"required": [
 					"entryObject"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the entry."
 			},
 			"AuditableItemStreamUpdateRequest": {
@@ -18270,7 +18188,6 @@
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data to be used in the stream."
 			},
 			"BlobStorageCreateRequest": {
@@ -18312,7 +18229,6 @@
 				"required": [
 					"blob"
 				],
-				"additionalProperties": false,
 				"description": "The body parameters."
 			},
 			"BlobStorageUpdateRequest": {
@@ -18330,239 +18246,7 @@
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					}
 				},
-				"additionalProperties": false,
 				"description": "The body parameters."
-			},
-			"CatalogOptionalContext": {
-				"type": "object",
-				"additionalProperties": false,
-				"properties": {
-					"@context": {
-						"$ref": "https://schema.twindev.org/dcat/DcatContextType"
-					}
-				},
-				"description": "Catalog omitting LD Context"
-			},
-			"CatalogRecordOptionalContext": {
-				"type": "object",
-				"additionalProperties": false,
-				"properties": {
-					"@context": {
-						"$ref": "https://schema.twindev.org/dcat/DcatContextType"
-					},
-					"@type": {
-						"type": "string",
-						"const": "dcat:CatalogRecord",
-						"description": "The type identifier, typically \"CatalogRecord\"."
-					},
-					"dcterms:title": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:description": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:issued": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:modified": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:conformsTo": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"foaf:primaryTopic": {
-						"$ref": "https://schema.twindev.org/dcat/DcatResource"
-					},
-					"@id": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@included": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@graph": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@nest": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@reverse": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@index": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					}
-				},
-				"required": [
-					"@graph",
-					"@id",
-					"@included",
-					"@index",
-					"@nest",
-					"@reverse",
-					"@type"
-				],
-				"description": "Record omitting LD Context"
 			},
 			"CatalogRequestResponse": {
 				"anyOf": [
@@ -18632,7 +18316,6 @@
 			},
 			"ConflictResponse": {
 				"type": "object",
-				"additionalProperties": false,
 				"properties": {
 					"conflicts": {
 						"type": "array",
@@ -18684,7 +18367,6 @@
 						"description": "The concerned datasets."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The description of a Data Asset"
 			},
 			"DataAssetItemList": {
@@ -18713,7 +18395,6 @@
 					"type",
 					"itemListElement"
 				],
-				"additionalProperties": false,
 				"description": "Interface describing a list of entities that are within a Data Asset. Pagination is handled via HTTP Link headers."
 			},
 			"DataAssetQueryRequest": {
@@ -18730,7 +18411,6 @@
 					"dataAsset",
 					"query"
 				],
-				"additionalProperties": false,
 				"description": "Request body containing the data asset and query criteria."
 			},
 			"DataProcessingConvertRequest": {
@@ -18748,7 +18428,6 @@
 				"required": [
 					"data"
 				],
-				"additionalProperties": false,
 				"description": "The params for the convert."
 			},
 			"DataProcessingConvertResponse": {
@@ -18778,7 +18457,6 @@
 					"ruleGroupId",
 					"data"
 				],
-				"additionalProperties": false,
 				"description": "The params for the extract."
 			},
 			"DataProcessingExtractResponse": {
@@ -18802,7 +18480,6 @@
 				"required": [
 					"entities"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"DataProcessingRuleGroupSetRequest": {
@@ -18824,1056 +18501,7 @@
 					"label",
 					"rules"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the store."
-			},
-			"DataServiceOptionalContext": {
-				"type": "object",
-				"additionalProperties": false,
-				"properties": {
-					"@context": {
-						"$ref": "https://schema.twindev.org/dcat/DcatContextType"
-					},
-					"@type": {
-						"type": "string",
-						"const": "dcat:DataService",
-						"description": "The type identifier, typically \"DataService\"."
-					},
-					"dcat:endpointURL": {
-						"type": "string",
-						"description": "The root location or primary endpoint of the service (a Web-resolvable IRI)."
-					},
-					"dcat:endpointDescription": {
-						"type": "string",
-						"description": "A description of the services available via the end-points, including their operations, parameters, etc."
-					},
-					"dcat:servesDataset": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcterms:title": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:description": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:identifier": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:issued": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:modified": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:language": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcterms:publisher": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/foaf/FoafAgent"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "An entity responsible for making the resource available."
-					},
-					"dcterms:creator": {
-						"$ref": "https://schema.twindev.org/foaf/FoafAgent"
-					},
-					"dcterms:accessRights": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Information about who can access the resource or an indication of its security status."
-					},
-					"dcterms:license": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "A legal document under which the resource is made available."
-					},
-					"dcterms:rights": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Information about rights held in and over the resource."
-					},
-					"dcterms:conformsTo": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcterms:type": {
-						"type": "string",
-						"description": "The nature or genre of the resource."
-					},
-					"dcat:contactPoint": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Relevant contact information for the catalogued resource."
-					},
-					"dcat:keyword": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcat:theme": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcat:landingPage": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcat:qualifiedRelation": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/dcat/DcatRelationship"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Link to a description of a relationship with another resource."
-					},
-					"odrl:hasPolicy": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
-					},
-					"@id": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@included": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@graph": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@nest": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@reverse": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@index": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					}
-				},
-				"required": [
-					"@graph",
-					"@id",
-					"@included",
-					"@index",
-					"@nest",
-					"@reverse",
-					"@type"
-				],
-				"description": "DataService omitting LD Context"
-			},
-			"DatasetOptionalContext": {
-				"type": "object",
-				"additionalProperties": false,
-				"properties": {
-					"@context": {
-						"$ref": "https://schema.twindev.org/dcat/DcatContextType"
-					},
-					"@type": {
-						"type": "string",
-						"enum": [
-							"dcat:Dataset",
-							"dcat:Catalog",
-							"dcat:DatasetSeries"
-						],
-						"description": "The type identifier, typically \"Dataset\". Can also be \"Catalog\" or \"DatasetSeries\" for subclasses."
-					},
-					"dcat:distribution": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/DistributionOptionalContext"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "#/components/schemas/DistributionOptionalContext"
-								}
-							}
-						]
-					},
-					"dcterms:accrualPeriodicity": {
-						"type": "string",
-						"description": "The frequency at which the dataset is published."
-					},
-					"dcat:inSeries": {
-						"type": "string",
-						"description": "A dataset series of which the dataset is part."
-					},
-					"dcterms:spatial": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"anyOf": [
-									{
-										"type": "string"
-									},
-									{
-										"type": "array",
-										"items": {
-											"type": "string"
-										}
-									}
-								],
-								"description": "Object or array data type"
-							}
-						],
-						"description": "The geographical area covered by the dataset."
-					},
-					"dcat:spatialResolutionInMeters": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDecimalType"
-					},
-					"dcterms:temporal": {
-						"$ref": "https://schema.twindev.org/dublin-core/DublinCorePeriodOfTime"
-					},
-					"dcat:temporalResolution": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDurationType"
-					},
-					"prov:wasGeneratedBy": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "An activity that generated, or provides the business context for, the creation of the dataset."
-					},
-					"dcterms:title": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:description": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:identifier": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:issued": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:modified": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:language": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcterms:publisher": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/foaf/FoafAgent"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "An entity responsible for making the resource available."
-					},
-					"dcterms:creator": {
-						"$ref": "https://schema.twindev.org/foaf/FoafAgent"
-					},
-					"dcterms:accessRights": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Information about who can access the resource or an indication of its security status."
-					},
-					"dcterms:license": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "A legal document under which the resource is made available."
-					},
-					"dcterms:rights": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Information about rights held in and over the resource."
-					},
-					"dcterms:conformsTo": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcterms:type": {
-						"type": "string",
-						"description": "The nature or genre of the resource."
-					},
-					"dcat:contactPoint": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Relevant contact information for the catalogued resource."
-					},
-					"dcat:keyword": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcat:theme": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcat:landingPage": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcat:qualifiedRelation": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/dcat/DcatRelationship"
-							},
-							{
-								"type": "string"
-							}
-						],
-						"description": "Link to a description of a relationship with another resource."
-					},
-					"odrl:hasPolicy": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
-					},
-					"@id": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@included": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@graph": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@nest": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@reverse": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@index": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					}
-				},
-				"required": [
-					"@graph",
-					"@id",
-					"@included",
-					"@index",
-					"@nest",
-					"@reverse",
-					"@type"
-				],
-				"description": "Dataset omitting LD Context"
-			},
-			"DistributionOptionalContext": {
-				"type": "object",
-				"additionalProperties": false,
-				"properties": {
-					"@context": {
-						"$ref": "https://schema.twindev.org/dcat/DcatContextType"
-					},
-					"@type": {
-						"type": "string",
-						"const": "dcat:Distribution",
-						"description": "The type identifier, typically \"Distribution\"."
-					},
-					"dcterms:title": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:description": {
-						"$ref": "https://schema.twindev.org/dcat/DcatLiteralType"
-					},
-					"dcterms:issued": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:modified": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDateTimeType"
-					},
-					"dcterms:license": {
-						"type": "string",
-						"description": "A legal document under which the distribution is made available."
-					},
-					"dcterms:accessRights": {
-						"type": "string",
-						"description": "Information about who can access the distribution."
-					},
-					"dcterms:rights": {
-						"type": "string",
-						"description": "Information about rights held in and over the distribution."
-					},
-					"dcat:accessURL": {
-						"type": "string",
-						"description": "A URL of the resource that gives access to a distribution of the dataset."
-					},
-					"dcat:accessService": {
-						"type": "string",
-						"description": "A data service that gives access to the distribution."
-					},
-					"dcat:downloadURL": {
-						"type": "string",
-						"description": "The URL of the downloadable file in a given format."
-					},
-					"dcat:byteSize": {
-						"$ref": "https://schema.twindev.org/dcat/DcatNonNegativeIntegerType"
-					},
-					"dcat:spatialResolutionInMeters": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDecimalType"
-					},
-					"dcat:temporalResolution": {
-						"$ref": "https://schema.twindev.org/dcat/DcatDurationType"
-					},
-					"dcterms:conformsTo": {
-						"description": "Object or array data type",
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						]
-					},
-					"dcat:mediaType": {
-						"type": "string",
-						"description": "The media type of the distribution as defined by IANA."
-					},
-					"dcterms:format": {
-						"type": "string",
-						"description": "The file format of the distribution."
-					},
-					"dcat:compressFormat": {
-						"type": "string",
-						"description": "The compression format of the distribution."
-					},
-					"dcat:packageFormat": {
-						"type": "string",
-						"description": "The package format of the distribution."
-					},
-					"spdx:checksum": {
-						"type": "string",
-						"description": "The checksum property provides a mechanism to verify the data integrity."
-					},
-					"odrl:hasPolicy": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
-					},
-					"@id": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@included": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@graph": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@nest": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@reverse": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@index": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					}
-				},
-				"required": [
-					"@graph",
-					"@id",
-					"@included",
-					"@index",
-					"@nest",
-					"@reverse",
-					"@type"
-				],
-				"description": "Distribution omitting LD Context"
 			},
 			"DocumentManagementCreateRequest": {
 				"type": "object",
@@ -19935,7 +18563,6 @@
 					"documentCode",
 					"blob"
 				],
-				"additionalProperties": false,
 				"description": "The body parameters."
 			},
 			"DocumentManagementUpdateRequest": {
@@ -19971,7 +18598,6 @@
 						"description": "The auditable item graph vertices to connect the document to."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The body parameters."
 			},
 			"Error": {
@@ -20006,7 +18632,6 @@
 					"name",
 					"message"
 				],
-				"additionalProperties": false,
 				"description": "Model to describe serialized error."
 			},
 			"FilteringQuery": {
@@ -20031,7 +18656,6 @@
 					"type",
 					"q"
 				],
-				"additionalProperties": false,
 				"description": "A query over a data asset that to be processed by a DS Connector App."
 			},
 			"GetDatasetResponse": {
@@ -20064,7 +18688,6 @@
 					"name",
 					"status"
 				],
-				"additionalProperties": false,
 				"description": "The health component information."
 			},
 			"HealthInfo": {
@@ -20084,7 +18707,6 @@
 				"required": [
 					"status"
 				],
-				"additionalProperties": false,
 				"description": "The status of the server."
 			},
 			"HealthStatus": {
@@ -20115,7 +18737,6 @@
 						"description": "The optional namespace to create the identity in."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityProfileCreateRequest": {
@@ -20128,7 +18749,6 @@
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityProfileGetResponse": {
@@ -20148,7 +18768,6 @@
 				"required": [
 					"identity"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityProfileListResponse": {
@@ -20182,7 +18801,6 @@
 				"required": [
 					"items"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityProfileUpdateRequest": {
@@ -20195,7 +18813,6 @@
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityProofCreateRequest": {
@@ -20212,7 +18829,6 @@
 					"proofType",
 					"document"
 				],
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityProofVerifyRequest": {
@@ -20229,7 +18845,6 @@
 					"document",
 					"proof"
 				],
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityProofVerifyResponse": {
@@ -20242,7 +18857,6 @@
 				"required": [
 					"verified"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityServiceCreateRequest": {
@@ -20286,7 +18900,6 @@
 					"type",
 					"endpoint"
 				],
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityVerifiableCredentialCreateRequest": {
@@ -20311,7 +18924,6 @@
 				"required": [
 					"subject"
 				],
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityVerifiableCredentialCreateResponse": {
@@ -20329,7 +18941,6 @@
 					"verifiableCredential",
 					"jwt"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityVerifiableCredentialVerifyResponse": {
@@ -20346,7 +18957,6 @@
 				"required": [
 					"revoked"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityVerifiablePresentationCreateRequest": {
@@ -20395,7 +19005,6 @@
 				"required": [
 					"verifiableCredentials"
 				],
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"IdentityVerifiablePresentationCreateResponse": {
@@ -20413,7 +19022,6 @@
 					"verifiablePresentation",
 					"jwt"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityVerifiablePresentationVerifyResponse": {
@@ -20437,7 +19045,6 @@
 				"required": [
 					"revoked"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"IdentityVerificationMethodCreateRequest": {
@@ -20454,7 +19061,6 @@
 				"required": [
 					"verificationMethodType"
 				],
-				"additionalProperties": false,
 				"description": "The data for the request."
 			},
 			"ImmutableProofCreateRequest": {
@@ -20467,7 +19073,6 @@
 				"required": [
 					"document"
 				],
-				"additionalProperties": false,
 				"description": "The parameters from the body."
 			},
 			"LogEntry": {
@@ -20502,7 +19107,6 @@
 					"source",
 					"message"
 				],
-				"additionalProperties": false,
 				"description": "Interface describing a log entry."
 			},
 			"LogLevel": {
@@ -20553,7 +19157,6 @@
 				"required": [
 					"entities"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"LoginRequest": {
@@ -20572,7 +19175,6 @@
 					"email",
 					"password"
 				],
-				"additionalProperties": false,
 				"description": "The login details."
 			},
 			"LoginResponse": {
@@ -20586,7 +19188,6 @@
 				"required": [
 					"expiry"
 				],
-				"additionalProperties": false,
 				"description": "The login response details."
 			},
 			"MetricType": {
@@ -20630,7 +19231,6 @@
 				"required": [
 					"tag"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the minting."
 			},
 			"NftResolveResponse": {
@@ -20660,7 +19260,6 @@
 					"owner",
 					"tag"
 				],
-				"additionalProperties": false,
 				"description": "The data that was resolved."
 			},
 			"NftTransferRequest": {
@@ -20682,7 +19281,6 @@
 					"recipientIdentity",
 					"recipientAddress"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the transfer."
 			},
 			"NftUpdateRequest": {
@@ -20692,12 +19290,10 @@
 						"description": "The metadata for the NFT."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data to be used in the update."
 			},
 			"NotFoundResponse": {
 				"type": "object",
-				"additionalProperties": false,
 				"properties": {
 					"notFoundId": {
 						"type": "string",
@@ -20736,7 +19332,6 @@
 			},
 			"PapCreateRequest": {
 				"type": "object",
-				"additionalProperties": false,
 				"properties": {
 					"uid": {
 						"type": "string"
@@ -20939,184 +19534,10 @@
 							}
 						],
 						"description": "The obligations in the policy. At least one of permission, prohibition, or obligation must be present."
-					},
-					"@id": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@included": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@graph": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@nest": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@reverse": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
-					},
-					"@index": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodePrimitive"
-								}
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdLanguageMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIndexMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIncludedBlock"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdIdMap"
-							},
-							{
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdTypeMap"
-							}
-						]
 					}
 				},
 				"required": [
 					"@context",
-					"@graph",
-					"@id",
-					"@included",
-					"@index",
-					"@nest",
-					"@reverse",
 					"@type"
 				],
 				"description": "The body of the request - the policy to create (uid will be auto-generated)."
@@ -21242,7 +19663,6 @@
 					"dateCreated",
 					"state"
 				],
-				"additionalProperties": false,
 				"description": "Interface describing a rights management policy negotiation."
 			},
 			"RefreshTokenResponse": {
@@ -21256,7 +19676,6 @@
 				"required": [
 					"expiry"
 				],
-				"additionalProperties": false,
 				"description": "The refresh token details."
 			},
 			"Rule": {
@@ -21282,7 +19701,6 @@
 					"source",
 					"target"
 				],
-				"additionalProperties": false,
 				"description": "Rule defining how to extract data from an object."
 			},
 			"RuleGroup": {
@@ -21309,7 +19727,6 @@
 					"label",
 					"rules"
 				],
-				"additionalProperties": false,
 				"description": "Group of rules for extraction."
 			},
 			"ServerInfo": {
@@ -21328,7 +19745,6 @@
 					"name",
 					"version"
 				],
-				"additionalProperties": false,
 				"description": "The information about the server."
 			},
 			"ServerLivezResponse": {
@@ -21379,7 +19795,6 @@
 					"operation",
 					"id"
 				],
-				"additionalProperties": false,
 				"description": "The object definition for a sync change."
 			},
 			"SyncChangeOperation": {
@@ -21448,7 +19863,6 @@
 					"nodeIdentity",
 					"changes"
 				],
-				"additionalProperties": false,
 				"description": "The object definition for a sync change set."
 			},
 			"SyncDecryptionKeyResponse": {
@@ -21462,7 +19876,6 @@
 				"required": [
 					"decryptionKey"
 				],
-				"additionalProperties": false,
 				"description": "The body of the response."
 			},
 			"SynchronisedEntityCore": {
@@ -21476,7 +19889,6 @@
 				"required": [
 					"dateModified"
 				],
-				"additionalProperties": false,
 				"description": "The base definition for synchronised entries."
 			},
 			"TaskApp": {
@@ -21495,7 +19907,6 @@
 					"taskId",
 					"dataSpaceConnectorAppId"
 				],
-				"additionalProperties": false,
 				"description": "Denotes a task associated with a Data Space Connector App"
 			},
 			"TelemetryAddMetricValueRequest": {
@@ -21526,7 +19937,6 @@
 				"required": [
 					"value"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the update."
 			},
 			"TelemetryGetMetricResponse": {
@@ -21543,7 +19953,6 @@
 					"metric",
 					"value"
 				],
-				"additionalProperties": false,
 				"description": "The body parameters."
 			},
 			"TelemetryListResponse": {
@@ -21564,7 +19973,6 @@
 				"required": [
 					"entities"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"TelemetryMetric": {
@@ -21595,7 +20003,6 @@
 					"label",
 					"type"
 				],
-				"additionalProperties": false,
 				"description": "Interface describing a telemetry metric."
 			},
 			"TelemetryMetricValue": {
@@ -21624,7 +20031,6 @@
 					"ts",
 					"value"
 				],
-				"additionalProperties": false,
 				"description": "Interface describing a telemetry metric value."
 			},
 			"TelemetryUpdateMetricRequest": {
@@ -21646,7 +20052,6 @@
 				"required": [
 					"label"
 				],
-				"additionalProperties": false,
 				"description": "The data to be used in the update."
 			},
 			"TelemetryValuesListResponse": {
@@ -21671,7 +20076,6 @@
 					"metric",
 					"entities"
 				],
-				"additionalProperties": false,
 				"description": "The response payload."
 			},
 			"TrustVerificationInfo": {
@@ -21692,7 +20096,6 @@
 				"required": [
 					"identity"
 				],
-				"additionalProperties": false,
 				"description": "Interface describing a trust verifier information."
 			},
 			"UpdatePasswordRequest": {
@@ -21711,7 +20114,6 @@
 					"currentPassword",
 					"newPassword"
 				],
-				"additionalProperties": false,
 				"description": "The body of the request."
 			},
 			"VerifiableStorageCreateRequest": {
@@ -21741,7 +20143,6 @@
 				"required": [
 					"data"
 				],
-				"additionalProperties": false,
 				"description": "The data to be stored."
 			},
 			"VerifiableStorageCreateResponse": {
@@ -21759,7 +20160,6 @@
 					"receipt",
 					"id"
 				],
-				"additionalProperties": false,
 				"description": "The data that was stored."
 			},
 			"VerifiableStorageGetRequest": {
@@ -21776,7 +20176,6 @@
 						"default": true
 					}
 				},
-				"additionalProperties": false,
 				"description": "The body optional param."
 			},
 			"VerifiableStorageGetResponse": {
@@ -21800,7 +20199,6 @@
 				"required": [
 					"receipt"
 				],
-				"additionalProperties": false,
 				"description": "The data that was obtained."
 			},
 			"VerifiableStorageUpdateRequest": {
@@ -21818,7 +20216,6 @@
 						"description": "An updated list of identities that are allowed to modify the item, send an empty list to remove all entries."
 					}
 				},
-				"additionalProperties": false,
 				"description": "The data to be updated."
 			},
 			"VerifyDepth": {
