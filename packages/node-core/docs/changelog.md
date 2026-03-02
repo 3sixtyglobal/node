@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.24](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.23...node-core-v0.0.3-next.24) (2026-03-02)
+
+
+### Features
+
+* align node module with dataspace rename and control plane integ… ([#95](https://github.com/twinfoundation/node/issues/95)) ([8129868](https://github.com/twinfoundation/node/commit/812986886fb5d779dd380956c4e6cc47c2d73530))
+
 ## [0.0.3-next.23](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.22...node-core-v0.0.3-next.23) (2026-02-26)
 
 

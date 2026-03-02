@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.24](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.23...node-v0.0.3-next.24) (2026-03-02)
+
+
+### Features
+
+* align node module with dataspace rename and control plane integ… ([#95](https://github.com/twinfoundation/node/issues/95)) ([8129868](https://github.com/twinfoundation/node/commit/812986886fb5d779dd380956c4e6cc47c2d73530))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.23 to 0.0.3-next.24
+
 ## [0.0.3-next.23](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.22...node-v0.0.3-next.23) (2026-02-26)
 
 
