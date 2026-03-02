@@ -271,10 +271,13 @@ export async function handleNpmProtocol(
 	try {
 		// Always pipe stdio to comply with env access restrictions in tests/lint
 		const stdio: "pipe" | "inherit" | "ignore" = "pipe";
-		execSync(`npm install ${packageName} --prefix "${cacheDir}" --no-save --no-package-lock`, {
-			cwd: cacheDir,
-			stdio
-		});
+		execSync(
+			`npm install ${packageName} --prefix "${cacheDir}" --omit=dev --no-save --no-package-lock`,
+			{
+				cwd: cacheDir,
+				stdio
+			}
+		);
 	} catch (err) {
 		throw new GeneralError(
 			"node",

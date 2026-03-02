@@ -1,7 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { DataSpaceConnectorAppFactory } from '@twin.org/data-space-connector-models';
-import { TestDataSpaceConnectorApp } from './test-data-space-connector-app.js';
+import { DataspaceAppFactory } from '@twin.org/dataspace-models';
+import { EngineTypeHelper } from '@twin.org/engine-types';
+import { TestDataspaceDataPlaneApp } from './test-dataspace-data-plane-app.js';
 
 /**
  * Initialise the  extension.
@@ -41,22 +42,23 @@ export async function extensionInitialiseEngineServer(engineCore, engineServer) 
  * @returns The instance created and the factory for it.
  */
 export function testAppInitialiser(engineCore, context, instanceConfig) {
-	let createComponent;
 	let instanceTypeName;
+	let createComponent;
 	if (instanceConfig.type === 'service') {
-		createComponent = createOptions =>
-			new TestDataSpaceConnectorApp({
-				dataSpaceConnectorComponentType: engineCore.getRegisteredInstanceType(
-					'dataSpaceConnectorComponent'
-				),
-				loggingComponentType: engineCore.getRegisteredInstanceType('loggingComponent'),
-				...createOptions.options
-			});
-		instanceTypeName = TestDataSpaceConnectorApp.APP_ID;
+		createComponent = createConfig =>
+			new TestDataspaceDataPlaneApp(
+				EngineTypeHelper.mergeConfig(
+					{
+						loggingComponentType: engineCore.getRegisteredInstanceType('loggingComponent')
+					},
+					createConfig.options
+				)
+			);
+		instanceTypeName = TestDataspaceDataPlaneApp.APP_ID;
 	}
 	return {
 		instanceTypeName,
-		factory: DataSpaceConnectorAppFactory,
+		factory: DataspaceAppFactory,
 		createComponent
 	};
 }

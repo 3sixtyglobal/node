@@ -1,10 +1,11 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/context';
-import { ComponentFactory } from '@twin.org/core';
+import { ComponentFactory, Guards } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
-import { DataRequestType } from '@twin.org/data-space-connector-models';
+import { DataRequestType } from '@twin.org/dataspace-models';
 import { DataspaceProtocolContexts } from '@twin.org/standards-dataspace-protocol';
+import { DublinCoreContexts } from '@twin.org/standards-dublin-core';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
 const entities = [
@@ -27,7 +28,7 @@ const entities = [
 /**
  * Test App Activity Handler.
  */
-export class TestDataSpaceConnectorApp {
+export class TestDataspaceDataPlaneApp {
 	/**
 	 * App Name.
 	 */
@@ -36,13 +37,13 @@ export class TestDataSpaceConnectorApp {
 	/**
 	 * Runtime name for the class.
 	 */
-	static CLASS_NAME = 'TestDataSpaceConnectorApp';
+	static CLASS_NAME = 'TestDataspaceDataPlaneApp';
 
 	/**
-	 * Logging service.
+	 * Logging component.
 	 * @internal
 	 */
-	_loggingService;
+	_logging;
 
 	/**
 	 * Node Identity
@@ -51,11 +52,11 @@ export class TestDataSpaceConnectorApp {
 	_nodeId;
 
 	/**
-	 * Create a new instance of TestDataSpaceConnectorApp.
+	 * Create a new instance of TestDataspaceDataPlaneApp.
 	 * @param options The constructor options.
 	 */
 	constructor(options) {
-		this._loggingService = ComponentFactory.getIfExists(options?.loggingComponentType ?? 'logging');
+		this._logging = ComponentFactory.getIfExists(options?.loggingComponentType ?? 'logging');
 	}
 
 	/**
@@ -63,25 +64,33 @@ export class TestDataSpaceConnectorApp {
 	 * @returns The class name of the component.
 	 */
 	className() {
-		return TestDataSpaceConnectorApp.CLASS_NAME;
+		return TestDataspaceDataPlaneApp.CLASS_NAME;
 	}
 
 	/**
 	 * Datasets handled by the App.
-	 * @returns DS Protocol compliant datasets
+	 * @returns Dataspace Protocol compliant datasets
 	 */
-	datasetsHandled() {
+	async datasetsHandled() {
+		const contextIds = await ContextIdStore.getContextIds();
+		const organizationId =
+			contextIds?.[ContextIdKeys.Organization] ?? contextIds?.[ContextIdKeys.Node] ?? '';
 		return [
 			{
-				'@context': [DataspaceProtocolContexts.Context],
+				'@context': [
+					DataspaceProtocolContexts.Context,
+					{
+						dcterms: DublinCoreContexts.NamespaceTerms
+					}
+				],
 				'@id': 'https://twin.example.org/data-service-1',
 				'@type': 'Dataset',
+				'dcterms:publisher': organizationId,
 				hasPolicy: [
 					{
 						'@type': 'Offer',
-						'@id': 'urn:uuid:test-policy-offer-1',
 						uid: 'urn:uuid:test-policy-offer-1',
-						assigner: 'https://twin.example.org',
+						assigner: organizationId,
 						permission: [
 							{
 								action: 'read'
@@ -148,14 +157,15 @@ export class TestDataSpaceConnectorApp {
 	 * @returns Activity processing result
 	 */
 	async handleActivity(activity) {
-		await this._loggingService?.log({
+		Guards.object(TestDataspaceDataPlaneApp.CLASS_NAME, 'activity', activity);
+		await this._logging?.log({
 			level: 'info',
-			source: TestDataSpaceConnectorApp.CLASS_NAME,
-			message: `App Called: ${TestDataSpaceConnectorApp.APP_ID}`
+			source: TestDataspaceDataPlaneApp.CLASS_NAME,
+			message: `App Called: ${TestDataspaceDataPlaneApp.APP_ID}`
 		});
-		await this._loggingService?.log({
+		await this._logging?.log({
 			level: 'info',
-			source: TestDataSpaceConnectorApp.CLASS_NAME,
+			source: TestDataspaceDataPlaneApp.CLASS_NAME,
 			message: `Node Identity: ${this._nodeId ?? ''}`
 		});
 		await new Promise(resolve => setTimeout(resolve, 500));
@@ -170,6 +180,7 @@ export class TestDataSpaceConnectorApp {
 	 * @returns the Data.
 	 */
 	async handleDataRequest(dataRequest, cursor, limit) {
+		Guards.object(TestDataspaceDataPlaneApp.CLASS_NAME, 'dataRequest', dataRequest);
 		switch (dataRequest.type) {
 			case DataRequestType.DataAssetEntities: {
 				if (dataRequest.entitySet.entityType === 'https://vocabulary.uncefact.org/Consignment') {
@@ -189,4 +200,4 @@ export class TestDataSpaceConnectorApp {
 		}
 	}
 }
-// # sourceMappingURL=testDataSpaceConnectorApp.js.map
+// # sourceMappingURL=testDataspaceDataPlaneApp.js.map

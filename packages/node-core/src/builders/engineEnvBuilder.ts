@@ -15,7 +15,8 @@ import {
 	type DataConverterConnectorType,
 	type DataExtractorConnectorType,
 	DataProcessingComponentType,
-	DataSpaceConnectorComponentType,
+	DataspaceControlPlaneComponentType,
+	DataspaceDataPlaneComponentType,
 	type DltConfig,
 	DltConfigType,
 	DocumentManagementComponentType,
@@ -128,7 +129,7 @@ export async function buildEngineConfiguration(
 	await configureRightsManagement(coreConfig, envVars);
 	await configureSynchronisedStorage(coreConfig, envVars);
 	await configureFederatedCatalogue(coreConfig, envVars);
-	await configureDataSpaceConnector(coreConfig, envVars);
+	await configureDataspace(coreConfig, envVars);
 
 	return coreConfig;
 }
@@ -698,7 +699,7 @@ async function configureMessaging(
 						accessKeyId: envVars.awsSesAccessKeyId,
 						secretAccessKey: envVars.awsSesSecretAccessKey,
 						endpoint: envVars.awsSesEndpoint,
-						applicationsSettings: Is.json(envVars.awsMessagingPushNotificationApplications)
+						applicationsSettings: Is.array(envVars.awsMessagingPushNotificationApplications)
 							? JSON.parse(envVars.awsMessagingPushNotificationApplications)
 							: []
 					}
@@ -1362,24 +1363,32 @@ async function configureFederatedCatalogue(
 }
 
 /**
- * Configures the data space connector.
+ * Configures the dataspace control plane and data plane.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-async function configureDataSpaceConnector(
+async function configureDataspace(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.dataSpaceConnectorEnabled) ?? false) {
-		coreConfig.types.dataSpaceConnectorComponent ??= [];
-		coreConfig.types.dataSpaceConnectorComponent.push({
-			type: DataSpaceConnectorComponentType.Service,
+	if (Coerce.boolean(envVars.dataspaceEnabled) ?? false) {
+		coreConfig.types.dataspaceControlPlaneComponent ??= [];
+		coreConfig.types.dataspaceControlPlaneComponent.push({
+			type: DataspaceControlPlaneComponentType.Service,
 			options: {
 				config: {
-					retainActivityLogsFor: Coerce.number(envVars.dataSpaceConnectorRetainActivityLogsFor),
-					activityLogsCleanUpInterval: Coerce.number(
-						envVars.dataSpaceConnectorActivityLogsCleanUpInterval
-					)
+					dataPlanePath: envVars.dataspaceDataPlanePath
+				}
+			}
+		});
+
+		coreConfig.types.dataspaceDataPlaneComponent ??= [];
+		coreConfig.types.dataspaceDataPlaneComponent.push({
+			type: DataspaceDataPlaneComponentType.Service,
+			options: {
+				config: {
+					retainActivityLogsFor: Coerce.number(envVars.dataspaceRetainActivityLogsFor),
+					activityLogsCleanUpInterval: Coerce.number(envVars.dataspaceActivityLogsCleanUpInterval)
 				}
 			}
 		});

@@ -950,7 +950,7 @@ AWS SES endpoint.
 
 > `optional` **awsMessagingPushNotificationApplications**: `string`
 
-The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
+The applications for the push notifications reference a separate json with @json: prefix.
 
 #### Inherited from
 
@@ -1660,21 +1660,21 @@ Is the task scheduler enabled, defaults to false.
 
 ***
 
-### dataSpaceConnectorEnabled?
+### dataspaceEnabled?
 
-> `optional` **dataSpaceConnectorEnabled**: `string`
+> `optional` **dataspaceEnabled**: `string`
 
-Is the data space connector enabled, defaults to false.
+Is the dataspace enabled, defaults to false.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataSpaceConnectorEnabled`](IEngineServerEnvironmentVariables.md#dataspaceconnectorenabled)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceEnabled`](IEngineServerEnvironmentVariables.md#dataspaceenabled)
 
 ***
 
-### dataSpaceConnectorRetainActivityLogsFor?
+### dataspaceRetainActivityLogsFor?
 
-> `optional` **dataSpaceConnectorRetainActivityLogsFor**: `string`
+> `optional` **dataspaceRetainActivityLogsFor**: `string`
 
 The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
 
@@ -1686,13 +1686,13 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataSpaceConnectorRetainActivityLogsFor`](IEngineServerEnvironmentVariables.md#dataspaceconnectorretainactivitylogsfor)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceRetainActivityLogsFor`](IEngineServerEnvironmentVariables.md#dataspaceretainactivitylogsfor)
 
 ***
 
-### dataSpaceConnectorActivityLogsCleanUpInterval?
+### dataspaceActivityLogsCleanUpInterval?
 
-> `optional` **dataSpaceConnectorActivityLogsCleanUpInterval**: `string`
+> `optional` **dataspaceActivityLogsCleanUpInterval**: `string`
 
 The interval for cleaning up the activity logs.
 
@@ -1704,7 +1704,22 @@ The interval for cleaning up the activity logs.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataSpaceConnectorActivityLogsCleanUpInterval`](IEngineServerEnvironmentVariables.md#dataspaceconnectoractivitylogscleanupinterval)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceActivityLogsCleanUpInterval`](IEngineServerEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
+
+***
+
+### dataspaceDataPlanePath?
+
+> `optional` **dataspaceDataPlanePath**: `string`
+
+The data plane path for PULL transfers (path only, not full URL).
+Will be combined with public origin from hosting component.
+Required if PULL transfers should be supported.
+Example: "dataspace/entities"
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceDataPlanePath`](IEngineServerEnvironmentVariables.md#dataspacedataplanepath)
 
 ***
 

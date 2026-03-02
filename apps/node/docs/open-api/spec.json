@@ -88,8 +88,12 @@
 			"description": "Service providing Dataspace Protocol-compliant catalogue endpoints for dataset discovery and query."
 		},
 		{
-			"name": "Data Space Connector",
-			"description": "Endpoints to access a Data Space Connector."
+			"name": "Dataspace Data Plane",
+			"description": "Endpoints to access a Dataspace Data Plane."
+		},
+		{
+			"name": "Transfer Process",
+			"description": "DSP Transfer Process Protocol endpoints for initiating and managing data transfers."
 		},
 		{
 			"name": "Policy Administration Point",
@@ -13886,12 +13890,12 @@
 				}
 			}
 		},
-		"/data-space-connector/notify": {
+		"/dataspace-data-plane/notify": {
 			"post": {
 				"operationId": "activityStreamNotify",
 				"summary": "Notify of a new Activity",
 				"tags": [
-					"Data Space Connector"
+					"Dataspace Data Plane"
 				],
 				"security": [
 					{
@@ -14008,17 +14012,17 @@
 				}
 			}
 		},
-		"/data-space-connector/activity-logs/{id}": {
+		"/dataspace-data-plane/activity-logs/{id}": {
 			"get": {
-				"operationId": "dataSpaceConnectorGetActivityLogEntry",
+				"operationId": "dataspaceDataPlaneGetActivityLogEntry",
 				"summary": "Get a Activity Log Entry",
 				"tags": [
-					"Data Space Connector"
+					"Dataspace Data Plane"
 				],
 				"parameters": [
 					{
 						"name": "id",
-						"description": "The ID of the entry to get.",
+						"description": "",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -14052,7 +14056,7 @@
 											"pendingTasks": [
 												{
 													"taskId": "urn:x-task-id:45678",
-													"dataSpaceConnectorAppId": "https://my-app.example.org/app1"
+													"dataspaceAppId": "https://my-app.example.org/app1"
 												}
 											],
 											"runningTasks": [],
@@ -14124,79 +14128,12 @@
 				}
 			}
 		},
-		"/data-space-connector/entities": {
+		"/dataspace-data-plane/entities": {
 			"get": {
-				"operationId": "dataSpaceConnectorGetDataAssetEntities",
+				"operationId": "dataspaceDataPlaneGetDataAssetEntities",
 				"summary": "Get Data Asset Entities",
 				"tags": [
-					"Data Space Connector"
-				],
-				"parameters": [
-					{
-						"name": "id",
-						"description": "The ID of the entity(ies) to get. (comma separated list)",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"example": "urn:ucr:24PLP051219453I002610799053311"
-					},
-					{
-						"name": "type",
-						"description": "The type of the entity to get.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"example": "https://vocabulary.uncefact.org/Consignment"
-					},
-					{
-						"name": "dataServiceId",
-						"description": "The Id of the data service that offers the data asset",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "datasetId",
-						"description": "The Id of the datasets that describes the data asset (comma separated list)",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "limit",
-						"description": "The maximum number of entities to retrieve.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "cursor",
-						"description": "Cursor to control pagination.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple"
-					}
+					"Dataspace Data Plane"
 				],
 				"responses": {
 					"200": {
@@ -14266,41 +14203,12 @@
 				}
 			}
 		},
-		"/data-space-connector/entities/query": {
+		"/dataspace-data-plane/entities/query": {
 			"post": {
-				"operationId": "dataSpaceConnectorQueryDataAsset",
+				"operationId": "dataspaceDataPlaneQueryDataAsset",
 				"summary": "Query Data Asset",
 				"tags": [
-					"Data Space Connector"
-				],
-				"parameters": [
-					{
-						"name": "cursor",
-						"description": "Opaque cursor token for pagination.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "limit",
-						"description": "Maximum number of items to return.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple"
-					}
+					"Dataspace Data Plane"
 				],
 				"requestBody": {
 					"description": "Request to query data asset entities.",
@@ -14313,7 +14221,7 @@
 							"examples": {
 								"dataAssetQuery": {
 									"value": {
-										"dataAsset": {},
+										"consumerPid": "urn:uuid:consumer-pid-12345",
 										"query": {
 											"type": "Example",
 											"q": "example query"
@@ -14365,6 +14273,564 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/transfers/request": {
+			"post": {
+				"operationId": "requestTransfer",
+				"summary": "Request Transfer Process (DSP)",
+				"tags": [
+					"Transfer Process"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The rest request ended in success with no data.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/OkResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/transfers/{pid}": {
+			"get": {
+				"operationId": "getTransferProcess",
+				"summary": "Get Transfer Process state (DSP)",
+				"tags": [
+					"Transfer Process"
+				],
+				"parameters": [
+					{
+						"name": "pid",
+						"description": "",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The rest request ended in success with no data.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/OkResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/transfers/{pid}/start": {
+			"post": {
+				"operationId": "startTransfer",
+				"summary": "Start Transfer Process (DSP)",
+				"tags": [
+					"Transfer Process"
+				],
+				"parameters": [
+					{
+						"name": "pid",
+						"description": "",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The rest request ended in success with no data.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/OkResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/transfers/{pid}/complete": {
+			"post": {
+				"operationId": "completeTransfer",
+				"summary": "Complete Transfer Process (DSP)",
+				"tags": [
+					"Transfer Process"
+				],
+				"parameters": [
+					{
+						"name": "pid",
+						"description": "",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The rest request ended in success with no data.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/OkResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/transfers/{pid}/suspend": {
+			"post": {
+				"operationId": "suspendTransfer",
+				"summary": "Suspend Transfer Process (DSP)",
+				"tags": [
+					"Transfer Process"
+				],
+				"parameters": [
+					{
+						"name": "pid",
+						"description": "",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The rest request ended in success with no data.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/OkResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/transfers/{pid}/terminate": {
+			"post": {
+				"operationId": "terminateTransfer",
+				"summary": "Terminate Transfer Process (DSP)",
+				"tags": [
+					"Transfer Process"
+				],
+				"parameters": [
+					{
+						"name": "pid",
+						"description": "",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The rest request ended in success with no data.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/OkResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -16393,7 +16859,8 @@
 											"id": "pid",
 											"correlationId": "cid",
 											"dateCreated": "2025-09-03T00:00:00.000Z",
-											"state": "REQUESTED"
+											"state": "REQUESTED",
+											"organizationIdentity": "did:iota:123456789abcdefghi"
 										}
 									}
 								}
@@ -16497,7 +16964,8 @@
 										"id": "pid",
 										"correlationId": "cid",
 										"dateCreated": "2025-09-03T00:00:00.000Z",
-										"state": "REQUESTED"
+										"state": "REQUESTED",
+										"organizationIdentity": "did:iota:123456789abcdefghi"
 									}
 								}
 							}
@@ -16704,7 +17172,8 @@
 												"id": "pid",
 												"correlationId": "cid",
 												"dateCreated": "2025-09-03T00:00:00.000Z",
-												"state": "REQUESTED"
+												"state": "REQUESTED",
+												"organizationIdentity": "did:iota:123456789abcdefghi"
 											}
 										]
 									}
@@ -16830,13 +17299,13 @@
 									"type": "string",
 									"description": "Task Id."
 								},
-								"dataSpaceConnectorAppId": {
+								"dataspaceAppId": {
 									"type": "string",
-									"description": "Data Space Connector App Id."
+									"description": "Dataspace App Id."
 								}
 							},
 							"required": [
-								"dataSpaceConnectorAppId",
+								"dataspaceAppId",
 								"startDate",
 								"taskId"
 							]
@@ -16865,13 +17334,13 @@
 									"type": "string",
 									"description": "Task Id."
 								},
-								"dataSpaceConnectorAppId": {
+								"dataspaceAppId": {
 									"type": "string",
-									"description": "Data Space Connector App Id."
+									"description": "Dataspace App Id."
 								}
 							},
 							"required": [
-								"dataSpaceConnectorAppId",
+								"dataspaceAppId",
 								"result",
 								"startDate",
 								"taskId"
@@ -16892,13 +17361,13 @@
 									"type": "string",
 									"description": "Task Id."
 								},
-								"dataSpaceConnectorAppId": {
+								"dataspaceAppId": {
 									"type": "string",
-									"description": "Data Space Connector App Id."
+									"description": "Dataspace App Id."
 								}
 							},
 							"required": [
-								"dataSpaceConnectorAppId",
+								"dataspaceAppId",
 								"error",
 								"taskId"
 							]
@@ -18356,19 +18825,6 @@
 				],
 				"description": "The body which contains the error."
 			},
-			"DataAssetDescription": {
-				"type": "object",
-				"properties": {
-					"dataSetId": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The concerned datasets."
-					}
-				},
-				"description": "The description of a Data Asset"
-			},
 			"DataAssetItemList": {
 				"type": "object",
 				"properties": {
@@ -18400,15 +18856,16 @@
 			"DataAssetQueryRequest": {
 				"type": "object",
 				"properties": {
-					"dataAsset": {
-						"$ref": "#/components/schemas/DataAssetDescription"
+					"consumerPid": {
+						"type": "string",
+						"description": "The consumer Process ID from the DSP Transfer Process. Mandatory - used to determine the Dataset, Distribution, and Agreement. The datasetId is resolved from the Transfer Process using this ID."
 					},
 					"query": {
 						"$ref": "#/components/schemas/FilteringQuery"
 					}
 				},
 				"required": [
-					"dataAsset",
+					"consumerPid",
 					"query"
 				],
 				"description": "Request body containing the data asset and query criteria."
@@ -18656,7 +19113,7 @@
 					"type",
 					"q"
 				],
-				"description": "A query over a data asset that to be processed by a DS Connector App."
+				"description": "A query over a data asset that to be processed by a Dataspace Data Plane App."
 			},
 			"GetDatasetResponse": {
 				"anyOf": [
@@ -19597,6 +20054,10 @@
 						"type": "string",
 						"description": "The callback address to send updates to the requester."
 					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "Organization identity to be used when sending trust payloads."
+					},
 					"offer": {
 						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlOffer"
 					},
@@ -19648,6 +20109,9 @@
 						},
 						"description": "A more detailed reason for the negotiation error."
 					},
+					"errorDetails": {
+						"$ref": "#/components/schemas/Error"
+					},
 					"handlerId": {
 						"type": "string",
 						"description": "The id of the handler, on provider side this is the negotiator, on consumer side this is the requester."
@@ -19661,7 +20125,8 @@
 					"id",
 					"correlationId",
 					"dateCreated",
-					"state"
+					"state",
+					"organizationIdentity"
 				],
 				"description": "Interface describing a rights management policy negotiation."
 			},
@@ -19898,16 +20363,16 @@
 						"type": "string",
 						"description": "Task Id."
 					},
-					"dataSpaceConnectorAppId": {
+					"dataspaceAppId": {
 						"type": "string",
-						"description": "Data Space Connector App Id."
+						"description": "Dataspace App Id."
 					}
 				},
 				"required": [
 					"taskId",
-					"dataSpaceConnectorAppId"
+					"dataspaceAppId"
 				],
-				"description": "Denotes a task associated with a Data Space Connector App"
+				"description": "Denotes a task associated with a Dataspace App"
 			},
 			"TelemetryAddMetricValueRequest": {
 				"type": "object",

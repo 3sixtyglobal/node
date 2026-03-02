@@ -398,7 +398,7 @@ export interface IEngineEnvironmentVariables {
 	awsSesEndpoint?: string;
 
 	/**
-	 * The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
+	 * The applications for the push notifications reference a separate json with @json: prefix.
 	 */
 	awsMessagingPushNotificationApplications?: string;
 
@@ -693,21 +693,29 @@ export interface IEngineEnvironmentVariables {
 	taskSchedulerEnabled?: string;
 
 	/**
-	 * Is the data space connector enabled, defaults to false.
+	 * Is the dataspace enabled, defaults to false.
 	 */
-	dataSpaceConnectorEnabled?: string;
+	dataspaceEnabled?: string;
 
 	/**
 	 * The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
 	 * @default 10
 	 */
-	dataSpaceConnectorRetainActivityLogsFor?: string;
+	dataspaceRetainActivityLogsFor?: string;
 
 	/**
 	 * The interval for cleaning up the activity logs.
 	 * @default 60
 	 */
-	dataSpaceConnectorActivityLogsCleanUpInterval?: string;
+	dataspaceActivityLogsCleanUpInterval?: string;
+
+	/**
+	 * The data plane path for PULL transfers (path only, not full URL).
+	 * Will be combined with public origin from hosting component.
+	 * Required if PULL transfers should be supported.
+	 * Example: "dataspace/entities"
+	 */
+	dataspaceDataPlanePath?: string;
 
 	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.

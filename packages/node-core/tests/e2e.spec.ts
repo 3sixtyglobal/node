@@ -20,11 +20,7 @@ import {
  * These tests use real npm registry and HTTPS CDN to verify download/install functionality.
  * They do NOT attempt to execute the downloaded modules as TWIN extensions.
  * They are slower and require network access, so they are in a separate file.
- *
- * Run with: npm run test:e2e
- * Skip with: npm test (default, runs only unit and integration tests)
  */
-
 const TEST_EXECUTION_DIR = "./tests";
 
 describe("E2E Protocol-Based Extension Loading", () => {
@@ -215,8 +211,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should download and verify real TWIN extension with lifecycle hooks", async () => {
-		// Using @twin.org/data-space-connector-test-app - real TWIN extension with lifecycle hooks
-		const packageName = "@twin.org/data-space-connector-test-app@0.0.1-next.7";
+		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.15";
 
 		// 1. Download real TWIN extension
 		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
@@ -264,9 +259,9 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		expect(extension.generateRestRoutes).toBeDefined();
 		expect(typeof extension.generateRestRoutes).toBe("function");
 
-		// 7. Verify this is a real extension (has TestDataSpaceConnectorApp class)
-		expect(extension.TestDataSpaceConnectorApp).toBeDefined();
-		expect(typeof extension.TestDataSpaceConnectorApp).toBe("function"); // Constructor function
+		// 7. Verify this is a real extension
+		expect(extension.TestDataspaceDataPlaneApp).toBeDefined();
+		expect(typeof extension.TestDataspaceDataPlaneApp).toBe("function"); // Constructor function
 	});
 
 	test("should use custom cache directory when configured", async () => {

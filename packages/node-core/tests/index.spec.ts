@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm, writeFile } from "node:fs/promises";
 import { ComponentFactory, Factory } from "@twin.org/core";
-import { DataSpaceConnectorAppFactory } from "@twin.org/data-space-connector-models";
+import { DataspaceAppFactory } from "@twin.org/dataspace-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
 	AuthenticationAdminComponentType,
@@ -172,7 +172,7 @@ describe("node-core", () => {
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
-				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
+				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true"
 			}
@@ -236,7 +236,7 @@ describe("node-core", () => {
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
-				TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
+				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true"
 			}
@@ -346,7 +346,7 @@ describe("node-core", () => {
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 			TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
-			TWIN_DATA_SPACE_CONNECTOR_ENABLED: "true",
+			TWIN_DATASPACE_ENABLED: "true",
 			TWIN_VC_AUTHENTICATION_ENABLED: "true",
 			TWIN_MESSAGING_ENABLED: "true",
 			TWIN_EXTENSIONS: "./tests/apps/test-app.js"
@@ -427,7 +427,8 @@ describe("node-core", () => {
 			"policy-negotiation-point-service",
 			"synchronised-storage-service",
 			"federated-catalogue-service",
-			"data-space-connector-service",
+			"dataspace-control-plane-service",
+			"dataspace-data-plane-service",
 			"did-context-id-handler",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
@@ -435,7 +436,7 @@ describe("node-core", () => {
 			"hosting-service"
 		]);
 
-		expect(DataSpaceConnectorAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
+		expect(DataspaceAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
 		expect(buildRestRoutes.map(r => `${r.method.padEnd(8, " ")} ${r.path}`)).toEqual([
@@ -565,21 +566,27 @@ describe("node-core", () => {
 			"POST     /synchronised-storage/decryption-key",
 			"POST     /federated-catalogue/request",
 			"GET      /federated-catalogue/datasets/:datasetId",
-			"POST     /data-space-connector/notify",
-			"GET      /data-space-connector/activity-logs/:id",
-			"GET      /data-space-connector/entities",
-			"POST     /data-space-connector/entities/query"
+			"POST     /dataspace/transfers/request",
+			"GET      /dataspace/transfers/:pid",
+			"POST     /dataspace/transfers/:pid/start",
+			"POST     /dataspace/transfers/:pid/complete",
+			"POST     /dataspace/transfers/:pid/suspend",
+			"POST     /dataspace/transfers/:pid/terminate",
+			"POST     /dataspace/notify",
+			"GET      /dataspace/activity-logs/:id",
+			"GET      /dataspace/entities",
+			"POST     /dataspace/entities/query"
 		]);
 
 		const buildSocketRoutes = startResult?.server?.getSocketRoutes() ?? [];
 		expect(buildSocketRoutes.map(r => r.path)).toEqual([
 			"event-bus/subscribe",
 			"event-bus/unsubscribe",
-			"data-space-connector/activity-logs/status"
+			"dataspace/activity-logs/status"
 		]);
 
 		if (startResult?.engine) {
-			expect(DataSpaceConnectorAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
+			expect(DataspaceAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
 
 			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
 
@@ -593,7 +600,10 @@ describe("node-core", () => {
 				"identity-policy-information-source"
 			]);
 			expect(PolicyNegotiatorFactory.names()).toEqual(["pass-through-policy-negotiator"]);
-			expect(PolicyRequesterFactory.names()).toEqual(["pass-through-policy-requester"]);
+			expect(PolicyRequesterFactory.names()).toEqual([
+				"pass-through-policy-requester",
+				"dataspace-control-plane-requester"
+			]);
 
 			expect(TrustGeneratorFactory.names()).toEqual(["jwt-verifiable-credential-generator"]);
 			expect(TrustVerifierFactory.names()).toEqual(["jwt-verifiable-credential-verifier"]);
