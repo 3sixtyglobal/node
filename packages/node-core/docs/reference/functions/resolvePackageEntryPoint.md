@@ -1,6 +1,6 @@
 # Function: resolvePackageEntryPoint()
 
-> **resolvePackageEntryPoint**(`packagePath`, `packageName`, `fallback`): `Promise`\<`string`\>
+> **resolvePackageEntryPoint**(`packagePath`, `packageName`, `fallback?`): `Promise`\<`string`\>
 
 Resolve the main entry point from a package directory using Node.js resolution with fallback.
 Uses require.resolve() when possible for standard Node.js behavior, with manual fallback.
@@ -19,7 +19,7 @@ The absolute path to the package directory.
 
 The package name for require.resolve().
 
-### fallback
+### fallback?
 
 `string` = `"index.js"`
 

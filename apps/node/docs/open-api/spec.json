@@ -5166,8 +5166,9 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"$ref": "#/components/schemas/MetricType"
-						}
+							"type": "string"
+						},
+						"example": "0"
 					},
 					{
 						"name": "cursor",
@@ -5734,10 +5735,7 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -5746,10 +5744,7 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -6015,10 +6010,7 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
@@ -6027,10 +6019,7 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": [
-								"number",
-								"string"
-							]
+							"type": "string"
 						}
 					},
 					{
