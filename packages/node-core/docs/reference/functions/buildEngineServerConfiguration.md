@@ -8,7 +8,7 @@ Handles the configuration of the server.
 
 ### envVars
 
-[`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md)
+[`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`
 
 The environment variables for the engine server.
 
