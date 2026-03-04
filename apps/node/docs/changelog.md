@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.25](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.24...node-v0.0.3-next.25) (2026-03-04)
+
+
+### Features
+
+* custom REST paths ([#99](https://github.com/twinfoundation/node/issues/99)) ([dcab1b2](https://github.com/twinfoundation/node/commit/dcab1b2b23c13b4c9f39c3c1c67284f56e732bd1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.24 to 0.0.3-next.25
+
 ## [0.0.3-next.24](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.23...node-v0.0.3-next.24) (2026-03-02)
 
 
