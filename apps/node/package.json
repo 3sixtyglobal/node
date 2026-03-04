@@ -25,8 +25,8 @@
 		"docs:clean": "rimraf docs/open-api",
 		"docs:api": "ts-to-openapi ./ts-to-openapi.json ./docs/open-api/spec.json",
 		"docs": "npm run docs:clean && npm run docs:api",
-		"dist": "npm run clean && npm run build && npm run merge-locales && npm run validate-locales && npm run test:build && npm run test && npm run docs",
-		"dist:no-test": "npm run clean && npm run build && npm run merge-locales && npm run docs",
+		"dist": "npm run clean && npm run build && npm run merge-locales && npm run validate-locales && npm run test:build && npm run test",
+		"dist:no-test": "npm run clean && npm run build && npm run merge-locales",
 		"start": "node src/index.js"
 	},
 	"dependencies": {
