@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IServerInfo, IWebServerOptions } from "@twin.org/api-models";
 import { ContextIdKeys } from "@twin.org/context";
-import { Coerce, GeneralError, Is, Url } from "@twin.org/core";
+import { Coerce, GeneralError, Is, StringHelper, Url } from "@twin.org/core";
 import type { IEngineCoreConfig } from "@twin.org/engine-models";
 import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
 import {
@@ -30,7 +30,7 @@ import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerE
  * @returns The config for the core and the server.
  */
 export async function buildEngineServerConfiguration(
-	envVars: IEngineServerEnvironmentVariables,
+	envVars: IEngineServerEnvironmentVariables & { [id: string]: string | unknown },
 	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[],
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
@@ -254,6 +254,24 @@ export async function buildEngineServerConfiguration(
 
 	addDefaultRestPaths(serverConfig);
 	addDefaultSocketPaths(serverConfig);
+
+	// See if any of the rest paths should be overridden by environment variables and update the config accordingly
+	for (const componentType in serverConfig.types) {
+		const types = serverConfig.types[componentType];
+
+		if (Is.arrayValue(types)) {
+			for (const typeConfig of types) {
+				if (Is.stringValue(typeConfig.restPath)) {
+					const envVarName = `restPath${StringHelper.pascalCase(componentType.replace("Component", ""))}`;
+					const overrideRestPath = envVars[envVarName];
+					if (Is.stringValue(overrideRestPath)) {
+						typeConfig.restPath = overrideRestPath;
+					}
+					break;
+				}
+			}
+		}
+	}
 
 	return serverConfig;
 }
