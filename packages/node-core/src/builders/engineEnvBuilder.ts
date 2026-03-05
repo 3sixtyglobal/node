@@ -146,9 +146,9 @@ async function configureEntityStorage(
 	coreConfig.types ??= {};
 	coreConfig.types.entityStorageConnector ??= [];
 
-	const entityStorageConnectorTypes = commaSeparatedListToArray<EntityStorageConnectorType>(
-		envVars.entityStorageConnectorType
-	);
+	const entityStorageConnectorTypes = commaSeparatedListToArray<
+		Omit<EntityStorageConnectorType, typeof EntityStorageConnectorType.Synchronised>
+	>(envVars.entityStorageConnectorType);
 
 	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Memory)) {
 		coreConfig.types.entityStorageConnector.push({
@@ -279,16 +279,6 @@ async function configureEntityStorage(
 
 	const defaultEntityStorageConnectorType =
 		envVars.entityStorageConnectorDefault ?? entityStorageConnectorTypes[0];
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Synchronised)) {
-		// For synchronised storage we use the default connector as the one we wrap for real DB operations
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.Synchronised,
-			options: {
-				entityStorageConnectorType: defaultEntityStorageConnectorType
-			}
-		});
-	}
 
 	if (Is.arrayValue(entityStorageConnectorTypes)) {
 		for (const config of coreConfig.types.entityStorageConnector) {
@@ -1344,10 +1334,39 @@ async function configureFederatedCatalogue(
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
 	if (Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) {
+		// If synchronised storage is enabled, then we need to add an entity storage connector
+		// using synchronised storage for the federated catalogue component
+		// as it relies on the synchronised storage to sync the data between the different instances of the federated catalogue
+		let overrideEntityStorageType;
+		if (
+			(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) &&
+			Is.arrayValue(coreConfig.types.entityStorageConnector)
+		) {
+			let defaultConnector = coreConfig.types.entityStorageConnector.find(
+				connector => connector.isDefault
+			);
+			if (Is.empty(defaultConnector)) {
+				// If there is no default connector, we set the first one as the default one
+				defaultConnector = coreConfig.types.entityStorageConnector[0];
+			}
+
+			overrideEntityStorageType = "federated-catalogue-dataset";
+			coreConfig.types.entityStorageConnector ??= [];
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.Synchronised,
+				overrideInstanceType: overrideEntityStorageType,
+				options: {
+					entityStorageConnectorType: defaultConnector.type
+				}
+			});
+		}
+
 		coreConfig.types.federatedCatalogueComponent ??= [];
 		coreConfig.types.federatedCatalogueComponent.push({
 			type: FederatedCatalogueComponentType.Service,
-			options: {}
+			options: {
+				datasetEntityStorageType: overrideEntityStorageType
+			}
 		});
 
 		coreConfig.types.federatedCatalogueFilterComponent ??= [];
