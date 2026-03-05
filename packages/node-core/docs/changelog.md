@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.26](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.25...node-core-v0.0.3-next.26) (2026-03-05)
+
+
+### Bug Fixes
+
+* synchronised storage construction ([#102](https://github.com/twinfoundation/node/issues/102)) ([58b61e9](https://github.com/twinfoundation/node/commit/58b61e9a67f499a35bea17e5d2dc6a1efc2cb893))
+
 ## [0.0.3-next.25](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.24...node-core-v0.0.3-next.25) (2026-03-04)
 
 

@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.26](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.25...node-v0.0.3-next.26) (2026-03-05)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.25 to 0.0.3-next.26
+
 ## [0.0.3-next.25](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.24...node-v0.0.3-next.25) (2026-03-04)
 
 
