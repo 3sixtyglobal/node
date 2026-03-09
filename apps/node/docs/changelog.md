@@ -1,5 +1,19 @@
 # @twin.org/node - Changelog
 
+## [0.0.3-next.27](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.26...node-v0.0.3-next.27) (2026-03-09)
+
+
+### Features
+
+* enable N2N dataspace protocol with synchronized storage ([#98](https://github.com/twinfoundation/node/issues/98)) ([f67e366](https://github.com/twinfoundation/node/commit/f67e366c5ed3c829955a62b19c420361f035a578))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.26 to 0.0.3-next.27
+
 ## [0.0.3-next.26](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.25...node-v0.0.3-next.26) (2026-03-05)
 
 

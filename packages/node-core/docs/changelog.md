@@ -1,5 +1,12 @@
 # @twin.org/node-core - Changelog
 
+## [0.0.3-next.27](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.26...node-core-v0.0.3-next.27) (2026-03-09)
+
+
+### Features
+
+* bootstrap legacy skip ([469d950](https://github.com/twinfoundation/node/commit/469d9505bd0497c271ba291641f63786200cb548))
+
 ## [0.0.3-next.26](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.25...node-core-v0.0.3-next.26) (2026-03-05)
 
 
