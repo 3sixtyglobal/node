@@ -157,7 +157,8 @@ export async function bootstrapLegacy(
 		await vaultKeyCreate(engineCore, envVars, {
 			identity: nodeIdentity.did,
 			keyType: "Ed25519",
-			keyId: envVars.authSigningKeyId
+			keyId: envVars.authSigningKeyId,
+			overwriteMode: "skip"
 		});
 
 		if (Coerce.boolean(envVars.trustEnabled) ?? false) {
@@ -250,7 +251,8 @@ export async function bootstrapLegacy(
 					await vaultKeyCreate(engineCore, envVars, {
 						identity: organisation.did,
 						keyType: "ChaCha20Poly1305",
-						keyId: envVars.blobStorageEncryptionKeyId
+						keyId: envVars.blobStorageEncryptionKeyId,
+						overwriteMode: "skip"
 					});
 				}
 
