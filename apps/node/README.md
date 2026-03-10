@@ -1,40 +1,30 @@
 # TWIN Node
 
-A REST server implementation support the routes from various packages.
+This app provides the executable server runtime for delivering service workloads through a deployable Node.js application. It assembles shared runtime components into a practical entry point so teams can run, configure, and operate service endpoints with predictable behaviour.
 
-The OpenAPI Spec can be found here [TWIN Node OpenAPI Spec](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/twinfoundation/node/refs/heads/next/apps/node/docs/open-api/spec.json)
+It supports local development and production aligned operation while keeping configuration and extension patterns explicit. The generated OpenAPI specification offers a clear integration contract and helps maintain consistency across consuming systems.
 
-## Building and running the application
-
-To install the dependencies, perform a full build and start the server.
+## Installation
 
 ```shell
-npm install
-npm run dist
-npm start
+npm install -D @twin.org/node
 ```
-
-## Development mode
-
-Once you have performed a full build you can run the server in development mode, this will watch the TypeScript code, rebuild if there are any changes, and relaunch the server.
-
-```shell
-npm run dev
-```
-
-## Extensions
-
-The TWIN Node supports dynamic extension loading from multiple sources (local files, npm packages, HTTPS URLs).
-
-For complete extension documentation, including syntax, lifecycle hooks, and configuration options, see [Extension Loading](docs/configuration.md#extension-loading).
 
 ## Configuration
 
-There are various options you can set through configuration, these can be found in [docs/configuration.md](docs/configuration.md)
+Configuration options are documented in [docs/configuration.md](docs/configuration.md)
 
 ## Deployment
 
 Examples of how to deploy the app can be found in [docs/deployment.md](docs/deployment.md)
+
+## Examples
+
+Usage of the APIs is shown in the examples [docs/examples.md](docs/examples.md)
+
+## Reference
+
+Detailed reference documentation for the API can be found in [docs/open-api/spec.json](docs/open-api/spec.json)
 
 ## Changelog
 

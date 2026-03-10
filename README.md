@@ -1,15 +1,25 @@
 # TWIN Node
 
-This mono-repository contains the TWIN Node packages which let you run TWIN as a REST server.
+This repository provides a core runtime toolkit and executable application for running service workloads through a consistent [Node.js](https://nodejs.org) server model.
+
+Together, the workspace packages and applications define a practical baseline for building, running, and operating service endpoints with clear configuration, deployment, and extension patterns. The focus is on centralising shared runtime behaviour so teams can deliver integrations more predictably across environments while keeping operational concerns maintainable over time.
 
 ## Packages
 
-- [node-core](packages/node-core/README.md) - A REST server implementation support the routes from various packages.
+- [node-core](packages/node-core/README.md) - Shared runtime components for hosting service routes with consistent server behaviour.
 
 ## Apps
 
-- [node](apps/node/README.md) - A runnable app which uses the node-core.
+- [node](apps/node/README.md) - Executable server application that assembles the shared runtime for deployment and operations.
+
+## Architecture
+
+- [Package Hierarchy](docs/architecture/package-hierarchy.md) - Overview of how the workspace package layers are organised.
+
+## Guides
+
+- [Docker Setup MySQL](docs/guides/docker-setup-mysql.md) - Walkthrough for running a local environment with Docker and MySQL.
 
 ## Contributing
 
-To contribute to this package see the guidelines for building and publishing in [CONTRIBUTING](./CONTRIBUTING.md)
+To contribute to this repository see the guidelines for building and publishing in [CONTRIBUTING](./CONTRIBUTING.md)

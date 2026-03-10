@@ -1,4 +1,4 @@
-# @twin.org/node - Deployment Docker
+# Node Deployment Docker
 
 ## Docker Building
 

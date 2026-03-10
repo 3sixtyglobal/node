@@ -1,4 +1,4 @@
-# @twin.org/node - Configuration
+# Node Configuration
 
 ## Extension Loading
 

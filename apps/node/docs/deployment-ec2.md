@@ -1,4 +1,4 @@
-# @twin.org/node - Deployment Amazon AWS EC2
+# Node Deployment Amazon AWS EC2
 
 ## Amazon AWS EC2 Instance
 
