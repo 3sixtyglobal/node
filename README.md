@@ -14,7 +14,7 @@ Together, the workspace packages and applications define a practical baseline fo
 
 ## Architecture
 
-- [Package Hierarchy](docs/architecture/package-hierarchy.md) - Overview of how the workspace package layers are organised.
+- [Codebase](docs/architecture/codebase.md) - Overview of the codebase and how package layers are organised.
 
 ## Guides
 

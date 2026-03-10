@@ -26,6 +26,7 @@
 		"bech",
 		"behavior",
 		"buildx",
+		"CEFACT",
 		"certbot",
 		"cosmosdb",
 		"crosshair",
@@ -47,6 +48,9 @@
 		"Stiftung",
 		"swatchbook",
 		"txblock",
+		"twinfoundation",
+		"GTSC",
+		"TLIP",
 		"Unece",
 		"whereis"
 	],
