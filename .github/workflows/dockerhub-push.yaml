@@ -38,7 +38,7 @@ jobs:
 
       # Clone the repository to the runner
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }} # Use the built-in token for GitHub Actions
           ref: ${{ steps.set-branch.outputs.branch }} # Checkout the calculated branch
