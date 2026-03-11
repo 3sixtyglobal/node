@@ -7,5 +7,5 @@ The `node` app is the executable service runtime for this repository, assembling
 - [README](../apps/node/README.md)
 - [Configuration](../apps/node/docs/configuration.md)
 - [Deployment](../apps/node/docs/deployment.md)
-- [Examples](../apps/node/docs/examples.md)
+- [Usage](../apps/attestation-cli/docs/usage.md)
 - [Changelog](../apps/node/docs/changelog.md)

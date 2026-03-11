@@ -18,9 +18,9 @@ Configuration options are documented in [docs/configuration.md](docs/configurati
 
 Examples of how to deploy the app can be found in [docs/deployment.md](docs/deployment.md)
 
-## Examples
+## Usage
 
-Usage of the APIs is shown in the examples [docs/examples.md](docs/examples.md)
+Usage of the tool is shown in the examples [docs/usage.md](docs/usage.md)
 
 ## Reference
 

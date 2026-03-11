@@ -1,4 +1,4 @@
-# @twin.org/node - Changelog
+# Changelog
 
 ## [0.0.3-next.27](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.26...node-v0.0.3-next.27) (2026-03-09)
 
