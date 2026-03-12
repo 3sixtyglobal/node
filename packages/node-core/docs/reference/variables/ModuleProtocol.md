@@ -6,31 +6,31 @@ The protocol types for modules.
 
 ## Type Declaration
 
-### Local
+### Local {#local}
 
 > `readonly` **Local**: `"local"` = `"local"`
 
 Local module (starts with . or / or file://).
 
-### Npm
+### Npm {#npm}
 
 > `readonly` **Npm**: `"npm"` = `"npm"`
 
 NPM package (starts with npm:).
 
-### Https
+### Https {#https}
 
 > `readonly` **Https**: `"https"` = `"https"`
 
 HTTPS URL (starts with https://).
 
-### Http
+### Http {#http}
 
 > `readonly` **Http**: `"http"` = `"http"`
 
 HTTP URL (starts with http://).
 
-### Default
+### Default {#default}
 
 > `readonly` **Default**: `"default"` = `"default"`
 

@@ -209,7 +209,8 @@ export async function identityVerificationMethodCreate(
 			try {
 				verificationMethod = DocumentHelper.getVerificationMethod(
 					identityDoc,
-					DocumentHelper.joinId(params.identity, params.verificationMethodId)
+					DocumentHelper.joinId(params.identity, params.verificationMethodId),
+					params.verificationMethodType
 				);
 			} catch {}
 

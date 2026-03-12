@@ -4,7 +4,7 @@ Command param to execute in the CLI.
 
 ## Properties
 
-### key
+### key {#key}
 
 > **key**: `string`
 
@@ -12,7 +12,7 @@ The param key.
 
 ***
 
-### type
+### type {#type}
 
 > **type**: `"string"` \| `"number"` \| `"boolean"`
 
@@ -20,7 +20,7 @@ The param type.
 
 ***
 
-### options?
+### options? {#options}
 
 > `optional` **options**: `string`[]
 
@@ -28,7 +28,7 @@ Possible options for the param.
 
 ***
 
-### extendedType?
+### extendedType? {#extendedtype}
 
 > `optional` **extendedType**: `string`
 
@@ -36,21 +36,15 @@ The extended type e.g. hex etc.
 
 ***
 
-### required?
+### required? {#required}
 
 > `optional` **required**: `boolean`
 
 Whether the param is required.
 
-#### Default
-
-```ts
-true
-```
-
 ***
 
-### defaultValue?
+### defaultValue? {#defaultvalue}
 
 > `optional` **defaultValue**: [`CliCommandParamType`](../type-aliases/CliCommandParamType.md)
 
@@ -58,7 +52,7 @@ The default value of the param.
 
 ***
 
-### description
+### description {#description}
 
 > **description**: `string`
 

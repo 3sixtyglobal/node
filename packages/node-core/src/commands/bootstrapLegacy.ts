@@ -310,7 +310,8 @@ export async function bootstrapLegacy(
 					password: envVars.adminUserPassword,
 					scope: "tenant-admin",
 					givenName: "Node",
-					familyName: "Admin"
+					familyName: "Admin",
+					overwriteMode: "skip"
 				});
 			}
 		);

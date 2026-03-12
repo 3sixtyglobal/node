@@ -4,7 +4,7 @@ The result from a protocol handler.
 
 ## Properties
 
-### resolvedPath
+### resolvedPath {#resolvedpath}
 
 > **resolvedPath**: `string`
 
@@ -12,7 +12,7 @@ The resolved path to the module file.
 
 ***
 
-### cached
+### cached {#cached}
 
 > **cached**: `boolean`
 
