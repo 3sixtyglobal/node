@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.28](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.27...node-core-v0.0.3-next.28) (2026-03-12)
+
+
+### Bug Fixes
+
+* bootstrap legacy fails on second run ([c0a4e6d](https://github.com/twinfoundation/node/commit/c0a4e6d6f8d1bf385412a22fed2a0974e219abaa))
+
 ## [0.0.3-next.27](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.26...node-core-v0.0.3-next.27) (2026-03-09)
 
 
