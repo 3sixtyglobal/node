@@ -4,7 +4,7 @@ Command to execute in the CLI.
 
 ## Properties
 
-### definition
+### definition {#definition}
 
 > **definition**: [`ICliCommandDefinition`](ICliCommandDefinition.md)
 
@@ -12,7 +12,7 @@ The command to execute.
 
 ***
 
-### params
+### params {#params}
 
 > **params**: `object`
 

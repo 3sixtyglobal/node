@@ -4,7 +4,7 @@ Command to execute in the CLI.
 
 ## Properties
 
-### command
+### command {#command}
 
 > **command**: `string`
 
@@ -12,7 +12,7 @@ The command name.
 
 ***
 
-### description
+### description {#description}
 
 > **description**: `string`
 
@@ -20,7 +20,7 @@ The command description.
 
 ***
 
-### example
+### example {#example}
 
 > **example**: `string`
 
@@ -28,7 +28,7 @@ The example.
 
 ***
 
-### params
+### params {#params}
 
 > **params**: [`ICliCommandDefinitionParam`](ICliCommandDefinitionParam.md)[]
 
@@ -36,7 +36,7 @@ The params available for the command.
 
 ***
 
-### action()
+### action() {#action}
 
 > **action**: (`engineCore`, `envVars`, `params`) => `Promise`\<`unknown`\>
 
@@ -60,7 +60,7 @@ The method to execute for the command.
 
 ***
 
-### requiresEngineStarted?
+### requiresEngineStarted? {#requiresenginestarted}
 
 > `optional` **requiresEngineStarted**: `boolean`
 
@@ -68,7 +68,7 @@ Indicates whether the engine needs to be started before executing the command.
 
 ***
 
-### requiresNodeIdentity?
+### requiresNodeIdentity? {#requiresnodeidentity}
 
 > `optional` **requiresNodeIdentity**: `boolean`
 
@@ -76,7 +76,7 @@ Indicates whether the engine needs the node identity to be set if configured to 
 
 ***
 
-### requiresTenantId?
+### requiresTenantId? {#requirestenantid}
 
 > `optional` **requiresTenantId**: `boolean`
 

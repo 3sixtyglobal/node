@@ -4,7 +4,7 @@ Command to execute in the CLI.
 
 ## Properties
 
-### nodePath?
+### nodePath? {#nodepath}
 
 > `optional` **nodePath**: `string`
 
@@ -12,7 +12,7 @@ The path of the node executable.
 
 ***
 
-### scriptPath?
+### scriptPath? {#scriptpath}
 
 > `optional` **scriptPath**: `string`
 
@@ -20,7 +20,7 @@ The path of the script to execute.
 
 ***
 
-### options?
+### options? {#options}
 
 > `optional` **options**: `object`[]
 
