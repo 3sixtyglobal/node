@@ -161,7 +161,7 @@ CREATE_RESPONSE=$(curl -s -X POST http://localhost:3000/verifiable \
         \"maxAllowListSize\": 100
     }" 2>/dev/null)
 
-STORAGE_ID=$(echo "${CREATE_RESPONSE}" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))" 2>/dev/null || echo "")
+STORAGE_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.id // ""')
 
 if [ -z "${STORAGE_ID}" ]; then
     echo "  Response: ${CREATE_RESPONSE}"

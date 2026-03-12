@@ -1,6 +1,6 @@
 services:
   twin-blob-ipfs:
-    image: ipfs/kubo:latest
+    image: ipfs/kubo:v0.40.1
     container_name: twin-blob-ipfs-docker
     ports:
       - '5001:5001'

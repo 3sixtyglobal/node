@@ -416,32 +416,7 @@ echo "  Response:"
 show_json "${NEGOTIATE_BODY}"
 
 if [ "${NEGOTIATE_HTTP_CODE}" != "200" ] && [ "${NEGOTIATE_HTTP_CODE}" != "201" ]; then
-    soft_fail "Contract negotiation request failed (HTTP ${NEGOTIATE_HTTP_CODE})"
-    PHASE_RESULTS+=("${RED}[1.5]${NC} Contract Negotiation (failed)")
-    warn "Falling back to direct PAP agreement seeding..."
-
-    # Fallback: seed agreement directly (like the old flow)
-    AGREEMENT_BODY=$(jq -n \
-        --arg uid "${OFFER_ID}" \
-        --arg assigner "${NODE_B_DID}" \
-        --arg assignee "${NODE_A_DID}" \
-        --arg target "${DATASET_ID}" \
-        '{
-            "@context": "http://www.w3.org/ns/odrl.jsonld",
-            "@type": "Agreement",
-            "uid": $uid,
-            "assigner": $assigner,
-            "assignee": $assignee,
-            "target": $target,
-            "action": "read",
-            "permission": [{ "action": "read", "target": $target }]
-        }')
-    curl -si -X POST "${NODE_B_HOST}/rights-management/policy/admin" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${NODE_B_TOKEN}" \
-        -d "${AGREEMENT_BODY}" >/dev/null 2>&1
-    AGREEMENT_ID="${OFFER_ID}"
-    ok "Fallback: Agreement seeded directly: ${AGREEMENT_ID}"
+    fail "Contract negotiation request failed (HTTP ${NEGOTIATE_HTTP_CODE})"
 else
     PROVIDER_NEGOTIATION_PID=$(echo "${NEGOTIATE_BODY}" | jq -r '.providerPid // empty' 2>/dev/null)
     NEGOTIATION_STATE=$(echo "${NEGOTIATE_BODY}" | jq -r '.state // empty' 2>/dev/null)
@@ -472,7 +447,9 @@ else
 
         echo -e "  ${CYAN}Attempt ${NEGO_ATTEMPT}/${NEGOTIATION_MAX_RETRIES}: state=${FINAL_NEGOTIATION_STATE}${NC}"
 
-        if [ "${FINAL_NEGOTIATION_STATE}" = "AGREED" ] || [ "${FINAL_NEGOTIATION_STATE}" = "FINALIZED" ] || [ "${FINAL_NEGOTIATION_STATE}" = "VERIFIED" ]; then
+        # Wait for FINALIZED (not just AGREED) because the agreement is only
+        # stored in the PAP during the AGREED→FINALIZED transition
+        if [ "${FINAL_NEGOTIATION_STATE}" = "FINALIZED" ] || [ "${FINAL_NEGOTIATION_STATE}" = "VERIFIED" ]; then
             break
         fi
 
@@ -481,7 +458,7 @@ else
         fi
     done
 
-    if [ "${FINAL_NEGOTIATION_STATE}" = "AGREED" ] || [ "${FINAL_NEGOTIATION_STATE}" = "FINALIZED" ] || [ "${FINAL_NEGOTIATION_STATE}" = "VERIFIED" ]; then
+    if [ "${FINAL_NEGOTIATION_STATE}" = "FINALIZED" ] || [ "${FINAL_NEGOTIATION_STATE}" = "VERIFIED" ]; then
         ok "Negotiation completed (state: ${FINAL_NEGOTIATION_STATE})"
         echo "  Final negotiation state:"
         show_json "${NEGO_STATE_BODY}"
@@ -504,30 +481,7 @@ else
         echo "  Node A consumer negotiation:"
         show_json "${CONSUMER_STATE_RESPONSE}"
 
-        # Fallback to direct agreement seeding
-        warn "Falling back to direct PAP agreement seeding..."
-        AGREEMENT_BODY=$(jq -n \
-            --arg uid "${OFFER_ID}" \
-            --arg assigner "${NODE_B_DID}" \
-            --arg assignee "${NODE_A_DID}" \
-            --arg target "${DATASET_ID}" \
-            '{
-                "@context": "http://www.w3.org/ns/odrl.jsonld",
-                "@type": "Agreement",
-                "uid": $uid,
-                "assigner": $assigner,
-                "assignee": $assignee,
-                "target": $target,
-                "action": "read",
-                "permission": [{ "action": "read", "target": $target }]
-            }')
-        curl -si -X POST "${NODE_B_HOST}/rights-management/policy/admin" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${NODE_B_TOKEN}" \
-            -d "${AGREEMENT_BODY}" >/dev/null 2>&1
-        AGREEMENT_ID="${OFFER_ID}"
-        ok "Fallback: Agreement seeded directly: ${AGREEMENT_ID}"
-        PHASE_RESULTS+=("${YELLOW}[1.5]${NC} Contract Negotiation (fallback to PAP seeding)")
+        fail "Negotiation did not reach FINALIZED state (stuck at: ${FINAL_NEGOTIATION_STATE})"
     fi
 fi
 
