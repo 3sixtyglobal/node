@@ -25,6 +25,25 @@ Node A (port 3000)                          Node B (port 3001)
 - **All modules built**: `npm run submodule:dist-no-test` from workspace root
 - **Three terminal windows** (Node A, Node B, test runner)
 
+## Quick Start
+
+```bash
+# 1. Setup (symlinks, env files, IPFS) — see detailed steps below
+# 2. Bootstrap both nodes (creates identities on IOTA testnet)
+# 3. Provision StorageItem (with Node A running)
+./node/apps/node/tests/node-to-node/provision-storage.sh '<pw-a>'
+# 4. Restart both nodes with updated env files
+# 5. Run the test
+./node/apps/node/tests/node-to-node/n2n-synced-storage.sh '<pw-a>' '<pw-b>'
+```
+
+## Scripts
+
+| Script                 | Purpose                                                     | When to run             |
+| ---------------------- | ----------------------------------------------------------- | ----------------------- |
+| `provision-storage.sh` | Derive addresses, create IOTA StorageItem, update env files | Once per bootstrap      |
+| `n2n-synced-storage.sh`| Run the full DSP + PNP test flow                            | After nodes are running |
+
 ## Setup
 
 All commands run from the **workspace root** unless stated otherwise.
@@ -107,62 +126,34 @@ node --env-file=.env.node-b src/index.js bootstrap-legacy
 
 ### 7. Provision IOTA StorageItem
 
-The sync service writes to a pre-existing on-chain `StorageItem`. Each developer (or clean restart) needs their own because the `StorageItem` allowlist contains specific wallet addresses derived from the bootstrap mnemonic.
+Start Node A temporarily, then run the provisioning script:
 
-**a) Derive node IOTA addresses:**
-
-Mnemonics are in `node/.local-data/node-{a,b}/vault-secret/store.json`.
-
-```bash
-cd node
-node -e "
-const { Ed25519Keypair } = require('@iota/iota-sdk/keypairs/ed25519');
-const kp = Ed25519Keypair.deriveKeypair('<MNEMONIC_FROM_STORE_JSON>', \"m/44'/4218'/0'/0'/0'\");
-console.log(kp.getPublicKey().toIotaAddress());
-"
-cd ..
-```
-
-Run this for both Node A and Node B mnemonics.
-
-**b) Start Node A temporarily:**
+**Terminal 1:**
 
 ```bash
 cd node/apps/node
 node --env-file=.env.node-a src/index.js
+# Wait for: API listening on http://0.0.0.0:3000
 ```
 
-Wait for `API listening on http://0.0.0.0:3000`.
-
-**c) Create StorageItem via REST API:**
+**Terminal 3 (test runner):**
 
 ```bash
-# Login
-TOKEN=$(curl -si -X POST http://localhost:3000/authentication/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@node","password":"<NODE_A_PASSWORD>"}' \
-  | grep -i 'set-cookie:' | sed 's/.*access_token=//;s/;.*//' | tr -d '[:space:]')
-
-# Create StorageItem with both node addresses in allowlist
-curl -s -X POST http://localhost:3000/verifiable/ \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -d '{
-    "data": "eyJ2ZXJzaW9uIjoiMSIsInN5bmNQb2ludGVycyI6e319",
-    "allowList": ["<NODE_A_IOTA_ADDR>", "<NODE_B_IOTA_ADDR>"],
-    "maxAllowListSize": 100
-  }' | jq '.id'
+./node/apps/node/tests/node-to-node/provision-storage.sh '<node-a-password>'
 ```
 
-This returns an ID like `verifiable:iota:<packageId>:<objectId>`.
+The script:
 
-The `data` value is base64 of `{"version":"1","syncPointers":{}}` — the empty initial state the sync service expects.
+1. Reads wallet mnemonics from `node/.local-data/node-{a,b}/vault-secret/store.json`
+2. Derives IOTA addresses using the SDK
+3. Creates a StorageItem on-chain with both addresses in the allowlist
+4. Updates `.env.node-a` and `.env.node-b` with the new StorageItem ID
 
-**d) Stop Node A**, then update **both** env files (`.env.node-a` and `.env.node-b`):
+After provisioning, stop Node A (Ctrl+C).
 
-```bash
-TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID="verifiable:iota:<packageId>:<objectId>"
-```
+**When is re-provisioning needed?** Only when node mnemonics change — i.e., after
+cleaning `node/.local-data/` and re-running bootstrap. If you restart nodes without
+wiping data, the existing StorageItem remains valid.
 
 ### 8. Start both nodes
 
@@ -194,20 +185,35 @@ From any directory:
 
 Wrap passwords in single quotes to prevent shell expansion of special characters.
 
-### Expected output
+## Test Phases
 
-All 8 phases should pass:
+| Phase | Description                                                       |
+| ----- | ----------------------------------------------------------------- |
+| 0     | Prerequisites (IPFS + both nodes reachable)                       |
+| 1     | Authentication (login + JWT-VC trust tokens + ODRL offer on PAP)  |
+| 1.5   | Contract Negotiation (PNP — see below)                            |
+| 2     | Discovery (Node B's dataset syncs to Node A's catalogue via IPFS) |
+| 3     | Transfer Request (consumer requests data from provider)           |
+| 4     | Start Transfer (provider returns data access token)               |
+| 5     | Pull Data (consumer fetches entities)                             |
+| 6     | Complete Transfer (signal completion)                             |
+| 7     | Verify (final state + IPFS health)                                |
 
-| Phase | Description                                                  |
-| ----- | ------------------------------------------------------------ |
-| 0     | Prerequisites (IPFS + both nodes reachable)                  |
-| 1     | Authentication (login + JWT-VC trust token + ODRL agreement) |
-| 2     | Discovery (Node B's dataset syncs to Node A's catalogue)     |
-| 3     | Transfer Request (consumer requests data)                    |
-| 4     | Start Transfer (provider returns data access token)          |
-| 5     | Pull Data (consumer fetches entities)                        |
-| 6     | Complete Transfer (signal completion)                        |
-| 7     | Verify (final state + IPFS health)                           |
+### Phase 1.5: PNP Contract Negotiation
+
+Instead of seeding an ODRL Agreement directly on the PAP, the test runs the full
+PNP negotiation flow:
+
+1. An ODRL **Offer** (not Agreement) is seeded on Node B's PAP
+2. Node A sends a `ContractRequestMessage` to Node B's PNP endpoint
+3. Node B's pass-through policy negotiator auto-accepts and callbacks to Node A
+4. The negotiation progresses through: REQUESTED → OFFERED → ACCEPTED → AGREED
+5. The resulting agreement ID is used for the subsequent transfer phases
+
+**Consumer-side state injection:** Since `sendRequestToProvider` is an internal-only method
+(no REST endpoint), the script injects a consumer-side negotiation entry on Node A via the
+PNAP admin PUT endpoint (`/rights-management/negotiations/admin/:policyId`). This simulates
+what the `DataspaceControlPlaneService.negotiateAgreement()` does internally.
 
 ## Configuration Reference
 
@@ -236,9 +242,9 @@ All 8 phases should pass:
 | Dataset never syncs to Node A                                     | Check `TWIN_SYNCHRONISED_STORAGE_ENABLED=true` in both env files                                 |
 | `Maximum call stack size exceeded` at bootstrap                   | Do NOT set `TWIN_ENTITY_STORAGE_CONNECTOR_DEFAULT="synchronised"` — it causes infinite recursion |
 | `verifiableStorageKeyNotFound`                                    | Set `TWIN_VERIFIABLE_STORAGE_CONNECTOR=iota` in both env files                                   |
-| `iotaVerifiableStorageConnector.updateFailed` with `TypeMismatch` | Stale `verifiableStorageKeys.json` — create a new StorageItem via Step 7                         |
-| `objectHelper.failedBytesToJSON`                                  | StorageItem was seeded with invalid data — recreate with the base64 value from Step 7c           |
-| `notInAllowList` (abort 401)                                      | Node wallet address not in StorageItem allowlist — recreate with both addresses from Step 7a     |
+| `iotaVerifiableStorageConnector.updateFailed` with `TypeMismatch` | Stale `verifiableStorageKeys.json` — run `provision-storage.sh` to create a new StorageItem      |
+| `objectHelper.failedBytesToJSON`                                  | StorageItem was seeded with invalid data — re-run `provision-storage.sh`                         |
+| `notInAllowList` (abort 401)                                      | Node wallet address not in StorageItem allowlist — re-run `provision-storage.sh`                 |
 | Node B can't get encryption key                                   | Start Node A first; check `TWIN_SYNCHRONISED_STORAGE_TRUSTED_URL` in Node B's env                |
 | `entityStorageVaultConnector.keyNotFound` for encryption key      | Vault key DID-scoping mismatch — see `bootstrapLegacy.ts` workaround in the codebase             |
 | Faucet funding timeout                                            | IOTA testnet may be slow — wait and retry bootstrap                                              |

@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # =============================================================================
-# n2n-synced-storage.sh — N2N DSP Flow with Synchronized Storage + IPFS
+# n2n-docker-test.sh — N2N DSP Flow with Dockerized Nodes
 # =============================================================================
-# Location: node/apps/node/tests/node-to-node/n2n-synced-storage.sh
+# Location: node/apps/node/tests/node-to-node-docker/n2n-docker-test.sh
 #
-# End-to-end test for the Dataspace Protocol with synchronized storage:
-#   - Federated Catalogue data is replicated between nodes via IPFS
-#   - Node A discovers Node B's datasets from its OWN local catalogue
-#   - No cross-node HTTP query needed for discovery
+# Same test flow as the local n2n-synced-storage.sh but adapted for Docker:
+#   - DIDs read from Docker volumes via docker exec
+#   - Callback addresses use container service names (container-to-container)
+#   - Data endpoint URLs translated from internal to host-accessible
 #
 # Phases:
-#   Phase 0: Prerequisites (IPFS + both nodes)
+#   Phase 0: Prerequisites (IPFS + both node containers)
 #   Phase 1: Authentication (login + JWT-VC trust token + ODRL offer)
 #   Phase 1.5: Contract Negotiation (PNP — REQUESTED → AGREED via pass-through)
 #   Phase 2: Discovery (verify sync: Node B's dataset visible on Node A)
@@ -20,41 +20,36 @@
 #   Phase 6: Complete Transfer (signal completion)
 #   Phase 7: Verify (check final state + cross-node consistency)
 #
-# Usage (from any directory):
-#   ./node/apps/node/tests/node-to-node/n2n-synced-storage.sh <node-a-pw> <node-b-pw>
+# Usage:
+#   ./n2n-docker-test.sh <node-a-password> <node-b-password>
 #
 # Prerequisites:
-#   - IPFS container running: docker run -d --name twin-blob-ipfs -p 5001:5001 -p 4001:4001 -p 8080:8080 ipfs/kubo:latest
-#   - Node A running on port 3000 with node-a-synced.env
-#   - Node B running on port 3001 with node-b-synced.env
-#   - jq installed (brew install jq / apt install jq)
-#   - Both nodes bootstrapped (admin credentials in startup logs)
-#   - See README.md in this directory for full setup instructions
-#
+#   - docker compose up (IPFS + both nodes running)
+#   - Both nodes bootstrapped via setup.sh
+#   - jq installed
 # =============================================================================
 
 set -euo pipefail
-
-# ---------------------------------------------------------------------------
-# Self-locating: derive workspace root from script location
-# ---------------------------------------------------------------------------
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/../../../../.." && pwd)"
 
 # ---------------------------------------------------------------------------
 # Configuration (override via env vars)
 # ---------------------------------------------------------------------------
 NODE_A_PORT="${NODE_A_PORT:-3000}"
 NODE_B_PORT="${NODE_B_PORT:-3001}"
+# Host-accessible URLs (via Docker port forwarding)
 NODE_A_HOST="${NODE_A_HOST:-http://localhost:${NODE_A_PORT}}"
 NODE_B_HOST="${NODE_B_HOST:-http://localhost:${NODE_B_PORT}}"
 NODE_A_EMAIL="${NODE_A_EMAIL:-admin@node}"
 NODE_B_EMAIL="${NODE_B_EMAIL:-admin@node}"
 IPFS_API="${IPFS_API:-http://localhost:5001/api/v0}"
 
-# State file paths (derived from workspace root)
-NODE_A_STATE_FILE="${NODE_A_STATE_FILE:-${WORKSPACE_ROOT}/node/.local-data/node-a/engine-state.json}"
-NODE_B_STATE_FILE="${NODE_B_STATE_FILE:-${WORKSPACE_ROOT}/node/.local-data/node-b/engine-state.json}"
+# Docker container names (must match docker-compose.yml)
+NODE_A_CONTAINER="${NODE_A_CONTAINER:-twin-node-a}"
+NODE_B_CONTAINER="${NODE_B_CONTAINER:-twin-node-b}"
+
+# Container-internal service names (for container-to-container communication)
+NODE_A_INTERNAL="http://twin-node-a:${NODE_A_PORT}"
+NODE_B_INTERNAL="http://twin-node-b:${NODE_B_PORT}"
 
 # Trust verification method ID
 TRUST_VERIFICATION_METHOD_ID="${TRUST_VERIFICATION_METHOD_ID:-trust-assertion}"
@@ -68,7 +63,7 @@ OFFER_ID="urn:policy:test-offer-read-consignment"
 ENTITY_TYPE="https://vocabulary.uncefact.org/Consignment"
 
 # Consumer PID (unique per run)
-CONSUMER_PID="urn:uuid:demo-consumer-$(date +%s)"
+CONSUMER_PID="urn:uuid:docker-demo-$(date +%s)"
 
 # Sync wait configuration
 SYNC_MAX_RETRIES="${SYNC_MAX_RETRIES:-12}"
@@ -134,13 +129,22 @@ count_datasets() {
     echo "$1" | jq -r '[(.dataset // [] | if type == "array" then .[] else . end), (.catalog // [] | if type == "array" then .[] else . end | .dataset // [] | if type == "array" then .[] else . end)] | length' 2>/dev/null || echo "0"
 }
 
+# Translate container-internal URL to host-accessible URL
+# e.g., http://twin-node-b:3001/dataspace/entities -> http://localhost:3001/dataspace/entities
+translate_endpoint() {
+    local url="$1"
+    url=$(echo "${url}" | sed "s|http://twin-node-a:${NODE_A_PORT}|http://localhost:${NODE_A_PORT}|g")
+    url=$(echo "${url}" | sed "s|http://twin-node-b:${NODE_B_PORT}|http://localhost:${NODE_B_PORT}|g")
+    echo "${url}"
+}
+
 # ---------------------------------------------------------------------------
 # Argument validation
 # ---------------------------------------------------------------------------
 if [ $# -lt 2 ]; then
     echo -e "${BOLD}Usage:${NC} $0 <node-a-password> <node-b-password>"
     echo ""
-    echo "  Passwords are printed in each node's bootstrap logs."
+    echo "  Passwords are printed during setup.sh bootstrap."
     echo "  IMPORTANT: Wrap passwords in single quotes."
     echo ""
     echo "  Optional env vars:"
@@ -155,11 +159,12 @@ fi
 NODE_A_PASSWORD="$1"
 NODE_B_PASSWORD="$2"
 
-echo -e "${BOLD}N2N Synchronized Storage Demo${NC}"
-echo -e "  Node A: ${NODE_A_HOST} (trusted node)"
-echo -e "  Node B: ${NODE_B_HOST} (regular node)"
+echo -e "${BOLD}N2N Docker Test${NC}"
+echo -e "  Node A: ${NODE_A_HOST} (trusted node, container: ${NODE_A_CONTAINER})"
+echo -e "  Node B: ${NODE_B_HOST} (regular node, container: ${NODE_B_CONTAINER})"
 echo -e "  IPFS:   ${IPFS_API}"
 echo -e "  Consumer PID: ${CONSUMER_PID}"
+echo -e "  Internal Node A: ${NODE_A_INTERNAL} (for container-to-container)"
 
 # ==========================================================================
 # Phase 0: Prerequisites Check
@@ -167,15 +172,17 @@ echo -e "  Consumer PID: ${CONSUMER_PID}"
 phase 0 "Prerequisites Check"
 
 step "Checking IPFS at ${IPFS_API}..."
-IPFS_ID=$(curl -sf -X POST "${IPFS_API}/id" 2>/dev/null) || fail "IPFS not reachable at ${IPFS_API}/id. Start with: docker run -d --name twin-blob-ipfs -p 5001:5001 -p 4001:4001 -p 8080:8080 ipfs/kubo:latest"
+IPFS_ID=$(curl -sf -X POST "${IPFS_API}/id" 2>/dev/null) || fail "IPFS not reachable at ${IPFS_API}/id. Is the IPFS container running?"
 IPFS_PEER_ID=$(echo "${IPFS_ID}" | jq -r '.ID // empty' 2>/dev/null)
 ok "IPFS running (peer: ${IPFS_PEER_ID:-unknown})"
 
-step "Checking Node A (trusted) at ${NODE_A_HOST}..."
+step "Checking Node A container (${NODE_A_CONTAINER})..."
+docker inspect "${NODE_A_CONTAINER}" >/dev/null 2>&1 || fail "Container ${NODE_A_CONTAINER} not found. Run: docker compose up -d"
 NODE_A_INFO=$(curl -sf "${NODE_A_HOST}/info" 2>/dev/null) || fail "Node A not reachable at ${NODE_A_HOST}/info"
 ok "Node A is running"
 
-step "Checking Node B (regular) at ${NODE_B_HOST}..."
+step "Checking Node B container (${NODE_B_CONTAINER})..."
+docker inspect "${NODE_B_CONTAINER}" >/dev/null 2>&1 || fail "Container ${NODE_B_CONTAINER} not found. Run: docker compose up -d"
 NODE_B_INFO=$(curl -sf "${NODE_B_HOST}/info" 2>/dev/null) || fail "Node B not reachable at ${NODE_B_HOST}/info"
 ok "Node B is running"
 
@@ -215,24 +222,18 @@ if [ -z "${NODE_B_TOKEN}" ]; then
 fi
 ok "Node B session token obtained (${#NODE_B_TOKEN} chars)"
 
-# --- 1b: Read DIDs from state files ---
-step "Reading Node A's DID from state file..."
-if [ ! -f "${NODE_A_STATE_FILE}" ]; then
-    fail "Node A state file not found at ${NODE_A_STATE_FILE}"
-fi
-NODE_A_DID=$(jq -r '.nodeId // empty' "${NODE_A_STATE_FILE}" 2>/dev/null)
+# --- 1b: Read DIDs from Docker volumes via docker exec ---
+step "Reading Node A's DID from container volume..."
+NODE_A_DID=$(docker exec "${NODE_A_CONTAINER}" cat /app/data/engine-state.json 2>/dev/null | jq -r '.nodeId // empty' 2>/dev/null)
 if [ -z "${NODE_A_DID}" ]; then
-    fail "Could not extract nodeId from ${NODE_A_STATE_FILE}"
+    fail "Could not read Node A DID. Is the container bootstrapped? Run setup.sh first."
 fi
 ok "Node A DID: ${NODE_A_DID}"
 
-step "Reading Node B's DID from state file..."
-if [ ! -f "${NODE_B_STATE_FILE}" ]; then
-    fail "Node B state file not found at ${NODE_B_STATE_FILE}"
-fi
-NODE_B_DID=$(jq -r '.nodeId // empty' "${NODE_B_STATE_FILE}" 2>/dev/null)
+step "Reading Node B's DID from container volume..."
+NODE_B_DID=$(docker exec "${NODE_B_CONTAINER}" cat /app/data/engine-state.json 2>/dev/null | jq -r '.nodeId // empty' 2>/dev/null)
 if [ -z "${NODE_B_DID}" ]; then
-    fail "Could not extract nodeId from ${NODE_B_STATE_FILE}"
+    fail "Could not read Node B DID. Is the container bootstrapped? Run setup.sh first."
 fi
 ok "Node B DID: ${NODE_B_DID}"
 
@@ -242,7 +243,7 @@ TRUST_TOKEN_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
     "${NODE_A_HOST}/identity/${NODE_A_DID}/verifiable-credential/${TRUST_VERIFICATION_METHOD_ID}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${NODE_A_TOKEN}" \
-    -d '{"subject": {"id": "urn:trust:n2n-demo"}}') || true
+    -d '{"subject": {"id": "urn:trust:n2n-docker-demo"}}') || true
 
 TRUST_TOKEN_HTTP_CODE=$(echo "${TRUST_TOKEN_RESPONSE}" | tail -1)
 TRUST_TOKEN_BODY=$(echo "${TRUST_TOKEN_RESPONSE}" | sed '$d')
@@ -266,7 +267,7 @@ TRUST_TOKEN_B_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
     "${NODE_B_HOST}/identity/${NODE_B_DID}/verifiable-credential/${TRUST_VERIFICATION_METHOD_ID}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${NODE_B_TOKEN}" \
-    -d '{"subject": {"id": "urn:trust:n2n-demo"}}') || true
+    -d '{"subject": {"id": "urn:trust:n2n-docker-demo"}}') || true
 
 TRUST_TOKEN_B_HTTP_CODE=$(echo "${TRUST_TOKEN_B_RESPONSE}" | tail -1)
 TRUST_TOKEN_B_BODY=$(echo "${TRUST_TOKEN_B_RESPONSE}" | sed '$d')
@@ -333,13 +334,12 @@ phase "1.5" "Contract Negotiation (PNP)"
 # IMPORTANT: The consumer entry MUST be created BEFORE the ContractRequestMessage is sent.
 # Node B's pass-through negotiator uses setTimeout(100ms) to fire the callback to Node A.
 # If the consumer entry doesn't exist when the callback arrives, offerFromProvider returns
-# NotFoundError and Node B transitions to TERMINATED. Creating the entry first avoids this
-# race condition (locally both nodes are on the same machine so callbacks are near-instant).
+# NotFoundError and Node B transitions to TERMINATED.
 #
-# The callback URL uses localhost (both nodes run on localhost in local mode).
+# The callback URL uses container service names (container-to-container).
 # handlerId is omitted so offerFromProvider auto-accepts without a PolicyRequester.
 NEGOTIATION_CONSUMER_PID="urn:contract-negotiation:consumer-$(date +%s)"
-PNP_CALLBACK="${NODE_A_HOST}"
+PNP_CALLBACK="${NODE_A_INTERNAL}"
 
 # --- Pre-inject consumer-side negotiation entry on Node A ---
 # This simulates what sendRequestToProvider creates internally.
@@ -379,7 +379,7 @@ fi
 step "Consumer (Node A) requesting negotiation from Provider (Node B)..."
 step "  consumerPid: ${NEGOTIATION_CONSUMER_PID}"
 step "  offer: ${OFFER_ID}"
-step "  callbackAddress: ${PNP_CALLBACK}"
+step "  callbackAddress: ${PNP_CALLBACK} (container-to-container)"
 
 NEGOTIATE_REQUEST=$(jq -n \
     --arg ctx "${DSP_CONTEXT}" \
@@ -536,9 +536,6 @@ fi
 # ==========================================================================
 phase 2 "Discovery (Synchronized Storage)"
 
-# With synchronized storage, Node B's dataset should be replicated to Node A.
-# We query Node A's OWN Federated Catalogue (not Node B's) and wait for the
-# dataset to appear via sync replication.
 step "Checking Node B's catalogue for baseline..."
 
 NODE_B_CATALOG_FULL=$(curl -s -w "\n%{http_code}" -X POST "${NODE_B_HOST}/federated-catalogue/request" \
@@ -558,7 +555,7 @@ echo "  Node B catalogue: ${NODE_B_DATASET_COUNT} dataset(s) (HTTP ${NODE_B_CATA
 
 if [ "${NODE_B_DATASET_COUNT}" -lt 1 ] 2>/dev/null; then
     warn "Node B has no datasets. The test app may not be loaded."
-    warn "Check TWIN_EXTENSIONS in node-b-synced.env."
+    warn "Check TWIN_EXTENSIONS in node-b-docker.env."
 fi
 
 step "Waiting for Node B's dataset to sync to Node A's catalogue..."
@@ -608,7 +605,7 @@ else
     warn "Sync did not complete after $((SYNC_MAX_RETRIES * SYNC_RETRY_DELAY))s."
     warn "Node A catalogue still has 0 datasets."
     warn "Check that synchronized storage is enabled in both env files."
-    warn "Check node logs for sync errors."
+    warn "Check node logs: docker compose logs twin-node-a twin-node-b"
     echo "  Node A catalogue response:"
     show_json "${NODE_A_CATALOG_BODY}"
 fi
@@ -620,9 +617,15 @@ PHASE_RESULTS+=("${GREEN}[2]${NC} Discovery (Sync Replication)")
 # ==========================================================================
 phase 3 "Transfer Request"
 
+# IMPORTANT: callbackAddress uses container service name (container-to-container)
+# The provider (Node B) will call back to the consumer (Node A) using this address.
+# Since both containers are on the same Docker network, they resolve each other by service name.
+CALLBACK_ADDRESS="${NODE_A_INTERNAL}/dataspace"
+
 step "Requesting data transfer on Node B (using JWT-VC trust token)..."
 step "  agreementId: ${AGREEMENT_ID}"
 step "  consumerPid: ${CONSUMER_PID}"
+step "  callbackAddress: ${CALLBACK_ADDRESS} (container-to-container)"
 
 TRANSFER_REQUEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${NODE_B_HOST}/dataspace/transfers/request" \
     -H "Content-Type: application/json" \
@@ -631,7 +634,7 @@ TRANSFER_REQUEST_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${NODE_B_HOST}/
         --arg ctx "${DSP_CONTEXT}" \
         --arg consumerPid "${CONSUMER_PID}" \
         --arg agreementId "${AGREEMENT_ID}" \
-        --arg callbackAddress "${NODE_A_HOST}/dataspace" \
+        --arg callbackAddress "${CALLBACK_ADDRESS}" \
         '{
             "@context": [$ctx],
             "@type": "TransferRequestMessage",
@@ -725,7 +728,7 @@ DATA_ACCESS_TOKEN=$(echo "${START_BODY}" | jq -r '
     | .value // empty
 ' 2>/dev/null || true)
 
-DATA_ENDPOINT=$(echo "${START_BODY}" | jq -r '.dataAddress.endpoint // empty' 2>/dev/null || true)
+DATA_ENDPOINT_RAW=$(echo "${START_BODY}" | jq -r '.dataAddress.endpoint // empty' 2>/dev/null || true)
 
 if [ -z "${DATA_ACCESS_TOKEN}" ]; then
     warn "Could not extract data access token from start response"
@@ -734,8 +737,13 @@ else
     ok "Data access token obtained (${#DATA_ACCESS_TOKEN} chars)"
 fi
 
-if [ -n "${DATA_ENDPOINT}" ] && [ "${DATA_ENDPOINT}" != "null" ]; then
-    ok "Data endpoint: ${DATA_ENDPOINT}"
+# Translate data endpoint from container-internal URL to host-accessible URL
+if [ -n "${DATA_ENDPOINT_RAW}" ] && [ "${DATA_ENDPOINT_RAW}" != "null" ]; then
+    DATA_ENDPOINT=$(translate_endpoint "${DATA_ENDPOINT_RAW}")
+    ok "Data endpoint (raw): ${DATA_ENDPOINT_RAW}"
+    if [ "${DATA_ENDPOINT}" != "${DATA_ENDPOINT_RAW}" ]; then
+        ok "Data endpoint (translated): ${DATA_ENDPOINT}"
+    fi
 else
     DATA_ENDPOINT="${NODE_B_HOST}/dataspace/entities"
     warn "No endpoint in response, using default: ${DATA_ENDPOINT}"
@@ -836,6 +844,13 @@ else
     warn "Could not get IPFS repo stats"
 fi
 
+step "Checking Docker container health..."
+for CONTAINER in "${NODE_A_CONTAINER}" "${NODE_B_CONTAINER}"; do
+    HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "${CONTAINER}" 2>/dev/null || echo "unknown")
+    STATUS=$(docker inspect --format='{{.State.Status}}' "${CONTAINER}" 2>/dev/null || echo "unknown")
+    ok "Container ${CONTAINER}: status=${STATUS}, health=${HEALTH}"
+done
+
 PHASE_RESULTS+=("${GREEN}[7]${NC} Verify")
 
 # ==========================================================================
@@ -843,10 +858,10 @@ PHASE_RESULTS+=("${GREEN}[7]${NC} Verify")
 # ==========================================================================
 echo ""
 echo -e "${BOLD}${GREEN}================================================================${NC}"
-echo -e "${BOLD}${GREEN}  N2N Synchronized Storage Demo Complete${NC}"
+echo -e "${BOLD}${GREEN}  N2N Docker Test Complete${NC}"
 echo -e "${BOLD}${GREEN}================================================================${NC}"
 echo ""
-echo -e "  Mode:             Synchronized Storage + IPFS"
+echo -e "  Mode:             Docker Containers + Synchronized Storage + IPFS"
 echo -e "  Consumer PID:     ${CONSUMER_PID}"
 echo -e "  Provider PID:     ${PROVIDER_PID}"
 echo -e "  Agreement ID:     ${AGREEMENT_ID}"
@@ -858,4 +873,6 @@ echo -e "  ${BOLD}Phase results:${NC}"
 for result in "${PHASE_RESULTS[@]}"; do
     echo -e "    ${result}"
 done
+echo ""
+echo -e "  ${BOLD}Tear down:${NC} docker compose down -v"
 echo ""

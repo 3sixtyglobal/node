@@ -1,0 +1,7 @@
+# Only include what's needed (node app + node_modules)
+# Everything else is excluded by the specific COPY paths in the Dockerfile
+**/.git
+**/.DS_Store
+**/coverage
+**/target
+**/*.tgz
