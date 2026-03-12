@@ -39,10 +39,10 @@ Node A (port 3000)                          Node B (port 3001)
 
 ## Scripts
 
-| Script                 | Purpose                                                     | When to run             |
-| ---------------------- | ----------------------------------------------------------- | ----------------------- |
-| `provision-storage.sh` | Derive addresses, create IOTA StorageItem, update env files | Once per bootstrap      |
-| `n2n-synced-storage.sh`| Run the full DSP + PNP test flow                            | After nodes are running |
+| Script                  | Purpose                                                     | When to run             |
+| ----------------------- | ----------------------------------------------------------- | ----------------------- |
+| `provision-storage.sh`  | Derive addresses, create IOTA StorageItem, update env files | Once per bootstrap      |
+| `n2n-synced-storage.sh` | Run the full DSP + PNP test flow                            | After nodes are running |
 
 ## Setup
 
