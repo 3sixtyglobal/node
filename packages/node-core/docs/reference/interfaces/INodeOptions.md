@@ -10,12 +10,6 @@ The options when running the node.
 
 The name of the server, defaults to "TWIN Node".
 
-#### Default
-
-```ts
-"TWIN Node"
-```
-
 ***
 
 ### serverVersion?

@@ -13690,8 +13690,8 @@
 													"dcterms:title": "Energy Consumption Data",
 													"dcterms:description": "Historical energy consumption data",
 													"hasPolicy": {
+														"@id": "urn:uuid:policy-456",
 														"@type": "Offer",
-														"uid": "urn:uuid:policy-456",
 														"assigner": "did:example:data-provider-789"
 													},
 													"distribution": {
@@ -14296,11 +14296,6 @@
 				"tags": [
 					"Transfer Process"
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "The rest request ended in success with no data.",
@@ -14327,24 +14322,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -14391,11 +14368,6 @@
 						"style": "simple"
 					}
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "The rest request ended in success with no data.",
@@ -14422,24 +14394,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -14486,11 +14440,6 @@
 						"style": "simple"
 					}
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "The rest request ended in success with no data.",
@@ -14517,24 +14466,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -14581,11 +14512,6 @@
 						"style": "simple"
 					}
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "The rest request ended in success with no data.",
@@ -14612,24 +14538,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -14676,11 +14584,6 @@
 						"style": "simple"
 					}
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "The rest request ended in success with no data.",
@@ -14707,24 +14610,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -14771,11 +14656,6 @@
 						"style": "simple"
 					}
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "The rest request ended in success with no data.",
@@ -14802,24 +14682,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -14865,7 +14727,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/PapCreateRequest"
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdObjectWithOptionalAtId<DataspaceProtocolPolicy>"
 							},
 							"examples": {
 								"papCreateRequestExample": {
@@ -15046,7 +14908,7 @@
 											{
 												"@context": "http://www.w3.org/ns/odrl.jsonld",
 												"@type": "Set",
-												"uid": "urn:rights-management:abc123def456",
+												"@id": "urn:rights-management:abc123def456",
 												"permission": [
 													{
 														"target": "http://example.com/asset/1",
@@ -15151,14 +15013,14 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
+								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
 							},
 							"examples": {
 								"papUpdateRequestExample": {
 									"value": {
 										"@context": "http://www.w3.org/ns/odrl.jsonld",
 										"@type": "Set",
-										"uid": "urn:rights-management:abc123def456",
+										"@id": "urn:rights-management:abc123def456",
 										"permission": [
 											{
 												"target": "http://example.com/asset/2",
@@ -15264,14 +15126,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
 								},
 								"examples": {
 									"papGetResponseExample": {
 										"value": {
 											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Set",
-											"uid": "urn:rights-management:abc123def456",
+											"@id": "urn:rights-management:abc123def456",
 											"permission": [
 												{
 													"target": "http://example.com/asset/1",
@@ -15462,14 +15324,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAgreement"
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
 								},
 								"examples": {
 									"papGetResponseExample": {
 										"value": {
 											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Agreement",
-											"uid": "urn:rights-management:abc123def456",
+											"@id": "urn:rights-management:abc123def456",
 											"permission": [
 												{
 													"target": "http://example.com/asset/1",
@@ -15575,14 +15437,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlOffer"
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
 								},
 								"examples": {
 									"papGetResponseExample": {
 										"value": {
 											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Offer",
-											"uid": "urn:rights-management:abc123def456",
+											"@id": "urn:rights-management:abc123def456",
 											"permission": [
 												{
 													"target": "http://example.com/asset/1",
@@ -15688,14 +15550,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlSet"
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolSet"
 								},
 								"examples": {
 									"papGetResponseExample": {
 										"value": {
 											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Set",
-											"uid": "urn:rights-management:abc123def456",
+											"@id": "urn:rights-management:abc123def456",
 											"permission": [
 												{
 													"target": "http://example.com/asset/1",
@@ -15922,9 +15784,8 @@
 										"@type": "ContractRequestMessage",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Offer",
-											"uid": "urn:offer-1",
+											"@id": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
 										}
 									}
@@ -16036,9 +15897,8 @@
 										"@type": "ContractRequestMessage",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Offer",
-											"uid": "urn:offer-1",
+											"@id": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
 										}
 									}
@@ -16496,9 +16356,8 @@
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Offer",
-											"uid": "urn:offer-1",
+											"@id": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
 										}
 									}
@@ -16610,9 +16469,8 @@
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"offer": {
-											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Offer",
-											"uid": "urn:offer-1",
+											"@id": "urn:offer-1",
 											"assigner": "urn:provider:node:1"
 										}
 									}
@@ -16744,9 +16602,8 @@
 										"providerPid": "urn:contract-negotiation:00aa11bb.......ffff",
 										"consumerPid": "urn:contract-negotiation:22aa11bb.......ffff",
 										"agreement": {
-											"@context": "http://www.w3.org/ns/odrl.jsonld",
 											"@type": "Agreement",
-											"uid": "urn:offer-1",
+											"@id": "urn:offer-1",
 											"assigner": "urn:provider:node:1",
 											"assignee": "urn:consumer:node:1"
 										}
@@ -17410,7 +17267,6 @@
 						"$ref": "#/components/schemas/ActivityStreamsContextType"
 					},
 					"type": {
-						"description": "Object or array data type",
 						"anyOf": [
 							{
 								"$ref": "#/components/schemas/ActivityStreamsTypes"
@@ -17431,11 +17287,13 @@
 									]
 								}
 							}
-						]
+						],
+						"description": "Activity Type."
 					},
 					"id": {
 						"type": "string",
-						"description": "Global identifier."
+						"description": "Global identifier.",
+						"format": "uri"
 					},
 					"name": {
 						"anyOf": [
@@ -17553,23 +17411,28 @@
 					},
 					"published": {
 						"type": "string",
-						"description": "Published date-time."
+						"description": "Published date-time.",
+						"format": "date-time"
 					},
 					"updated": {
 						"type": "string",
-						"description": "The date and time at which the object was updated."
+						"description": "Updated date-time.",
+						"format": "date-time"
 					},
 					"startTime": {
 						"type": "string",
-						"description": "Start time."
+						"description": "Start time.",
+						"format": "date-time"
 					},
 					"endTime": {
 						"type": "string",
-						"description": "End time."
+						"description": "End time.",
+						"format": "date-time"
 					},
 					"duration": {
 						"type": "string",
-						"description": "Duration."
+						"description": "Duration.",
+						"format": "duration"
 					},
 					"generator": {
 						"description": "Object or array data type",
@@ -18058,8 +17921,11 @@
 					},
 					{
 						"type": "array",
-						"minItems": 1,
+						"minItems": 2,
 						"prefixItems": [
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							},
 							{
 								"type": "string",
 								"const": "https://www.w3.org/ns/activitystreams"
@@ -18071,11 +17937,14 @@
 					},
 					{
 						"type": "array",
-						"minItems": 1,
+						"minItems": 2,
 						"prefixItems": [
 							{
 								"type": "string",
 								"const": "https://www.w3.org/ns/activitystreams"
+							},
+							{
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
 							}
 						],
 						"items": {
@@ -18084,151 +17953,6 @@
 					}
 				],
 				"description": "The Activity Streams JSON-LD context type."
-			},
-			"ActivityStreamsLinkTypes": {
-				"anyOf": [
-					{
-						"type": "string",
-						"const": "Link",
-						"description": "Link"
-					},
-					{
-						"type": "string",
-						"const": "Mention",
-						"description": "Mention"
-					}
-				],
-				"description": "The link types concerning Activity Streams."
-			},
-			"ActivityStreamsObjectTypes": {
-				"anyOf": [
-					{
-						"type": "string",
-						"const": "Object",
-						"description": "Object"
-					},
-					{
-						"type": "string",
-						"const": "Activity",
-						"description": "Activity"
-					},
-					{
-						"type": "string",
-						"const": "IntransitiveActivity",
-						"description": "IntransitiveActivity"
-					},
-					{
-						"type": "string",
-						"const": "Collection",
-						"description": "Collection"
-					},
-					{
-						"type": "string",
-						"const": "OrderedCollection",
-						"description": "OrderedCollection"
-					},
-					{
-						"type": "string",
-						"const": "CollectionPage",
-						"description": "CollectionPage"
-					},
-					{
-						"type": "string",
-						"const": "OrderedCollectionPage",
-						"description": "OrderedCollectionPage"
-					},
-					{
-						"type": "string",
-						"const": "Actor",
-						"description": "Actor"
-					},
-					{
-						"type": "string",
-						"const": "Application",
-						"description": "Application"
-					},
-					{
-						"type": "string",
-						"const": "Group",
-						"description": "Group"
-					},
-					{
-						"type": "string",
-						"const": "Organization",
-						"description": "Organization"
-					},
-					{
-						"type": "string",
-						"const": "Person",
-						"description": "Person"
-					},
-					{
-						"type": "string",
-						"const": "Service",
-						"description": "Service"
-					},
-					{
-						"type": "string",
-						"const": "Article",
-						"description": "Article"
-					},
-					{
-						"type": "string",
-						"const": "Audio",
-						"description": "Audio"
-					},
-					{
-						"type": "string",
-						"const": "Document",
-						"description": "Document"
-					},
-					{
-						"type": "string",
-						"const": "Event",
-						"description": "Event"
-					},
-					{
-						"type": "string",
-						"const": "Image",
-						"description": "Image"
-					},
-					{
-						"type": "string",
-						"const": "Note",
-						"description": "Note"
-					},
-					{
-						"type": "string",
-						"const": "Page",
-						"description": "Page"
-					},
-					{
-						"type": "string",
-						"const": "Place",
-						"description": "Place"
-					},
-					{
-						"type": "string",
-						"const": "Profile",
-						"description": "Profile"
-					},
-					{
-						"type": "string",
-						"const": "Relationship",
-						"description": "Relationship"
-					},
-					{
-						"type": "string",
-						"const": "Tombstone",
-						"description": "Tombstone"
-					},
-					{
-						"type": "string",
-						"const": "Video",
-						"description": "Video"
-					}
-				],
-				"description": "The object types concerning Activity Streams."
 			},
 			"ActivityStreamsTypes": {
 				"anyOf": [
@@ -19776,222 +19500,10 @@
 				],
 				"description": "The body which contains the error."
 			},
-			"PapCreateRequest": {
-				"type": "object",
-				"properties": {
-					"uid": {
-						"type": "string"
-					},
-					"@context": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
-					},
-					"@type": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/PolicyType"
-					},
-					"profile": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						],
-						"description": "The profile(s) this policy conforms to. IRIs identifying the ODRL Profile(s)."
-					},
-					"assigner": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-										}
-									]
-								}
-							}
-						],
-						"description": "The assigner of the policy. Applies to all rules unless overridden at rule level."
-					},
-					"assignee": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-										}
-									]
-								}
-							}
-						],
-						"description": "The assignee of the policy. Applies to all rules unless overridden at rule level."
-					},
-					"target": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
-										}
-									]
-								}
-							}
-						],
-						"description": "The target asset for the rule."
-					},
-					"action": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/ActionType"
-							},
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/ActionType"
-										},
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
-										}
-									]
-								}
-							}
-						],
-						"description": "The action associated with the rule."
-					},
-					"inheritFrom": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						],
-						"description": "The parent policy(ies) this policy inherits from. IRIs identifying the parent Policy(ies)."
-					},
-					"conflict": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/ConflictStrategyType"
-					},
-					"permission": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
-								}
-							}
-						],
-						"description": "The permissions in the policy. At least one of permission, prohibition, or obligation must be present."
-					},
-					"prohibition": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
-								}
-							}
-						],
-						"description": "The prohibitions in the policy. At least one of permission, prohibition, or obligation must be present."
-					},
-					"obligation": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
-								}
-							}
-						],
-						"description": "The obligations in the policy. At least one of permission, prohibition, or obligation must be present."
-					}
-				},
-				"required": [
-					"@context",
-					"@type"
-				],
-				"description": "The body of the request - the policy to create (uid will be auto-generated)."
-			},
 			"PapQueryResponse": {
 				"type": "array",
 				"items": {
-					"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicy"
+					"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
 				},
 				"description": "The body of the response."
 			},
@@ -20048,10 +19560,10 @@
 						"description": "Organization identity to be used when sending trust payloads."
 					},
 					"offer": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlOffer"
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
 					},
 					"agreement": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAgreement"
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
 					},
 					"trustVerificationInfo": {
 						"$ref": "#/components/schemas/TrustVerificationInfo"

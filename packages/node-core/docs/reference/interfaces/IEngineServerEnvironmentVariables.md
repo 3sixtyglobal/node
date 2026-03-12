@@ -1380,12 +1380,6 @@ Only required for trusted nodes, as regular nodes will not write encrypted data.
 
 How often to check for entity updates in minutes.
 
-#### Default
-
-```ts
-5
-```
-
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`synchronisedStorageEntityUpdateIntervalMinutes`](IEngineEnvironmentVariables.md#synchronisedstorageentityupdateintervalminutes)
@@ -1397,12 +1391,6 @@ How often to check for entity updates in minutes.
 > `optional` **synchronisedStorageConsolidationIntervalMinutes**: `string`
 
 Interval to perform consolidation of changesets, only used if this is a trusted node.
-
-#### Default
-
-```ts
-60
-```
 
 #### Inherited from
 
@@ -1416,12 +1404,6 @@ Interval to perform consolidation of changesets, only used if this is a trusted 
 
 The number of entities to process in a single consolidation batch, only used if this is a trusted node.
 
-#### Default
-
-```ts
-1000
-```
-
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`synchronisedStorageConsolidationBatchSize`](IEngineEnvironmentVariables.md#synchronisedstorageconsolidationbatchsize)
@@ -1433,12 +1415,6 @@ The number of entities to process in a single consolidation batch, only used if 
 > `optional` **synchronisedStorageMaxConsolidations**: `string`
 
 The maximum number of consolidations to keep in storage, only used if this is a trusted node.
-
-#### Default
-
-```ts
-5
-```
 
 #### Inherited from
 
@@ -1682,12 +1658,6 @@ Is the dataspace enabled, defaults to false.
 
 The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
 
-#### Default
-
-```ts
-10
-```
-
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceRetainActivityLogsFor`](IEngineEnvironmentVariables.md#dataspaceretainactivitylogsfor)
@@ -1699,12 +1669,6 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 > `optional` **dataspaceActivityLogsCleanUpInterval**: `string`
 
 The interval for cleaning up the activity logs.
-
-#### Default
-
-```ts
-60
-```
 
 #### Inherited from
 

@@ -42,12 +42,6 @@ The extended type e.g. hex etc.
 
 Whether the param is required.
 
-#### Default
-
-```ts
-true
-```
-
 ***
 
 ### defaultValue?
