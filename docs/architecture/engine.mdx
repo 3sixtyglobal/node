@@ -1,0 +1,169 @@
+---
+category: framework
+order: 6
+---
+
+import { ComponentWorkflowDiagram, EngineRuntimeDiagram } from './engine-diagrams.jsx';
+
+# Engine
+
+The engine is the runtime assembly layer for TWIN capabilities. It takes structured type
+configuration, initialises connectors and components, registers named instances, manages lifecycle,
+and provides a stable runtime surface for server routes, processors, background tasks, and extension
+modules.
+
+## Core Responsibilities
+
+At a high level, the engine performs six responsibilities:
+
+1. Load and maintain runtime state through pluggable state storage.
+2. Initialise configured connector and component types.
+3. Register created instances in shared factories.
+4. Track instance metadata such as defaults, features, and names.
+5. Run deterministic lifecycle phases (`bootstrap`, `start`, `stop`).
+6. Manage context IDs and context ID handlers for node, tenant, and other scoped execution keys.
+
+`EngineCore` is the central implementation of this behaviour. The `Engine` package extends and
+composes this core for full runtime use, but the operational mechanics are driven by `EngineCore`.
+
+## Runtime Data Model
+
+`IEngineCoreContext` stores the runtime working set:
+
+- `config`: the active engine configuration.
+- `state`: mutable persisted runtime state.
+- `stateDirty`: a flag controlling state write-back.
+- `registeredInstances`: per-type registry metadata (`type`, `isDefault`, `features`).
+- `componentInstances`: concrete runtime instances plus initialisation status.
+
+This separation is important. Factory registries provide lookup by name, while
+`componentInstances` is the ordered list the engine uses for lifecycle execution.
+
+{EngineRuntimeDiagram()}
+
+## Type Configuration and Instances
+
+`IEngineConfig` extends `IEngineCoreConfig` and defines a strongly typed `types` map. Each map entry
+is an array of `IEngineCoreTypeConfig<T>` values. Every entry can control:
+
+- `type`: concrete implementation selector.
+- `overrideInstanceType`: explicit runtime instance name.
+- `isDefault`: default instance marker for lookups that do not specify a name.
+- `isMultiInstance`: per-call dynamic instance generation model.
+- `features`: feature tags used for contextual resolution.
+- optional route metadata (`restPath`, `socketPath`, options).
+
+The engine records the resulting registrations in `registeredInstances`, then provides helper
+resolution methods:
+
+- `getRegisteredInstanceType(type, features?)`.
+- `getRegisteredInstanceTypeOptional(type, features?)`.
+
+Default selection first honours `isDefault`, then falls back to first configured entry.
+
+## Initialisation Pipeline
+
+On `start()`, the engine performs:
+
+1. Internal logging setup (`engine-logging-connector`, `engine-logging-service`).
+2. State load from configured state storage.
+3. Iteration over all registered type initialisers.
+4. Context ID handler registration.
+5. Bootstrap phase.
+6. Start phase (unless explicitly skipped).
+7. State save in finalisation.
+
+If any step fails, the engine calls `stop()`, logs the error chain, and rethrows.
+
+Type initialisers are registered with `(type, module, method)` metadata and loaded dynamically at
+runtime. For each config entry in `types[type]`, the initialiser returns:
+
+- a `createComponent` function,
+- an `instanceTypeName`,
+- and the target factory for registration.
+
+The engine then computes a final instance name (`overrideInstanceType` or returned type name),
+creates the instance, pushes it into `componentInstances`, and registers it in the returned factory.
+
+## Component Workflow in Engine
+
+Component initialisation follows the same engine type pipeline as connectors, but with component
+specific orchestration semantics.
+
+{ComponentWorkflowDiagram()}
+
+A practical example is logging:
+
+- logging connector initialiser selects `console`, `entity-storage`, or `multi` connector type,
+  then registers the connector in `LoggingConnectorFactory`.
+- logging component initialiser selects `service` or `rest-client` type.
+- for `service`, it injects default `loggingConnectorType` from the currently registered connector
+  instance and creates `LoggingService`.
+- the created component is registered in `ComponentFactory` and tracked for lifecycle.
+
+This pattern repeats across domains, enabling consistent runtime composition while preserving domain
+specific implementation details.
+
+## Lifecycle Semantics
+
+Lifecycle execution is deterministic and instance based:
+
+- `bootstrap`: executed first over all tracked instances. Any false result is treated as failure.
+- `start`: executed after successful bootstrap for each uninitialised instance.
+- `stop`: executed when shutting down for each initialised instance.
+
+Each lifecycle method receives a logging component type parameter, so startup and shutdown logging
+can be routed consistently.
+
+When `skipComponentStart` is used, components are marked initialised without calling `start`, which
+allows subsequent `stop` logic to still run for cleanup.
+
+This is used by TWIN Node during CLI command execution. In `node-core` command flow,
+`executeCommand` starts the engine with `engineCore.start(true)`, so the engine can be configured,
+state and bootstrap logic can run, and command actions can execute without fully starting component
+runtime services.
+
+## State and Cloning
+
+The engine supports pluggable state backends and clone replication.
+
+- `stateLoad()` pulls persisted state into context.
+- `setStateDirty()` marks state for persistence.
+- `stateSave()` writes state only when dirty and non-empty.
+
+`getCloneData()` captures configuration, state, registered type initialisers, context ID keys, and
+entity schemas. `populateClone()` reconstructs an engine clone from this payload using in-memory
+state storage, enabling worker-based or task-based engine replication.
+
+## Context IDs and Feature-Aware Handlers
+
+The engine can register context ID keys with required handler features, then bind concrete handlers
+through `ComponentFactory` into `ContextIdHandlerFactory`. This enables contextual execution for
+scopes such as node or tenant, while keeping handler implementation selection configuration driven.
+
+Feature tags in `registeredInstances` support selecting handlers and other instance types by
+capability rather than only by static name.
+
+## Multi-Instance Mode
+
+`isMultiInstance` changes registration semantics. Instead of registering a singleton instance,
+engine registers a factory callback that creates instances from supplied params. This is useful for
+cases such as per-endpoint rest clients or dynamically scoped component instances.
+
+For non-multi-instance entries, the engine registers and reuses a singleton instance.
+
+## Operational Notes
+
+- Keep `overrideInstanceType` stable where routes or processors reference explicit names.
+- Use `isDefault` for expected fallback behaviour.
+- Use `features` for context-sensitive resolution rather than proliferating hard-coded instance
+  names.
+- Prefer component-level business logic and connector-level infrastructure logic to preserve clean
+  separation of concerns.
+
+## Further Reading
+
+- [Components](./components.mdx): component behaviour and responsibilities.
+- [Connectors](./connectors.mdx): connector architecture.
+- [Node Runtime](./node.mdx): node startup and environment-driven configuration assembly.
+- [Context IDs](./context-ids.mdx): context key registration, handlers, and async propagation.

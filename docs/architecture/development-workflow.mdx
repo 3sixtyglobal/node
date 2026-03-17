@@ -1,0 +1,223 @@
+---
+category: framework
+order: 2
+---
+
+# Development Workflow
+
+This document describes the shared development practices used across the TWIN repositories. It covers the outer workspace orchestration repo, the common npm script patterns used inside each submodule repo, and the `local-link` mechanism for testing unpublished changes across sibling repositories.
+
+## Two Levels of Workflow
+
+Development usually happens at two levels:
+
+1. the outer `workspace` repository, which orchestrates operations across all submodules,
+2. an individual repository such as `node`, `engine`, `data`, `standards`, or `dataspace`, where actual feature implementation happens.
+
+The outer workspace is useful for broad maintenance and coordinated checks. Day-to-day coding is normally done inside the target submodule repository.
+
+## Workspace-Level Orchestration
+
+The top-level workspace repository provides orchestration commands that run across submodules in the order defined by the `submodules` array in its root `package.json`.
+
+The main commands are:
+
+- `npm run submodule:install`
+- `npm run submodule:format`
+- `npm run submodule:lint`
+- `npm run submodule:dist`
+- `npm run submodule:dist-no-test`
+- `npm run submodule:docs`
+- `npm run submodule:refresh-deps-build`
+
+These commands can be used in three ways:
+
+- across all submodules,
+- from a named starting submodule onward,
+- against one specific submodule with the `:single` variant.
+
+That makes the workspace repo suitable for coordinated dependency refreshes, broad quality checks, and recovery from failures late in the submodule sequence.
+
+## Normal Local Workflow
+
+A typical implementation flow across the TWIN codebase is:
+
+1. run `npm install` at the repository root,
+2. make changes in the relevant package or app inside that repository,
+3. run targeted local commands while iterating,
+4. run repository-wide checks from the submodule root,
+5. if the change depends on unpublished sibling repositories, use `local-link` to replace installed packages with local checkouts.
+
+If the work spans several repos, you can optionally finish with a workspace-level orchestration run from the outer `workspace` repository.
+
+## Common Repository Scripts
+
+Most TWIN repositories expose the same root-level script pattern in their own `package.json`:
+
+- `npm run build`
+- `npm run dist`
+- `npm run dist:no-test`
+- `npm run docs`
+- `npm run format`
+- `npm run lint`
+- `npm run local-link`
+
+In the repositories that are npm workspaces, the build-style commands usually call a local `scripts/workspaces.mjs` helper. That helper reads the repo's workspace list, checks whether each workspace defines the requested npm script, and executes it in order.
+
+The important behaviour is that these repo-level orchestration commands fail fast. If one package or app fails, the overall command stops immediately.
+
+In practice:
+
+- root scripts are best for repository-wide validation,
+- package or app scripts are best for fast iteration,
+- workspace-level orchestration from the outer repo is best for coordinated multi-repo checks.
+
+## Common Package and App Script Pattern
+
+Across the TWIN repositories, most packages and apps follow the same script structure:
+
+- `clean` removes generated output,
+- `build` prepares runnable or distributable artefacts,
+- `dev` often watches source files and reruns the package build automatically,
+- `merge-locales` merges locale fragments where needed,
+- `validate-locales` checks locale resources,
+- `test:build` type-checks tests,
+- `test` runs Vitest,
+- `docs` regenerates published documentation artefacts,
+- `dist` runs the full clean, build, locale, and test flow,
+- `dist:no-test` runs the distributable build without the runtime tests.
+
+Some packages add specialised stages such as schema generation, OpenAPI generation, locale merging, or executable startup, but the overall shape stays consistent.
+
+This consistency is intentional. It means you can move between repositories and expect the same basic workflow even when the package purpose changes.
+
+In many repositories, `npm run dev` is implemented as a watch loop that rebuilds the package when files change. That is particularly useful during cross-repository integration work.
+
+## Recommended Command Pattern
+
+For focused work, run commands in the package or app you are actively changing. For example:
+
+```shell
+cd packages/some-package
+npm run build
+npm run test
+```
+
+For repository-wide validation, run commands from the submodule root:
+
+```shell
+npm run format
+npm run lint
+npm run dist:no-test
+```
+
+Use `dist` when you need the full validation path including tests. Use `dist:no-test` when you need faster feedback or when the full test environment is not available.
+
+For broad coordinated checks across repositories, switch back to the outer workspace repo and use the `submodule:*` commands.
+
+## When to Use Which Level
+
+Use package or app scripts when:
+
+- you want the fastest feedback loop,
+- you are changing one package or app,
+- you only need one unit of the repo to rebuild or retest.
+
+Use repository root scripts when:
+
+- you need a repository-wide quality gate,
+- several packages in one repo changed together,
+- you are preparing the branch for review or release.
+
+Use outer workspace orchestration when:
+
+- you are coordinating changes across several repositories,
+- you want to restart a long sequence from a known submodule,
+- you are refreshing dependencies or running cross-repo maintenance.
+
+## Local Linking Across Sibling Repositories
+
+TWIN repositories normally consume each other through published npm packages. When you need to test local unpublished changes from one repository inside another, use the consuming repository's root `local-link` script.
+
+The script supports both package patterns and explicit paths:
+
+```shell
+npm run local-link "@twin.org/engine*"
+npm run local-link "@twin.org/dataspace*"
+npm run local-link "@twin.org//*"
+npm run local-link ..\engine\packages\engine-core
+```
+
+To restore the installed package, run the same target with `unlink`:
+
+```shell
+npm run local-link "@twin.org/engine*" unlink
+npm run local-link ..\engine\packages\engine-core unlink
+```
+
+## How local-link Works
+
+`scripts/local-link.mjs` does not use `npm link`. Instead, it swaps the installed package directory directly:
+
+1. it resolves the requested package name or explicit path,
+2. for package names beginning with `@`, it scans sibling repositories one directory above the current repository,
+3. it reads each sibling repository root `package.json` and its workspaces to find matches,
+4. it renames the installed package in `node_modules` to a `.bak` directory,
+5. it creates a symlink from `node_modules/<package>` to the local workspace directory,
+6. on `unlink`, it removes the symlink and restores the backup directory.
+
+This makes the link explicit, reversible, and independent of global npm link state.
+
+Because the symlink points at the real local package directory, any rebuilt output is picked up automatically by the consuming repository. In practice, if the source package exposes a `dev` script that watches files and reruns `build`, you can keep that `npm run dev` process running while testing the consumer through `local-link`, and the consumer will see the refreshed built output without re-linking after every change.
+
+## Practical Constraints
+
+There are a few practical constraints when using `local-link`:
+
+- the dependency must already exist in `node_modules`, so run `npm install` first,
+- the linked package should already be built, because consumers usually read from `dist`,
+- sibling repositories are expected to sit beside each other in the shared workspace folder,
+- wildcard matching is based on workspace path segments, so patterns should match the workspace folder name prefix.
+
+In practice, a safe cross-repository flow is:
+
+1. build the source package in its own repository,
+2. switch to the consuming repository,
+3. run `npm install` if needed,
+4. run `npm run local-link "@twin.org/package-name"`,
+5. rebuild or retest the consuming repo,
+6. run `unlink` when finished.
+
+## Best Practices
+
+The shared practices that work best across the repositories are:
+
+- do most coding and debugging inside the target submodule repository,
+- use package or app scripts for the inner loop,
+- use repo root scripts before review,
+- use outer workspace orchestration only when you genuinely need cross-repo coordination,
+- build the source repository before linking it into another repo,
+- when available, run `npm run dev` in the linked source package to keep its built output current during integration testing,
+- unlink temporary symlinks when the integration check is complete,
+- keep repositories on their intended branches while doing coordinated changes,
+- prefer `dist:no-test` for fast structural verification and reserve full `dist` for final checks.
+
+This keeps development predictable, reduces accidental environment drift, and makes multi-repo work much easier to reason about.
+
+## Typical Flow for Multi-Repo Changes
+
+When a change spans repositories, a practical sequence is:
+
+1. update and build the source repository,
+2. switch to the consuming repository,
+3. run `npm install` if required,
+4. run `npm run local-link "@twin.org/package-name"`,
+5. run local build, lint, docs, or test commands in the consumer,
+6. repeat as needed while iterating,
+7. remove links with `unlink` after verification,
+8. optionally run workspace-level orchestration to confirm the wider integration path.
+
+## Further Reading
+
+- [Connectors](./connectors.mdx)
+- [Codebase](./codebase.mdx)

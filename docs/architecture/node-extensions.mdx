@@ -1,0 +1,123 @@
+---
+category: node
+order: 3
+---
+
+import { ExtensionPhaseDiagram } from './node-extensions-diagrams.jsx';
+
+# Node Extensions
+
+This document describes how TWIN Node discovers, loads, initialises, and shuts down extensions, and how protocol-based module loading works for local files, npm packages, and remote HTTPS modules.
+
+## Extension Entry Point
+
+Node reads the `extensions` environment variable (from `INodeEnvironmentVariables`) as a comma-separated list of module identifiers. For each entry, Node attempts to load optional lifecycle methods:
+
+- `extensionInitialise(envVars, nodeEngineConfig)`
+- `extensionInitialiseEngine(engineCore)`
+- `extensionInitialiseEngineServer(engineCore, engineServer)`
+- `extensionShutdown()`
+
+These are orchestrated in `packages/node-core/src/builders/extensionsBuilder.ts`.
+
+## Lifecycle Timing
+
+The extension lifecycle is split across runtime phases:
+
+1. Configuration phase: `extensionInitialise` can mutate node engine configuration before engine
+   creation.
+2. Engine phase: `extensionInitialiseEngine` runs after engine construction.
+3. Engine-server phase: `extensionInitialiseEngineServer` runs after server construction.
+4. Shutdown phase: `extensionShutdown` runs during graceful termination.
+
+Extension initialisation state is tracked to avoid duplicate initialisation in-process.
+
+{ExtensionPhaseDiagram()}
+
+## Module Protocols
+
+Protocol handling is implemented via `overrideModuleImport` and utility functions in `packages/node-core/src/utils.ts`.
+
+Supported module forms:
+
+- Local file/module path: `./my-extension.mjs`, `../path/ext.mjs`, absolute path, or `file://...`
+- npm protocol: `npm:@scope/package` or `npm:package@version`
+- HTTPS protocol: `https://host/path/extension.mjs`
+- Default package resolution: plain package name lookup with fallback into extension cache
+
+Rejected protocol:
+
+- `http://` is blocked and treated as insecure.
+
+## npm Protocol Flow
+
+For `npm:` entries, Node:
+
+1. Resolves a protocol-specific cache directory.
+2. Checks if the package already exists in cache.
+3. If missing, installs the package under cache using npm.
+4. Resolves package entry point and returns module path.
+
+This provides repeatable extension loading without modifying the application repository's dependency manifests.
+
+## HTTPS Protocol Flow
+
+For `https:` entries, Node:
+
+1. Hashes the URL to produce a stable cache filename.
+2. Checks cached file and metadata.
+3. Applies TTL and force-refresh logic.
+4. Downloads content with max-size enforcement.
+5. Writes file plus metadata for future reuse.
+
+Security and operational controls are applied through extension cache settings in environment variables.
+
+## Cache and Security Controls
+
+Extension-related node environment settings:
+
+```json
+{
+  "extensions": "Comma-separated list of extension module identifiers",
+  "extensionsMaxSizeMb": "Maximum HTTPS extension download size in MB",
+  "extensionsClearCache": "Clear extension cache on startup",
+  "extensionsCacheDirectory": "Custom extension cache directory",
+  "extensionsCacheTtlHours": "HTTPS extension cache TTL in hours",
+  "extensionsForceRefresh": "Force refresh cached extensions"
+}
+```
+
+Default values are documented in `INodeEnvironmentVariables` and the extension loader utilities.
+
+## Example Extension
+
+```javascript
+export async function extensionInitialise(envVars, nodeEngineConfig) {
+  nodeEngineConfig.debug = nodeEngineConfig.debug ?? false;
+}
+
+export async function extensionInitialiseEngine(engineCore) {
+  await engineCore.logInfo('Extension engine init');
+}
+
+export async function extensionInitialiseEngineServer(engineCore, engineServer) {
+  await engineCore.logInfo('Extension server init');
+}
+
+export async function extensionShutdown() {
+  // cleanup resources
+}
+```
+
+## Operational Guidance
+
+- Prefer pinned npm versions for deterministic deployments.
+- Use HTTPS sources only from trusted origins.
+- Use cache TTL and force refresh intentionally during rollout.
+- Keep extension initialisers idempotent where possible.
+- Handle missing optional hooks gracefully; Node already treats them as optional.
+
+## Further Reading
+
+- Node bootstrap and runtime flow: [Node Runtime](./node.mdx)
+- Full environment variable reference: [Node Environment Variables](./node-env-variables.mdx)

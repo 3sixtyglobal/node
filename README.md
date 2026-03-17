@@ -14,11 +14,19 @@ Together, the workspace packages and applications define a practical baseline fo
 
 ## Architecture
 
-- [Codebase](docs/architecture/codebase.md) - Overview of the codebase and how package layers are organised.
+- [Codebase](docs/architecture/codebase.mdx) - Overview of the repository structure, package layering, and packaging model.
+- [Components](docs/architecture/components.mdx) - Domain component contracts, implementations, factories, and lifecycle behaviour.
+- [Connectors](docs/architecture/connectors.mdx) - Connector interfaces, capability types, factory composition, and runtime integration.
+- [Context IDs](docs/architecture/context-ids.mdx) - Context propagation, key derivation, short forms, and data partitioning rules.
+- [Development Workflow](docs/architecture/development-workflow.mdx) - Workspace scripts, local development patterns, and sibling repository linking.
+- [Engine](docs/architecture/engine.mdx) - Engine responsibilities, data model, initialisation pipeline, and lifecycle semantics.
+- [Node Runtime](docs/architecture/node.mdx) - How the executable runtime builds configuration, starts services, and handles extensions.
+- [Node Environment Variables](docs/architecture/node-env-variables.mdx) - Runtime configuration surface for connectors, features, servers, and providers.
+- [Node Extensions](docs/architecture/node-extensions.mdx) - Extension loading protocols, lifecycle timing, and operational controls.
 
 ## Guides
 
-- [Docker Setup MySQL](docs/guides/docker-setup-mysql.md) - Walkthrough for running a local environment with Docker and MySQL.
+- [Docker Setup MySQL](docs/guides/node-docker-setup-mysql.md) - Walkthrough for running a local environment with Docker and MySQL.
 
 ## Contributing
 
