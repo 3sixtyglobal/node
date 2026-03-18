@@ -4,7 +4,7 @@ Simulates a 3-node supply chain scenario with Dockerized TWIN nodes communicatin
 
 ## Scenario
 
-```
+```text
 Node A (Shipper/Docket)    — publishes consignment data, trusted node
 Node B (Twin UK Hub)       — central hub, publishes own data
 Node C (Logistics Partner) — consumes from both A and B
@@ -20,7 +20,7 @@ Node C (Logistics Partner) — consumes from both A and B
 
 ### Sync Topology (Star)
 
-```
+```text
         Node A (Trusted)
        /        \
   Node B         Node C

@@ -6,7 +6,7 @@ PNP (Policy Negotiation Point) contract negotiation.
 
 ## Architecture
 
-```
+```text
 Host machine
 ├── docker compose up  →  twin-network (bridge)
 │   ├── twin-blob-ipfs-docker  (ipfs/kubo:latest)   :5001, :4001, :8080
