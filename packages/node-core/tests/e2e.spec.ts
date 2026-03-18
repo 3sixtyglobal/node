@@ -166,8 +166,8 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should download, install, and import a real TWIN module", async () => {
-		// Using @twin.org/nameof - we know it has nameofKebabCase export from code usage
-		const packageName = "@twin.org/nameof@0.0.2-next.19";
+		// Using @twin.org/core - we know it has core exports from code usage
+		const packageName = "@twin.org/core@0.0.3-next.23";
 
 		// 1. Download/install the package
 		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
@@ -191,23 +191,10 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		expect(importedModule).toBeDefined();
 
 		// Verify nameof function exists
-		const nameofFn = importedModule.nameof;
-		expect(nameofFn).toBeDefined();
-		expect(typeof nameofFn).toBe("function");
-
-		// Verify nameofKebabCase function exists
-		const nameofKebabCaseFn = importedModule.nameofKebabCase;
-		expect(nameofKebabCaseFn).toBeDefined();
-		expect(typeof nameofKebabCaseFn).toBe("function");
-
-		// 5. Verify the functions are callable and return expected types
-		// Note: Without the transformer, nameof functions return error strings
-		expect(typeof nameofFn()).toBe("string");
-		expect(typeof nameofKebabCaseFn()).toBe("string");
-
-		// Verify they contain the expected error message (transformer not in pipeline)
-		expect(nameofFn()).toContain("nameof-transformer is not in the build pipeline");
-		expect(nameofKebabCaseFn()).toContain("nameof-transformer is not in the build pipeline");
+		const isFn = importedModule.Is;
+		expect(isFn).toBeDefined();
+		expect(typeof isFn).toBe("function");
+		expect(isFn.string("test")).toBe(true);
 	});
 
 	test("should download and verify real TWIN extension with lifecycle hooks", async () => {
