@@ -1,0 +1,73 @@
+services:
+  twin-blob-ipfs:
+    image: ipfs/kubo:v0.40.1
+    container_name: twin-multi-ipfs
+    ports:
+      - '5011:5001'
+      - '4011:4001'
+      - '8090:8080'
+    volumes:
+      - ipfs-data:/data/ipfs
+    networks:
+      - twin-multi-network
+
+  twin-node-a:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/node-to-node-multi-docker/Dockerfile
+    container_name: twin-multi-node-a
+    ports:
+      - '3010:3000'
+    env_file:
+      - env/node-a-docker.env
+    volumes:
+      - node-a-data:/app/data
+    depends_on:
+      twin-blob-ipfs:
+        condition: service_started
+    networks:
+      - twin-multi-network
+
+  twin-node-b:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/node-to-node-multi-docker/Dockerfile
+    container_name: twin-multi-node-b
+    ports:
+      - '3011:3001'
+    env_file:
+      - env/node-b-docker.env
+    volumes:
+      - node-b-data:/app/data
+    depends_on:
+      twin-node-a:
+        condition: service_started
+    networks:
+      - twin-multi-network
+
+  twin-node-c:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/node-to-node-multi-docker/Dockerfile
+    container_name: twin-multi-node-c
+    ports:
+      - '3012:3002'
+    env_file:
+      - env/node-c-docker.env
+    volumes:
+      - node-c-data:/app/data
+    depends_on:
+      twin-node-b:
+        condition: service_started
+    networks:
+      - twin-multi-network
+
+volumes:
+  ipfs-data:
+  node-a-data:
+  node-b-data:
+  node-c-data:
+
+networks:
+  twin-multi-network:
+    driver: bridge
