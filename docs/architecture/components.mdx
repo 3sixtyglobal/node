@@ -1,0 +1,126 @@
+---
+category: framework
+order: 4
+---
+
+import { ComponentLayerDiagram } from './components-diagrams.jsx';
+
+# Components
+
+A component is the business capability layer of the TWIN platform. Where connectors translate between platform contracts and external technologies, components translate domain operations into co-ordinated connector calls, cross-domain orchestration, input validation, conversion, and policy-aware processing. Components are the units that routes and processors normally expose.
+
+{ComponentLayerDiagram()}
+
+## Core Contract
+
+All components implement `IComponent` from `@twin.org/core`. The interface provides a required `className()` method and optional `bootstrap`, `start`, and `stop` lifecycle methods.
+
+The component layer therefore shares the same lifecycle protocol as connectors, but has a different responsibility boundary. Components model domain behaviour, whilst connectors model infrastructure integration.
+
+## Domain Component Interfaces
+
+Each capability repository typically defines one or more `I...Component` interfaces in its `-models` package. These interfaces extend `IComponent` and provide domain-specific methods.
+
+`ILoggingComponent` defines `log` and `query` methods over log entries.
+
+`IEntityStorageComponent` defines `set`, `get`, `remove`, and `query` operations with domain-oriented query semantics.
+
+`IIdentityComponent`, `IAttestationComponent`, `INftComponent`, `IVerifiableStorageComponent`, `IDataProcessingComponent`, `IDocumentManagementComponent`, and related interfaces follow the same pattern.
+
+In total, the codebase currently includes component interfaces for identity, storage, logging, attestation, NFT, verifiable storage, messaging, telemetry, trust, background task scheduling, auditable graph and stream processing, immutable proof, federated catalogue, synchronised storage, and API authentication management.
+
+## Implementations
+
+The most common implementation style is a service class in a `-service` package, for example
+`LoggingService`. The service resolves one or more connectors at construction time and exposes the
+domain component interface to upstream callers.
+
+`LoggingService` is representative. It implements `ILoggingComponent`, resolves its connector using
+`LoggingConnectorFactory.get`, validates inputs with guard utilities, builds query conditions,
+delegates storage and retrieval to the connector, and preserves a domain-centric API for callers.
+
+A second implementation style is a REST client class in a `-rest-client` package. In engine
+configuration, the same component interface can therefore be backed by either an in-process service
+or a remote service endpoint, depending on deployment topology.
+
+## Component Factory
+
+Components are registered and resolved through `ComponentFactory`, which is created in core via `Factory.createFactory<IComponent>("component")`.
+
+This gives all modules a shared registry for named component instances. Routes and processors then
+resolve components by instance name, normally through `ComponentFactory.get<SomeComponentType>(...)`.
+This allows route code to remain decoupled from concrete class constructors.
+
+Because the underlying factory implementation uses shared runtime storage, instances registered inside engine initialisation are available across package boundaries without direct compile-time coupling.
+
+## Engine Initialisation
+
+Engine initialisers in `engine-types` create and register components in the same pass that creates
+connectors. The logging initialiser shows the pattern clearly:
+
+1. Resolve component type from config (`service` or `rest-client`).
+2. Build constructor options, often including default connector type from the active connector registration.
+3. Instantiate the concrete component class.
+4. Register it in `ComponentFactory` under an instance name.
+5. Push the instance to engine lifecycle tracking.
+
+This process ensures that components are available before route registration attempts to resolve
+instances from `ComponentFactory`.
+
+## Relationship to Connectors
+
+Components consume connectors, but do not duplicate connector responsibilities. A connector decides how to communicate with a technology provider. A component decides when, why, and in which combination those connector calls should occur.
+
+The practical effect is that changing infrastructure details usually only changes connector configuration, whilst changing business behaviour usually only changes component logic.
+
+This distinction is most useful when domain behaviour should remain invariant across infrastructure choices. A component can hold rules that are intentionally independent of connector selection, so that operational policies remain consistent even when the backend changes.
+
+Blob storage encryption is a good example. The component can apply the same encryption, decryption, key-selection, and metadata rules regardless of whether the active connector writes to AWS S3, IPFS, Azure Blob Storage, GCP Storage, a local file store, or an in-memory adapter. In that model, connector choice affects transport and persistence details, while the encryption behaviour remains a stable business concern in the component layer.
+
+A single component can depend on multiple connectors or multiple other components. For example,
+document management and auditable item services orchestrate across storage, proof, processing,
+attestation, and event capabilities while still exposing one coherent domain interface.
+
+## Exposure Through Routes
+
+Service route packages consistently use `ComponentFactory` to resolve the domain component selected for that endpoint namespace. This pattern appears throughout attestation, blob storage, identity, verifiable storage, telemetry, document management, auditable item graph, and auditable item stream route implementations.
+
+The route layer therefore acts as a transport adapter, while the component remains the domain execution boundary. This keeps HTTP concerns separate from business behaviour and simplifies testing of domain logic without transport setup.
+
+## Lifecycle and Observability
+
+Components can implement lifecycle hooks when they own resources or require staged startup. Many components also resolve logging components from `ComponentFactory.getIfExists(...)`, allowing operational telemetry even during bootstrap and background processing.
+
+In distributed deployments, this consistent lifecycle model allows deterministic startup ordering, controlled shutdown, and predictable operational behaviour under failure or restart scenarios.
+
+## Available Component Domains
+
+The table below summarises key component interfaces currently present in the codebase.
+
+| Domain                | Interface                                                                       |
+| --------------------- | ------------------------------------------------------------------------------- |
+| Entity Storage        | `IEntityStorageComponent`                                                       |
+| Logging               | `ILoggingComponent`                                                             |
+| Blob Storage          | `IBlobStorageComponent`                                                         |
+| Identity              | `IIdentityComponent`, `IIdentityResolverComponent`, `IIdentityProfileComponent` |
+| Messaging             | `IMessagingComponent`, `IMessagingAdminComponent`                               |
+| NFT                   | `INftComponent`                                                                 |
+| Verifiable Storage    | `IVerifiableStorageComponent`                                                   |
+| Attestation           | `IAttestationComponent`                                                         |
+| Data Processing       | `IDataProcessingComponent`                                                      |
+| Document Management   | `IDocumentManagementComponent`                                                  |
+| Auditable Item Graph  | `IAuditableItemGraphComponent`                                                  |
+| Auditable Item Stream | `IAuditableItemStreamComponent`                                                 |
+| Telemetry             | `ITelemetryComponent`                                                           |
+| Trust                 | `ITrustComponent`                                                               |
+| Background Tasks      | `IBackgroundTaskComponent`, `ITaskSchedulerComponent`                           |
+| Synchronised Storage  | `ISynchronisedStorageComponent`                                                 |
+| Immutable Proof       | `IImmutableProofComponent`                                                      |
+| Federated Catalogue   | `IFederatedCatalogueComponent`                                                  |
+| API Authentication    | `IAuthenticationComponent`, `IAuthenticationAdminComponent`                     |
+
+## Further Reading
+
+- [Engine](./engine.mdx): runtime assembly and lifecycle execution over components and connectors.
+- [Connectors](./connectors.mdx): infrastructure adapter layer orchestrated by components.
+- [Codebase](./codebase.mdx): wider package and runtime architecture.

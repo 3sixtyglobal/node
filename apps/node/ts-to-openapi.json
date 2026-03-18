@@ -118,6 +118,7 @@
 		"DataspaceProtocol(.*?)": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocol$1",
 		"Dcat(.*?)": "https://schema.twindev.org/dcat/Dcat$1",
 		"DublinCore(.*?)": "https://schema.twindev.org/dublin-core/DublinCore$1",
-		"Foaf(.*?)": "https://schema.twindev.org/foaf/Foaf$1"
+		"Foaf(.*?)": "https://schema.twindev.org/foaf/Foaf$1",
+		"ActivityStreams(.*?)": "https://schema.twindev.org/w3c-activity-streams/ActivityStreams$1"
 	}
 }
