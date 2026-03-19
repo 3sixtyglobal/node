@@ -35,8 +35,16 @@ RUN rm -rf ./node_modules/@twin.org/node ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/federated-catalogue-service \
     ./node_modules/@twin.org/federated-catalogue-models \
     ./node_modules/@twin.org/data-core \
-    ./node_modules/@twin.org/api-core
+    ./node_modules/@twin.org/auditable-item-graph-models \
+    ./node_modules/@twin.org/auditable-item-graph-rest-client \
+    ./node_modules/@twin.org/auditable-item-graph-service \
+    ./node_modules/@twin.org/api-core \
+    ./node_modules/@twin.org/entity
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
+COPY framework/packages/entity ./node_modules/@twin.org/entity/
+COPY auditable-item-graph/packages/auditable-item-graph-models ./node_modules/@twin.org/auditable-item-graph-models/
+COPY auditable-item-graph/packages/auditable-item-graph-rest-client ./node_modules/@twin.org/auditable-item-graph-rest-client/
+COPY auditable-item-graph/packages/auditable-item-graph-service ./node_modules/@twin.org/auditable-item-graph-service/
 COPY verifiable-storage/packages/verifiable-storage-connector-iota ./node_modules/@twin.org/verifiable-storage-connector-iota/
 COPY rights-management/packages/rights-management-rest-client ./node_modules/@twin.org/rights-management-rest-client/
 COPY rights-management/packages/rights-management-pnp-service ./node_modules/@twin.org/rights-management-pnp-service/
