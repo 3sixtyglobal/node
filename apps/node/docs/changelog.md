@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.29](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.28...node-v0.0.3-next.29) (2026-03-20)
+
+
+### Features
+
+* update dependencies ([aab05b5](https://github.com/twinfoundation/node/commit/aab05b552152a208a504fb9a080603f1990d4f79))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.28 to 0.0.3-next.29
+
 ## [0.0.3-next.28](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.27...node-v0.0.3-next.28) (2026-03-12)
 
 
