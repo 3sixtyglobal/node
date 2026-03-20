@@ -22,7 +22,7 @@ The param type.
 
 ### options? {#options}
 
-> `optional` **options**: `string`[]
+> `optional` **options?**: `string`[]
 
 Possible options for the param.
 
@@ -30,7 +30,7 @@ Possible options for the param.
 
 ### extendedType? {#extendedtype}
 
-> `optional` **extendedType**: `string`
+> `optional` **extendedType?**: `string`
 
 The extended type e.g. hex etc.
 
@@ -38,15 +38,21 @@ The extended type e.g. hex etc.
 
 ### required? {#required}
 
-> `optional` **required**: `boolean`
+> `optional` **required?**: `boolean`
 
 Whether the param is required.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
 ### defaultValue? {#defaultvalue}
 
-> `optional` **defaultValue**: [`CliCommandParamType`](../type-aliases/CliCommandParamType.md)
+> `optional` **defaultValue?**: [`CliCommandParamType`](../type-aliases/CliCommandParamType.md)
 
 The default value of the param.
 

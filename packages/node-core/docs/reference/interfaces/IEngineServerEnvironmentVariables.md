@@ -14,7 +14,7 @@ The engine server environment variables.
 
 ### debug? {#debug}
 
-> `optional` **debug**: `string`
+> `optional` **debug?**: `string`
 
 Start the engine in debug mode.
 
@@ -26,7 +26,7 @@ Start the engine in debug mode.
 
 ### silent? {#silent}
 
-> `optional` **silent**: `string`
+> `optional` **silent?**: `string`
 
 Start the engine in silent mode.
 
@@ -38,7 +38,7 @@ Start the engine in silent mode.
 
 ### storageFileRoot? {#storagefileroot}
 
-> `optional` **storageFileRoot**: `string`
+> `optional` **storageFileRoot?**: `string`
 
 The root directory for storing items like state file.
 
@@ -50,7 +50,7 @@ The root directory for storing items like state file.
 
 ### stateFilename? {#statefilename}
 
-> `optional` **stateFilename**: `string`
+> `optional` **stateFilename?**: `string`
 
 The name of the state file.
 
@@ -62,7 +62,7 @@ The name of the state file.
 
 ### nodeIdentityEnabled? {#nodeidentityenabled}
 
-> `optional` **nodeIdentityEnabled**: `string`
+> `optional` **nodeIdentityEnabled?**: `string`
 
 Does the node have a unique ID, defaults to true.
 
@@ -74,7 +74,7 @@ Does the node have a unique ID, defaults to true.
 
 ### tenantEnabled? {#tenantenabled}
 
-> `optional` **tenantEnabled**: `string`
+> `optional` **tenantEnabled?**: `string`
 
 Is multi-tenant support enabled, defaults to false.
 
@@ -86,7 +86,7 @@ Is multi-tenant support enabled, defaults to false.
 
 ### entityStorageConnectorType? {#entitystorageconnectortype}
 
-> `optional` **entityStorageConnectorType**: `string`
+> `optional` **entityStorageConnectorType?**: `string`
 
 The type of the entity storage to create, comma separate for more than one connector.
 values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
@@ -99,7 +99,7 @@ values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, m
 
 ### entityStorageConnectorDefault? {#entitystorageconnectordefault}
 
-> `optional` **entityStorageConnectorDefault**: `string`
+> `optional` **entityStorageConnectorDefault?**: `string`
 
 The default entity storage connector to use, defaults to the first one in the list.
 
@@ -111,7 +111,7 @@ The default entity storage connector to use, defaults to the first one in the li
 
 ### entityStorageTablePrefix? {#entitystoragetableprefix}
 
-> `optional` **entityStorageTablePrefix**: `string`
+> `optional` **entityStorageTablePrefix?**: `string`
 
 A prefix for all the table in entity-storage, can be empty.
 
@@ -123,7 +123,7 @@ A prefix for all the table in entity-storage, can be empty.
 
 ### awsDynamodbAuthMode? {#awsdynamodbauthmode}
 
-> `optional` **awsDynamodbAuthMode**: `string`
+> `optional` **awsDynamodbAuthMode?**: `string`
 
 AWS DynamoDB auth mode, either credentials or pod.
 
@@ -135,7 +135,7 @@ AWS DynamoDB auth mode, either credentials or pod.
 
 ### awsDynamodbAccessKeyId? {#awsdynamodbaccesskeyid}
 
-> `optional` **awsDynamodbAccessKeyId**: `string`
+> `optional` **awsDynamodbAccessKeyId?**: `string`
 
 AWS Dynamo DB access key id.
 
@@ -147,7 +147,7 @@ AWS Dynamo DB access key id.
 
 ### awsDynamodbEndpoint? {#awsdynamodbendpoint}
 
-> `optional` **awsDynamodbEndpoint**: `string`
+> `optional` **awsDynamodbEndpoint?**: `string`
 
 AWS Dynamo DB Endpoint if running local instance.
 
@@ -159,7 +159,7 @@ AWS Dynamo DB Endpoint if running local instance.
 
 ### awsDynamodbRegion? {#awsdynamodbregion}
 
-> `optional` **awsDynamodbRegion**: `string`
+> `optional` **awsDynamodbRegion?**: `string`
 
 AWS Dynamo DB region.
 
@@ -171,7 +171,7 @@ AWS Dynamo DB region.
 
 ### awsDynamodbSecretAccessKey? {#awsdynamodbsecretaccesskey}
 
-> `optional` **awsDynamodbSecretAccessKey**: `string`
+> `optional` **awsDynamodbSecretAccessKey?**: `string`
 
 AWS Dynamo DB secret access key.
 
@@ -183,7 +183,7 @@ AWS Dynamo DB secret access key.
 
 ### awsDynamodbConnectionTimeoutMs? {#awsdynamodbconnectiontimeoutms}
 
-> `optional` **awsDynamodbConnectionTimeoutMs**: `string`
+> `optional` **awsDynamodbConnectionTimeoutMs?**: `string`
 
 AWS Dynamo DB connection timeout.
 
@@ -195,7 +195,7 @@ AWS Dynamo DB connection timeout.
 
 ### azureCosmosdbKey? {#azurecosmosdbkey}
 
-> `optional` **azureCosmosdbKey**: `string`
+> `optional` **azureCosmosdbKey?**: `string`
 
 Azure Cosmos DB key.
 
@@ -207,7 +207,7 @@ Azure Cosmos DB key.
 
 ### azureCosmosdbContainerId? {#azurecosmosdbcontainerid}
 
-> `optional` **azureCosmosdbContainerId**: `string`
+> `optional` **azureCosmosdbContainerId?**: `string`
 
 Azure Cosmos DB container id.
 
@@ -219,7 +219,7 @@ Azure Cosmos DB container id.
 
 ### azureCosmosdbDatabaseId? {#azurecosmosdbdatabaseid}
 
-> `optional` **azureCosmosdbDatabaseId**: `string`
+> `optional` **azureCosmosdbDatabaseId?**: `string`
 
 Azure Cosmos DB database id.
 
@@ -231,7 +231,7 @@ Azure Cosmos DB database id.
 
 ### azureCosmosdbEndpoint? {#azurecosmosdbendpoint}
 
-> `optional` **azureCosmosdbEndpoint**: `string`
+> `optional` **azureCosmosdbEndpoint?**: `string`
 
 Azure Cosmos DB endpoint.
 
@@ -243,7 +243,7 @@ Azure Cosmos DB endpoint.
 
 ### gcpFirestoreCollectionName? {#gcpfirestorecollectionname}
 
-> `optional` **gcpFirestoreCollectionName**: `string`
+> `optional` **gcpFirestoreCollectionName?**: `string`
 
 GCP Firestore collection name.
 
@@ -255,7 +255,7 @@ GCP Firestore collection name.
 
 ### gcpFirestoreCredentials? {#gcpfirestorecredentials}
 
-> `optional` **gcpFirestoreCredentials**: `string`
+> `optional` **gcpFirestoreCredentials?**: `string`
 
 GCP Firestore credentials.
 
@@ -267,7 +267,7 @@ GCP Firestore credentials.
 
 ### gcpFirestoreDatabaseId? {#gcpfirestoredatabaseid}
 
-> `optional` **gcpFirestoreDatabaseId**: `string`
+> `optional` **gcpFirestoreDatabaseId?**: `string`
 
 GCP Firestore database id.
 
@@ -279,7 +279,7 @@ GCP Firestore database id.
 
 ### gcpFirestoreApiEndpoint? {#gcpfirestoreapiendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint**: `string`
+> `optional` **gcpFirestoreApiEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
@@ -291,7 +291,7 @@ GCP Firestore endpoint.
 
 ### gcpFirestoreProjectId? {#gcpfirestoreprojectid}
 
-> `optional` **gcpFirestoreProjectId**: `string`
+> `optional` **gcpFirestoreProjectId?**: `string`
 
 GCP Firestore project id.
 
@@ -303,7 +303,7 @@ GCP Firestore project id.
 
 ### scylladbHosts? {#scylladbhosts}
 
-> `optional` **scylladbHosts**: `string`
+> `optional` **scylladbHosts?**: `string`
 
 ScyllaDB hosts as comma separated string.
 
@@ -315,7 +315,7 @@ ScyllaDB hosts as comma separated string.
 
 ### scylladbKeyspace? {#scylladbkeyspace}
 
-> `optional` **scylladbKeyspace**: `string`
+> `optional` **scylladbKeyspace?**: `string`
 
 ScyllaDB keyspace.
 
@@ -327,7 +327,7 @@ ScyllaDB keyspace.
 
 ### scylladbLocalDataCenter? {#scylladblocaldatacenter}
 
-> `optional` **scylladbLocalDataCenter**: `string`
+> `optional` **scylladbLocalDataCenter?**: `string`
 
 ScyllaDB local data center.
 
@@ -339,7 +339,7 @@ ScyllaDB local data center.
 
 ### scylladbPort? {#scylladbport}
 
-> `optional` **scylladbPort**: `string`
+> `optional` **scylladbPort?**: `string`
 
 ScyllaDB port.
 
@@ -351,7 +351,7 @@ ScyllaDB port.
 
 ### mySqlHost? {#mysqlhost}
 
-> `optional` **mySqlHost**: `string`
+> `optional` **mySqlHost?**: `string`
 
 MySQL host.
 
@@ -363,7 +363,7 @@ MySQL host.
 
 ### mySqlPort? {#mysqlport}
 
-> `optional` **mySqlPort**: `number`
+> `optional` **mySqlPort?**: `number`
 
 MySQL port.
 
@@ -375,7 +375,7 @@ MySQL port.
 
 ### mySqlUser? {#mysqluser}
 
-> `optional` **mySqlUser**: `string`
+> `optional` **mySqlUser?**: `string`
 
 MySQL username.
 
@@ -387,7 +387,7 @@ MySQL username.
 
 ### mySqlPassword? {#mysqlpassword}
 
-> `optional` **mySqlPassword**: `string`
+> `optional` **mySqlPassword?**: `string`
 
 MySQL password.
 
@@ -399,7 +399,7 @@ MySQL password.
 
 ### mySqlDatabase? {#mysqldatabase}
 
-> `optional` **mySqlDatabase**: `string`
+> `optional` **mySqlDatabase?**: `string`
 
 MySQL Database.
 
@@ -411,7 +411,7 @@ MySQL Database.
 
 ### mongoDbHost? {#mongodbhost}
 
-> `optional` **mongoDbHost**: `string`
+> `optional` **mongoDbHost?**: `string`
 
 MongoDB host.
 
@@ -423,7 +423,7 @@ MongoDB host.
 
 ### mongoDbPort? {#mongodbport}
 
-> `optional` **mongoDbPort**: `number`
+> `optional` **mongoDbPort?**: `number`
 
 MongoDB port.
 
@@ -435,7 +435,7 @@ MongoDB port.
 
 ### mongoDbUser? {#mongodbuser}
 
-> `optional` **mongoDbUser**: `string`
+> `optional` **mongoDbUser?**: `string`
 
 MongoDB username.
 
@@ -447,7 +447,7 @@ MongoDB username.
 
 ### mongoDbPassword? {#mongodbpassword}
 
-> `optional` **mongoDbPassword**: `string`
+> `optional` **mongoDbPassword?**: `string`
 
 MongoDB password.
 
@@ -459,7 +459,7 @@ MongoDB password.
 
 ### mongoDbDatabase? {#mongodbdatabase}
 
-> `optional` **mongoDbDatabase**: `string`
+> `optional` **mongoDbDatabase?**: `string`
 
 MongoDB Database.
 
@@ -471,7 +471,7 @@ MongoDB Database.
 
 ### postgreSqlHost? {#postgresqlhost}
 
-> `optional` **postgreSqlHost**: `string`
+> `optional` **postgreSqlHost?**: `string`
 
 PostgreSQl host.
 
@@ -483,7 +483,7 @@ PostgreSQl host.
 
 ### postgreSqlPort? {#postgresqlport}
 
-> `optional` **postgreSqlPort**: `number`
+> `optional` **postgreSqlPort?**: `number`
 
 PostgreSQl port.
 
@@ -495,7 +495,7 @@ PostgreSQl port.
 
 ### postgreSqlUser? {#postgresqluser}
 
-> `optional` **postgreSqlUser**: `string`
+> `optional` **postgreSqlUser?**: `string`
 
 PostgreSQl username.
 
@@ -507,7 +507,7 @@ PostgreSQl username.
 
 ### postgreSqlPassword? {#postgresqlpassword}
 
-> `optional` **postgreSqlPassword**: `string`
+> `optional` **postgreSqlPassword?**: `string`
 
 PostgreSQl password.
 
@@ -519,7 +519,7 @@ PostgreSQl password.
 
 ### postgreSqlDatabase? {#postgresqldatabase}
 
-> `optional` **postgreSqlDatabase**: `string`
+> `optional` **postgreSqlDatabase?**: `string`
 
 PostgreSQl Database.
 
@@ -531,7 +531,7 @@ PostgreSQl Database.
 
 ### ipfsBearerToken? {#ipfsbearertoken}
 
-> `optional` **ipfsBearerToken**: `string`
+> `optional` **ipfsBearerToken?**: `string`
 
 The security token for accessing IPFS API.
 
@@ -543,7 +543,7 @@ The security token for accessing IPFS API.
 
 ### ipfsApiUrl? {#ipfsapiurl}
 
-> `optional` **ipfsApiUrl**: `string`
+> `optional` **ipfsApiUrl?**: `string`
 
 The url for accessing IPFS API.
 
@@ -555,7 +555,7 @@ The url for accessing IPFS API.
 
 ### blobStorageConnectorType? {#blobstorageconnectortype}
 
-> `optional` **blobStorageConnectorType**: `string`
+> `optional` **blobStorageConnectorType?**: `string`
 
 The type of the entity storage to create, comma separate for more than one connector.
 values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
@@ -568,7 +568,7 @@ values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
 
 ### blobStorageConnectorDefault? {#blobstorageconnectordefault}
 
-> `optional` **blobStorageConnectorDefault**: `string`
+> `optional` **blobStorageConnectorDefault?**: `string`
 
 The default blob storage connector to use, defaults to the first one in the list.
 
@@ -580,7 +580,7 @@ The default blob storage connector to use, defaults to the first one in the list
 
 ### blobStorageConnectorPublic? {#blobstorageconnectorpublic}
 
-> `optional` **blobStorageConnectorPublic**: `string`
+> `optional` **blobStorageConnectorPublic?**: `string`
 
 Blog storage connector which has public access.
 
@@ -592,7 +592,7 @@ Blog storage connector which has public access.
 
 ### blobStorageEnableEncryption? {#blobstorageenableencryption}
 
-> `optional` **blobStorageEnableEncryption**: `string`
+> `optional` **blobStorageEnableEncryption?**: `string`
 
 Enable encryption for the blob storage.
 
@@ -604,7 +604,7 @@ Enable encryption for the blob storage.
 
 ### blobStorageEncryptionKeyId? {#blobstorageencryptionkeyid}
 
-> `optional` **blobStorageEncryptionKeyId**: `string`
+> `optional` **blobStorageEncryptionKeyId?**: `string`
 
 The id of the encryption key for the blob storage.
 
@@ -616,7 +616,7 @@ The id of the encryption key for the blob storage.
 
 ### blobStoragePrefix? {#blobstorageprefix}
 
-> `optional` **blobStoragePrefix**: `string`
+> `optional` **blobStoragePrefix?**: `string`
 
 A prefix for all the blobs in blob-storage, can be empty.
 
@@ -628,7 +628,7 @@ A prefix for all the blobs in blob-storage, can be empty.
 
 ### awsS3Region? {#awss3region}
 
-> `optional` **awsS3Region**: `string`
+> `optional` **awsS3Region?**: `string`
 
 AWS S3 region.
 
@@ -640,7 +640,7 @@ AWS S3 region.
 
 ### awsS3BucketName? {#awss3bucketname}
 
-> `optional` **awsS3BucketName**: `string`
+> `optional` **awsS3BucketName?**: `string`
 
 AWS S3 bucket name.
 
@@ -652,7 +652,7 @@ AWS S3 bucket name.
 
 ### awsS3AuthMode? {#awss3authmode}
 
-> `optional` **awsS3AuthMode**: `string`
+> `optional` **awsS3AuthMode?**: `string`
 
 AWS S3 auth mode, either credentials or pod, defaults to credentials.
 
@@ -664,7 +664,7 @@ AWS S3 auth mode, either credentials or pod, defaults to credentials.
 
 ### awsS3AccessKeyId? {#awss3accesskeyid}
 
-> `optional` **awsS3AccessKeyId**: `string`
+> `optional` **awsS3AccessKeyId?**: `string`
 
 AWS S3 access key id.
 
@@ -676,7 +676,7 @@ AWS S3 access key id.
 
 ### awsS3SecretAccessKey? {#awss3secretaccesskey}
 
-> `optional` **awsS3SecretAccessKey**: `string`
+> `optional` **awsS3SecretAccessKey?**: `string`
 
 AWS S3 secret access key.
 
@@ -688,7 +688,7 @@ AWS S3 secret access key.
 
 ### awsS3Endpoint? {#awss3endpoint}
 
-> `optional` **awsS3Endpoint**: `string`
+> `optional` **awsS3Endpoint?**: `string`
 
 AWS S3 endpoint.
 
@@ -700,7 +700,7 @@ AWS S3 endpoint.
 
 ### azureStorageAccountKey? {#azurestorageaccountkey}
 
-> `optional` **azureStorageAccountKey**: `string`
+> `optional` **azureStorageAccountKey?**: `string`
 
 Azure Storage account key.
 
@@ -712,7 +712,7 @@ Azure Storage account key.
 
 ### azureStorageAccountName? {#azurestorageaccountname}
 
-> `optional` **azureStorageAccountName**: `string`
+> `optional` **azureStorageAccountName?**: `string`
 
 Azure Storage account name.
 
@@ -724,7 +724,7 @@ Azure Storage account name.
 
 ### azureStorageContainerName? {#azurestoragecontainername}
 
-> `optional` **azureStorageContainerName**: `string`
+> `optional` **azureStorageContainerName?**: `string`
 
 Azure Storage container.
 
@@ -736,7 +736,7 @@ Azure Storage container.
 
 ### azureStorageEndpoint? {#azurestorageendpoint}
 
-> `optional` **azureStorageEndpoint**: `string`
+> `optional` **azureStorageEndpoint?**: `string`
 
 Azure Storage endpoint.
 
@@ -748,7 +748,7 @@ Azure Storage endpoint.
 
 ### gcpStorageBucketName? {#gcpstoragebucketname}
 
-> `optional` **gcpStorageBucketName**: `string`
+> `optional` **gcpStorageBucketName?**: `string`
 
 GCP Storage bucket.
 
@@ -760,7 +760,7 @@ GCP Storage bucket.
 
 ### gcpStorageCredentials? {#gcpstoragecredentials}
 
-> `optional` **gcpStorageCredentials**: `string`
+> `optional` **gcpStorageCredentials?**: `string`
 
 GCP Storage credentials.
 
@@ -772,7 +772,7 @@ GCP Storage credentials.
 
 ### gcpStorageEndpoint? {#gcpstorageendpoint}
 
-> `optional` **gcpStorageEndpoint**: `string`
+> `optional` **gcpStorageEndpoint?**: `string`
 
 GCP Storage endpoint.
 
@@ -784,7 +784,7 @@ GCP Storage endpoint.
 
 ### gcpStorageProjectId? {#gcpstorageprojectid}
 
-> `optional` **gcpStorageProjectId**: `string`
+> `optional` **gcpStorageProjectId?**: `string`
 
 GCP Storage project id.
 
@@ -796,7 +796,7 @@ GCP Storage project id.
 
 ### vaultConnector? {#vaultconnector}
 
-> `optional` **vaultConnector**: `string`
+> `optional` **vaultConnector?**: `string`
 
 The type of the default vault connector: entity-storage, hashicorp.
 
@@ -808,7 +808,7 @@ The type of the default vault connector: entity-storage, hashicorp.
 
 ### vaultPrefix? {#vaultprefix}
 
-> `optional` **vaultPrefix**: `string`
+> `optional` **vaultPrefix?**: `string`
 
 Prefix to prepend to entries in the vault.
 
@@ -820,7 +820,7 @@ Prefix to prepend to entries in the vault.
 
 ### hashicorpVaultToken? {#hashicorpvaulttoken}
 
-> `optional` **hashicorpVaultToken**: `string`
+> `optional` **hashicorpVaultToken?**: `string`
 
 Hashicorp Vault token.
 
@@ -832,7 +832,7 @@ Hashicorp Vault token.
 
 ### hashicorpVaultEndpoint? {#hashicorpvaultendpoint}
 
-> `optional` **hashicorpVaultEndpoint**: `string`
+> `optional` **hashicorpVaultEndpoint?**: `string`
 
 Hashicorp Vault endpoint.
 
@@ -844,7 +844,7 @@ Hashicorp Vault endpoint.
 
 ### loggingConnector? {#loggingconnector}
 
-> `optional` **loggingConnector**: `string`
+> `optional` **loggingConnector?**: `string`
 
 The type of logging task connector, can be a comma separated list: console, entity-storage.
 
@@ -856,7 +856,7 @@ The type of logging task connector, can be a comma separated list: console, enti
 
 ### eventBusConnector? {#eventbusconnector}
 
-> `optional` **eventBusConnector**: `string`
+> `optional` **eventBusConnector?**: `string`
 
 The type of event bus connector: local.
 
@@ -868,7 +868,7 @@ The type of event bus connector: local.
 
 ### eventBusComponent? {#eventbuscomponent}
 
-> `optional` **eventBusComponent**: `string`
+> `optional` **eventBusComponent?**: `string`
 
 The type of event bus component: service.
 
@@ -880,7 +880,7 @@ The type of event bus component: service.
 
 ### messagingEnabled? {#messagingenabled}
 
-> `optional` **messagingEnabled**: `string`
+> `optional` **messagingEnabled?**: `string`
 
 Are the messaging components enabled, defaults to false.
 
@@ -892,7 +892,7 @@ Are the messaging components enabled, defaults to false.
 
 ### awsSesRegion? {#awssesregion}
 
-> `optional` **awsSesRegion**: `string`
+> `optional` **awsSesRegion?**: `string`
 
 AWS SES region.
 
@@ -904,7 +904,7 @@ AWS SES region.
 
 ### awsSesAuthMode? {#awssesauthmode}
 
-> `optional` **awsSesAuthMode**: `string`
+> `optional` **awsSesAuthMode?**: `string`
 
 AWS SES auth mode, either credentials or pod, defaults to credentials.
 
@@ -916,7 +916,7 @@ AWS SES auth mode, either credentials or pod, defaults to credentials.
 
 ### awsSesSecretAccessKey? {#awssessecretaccesskey}
 
-> `optional` **awsSesSecretAccessKey**: `string`
+> `optional` **awsSesSecretAccessKey?**: `string`
 
 AWS SES secret access key.
 
@@ -928,7 +928,7 @@ AWS SES secret access key.
 
 ### awsSesAccessKeyId? {#awssesaccesskeyid}
 
-> `optional` **awsSesAccessKeyId**: `string`
+> `optional` **awsSesAccessKeyId?**: `string`
 
 AWS SES access key id.
 
@@ -940,7 +940,7 @@ AWS SES access key id.
 
 ### awsSesEndpoint? {#awssesendpoint}
 
-> `optional` **awsSesEndpoint**: `string`
+> `optional` **awsSesEndpoint?**: `string`
 
 AWS SES endpoint.
 
@@ -952,7 +952,7 @@ AWS SES endpoint.
 
 ### awsMessagingPushNotificationApplications? {#awsmessagingpushnotificationapplications}
 
-> `optional` **awsMessagingPushNotificationApplications**: `string`
+> `optional` **awsMessagingPushNotificationApplications?**: `string`
 
 The applications for the push notifications reference a separate json with @json: prefix.
 
@@ -964,7 +964,7 @@ The applications for the push notifications reference a separate json with @json
 
 ### messagingEmailConnector? {#messagingemailconnector}
 
-> `optional` **messagingEmailConnector**: `string`
+> `optional` **messagingEmailConnector?**: `string`
 
 The type of messaging email connector: entity-storage, aws.
 
@@ -976,7 +976,7 @@ The type of messaging email connector: entity-storage, aws.
 
 ### messagingSmsConnector? {#messagingsmsconnector}
 
-> `optional` **messagingSmsConnector**: `string`
+> `optional` **messagingSmsConnector?**: `string`
 
 The type of messaging sms connector: entity-storage, aws.
 
@@ -988,7 +988,7 @@ The type of messaging sms connector: entity-storage, aws.
 
 ### messagingPushNotificationConnector? {#messagingpushnotificationconnector}
 
-> `optional` **messagingPushNotificationConnector**: `string`
+> `optional` **messagingPushNotificationConnector?**: `string`
 
 The type of messaging push notification connector: entity-storage, aws.
 
@@ -1000,7 +1000,7 @@ The type of messaging push notification connector: entity-storage, aws.
 
 ### telemetryConnector? {#telemetryconnector}
 
-> `optional` **telemetryConnector**: `string`
+> `optional` **telemetryConnector?**: `string`
 
 The type of telemetry connector: entity-storage.
 
@@ -1012,7 +1012,7 @@ The type of telemetry connector: entity-storage.
 
 ### faucetConnector? {#faucetconnector}
 
-> `optional` **faucetConnector**: `string`
+> `optional` **faucetConnector?**: `string`
 
 The type of faucet connector: entity-storage, iota.
 
@@ -1024,7 +1024,7 @@ The type of faucet connector: entity-storage, iota.
 
 ### walletConnector? {#walletconnector}
 
-> `optional` **walletConnector**: `string`
+> `optional` **walletConnector?**: `string`
 
 The type of wallet connector: entity-storage, iota.
 
@@ -1036,7 +1036,7 @@ The type of wallet connector: entity-storage, iota.
 
 ### nftConnector? {#nftconnector}
 
-> `optional` **nftConnector**: `string`
+> `optional` **nftConnector?**: `string`
 
 The type of NFT connector: entity-storage, iota.
 
@@ -1048,7 +1048,7 @@ The type of NFT connector: entity-storage, iota.
 
 ### identityConnector? {#identityconnector}
 
-> `optional` **identityConnector**: `string`
+> `optional` **identityConnector?**: `string`
 
 The type of identity connector: entity-storage, iota.
 
@@ -1060,7 +1060,7 @@ The type of identity connector: entity-storage, iota.
 
 ### identityWalletAddressIndex? {#identitywalletaddressindex}
 
-> `optional` **identityWalletAddressIndex**: `string`
+> `optional` **identityWalletAddressIndex?**: `string`
 
 The index of the wallet address to use, defaults to 0.
 
@@ -1072,7 +1072,7 @@ The index of the wallet address to use, defaults to 0.
 
 ### identityResolverConnector? {#identityresolverconnector}
 
-> `optional` **identityResolverConnector**: `string`
+> `optional` **identityResolverConnector?**: `string`
 
 The type of identity resolver connector: entity-storage, iota.
 
@@ -1084,7 +1084,7 @@ The type of identity resolver connector: entity-storage, iota.
 
 ### verifiableStorageConnector? {#verifiablestorageconnector}
 
-> `optional` **verifiableStorageConnector**: `string`
+> `optional` **verifiableStorageConnector?**: `string`
 
 The type of verifiable storage connector: entity-storage, iota.
 
@@ -1096,7 +1096,7 @@ The type of verifiable storage connector: entity-storage, iota.
 
 ### iotaFaucetEndpoint? {#iotafaucetendpoint}
 
-> `optional` **iotaFaucetEndpoint**: `string`
+> `optional` **iotaFaucetEndpoint?**: `string`
 
 IOTA Faucet Endpoint.
 
@@ -1108,7 +1108,7 @@ IOTA Faucet Endpoint.
 
 ### iotaNodeEndpoint? {#iotanodeendpoint}
 
-> `optional` **iotaNodeEndpoint**: `string`
+> `optional` **iotaNodeEndpoint?**: `string`
 
 IOTA Node Endpoint.
 
@@ -1120,7 +1120,7 @@ IOTA Node Endpoint.
 
 ### iotaNetwork? {#iotanetwork}
 
-> `optional` **iotaNetwork**: `string`
+> `optional` **iotaNetwork?**: `string`
 
 IOTA network.
 
@@ -1132,7 +1132,7 @@ IOTA network.
 
 ### iotaCoinType? {#iotacointype}
 
-> `optional` **iotaCoinType**: `string`
+> `optional` **iotaCoinType?**: `string`
 
 IOTA coin type.
 
@@ -1144,7 +1144,7 @@ IOTA coin type.
 
 ### iotaExplorerEndpoint? {#iotaexplorerendpoint}
 
-> `optional` **iotaExplorerEndpoint**: `string`
+> `optional` **iotaExplorerEndpoint?**: `string`
 
 IOTA Explorer Endpoint.
 
@@ -1156,7 +1156,7 @@ IOTA Explorer Endpoint.
 
 ### iotaGasStationEndpoint? {#iotagasstationendpoint}
 
-> `optional` **iotaGasStationEndpoint**: `string`
+> `optional` **iotaGasStationEndpoint?**: `string`
 
 IOTA Gas Station Endpoint.
 
@@ -1168,7 +1168,7 @@ IOTA Gas Station Endpoint.
 
 ### iotaGasStationAuthToken? {#iotagasstationauthtoken}
 
-> `optional` **iotaGasStationAuthToken**: `string`
+> `optional` **iotaGasStationAuthToken?**: `string`
 
 IOTA Gas Station Authentication Token.
 
@@ -1180,7 +1180,7 @@ IOTA Gas Station Authentication Token.
 
 ### universalResolverEndpoint? {#universalresolverendpoint}
 
-> `optional` **universalResolverEndpoint**: `string`
+> `optional` **universalResolverEndpoint?**: `string`
 
 Universal Resolver Endpoint.
 
@@ -1192,7 +1192,7 @@ Universal Resolver Endpoint.
 
 ### identityProfileConnector? {#identityprofileconnector}
 
-> `optional` **identityProfileConnector**: `string`
+> `optional` **identityProfileConnector?**: `string`
 
 The type of identity profile connector: entity-storage.
 
@@ -1204,7 +1204,7 @@ The type of identity profile connector: entity-storage.
 
 ### immutableProofVerificationMethodId? {#immutableproofverificationmethodid}
 
-> `optional` **immutableProofVerificationMethodId**: `string`
+> `optional` **immutableProofVerificationMethodId?**: `string`
 
 The identity verification method id to use with immutable proofs.
 
@@ -1216,7 +1216,7 @@ The identity verification method id to use with immutable proofs.
 
 ### attestationConnector? {#attestationconnector}
 
-> `optional` **attestationConnector**: `string`
+> `optional` **attestationConnector?**: `string`
 
 The type of attestation connector: entity-storage, iota.
 
@@ -1228,7 +1228,7 @@ The type of attestation connector: entity-storage, iota.
 
 ### attestationVerificationMethodId? {#attestationverificationmethodid}
 
-> `optional` **attestationVerificationMethodId**: `string`
+> `optional` **attestationVerificationMethodId?**: `string`
 
 The identity verification method id to use with attestation.
 
@@ -1240,7 +1240,7 @@ The identity verification method id to use with attestation.
 
 ### dataProcessingEnabled? {#dataprocessingenabled}
 
-> `optional` **dataProcessingEnabled**: `string`
+> `optional` **dataProcessingEnabled?**: `string`
 
 Is the data processing enabled, defaults to false.
 
@@ -1252,7 +1252,7 @@ Is the data processing enabled, defaults to false.
 
 ### dataConverterConnectors? {#dataconverterconnectors}
 
-> `optional` **dataConverterConnectors**: `string`
+> `optional` **dataConverterConnectors?**: `string`
 
 The type of the default data converters, can be a comma separated list: json, xml.
 
@@ -1264,7 +1264,7 @@ The type of the default data converters, can be a comma separated list: json, xm
 
 ### dataExtractorConnectors? {#dataextractorconnectors}
 
-> `optional` **dataExtractorConnectors**: `string`
+> `optional` **dataExtractorConnectors?**: `string`
 
 The type of the default data extractor, can be a comma separated list: json-path.
 
@@ -1276,7 +1276,7 @@ The type of the default data extractor, can be a comma separated list: json-path
 
 ### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
-> `optional` **auditableItemGraphEnabled**: `string`
+> `optional` **auditableItemGraphEnabled?**: `string`
 
 Is the auditable item graph enabled, defaults to false.
 
@@ -1288,7 +1288,7 @@ Is the auditable item graph enabled, defaults to false.
 
 ### auditableItemStreamEnabled? {#auditableitemstreamenabled}
 
-> `optional` **auditableItemStreamEnabled**: `string`
+> `optional` **auditableItemStreamEnabled?**: `string`
 
 Is the auditable item stream enabled, defaults to false.
 
@@ -1300,7 +1300,7 @@ Is the auditable item stream enabled, defaults to false.
 
 ### documentManagementEnabled? {#documentmanagementenabled}
 
-> `optional` **documentManagementEnabled**: `string`
+> `optional` **documentManagementEnabled?**: `string`
 
 Is the document management enabled, defaults to false.
 
@@ -1312,7 +1312,7 @@ Is the document management enabled, defaults to false.
 
 ### synchronisedStorageEnabled? {#synchronisedstorageenabled}
 
-> `optional` **synchronisedStorageEnabled**: `string`
+> `optional` **synchronisedStorageEnabled?**: `string`
 
 Is the synchronised storage enabled, defaults to false.
 
@@ -1324,7 +1324,7 @@ Is the synchronised storage enabled, defaults to false.
 
 ### synchronisedStorageTrustedUrl? {#synchronisedstoragetrustedurl}
 
-> `optional` **synchronisedStorageTrustedUrl**: `string`
+> `optional` **synchronisedStorageTrustedUrl?**: `string`
 
 Url which points to the api for a trusted synchronised storage node, not required if this is a trusted node.
 
@@ -1336,7 +1336,7 @@ Url which points to the api for a trusted synchronised storage node, not require
 
 ### synchronisedStorageVerifiableStorageKeyId? {#synchronisedstorageverifiablestoragekeyid}
 
-> `optional` **synchronisedStorageVerifiableStorageKeyId**: `string`
+> `optional` **synchronisedStorageVerifiableStorageKeyId?**: `string`
 
 The key for the smart contract which contains the verifiable storage pointer store for synchronised storage.
 This only required if using a custom verifiable storage item, otherwise it will default to the network name.
@@ -1349,7 +1349,7 @@ This only required if using a custom verifiable storage item, otherwise it will 
 
 ### synchronisedStorageBlobStorageEncryptionKeyId? {#synchronisedstorageblobstorageencryptionkeyid}
 
-> `optional` **synchronisedStorageBlobStorageEncryptionKeyId**: `string`
+> `optional` **synchronisedStorageBlobStorageEncryptionKeyId?**: `string`
 
 The key from the vault which is used to encrypt the synchronised storage blobs.
 Only required for trusted nodes, as regular nodes will request from the trusted nodes.
@@ -1363,7 +1363,7 @@ Defaults to synchronised-storage-blob-encryption
 
 ### synchronisedStorageBlobStorageKey? {#synchronisedstorageblobstoragekey}
 
-> `optional` **synchronisedStorageBlobStorageKey**: `string`
+> `optional` **synchronisedStorageBlobStorageKey?**: `string`
 
 The key used for blob encryption, should be ChaCha20Poly1305 encoded as base64.
 Only required for trusted nodes, as regular nodes will not write encrypted data.
@@ -1376,9 +1376,15 @@ Only required for trusted nodes, as regular nodes will not write encrypted data.
 
 ### synchronisedStorageEntityUpdateIntervalMinutes? {#synchronisedstorageentityupdateintervalminutes}
 
-> `optional` **synchronisedStorageEntityUpdateIntervalMinutes**: `string`
+> `optional` **synchronisedStorageEntityUpdateIntervalMinutes?**: `string`
 
 How often to check for entity updates in minutes.
+
+#### Default
+
+```ts
+5
+```
 
 #### Inherited from
 
@@ -1388,9 +1394,15 @@ How often to check for entity updates in minutes.
 
 ### synchronisedStorageConsolidationIntervalMinutes? {#synchronisedstorageconsolidationintervalminutes}
 
-> `optional` **synchronisedStorageConsolidationIntervalMinutes**: `string`
+> `optional` **synchronisedStorageConsolidationIntervalMinutes?**: `string`
 
 Interval to perform consolidation of changesets, only used if this is a trusted node.
+
+#### Default
+
+```ts
+60
+```
 
 #### Inherited from
 
@@ -1400,9 +1412,15 @@ Interval to perform consolidation of changesets, only used if this is a trusted 
 
 ### synchronisedStorageConsolidationBatchSize? {#synchronisedstorageconsolidationbatchsize}
 
-> `optional` **synchronisedStorageConsolidationBatchSize**: `string`
+> `optional` **synchronisedStorageConsolidationBatchSize?**: `string`
 
 The number of entities to process in a single consolidation batch, only used if this is a trusted node.
+
+#### Default
+
+```ts
+1000
+```
 
 #### Inherited from
 
@@ -1412,9 +1430,15 @@ The number of entities to process in a single consolidation batch, only used if 
 
 ### synchronisedStorageMaxConsolidations? {#synchronisedstoragemaxconsolidations}
 
-> `optional` **synchronisedStorageMaxConsolidations**: `string`
+> `optional` **synchronisedStorageMaxConsolidations?**: `string`
 
 The maximum number of consolidations to keep in storage, only used if this is a trusted node.
+
+#### Default
+
+```ts
+5
+```
 
 #### Inherited from
 
@@ -1424,7 +1448,7 @@ The maximum number of consolidations to keep in storage, only used if this is a 
 
 ### federatedCatalogueEnabled? {#federatedcatalogueenabled}
 
-> `optional` **federatedCatalogueEnabled**: `string`
+> `optional` **federatedCatalogueEnabled?**: `string`
 
 Is the federated catalogue enabled, defaults to false.
 
@@ -1436,7 +1460,7 @@ Is the federated catalogue enabled, defaults to false.
 
 ### federatedCatalogueFilters? {#federatedcataloguefilters}
 
-> `optional` **federatedCatalogueFilters**: `string`
+> `optional` **federatedCatalogueFilters?**: `string`
 
 Federated catalog filters, command separated list of filters to add.
 
@@ -1448,7 +1472,7 @@ Federated catalog filters, command separated list of filters to add.
 
 ### trustEnabled? {#trustenabled}
 
-> `optional` **trustEnabled**: `string`
+> `optional` **trustEnabled?**: `string`
 
 Is the trust management enabled, defaults to false.
 
@@ -1460,7 +1484,7 @@ Is the trust management enabled, defaults to false.
 
 ### trustGenerators? {#trustgenerators}
 
-> `optional` **trustGenerators**: `string`
+> `optional` **trustGenerators?**: `string`
 
 The trust generators to add to the factory, comma separated list.
 
@@ -1472,7 +1496,7 @@ The trust generators to add to the factory, comma separated list.
 
 ### trustVerifiers? {#trustverifiers}
 
-> `optional` **trustVerifiers**: `string`
+> `optional` **trustVerifiers?**: `string`
 
 The trust verifiers to add to the factory, comma separated list.
 
@@ -1484,7 +1508,7 @@ The trust verifiers to add to the factory, comma separated list.
 
 ### trustVerificationMethodId? {#trustverificationmethodid}
 
-> `optional` **trustVerificationMethodId**: `string`
+> `optional` **trustVerificationMethodId?**: `string`
 
 The verification method to use for trust identities.
 Defaults to trust-assertion.
@@ -1497,7 +1521,7 @@ Defaults to trust-assertion.
 
 ### trustJwtTtlSeconds? {#trustjwtttlseconds}
 
-> `optional` **trustJwtTtlSeconds**: `string`
+> `optional` **trustJwtTtlSeconds?**: `string`
 
 The trust time to live for generating JWTs.
 Defaults to undefined for never expiring.
@@ -1510,7 +1534,7 @@ Defaults to undefined for never expiring.
 
 ### rightsManagementEnabled? {#rightsmanagementenabled}
 
-> `optional` **rightsManagementEnabled**: `string`
+> `optional` **rightsManagementEnabled?**: `string`
 
 Is the rights management enabled, defaults to false.
 
@@ -1522,7 +1546,7 @@ Is the rights management enabled, defaults to false.
 
 ### rightsManagementCallbackPath? {#rightsmanagementcallbackpath}
 
-> `optional` **rightsManagementCallbackPath**: `string`
+> `optional` **rightsManagementCallbackPath?**: `string`
 
 What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
 
@@ -1534,7 +1558,7 @@ What is the callback path for rights management negotiations, will be combined w
 
 ### rightsManagementPolicyInformationSources? {#rightsmanagementpolicyinformationsources}
 
-> `optional` **rightsManagementPolicyInformationSources**: `string`
+> `optional` **rightsManagementPolicyInformationSources?**: `string`
 
 The rights management policy information sources to add to the factory.
 
@@ -1546,7 +1570,7 @@ The rights management policy information sources to add to the factory.
 
 ### rightsManagementPolicyNegotiators? {#rightsmanagementpolicynegotiators}
 
-> `optional` **rightsManagementPolicyNegotiators**: `string`
+> `optional` **rightsManagementPolicyNegotiators?**: `string`
 
 The rights management policy negotiators sources to add to the factory.
 
@@ -1558,7 +1582,7 @@ The rights management policy negotiators sources to add to the factory.
 
 ### rightsManagementPolicyRequesters? {#rightsmanagementpolicyrequesters}
 
-> `optional` **rightsManagementPolicyRequesters**: `string`
+> `optional` **rightsManagementPolicyRequesters?**: `string`
 
 The rights management policy requesters to add to the factory.
 
@@ -1570,7 +1594,7 @@ The rights management policy requesters to add to the factory.
 
 ### rightsManagementPolicyExecutionActions? {#rightsmanagementpolicyexecutionactions}
 
-> `optional` **rightsManagementPolicyExecutionActions**: `string`
+> `optional` **rightsManagementPolicyExecutionActions?**: `string`
 
 The rights management policy execution actions to add to the factory.
 
@@ -1582,7 +1606,7 @@ The rights management policy execution actions to add to the factory.
 
 ### rightsManagementPolicyEnforcementProcessors? {#rightsmanagementpolicyenforcementprocessors}
 
-> `optional` **rightsManagementPolicyEnforcementProcessors**: `string`
+> `optional` **rightsManagementPolicyEnforcementProcessors?**: `string`
 
 The rights management policy enforcement processors to add to the factory.
 
@@ -1594,7 +1618,7 @@ The rights management policy enforcement processors to add to the factory.
 
 ### rightsManagementPolicyArbiters? {#rightsmanagementpolicyarbiters}
 
-> `optional` **rightsManagementPolicyArbiters**: `string`
+> `optional` **rightsManagementPolicyArbiters?**: `string`
 
 The rights management policy arbiters to add to the factory.
 
@@ -1606,7 +1630,7 @@ The rights management policy arbiters to add to the factory.
 
 ### rightsManagementPolicyObligationEnforcers? {#rightsmanagementpolicyobligationenforcers}
 
-> `optional` **rightsManagementPolicyObligationEnforcers**: `string`
+> `optional` **rightsManagementPolicyObligationEnforcers?**: `string`
 
 The rights management policy obligation enforcers to add to the factory.
 
@@ -1618,7 +1642,7 @@ The rights management policy obligation enforcers to add to the factory.
 
 ### backgroundTasksEnabled? {#backgroundtasksenabled}
 
-> `optional` **backgroundTasksEnabled**: `string`
+> `optional` **backgroundTasksEnabled?**: `string`
 
 Are background tasks enabled, defaults to false.
 
@@ -1630,7 +1654,7 @@ Are background tasks enabled, defaults to false.
 
 ### taskSchedulerEnabled? {#taskschedulerenabled}
 
-> `optional` **taskSchedulerEnabled**: `string`
+> `optional` **taskSchedulerEnabled?**: `string`
 
 Is the task scheduler enabled, defaults to false.
 
@@ -1642,7 +1666,7 @@ Is the task scheduler enabled, defaults to false.
 
 ### dataspaceEnabled? {#dataspaceenabled}
 
-> `optional` **dataspaceEnabled**: `string`
+> `optional` **dataspaceEnabled?**: `string`
 
 Is the dataspace enabled, defaults to false.
 
@@ -1654,9 +1678,15 @@ Is the dataspace enabled, defaults to false.
 
 ### dataspaceRetainActivityLogsFor? {#dataspaceretainactivitylogsfor}
 
-> `optional` **dataspaceRetainActivityLogsFor**: `string`
+> `optional` **dataspaceRetainActivityLogsFor?**: `string`
 
 The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
+
+#### Default
+
+```ts
+10
+```
 
 #### Inherited from
 
@@ -1666,9 +1696,15 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 ### dataspaceActivityLogsCleanUpInterval? {#dataspaceactivitylogscleanupinterval}
 
-> `optional` **dataspaceActivityLogsCleanUpInterval**: `string`
+> `optional` **dataspaceActivityLogsCleanUpInterval?**: `string`
 
 The interval for cleaning up the activity logs.
+
+#### Default
+
+```ts
+60
+```
 
 #### Inherited from
 
@@ -1678,7 +1714,7 @@ The interval for cleaning up the activity logs.
 
 ### dataspaceDataPlanePath? {#dataspacedataplanepath}
 
-> `optional` **dataspaceDataPlanePath**: `string`
+> `optional` **dataspaceDataPlanePath?**: `string`
 
 The data plane path for PULL transfers (path only, not full URL).
 Will be combined with public origin from hosting component.
@@ -1693,7 +1729,7 @@ Example: "dataspace/entities"
 
 ### extensions? {#extensions}
 
-> `optional` **extensions**: `string`
+> `optional` **extensions?**: `string`
 
 A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
 
@@ -1705,7 +1741,7 @@ A comma separated list of additional node extensions to load, the initialiseExte
 
 ### port? {#port}
 
-> `optional` **port**: `string`
+> `optional` **port?**: `string`
 
 The port to serve the API from.
 
@@ -1713,7 +1749,7 @@ The port to serve the API from.
 
 ### host? {#host}
 
-> `optional` **host**: `string`
+> `optional` **host?**: `string`
 
 The host to serve the API from.
 
@@ -1721,7 +1757,7 @@ The host to serve the API from.
 
 ### corsOrigins? {#corsorigins}
 
-> `optional` **corsOrigins**: `string`
+> `optional` **corsOrigins?**: `string`
 
 The CORS origins to allow, defaults to *.
 
@@ -1729,7 +1765,7 @@ The CORS origins to allow, defaults to *.
 
 ### httpMethods? {#httpmethods}
 
-> `optional` **httpMethods**: `string`
+> `optional` **httpMethods?**: `string`
 
 The CORS methods to allow, defaults to GET, POST, PUT, DELETE, OPTIONS.
 
@@ -1737,7 +1773,7 @@ The CORS methods to allow, defaults to GET, POST, PUT, DELETE, OPTIONS.
 
 ### httpAllowedHeaders? {#httpallowedheaders}
 
-> `optional` **httpAllowedHeaders**: `string`
+> `optional` **httpAllowedHeaders?**: `string`
 
 The CORS headers to allow.
 
@@ -1745,7 +1781,7 @@ The CORS headers to allow.
 
 ### httpExposedHeaders? {#httpexposedheaders}
 
-> `optional` **httpExposedHeaders**: `string`
+> `optional` **httpExposedHeaders?**: `string`
 
 The CORS headers to expose.
 
@@ -1753,7 +1789,7 @@ The CORS headers to expose.
 
 ### publicOrigin? {#publicorigin}
 
-> `optional` **publicOrigin**: `string`
+> `optional` **publicOrigin?**: `string`
 
 The public origin URL for the API e.g. https://api.example.com:1234
 
@@ -1761,7 +1797,7 @@ The public origin URL for the API e.g. https://api.example.com:1234
 
 ### authAdminProcessorType? {#authadminprocessortype}
 
-> `optional` **authAdminProcessorType**: `string`
+> `optional` **authAdminProcessorType?**: `string`
 
 The type of auth admin processor to use on the API: entity-storage.
 
@@ -1769,7 +1805,7 @@ The type of auth admin processor to use on the API: entity-storage.
 
 ### authProcessorType? {#authprocessortype}
 
-> `optional` **authProcessorType**: `string`
+> `optional` **authProcessorType?**: `string`
 
 The type of auth processor to use on the API: entity-storage.
 
@@ -1777,7 +1813,7 @@ The type of auth processor to use on the API: entity-storage.
 
 ### authSigningKeyId? {#authsigningkeyid}
 
-> `optional` **authSigningKeyId**: `string`
+> `optional` **authSigningKeyId?**: `string`
 
 The id of the key in the vault to use for signing in auth operations.
 
@@ -1785,7 +1821,7 @@ The id of the key in the vault to use for signing in auth operations.
 
 ### mimeTypeProcessors? {#mimetypeprocessors}
 
-> `optional` **mimeTypeProcessors**: `string`
+> `optional` **mimeTypeProcessors?**: `string`
 
 Additional MIME type processors to include, comma separated.
 
@@ -1793,7 +1829,7 @@ Additional MIME type processors to include, comma separated.
 
 ### routeLoggingIncludeBody? {#routeloggingincludebody}
 
-> `optional` **routeLoggingIncludeBody**: `string`
+> `optional` **routeLoggingIncludeBody?**: `string`
 
 Include the body in the REST logging output, useful for debugging.
 
@@ -1801,7 +1837,7 @@ Include the body in the REST logging output, useful for debugging.
 
 ### routeLoggingFullBase64? {#routeloggingfullbase64}
 
-> `optional` **routeLoggingFullBase64**: `string`
+> `optional` **routeLoggingFullBase64?**: `string`
 
 Include the full base 64 output in the REST logging output, useful for debugging.
 
@@ -1809,6 +1845,6 @@ Include the full base 64 output in the REST logging output, useful for debugging
 
 ### routeLoggingObfuscateProperties? {#routeloggingobfuscateproperties}
 
-> `optional` **routeLoggingObfuscateProperties**: `string`
+> `optional` **routeLoggingObfuscateProperties?**: `string`
 
 List of properties to obfuscate in the REST logging output, comma separated.

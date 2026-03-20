@@ -6,7 +6,7 @@ Command to execute in the CLI.
 
 ### nodePath? {#nodepath}
 
-> `optional` **nodePath**: `string`
+> `optional` **nodePath?**: `string`
 
 The path of the node executable.
 
@@ -14,7 +14,7 @@ The path of the node executable.
 
 ### scriptPath? {#scriptpath}
 
-> `optional` **scriptPath**: `string`
+> `optional` **scriptPath?**: `string`
 
 The path of the script to execute.
 
@@ -22,7 +22,7 @@ The path of the script to execute.
 
 ### options? {#options}
 
-> `optional` **options**: `object`[]
+> `optional` **options?**: `object`[]
 
 The command line options.
 

@@ -1,4 +1,4 @@
-# Type Alias: NodeExtensionInitialiseMethod()
+# Type Alias: NodeExtensionInitialiseMethod
 
 > **NodeExtensionInitialiseMethod** = (`envVars`, `nodeEngineConfig`) => `Promise`\<`void`\>
 

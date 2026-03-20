@@ -1,4 +1,4 @@
-# Type Alias: NodeExtensionInitialiseEngineMethod()
+# Type Alias: NodeExtensionInitialiseEngineMethod
 
 > **NodeExtensionInitialiseEngineMethod** = (`engineCore`) => `Promise`\<`void`\>
 

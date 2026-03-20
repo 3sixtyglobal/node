@@ -36,7 +36,7 @@ The params available for the command.
 
 ***
 
-### action() {#action}
+### action {#action}
 
 > **action**: (`engineCore`, `envVars`, `params`) => `Promise`\<`unknown`\>
 
@@ -62,22 +62,40 @@ The method to execute for the command.
 
 ### requiresEngineStarted? {#requiresenginestarted}
 
-> `optional` **requiresEngineStarted**: `boolean`
+> `optional` **requiresEngineStarted?**: `boolean`
 
 Indicates whether the engine needs to be started before executing the command.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
 ### requiresNodeIdentity? {#requiresnodeidentity}
 
-> `optional` **requiresNodeIdentity**: `boolean`
+> `optional` **requiresNodeIdentity?**: `boolean`
 
 Indicates whether the engine needs the node identity to be set if configured to use.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
 ### requiresTenantId? {#requirestenantid}
 
-> `optional` **requiresTenantId**: `boolean`
+> `optional` **requiresTenantId?**: `boolean`
 
 Indicates whether the engine needs the tenant id to be set if configured to use.
+
+#### Default
+
+```ts
+true
+```

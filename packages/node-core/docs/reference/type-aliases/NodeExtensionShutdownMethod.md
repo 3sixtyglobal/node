@@ -1,4 +1,4 @@
-# Type Alias: NodeExtensionShutdownMethod()
+# Type Alias: NodeExtensionShutdownMethod
 
 > **NodeExtensionShutdownMethod** = () => `Promise`\<`void`\>
 

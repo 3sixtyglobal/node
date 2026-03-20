@@ -196,7 +196,7 @@
 						"content": {
 							"image/x-icon": {
 								"schema": {
-									"$ref": "#/components/schemas/Uint8Array"
+									"$ref": "#/components/schemas/ServerFavIconResponse"
 								}
 							}
 						}
@@ -960,7 +960,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/AuthenticationUser"
+								"$ref": "#/components/schemas/AdminUserCreateRequest"
 							},
 							"examples": {
 								"createUserRequestExample": {
@@ -1075,7 +1075,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Partial<AuthenticationUser"
+								"$ref": "#/components/schemas/AdminUserUpdateRequest"
 							},
 							"examples": {
 								"updateUserRequestExample": {
@@ -1186,7 +1186,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AuthenticationUser"
+									"$ref": "#/components/schemas/AdminUserGetResponse"
 								},
 								"examples": {
 									"getUserResponseExample": {
@@ -1491,7 +1491,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AuthenticationUser"
+									"$ref": "#/components/schemas/AdminUserGetResponse"
 								},
 								"examples": {
 									"getUserResponseExample": {
@@ -3933,7 +3933,7 @@
 						"content": {
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+									"$ref": "#/components/schemas/IdentityProfileGetPublicResponse"
 								},
 								"examples": {
 									"identityGetPublicResponseExample": {
@@ -4286,7 +4286,6 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": "string",
 							"enum": [
 								"dateCreated",
 								"dateModified"
@@ -9768,11 +9767,16 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": "string",
-							"enum": [
-								"id",
-								"alias",
-								"both"
+							"anyOf": [
+								{
+									"const": "id"
+								},
+								{
+									"const": "alias"
+								},
+								{
+									"const": "both"
+								}
 							]
 						}
 					},
@@ -9809,7 +9813,6 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": "string",
 							"enum": [
 								"dateCreated",
 								"dateModified"
@@ -11059,7 +11062,6 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"type": "string",
 							"enum": [
 								"dateCreated",
 								"dateModified"
@@ -11315,7 +11317,7 @@
 					},
 					{
 						"name": "includeEntries",
-						"description": "Whether to include the entries, defaults to false. The entries will be limited to the first page of entries in date descending order. If you want to get more entries you can use the returned cursor with the get entries method.",
+						"description": "Whether to include the entries, defaults to false.\nThe entries will be limited to the first page of entries in date descending order.\nIf you want to get more entries you can use the returned cursor with the get entries method.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -13668,7 +13670,7 @@
 				},
 				"responses": {
 					"200": {
-						"description": "The response payload for the catalog request method. Returns a DS Protocol compliant Catalog with participantId, or CatalogError if no datasets found.",
+						"description": "The response payload for the catalog request method.\nReturns a DS Protocol compliant Catalog with participantId, or CatalogError if no datasets found.",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -13689,21 +13691,25 @@
 													"@type": "Dataset",
 													"dcterms:title": "Energy Consumption Data",
 													"dcterms:description": "Historical energy consumption data",
-													"hasPolicy": {
-														"@id": "urn:uuid:policy-456",
-														"@type": "Offer",
-														"assigner": "did:example:data-provider-789"
-													},
-													"distribution": {
-														"@id": "urn:uuid:distribution-789",
-														"@type": "Distribution",
-														"format": "application/json",
-														"accessService": {
-															"@id": "urn:uuid:access-service-321",
-															"@type": "DataService",
-															"endpointURL": "https://example.com/data-access"
+													"hasPolicy": [
+														{
+															"@id": "urn:uuid:policy-456",
+															"@type": "Offer",
+															"assigner": "did:example:data-provider-789"
 														}
-													}
+													],
+													"distribution": [
+														{
+															"@id": "urn:uuid:distribution-789",
+															"@type": "Distribution",
+															"format": "application/json",
+															"accessService": {
+																"@id": "urn:uuid:access-service-321",
+																"@type": "DataService",
+																"endpointURL": "https://example.com/data-access"
+															}
+														}
+													]
 												}
 											]
 										}
@@ -13900,7 +13906,7 @@
 								"$ref": "https://schema.twindev.org/w3c-activity-streams/ActivityStreamsActivity"
 							},
 							"examples": {
-								"activityStreamNotifyExample": {
+								"activityStreamNotifyRequestExample": {
 									"value": {
 										"@context": "https://www.w3.org/ns/activitystreams",
 										"type": "Add",
@@ -14035,7 +14041,7 @@
 									"$ref": "#/components/schemas/ActivityLogEntry"
 								},
 								"examples": {
-									"activityLogEntryResponseExample": {
+									"activityLogEntryGetResponseExample": {
 										"value": {
 											"id": "urn:x-activity-log:134567",
 											"dateCreated": "2025-08-12T12:00:00Z",
@@ -14208,7 +14214,7 @@
 								"$ref": "#/components/schemas/DataAssetQueryRequest"
 							},
 							"examples": {
-								"dataAssetQuery": {
+								"dataAssetQueryRequestExample": {
 									"value": {
 										"consumerPid": "urn:uuid:consumer-pid-12345",
 										"query": {
@@ -14230,7 +14236,7 @@
 									"$ref": "#/components/schemas/DataAssetItemList"
 								},
 								"examples": {
-									"dataAssetEntitiesGetResponseExample": {
+									"dataAssetQueryResponseExample": {
 										"value": {
 											"@context": "https://schema.org",
 											"type": "ItemList",
@@ -14296,13 +14302,74 @@
 				"tags": [
 					"Transfer Process"
 				],
+				"parameters": [
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+					}
+				],
+				"requestBody": {
+					"description": "API request for requesting a transfer process.",
+					"required": true,
+					"content": {
+						"application/ld+json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferRequestMessage"
+							},
+							"examples": {
+								"requestTransferRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@type": "TransferRequestMessage",
+										"processId": "urn:uuid:consumer-process-12345",
+										"consumerPid": "urn:uuid:consumer-process-12345",
+										"providerPid": "urn:uuid:provider-process-12345",
+										"agreementId": "urn:uuid:agreement-12345",
+										"dataAddress": {
+											"@type": "DataAddress",
+											"@id": "https://provider.example.com/data",
+											"endpointType": "https://w3id.org/dspace/v1/HttpDataAddress",
+											"baseUrl": "https://provider.example.com/data"
+										},
+										"callbackAddress": "https://consumer.example.com/transfer/webhook",
+										"format": "urn:example:format"
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
 					"200": {
-						"description": "The rest request ended in success with no data.",
+						"description": "API response for requesting a transfer process.",
 						"content": {
-							"text/plain": {
+							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OkResponse"
+									"$ref": "#/components/schemas/RequestTransferResponse"
+								},
+								"examples": {
+									"requestTransferResponseExample": {
+										"value": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "TransferProcess",
+											"processId": "urn:uuid:provider-process-12345",
+											"consumerPid": "urn:uuid:consumer-process-12345",
+											"providerPid": "urn:uuid:provider-process-12345",
+											"state": "STARTED",
+											"dataAddress": {
+												"@type": "DataAddress",
+												"@id": "https://provider.example.com/data/transfer-12345",
+												"endpointType": "https://w3id.org/dspace/v1/HttpDataAddress",
+												"baseUrl": "https://provider.example.com/data/transfer-12345"
+											}
+										}
+									}
 								}
 							}
 						}
@@ -14359,22 +14426,51 @@
 				"parameters": [
 					{
 						"name": "pid",
-						"description": "",
+						"description": "Process ID (consumerPid or providerPid).",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
 						},
-						"style": "simple"
+						"style": "simple",
+						"example": "urn:uuid:provider-process-12345"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 					}
 				],
 				"responses": {
 					"200": {
-						"description": "The rest request ended in success with no data.",
+						"description": "API response for getting a transfer process state.",
 						"content": {
-							"text/plain": {
+							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OkResponse"
+									"$ref": "#/components/schemas/GetTransferProcessResponse"
+								},
+								"examples": {
+									"getTransferProcessResponseExample": {
+										"value": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "TransferProcess",
+											"processId": "urn:uuid:provider-process-12345",
+											"consumerPid": "urn:uuid:consumer-process-12345",
+											"providerPid": "urn:uuid:provider-process-12345",
+											"state": "STARTED",
+											"dataAddress": {
+												"@type": "DataAddress",
+												"@id": "https://provider.example.com/data/transfer-12345",
+												"endpointType": "https://w3id.org/dspace/v1/HttpDataAddress",
+												"baseUrl": "https://provider.example.com/data/transfer-12345"
+											}
+										}
+									}
 								}
 							}
 						}
@@ -14431,22 +14527,64 @@
 				"parameters": [
 					{
 						"name": "pid",
-						"description": "",
+						"description": "Process ID (consumerPid).",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
 						},
-						"style": "simple"
+						"style": "simple",
+						"example": "urn:uuid:consumer-process-12345"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 					}
 				],
+				"requestBody": {
+					"description": "API request for starting a transfer process.",
+					"required": true,
+					"content": {
+						"application/ld+json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferStartMessage"
+							},
+							"examples": {
+								"startTransferRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@type": "TransferStartMessage",
+										"consumerPid": "urn:uuid:consumer-process-12345",
+										"providerPid": "urn:uuid:provider-process-12345"
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
 					"200": {
-						"description": "The rest request ended in success with no data.",
+						"description": "API response for starting a transfer process.",
 						"content": {
-							"text/plain": {
+							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OkResponse"
+									"$ref": "#/components/schemas/StartTransferResponse"
+								},
+								"examples": {
+									"startTransferResponseExample": {
+										"value": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "TransferStartMessage",
+											"consumerPid": "urn:uuid:consumer-process-12345",
+											"providerPid": "urn:uuid:provider-process-12345"
+										}
+									}
 								}
 							}
 						}
@@ -14503,22 +14641,72 @@
 				"parameters": [
 					{
 						"name": "pid",
-						"description": "",
+						"description": "Process ID (consumerPid).",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
 						},
-						"style": "simple"
+						"style": "simple",
+						"example": "urn:uuid:consumer-process-12345"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 					}
 				],
+				"requestBody": {
+					"description": "API request for completing a transfer process.",
+					"required": true,
+					"content": {
+						"application/ld+json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferCompletionMessage"
+							},
+							"examples": {
+								"completeTransferRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@type": "TransferCompletionMessage",
+										"consumerPid": "urn:uuid:consumer-process-12345",
+										"providerPid": "urn:uuid:provider-process-12345"
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
 					"200": {
-						"description": "The rest request ended in success with no data.",
+						"description": "API response for completing a transfer process.",
 						"content": {
-							"text/plain": {
+							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OkResponse"
+									"$ref": "#/components/schemas/CompleteTransferResponse"
+								},
+								"examples": {
+									"completeTransferResponseExample": {
+										"value": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "TransferProcess",
+											"processId": "urn:uuid:provider-process-12345",
+											"consumerPid": "urn:uuid:consumer-process-12345",
+											"providerPid": "urn:uuid:provider-process-12345",
+											"state": "COMPLETED",
+											"dataAddress": {
+												"@type": "DataAddress",
+												"@id": "https://provider.example.com/data/transfer-12345",
+												"endpointType": "https://w3id.org/dspace/v1/HttpDataAddress",
+												"baseUrl": "https://provider.example.com/data/transfer-12345"
+											}
+										}
+									}
 								}
 							}
 						}
@@ -14575,22 +14763,72 @@
 				"parameters": [
 					{
 						"name": "pid",
-						"description": "",
+						"description": "Process ID (consumerPid).",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
 						},
-						"style": "simple"
+						"style": "simple",
+						"example": "urn:uuid:consumer-process-12345"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 					}
 				],
+				"requestBody": {
+					"description": "API request for suspending a transfer process.",
+					"required": true,
+					"content": {
+						"application/ld+json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferSuspensionMessage"
+							},
+							"examples": {
+								"suspendTransferRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@type": "TransferSuspensionMessage",
+										"consumerPid": "urn:uuid:consumer-process-12345",
+										"providerPid": "urn:uuid:provider-process-12345"
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
 					"200": {
-						"description": "The rest request ended in success with no data.",
+						"description": "API response for suspending a transfer process.",
 						"content": {
-							"text/plain": {
+							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OkResponse"
+									"$ref": "#/components/schemas/SuspendTransferResponse"
+								},
+								"examples": {
+									"suspendTransferResponseExample": {
+										"value": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "TransferProcess",
+											"processId": "urn:uuid:provider-process-12345",
+											"consumerPid": "urn:uuid:consumer-process-12345",
+											"providerPid": "urn:uuid:provider-process-12345",
+											"state": "SUSPENDED",
+											"dataAddress": {
+												"@type": "DataAddress",
+												"@id": "https://provider.example.com/data/transfer-12345",
+												"endpointType": "https://w3id.org/dspace/v1/HttpDataAddress",
+												"baseUrl": "https://provider.example.com/data/transfer-12345"
+											}
+										}
+									}
 								}
 							}
 						}
@@ -14647,22 +14885,72 @@
 				"parameters": [
 					{
 						"name": "pid",
-						"description": "",
+						"description": "Process ID (consumerPid).",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
 						},
-						"style": "simple"
+						"style": "simple",
+						"example": "urn:uuid:consumer-process-12345"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 					}
 				],
+				"requestBody": {
+					"description": "API request for terminating a transfer process.",
+					"required": true,
+					"content": {
+						"application/ld+json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferTerminationMessage"
+							},
+							"examples": {
+								"terminateTransferRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@type": "TransferTerminationMessage",
+										"consumerPid": "urn:uuid:consumer-process-12345",
+										"providerPid": "urn:uuid:provider-process-12345"
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
 					"200": {
-						"description": "The rest request ended in success with no data.",
+						"description": "API response for terminating a transfer process.",
 						"content": {
-							"text/plain": {
+							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/OkResponse"
+									"$ref": "#/components/schemas/TerminateTransferResponse"
+								},
+								"examples": {
+									"terminateTransferResponseExample": {
+										"value": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "TransferProcess",
+											"processId": "urn:uuid:provider-process-12345",
+											"consumerPid": "urn:uuid:consumer-process-12345",
+											"providerPid": "urn:uuid:provider-process-12345",
+											"state": "TERMINATED",
+											"dataAddress": {
+												"@type": "DataAddress",
+												"@id": "https://provider.example.com/data/transfer-12345",
+												"endpointType": "https://w3id.org/dspace/v1/HttpDataAddress",
+												"baseUrl": "https://provider.example.com/data/transfer-12345"
+											}
+										}
+									}
 								}
 							}
 						}
@@ -14727,7 +15015,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdObjectWithOptionalAtId<DataspaceProtocolPolicy>"
+								"$ref": "#/components/schemas/PapCreateRequest"
 							},
 							"examples": {
 								"papCreateRequestExample": {
@@ -17090,7 +17378,25 @@
 	},
 	"components": {
 		"schemas": {
-			"ActivityLogEntry": {
+			"ActivityLogDates": {
+				"description": "Activity log dates.",
+				"type": "object",
+				"properties": {
+					"startDate": {
+						"type": "string",
+						"description": "Task processing start timestamp"
+					},
+					"endDate": {
+						"type": "string",
+						"description": "Task processing end timestamp"
+					}
+				},
+				"required": [
+					"startDate"
+				]
+			},
+			"ActivityLogDetails": {
+				"description": "The details related to the processing of an Activity",
 				"type": "object",
 				"properties": {
 					"id": {
@@ -17116,7 +17422,19 @@
 					"retryCount": {
 						"type": "number",
 						"description": "Number of times this activity has been retried."
-					},
+					}
+				},
+				"required": [
+					"id",
+					"generator",
+					"dateCreated",
+					"dateModified"
+				]
+			},
+			"ActivityLogEntry": {
+				"description": "The details related to the processing of an Activity",
+				"type": "object",
+				"properties": {
 					"status": {
 						"$ref": "#/components/schemas/ActivityProcessingStatus"
 					},
@@ -17131,29 +17449,13 @@
 						"type": "array",
 						"items": {
 							"type": "object",
-							"additionalProperties": false,
-							"properties": {
-								"startDate": {
-									"type": "string",
-									"description": "Task processing start timestamp"
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/TaskApp"
 								},
-								"endDate": {
-									"type": "string",
-									"description": "Task processing end timestamp"
-								},
-								"taskId": {
-									"type": "string",
-									"description": "Task Id."
-								},
-								"dataspaceAppId": {
-									"type": "string",
-									"description": "Dataspace App Id."
+								{
+									"$ref": "#/components/schemas/ActivityLogDates"
 								}
-							},
-							"required": [
-								"dataspaceAppId",
-								"startDate",
-								"taskId"
 							]
 						},
 						"description": "The running tasks that are processing the Activity."
@@ -17162,34 +17464,22 @@
 						"type": "array",
 						"items": {
 							"type": "object",
-							"additionalProperties": false,
 							"properties": {
 								"result": {
 									"type": "string",
 									"description": "The task result."
-								},
-								"startDate": {
-									"type": "string",
-									"description": "Task processing start timestamp"
-								},
-								"endDate": {
-									"type": "string",
-									"description": "Task processing end timestamp"
-								},
-								"taskId": {
-									"type": "string",
-									"description": "Task Id."
-								},
-								"dataspaceAppId": {
-									"type": "string",
-									"description": "Dataspace App Id."
 								}
 							},
 							"required": [
-								"dataspaceAppId",
-								"result",
-								"startDate",
-								"taskId"
+								"result"
+							],
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/TaskApp"
+								},
+								{
+									"$ref": "#/components/schemas/ActivityLogDates"
+								}
 							]
 						},
 						"description": "The tasks that have already finalized."
@@ -17198,67 +17488,123 @@
 						"type": "array",
 						"items": {
 							"type": "object",
-							"additionalProperties": false,
 							"properties": {
 								"error": {
 									"$ref": "#/components/schemas/Error"
-								},
-								"taskId": {
-									"type": "string",
-									"description": "Task Id."
-								},
-								"dataspaceAppId": {
-									"type": "string",
-									"description": "Dataspace App Id."
 								}
 							},
 							"required": [
-								"dataspaceAppId",
-								"error",
-								"taskId"
+								"error"
+							],
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/TaskApp"
+								}
 							]
 						},
 						"description": "The tasks that are in error."
 					}
 				},
 				"required": [
-					"dateCreated",
-					"dateModified",
-					"generator",
-					"id",
 					"status"
 				],
-				"description": "The details related to the processing of an Activity"
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/ActivityLogDetails"
+					}
+				]
 			},
 			"ActivityProcessingStatus": {
+				"description": "The type exported.",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "pending",
 						"description": "Pending: Activity Processing has not started yet."
 					},
 					{
-						"type": "string",
 						"const": "running",
 						"description": "Running Activity processing is running."
 					},
 					{
-						"type": "string",
 						"const": "completed",
 						"description": "Completed: Activity processing completed without error."
 					},
 					{
-						"type": "string",
 						"const": "error",
 						"description": "Error: Activity processing cannot be performed and marked as in error. (Depends on application)."
 					},
 					{
-						"type": "string",
 						"const": "registering",
 						"description": "Transient state. The background tasks associated with the activity are still being registered."
 					}
-				],
-				"description": "Activity processing statuses.   The type exported."
+				]
+			},
+			"AdminUserCreateRequest": {
+				"description": "The body of the request.",
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user e-mail address."
+					},
+					"password": {
+						"type": "string",
+						"description": "The encrypted password for the user."
+					},
+					"userIdentity": {
+						"type": "string",
+						"description": "The user identity."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The users organization."
+					},
+					"scope": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The scope assigned to the user, comma separated."
+					}
+				},
+				"required": [
+					"email",
+					"password",
+					"userIdentity",
+					"organizationIdentity",
+					"scope"
+				]
+			},
+			"AdminUserGetResponse": {
+				"description": "The body of the request.",
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user e-mail address."
+					},
+					"userIdentity": {
+						"type": "string",
+						"description": "The user identity."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The users organization."
+					},
+					"scope": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The scope assigned to the user, comma separated."
+					}
+				},
+				"required": [
+					"email",
+					"userIdentity",
+					"organizationIdentity",
+					"scope"
+				]
 			},
 			"AdminUserUpdatePasswordRequest": {
 				"type": "object",
@@ -17276,6 +17622,27 @@
 					"newPassword"
 				],
 				"description": "The body of the request."
+			},
+			"AdminUserUpdateRequest": {
+				"description": "The body of the request.",
+				"type": "object",
+				"properties": {
+					"userIdentity": {
+						"type": "string",
+						"description": "The user identity."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The users organization."
+					},
+					"scope": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The scope assigned to the user, comma separated."
+					}
+				}
 			},
 			"AttestationCreateRequest": {
 				"type": "object",
@@ -17337,8 +17704,7 @@
 							},
 							"required": [
 								"id"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "Alternative aliases that can be used to identify the vertex."
 					},
@@ -17353,8 +17719,7 @@
 								"resourceObject": {
 									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 								}
-							},
-							"additionalProperties": false
+							}
 						},
 						"description": "The resources attached to the vertex."
 					},
@@ -17379,8 +17744,7 @@
 							"required": [
 								"targetId",
 								"edgeRelationships"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "The edges connected to the vertex."
 					}
@@ -17413,8 +17777,7 @@
 							},
 							"required": [
 								"id"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "Alternative aliases that can be used to identify the vertex."
 					},
@@ -17429,8 +17792,7 @@
 								"resourceObject": {
 									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 								}
-							},
-							"additionalProperties": false
+							}
 						},
 						"description": "The resources attached to the vertex."
 					},
@@ -17458,8 +17820,7 @@
 							"required": [
 								"targetId",
 								"edgeRelationships"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "The edges connected to the vertex."
 					}
@@ -17495,14 +17856,13 @@
 							},
 							"required": [
 								"entryObject"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "The entries for the stream."
 					},
 					"immutableInterval": {
 						"type": "number",
-						"description": "After how many entries do we add immutable checks, defaults to service configured value. A value of 0 will disable immutable checks, 1 will be every item, or any other integer for an interval."
+						"description": "After how many entries do we add immutable checks, defaults to service configured value.\nA value of 0 will disable immutable checks, 1 will be every item, or any other integer for an interval."
 					}
 				},
 				"description": "The data to be used in the stream."
@@ -17595,62 +17955,63 @@
 						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
 					}
 				],
-				"description": "The response payload containing the DS Protocol compliant catalog with participantId, or a CatalogError if no datasets are found (404). Per DS Protocol: Single participant returns flat catalog, multiple participants return nested catalogs."
+				"description": "The response payload containing the DS Protocol compliant catalog with participantId,\nor a CatalogError if no datasets are found (404).\nPer DS Protocol: Single participant returns flat catalog, multiple participants return nested catalogs."
 			},
 			"CoerceType": {
+				"description": "The types the extracted data can be coerced to.",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "string",
 						"description": "String."
 					},
 					{
-						"type": "string",
 						"const": "number",
 						"description": "Number."
 					},
 					{
-						"type": "string",
 						"const": "integer",
 						"description": "Integer."
 					},
 					{
-						"type": "string",
 						"const": "boolean",
 						"description": "Boolean."
 					},
 					{
-						"type": "string",
 						"const": "bigint",
 						"description": "Big Integer."
 					},
 					{
-						"type": "string",
 						"const": "date",
 						"description": "Date."
 					},
 					{
-						"type": "string",
 						"const": "datetime",
 						"description": "Date Time."
 					},
 					{
-						"type": "string",
 						"const": "time",
 						"description": "Time."
 					},
 					{
-						"type": "string",
 						"const": "object",
 						"description": "Object."
 					},
 					{
-						"type": "string",
 						"const": "uint8array",
 						"description": "Uint8Array."
 					}
+				]
+			},
+			"CompleteTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
 				],
-				"description": "The types the extracted data can be coerced to."
+				"description": "Transfer Process (DSP compliant) with state COMPLETED, or error."
 			},
 			"ConflictResponse": {
 				"type": "object",
@@ -17661,49 +18022,27 @@
 							"type": "string"
 						},
 						"description": "The conflicting items."
-					},
-					"name": {
-						"type": "string",
-						"description": "The name for the error."
-					},
-					"message": {
-						"type": "string",
-						"description": "The message for the error."
-					},
-					"source": {
-						"type": "string",
-						"description": "The source of the error."
-					},
-					"properties": {
-						"type": "object",
-						"additionalProperties": {},
-						"description": "Any additional information for the error."
-					},
-					"stack": {
-						"type": "string",
-						"description": "The stack trace for the error."
-					},
-					"cause": {
-						"$ref": "#/components/schemas/Error"
 					}
 				},
 				"required": [
-					"conflicts",
-					"message",
-					"name"
+					"conflicts"
+				],
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Error"
+					}
 				],
 				"description": "The body which contains the error."
 			},
 			"DataAssetItemList": {
+				"description": "Interface describing a list of entities that are within a Data Asset.\nPagination is handled via HTTP Link headers.",
 				"type": "object",
 				"properties": {
 					"@context": {
-						"type": "string",
 						"const": "https://schema.org",
 						"description": "The LD Context."
 					},
 					"type": {
-						"type": "string",
 						"const": "ItemList",
 						"description": "The type"
 					},
@@ -17719,15 +18058,14 @@
 					"@context",
 					"type",
 					"itemListElement"
-				],
-				"description": "Interface describing a list of entities that are within a Data Asset. Pagination is handled via HTTP Link headers."
+				]
 			},
 			"DataAssetQueryRequest": {
 				"type": "object",
 				"properties": {
 					"consumerPid": {
 						"type": "string",
-						"description": "The consumer Process ID from the DSP Transfer Process. Mandatory - used to determine the Dataset, Distribution, and Agreement. The datasetId is resolved from the Transfer Process using this ID."
+						"description": "The consumer Process ID from the DSP Transfer Process.\nMandatory - used to determine the Dataset, Distribution, and Agreement.\nThe datasetId is resolved from the Transfer Process using this ID."
 					},
 					"query": {
 						"$ref": "#/components/schemas/FilteringQuery"
@@ -17786,7 +18124,7 @@
 				"description": "The params for the extract."
 			},
 			"DataProcessingExtractResponse": {
-				"description": "The extracted data in extended JSON format which keeps types like bigint, dates and uint8array intact. Use ObjectHelper.fromExtended to get the object with original types."
+				"description": "The extracted data in extended JSON format which keeps types like bigint, dates and uint8array intact.\nUse ObjectHelper.fromExtended to get the object with original types."
 			},
 			"DataProcessingRuleGroupListResponse": {
 				"type": "object",
@@ -17867,8 +18205,7 @@
 							},
 							"required": [
 								"targetId"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "The auditable item graph vertices to connect the document to."
 					},
@@ -17886,6 +18223,7 @@
 				},
 				"required": [
 					"documentId",
+					"documentIdFormat",
 					"documentCode",
 					"blob"
 				],
@@ -17918,8 +18256,7 @@
 							},
 							"required": [
 								"targetId"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "The auditable item graph vertices to connect the document to."
 					}
@@ -17927,6 +18264,7 @@
 				"description": "The body parameters."
 			},
 			"Error": {
+				"description": "Model to describe serialized error.",
 				"type": "object",
 				"properties": {
 					"name": {
@@ -17957,10 +18295,10 @@
 				"required": [
 					"name",
 					"message"
-				],
-				"description": "Model to describe serialized error."
+				]
 			},
 			"FilteringQuery": {
+				"description": "A query over a data asset that to be processed by a Dataspace Data Plane App.",
 				"type": "object",
 				"properties": {
 					"type": {
@@ -17981,8 +18319,7 @@
 				"required": [
 					"type",
 					"q"
-				],
-				"description": "A query over a data asset that to be processed by a Dataspace Data Plane App."
+				]
 			},
 			"GetDatasetResponse": {
 				"anyOf": [
@@ -17995,7 +18332,19 @@
 				],
 				"description": "The response payload containing the dataset or error."
 			},
+			"GetTransferProcessResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
+				],
+				"description": "Transfer Process (DSP compliant) with current state, or error."
+			},
 			"HealthComponentInfo": {
+				"description": "The health component information.",
 				"type": "object",
 				"properties": {
 					"name": {
@@ -18013,10 +18362,10 @@
 				"required": [
 					"name",
 					"status"
-				],
-				"description": "The health component information."
+				]
 			},
 			"HealthInfo": {
+				"description": "The status of the server.",
 				"type": "object",
 				"properties": {
 					"status": {
@@ -18032,28 +18381,24 @@
 				},
 				"required": [
 					"status"
-				],
-				"description": "The status of the server."
+				]
 			},
 			"HealthStatus": {
+				"description": "The health status of the component.",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "ok",
 						"description": "OK."
 					},
 					{
-						"type": "string",
 						"const": "warning",
 						"description": "Warning."
 					},
 					{
-						"type": "string",
 						"const": "error",
 						"description": "Error."
 					}
-				],
-				"description": "The health status of the component."
+				]
 			},
 			"IdentityCreateRequest": {
 				"type": "object",
@@ -18077,18 +18422,13 @@
 				},
 				"description": "The data for the request."
 			},
+			"IdentityProfileGetPublicResponse": {},
 			"IdentityProfileGetResponse": {
 				"type": "object",
 				"properties": {
 					"identity": {
 						"type": "string",
 						"description": "The identity of the profile, this is the authenticated user identity."
-					},
-					"publicProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
-					},
-					"privateProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
 					}
 				},
 				"required": [
@@ -18107,15 +18447,11 @@
 								"identity": {
 									"type": "string",
 									"description": "The identity."
-								},
-								"publicProfile": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
 								}
 							},
 							"required": [
 								"identity"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "The identities."
 					},
@@ -18402,6 +18738,7 @@
 				"description": "The parameters from the body."
 			},
 			"LogEntry": {
+				"description": "Interface describing a log entry.",
 				"type": "object",
 				"properties": {
 					"level": {
@@ -18432,38 +18769,32 @@
 					"level",
 					"source",
 					"message"
-				],
-				"description": "Interface describing a log entry."
+				]
 			},
 			"LogLevel": {
+				"description": "The log levels.",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "info",
 						"description": "Info."
 					},
 					{
-						"type": "string",
 						"const": "error",
 						"description": "Error."
 					},
 					{
-						"type": "string",
 						"const": "warn",
 						"description": "Warn."
 					},
 					{
-						"type": "string",
 						"const": "trace",
 						"description": "Trace."
 					},
 					{
-						"type": "string",
 						"const": "debug",
 						"description": "Debug."
 					}
-				],
-				"description": "The log levels."
+				]
 			},
 			"LoggingListResponse": {
 				"type": "object",
@@ -18517,24 +18848,21 @@
 				"description": "The login response details."
 			},
 			"MetricType": {
+				"description": "The types of metrics.",
 				"anyOf": [
 					{
-						"type": "number",
 						"const": 0,
 						"description": "Counter."
 					},
 					{
-						"type": "number",
 						"const": 1,
 						"description": "Increment Decrement Counter."
 					},
 					{
-						"type": "number",
 						"const": 2,
 						"description": "Gauge."
 					}
-				],
-				"description": "The types of metrics."
+				]
 			},
 			"NftMintRequest": {
 				"type": "object",
@@ -18624,37 +18952,227 @@
 					"notFoundId": {
 						"type": "string",
 						"description": "The id if the item that was not found."
-					},
-					"name": {
-						"type": "string",
-						"description": "The name for the error."
-					},
-					"message": {
-						"type": "string",
-						"description": "The message for the error."
-					},
-					"source": {
-						"type": "string",
-						"description": "The source of the error."
-					},
-					"properties": {
-						"type": "object",
-						"additionalProperties": {},
-						"description": "Any additional information for the error."
-					},
-					"stack": {
-						"type": "string",
-						"description": "The stack trace for the error."
-					},
-					"cause": {
+					}
+				},
+				"allOf": [
+					{
 						"$ref": "#/components/schemas/Error"
+					}
+				],
+				"description": "The body which contains the error."
+			},
+			"PapCreateRequest": {
+				"description": "The body of the request - the policy to create (id will be auto-generated if not provided).",
+				"type": "object",
+				"properties": {
+					"@context": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
+					},
+					"@type": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicyType"
+					},
+					"profile": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						],
+						"description": "The profile(s) this policy conforms to.\nIRIs identifying the ODRL Profile(s)."
+					},
+					"assigner": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assigner of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"assignee": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assignee of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"target": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The target asset for the rule."
+					},
+					"action": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+							},
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+										},
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+										}
+									]
+								}
+							}
+						],
+						"description": "The action associated with the rule."
+					},
+					"inheritFrom": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						],
+						"description": "The parent policy(ies) this policy inherits from.\nIRIs identifying the parent Policy(ies)."
+					},
+					"conflict": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlConflictStrategyType"
+					},
+					"permission": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+								}
+							}
+						],
+						"description": "The permissions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"prohibition": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+								}
+							}
+						],
+						"description": "The prohibitions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"obligation": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+								}
+							}
+						],
+						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"@id": {
+						"type": "string",
+						"description": "Unique identifier for the policy."
 					}
 				},
 				"required": [
-					"message",
-					"name"
-				],
-				"description": "The body which contains the error."
+					"@context",
+					"@type"
+				]
 			},
 			"PapQueryResponse": {
 				"type": "array",
@@ -18671,7 +19189,7 @@
 				"description": "The body of the response."
 			},
 			"PnpContractNegotiationResponse": {
-				"anyOf": [
+				"oneOf": [
 					{
 						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiation"
 					},
@@ -18682,6 +19200,7 @@
 				"description": "The state of the policy or an error."
 			},
 			"PolicyNegotiation": {
+				"description": "Interface describing a rights management policy negotiation.",
 				"type": "object",
 				"properties": {
 					"id": {
@@ -18710,6 +19229,10 @@
 					"callbackAddress": {
 						"type": "string",
 						"description": "The callback address to send updates to the requester."
+					},
+					"publicOrigin": {
+						"type": "string",
+						"description": "The public origin of the server that initiated or received this negotiation.\nUsed to construct callback URLs in subsequent async messages."
 					},
 					"organizationIdentity": {
 						"type": "string",
@@ -18742,8 +19265,7 @@
 							},
 							"required": [
 								"@value"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "A more detailed reason for the negotiation error."
 					},
@@ -18761,8 +19283,7 @@
 							},
 							"required": [
 								"@value"
-							],
-							"additionalProperties": false
+							]
 						},
 						"description": "A more detailed reason for the negotiation error."
 					},
@@ -18784,8 +19305,7 @@
 					"dateCreated",
 					"state",
 					"organizationIdentity"
-				],
-				"description": "Interface describing a rights management policy negotiation."
+				]
 			},
 			"RefreshTokenResponse": {
 				"type": "object",
@@ -18800,16 +19320,28 @@
 				],
 				"description": "The refresh token details."
 			},
+			"RequestTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
+				],
+				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
+			},
 			"Rule": {
+				"description": "Rule defining how to extract data from an object.",
 				"type": "object",
 				"properties": {
 					"source": {
 						"type": "string",
-						"description": "The path to the data in the document to extract. should be in JSONPath format https://www.rfc-editor.org/rfc/rfc9535.html."
+						"description": "The path to the data in the document to extract.\nshould be in JSONPath format https://www.rfc-editor.org/rfc/rfc9535.html."
 					},
 					"target": {
 						"type": "string",
-						"description": "The target path of where to store the extracted data. Supports simple dotted path notation, and numeric index notation."
+						"description": "The target path of where to store the extracted data.\nSupports simple dotted path notation, and numeric index notation."
 					},
 					"retainPathDepth": {
 						"type": "number",
@@ -18822,10 +19354,10 @@
 				"required": [
 					"source",
 					"target"
-				],
-				"description": "Rule defining how to extract data from an object."
+				]
 			},
 			"RuleGroup": {
+				"description": "Group of rules for extraction.",
 				"type": "object",
 				"properties": {
 					"id": {
@@ -18848,10 +19380,17 @@
 					"id",
 					"label",
 					"rules"
-				],
-				"description": "Group of rules for extraction."
+				]
+			},
+			"ServerFavIconResponse": {
+				"type": "array",
+				"items": {
+					"type": "number"
+				},
+				"description": "The favicon for the server."
 			},
 			"ServerInfo": {
+				"description": "The information about the server.",
 				"type": "object",
 				"properties": {
 					"name": {
@@ -18866,14 +19405,16 @@
 				"required": [
 					"name",
 					"version"
-				],
-				"description": "The information about the server."
+				]
 			},
 			"ServerLivezResponse": {
-				"type": "string",
-				"enum": [
-					"ok",
-					"failed"
+				"anyOf": [
+					{
+						"const": "ok"
+					},
+					{
+						"const": "failed"
+					}
 				],
 				"description": "The livez information for the server."
 			},
@@ -18885,21 +19426,42 @@
 				"description": "The spec for the server."
 			},
 			"SortDirection": {
+				"description": "The sort directions.",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "asc",
 						"description": "Ascending."
 					},
 					{
-						"type": "string",
 						"const": "desc",
 						"description": "Descending."
 					}
+				]
+			},
+			"StartTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferStartMessage"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
 				],
-				"description": "The sort directions."
+				"description": "Transfer Start Message (DSP compliant) with dataAddress for PULL transfers, or error."
+			},
+			"SuspendTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
+				],
+				"description": "Transfer Process (DSP compliant) with state SUSPENDED, or error."
 			},
 			"SyncChange": {
+				"description": "The object definition for a sync change.",
 				"type": "object",
 				"properties": {
 					"operation": {
@@ -18916,34 +19478,30 @@
 				"required": [
 					"operation",
 					"id"
-				],
-				"description": "The object definition for a sync change."
+				]
 			},
 			"SyncChangeOperation": {
+				"description": "The operations for a change",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "set",
 						"description": "An item was set in the storage."
 					},
 					{
-						"type": "string",
 						"const": "delete",
 						"description": "An item was deleted from the storage."
 					}
-				],
-				"description": "The operations for a change.   The operations for a change"
+				]
 			},
 			"SyncChangeSet": {
+				"description": "The object definition for a sync change set.",
 				"type": "object",
 				"properties": {
 					"@context": {
-						"type": "string",
 						"const": "https://schema.twindev.org/synchronised-storage/",
 						"description": "The LD Context for the change set."
 					},
 					"type": {
-						"type": "string",
 						"const": "ChangeSet",
 						"description": "The LD Type for the change set."
 					},
@@ -18953,26 +19511,26 @@
 					},
 					"storageKey": {
 						"type": "string",
-						"description": "The storage key of the change set. This is used to identify the entities being synchronised. json-ld type:schema:identifier"
+						"description": "The storage key of the change set. This is used to identify the entities being synchronised."
 					},
 					"dateCreated": {
 						"type": "string",
-						"description": "The date the change set was created. json-ld namespace:schema"
+						"description": "The date the change set was created."
 					},
 					"dateModified": {
 						"type": "string",
-						"description": "The date the change set was last modified. json-ld namespace:schema"
+						"description": "The date the change set was last modified."
 					},
 					"nodeIdentity": {
 						"type": "string",
-						"description": "The identity of the node that created the change set. json-ld namespace:twin-common"
+						"description": "The identity of the node that created the change set."
 					},
 					"changes": {
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/SyncChange"
 						},
-						"description": "The changes to apply after a snapshot. json-ld type:json"
+						"description": "The changes to apply after a snapshot."
 					}
 				},
 				"required": [
@@ -18984,8 +19542,7 @@
 					"dateModified",
 					"nodeIdentity",
 					"changes"
-				],
-				"description": "The object definition for a sync change set."
+				]
 			},
 			"SyncDecryptionKeyResponse": {
 				"type": "object",
@@ -19001,19 +19558,20 @@
 				"description": "The body of the response."
 			},
 			"SynchronisedEntityCore": {
+				"description": "The base definition for synchronised entries.",
 				"type": "object",
 				"properties": {
 					"dateModified": {
 						"type": "string",
-						"description": "The date the entry was modified. json-ld namespace:schema"
+						"description": "The date the entry was modified."
 					}
 				},
 				"required": [
 					"dateModified"
-				],
-				"description": "The base definition for synchronised entries."
+				]
 			},
 			"TaskApp": {
+				"description": "Denotes a task associated with a Dataspace App",
 				"type": "object",
 				"properties": {
 					"taskId": {
@@ -19028,8 +19586,7 @@
 				"required": [
 					"taskId",
 					"dataspaceAppId"
-				],
-				"description": "Denotes a task associated with a Dataspace App"
+				]
 			},
 			"TelemetryAddMetricValueRequest": {
 				"type": "object",
@@ -19037,11 +19594,9 @@
 					"value": {
 						"anyOf": [
 							{
-								"type": "string",
 								"const": "inc"
 							},
 							{
-								"type": "string",
 								"const": "dec"
 							},
 							{
@@ -19098,6 +19653,7 @@
 				"description": "The response payload."
 			},
 			"TelemetryMetric": {
+				"description": "Interface describing a telemetry metric.",
 				"type": "object",
 				"properties": {
 					"id": {
@@ -19124,10 +19680,10 @@
 					"id",
 					"label",
 					"type"
-				],
-				"description": "Interface describing a telemetry metric."
+				]
 			},
 			"TelemetryMetricValue": {
+				"description": "Interface describing a telemetry metric value.",
 				"type": "object",
 				"properties": {
 					"id": {
@@ -19152,8 +19708,7 @@
 					"id",
 					"ts",
 					"value"
-				],
-				"description": "Interface describing a telemetry metric value."
+				]
 			},
 			"TelemetryUpdateMetricRequest": {
 				"type": "object",
@@ -19200,7 +19755,19 @@
 				],
 				"description": "The response payload."
 			},
+			"TerminateTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
+				],
+				"description": "Transfer Process (DSP compliant) with state TERMINATED, or error."
+			},
 			"TrustVerificationInfo": {
+				"description": "Interface describing a trust verifier information.",
 				"type": "object",
 				"properties": {
 					"identity": {
@@ -19217,8 +19784,7 @@
 				},
 				"required": [
 					"identity"
-				],
-				"description": "Interface describing a trust verifier information."
+				]
 			},
 			"UpdatePasswordRequest": {
 				"type": "object",
@@ -19341,24 +19907,21 @@
 				"description": "The data to be updated."
 			},
 			"VerifyDepth": {
+				"description": "How deep to verify the signatures.",
 				"anyOf": [
 					{
-						"type": "string",
 						"const": "none",
 						"description": "Do not verify any signatures."
 					},
 					{
-						"type": "string",
 						"const": "current",
 						"description": "Verify only the most recent signature."
 					},
 					{
-						"type": "string",
 						"const": "all",
 						"description": "Verify all the signatures."
 					}
-				],
-				"description": "How deep to verify the signatures."
+				]
 			}
 		},
 		"securitySchemes": {
