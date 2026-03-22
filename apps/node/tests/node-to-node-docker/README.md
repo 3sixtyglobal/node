@@ -32,12 +32,12 @@ Host machine
 
 The Docker image copies packages from multiple submodules at build time (see `Dockerfile`). These must be built before running `docker compose build`:
 
-| Submodule | Packages used |
-| --------- | ------------- |
-| `node` | `node-core`, `apps/node` |
-| `verifiable-storage` | `verifiable-storage-connector-iota` |
-| `rights-management` | `rights-management-rest-client`, `rights-management-pnp-service`, `rights-management-service` |
-| `api` | `api-core` |
+| Submodule            | Packages used                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `node`               | `node-core`, `apps/node`                                                                      |
+| `verifiable-storage` | `verifiable-storage-connector-iota`                                                           |
+| `rights-management`  | `rights-management-rest-client`, `rights-management-pnp-service`, `rights-management-service` |
+| `api`                | `api-core`                                                                                    |
 
 > **Note:** `@twin.org/dataspace-test-app` is loaded dynamically by the engine at runtime via `local-link` or Dockerfile `COPY`. It is **not** a dependency in `node/package.json` — do not add it.
 

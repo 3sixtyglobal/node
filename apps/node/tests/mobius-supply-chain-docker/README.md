@@ -13,11 +13,11 @@ MCP (Port Community System)           — Consumer (all locations)
 
 ### Data Flows Tested
 
-| Flow | Consumer | Provider | Filtering                          |
-| ---- | -------- | -------- | ---------------------------------- |
-| 1    | Ashford  | Mobius   | Sees only `unece:LOCODE#GBDVR`     |
-| 2    | Suffolk  | Mobius   | Sees only `unece:LOCODE#GBFXT`     |
-| 3    | MCP      | Mobius   | Sees all consignments (no filter)  |
+| Flow | Consumer | Provider | Filtering                         |
+| ---- | -------- | -------- | --------------------------------- |
+| 1    | Ashford  | Mobius   | Sees only `unece:LOCODE#GBDVR`    |
+| 2    | Suffolk  | Mobius   | Sees only `unece:LOCODE#GBFXT`    |
+| 3    | MCP      | Mobius   | Sees all consignments (no filter) |
 
 ### Per-Item ODRL Filtering
 
@@ -28,10 +28,10 @@ Each consumer has a dedicated ODRL offer with `AssetCollection` refinement const
 | Service | Internal Port | Host Port | Container Name    |
 | ------- | ------------- | --------- | ----------------- |
 | IPFS    | 5001          | 5021      | twin-mobius-ipfs  |
-| Mobius   | 3000          | 3020      | twin-mobius-node  |
-| Ashford  | 3001          | 3021      | twin-ashford-node |
-| Suffolk  | 3002          | 3022      | twin-suffolk-node |
-| MCP      | 3003          | 3023      | twin-mcp-node     |
+| Mobius  | 3000          | 3020      | twin-mobius-node  |
+| Ashford | 3001          | 3021      | twin-ashford-node |
+| Suffolk | 3002          | 3022      | twin-suffolk-node |
+| MCP     | 3003          | 3023      | twin-mcp-node     |
 
 ## Prerequisites
 
@@ -44,19 +44,19 @@ Each consumer has a dedicated ODRL offer with `AssetCollection` refinement const
 
 The Docker image copies packages from multiple submodules at build time (see `Dockerfile`). These must be built **before** running `docker compose build`:
 
-| Submodule | Packages used |
-| --------- | ------------- |
-| `node` | `node-core`, `apps/node` |
+| Submodule              | Packages used                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `node`                 | `node-core`, `apps/node`                                                                                        |
 | `data-space-connector` | `dataspace-control-plane-service`, `dataspace-data-plane-service`, `dataspace-models`, **`dataspace-test-app`** |
-| `rights-management` | `rights-management-*` (models, service, plugins, pap, pep, pnp, rest-client) |
-| `standards` | `standards-dataspace-protocol`, `standards-w3c-odrl` |
-| `synchronised-storage` | `synchronised-storage-models` |
-| `federated-catalogue` | `federated-catalogue-service`, `federated-catalogue-models` |
-| `verifiable-storage` | `verifiable-storage-connector-iota` |
-| `auditable-item-graph` | `auditable-item-graph-models`, `auditable-item-graph-rest-client`, `auditable-item-graph-service` |
-| `framework` | `entity` |
-| `data` | `data-core` |
-| `api` | `api-core` |
+| `rights-management`    | `rights-management-*` (models, service, plugins, pap, pep, pnp, rest-client)                                    |
+| `standards`            | `standards-dataspace-protocol`, `standards-w3c-odrl`                                                            |
+| `synchronised-storage` | `synchronised-storage-models`                                                                                   |
+| `federated-catalogue`  | `federated-catalogue-service`, `federated-catalogue-models`                                                     |
+| `verifiable-storage`   | `verifiable-storage-connector-iota`                                                                             |
+| `auditable-item-graph` | `auditable-item-graph-models`, `auditable-item-graph-rest-client`, `auditable-item-graph-service`               |
+| `framework`            | `entity`                                                                                                        |
+| `data`                 | `data-core`                                                                                                     |
+| `api`                  | `api-core`                                                                                                      |
 
 > **Note:** `@twin.org/dataspace-test-app` is **not** a dependency in `node/package.json`. It is loaded dynamically by the engine at runtime and reaches `node_modules` via `npm run local-link` (local dev) or `COPY` in the Dockerfile (Docker). Do not add it as a package.json dependency.
 
@@ -94,20 +94,20 @@ docker compose down -v
 
 ## Test Phases
 
-| Phase | Description |
-| ----- | ----------- |
-| 0     | Prerequisites: IPFS + 4 node health checks |
+| Phase | Description                                                              |
+| ----- | ------------------------------------------------------------------------ |
+| 0     | Prerequisites: IPFS + 4 node health checks                               |
 | 1     | Authentication: login, DID extraction, JWT-VC trust tokens (all 4 nodes) |
-| 2     | Seed 3 per-consumer ODRL offers on Mobius (AssetCollection refinements) |
-| 3     | Discovery: verify federated catalogue has datasets |
-| 4     | Contract Negotiation: Ashford <-> Mobius |
-| 5     | Contract Negotiation: Suffolk <-> Mobius |
-| 6     | Contract Negotiation: MCP <-> Mobius |
-| 7     | Data Transfer: Ashford pulls from Mobius |
-| 8     | Data Transfer: Suffolk pulls from Mobius |
-| 9     | Data Transfer: MCP pulls from Mobius |
-| 10    | Location filtering verification (per-consumer LOCODE check) |
-| 11    | Final verification: health, IPFS, catalogue consistency |
+| 2     | Seed 3 per-consumer ODRL offers on Mobius (AssetCollection refinements)  |
+| 3     | Discovery: verify federated catalogue has datasets                       |
+| 4     | Contract Negotiation: Ashford <-> Mobius                                 |
+| 5     | Contract Negotiation: Suffolk <-> Mobius                                 |
+| 6     | Contract Negotiation: MCP <-> Mobius                                     |
+| 7     | Data Transfer: Ashford pulls from Mobius                                 |
+| 8     | Data Transfer: Suffolk pulls from Mobius                                 |
+| 9     | Data Transfer: MCP pulls from Mobius                                     |
+| 10    | Location filtering verification (per-consumer LOCODE check)              |
+| 11    | Final verification: health, IPFS, catalogue consistency                  |
 
 ## Troubleshooting
 
