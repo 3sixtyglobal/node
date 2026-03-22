@@ -10,7 +10,7 @@ The engine state for the node.
 
 ### nodeId? {#nodeid}
 
-> `optional` **nodeId**: `string`
+> `optional` **nodeId?**: `string`
 
 The identity for the node.
 
@@ -18,6 +18,6 @@ The identity for the node.
 
 ### nodeTenantId? {#nodetenantid}
 
-> `optional` **nodeTenantId**: `string`
+> `optional` **nodeTenantId?**: `string`
 
 The tenant id for the node.

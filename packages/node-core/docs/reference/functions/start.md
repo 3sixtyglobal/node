@@ -8,9 +8,9 @@ Start the engine server.
 
 ### nodeOptions
 
-Optional run options for the engine server.
+[`INodeOptions`](../interfaces/INodeOptions.md) \| `undefined`
 
-[`INodeOptions`](../interfaces/INodeOptions.md) | `undefined`
+Optional run options for the engine server.
 
 ### nodeEngineConfig
 
