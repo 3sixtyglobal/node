@@ -46,6 +46,25 @@ Host ports are offset from the 2-node setup (3000→3010) to allow both setups t
 - IOTA testnet reachable
 - `jq` installed
 
+### Cross-Submodule Dependencies
+
+The Docker image copies packages from multiple submodules at build time (see `Dockerfile`). These must be built before running `docker compose build`:
+
+| Submodule | Packages used |
+| --------- | ------------- |
+| `node` | `node-core`, `apps/node` |
+| `data-space-connector` | `dataspace-control-plane-service`, `dataspace-models`, **`dataspace-test-app`** |
+| `rights-management` | `rights-management-rest-client`, `rights-management-pnp-service`, `rights-management-plugins`, `rights-management-service`, `rights-management-models` |
+| `standards` | `standards-dataspace-protocol` |
+| `federated-catalogue` | `federated-catalogue-service`, `federated-catalogue-models` |
+| `verifiable-storage` | `verifiable-storage-connector-iota` |
+| `auditable-item-graph` | `auditable-item-graph-models`, `auditable-item-graph-rest-client`, `auditable-item-graph-service` |
+| `framework` | `entity` |
+| `data` | `data-core` |
+| `api` | `api-core` |
+
+> **Note:** `@twin.org/dataspace-test-app` is loaded dynamically by the engine at runtime via `local-link` or Dockerfile `COPY`. It is **not** a dependency in `node/package.json` — do not add it.
+
 ## Quick Start
 
 ```bash
