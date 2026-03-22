@@ -1,0 +1,91 @@
+services:
+  twin-blob-ipfs:
+    image: ipfs/kubo:v0.40.1
+    container_name: twin-mobius-ipfs
+    ports:
+      - '5021:5001'
+      - '4021:4001'
+      - '8091:8080'
+    volumes:
+      - ipfs-data:/data/ipfs
+    networks:
+      - twin-mobius-network
+
+  twin-mobius:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+    container_name: twin-mobius-node
+    ports:
+      - '3020:3000'
+    env_file:
+      - env/mobius-docker.env
+    volumes:
+      - mobius-data:/app/data
+    depends_on:
+      twin-blob-ipfs:
+        condition: service_started
+    networks:
+      - twin-mobius-network
+
+  twin-ashford:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+    container_name: twin-ashford-node
+    ports:
+      - '3021:3001'
+    env_file:
+      - env/ashford-docker.env
+    volumes:
+      - ashford-data:/app/data
+    depends_on:
+      twin-mobius:
+        condition: service_started
+    networks:
+      - twin-mobius-network
+
+  twin-suffolk:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+    container_name: twin-suffolk-node
+    ports:
+      - '3022:3002'
+    env_file:
+      - env/suffolk-docker.env
+    volumes:
+      - suffolk-data:/app/data
+    depends_on:
+      twin-ashford:
+        condition: service_started
+    networks:
+      - twin-mobius-network
+
+  twin-mcp:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+    container_name: twin-mcp-node
+    ports:
+      - '3023:3003'
+    env_file:
+      - env/mcp-docker.env
+    volumes:
+      - mcp-data:/app/data
+    depends_on:
+      twin-suffolk:
+        condition: service_started
+    networks:
+      - twin-mobius-network
+
+volumes:
+  ipfs-data:
+  mobius-data:
+  ashford-data:
+  suffolk-data:
+  mcp-data:
+
+networks:
+  twin-mobius-network:
+    driver: bridge
