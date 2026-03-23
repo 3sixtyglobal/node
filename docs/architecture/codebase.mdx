@@ -17,6 +17,10 @@ The initiative started in August 2019 and was developed in collaboration with Tr
 
 The architecture is intentionally shaped by experience from v1. It uses open source to reduce adoption barriers, is designed to augment existing systems rather than replace them, and prioritises interoperability with established infrastructure. Standards-first modelling, extensibility, modularity, and testability are treated as core design constraints.
 
+## Philosophy
+
+The codebase is built on standardised patterns and engineering practices that prioritise refactor safety, type-driven development, and consistent message handling across the system. For detailed guidance on the architectural philosophy, patterns, and the reasoning behind key design decisions, see [Codebase Philosophy](./codebase-philosophy.mdx).
+
 ## Repository Breakdown
 
 The repositories are organised by capability domains such as blob storage. Each repository generally contains models, connectors, and components that work together. Models define standards-aligned object shapes, including REST request and response types. Connectors provide contract implementations for concrete providers such as AWS S3, IPFS, GCP Storage, or Azure Storage. Components usually wrap one or more connectors and add shared business logic such as encryption. Service variants expose component capabilities on the server side, while client variants preserve the same interfaces and route calls through REST.

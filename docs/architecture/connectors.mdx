@@ -7,7 +7,17 @@ import { ConnectorCompositionDiagram, ConnectorFactoryDiagram } from './connecto
 
 # Connectors
 
-A connector is a technology-specific implementation of a well-defined capability interface. Connectors form the infrastructure adapter layer of the TWIN platform, translating abstract, domain-oriented contracts into concrete interactions with storage backends, cloud services, messaging systems, distributed ledger networks, and other external systems. By separating the capability interface from its implementation, the platform allows any combination of backends to be selected and swapped at deployment time without modifying application code.
+A connector is a technology-specific implementation of a well-defined capability interface. Connectors form the infrastructure adapter layer of the platform, translating abstract, domain-oriented contracts into concrete interactions with storage backends, cloud services, messaging systems, distributed ledger networks, and other external systems. By separating the capability interface from its implementation, the platform allows any combination of backends to be selected and swapped at deployment time without modifying application code.
+
+## Why Pluggable Connectors
+
+The connector architecture solves a fundamental problem in distributed systems: operational flexibility. Once applications are built on this platform, they should be able to evolve their infrastructure without being forced to rewrite their application code or switch their underlying technology stack.
+
+This means deployments can run on any infrastructure, whether that is a cloud provider such as AWS, Azure, or GCP; a private on-premise data centre; or a hybrid combination with some services cloud-hosted and others running locally. The same application code works everywhere because the stack does not depend on a specific cloud vendor's APIs or proprietary services.
+
+Similarly, organisations can start with one backend technology and migrate to another without stopping the application. A deployment might begin with PostgreSQL for entity storage during initial development, migrate to DynamoDB as it scales cloud-first, and later add a separate ScyllaDB cluster for a specific entity type without changing a single line of application code. Only the deployment configuration changes, allowing the infrastructure team to optimise for cost, performance, compliance, or operational expertise without coupling those decisions to service implementation.
+
+The connector model also enables vendor independence. Rather than binding the platform to a specific cloud provider's ecosystem or a particular database technology, the abstraction allows teams to make infrastructure decisions based on long-term organisational strategy rather than architectural lock-in. This is especially important in evolving landscapes where technologies, pricing models, and service availability change rapidly.
 
 ## The Connector Interface
 
@@ -63,7 +73,7 @@ Connector selection and configuration at runtime is managed through `IEngineConf
 
 Multiple entries for the same domain are supported and serve different purposes. One entry can be marked with `isDefault: true` to indicate which instance services should use when no specific connector name is requested. Additional entries can be given individual instance names through `overrideInstanceType` to permit multiple named connectors of the same type to coexist. This is particularly useful when different entity schemas should be stored in different database clusters, or when a secondary logging connector should write to a different destination than the primary one.
 
-In a TWIN Node deployment, configuration is driven by environment variables. The `engineEnvBuilder` in the `node-core` package translates variables such as `ENTITY_STORAGE_CONNECTOR_TYPE`, `VAULT_CONNECTOR_TYPE`, and `LOGGING_CONNECTOR_TYPE` into the corresponding `IEngineConfig.types` entries, with further variables supplying the backend-specific connection details. The builder also resolves file-path roots, state filenames, and feature flags that control which optional components are active.
+In a node deployment, configuration is driven by environment variables. The `engineEnvBuilder` in the `node-core` package translates variables such as `ENTITY_STORAGE_CONNECTOR_TYPE`, `VAULT_CONNECTOR_TYPE`, and `LOGGING_CONNECTOR_TYPE` into the corresponding `IEngineConfig.types` entries, with further variables supplying the backend-specific connection details. The builder also resolves file-path roots, state filenames, and feature flags that control which optional components are active.
 
 Type initialisers reside in `engine/packages/engine-types/src/components/` with one file per connector domain. When `EngineCore.start()` runs, it iterates the registered initialisers in order, constructs the appropriate class based on the configuration entry, registers the instance in the domain factory, and adds it to `context.componentInstances` for lifecycle management. Because all registration happens in this single startup pass, the full connector graph is consistently wired before any service resolves its dependencies.
 
