@@ -69,7 +69,7 @@ cd <submodule> && npm run dist
 ## Quick Start
 
 ```bash
-cd node/apps/node/tests/mobius-supply-chain-docker
+cd node/apps/node/tests/mobiusSupplyChainDocker
 
 # 1. Bootstrap all 4 nodes (creates DIDs on IOTA testnet, ~8 min)
 #    Passwords are saved to .node-passwords for subsequent runs.

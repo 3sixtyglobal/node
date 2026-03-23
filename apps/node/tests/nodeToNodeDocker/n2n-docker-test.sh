@@ -2,7 +2,7 @@
 # =============================================================================
 # n2n-docker-test.sh — N2N DSP Flow with Dockerized Nodes
 # =============================================================================
-# Location: node/apps/node/tests/node-to-node-docker/n2n-docker-test.sh
+# Location: node/apps/node/tests/nodeToNodeDocker/n2n-docker-test.sh
 #
 # Same test flow as the local n2n-synced-storage.sh but adapted for Docker:
 #   - DIDs read from Docker volumes via docker exec

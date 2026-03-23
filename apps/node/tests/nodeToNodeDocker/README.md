@@ -44,7 +44,7 @@ The Docker image copies packages from multiple submodules at build time (see `Do
 ## Quick Start
 
 ```bash
-cd node/apps/node/tests/node-to-node-docker
+cd node/apps/node/tests/nodeToNodeDocker
 
 # 1. Build image, start IPFS, bootstrap both nodes (~3 min)
 ./setup.sh
@@ -138,7 +138,7 @@ internal DNS on the bridge network.
 
 ## Key Differences from Local Setup
 
-| Aspect         | Local (`node-to-node/`)           | Docker (`node-to-node-docker/`)           |
+| Aspect         | Local (`node-to-node/`)           | Docker (`nodeToNodeDocker/`)              |
 | -------------- | --------------------------------- | ----------------------------------------- |
 | Node processes | Direct `node src/index.js`        | Docker containers                         |
 | Data directory | `node/.local-data/node-a/`        | Docker volumes (`node-a-data`)            |

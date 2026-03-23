@@ -132,12 +132,12 @@ Each node creates a DID on IOTA testnet (~60s each). If the faucet is rate-limit
 
 ## Differences from 2-Node Setup
 
-| Aspect           | 2-Node (`node-to-node-docker/`) | 3-Node (this directory)       |
-| ---------------- | ------------------------------- | ----------------------------- |
-| Nodes            | 2 (A, B)                        | 3 (A, B, C)                   |
-| Host ports       | 3000, 3001, 5001                | 3010, 3011, 3012, 5011        |
-| Container prefix | `twin-`                         | `twin-multi-`                 |
-| Network          | `twin-network`                  | `twin-multi-network`          |
-| Test script      | Monolithic (833 lines)          | Modular with helper functions |
-| Data flows       | 1 (A<-B)                        | 3 (A<-B, C<-B, C<-A)          |
-| StorageItem      | 2 addresses                     | 3 addresses                   |
+| Aspect           | 2-Node (`nodeToNodeDocker/`) | 3-Node (this directory)       |
+| ---------------- | ---------------------------- | ----------------------------- |
+| Nodes            | 2 (A, B)                     | 3 (A, B, C)                   |
+| Host ports       | 3000, 3001, 5001             | 3010, 3011, 3012, 5011        |
+| Container prefix | `twin-`                      | `twin-multi-`                 |
+| Network          | `twin-network`               | `twin-multi-network`          |
+| Test script      | Monolithic (833 lines)       | Modular with helper functions |
+| Data flows       | 1 (A<-B)                     | 3 (A<-B, C<-B, C<-A)          |
+| StorageItem      | 2 addresses                  | 3 addresses                   |

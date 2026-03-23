@@ -14,7 +14,7 @@ services:
   twin-node-a:
     build:
       context: ../../../../..
-      dockerfile: node/apps/node/tests/node-to-node-docker/Dockerfile
+      dockerfile: node/apps/node/tests/nodeToNodeDocker/Dockerfile
     container_name: twin-node-a
     ports:
       - '3000:3000'
@@ -31,7 +31,7 @@ services:
   twin-node-b:
     build:
       context: ../../../../..
-      dockerfile: node/apps/node/tests/node-to-node-docker/Dockerfile
+      dockerfile: node/apps/node/tests/nodeToNodeDocker/Dockerfile
     container_name: twin-node-b
     ports:
       - '3001:3001'

@@ -252,7 +252,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should use custom cache directory when configured", async () => {
-		const customCacheDir = "custom-test-cache";
+		const customCacheDir = "customTestCache";
 		const packageName = "is-number@7.0.0";
 
 		try {
@@ -308,7 +308,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should use custom cache directory for HTTPS downloads", async () => {
-		const customCacheDir = "custom-https-cache";
+		const customCacheDir = "customHttpsCache";
 		const testUrl = "https://unpkg.com/is-number@7.0.0/index.js";
 		const maxSizeMb = 10;
 

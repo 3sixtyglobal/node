@@ -1,29 +1,34 @@
 #!/usr/bin/env bash
 # =============================================================================
-# multi-n2n-docker-test.sh — 3-Node Supply Chain DSP Flow Test
+# mobius-test.sh — 4-Node Mobius Supply Chain DSP Flow Test
 # =============================================================================
-# Location: node/apps/node/tests/node-to-node-multi-docker/
+# Location: node/apps/node/tests/mobiusSupplyChainDocker/
 #
-# Simulates a 3-node supply chain scenario:
-#   Node A (Shipper/Docket)  — publishes consignment data
-#   Node B (Twin UK Hub)     — central hub, consumes from A, publishes own data
-#   Node C (Logistics)       — consumes from B and A
+# Simulates the Mobius freight forwarder supply chain scenario:
+#   Mobius (Freight Forwarder)            — Publisher, publishes consignment data
+#   Ashford Port Health (Border Agency)   — Consumer (UN/LOCODE: GBDVR, GBFOL)
+#   Suffolk Coastal Port Health           — Consumer (UN/LOCODE: GBFXT, GBHWR)
+#   MCP (Port Community System)           — Consumer (all locations)
 #
 # Phases:
-#   Phase 0: Prerequisites (IPFS + 3 node containers)
-#   Phase 1: Authentication (login + DIDs + trust tokens for all 3 nodes)
-#   Phase 2: Seed ODRL Offers (on providers: Node A and Node B)
-#   Phase 3: Discovery (verify 3-way federated catalogue sync)
-#   Phase 4: Flow 1 — Node A consumes from Node B (Twin UK pulls from Shipper)
-#   Phase 5: Flow 2 — Node C consumes from Node B (Logistics pulls from Twin UK)
-#   Phase 6: Flow 3 — Node C consumes from Node A (Logistics pulls from Shipper)
-#   Phase 7: Final verification
+#   Phase 0: Prerequisites (IPFS + 4 node containers)
+#   Phase 1: Authentication (login + DIDs + trust tokens for all 4 nodes)
+#   Phase 2: Seed ODRL Offer on Mobius (publisher)
+#   Phase 3: Discovery (verify federated catalogue has datasets)
+#   Phase 4: Contract Negotiation — Ashford negotiates with Mobius
+#   Phase 5: Contract Negotiation — Suffolk negotiates with Mobius
+#   Phase 6: Contract Negotiation — MCP negotiates with Mobius
+#   Phase 7: Data Transfer — Ashford pulls from Mobius
+#   Phase 8: Data Transfer — Suffolk pulls from Mobius
+#   Phase 9: Data Transfer — MCP pulls from Mobius
+#   Phase 10: Location filtering verification (per-consumer LOCODE check)
+#   Phase 11: Final verification
 #
 # Usage:
-#   ./multi-n2n-docker-test.sh <node-a-password> <node-b-password> <node-c-password>
+#   ./mobius-test.sh <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>
 #
 # Prerequisites:
-#   - docker compose up (IPFS + all 3 nodes running)
+#   - docker compose up (IPFS + all 4 nodes running)
 #   - All nodes bootstrapped via setup.sh
 #   - StorageItem provisioned via provision-storage.sh
 #   - jq installed
@@ -34,30 +39,35 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-NODE_A_PORT="${NODE_A_PORT:-3000}"
-NODE_B_PORT="${NODE_B_PORT:-3001}"
-NODE_C_PORT="${NODE_C_PORT:-3002}"
+MOBIUS_PORT="${MOBIUS_PORT:-3000}"
+ASHFORD_PORT="${ASHFORD_PORT:-3001}"
+SUFFOLK_PORT="${SUFFOLK_PORT:-3002}"
+MCP_PORT="${MCP_PORT:-3003}"
 
 # Host-accessible URLs (via Docker port forwarding)
-NODE_A_HOST="${NODE_A_HOST:-http://localhost:3010}"
-NODE_B_HOST="${NODE_B_HOST:-http://localhost:3011}"
-NODE_C_HOST="${NODE_C_HOST:-http://localhost:3012}"
+MOBIUS_HOST="${MOBIUS_HOST:-http://localhost:3020}"
+ASHFORD_HOST="${ASHFORD_HOST:-http://localhost:3021}"
+SUFFOLK_HOST="${SUFFOLK_HOST:-http://localhost:3022}"
+MCP_HOST="${MCP_HOST:-http://localhost:3023}"
 
-NODE_A_EMAIL="${NODE_A_EMAIL:-admin@node}"
-NODE_B_EMAIL="${NODE_B_EMAIL:-admin@node}"
-NODE_C_EMAIL="${NODE_C_EMAIL:-admin@node}"
+MOBIUS_EMAIL="${MOBIUS_EMAIL:-admin@node}"
+ASHFORD_EMAIL="${ASHFORD_EMAIL:-admin@node}"
+SUFFOLK_EMAIL="${SUFFOLK_EMAIL:-admin@node}"
+MCP_EMAIL="${MCP_EMAIL:-admin@node}"
 
-IPFS_API="${IPFS_API:-http://localhost:5011/api/v0}"
+IPFS_API="${IPFS_API:-http://localhost:5021/api/v0}"
 
 # Docker container names (must match docker-compose.yml)
-NODE_A_CONTAINER="twin-multi-node-a"
-NODE_B_CONTAINER="twin-multi-node-b"
-NODE_C_CONTAINER="twin-multi-node-c"
+MOBIUS_CONTAINER="twin-mobius-node"
+ASHFORD_CONTAINER="twin-ashford-node"
+SUFFOLK_CONTAINER="twin-suffolk-node"
+MCP_CONTAINER="twin-mcp-node"
 
 # Container-internal service names (for container-to-container communication)
-NODE_A_INTERNAL="http://twin-node-a:${NODE_A_PORT}"
-NODE_B_INTERNAL="http://twin-node-b:${NODE_B_PORT}"
-NODE_C_INTERNAL="http://twin-node-c:${NODE_C_PORT}"
+MOBIUS_INTERNAL="http://twin-mobius:${MOBIUS_PORT}"
+ASHFORD_INTERNAL="http://twin-ashford:${ASHFORD_PORT}"
+SUFFOLK_INTERNAL="http://twin-suffolk:${SUFFOLK_PORT}"
+MCP_INTERNAL="http://twin-mcp:${MCP_PORT}"
 
 # Trust verification method ID
 TRUST_VERIFICATION_METHOD_ID="${TRUST_VERIFICATION_METHOD_ID:-trust-assertion}"
@@ -65,12 +75,16 @@ TRUST_VERIFICATION_METHOD_ID="${TRUST_VERIFICATION_METHOD_ID:-trust-assertion}"
 # DSP context
 DSP_CONTEXT="https://w3id.org/dspace/2025/1/context.jsonld"
 
-# Test app dataset and offer (must match testDataspaceDataPlaneApp.ts)
+# Test app dataset and offers (must match testDataspaceDataPlaneApp.ts)
 DATASET_ID="https://twin.example.org/data-service-1"
-OFFER_ID="urn:policy:test-offer-read-consignment"
 ENTITY_TYPE="https://vocabulary.uncefact.org/Consignment"
 
-# Sync wait configuration (increased for 3 nodes)
+# Per-consumer offer IDs for location-based filtering
+ASHFORD_OFFER_ID="urn:policy:mobius-consignment-offer-ashford"
+SUFFOLK_OFFER_ID="urn:policy:mobius-consignment-offer-suffolk"
+MCP_OFFER_ID="urn:policy:mobius-consignment-offer-mcp"
+
+# Sync wait configuration
 SYNC_MAX_RETRIES="${SYNC_MAX_RETRIES:-20}"
 SYNC_RETRY_DELAY="${SYNC_RETRY_DELAY:-10}"
 
@@ -108,7 +122,6 @@ show_json() { echo "$1" | jq '.' 2>/dev/null || echo "$1"; }
 # ---------------------------------------------------------------------------
 
 # Login to a node and return session token via RESULT_TOKEN
-# Usage: login_node <host> <email> <password>
 login_node() {
     local host="$1" email="$2" password="$3"
     local response token
@@ -128,7 +141,6 @@ login_node() {
 }
 
 # Read DID from a container's engine-state.json
-# Usage: read_did <container_name>
 read_did() {
     local container="$1"
     local did
@@ -142,7 +154,6 @@ read_did() {
 }
 
 # Generate JWT-VC trust token on a node
-# Usage: generate_trust <host> <did> <session_token>
 generate_trust() {
     local host="$1" did="$2" session_token="$3"
     local response http_code body jwt
@@ -151,7 +162,7 @@ generate_trust() {
         "${host}/identity/${did}/verifiable-credential/${TRUST_VERIFICATION_METHOD_ID}" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${session_token}" \
-        -d '{"subject": {"id": "urn:trust:multi-n2n-docker"}}') || true
+        -d '{"subject": {"id": "urn:trust:mobius-supply-chain"}}') || true
 
     http_code=$(echo "${response}" | tail -1)
     body=$(echo "${response}" | sed '$d')
@@ -170,25 +181,63 @@ generate_trust() {
     RESULT_TRUST_TOKEN="${jwt}"
 }
 
-# Seed ODRL Offer into a provider's PAP
-# Usage: seed_offer <host> <session_token> <provider_did>
-seed_offer() {
-    local host="$1" session_token="$2" provider_did="$3"
-    local body response http_code
+# Build an ODRL Offer JSON for seeding / negotiation
+# Usage: build_offer_json <offer_id> <assigner> <target> [refinement_field] [refinement_value]
+#   Without refinement: simple offer (sees all data)
+#   With refinement: AssetCollection offer (per-item filtering)
+build_offer_json() {
+    local offer_id="$1" assigner="$2" target="$3"
+    local refinement_field="${4:-}" refinement_value="${5:-}"
 
-    body=$(jq -n \
-        --arg uid "${OFFER_ID}" \
-        --arg assigner "${provider_did}" \
-        --arg target "${DATASET_ID}" \
-        '{
-            "@context": "http://www.w3.org/ns/odrl.jsonld",
-            "@type": "Offer",
-            "uid": $uid,
-            "assigner": $assigner,
-            "target": $target,
-            "action": "read",
-            "permission": [{ "action": "read", "target": $target }]
-        }')
+    if [ -n "${refinement_field}" ]; then
+        jq -n \
+            --arg uid "${offer_id}" \
+            --arg assigner "${assigner}" \
+            --arg source "${target}" \
+            --arg field "${refinement_field}" \
+            --arg value "${refinement_value}" \
+            '{
+                "@context": "http://www.w3.org/ns/odrl.jsonld",
+                "@type": "Offer",
+                "uid": $uid,
+                "assigner": $assigner,
+                "target": $source,
+                "action": "read",
+                "permission": [{
+                    "action": "read",
+                    "target": {
+                        "@type": "AssetCollection",
+                        "source": $source,
+                        "refinement": {
+                            "leftOperand": $field,
+                            "operator": "eq",
+                            "rightOperand": $value
+                        }
+                    }
+                }]
+            }'
+    else
+        jq -n \
+            --arg uid "${offer_id}" \
+            --arg assigner "${assigner}" \
+            --arg target "${target}" \
+            '{
+                "@context": "http://www.w3.org/ns/odrl.jsonld",
+                "@type": "Offer",
+                "uid": $uid,
+                "assigner": $assigner,
+                "target": $target,
+                "action": "read",
+                "permission": [{ "action": "read", "target": $target }]
+            }'
+    fi
+}
+
+# Seed ODRL Offer JSON into a node's PAP
+# Usage: seed_offer <host> <session_token> <offer_json>
+seed_offer() {
+    local host="$1" session_token="$2" body="$3"
+    local response http_code
 
     response=$(curl -si -X POST "${host}/rights-management/policy/admin" \
         -H "Content-Type: application/json" \
@@ -205,12 +254,12 @@ seed_offer() {
 }
 
 # Run full PNP contract negotiation between consumer and provider
-# Usage: negotiate_contract <consumer_host> <provider_host> <consumer_trust> <consumer_did> <provider_did> <consumer_internal>
+# Usage: negotiate_contract <consumer_host> <provider_host> <consumer_trust> <consumer_did> <provider_did> <consumer_internal> <consumer_token> <offer_json>
 # Sets: RESULT_AGREEMENT_ID, RESULT_PROVIDER_NEGOTIATION_PID
 negotiate_contract() {
     local consumer_host="$1" provider_host="$2" consumer_trust="$3"
     local consumer_did="$4" provider_did="$5" consumer_internal="$6"
-    local consumer_token="$7"
+    local consumer_token="$7" offer_json="$8"
     local consumer_pid="urn:contract-negotiation:consumer-$(date +%s)-${RANDOM}"
 
     # Pre-inject consumer-side negotiation entry (race condition fix)
@@ -247,22 +296,13 @@ negotiate_contract() {
     negotiate_body=$(jq -n \
         --arg ctx "${DSP_CONTEXT}" \
         --arg consumerPid "${consumer_pid}" \
-        --arg offerId "${OFFER_ID}" \
-        --arg assigner "${provider_did}" \
-        --arg target "${DATASET_ID}" \
+        --argjson offer "${offer_json}" \
         --arg callback "${consumer_internal}" \
         '{
             "@context": [$ctx],
             "@type": "ContractRequestMessage",
             "consumerPid": $consumerPid,
-            "offer": {
-                "@type": "Offer",
-                "@id": $offerId,
-                "assigner": $assigner,
-                "target": $target,
-                "action": "read",
-                "permission": [{ "action": "read", "target": $target }]
-            },
+            "offer": $offer,
             "callbackAddress": $callback
         }')
 
@@ -314,20 +354,22 @@ negotiate_contract() {
     if [ "${final_state}" = "FINALIZED" ] || [ "${final_state}" = "VERIFIED" ]; then
         ok "Negotiation completed (state: ${final_state})"
 
-        # Extract actual agreement ID from consumer's PNAP (agreement UID differs from offer UID)
-        local pnap_response pnap_body agreement_id
-        pnap_response=$(curl -s -w "\n%{http_code}" \
+        # Extract actual agreement ID from consumer's PNAP
+        local pnap_response2 pnap_body2 agreement_id
+        pnap_response2=$(curl -s -w "\n%{http_code}" \
             "${consumer_host}/rights-management/negotiations/admin/${consumer_pid}" \
             -H "Authorization: Bearer ${consumer_token}") || true
-        pnap_body=$(echo "${pnap_response}" | sed '$d')
-        agreement_id=$(echo "${pnap_body}" | jq -r '.agreement["@id"] // .agreement.uid // empty' 2>/dev/null)
+        pnap_body2=$(echo "${pnap_response2}" | sed '$d')
+        agreement_id=$(echo "${pnap_body2}" | jq -r '.agreement["@id"] // .agreement.uid // empty' 2>/dev/null)
 
         if [ -n "${agreement_id}" ]; then
             RESULT_AGREEMENT_ID="${agreement_id}"
             ok "Agreement ID: ${agreement_id}"
         else
+            local fallback_offer_id
+            fallback_offer_id=$(echo "${offer_json}" | jq -r '.uid // empty' 2>/dev/null)
             warn "Could not extract agreement ID from PNAP, falling back to offer ID"
-            RESULT_AGREEMENT_ID="${OFFER_ID}"
+            RESULT_AGREEMENT_ID="${fallback_offer_id}"
         fi
         RESULT_PROVIDER_NEGOTIATION_PID="${provider_nego_pid}"
     else
@@ -344,7 +386,7 @@ run_dsp_transfer() {
     local flow_name="$1" provider_host="$2" consumer_host="$3"
     local consumer_trust="$4" provider_trust="$5" agreement_id="$6"
     local consumer_internal="$7"
-    local consumer_pid="urn:uuid:multi-${flow_name}-$(date +%s)-${RANDOM}"
+    local consumer_pid="urn:uuid:mobius-${flow_name}-$(date +%s)-${RANDOM}"
     local callback="${consumer_internal}/dataspace"
 
     # --- Transfer Request ---
@@ -440,13 +482,25 @@ run_dsp_transfer() {
 
     pull_http=$(echo "${pull_response}" | tail -1)
     pull_body=$(echo "${pull_response}" | sed '$d')
-    item_count=$(echo "${pull_body}" | jq -r '(.itemListElement // []) | length' 2>/dev/null || echo "0")
+    item_count=$(echo "${pull_body}" | jq -r '[(.itemListElement // [])[] | select(. != null)] | length' 2>/dev/null || echo "0")
 
     if [ "${item_count}" -gt 0 ] 2>/dev/null; then
         ok "[${flow_name}] Received ${item_count} entity/entities"
+
+        # Extract ALL unloadingLocation.id values (UN/LOCODE) from the response
+        local ports_of_entry
+        ports_of_entry=$(echo "${pull_body}" | jq -r '[(.itemListElement // [])[] | select(. != null) | .unloadingLocation.id // empty] | map(select(. != "")) | join(",")' 2>/dev/null || true)
+        if [ -n "${ports_of_entry}" ] && [ "${ports_of_entry}" != "null" ]; then
+            ok "[${flow_name}] Consignment unloadingLocation IDs: ${ports_of_entry}"
+        else
+            warn "[${flow_name}] No unloadingLocation in consignment data"
+        fi
     else
+        local ports_of_entry=""
         warn "[${flow_name}] No entities in response"
     fi
+
+    RESULT_PORTS_OF_ENTRY="${ports_of_entry:-}"
 
     # --- Complete Transfer ---
     step "[${flow_name}] Completing transfer..."
@@ -485,14 +539,14 @@ count_datasets() {
 # Translate container-internal URL to host-accessible URL
 translate_endpoint() {
     local url="$1"
-    url=$(echo "${url}" | sed "s|http://twin-node-a:${NODE_A_PORT}|http://localhost:3010|g")
-    url=$(echo "${url}" | sed "s|http://twin-node-b:${NODE_B_PORT}|http://localhost:3011|g")
-    url=$(echo "${url}" | sed "s|http://twin-node-c:${NODE_C_PORT}|http://localhost:3012|g")
+    url=$(echo "${url}" | sed "s|http://twin-mobius:${MOBIUS_PORT}|http://localhost:3020|g")
+    url=$(echo "${url}" | sed "s|http://twin-ashford:${ASHFORD_PORT}|http://localhost:3021|g")
+    url=$(echo "${url}" | sed "s|http://twin-suffolk:${SUFFOLK_PORT}|http://localhost:3022|g")
+    url=$(echo "${url}" | sed "s|http://twin-mcp:${MCP_PORT}|http://localhost:3023|g")
     echo "${url}"
 }
 
 # Query federated catalogue and return dataset count
-# Usage: query_catalogue <host> <session_token>
 query_catalogue() {
     local host="$1" token="$2"
     local response http_code body
@@ -515,8 +569,8 @@ query_catalogue() {
 # ---------------------------------------------------------------------------
 # Argument validation
 # ---------------------------------------------------------------------------
-if [ $# -lt 3 ]; then
-    echo -e "${BOLD}Usage:${NC} $0 <node-a-password> <node-b-password> <node-c-password>"
+if [ $# -lt 4 ]; then
+    echo -e "${BOLD}Usage:${NC} $0 <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>"
     echo ""
     echo "  Passwords are printed during setup.sh bootstrap."
     echo "  IMPORTANT: Wrap passwords in single quotes."
@@ -527,14 +581,16 @@ if [ $# -lt 3 ]; then
     exit 1
 fi
 
-NODE_A_PASSWORD="$1"
-NODE_B_PASSWORD="$2"
-NODE_C_PASSWORD="$3"
+MOBIUS_PASSWORD="$1"
+ASHFORD_PASSWORD="$2"
+SUFFOLK_PASSWORD="$3"
+MCP_PASSWORD="$4"
 
-echo -e "${BOLD}Multi-Node Docker Test (3-node supply chain)${NC}"
-echo -e "  Node A (Shipper):   ${NODE_A_HOST} (container: ${NODE_A_CONTAINER})"
-echo -e "  Node B (Twin UK):   ${NODE_B_HOST} (container: ${NODE_B_CONTAINER})"
-echo -e "  Node C (Logistics): ${NODE_C_HOST} (container: ${NODE_C_CONTAINER})"
+echo -e "${BOLD}Mobius Supply Chain Docker Test (4-node)${NC}"
+echo -e "  Mobius (Freight Forwarder): ${MOBIUS_HOST} (container: ${MOBIUS_CONTAINER})"
+echo -e "  Ashford (Port Health):     ${ASHFORD_HOST} (container: ${ASHFORD_CONTAINER})"
+echo -e "  Suffolk (Coastal PH):      ${SUFFOLK_HOST} (container: ${SUFFOLK_CONTAINER})"
+echo -e "  MCP (Port Community):      ${MCP_HOST} (container: ${MCP_CONTAINER})"
 echo -e "  IPFS: ${IPFS_API}"
 
 # ==========================================================================
@@ -548,177 +604,283 @@ ok "IPFS running"
 
 check_node() {
     local label="$1" container="$2" host="$3"
-    step "Checking Node ${label}..."
+    step "Checking ${label}..."
     docker inspect "${container}" >/dev/null 2>&1 || fail "Container ${container} not found"
-    curl -sf "${host}/info" >/dev/null 2>&1 || fail "Node ${label} not reachable at ${host}/info"
-    ok "Node ${label} is running"
+    curl -sf "${host}/info" >/dev/null 2>&1 || fail "${label} not reachable at ${host}/info"
+    ok "${label} is running"
 }
-check_node "A(Shipper)" "${NODE_A_CONTAINER}" "${NODE_A_HOST}"
-check_node "B(TwinUK)" "${NODE_B_CONTAINER}" "${NODE_B_HOST}"
-check_node "C(Logistics)" "${NODE_C_CONTAINER}" "${NODE_C_HOST}"
+check_node "Mobius" "${MOBIUS_CONTAINER}" "${MOBIUS_HOST}"
+check_node "Ashford" "${ASHFORD_CONTAINER}" "${ASHFORD_HOST}"
+check_node "Suffolk" "${SUFFOLK_CONTAINER}" "${SUFFOLK_HOST}"
+check_node "MCP" "${MCP_CONTAINER}" "${MCP_HOST}"
 
 PHASE_RESULTS+=("${GREEN}[0]${NC} Prerequisites")
 
 # ==========================================================================
 # Phase 1: Authentication
 # ==========================================================================
-phase 1 "Authentication (3 nodes)"
+phase 1 "Authentication (4 nodes)"
 
-# Login all 3 nodes
-step "Logging in to Node A (Shipper)..."
-login_node "${NODE_A_HOST}" "${NODE_A_EMAIL}" "${NODE_A_PASSWORD}"
-NODE_A_TOKEN="${RESULT_TOKEN}"
-ok "Node A token (${#NODE_A_TOKEN} chars)"
+step "Logging in to Mobius..."
+login_node "${MOBIUS_HOST}" "${MOBIUS_EMAIL}" "${MOBIUS_PASSWORD}"
+MOBIUS_TOKEN="${RESULT_TOKEN}"
+ok "Mobius token (${#MOBIUS_TOKEN} chars)"
 
-step "Logging in to Node B (Twin UK)..."
-login_node "${NODE_B_HOST}" "${NODE_B_EMAIL}" "${NODE_B_PASSWORD}"
-NODE_B_TOKEN="${RESULT_TOKEN}"
-ok "Node B token (${#NODE_B_TOKEN} chars)"
+step "Logging in to Ashford..."
+login_node "${ASHFORD_HOST}" "${ASHFORD_EMAIL}" "${ASHFORD_PASSWORD}"
+ASHFORD_TOKEN="${RESULT_TOKEN}"
+ok "Ashford token (${#ASHFORD_TOKEN} chars)"
 
-step "Logging in to Node C (Logistics)..."
-login_node "${NODE_C_HOST}" "${NODE_C_EMAIL}" "${NODE_C_PASSWORD}"
-NODE_C_TOKEN="${RESULT_TOKEN}"
-ok "Node C token (${#NODE_C_TOKEN} chars)"
+step "Logging in to Suffolk..."
+login_node "${SUFFOLK_HOST}" "${SUFFOLK_EMAIL}" "${SUFFOLK_PASSWORD}"
+SUFFOLK_TOKEN="${RESULT_TOKEN}"
+ok "Suffolk token (${#SUFFOLK_TOKEN} chars)"
+
+step "Logging in to MCP..."
+login_node "${MCP_HOST}" "${MCP_EMAIL}" "${MCP_PASSWORD}"
+MCP_TOKEN="${RESULT_TOKEN}"
+ok "MCP token (${#MCP_TOKEN} chars)"
 
 # Read DIDs
 step "Reading DIDs from containers..."
-read_did "${NODE_A_CONTAINER}"; NODE_A_DID="${RESULT_DID}"; ok "Node A DID: ${NODE_A_DID}"
-read_did "${NODE_B_CONTAINER}"; NODE_B_DID="${RESULT_DID}"; ok "Node B DID: ${NODE_B_DID}"
-read_did "${NODE_C_CONTAINER}"; NODE_C_DID="${RESULT_DID}"; ok "Node C DID: ${NODE_C_DID}"
+read_did "${MOBIUS_CONTAINER}"; MOBIUS_DID="${RESULT_DID}"; ok "Mobius DID: ${MOBIUS_DID}"
+read_did "${ASHFORD_CONTAINER}"; ASHFORD_DID="${RESULT_DID}"; ok "Ashford DID: ${ASHFORD_DID}"
+read_did "${SUFFOLK_CONTAINER}"; SUFFOLK_DID="${RESULT_DID}"; ok "Suffolk DID: ${SUFFOLK_DID}"
+read_did "${MCP_CONTAINER}"; MCP_DID="${RESULT_DID}"; ok "MCP DID: ${MCP_DID}"
 
 # Generate trust tokens
 step "Generating trust tokens..."
-generate_trust "${NODE_A_HOST}" "${NODE_A_DID}" "${NODE_A_TOKEN}"
-NODE_A_TRUST="${RESULT_TRUST_TOKEN}"; ok "Node A trust token (${#NODE_A_TRUST} chars)"
+generate_trust "${MOBIUS_HOST}" "${MOBIUS_DID}" "${MOBIUS_TOKEN}"
+MOBIUS_TRUST="${RESULT_TRUST_TOKEN}"; ok "Mobius trust token (${#MOBIUS_TRUST} chars)"
 
-generate_trust "${NODE_B_HOST}" "${NODE_B_DID}" "${NODE_B_TOKEN}"
-NODE_B_TRUST="${RESULT_TRUST_TOKEN}"; ok "Node B trust token (${#NODE_B_TRUST} chars)"
+generate_trust "${ASHFORD_HOST}" "${ASHFORD_DID}" "${ASHFORD_TOKEN}"
+ASHFORD_TRUST="${RESULT_TRUST_TOKEN}"; ok "Ashford trust token (${#ASHFORD_TRUST} chars)"
 
-generate_trust "${NODE_C_HOST}" "${NODE_C_DID}" "${NODE_C_TOKEN}"
-NODE_C_TRUST="${RESULT_TRUST_TOKEN}"; ok "Node C trust token (${#NODE_C_TRUST} chars)"
+generate_trust "${SUFFOLK_HOST}" "${SUFFOLK_DID}" "${SUFFOLK_TOKEN}"
+SUFFOLK_TRUST="${RESULT_TRUST_TOKEN}"; ok "Suffolk trust token (${#SUFFOLK_TRUST} chars)"
 
-PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (3 nodes)")
+generate_trust "${MCP_HOST}" "${MCP_DID}" "${MCP_TOKEN}"
+MCP_TRUST="${RESULT_TRUST_TOKEN}"; ok "MCP trust token (${#MCP_TRUST} chars)"
 
-# ==========================================================================
-# Phase 2: Seed ODRL Offers
-# ==========================================================================
-phase 2 "Seed ODRL Offers"
-
-step "Seeding offer into Node A's PAP (Shipper as provider)..."
-seed_offer "${NODE_A_HOST}" "${NODE_A_TOKEN}" "${NODE_A_DID}"
-ok "Offer seeded on Node A: ${OFFER_ID}"
-
-step "Seeding offer into Node B's PAP (Twin UK as provider)..."
-seed_offer "${NODE_B_HOST}" "${NODE_B_TOKEN}" "${NODE_B_DID}"
-ok "Offer seeded on Node B: ${OFFER_ID}"
-
-PHASE_RESULTS+=("${GREEN}[2]${NC} ODRL Offers Seeded (Node A + B)")
+PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (4 nodes)")
 
 # ==========================================================================
-# Phase 3: Discovery — 3-way Sync
+# Phase 2: Seed ODRL Offer on Mobius (publisher)
 # ==========================================================================
-phase 3 "Discovery (3-way Federated Catalogue Sync)"
+phase 2 "Seed Per-Consumer ODRL Offers on Mobius"
 
-# Check each node's own catalogue first
-query_catalogue "${NODE_A_HOST}" "${NODE_A_TOKEN}"; echo "  Node A catalogue: ${RESULT_DATASET_COUNT} dataset(s)"
-query_catalogue "${NODE_B_HOST}" "${NODE_B_TOKEN}"; echo "  Node B catalogue: ${RESULT_DATASET_COUNT} dataset(s)"
-query_catalogue "${NODE_C_HOST}" "${NODE_C_TOKEN}"; echo "  Node C catalogue: ${RESULT_DATASET_COUNT} dataset(s)"
+# Build per-consumer offers with AssetCollection refinements
+# Ashford: unloadingLocation.id == unece:LOCODE#GBDVR (Dover area)
+ASHFORD_OFFER_JSON=$(build_offer_json "${ASHFORD_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
+    "twin:jsonpath:$.unloadingLocation.id" "unece:LOCODE#GBDVR")
+# Suffolk: unloadingLocation.id == unece:LOCODE#GBFXT (Felixstowe area)
+SUFFOLK_OFFER_JSON=$(build_offer_json "${SUFFOLK_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
+    "twin:jsonpath:$.unloadingLocation.id" "unece:LOCODE#GBFXT")
+# MCP: no refinement (sees all data)
+MCP_OFFER_JSON=$(build_offer_json "${MCP_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}")
 
-# NOTE: Synchronized storage syncs entity data from the trusted node (A) to
-# secondary nodes (B, C) via IOTA verifiable storage. However, federated catalogue
-# datasets created by the test app are local to each node. Cross-node catalogue
-# discovery happens at negotiation time — the consumer queries the PROVIDER's
-# catalogue endpoint directly, so local sync is not required for DSP flows.
-#
-# This phase verifies each node has its own dataset registered. No sync wait needed.
-step "Verifying each node has its own catalogue dataset..."
+step "Seeding Ashford offer (GBDVR only)..."
+seed_offer "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${ASHFORD_OFFER_JSON}"
+ok "Offer seeded: ${ASHFORD_OFFER_ID}"
 
-ALL_HAVE_DATASETS=true
-query_catalogue "${NODE_A_HOST}" "${NODE_A_TOKEN}"
+step "Seeding Suffolk offer (GBFXT only)..."
+seed_offer "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${SUFFOLK_OFFER_JSON}"
+ok "Offer seeded: ${SUFFOLK_OFFER_ID}"
+
+step "Seeding MCP offer (all locations)..."
+seed_offer "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${MCP_OFFER_JSON}"
+ok "Offer seeded: ${MCP_OFFER_ID}"
+
+PHASE_RESULTS+=("${GREEN}[2]${NC} 3 Per-Consumer ODRL Offers Seeded (Mobius)")
+
+# ==========================================================================
+# Phase 3: Discovery — Federated Catalogue
+# ==========================================================================
+phase 3 "Discovery (Federated Catalogue)"
+
+step "Verifying Mobius has datasets registered..."
+query_catalogue "${MOBIUS_HOST}" "${MOBIUS_TOKEN}"
 if [ "${RESULT_DATASET_COUNT}" -ge 1 ] 2>/dev/null; then
-    ok "Node A: ${RESULT_DATASET_COUNT} dataset(s)"
+    ok "Mobius: ${RESULT_DATASET_COUNT} dataset(s)"
 else
-    warn "Node A: no datasets found"; ALL_HAVE_DATASETS=false
+    warn "Mobius: no datasets found"
 fi
 
-query_catalogue "${NODE_B_HOST}" "${NODE_B_TOKEN}"
-if [ "${RESULT_DATASET_COUNT}" -ge 1 ] 2>/dev/null; then
-    ok "Node B: ${RESULT_DATASET_COUNT} dataset(s)"
+# Also check consumer catalogues (they should have their own from the test app)
+step "Checking consumer catalogues..."
+query_catalogue "${ASHFORD_HOST}" "${ASHFORD_TOKEN}"; echo -e "    Ashford: ${RESULT_DATASET_COUNT} dataset(s)"
+query_catalogue "${SUFFOLK_HOST}" "${SUFFOLK_TOKEN}"; echo -e "    Suffolk: ${RESULT_DATASET_COUNT} dataset(s)"
+query_catalogue "${MCP_HOST}" "${MCP_TOKEN}"; echo -e "    MCP: ${RESULT_DATASET_COUNT} dataset(s)"
+
+PHASE_RESULTS+=("${GREEN}[3]${NC} Discovery")
+
+# ==========================================================================
+# Phase 4: Contract Negotiation — Ashford negotiates with Mobius
+# ==========================================================================
+phase 4 "Contract Negotiation: Ashford <-> Mobius"
+
+step "Negotiating contract: Ashford (consumer) -> Mobius (provider)..."
+negotiate_contract "${ASHFORD_HOST}" "${MOBIUS_HOST}" "${ASHFORD_TRUST}" \
+    "${ASHFORD_DID}" "${MOBIUS_DID}" "${ASHFORD_INTERNAL}" "${ASHFORD_TOKEN}" \
+    "${ASHFORD_OFFER_JSON}"
+ASHFORD_AGREEMENT="${RESULT_AGREEMENT_ID}"
+
+PHASE_RESULTS+=("${GREEN}[4]${NC} Ashford<->Mobius negotiation")
+
+# ==========================================================================
+# Phase 5: Contract Negotiation — Suffolk negotiates with Mobius
+# ==========================================================================
+phase 5 "Contract Negotiation: Suffolk <-> Mobius"
+
+step "Negotiating contract: Suffolk (consumer) -> Mobius (provider)..."
+negotiate_contract "${SUFFOLK_HOST}" "${MOBIUS_HOST}" "${SUFFOLK_TRUST}" \
+    "${SUFFOLK_DID}" "${MOBIUS_DID}" "${SUFFOLK_INTERNAL}" "${SUFFOLK_TOKEN}" \
+    "${SUFFOLK_OFFER_JSON}"
+SUFFOLK_AGREEMENT="${RESULT_AGREEMENT_ID}"
+
+PHASE_RESULTS+=("${GREEN}[5]${NC} Suffolk<->Mobius negotiation")
+
+# ==========================================================================
+# Phase 6: Contract Negotiation — MCP negotiates with Mobius
+# ==========================================================================
+phase 6 "Contract Negotiation: MCP <-> Mobius"
+
+step "Negotiating contract: MCP (consumer) -> Mobius (provider)..."
+negotiate_contract "${MCP_HOST}" "${MOBIUS_HOST}" "${MCP_TRUST}" \
+    "${MCP_DID}" "${MOBIUS_DID}" "${MCP_INTERNAL}" "${MCP_TOKEN}" \
+    "${MCP_OFFER_JSON}"
+MCP_AGREEMENT="${RESULT_AGREEMENT_ID}"
+
+PHASE_RESULTS+=("${GREEN}[6]${NC} MCP<->Mobius negotiation")
+
+# ==========================================================================
+# Phase 7: Data Transfer — Ashford pulls from Mobius
+# ==========================================================================
+phase 7 "Data Transfer: Ashford <-- Mobius"
+
+step "Running DSP transfer: Ashford pulls from Mobius..."
+run_dsp_transfer "ashford" "${MOBIUS_HOST}" "${ASHFORD_HOST}" \
+    "${ASHFORD_TRUST}" "${MOBIUS_TRUST}" "${ASHFORD_AGREEMENT}" "${ASHFORD_INTERNAL}"
+
+ok "Ashford transfer: ${RESULT_ITEM_COUNT} entities, ports: ${RESULT_PORTS_OF_ENTRY:-n/a}, state: ${RESULT_FINAL_STATE}"
+ASHFORD_PORTS="${RESULT_PORTS_OF_ENTRY:-}"
+PHASE_RESULTS+=("${GREEN}[7]${NC} Ashford<-Mobius (${RESULT_ITEM_COUNT} entities, ports: ${ASHFORD_PORTS:-n/a})")
+
+# ==========================================================================
+# Phase 8: Data Transfer — Suffolk pulls from Mobius
+# ==========================================================================
+phase 8 "Data Transfer: Suffolk <-- Mobius"
+
+step "Running DSP transfer: Suffolk pulls from Mobius..."
+run_dsp_transfer "suffolk" "${MOBIUS_HOST}" "${SUFFOLK_HOST}" \
+    "${SUFFOLK_TRUST}" "${MOBIUS_TRUST}" "${SUFFOLK_AGREEMENT}" "${SUFFOLK_INTERNAL}"
+
+ok "Suffolk transfer: ${RESULT_ITEM_COUNT} entities, ports: ${RESULT_PORTS_OF_ENTRY:-n/a}, state: ${RESULT_FINAL_STATE}"
+SUFFOLK_PORTS="${RESULT_PORTS_OF_ENTRY:-}"
+PHASE_RESULTS+=("${GREEN}[8]${NC} Suffolk<-Mobius (${RESULT_ITEM_COUNT} entities, ports: ${SUFFOLK_PORTS:-n/a})")
+
+# ==========================================================================
+# Phase 9: Data Transfer — MCP pulls from Mobius
+# ==========================================================================
+phase 9 "Data Transfer: MCP <-- Mobius"
+
+step "Running DSP transfer: MCP pulls from Mobius..."
+run_dsp_transfer "mcp" "${MOBIUS_HOST}" "${MCP_HOST}" \
+    "${MCP_TRUST}" "${MOBIUS_TRUST}" "${MCP_AGREEMENT}" "${MCP_INTERNAL}"
+
+ok "MCP transfer: ${RESULT_ITEM_COUNT} entities, ports: ${RESULT_PORTS_OF_ENTRY:-n/a}, state: ${RESULT_FINAL_STATE}"
+MCP_PORTS="${RESULT_PORTS_OF_ENTRY:-}"
+PHASE_RESULTS+=("${GREEN}[9]${NC} MCP<-Mobius (${RESULT_ITEM_COUNT} entities, ports: ${MCP_PORTS:-n/a})")
+
+# ==========================================================================
+# Phase 10: Location Filtering Verification
+# ==========================================================================
+phase 10 "Location Filtering Verification"
+
+# Helper: check if a comma-separated list contains a value
+contains_port() {
+    local ports="$1" target="$2"
+    echo "${ports}" | tr ',' '\n' | grep -qF "${target}"
+}
+
+FILTER_PASS=true
+
+# Ashford should see GBDVR only (not GBFXT)
+step "Checking Ashford received ports: ${ASHFORD_PORTS:-none}"
+if [ -z "${ASHFORD_PORTS}" ]; then
+    soft_fail "Ashford received no port data"
+    FILTER_PASS=false
 else
-    warn "Node B: no datasets found"; ALL_HAVE_DATASETS=false
+    if contains_port "${ASHFORD_PORTS}" "unece:LOCODE#GBDVR"; then
+        ok "Ashford received unece:LOCODE#GBDVR (Dover) — correct"
+    else
+        soft_fail "Ashford did NOT receive unece:LOCODE#GBDVR (expected)"
+        FILTER_PASS=false
+    fi
+    if contains_port "${ASHFORD_PORTS}" "unece:LOCODE#GBFXT"; then
+        soft_fail "Ashford received unece:LOCODE#GBFXT (Felixstowe) — should be filtered out"
+        FILTER_PASS=false
+    else
+        ok "Ashford correctly filtered out GBFXT"
+    fi
 fi
 
-query_catalogue "${NODE_C_HOST}" "${NODE_C_TOKEN}"
-if [ "${RESULT_DATASET_COUNT}" -ge 1 ] 2>/dev/null; then
-    ok "Node C: ${RESULT_DATASET_COUNT} dataset(s)"
+# Suffolk should see GBFXT only (not GBDVR)
+step "Checking Suffolk received ports: ${SUFFOLK_PORTS:-none}"
+if [ -z "${SUFFOLK_PORTS}" ]; then
+    soft_fail "Suffolk received no port data"
+    FILTER_PASS=false
 else
-    warn "Node C: no datasets found"; ALL_HAVE_DATASETS=false
+    if contains_port "${SUFFOLK_PORTS}" "unece:LOCODE#GBFXT"; then
+        ok "Suffolk received unece:LOCODE#GBFXT (Felixstowe) — correct"
+    else
+        soft_fail "Suffolk did NOT receive unece:LOCODE#GBFXT (expected)"
+        FILTER_PASS=false
+    fi
+    if contains_port "${SUFFOLK_PORTS}" "unece:LOCODE#GBDVR"; then
+        soft_fail "Suffolk received unece:LOCODE#GBDVR (Dover) — should be filtered out"
+        FILTER_PASS=false
+    else
+        ok "Suffolk correctly filtered out GBDVR"
+    fi
 fi
 
-if [ "${ALL_HAVE_DATASETS}" = true ]; then
-    PHASE_RESULTS+=("${GREEN}[3]${NC} Discovery (all nodes have datasets)")
+# MCP should see ALL locations (no refinement)
+step "Checking MCP received ports: ${MCP_PORTS:-none}"
+if [ -z "${MCP_PORTS}" ]; then
+    soft_fail "MCP received no port data"
+    FILTER_PASS=false
 else
-    PHASE_RESULTS+=("${YELLOW}[3]${NC} Discovery (some nodes missing datasets)")
+    if contains_port "${MCP_PORTS}" "unece:LOCODE#GBFXT" && contains_port "${MCP_PORTS}" "unece:LOCODE#GBDVR"; then
+        ok "MCP received both LOCODE#GBFXT and LOCODE#GBDVR — full visibility as expected"
+    else
+        soft_fail "MCP should see both GBFXT and GBDVR but got: ${MCP_PORTS}"
+        FILTER_PASS=false
+    fi
+fi
+
+# Summary for this phase
+echo ""
+step "Location filtering summary:"
+echo -e "    Ashford (expected: LOCODE#GBDVR only):  received ${ASHFORD_PORTS:-none}"
+echo -e "    Suffolk (expected: LOCODE#GBFXT only):  received ${SUFFOLK_PORTS:-none}"
+echo -e "    MCP     (expected: both LOCODEs):       received ${MCP_PORTS:-none}"
+echo ""
+if [ "${FILTER_PASS}" = true ]; then
+    ok "Per-item ODRL filtering is working correctly!"
+    PHASE_RESULTS+=("${GREEN}[10]${NC} Location filtering (per-item ODRL — PASS)")
+else
+    soft_fail "Per-item ODRL filtering did not produce expected results"
+    PHASE_RESULTS+=("${RED}[10]${NC} Location filtering (per-item ODRL — FAIL)")
 fi
 
 # ==========================================================================
-# Phase 4: Flow 1 — Node A consumes from Node B
+# Phase 11: Final Verification
 # ==========================================================================
-phase 4 "Flow 1: Node A (Shipper) <-- Node B (Twin UK)"
-
-step "Negotiating contract: A (consumer) -> B (provider)..."
-negotiate_contract "${NODE_A_HOST}" "${NODE_B_HOST}" "${NODE_A_TRUST}" \
-    "${NODE_A_DID}" "${NODE_B_DID}" "${NODE_A_INTERNAL}" "${NODE_A_TOKEN}"
-FLOW1_AGREEMENT="${RESULT_AGREEMENT_ID}"
-
-step "Running DSP transfer flow..."
-run_dsp_transfer "flow1" "${NODE_B_HOST}" "${NODE_A_HOST}" \
-    "${NODE_A_TRUST}" "${NODE_B_TRUST}" "${FLOW1_AGREEMENT}" "${NODE_A_INTERNAL}"
-
-ok "Flow 1 complete: ${RESULT_ITEM_COUNT} entities, state: ${RESULT_FINAL_STATE}"
-PHASE_RESULTS+=("${GREEN}[4]${NC} Flow 1: A<-B (${RESULT_ITEM_COUNT} entities)")
-
-# ==========================================================================
-# Phase 5: Flow 2 — Node C consumes from Node B
-# ==========================================================================
-phase 5 "Flow 2: Node C (Logistics) <-- Node B (Twin UK)"
-
-step "Negotiating contract: C (consumer) -> B (provider)..."
-negotiate_contract "${NODE_C_HOST}" "${NODE_B_HOST}" "${NODE_C_TRUST}" \
-    "${NODE_C_DID}" "${NODE_B_DID}" "${NODE_C_INTERNAL}" "${NODE_C_TOKEN}"
-FLOW2_AGREEMENT="${RESULT_AGREEMENT_ID}"
-
-step "Running DSP transfer flow..."
-run_dsp_transfer "flow2" "${NODE_B_HOST}" "${NODE_C_HOST}" \
-    "${NODE_C_TRUST}" "${NODE_B_TRUST}" "${FLOW2_AGREEMENT}" "${NODE_C_INTERNAL}"
-
-ok "Flow 2 complete: ${RESULT_ITEM_COUNT} entities, state: ${RESULT_FINAL_STATE}"
-PHASE_RESULTS+=("${GREEN}[5]${NC} Flow 2: C<-B (${RESULT_ITEM_COUNT} entities)")
-
-# ==========================================================================
-# Phase 6: Flow 3 — Node C consumes from Node A
-# ==========================================================================
-phase 6 "Flow 3: Node C (Logistics) <-- Node A (Shipper)"
-
-step "Negotiating contract: C (consumer) -> A (provider)..."
-negotiate_contract "${NODE_C_HOST}" "${NODE_A_HOST}" "${NODE_C_TRUST}" \
-    "${NODE_C_DID}" "${NODE_A_DID}" "${NODE_C_INTERNAL}" "${NODE_C_TOKEN}"
-FLOW3_AGREEMENT="${RESULT_AGREEMENT_ID}"
-
-step "Running DSP transfer flow..."
-run_dsp_transfer "flow3" "${NODE_A_HOST}" "${NODE_C_HOST}" \
-    "${NODE_C_TRUST}" "${NODE_A_TRUST}" "${FLOW3_AGREEMENT}" "${NODE_C_INTERNAL}"
-
-ok "Flow 3 complete: ${RESULT_ITEM_COUNT} entities, state: ${RESULT_FINAL_STATE}"
-PHASE_RESULTS+=("${GREEN}[6]${NC} Flow 3: C<-A (${RESULT_ITEM_COUNT} entities)")
-
-# ==========================================================================
-# Phase 7: Final Verification
-# ==========================================================================
-phase 7 "Final Verification"
+phase 11 "Final Verification"
 
 step "Checking Docker container health..."
-for CONTAINER in "${NODE_A_CONTAINER}" "${NODE_B_CONTAINER}" "${NODE_C_CONTAINER}"; do
+for CONTAINER in "${MOBIUS_CONTAINER}" "${ASHFORD_CONTAINER}" "${SUFFOLK_CONTAINER}" "${MCP_CONTAINER}"; do
     HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "${CONTAINER}" 2>/dev/null || echo "unknown")
     STATUS=$(docker inspect --format='{{.State.Status}}' "${CONTAINER}" 2>/dev/null || echo "unknown")
     ok "Container ${CONTAINER}: status=${STATUS}, health=${HEALTH}"
@@ -731,25 +893,36 @@ if [ -n "${IPFS_STATS}" ]; then
     ok "IPFS repo: ${IPFS_OBJECTS} objects"
 fi
 
-step "Final catalogue check (all 3 nodes)..."
-query_catalogue "${NODE_A_HOST}" "${NODE_A_TOKEN}"; ok "Node A: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
-query_catalogue "${NODE_B_HOST}" "${NODE_B_TOKEN}"; ok "Node B: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
-query_catalogue "${NODE_C_HOST}" "${NODE_C_TOKEN}"; ok "Node C: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+step "Final catalogue check (all 4 nodes)..."
+query_catalogue "${MOBIUS_HOST}" "${MOBIUS_TOKEN}"; ok "Mobius: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${ASHFORD_HOST}" "${ASHFORD_TOKEN}"; ok "Ashford: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${SUFFOLK_HOST}" "${SUFFOLK_TOKEN}"; ok "Suffolk: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${MCP_HOST}" "${MCP_TOKEN}"; ok "MCP: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
 
-PHASE_RESULTS+=("${GREEN}[7]${NC} Verification")
+PHASE_RESULTS+=("${GREEN}[11]${NC} Verification")
 
 # ==========================================================================
 # Summary
 # ==========================================================================
 echo ""
 echo -e "${BOLD}${GREEN}================================================================${NC}"
-echo -e "${BOLD}${GREEN}  Multi-Node Docker Test Complete (3 nodes, 3 flows)${NC}"
+echo -e "${BOLD}${GREEN}  Mobius Supply Chain Docker Test Complete (4 nodes)${NC}"
 echo -e "${BOLD}${GREEN}================================================================${NC}"
+echo ""
+echo -e "  ${BOLD}Scenario:${NC}"
+echo -e "    Mobius (Freight Forwarder) publishes consignment data"
+echo -e "    3 consumers negotiate and pull data from Mobius:"
+echo -e "      - Ashford Port Health (GBDVR, GBFOL)"
+echo -e "      - Suffolk Coastal Port Health (GBFXT, GBHWR)"
+echo -e "      - MCP / Port Community System (all locations)"
 echo ""
 echo -e "  ${BOLD}Phase results:${NC}"
 for result in "${PHASE_RESULTS[@]}"; do
     echo -e "    ${result}"
 done
+echo ""
+echo -e "  ${BOLD}Policy:${NC} Per-item ODRL filtering with AssetCollection refinements."
+echo -e "  Ashford: unloadingLocation.id==unece:LOCODE#GBDVR | Suffolk: ==LOCODE#GBFXT | MCP: all"
 echo ""
 echo -e "  ${BOLD}Tear down:${NC} docker compose down -v"
 echo ""

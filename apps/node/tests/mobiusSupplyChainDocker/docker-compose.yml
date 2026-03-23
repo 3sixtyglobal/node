@@ -14,7 +14,7 @@ services:
   twin-mobius:
     build:
       context: ../../../../..
-      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-mobius-node
     ports:
       - '3020:3000'
@@ -31,7 +31,7 @@ services:
   twin-ashford:
     build:
       context: ../../../../..
-      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-ashford-node
     ports:
       - '3021:3001'
@@ -48,7 +48,7 @@ services:
   twin-suffolk:
     build:
       context: ../../../../..
-      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-suffolk-node
     ports:
       - '3022:3002'
@@ -65,7 +65,7 @@ services:
   twin-mcp:
     build:
       context: ../../../../..
-      dockerfile: node/apps/node/tests/mobius-supply-chain-docker/Dockerfile
+      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-mcp-node
     ports:
       - '3023:3003'
