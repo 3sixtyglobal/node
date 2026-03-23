@@ -672,10 +672,10 @@ phase 2 "Seed Per-Consumer ODRL Offers on Mobius"
 # Build per-consumer offers with AssetCollection refinements
 # Ashford: unloadingLocation.id == unece:LOCODE#GBDVR (Dover area)
 ASHFORD_OFFER_JSON=$(build_offer_json "${ASHFORD_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
-    "twin:jsonpath:.unloadingLocation.id" "unece:LOCODE#GBDVR")
+    "twin:jsonpath:$.unloadingLocation.id" "unece:LOCODE#GBDVR")
 # Suffolk: unloadingLocation.id == unece:LOCODE#GBFXT (Felixstowe area)
 SUFFOLK_OFFER_JSON=$(build_offer_json "${SUFFOLK_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
-    "twin:jsonpath:.unloadingLocation.id" "unece:LOCODE#GBFXT")
+    "twin:jsonpath:$.unloadingLocation.id" "unece:LOCODE#GBFXT")
 # MCP: no refinement (sees all data)
 MCP_OFFER_JSON=$(build_offer_json "${MCP_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}")
 

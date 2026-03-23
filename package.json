@@ -61,5 +61,9 @@
 	"bugs": {
 		"url": "git+https://github.com/twinfoundation/node/issues"
 	},
-	"homepage": "https://twindev.org"
+	"homepage": "https://twindev.org",
+	"dependencies": {
+		"@twin.org/dataspace-test-app": "^0.0.3-next.16",
+		"@twin.org/verifiable-storage-connector-entity-storage": "^0.0.1"
+	}
 }
