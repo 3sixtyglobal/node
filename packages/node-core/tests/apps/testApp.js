@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { DataspaceAppFactory } from '@twin.org/dataspace-models';
 import { EngineTypeHelper } from '@twin.org/engine-types';
-import { TestDataspaceDataPlaneApp } from './test-dataspace-data-plane-app.js';
+import { TestDataspaceDataPlaneApp } from './testDataspaceDataPlaneApp.js';
 
 /**
  * Initialise the  extension.
