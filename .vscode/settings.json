@@ -15,7 +15,8 @@
 			"source.organizeImports": "never"
 		}
 	},
-	"prettier.configPath": ".prettierrc",
+	// Use repository-local Prettier config.
+	"prettier.configPath": "prettier.config.mjs",
 	"cSpell.autoFormatConfigFile": true,
 	"vitest.disableWorkspaceWarning": true,
 	"markdownlint.lintWorkspaceGlobs": [
