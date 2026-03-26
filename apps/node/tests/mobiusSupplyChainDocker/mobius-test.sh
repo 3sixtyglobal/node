@@ -182,18 +182,19 @@ generate_trust() {
 }
 
 # Build an ODRL Offer JSON for seeding / negotiation
-# Usage: build_offer_json <offer_id> <assigner> <target> [refinement_field] [refinement_value]
+# Usage: build_offer_json <offer_id> <assigner> <target> [collection_source] [refinement_field] [refinement_value]
 #   Without refinement: simple offer (sees all data)
-#   With refinement: AssetCollection offer (per-item filtering)
+#   With refinement: AssetCollection offer (per-item filtering via source + refinement)
 build_offer_json() {
     local offer_id="$1" assigner="$2" target="$3"
-    local refinement_field="${4:-}" refinement_value="${5:-}"
+    local collection_source="${4:-}" refinement_field="${5:-}" refinement_value="${6:-}"
 
     if [ -n "${refinement_field}" ]; then
         jq -n \
             --arg uid "${offer_id}" \
             --arg assigner "${assigner}" \
-            --arg source "${target}" \
+            --arg target "${target}" \
+            --arg source "${collection_source}" \
             --arg field "${refinement_field}" \
             --arg value "${refinement_value}" \
             '{
@@ -201,12 +202,13 @@ build_offer_json() {
                 "@type": "Offer",
                 "uid": $uid,
                 "assigner": $assigner,
-                "target": $source,
+                "target": $target,
                 "action": "read",
                 "permission": [{
                     "action": "read",
                     "target": {
                         "@type": "AssetCollection",
+                        "source": $source,
                         "refinement": {
                             "leftOperand": $field,
                             "operator": "eq",
@@ -227,7 +229,7 @@ build_offer_json() {
                 "assigner": $assigner,
                 "target": $target,
                 "action": "read",
-                "permission": [{ "action": "read", "target": $target }]
+                "permission": [{ "action": "read", "target": "twin:jsonpath:$" }]
             }'
     fi
 }
@@ -669,11 +671,14 @@ PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (4 nodes)")
 phase 2 "Seed Per-Consumer ODRL Offers on Mobius"
 
 # Build per-consumer offers with AssetCollection refinements
+# source: JSONPath to the array being filtered; leftOperand: absolute wildcard path for per-item evaluation
 # Ashford: unloadingLocation.id == unece:LOCODE#GBDVR (Dover area)
 ASHFORD_OFFER_JSON=$(build_offer_json "${ASHFORD_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
+    "twin:jsonpath:\$.itemList.itemListElement[*]" \
     "twin:jsonpath:\$.itemList.itemListElement[*].unloadingLocation.id" "unece:LOCODE#GBDVR")
 # Suffolk: unloadingLocation.id == unece:LOCODE#GBFXT (Felixstowe area)
 SUFFOLK_OFFER_JSON=$(build_offer_json "${SUFFOLK_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
+    "twin:jsonpath:\$.itemList.itemListElement[*]" \
     "twin:jsonpath:\$.itemList.itemListElement[*].unloadingLocation.id" "unece:LOCODE#GBFXT")
 # MCP: no refinement (sees all data)
 MCP_OFFER_JSON=$(build_offer_json "${MCP_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}")

@@ -349,7 +349,7 @@ describe("node-core", () => {
 			TWIN_DATASPACE_ENABLED: "true",
 			TWIN_VC_AUTHENTICATION_ENABLED: "true",
 			TWIN_MESSAGING_ENABLED: "true",
-			TWIN_EXTENSIONS: "./tests/apps/test-app.js"
+			TWIN_EXTENSIONS: "./tests/apps/testApp.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -857,7 +857,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = {
 			envPrefix: "TWIN_",
-			configFilenames: ["tests/test-config.json"],
+			configFilenames: ["tests/testConfig.json"],
 			stateStorage: memoryStateStorage
 		};
 
@@ -973,7 +973,7 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_EXTENSIONS: "./tests/extensions/my-extension.js"
+			TWIN_EXTENSIONS: "./tests/extensions/myExtension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
