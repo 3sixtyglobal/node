@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.30](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.29...node-core-v0.0.3-next.30) (2026-04-06)
+
+
+### Bug Fixes
+
+* bootstrap vault key skip logic ([#112](https://github.com/twinfoundation/node/issues/112)) ([4084368](https://github.com/twinfoundation/node/commit/4084368f0762c3a1b8e214ac30f5545297c88ea6))
+
 ## [0.0.3-next.29](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.28...node-core-v0.0.3-next.29) (2026-03-20)
 
 
