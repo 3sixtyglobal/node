@@ -1,7 +1,7 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import { CLIUtils } from "@twin.org/cli-core";
 import { Converter, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
@@ -603,5 +603,46 @@ describe("node-core", () => {
 			Converter.hexToBytes(nodeTenantJson?.tenantId)
 		);
 		expect(dbTable?.[1]?.partitionId).toEqual(`${nodePartitionId}/${tenantPartitionId}`);
+	});
+
+	test("Can re-create a verification method when vault key is missing in skip mode", async () => {
+		// Remove the trust-assertion vault key to simulate vault/identity desync
+		const vaultKeyStorePath = `${OUTPUT_TMP_DIR}db/vault-key/store.json`;
+		const vaultKeysRaw = await readFile(vaultKeyStorePath, "utf8");
+		const vaultKeys = JSON.parse(vaultKeysRaw);
+
+		const trustKey = vaultKeys.find((k: { id: string }) => k.id.includes("trust-assertion"));
+		expect(trustKey).toBeDefined();
+
+		const filteredKeys = vaultKeys.filter((k: { id: string }) => !k.id.includes("trust-assertion"));
+		await writeFile(vaultKeyStorePath, JSON.stringify(filteredKeys, undefined, "\t"));
+
+		// Re-run with --overwrite-mode=skip — should detect missing vault key and re-create it
+		await executeCliCommand(
+			[
+				"identity-verification-method-create",
+				`--load-env=${OUTPUT_TMP_DIR}node-identity.env,${OUTPUT_TMP_DIR}organization-identity.env`,
+				"--identity=!ORGANIZATION_DID",
+				"--controller=!NODE_DID",
+				"--verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID",
+				"--overwrite-mode=skip",
+				`--output-json=${OUTPUT_TMP_DIR}organization-trust-recovered.json`
+			],
+			{}
+		);
+
+		const recoveredJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}organization-trust-recovered.json`
+		);
+		expect(recoveredJson?.verificationMethodId).toEqual(
+			`${organizationIdentityJson.did}#trust-assertion`
+		);
+
+		// Verify the vault key was re-created
+		const vaultKeysAfter = JSON.parse(await readFile(vaultKeyStorePath, "utf8"));
+		const recoveredKey = vaultKeysAfter.find((k: { id: string }) =>
+			k.id.includes("trust-assertion")
+		);
+		expect(recoveredKey).toBeDefined();
 	});
 });
