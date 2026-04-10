@@ -15095,6 +15095,24 @@
 											}
 										]
 									}
+								},
+								"papCreateEcosystemPolicyRequestExample": {
+									"value": {
+										"@context": [
+											"http://www.w3.org/ns/odrl.jsonld",
+											"https://schema.twindev.org/odrl/v1/"
+										],
+										"@type": "EcosystemPolicy",
+										"profile": "https://schema.twindev.org/odrl/v1/profile",
+										"assigner": "did:example:publisher",
+										"obligation": [
+											{
+												"action": "inform",
+												"assignee": "did:example:border-agency",
+												"target": "urn:twin:asset:consignment:*"
+											}
+										]
+									}
 								}
 							}
 						}
@@ -15367,7 +15385,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
+								"$ref": "#/components/schemas/RightsManagementPolicy"
 							},
 							"examples": {
 								"papUpdateRequestExample": {
@@ -15480,7 +15498,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
+									"$ref": "#/components/schemas/RightsManagementPolicy"
 								},
 								"examples": {
 									"papGetResponseExample": {
@@ -15920,6 +15938,123 @@
 											],
 											"assignee": "did:example:receiver",
 											"assigner": "did:example:sender"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/rights-management/policy/admin/ecosystem-policy/{id}": {
+			"get": {
+				"operationId": "papGetEcosystemPolicy",
+				"summary": "Get an ecosystem policy",
+				"tags": [
+					"Policy Administration Point"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The ID of the ecosystem policy to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:rights-management:abc123def456"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response structure for getting an ecosystem policy.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RightsManagementEcosystemPolicy"
+								},
+								"examples": {
+									"papGetEcosystemPolicyResponseExample": {
+										"value": {
+											"@context": [
+												"http://www.w3.org/ns/odrl.jsonld",
+												"https://schema.twindev.org/odrl/v1/"
+											],
+											"@type": "EcosystemPolicy",
+											"@id": "urn:rights-management:abc123def456",
+											"profile": "https://schema.twindev.org/odrl/v1/profile",
+											"assigner": "did:example:publisher",
+											"obligation": [
+												{
+													"action": "inform",
+													"assignee": "did:example:border-agency",
+													"target": "urn:twin:asset:consignment:abc123"
+												}
+											]
 										}
 									}
 								}
@@ -19011,8 +19146,375 @@
 					"@context": {
 						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
 					},
+					"profile": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						],
+						"description": "The profile(s) this policy conforms to.\nIRIs identifying the ODRL Profile(s)."
+					},
+					"assigner": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assigner of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"assignee": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assignee of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"target": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The target asset for the rule."
+					},
+					"action": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+							},
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+										},
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+										}
+									]
+								}
+							}
+						],
+						"description": "The action associated with the rule."
+					},
+					"inheritFrom": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						],
+						"description": "The parent policy(ies) this policy inherits from.\nIRIs identifying the parent Policy(ies)."
+					},
+					"conflict": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlConflictStrategyType"
+					},
+					"permission": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+								}
+							}
+						],
+						"description": "The permissions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"prohibition": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+								}
+							}
+						],
+						"description": "The prohibitions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"obligation": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+								}
+							}
+						],
+						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
 					"@type": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicyType"
+						"$ref": "#/components/schemas/RightsManagementPolicyType"
+					},
+					"@id": {
+						"type": "string",
+						"description": "Unique identifier for the policy."
+					}
+				},
+				"required": [
+					"@context",
+					"@type"
+				]
+			},
+			"PapQueryResponse": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/RightsManagementPolicy"
+				},
+				"description": "The body of the response."
+			},
+			"PnapQueryResponse": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/PolicyNegotiation"
+				},
+				"description": "The body of the response."
+			},
+			"PnpContractNegotiationResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiation"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+					}
+				],
+				"description": "The state of the policy or an error."
+			},
+			"PolicyNegotiation": {
+				"description": "Interface describing a rights management policy negotiation.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The primary id used by the provider."
+					},
+					"correlationId": {
+						"type": "string",
+						"description": "This is used by the other side of the negotiation."
+					},
+					"policyId": {
+						"type": "string",
+						"description": "The unique identifier for the policy."
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "The date and time when the negotiation was created."
+					},
+					"expires": {
+						"type": "number",
+						"description": "The expiration time for the policy negotiation if it's a manual process."
+					},
+					"state": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
+					},
+					"callbackAddress": {
+						"type": "string",
+						"description": "The callback address to send updates to the requester."
+					},
+					"publicOrigin": {
+						"type": "string",
+						"description": "The public origin of the server that initiated or received this negotiation.\nUsed to construct callback URLs in subsequent async messages."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "Organization identity to be used when sending trust payloads."
+					},
+					"offer": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
+					},
+					"agreement": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
+					},
+					"trustVerificationInfo": {
+						"$ref": "#/components/schemas/TrustVerificationInfo"
+					},
+					"code": {
+						"type": "string",
+						"description": "A reason code for when the negotiation errors."
+					},
+					"reason": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"@value": {
+									"type": "string"
+								},
+								"@language": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"@value"
+							]
+						},
+						"description": "A more detailed reason for the negotiation error."
+					},
+					"description": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"@value": {
+									"type": "string"
+								},
+								"@language": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"@value"
+							]
+						},
+						"description": "A more detailed reason for the negotiation error."
+					},
+					"errorDetails": {
+						"$ref": "#/components/schemas/Error"
+					},
+					"handlerId": {
+						"type": "string",
+						"description": "The id of the handler, on provider side this is the negotiator, on consumer side this is the requester."
+					},
+					"interventionRequired": {
+						"type": "boolean",
+						"description": "Is manual intervention required to complete the negotiation?"
+					}
+				},
+				"required": [
+					"id",
+					"correlationId",
+					"dateCreated",
+					"state",
+					"organizationIdentity"
+				]
+			},
+			"RefreshTokenResponse": {
+				"type": "object",
+				"properties": {
+					"expiry": {
+						"type": "number",
+						"description": "The expiry time of the token."
+					}
+				},
+				"required": [
+					"expiry"
+				],
+				"description": "The refresh token details."
+			},
+			"RequestTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
+				],
+				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
+			},
+			"RightsManagementEcosystemPolicy": {
+				"description": "TWIN EcosystemPolicy in DSP storage shape.\n\nCombines the DSP wire-format requirements (mandatory `@id`, no `uid`) from\n`IDataspaceProtocolPolicy` with a narrowed `@type` discriminant so that callers\ncan rely on the type at compile time without any `as unknown as` cast.\n\nDefined as an intersection type (rather than `extends IDataspaceProtocolPolicy`)\nso that the narrowed `\"@type\": \"EcosystemPolicy\"` can override the base\n`\"@type\": OdrlPolicyType` without a TS2430 extends-incompatibility error.\n`\"EcosystemPolicy\"` is a TWIN extension — not in the W3C ODRL `OdrlPolicyType`\nenum — so the interface hierarchy cannot express this narrowing directly.\n\nLives in `rights-management-models` (not `standards-dataspace-protocol`) because\nEcosystemPolicy is a TWIN platform extension — not a DSP specification concept —\nand `standards-dataspace-protocol` should remain a pure standards mirror.",
+				"type": "object",
+				"properties": {
+					"@context": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
 					},
 					"profile": {
 						"anyOf": [
@@ -19210,169 +19712,252 @@
 					"@id": {
 						"type": "string",
 						"description": "Unique identifier for the policy."
+					},
+					"@type": {
+						"const": "EcosystemPolicy",
+						"description": "The type must be \"EcosystemPolicy\"."
 					}
 				},
 				"required": [
 					"@context",
+					"@id",
 					"@type"
 				]
 			},
-			"PapQueryResponse": {
-				"type": "array",
-				"items": {
-					"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
-				},
-				"description": "The body of the response."
-			},
-			"PnapQueryResponse": {
-				"type": "array",
-				"items": {
-					"$ref": "#/components/schemas/PolicyNegotiation"
-				},
-				"description": "The body of the response."
-			},
-			"PnpContractNegotiationResponse": {
-				"oneOf": [
-					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiation"
-					},
-					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
-					}
-				],
-				"description": "The state of the policy or an error."
-			},
-			"PolicyNegotiation": {
-				"description": "Interface describing a rights management policy negotiation.",
+			"RightsManagementPolicy": {
+				"description": "Base type for any ODRL policy stored and managed by the TWIN rights-management PAP.\n\nDefined as an intersection type (rather than `extends IDataspaceProtocolPolicy`)\nbecause `IDataspaceProtocolPolicy[\"@type\"]` is constrained to `OdrlPolicyType`\n(the closed W3C ODRL enum). TWIN adds `\"EcosystemPolicy\"` as a platform extension\nvia `RightsManagementPolicyType`, which is a superset of `OdrlPolicyType`.\n\nAll standard DSP policy types (`IDataspaceProtocolAgreement`, `IDataspaceProtocolOffer`,\n`IDataspaceProtocolSet`) remain structurally assignable to this type because their\n`\"@type\"` literals are all members of `RightsManagementPolicyType`.\n\nUse this type wherever the PAP needs to accept or return any policy regardless of\nits specific subtype. Use the narrower `IRightsManagementEcosystemPolicy`,\n`IDataspaceProtocolAgreement`, etc. when the specific subtype is known.",
 				"type": "object",
 				"properties": {
-					"id": {
-						"type": "string",
-						"description": "The primary id used by the provider."
+					"@context": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
 					},
-					"correlationId": {
-						"type": "string",
-						"description": "This is used by the other side of the negotiation."
-					},
-					"policyId": {
-						"type": "string",
-						"description": "The unique identifier for the policy."
-					},
-					"dateCreated": {
-						"type": "string",
-						"description": "The date and time when the negotiation was created."
-					},
-					"expires": {
-						"type": "number",
-						"description": "The expiration time for the policy negotiation if it's a manual process."
-					},
-					"state": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
-					},
-					"callbackAddress": {
-						"type": "string",
-						"description": "The callback address to send updates to the requester."
-					},
-					"publicOrigin": {
-						"type": "string",
-						"description": "The public origin of the server that initiated or received this negotiation.\nUsed to construct callback URLs in subsequent async messages."
-					},
-					"organizationIdentity": {
-						"type": "string",
-						"description": "Organization identity to be used when sending trust payloads."
-					},
-					"offer": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
-					},
-					"agreement": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
-					},
-					"trustVerificationInfo": {
-						"$ref": "#/components/schemas/TrustVerificationInfo"
-					},
-					"code": {
-						"type": "string",
-						"description": "A reason code for when the negotiation errors."
-					},
-					"reason": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"@value": {
-									"type": "string"
-								},
-								"@language": {
+					"profile": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
 									"type": "string"
 								}
-							},
-							"required": [
-								"@value"
-							]
-						},
-						"description": "A more detailed reason for the negotiation error."
+							}
+						],
+						"description": "The profile(s) this policy conforms to.\nIRIs identifying the ODRL Profile(s)."
 					},
-					"description": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"@value": {
-									"type": "string"
-								},
-								"@language": {
+					"assigner": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assigner of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"assignee": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assignee of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"target": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The target asset for the rule."
+					},
+					"action": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+							},
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+										},
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+										}
+									]
+								}
+							}
+						],
+						"description": "The action associated with the rule."
+					},
+					"inheritFrom": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
 									"type": "string"
 								}
+							}
+						],
+						"description": "The parent policy(ies) this policy inherits from.\nIRIs identifying the parent Policy(ies)."
+					},
+					"conflict": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlConflictStrategyType"
+					},
+					"permission": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
 							},
-							"required": [
-								"@value"
-							]
-						},
-						"description": "A more detailed reason for the negotiation error."
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+								}
+							}
+						],
+						"description": "The permissions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
 					},
-					"errorDetails": {
-						"$ref": "#/components/schemas/Error"
+					"prohibition": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+								}
+							}
+						],
+						"description": "The prohibitions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
 					},
-					"handlerId": {
+					"obligation": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+								}
+							}
+						],
+						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"@id": {
 						"type": "string",
-						"description": "The id of the handler, on provider side this is the negotiator, on consumer side this is the requester."
+						"description": "Unique identifier for the policy."
 					},
-					"interventionRequired": {
-						"type": "boolean",
-						"description": "Is manual intervention required to complete the negotiation?"
+					"@type": {
+						"$ref": "#/components/schemas/RightsManagementPolicyType"
 					}
 				},
 				"required": [
-					"id",
-					"correlationId",
-					"dateCreated",
-					"state",
-					"organizationIdentity"
+					"@context",
+					"@id",
+					"@type"
 				]
 			},
-			"RefreshTokenResponse": {
-				"type": "object",
-				"properties": {
-					"expiry": {
-						"type": "number",
-						"description": "The expiry time of the token."
-					}
-				},
-				"required": [
-					"expiry"
-				],
-				"description": "The refresh token details."
-			},
-			"RequestTransferResponse": {
-				"oneOf": [
+			"RightsManagementPolicyType": {
+				"description": "TWIN rights-management policy types.",
+				"anyOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"const": "EcosystemPolicy",
+						"description": "EcosystemPolicy type.\nA TWIN platform-level governance policy that carries obligations for data events.\nNot a bilateral contract — does not participate in DSP negotiation."
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"const": "Policy"
+					},
+					{
+						"const": "Set"
+					},
+					{
+						"const": "Offer"
+					},
+					{
+						"const": "Agreement"
 					}
-				],
-				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
+				]
 			},
 			"Rule": {
 				"description": "Rule defining how to extract data from an object.",
