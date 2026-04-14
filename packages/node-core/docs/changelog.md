@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.31](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.30...node-core-v0.0.3-next.31) (2026-04-14)
+
+
+### Features
+
+* authentication services ([#118](https://github.com/twinfoundation/node/issues/118)) ([311a7f8](https://github.com/twinfoundation/node/commit/311a7f882db1e50a83e94d2dae32fefc68debb47))
+
 ## [0.0.3-next.30](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.29...node-core-v0.0.3-next.30) (2026-04-06)
 
 
