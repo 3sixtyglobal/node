@@ -28,6 +28,9 @@
 			"package": "@twin.org/nft-service"
 		},
 		{
+			"package": "@twin.org/notarization-service"
+		},
+		{
 			"package": "@twin.org/attestation-service"
 		},
 		{

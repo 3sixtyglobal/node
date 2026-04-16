@@ -44,6 +44,8 @@ import {
 	MessagingSmsConnectorType,
 	NftComponentType,
 	NftConnectorType,
+	NotarizationComponentType,
+	NotarizationConnectorType,
 	RightsManagementPapComponentType,
 	RightsManagementPdpComponentType,
 	RightsManagementPepComponentType,
@@ -115,6 +117,7 @@ export async function buildEngineConfiguration(
 	await configureFaucet(coreConfig, envVars);
 	await configureWallet(coreConfig, envVars);
 	await configureNft(coreConfig, envVars);
+	await configureNotarization(coreConfig, envVars);
 	await configureVerifiableStorage(coreConfig, envVars);
 	await configureIdentity(coreConfig, envVars);
 	await configureIdentityResolver(coreConfig, envVars);
@@ -803,6 +806,41 @@ async function configureNft(
 	if (coreConfig.types.nftConnector.length > 0) {
 		coreConfig.types.nftComponent ??= [];
 		coreConfig.types.nftComponent.push({ type: NftComponentType.Service });
+	}
+}
+
+/**
+ * Configures the notarization.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureNotarization(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.notarizationConnector ??= [];
+
+	if (envVars.notarizationConnector === NotarizationConnectorType.EntityStorage) {
+		coreConfig.types.notarizationConnector.push({
+			type: NotarizationConnectorType.EntityStorage
+		});
+	} else if (envVars.notarizationConnector === NotarizationConnectorType.Iota) {
+		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
+			coreConfig,
+			"dltConfig",
+			DltConfigType.Iota
+		);
+		coreConfig.types.notarizationConnector.push({
+			type: NotarizationConnectorType.Iota,
+			options: {
+				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+			}
+		});
+	}
+
+	if (coreConfig.types.notarizationConnector.length > 0) {
+		coreConfig.types.notarizationComponent ??= [];
+		coreConfig.types.notarizationComponent.push({ type: NotarizationComponentType.Service });
 	}
 }
 
