@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.32](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.31...node-core-v0.0.3-next.32) (2026-04-16)
+
+
+### Features
+
+* add notarization ([#121](https://github.com/twinfoundation/node/issues/121)) ([b2a11df](https://github.com/twinfoundation/node/commit/b2a11df92c7b5026f73f08a018c0586ebe008e92))
+
 ## [0.0.3-next.31](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.30...node-core-v0.0.3-next.31) (2026-04-14)
 
 
