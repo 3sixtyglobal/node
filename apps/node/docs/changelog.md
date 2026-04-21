@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.0.3-next.32](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.31...node-v0.0.3-next.32) (2026-04-16)
+
+
+### Features
+
+* add notarization ([#121](https://github.com/twinfoundation/node/issues/121)) ([b2a11df](https://github.com/twinfoundation/node/commit/b2a11df92c7b5026f73f08a018c0586ebe008e92))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.31 to 0.0.3-next.32
+
+## [0.0.3-next.31](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.30...node-v0.0.3-next.31) (2026-04-14)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.30 to 0.0.3-next.31
+
+## [0.0.3-next.30](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.29...node-v0.0.3-next.30) (2026-04-06)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.29 to 0.0.3-next.30
+
 ## [0.0.3-next.29](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.28...node-v0.0.3-next.29) (2026-03-20)
 
 

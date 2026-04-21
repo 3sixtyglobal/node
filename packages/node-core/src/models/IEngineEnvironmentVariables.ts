@@ -438,6 +438,11 @@ export interface IEngineEnvironmentVariables {
 	nftConnector?: string;
 
 	/**
+	 * The type of notarization connector: entity-storage, iota.
+	 */
+	notarizationConnector?: string;
+
+	/**
 	 * The type of identity connector: entity-storage, iota.
 	 */
 	identityConnector?: string;

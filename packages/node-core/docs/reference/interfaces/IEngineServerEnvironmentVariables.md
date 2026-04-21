@@ -1046,6 +1046,18 @@ The type of NFT connector: entity-storage, iota.
 
 ***
 
+### notarizationConnector? {#notarizationconnector}
+
+> `optional` **notarizationConnector?**: `string`
+
+The type of notarization connector: entity-storage, iota.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`notarizationConnector`](IEngineEnvironmentVariables.md#notarizationconnector)
+
+***
+
 ### identityConnector? {#identityconnector}
 
 > `optional` **identityConnector?**: `string`

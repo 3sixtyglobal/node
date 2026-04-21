@@ -221,12 +221,27 @@ export async function identityVerificationMethodCreate(
 						"verificationMethodAlreadyExists"
 					);
 				}
-				createMethod = false;
-				CLIDisplay.task(
-					I18n.formatMessage(
-						"node.cli.commands.identity-verification-method-create.labels.skipping"
-					)
-				);
+
+				// Verify the vault key also exists before skipping.
+				// The verification method may exist in the identity document while the
+				// vault key is missing (e.g. database wipe, renameKey partial failure).
+				// In that case we must NOT skip the addVerificationMethod will re-create
+				// the vault key and update the method.
+				let vaultKeyExists = false;
+				try {
+					const keyParts = DocumentHelper.parseId(verificationMethod.id);
+					await vaultConnector.getKey(`${params.identity}/${keyParts.fragment}`);
+					vaultKeyExists = true;
+				} catch {}
+
+				if (vaultKeyExists) {
+					createMethod = false;
+					CLIDisplay.task(
+						I18n.formatMessage(
+							"node.cli.commands.identity-verification-method-create.labels.skipping"
+						)
+					);
+				}
 			}
 		}
 	}

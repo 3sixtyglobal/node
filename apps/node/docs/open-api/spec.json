@@ -28,6 +28,10 @@
 			"description": "Authentication Admin endpoints for the REST server."
 		},
 		{
+			"name": "Authentication Audit",
+			"description": "Authentication audit endpoints for the REST server."
+		},
+		{
 			"name": "Identity",
 			"description": "Service to provide all features related to digital identity."
 		},
@@ -50,6 +54,10 @@
 		{
 			"name": "NFT",
 			"description": "Endpoints which are modelled to access an NFT contract."
+		},
+		{
+			"name": "Notarization",
+			"description": "Endpoints which are modelled to access a notarization service."
 		},
 		{
 			"name": "Attestation",
@@ -1504,6 +1512,308 @@
 												"scope1",
 												"scope2"
 											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/audit": {
+			"post": {
+				"operationId": "authenticationAuditCreate",
+				"summary": "Create an authentication audit entry",
+				"tags": [
+					"Authentication Audit"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Create an authentication audit entry.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuditCreateRequest"
+							},
+							"examples": {
+								"authenticationAuditCreateRequestExample": {
+									"summary": "The request to create an authentication audit entry.",
+									"value": {
+										"actorId": "user@example.com",
+										"event": "login-success",
+										"data": {
+											"organizationIdentity": "did:example:org1"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "The rest request ended in created response.",
+						"headers": {
+							"location": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. 018f0b53d5d5704fa3a06d6ed2478575"
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "authenticationAuditQuery",
+				"summary": "Query authentication audit entries",
+				"tags": [
+					"Authentication Audit"
+				],
+				"parameters": [
+					{
+						"name": "actorId",
+						"description": "The actor identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "user@example.com"
+					},
+					{
+						"name": "organizationId",
+						"description": "The organization identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "tenantId",
+						"description": "The tenant identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "nodeId",
+						"description": "The node identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "event",
+						"description": "The event to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/AuthAuditEvent"
+								},
+								{
+									"type": "string"
+								}
+							]
+						},
+						"example": "login-success"
+					},
+					{
+						"name": "startDate",
+						"description": "The inclusive start date for filtering, in ISO 8601 format.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2026-01-01T00:00:00.000Z"
+					},
+					{
+						"name": "endDate",
+						"description": "The inclusive end date for filtering, in ISO 8601 format.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2026-01-31T23:59:59.999Z"
+					},
+					{
+						"name": "cursor",
+						"description": "The pagination cursor.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"description": "The maximum number of results to return.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "50"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response from querying authentication audit entries.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuditQueryResponse"
+								},
+								"examples": {
+									"authenticationAuditQueryResponseExample": {
+										"summary": "The response for querying authentication audit entries.",
+										"value": {
+											"entries": [
+												{
+													"id": "018f0b53d5d5704fa3a06d6ed2478575",
+													"actorId": "user@example.com",
+													"dateCreated": "2026-01-12T09:05:23.123Z",
+													"event": "login-success",
+													"data": {
+														"organizationIdentity": "did:example:org1"
+													}
+												}
+											],
+											"cursor": "next-cursor"
 										}
 									}
 								}
@@ -3503,7 +3813,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ConflictResponse"
+									"$ref": "#/components/schemas/Error"
 								},
 								"examples": {
 									"exampleResponse": {
@@ -6659,6 +6969,520 @@
 				}
 			}
 		},
+		"/notarization": {
+			"post": {
+				"operationId": "notarizationCreate",
+				"summary": "Create a notarization",
+				"tags": [
+					"Notarization"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to create a notarization.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NotarizationCreateRequest"
+							},
+							"examples": {
+								"notarizationCreateExample": {
+									"value": {
+										"mode": "dynamic",
+										"data": {},
+										"description": "My first notarization"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "The rest request ended in created response.",
+						"headers": {
+							"location": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. 123"
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/notarization/{id}": {
+			"get": {
+				"operationId": "notarizationGet",
+				"summary": "Get a notarization",
+				"tags": [
+					"Notarization"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the notarization to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response for getting a notarization.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Notarization"
+								},
+								"examples": {
+									"notarizationGetResponseExample": {
+										"value": {
+											"id": "123",
+											"mode": "dynamic",
+											"dateCreated": "2026-01-01T00:00:00.000Z",
+											"data": {},
+											"description": "A notarization"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "notarizationRemove",
+				"summary": "Remove a notarization",
+				"tags": [
+					"Notarization"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the notarization to remove.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"operationId": "notarizationUpdate",
+				"summary": "Update a notarization",
+				"tags": [
+					"Notarization"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the notarization to update.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to update a notarization.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Notarization"
+							},
+							"examples": {
+								"notarizationUpdateExample": {
+									"value": {
+										"id": "123",
+										"mode": "dynamic",
+										"dateCreated": "2026-01-01T00:00:00.000Z",
+										"data": {},
+										"description": "Updated notarization"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/notarization/{id}/transfer": {
+			"post": {
+				"operationId": "notarizationTransfer",
+				"summary": "Transfer a notarization",
+				"tags": [
+					"Notarization"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the notarization to transfer.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to transfer a notarization.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NotarizationTransferRequest"
+							},
+							"examples": {
+								"notarizationTransferExample": {
+									"value": {
+										"recipientAddress": "recipient-address-1"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/attestation": {
 			"post": {
 				"operationId": "attestationCreate",
@@ -9603,6 +10427,11 @@
 							"examples": {
 								"auditableItemGraphCreateRequestExample": {
 									"value": {
+										"@context": [
+											"https://schema.twindev.org/aig/",
+											"https://schema.twindev.org/common/"
+										],
+										"type": "AuditableItemGraphVertex",
 										"annotationObject": {
 											"@context": "https://schema.org",
 											"@type": "Note",
@@ -9610,6 +10439,7 @@
 										},
 										"aliases": [
 											{
+												"type": "AuditableItemGraphAlias",
 												"id": "bar456",
 												"annotationObject": {
 													"@context": "https://schema.org",
@@ -9618,6 +10448,7 @@
 												}
 											},
 											{
+												"type": "AuditableItemGraphAlias",
 												"id": "foo321",
 												"annotationObject": {
 													"@context": "https://schema.org",
@@ -9628,6 +10459,7 @@
 										],
 										"resources": [
 											{
+												"type": "AuditableItemGraphResource",
 												"id": "resource1",
 												"resourceObject": {
 													"@context": "https://schema.org",
@@ -9636,6 +10468,7 @@
 												}
 											},
 											{
+												"type": "AuditableItemGraphResource",
 												"id": "resource2",
 												"resourceObject": {
 													"@context": "https://schema.org",
@@ -9646,6 +10479,7 @@
 										],
 										"edges": [
 											{
+												"type": "AuditableItemGraphEdge",
 												"targetId": "aig:1234567890",
 												"edgeRelationships": [
 													"frenemy"
@@ -9657,6 +10491,7 @@
 												}
 											},
 											{
+												"type": "AuditableItemGraphEdge",
 												"targetId": "aig:45678901234",
 												"edgeRelationships": [
 													"end"
@@ -10267,6 +11102,11 @@
 							"examples": {
 								"auditableItemGraphUpdateRequestExample": {
 									"value": {
+										"@context": [
+											"https://schema.twindev.org/aig/",
+											"https://schema.twindev.org/common/"
+										],
+										"type": "AuditableItemGraphVertex",
 										"annotationObject": {
 											"@context": "https://schema.org",
 											"@type": "Note",
@@ -10274,6 +11114,7 @@
 										},
 										"aliases": [
 											{
+												"type": "AuditableItemGraphAlias",
 												"id": "bar456",
 												"annotationObject": {
 													"@context": "https://schema.org",
@@ -10282,6 +11123,7 @@
 												}
 											},
 											{
+												"type": "AuditableItemGraphAlias",
 												"id": "foo321",
 												"annotationObject": {
 													"@context": "https://schema.org",
@@ -10292,6 +11134,7 @@
 										],
 										"resources": [
 											{
+												"type": "AuditableItemGraphResource",
 												"id": "resource1",
 												"resourceObject": {
 													"@context": "https://schema.org",
@@ -10300,6 +11143,7 @@
 												}
 											},
 											{
+												"type": "AuditableItemGraphResource",
 												"id": "resource2",
 												"resourceObject": {
 													"@context": "https://schema.org",
@@ -10310,6 +11154,7 @@
 										],
 										"edges": [
 											{
+												"type": "AuditableItemGraphEdge",
 												"id": "edge1",
 												"targetId": "aig:1234567890",
 												"edgeRelationships": [
@@ -10322,6 +11167,7 @@
 												}
 											},
 											{
+												"type": "AuditableItemGraphEdge",
 												"id": "edge2",
 												"targetId": "aig:45678901234",
 												"edgeRelationships": [
@@ -10943,26 +11789,36 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/AuditableItemStreamCreateRequest"
+								"$ref": "https://schema.twindev.org/ais/AuditableItemStreamBase"
 							},
 							"examples": {
 								"auditableItemStreamCreateRequestExample": {
 									"value": {
+										"@context": [
+											"https://schema.org",
+											"https://schema.twindev.org/ais/",
+											"https://schema.twindev.org/common/"
+										],
+										"type": "AuditableItemStream",
 										"annotationObject": {
 											"@context": "https://schema.org",
 											"@type": "Note",
 											"content": "This is a simple note"
 										},
-										"entries": [
-											{
-												"entryObject": {
-													"@context": "https://schema.org",
-													"@type": "Event",
-													"startDate": "2011-04-09T20:00:00Z",
-													"description": "A description of the event"
+										"entries": {
+											"type": "ItemList",
+											"itemListElement": [
+												{
+													"type": "AuditableItemStreamEntry",
+													"entryObject": {
+														"@context": "https://schema.org",
+														"@type": "Event",
+														"startDate": "2011-04-09T20:00:00Z",
+														"description": "A description of the event"
+													}
 												}
-											}
-										]
+											]
+										}
 									}
 								}
 							}
@@ -11142,6 +11998,7 @@
 											"itemListElement": [
 												{
 													"@context": [
+														"https://schema.org",
 														"https://schema.twindev.org/ais/",
 														"https://schema.twindev.org/common/"
 													],
@@ -11183,6 +12040,7 @@
 											"itemListElement": [
 												{
 													"@context": [
+														"https://schema.org",
 														"https://schema.twindev.org/ais/",
 														"https://schema.twindev.org/common/"
 													],
@@ -11316,6 +12174,24 @@
 						"example": "ais:1234567890"
 					},
 					{
+						"name": "cursor",
+						"description": "Cursor to use for next chunk of entries.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"description": "Limit the number of entries to return, only applicable if includeEntries is true.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "includeEntries",
 						"description": "Whether to include the entries, defaults to false.\nThe entries will be limited to the first page of entries in date descending order.\nIf you want to get more entries you can use the returned cursor with the get entries method.",
 						"in": "query",
@@ -11379,6 +12255,7 @@
 									"auditableItemStreamGetResponseExample": {
 										"value": {
 											"@context": [
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11395,25 +12272,28 @@
 											"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
 											"immutableInterval": 10,
 											"numberOfItems": 1,
-											"entries": [
-												{
-													"@context": [
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
-													],
-													"type": "AuditableItemStreamEntry",
-													"id": "tst:1234567890",
-													"dateCreated": "2024-08-22T11:55:16.271Z",
-													"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
-													"index": 0,
-													"entryObject": {
-														"@context": "https://schema.org",
-														"@type": "Event",
-														"startDate": "2011-04-09T20:00:00Z",
-														"description": "A description of the event"
+											"entries": {
+												"type": "ItemList",
+												"itemListElement": [
+													{
+														"@context": [
+															"https://schema.twindev.org/ais/",
+															"https://schema.twindev.org/common/"
+														],
+														"type": "AuditableItemStreamEntry",
+														"id": "tst:1234567890",
+														"dateCreated": "2024-08-22T11:55:16.271Z",
+														"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
+														"index": 0,
+														"entryObject": {
+															"@context": "https://schema.org",
+															"@type": "Event",
+															"startDate": "2011-04-09T20:00:00Z",
+															"description": "A description of the event"
+														}
 													}
-												}
-											]
+												]
+											}
 										}
 									}
 								}
@@ -11426,6 +12306,7 @@
 									"auditableItemStreamJsonLdGetResponseExample": {
 										"value": {
 											"@context": [
+												"https://schema.org",
 												"https://schema.twindev.org/ais/",
 												"https://schema.twindev.org/common/"
 											],
@@ -11442,25 +12323,28 @@
 											"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
 											"immutableInterval": 10,
 											"numberOfItems": 1,
-											"entries": [
-												{
-													"@context": [
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
-													],
-													"type": "AuditableItemStreamEntry",
-													"id": "tst:1234567890",
-													"dateCreated": "2024-08-22T11:55:16.271Z",
-													"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
-													"index": 0,
-													"entryObject": {
-														"@context": "https://schema.org",
-														"@type": "Event",
-														"startDate": "2011-04-09T20:00:00Z",
-														"description": "A description of the event"
+											"entries": {
+												"type": "ItemList",
+												"itemListElement": [
+													{
+														"@context": [
+															"https://schema.twindev.org/ais/",
+															"https://schema.twindev.org/common/"
+														],
+														"type": "AuditableItemStreamEntry",
+														"id": "tst:1234567890",
+														"dateCreated": "2024-08-22T11:55:16.271Z",
+														"proofId": "0101010101010101010101010101010101010101010101010101010101010101",
+														"index": 0,
+														"entryObject": {
+															"@context": "https://schema.org",
+															"@type": "Event",
+															"startDate": "2011-04-09T20:00:00Z",
+															"description": "A description of the event"
+														}
 													}
-												}
-											]
+												]
+											}
 										}
 									}
 								}
@@ -11590,6 +12474,12 @@
 							"examples": {
 								"auditableItemStreamUpdateRequestExample": {
 									"value": {
+										"@context": [
+											"https://schema.org",
+											"https://schema.twindev.org/ais/",
+											"https://schema.twindev.org/common/"
+										],
+										"type": "AuditableItemStream",
 										"annotationObject": {
 											"@context": "https://schema.org",
 											"@type": "Note",
@@ -11695,6 +12585,116 @@
 					{
 						"name": "id",
 						"description": "The id of the stream to remove.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "ais:1234567890"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/ais/{id}/close": {
+			"put": {
+				"operationId": "auditableItemStreamClose",
+				"summary": "Close a stream",
+				"tags": [
+					"Auditable Item Stream"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the stream to close.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -13926,8 +14926,15 @@
 					}
 				},
 				"responses": {
-					"201": {
-						"description": "The rest request ended in created response."
+					"200": {
+						"description": "Activity Stream Notify Response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ActivityLogEntry"
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -14048,15 +15055,13 @@
 											"dateModified": "2025-08-12T12:00:00Z",
 											"generator": "did:iota:testnet:123456",
 											"status": "pending",
-											"pendingTasks": [
+											"tasks": [
 												{
 													"taskId": "urn:x-task-id:45678",
-													"dataspaceAppId": "https://my-app.example.org/app1"
+													"dataspaceAppId": "https://my-app.example.org/app1",
+													"status": "pending"
 												}
-											],
-											"runningTasks": [],
-											"finalizedTasks": [],
-											"inErrorTasks": []
+											]
 										}
 									}
 								}
@@ -15029,6 +16034,24 @@
 											}
 										]
 									}
+								},
+								"papCreateEcosystemPolicyRequestExample": {
+									"value": {
+										"@context": [
+											"http://www.w3.org/ns/odrl.jsonld",
+											"https://schema.twindev.org/odrl/v1/"
+										],
+										"@type": "EcosystemPolicy",
+										"profile": "https://schema.twindev.org/odrl/v1/profile",
+										"assigner": "did:example:publisher",
+										"obligation": [
+											{
+												"action": "inform",
+												"assignee": "did:example:border-agency",
+												"target": "urn:twin:asset:consignment:*"
+											}
+										]
+									}
 								}
 							}
 						}
@@ -15301,7 +16324,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
+								"$ref": "#/components/schemas/RightsManagementPolicy"
 							},
 							"examples": {
 								"papUpdateRequestExample": {
@@ -15414,7 +16437,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
+									"$ref": "#/components/schemas/RightsManagementPolicy"
 								},
 								"examples": {
 									"papGetResponseExample": {
@@ -15854,6 +16877,123 @@
 											],
 											"assignee": "did:example:receiver",
 											"assigner": "did:example:sender"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/rights-management/policy/admin/ecosystem-policy/{id}": {
+			"get": {
+				"operationId": "papGetEcosystemPolicy",
+				"summary": "Get an ecosystem policy",
+				"tags": [
+					"Policy Administration Point"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The ID of the ecosystem policy to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:rights-management:abc123def456"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response structure for getting an ecosystem policy.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RightsManagementEcosystemPolicy"
+								},
+								"examples": {
+									"papGetEcosystemPolicyResponseExample": {
+										"value": {
+											"@context": [
+												"http://www.w3.org/ns/odrl.jsonld",
+												"https://schema.twindev.org/odrl/v1/"
+											],
+											"@type": "EcosystemPolicy",
+											"@id": "urn:rights-management:abc123def456",
+											"profile": "https://schema.twindev.org/odrl/v1/profile",
+											"assigner": "did:example:publisher",
+											"obligation": [
+												{
+													"action": "inform",
+													"assignee": "did:example:border-agency",
+													"target": "urn:twin:asset:consignment:abc123"
+												}
+											]
 										}
 									}
 								}
@@ -17378,23 +18518,6 @@
 	},
 	"components": {
 		"schemas": {
-			"ActivityLogDates": {
-				"description": "Activity log dates.",
-				"type": "object",
-				"properties": {
-					"startDate": {
-						"type": "string",
-						"description": "Task processing start timestamp"
-					},
-					"endDate": {
-						"type": "string",
-						"description": "Task processing end timestamp"
-					}
-				},
-				"required": [
-					"startDate"
-				]
-			},
 			"ActivityLogDetails": {
 				"description": "The details related to the processing of an Activity",
 				"type": "object",
@@ -17418,10 +18541,6 @@
 					"dateModified": {
 						"type": "string",
 						"description": "The last update date of this object."
-					},
-					"retryCount": {
-						"type": "number",
-						"description": "Number of times this activity has been retried."
 					}
 				},
 				"required": [
@@ -17438,71 +18557,12 @@
 					"status": {
 						"$ref": "#/components/schemas/ActivityProcessingStatus"
 					},
-					"pendingTasks": {
+					"tasks": {
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/TaskApp"
+							"$ref": "#/components/schemas/ActivityTaskEntry"
 						},
-						"description": "The pending tasks that have to be run to process the Activity."
-					},
-					"runningTasks": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/TaskApp"
-								},
-								{
-									"$ref": "#/components/schemas/ActivityLogDates"
-								}
-							]
-						},
-						"description": "The running tasks that are processing the Activity."
-					},
-					"finalizedTasks": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"result": {
-									"type": "string",
-									"description": "The task result."
-								}
-							},
-							"required": [
-								"result"
-							],
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/TaskApp"
-								},
-								{
-									"$ref": "#/components/schemas/ActivityLogDates"
-								}
-							]
-						},
-						"description": "The tasks that have already finalized."
-					},
-					"inErrorTasks": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"error": {
-									"$ref": "#/components/schemas/Error"
-								}
-							},
-							"required": [
-								"error"
-							],
-							"allOf": [
-								{
-									"$ref": "#/components/schemas/TaskApp"
-								}
-							]
-						},
-						"description": "The tasks that are in error."
+						"description": "The tasks that have to be run to process the Activity."
 					}
 				},
 				"required": [
@@ -17536,6 +18596,67 @@
 					{
 						"const": "registering",
 						"description": "Transient state. The background tasks associated with the activity are still being registered."
+					}
+				]
+			},
+			"ActivityTaskEntry": {
+				"description": "Denotes a task associated with a Dataspace App",
+				"type": "object",
+				"properties": {
+					"taskId": {
+						"type": "string",
+						"description": "Task Id."
+					},
+					"dataspaceAppId": {
+						"type": "string",
+						"description": "Dataspace App Id."
+					},
+					"status": {
+						"$ref": "#/components/schemas/ActivityTaskStatus"
+					},
+					"processingGroupId": {
+						"type": "string",
+						"description": "Processing Group Id."
+					},
+					"startDate": {
+						"type": "string",
+						"description": "Task processing start timestamp"
+					},
+					"endDate": {
+						"type": "string",
+						"description": "Task processing end timestamp"
+					},
+					"result": {
+						"description": "The result of the task processing, if completed."
+					},
+					"error": {
+						"$ref": "#/components/schemas/Error"
+					}
+				},
+				"required": [
+					"taskId",
+					"dataspaceAppId",
+					"status"
+				]
+			},
+			"ActivityTaskStatus": {
+				"description": "Activity task statuses.",
+				"anyOf": [
+					{
+						"const": "pending",
+						"description": "Pending."
+					},
+					{
+						"const": "processing",
+						"description": "Processing."
+					},
+					{
+						"const": "success",
+						"description": "Success."
+					},
+					{
+						"const": "failed",
+						"description": "Failed."
 					}
 				]
 			},
@@ -17678,154 +18799,227 @@
 				],
 				"description": "The parameters to be used in the transfer."
 			},
-			"AuditableItemGraphCreateRequest": {
+			"AuditCreateRequest": {
+				"description": "The body of the request.",
 				"type": "object",
 				"properties": {
+					"event": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/AuthAuditEvent"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"description": "The audit event that occurred."
+					},
+					"actorId": {
+						"type": "string",
+						"description": "The actor identifier, could be e-mail, username, or other unique identifier."
+					},
+					"nodeId": {
+						"type": "string",
+						"description": "The node identifier associated with the audit entry, if applicable."
+					},
+					"organizationId": {
+						"type": "string",
+						"description": "The organization identifier associated with the audit entry, if applicable."
+					},
+					"tenantId": {
+						"type": "string",
+						"description": "The tenant identifier associated with the audit entry, if applicable."
+					},
+					"ipAddressHashes": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The hashed IP addresses of the client."
+					},
+					"userAgent": {
+						"type": "string",
+						"description": "The user agent string of the client."
+					},
+					"correlationId": {
+						"type": "string",
+						"description": "The correlation ID for request tracing."
+					},
+					"data": {
+						"description": "Additional data related to the audit entry, such as IP address, user agent, etc."
+					}
+				},
+				"required": [
+					"event"
+				]
+			},
+			"AuditQueryResponse": {
+				"type": "object",
+				"properties": {
+					"entries": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuthenticationAuditEntry"
+						},
+						"description": "The returned audit entries."
+					},
+					"cursor": {
+						"type": "string",
+						"description": "The cursor to retrieve the next page, if any."
+					}
+				},
+				"required": [
+					"entries"
+				],
+				"description": "The response body."
+			},
+			"AuditableItemGraphCreateRequest": {
+				"description": "The data to be used in the vertex.",
+				"type": "object",
+				"properties": {
+					"dateCreated": {
+						"type": "string",
+						"description": "The date/time of when the element was created."
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date/time of when the element was modified."
+					},
+					"dateDeleted": {
+						"type": "string",
+						"description": "The date/time of when the element was deleted, as we never actually remove items."
+					},
+					"@context": {
+						"type": "array",
+						"prefixItems": [
+							{
+								"const": "https://schema.twindev.org/aig/"
+							},
+							{
+								"const": "https://schema.twindev.org/common/"
+							}
+						],
+						"items": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+						},
+						"minItems": 2,
+						"description": "JSON-LD Context."
+					},
+					"type": {
+						"const": "AuditableItemGraphVertex",
+						"description": "JSON-LD Type."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The identity of the organization which controls the vertex."
+					},
 					"annotationObject": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					},
 					"aliases": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"id": {
-									"type": "string"
-								},
-								"aliasFormat": {
-									"type": "string"
-								},
-								"unique": {
-									"type": "boolean"
-								},
-								"annotationObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							},
-							"required": [
-								"id"
-							]
+							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAlias"
 						},
 						"description": "Alternative aliases that can be used to identify the vertex."
 					},
 					"resources": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"id": {
-									"type": "string"
-								},
-								"resourceObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							}
+							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphResource"
 						},
 						"description": "The resources attached to the vertex."
 					},
 					"edges": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"targetId": {
-									"type": "string"
-								},
-								"edgeRelationships": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								},
-								"annotationObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							},
-							"required": [
-								"targetId",
-								"edgeRelationships"
-							]
+							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphEdge"
 						},
-						"description": "The edges connected to the vertex."
+						"description": "Edges connected to the vertex."
+					},
+					"verified": {
+						"type": "boolean",
+						"description": "Is the vertex verified, will only be populated when verification is requested."
 					}
 				},
-				"description": "The data to be used in the vertex."
+				"required": [
+					"@context",
+					"type"
+				]
 			},
 			"AuditableItemGraphUpdateRequest": {
+				"description": "The data to be used in the vertex.",
 				"type": "object",
 				"properties": {
+					"dateCreated": {
+						"type": "string",
+						"description": "The date/time of when the element was created."
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date/time of when the element was modified."
+					},
+					"dateDeleted": {
+						"type": "string",
+						"description": "The date/time of when the element was deleted, as we never actually remove items."
+					},
+					"@context": {
+						"type": "array",
+						"prefixItems": [
+							{
+								"const": "https://schema.twindev.org/aig/"
+							},
+							{
+								"const": "https://schema.twindev.org/common/"
+							}
+						],
+						"items": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+						},
+						"minItems": 2,
+						"description": "JSON-LD Context."
+					},
+					"type": {
+						"const": "AuditableItemGraphVertex",
+						"description": "JSON-LD Type."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The identity of the organization which controls the vertex."
+					},
 					"annotationObject": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					},
 					"aliases": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"id": {
-									"type": "string"
-								},
-								"aliasFormat": {
-									"type": "string"
-								},
-								"unique": {
-									"type": "boolean"
-								},
-								"annotationObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							},
-							"required": [
-								"id"
-							]
+							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAlias"
 						},
 						"description": "Alternative aliases that can be used to identify the vertex."
 					},
 					"resources": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"id": {
-									"type": "string"
-								},
-								"resourceObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							}
+							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphResource"
 						},
 						"description": "The resources attached to the vertex."
 					},
 					"edges": {
 						"type": "array",
 						"items": {
-							"type": "object",
-							"properties": {
-								"id": {
-									"type": "string"
-								},
-								"targetId": {
-									"type": "string"
-								},
-								"edgeRelationships": {
-									"type": "array",
-									"items": {
-										"type": "string"
-									}
-								},
-								"annotationObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							},
-							"required": [
-								"targetId",
-								"edgeRelationships"
-							]
+							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphEdge"
 						},
-						"description": "The edges connected to the vertex."
+						"description": "Edges connected to the vertex."
+					},
+					"verified": {
+						"type": "boolean",
+						"description": "Is the vertex verified, will only be populated when verification is requested."
 					}
 				},
-				"description": "The data to be used in the vertex."
+				"required": [
+					"@context",
+					"type"
+				]
 			},
 			"AuditableItemStreamCreateEntryRequest": {
 				"type": "object",
@@ -17837,34 +19031,6 @@
 				"required": [
 					"entryObject"
 				],
-				"description": "The data to be used in the stream."
-			},
-			"AuditableItemStreamCreateRequest": {
-				"type": "object",
-				"properties": {
-					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					},
-					"entries": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"entryObject": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								}
-							},
-							"required": [
-								"entryObject"
-							]
-						},
-						"description": "The entries for the stream."
-					},
-					"immutableInterval": {
-						"type": "number",
-						"description": "After how many entries do we add immutable checks, defaults to service configured value.\nA value of 0 will disable immutable checks, 1 will be every item, or any other integer for an interval."
-					}
-				},
 				"description": "The data to be used in the stream."
 			},
 			"AuditableItemStreamUpdateEntryRequest": {
@@ -17880,13 +19046,149 @@
 				"description": "The data to be used in the entry."
 			},
 			"AuditableItemStreamUpdateRequest": {
+				"description": "The data to be used in the stream, entries should be updated separately.",
 				"type": "object",
 				"properties": {
+					"@context": {
+						"type": "array",
+						"prefixItems": [
+							{
+								"const": "https://schema.org"
+							},
+							{
+								"const": "https://schema.twindev.org/ais/"
+							},
+							{
+								"const": "https://schema.twindev.org/common/"
+							}
+						],
+						"items": {
+							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+						},
+						"minItems": 3,
+						"description": "JSON-LD Context."
+					},
+					"type": {
+						"const": "AuditableItemStream",
+						"description": "JSON-LD Type."
+					},
 					"annotationObject": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					}
 				},
-				"description": "The data to be used in the stream."
+				"required": [
+					"@context",
+					"type"
+				]
+			},
+			"AuthAuditEvent": {
+				"description": "Supported authentication audit event values.",
+				"anyOf": [
+					{
+						"const": "login-success",
+						"description": "Login success."
+					},
+					{
+						"const": "login-failure",
+						"description": "Login failure."
+					},
+					{
+						"const": "logout",
+						"description": "Logout."
+					},
+					{
+						"const": "token-refreshed",
+						"description": "Token refreshed."
+					},
+					{
+						"const": "account-created",
+						"description": "Account created."
+					},
+					{
+						"const": "account-deleted",
+						"description": "Account deleted."
+					},
+					{
+						"const": "account-updated",
+						"description": "Account updated."
+					},
+					{
+						"const": "account-locked",
+						"description": "Account locked."
+					},
+					{
+						"const": "account-unlocked",
+						"description": "Account unlocked."
+					},
+					{
+						"const": "password-changed",
+						"description": "Password changed."
+					}
+				]
+			},
+			"AuthenticationAuditEntry": {
+				"description": "Contract definition for authentication audit entry.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The unique identifier for the audit entry."
+					},
+					"event": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/AuthAuditEvent"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"description": "The audit event that occurred."
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "The timestamp of the audit entry in ISO 8601 format."
+					},
+					"actorId": {
+						"type": "string",
+						"description": "The actor identifier, could be e-mail, username, or other unique identifier."
+					},
+					"nodeId": {
+						"type": "string",
+						"description": "The node identifier associated with the audit entry, if applicable."
+					},
+					"organizationId": {
+						"type": "string",
+						"description": "The organization identifier associated with the audit entry, if applicable."
+					},
+					"tenantId": {
+						"type": "string",
+						"description": "The tenant identifier associated with the audit entry, if applicable."
+					},
+					"ipAddressHashes": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The hashed IP addresses of the client."
+					},
+					"userAgent": {
+						"type": "string",
+						"description": "The user agent string of the client."
+					},
+					"correlationId": {
+						"type": "string",
+						"description": "The correlation ID for request tracing."
+					},
+					"data": {
+						"description": "Additional data related to the audit entry, such as IP address, user agent, etc."
+					}
+				},
+				"required": [
+					"id",
+					"event",
+					"dateCreated"
+				]
 			},
 			"BlobStorageCreateRequest": {
 				"type": "object",
@@ -18012,27 +19314,6 @@
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with state COMPLETED, or error."
-			},
-			"ConflictResponse": {
-				"type": "object",
-				"properties": {
-					"conflicts": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The conflicting items."
-					}
-				},
-				"required": [
-					"conflicts"
-				],
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/Error"
-					}
-				],
-				"description": "The body which contains the error."
 			},
 			"DataAssetItemList": {
 				"description": "Interface describing a list of entities that are within a Data Asset.\nPagination is handled via HTTP Link headers.",
@@ -18961,6 +20242,134 @@
 				],
 				"description": "The body which contains the error."
 			},
+			"Notarization": {
+				"description": "Interface describing a notarization.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The unique identifier of the notarization."
+					},
+					"mode": {
+						"$ref": "#/components/schemas/NotarizationMode"
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "The date and time when the notarization was created, in ISO 8601 format."
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"type": "number"
+						},
+						"description": "The notarization data as a byte array."
+					},
+					"immutableDescription": {
+						"type": "string",
+						"description": "An optional description of the notarization that cannot be changed after creation."
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description of the notarization that can be modified until the notarization is locked."
+					},
+					"deleteLockDateTime": {
+						"type": "string",
+						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
+					},
+					"transferLockUntilDestroyed": {
+						"type": "boolean",
+						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
+					},
+					"transferLockDateTime": {
+						"type": "string",
+						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					}
+				},
+				"required": [
+					"id",
+					"mode",
+					"dateCreated",
+					"data"
+				]
+			},
+			"NotarizationCreateRequest": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"$ref": "#/components/schemas/NotarizationMode"
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"type": "number"
+						},
+						"description": "The notarization data as a byte array."
+					},
+					"immutableDescription": {
+						"type": "string",
+						"description": "An optional description of the notarization that cannot be changed after creation."
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description of the notarization that can be modified until the notarization is locked."
+					},
+					"deleteLockDateTime": {
+						"type": "string",
+						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
+					},
+					"transferLockUntilDestroyed": {
+						"type": "boolean",
+						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
+					},
+					"transferLockDateTime": {
+						"type": "string",
+						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"namespace": {
+						"type": "string",
+						"description": "The namespace of the connector to use for the notarization, defaults to component configured namespace."
+					}
+				},
+				"required": [
+					"mode",
+					"data"
+				],
+				"description": "The request data."
+			},
+			"NotarizationMode": {
+				"description": "Supported notarization mode values.",
+				"anyOf": [
+					{
+						"const": "dynamic",
+						"description": "Dynamic notarization mode."
+					},
+					{
+						"const": "locked",
+						"description": "Locked notarization mode."
+					}
+				]
+			},
+			"NotarizationTransferRequest": {
+				"type": "object",
+				"properties": {
+					"recipientAddress": {
+						"type": "string",
+						"description": "The recipient address."
+					}
+				},
+				"required": [
+					"recipientAddress"
+				],
+				"description": "The request data."
+			},
 			"PapCreateRequest": {
 				"description": "The body of the request - the policy to create (id will be auto-generated if not provided).",
 				"type": "object",
@@ -18968,8 +20377,375 @@
 					"@context": {
 						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
 					},
+					"profile": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						],
+						"description": "The profile(s) this policy conforms to.\nIRIs identifying the ODRL Profile(s)."
+					},
+					"assigner": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assigner of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"assignee": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assignee of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"target": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The target asset for the rule."
+					},
+					"action": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+							},
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+										},
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+										}
+									]
+								}
+							}
+						],
+						"description": "The action associated with the rule."
+					},
+					"inheritFrom": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						],
+						"description": "The parent policy(ies) this policy inherits from.\nIRIs identifying the parent Policy(ies)."
+					},
+					"conflict": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlConflictStrategyType"
+					},
+					"permission": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+								}
+							}
+						],
+						"description": "The permissions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"prohibition": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+								}
+							}
+						],
+						"description": "The prohibitions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"obligation": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+								}
+							}
+						],
+						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
 					"@type": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicyType"
+						"$ref": "#/components/schemas/RightsManagementPolicyType"
+					},
+					"@id": {
+						"type": "string",
+						"description": "Unique identifier for the policy."
+					}
+				},
+				"required": [
+					"@context",
+					"@type"
+				]
+			},
+			"PapQueryResponse": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/RightsManagementPolicy"
+				},
+				"description": "The body of the response."
+			},
+			"PnapQueryResponse": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/PolicyNegotiation"
+				},
+				"description": "The body of the response."
+			},
+			"PnpContractNegotiationResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiation"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+					}
+				],
+				"description": "The state of the policy or an error."
+			},
+			"PolicyNegotiation": {
+				"description": "Interface describing a rights management policy negotiation.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The primary id used by the provider."
+					},
+					"correlationId": {
+						"type": "string",
+						"description": "This is used by the other side of the negotiation."
+					},
+					"policyId": {
+						"type": "string",
+						"description": "The unique identifier for the policy."
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "The date and time when the negotiation was created."
+					},
+					"expires": {
+						"type": "number",
+						"description": "The expiration time for the policy negotiation if it's a manual process."
+					},
+					"state": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
+					},
+					"callbackAddress": {
+						"type": "string",
+						"description": "The callback address to send updates to the requester."
+					},
+					"publicOrigin": {
+						"type": "string",
+						"description": "The public origin of the server that initiated or received this negotiation.\nUsed to construct callback URLs in subsequent async messages."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "Organization identity to be used when sending trust payloads."
+					},
+					"offer": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
+					},
+					"agreement": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
+					},
+					"trustVerificationInfo": {
+						"$ref": "#/components/schemas/TrustVerificationInfo"
+					},
+					"code": {
+						"type": "string",
+						"description": "A reason code for when the negotiation errors."
+					},
+					"reason": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"@value": {
+									"type": "string"
+								},
+								"@language": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"@value"
+							]
+						},
+						"description": "A more detailed reason for the negotiation error."
+					},
+					"description": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"@value": {
+									"type": "string"
+								},
+								"@language": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"@value"
+							]
+						},
+						"description": "A more detailed reason for the negotiation error."
+					},
+					"errorDetails": {
+						"$ref": "#/components/schemas/Error"
+					},
+					"handlerId": {
+						"type": "string",
+						"description": "The id of the handler, on provider side this is the negotiator, on consumer side this is the requester."
+					},
+					"interventionRequired": {
+						"type": "boolean",
+						"description": "Is manual intervention required to complete the negotiation?"
+					}
+				},
+				"required": [
+					"id",
+					"correlationId",
+					"dateCreated",
+					"state",
+					"organizationIdentity"
+				]
+			},
+			"RefreshTokenResponse": {
+				"type": "object",
+				"properties": {
+					"expiry": {
+						"type": "number",
+						"description": "The expiry time of the token."
+					}
+				},
+				"required": [
+					"expiry"
+				],
+				"description": "The refresh token details."
+			},
+			"RequestTransferResponse": {
+				"oneOf": [
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+					}
+				],
+				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
+			},
+			"RightsManagementEcosystemPolicy": {
+				"description": "TWIN EcosystemPolicy in DSP storage shape.\n\nCombines the DSP wire-format requirements (mandatory `@id`, no `uid`) from\n`IDataspaceProtocolPolicy` with a narrowed `@type` discriminant so that callers\ncan rely on the type at compile time without any `as unknown as` cast.\n\nDefined as an intersection type (rather than `extends IDataspaceProtocolPolicy`)\nso that the narrowed `\"@type\": \"EcosystemPolicy\"` can override the base\n`\"@type\": OdrlPolicyType` without a TS2430 extends-incompatibility error.\n`\"EcosystemPolicy\"` is a TWIN extension — not in the W3C ODRL `OdrlPolicyType`\nenum — so the interface hierarchy cannot express this narrowing directly.\n\nLives in `rights-management-models` (not `standards-dataspace-protocol`) because\nEcosystemPolicy is a TWIN platform extension — not a DSP specification concept —\nand `standards-dataspace-protocol` should remain a pure standards mirror.",
+				"type": "object",
+				"properties": {
+					"@context": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
 					},
 					"profile": {
 						"anyOf": [
@@ -19167,169 +20943,252 @@
 					"@id": {
 						"type": "string",
 						"description": "Unique identifier for the policy."
+					},
+					"@type": {
+						"const": "EcosystemPolicy",
+						"description": "The type must be \"EcosystemPolicy\"."
 					}
 				},
 				"required": [
 					"@context",
+					"@id",
 					"@type"
 				]
 			},
-			"PapQueryResponse": {
-				"type": "array",
-				"items": {
-					"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
-				},
-				"description": "The body of the response."
-			},
-			"PnapQueryResponse": {
-				"type": "array",
-				"items": {
-					"$ref": "#/components/schemas/PolicyNegotiation"
-				},
-				"description": "The body of the response."
-			},
-			"PnpContractNegotiationResponse": {
-				"oneOf": [
-					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiation"
-					},
-					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
-					}
-				],
-				"description": "The state of the policy or an error."
-			},
-			"PolicyNegotiation": {
-				"description": "Interface describing a rights management policy negotiation.",
+			"RightsManagementPolicy": {
+				"description": "Base type for any ODRL policy stored and managed by the TWIN rights-management PAP.\n\nDefined as an intersection type (rather than `extends IDataspaceProtocolPolicy`)\nbecause `IDataspaceProtocolPolicy[\"@type\"]` is constrained to `OdrlPolicyType`\n(the closed W3C ODRL enum). TWIN adds `\"EcosystemPolicy\"` as a platform extension\nvia `RightsManagementPolicyType`, which is a superset of `OdrlPolicyType`.\n\nAll standard DSP policy types (`IDataspaceProtocolAgreement`, `IDataspaceProtocolOffer`,\n`IDataspaceProtocolSet`) remain structurally assignable to this type because their\n`\"@type\"` literals are all members of `RightsManagementPolicyType`.\n\nUse this type wherever the PAP needs to accept or return any policy regardless of\nits specific subtype. Use the narrower `IRightsManagementEcosystemPolicy`,\n`IDataspaceProtocolAgreement`, etc. when the specific subtype is known.",
 				"type": "object",
 				"properties": {
-					"id": {
-						"type": "string",
-						"description": "The primary id used by the provider."
+					"@context": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
 					},
-					"correlationId": {
-						"type": "string",
-						"description": "This is used by the other side of the negotiation."
-					},
-					"policyId": {
-						"type": "string",
-						"description": "The unique identifier for the policy."
-					},
-					"dateCreated": {
-						"type": "string",
-						"description": "The date and time when the negotiation was created."
-					},
-					"expires": {
-						"type": "number",
-						"description": "The expiration time for the policy negotiation if it's a manual process."
-					},
-					"state": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
-					},
-					"callbackAddress": {
-						"type": "string",
-						"description": "The callback address to send updates to the requester."
-					},
-					"publicOrigin": {
-						"type": "string",
-						"description": "The public origin of the server that initiated or received this negotiation.\nUsed to construct callback URLs in subsequent async messages."
-					},
-					"organizationIdentity": {
-						"type": "string",
-						"description": "Organization identity to be used when sending trust payloads."
-					},
-					"offer": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
-					},
-					"agreement": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
-					},
-					"trustVerificationInfo": {
-						"$ref": "#/components/schemas/TrustVerificationInfo"
-					},
-					"code": {
-						"type": "string",
-						"description": "A reason code for when the negotiation errors."
-					},
-					"reason": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"@value": {
-									"type": "string"
-								},
-								"@language": {
+					"profile": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
 									"type": "string"
 								}
-							},
-							"required": [
-								"@value"
-							]
-						},
-						"description": "A more detailed reason for the negotiation error."
+							}
+						],
+						"description": "The profile(s) this policy conforms to.\nIRIs identifying the ODRL Profile(s)."
 					},
-					"description": {
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"@value": {
-									"type": "string"
-								},
-								"@language": {
+					"assigner": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assigner of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"assignee": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The assignee of the policy.\nApplies to all rules unless overridden at rule level."
+					},
+					"target": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
+										}
+									]
+								}
+							}
+						],
+						"description": "The target asset for the rule."
+					},
+					"action": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+							},
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+							},
+							{
+								"type": "array",
+								"items": {
+									"anyOf": [
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
+										},
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
+										}
+									]
+								}
+							}
+						],
+						"description": "The action associated with the rule."
+					},
+					"inheritFrom": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "array",
+								"items": {
 									"type": "string"
 								}
+							}
+						],
+						"description": "The parent policy(ies) this policy inherits from.\nIRIs identifying the parent Policy(ies)."
+					},
+					"conflict": {
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlConflictStrategyType"
+					},
+					"permission": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
 							},
-							"required": [
-								"@value"
-							]
-						},
-						"description": "A more detailed reason for the negotiation error."
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
+								}
+							}
+						],
+						"description": "The permissions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
 					},
-					"errorDetails": {
-						"$ref": "#/components/schemas/Error"
+					"prohibition": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
+								}
+							}
+						],
+						"description": "The prohibitions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
 					},
-					"handlerId": {
+					"obligation": {
+						"anyOf": [
+							{
+								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+							},
+							{
+								"type": "array",
+								"items": {
+									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
+								}
+							}
+						],
+						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
+					},
+					"@id": {
 						"type": "string",
-						"description": "The id of the handler, on provider side this is the negotiator, on consumer side this is the requester."
+						"description": "Unique identifier for the policy."
 					},
-					"interventionRequired": {
-						"type": "boolean",
-						"description": "Is manual intervention required to complete the negotiation?"
+					"@type": {
+						"$ref": "#/components/schemas/RightsManagementPolicyType"
 					}
 				},
 				"required": [
-					"id",
-					"correlationId",
-					"dateCreated",
-					"state",
-					"organizationIdentity"
+					"@context",
+					"@id",
+					"@type"
 				]
 			},
-			"RefreshTokenResponse": {
-				"type": "object",
-				"properties": {
-					"expiry": {
-						"type": "number",
-						"description": "The expiry time of the token."
-					}
-				},
-				"required": [
-					"expiry"
-				],
-				"description": "The refresh token details."
-			},
-			"RequestTransferResponse": {
-				"oneOf": [
+			"RightsManagementPolicyType": {
+				"description": "TWIN rights-management policy types.",
+				"anyOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"const": "EcosystemPolicy",
+						"description": "EcosystemPolicy type.\nA TWIN platform-level governance policy that carries obligations for data events.\nNot a bilateral contract — does not participate in DSP negotiation."
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"const": "Policy"
+					},
+					{
+						"const": "Set"
+					},
+					{
+						"const": "Offer"
+					},
+					{
+						"const": "Agreement"
 					}
-				],
-				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
+				]
 			},
 			"Rule": {
 				"description": "Rule defining how to extract data from an object.",
@@ -19568,24 +21427,6 @@
 				},
 				"required": [
 					"dateModified"
-				]
-			},
-			"TaskApp": {
-				"description": "Denotes a task associated with a Dataspace App",
-				"type": "object",
-				"properties": {
-					"taskId": {
-						"type": "string",
-						"description": "Task Id."
-					},
-					"dataspaceAppId": {
-						"type": "string",
-						"description": "Dataspace App Id."
-					}
-				},
-				"required": [
-					"taskId",
-					"dataspaceAppId"
 				]
 			},
 			"TelemetryAddMetricValueRequest": {

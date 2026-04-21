@@ -7,7 +7,9 @@ import type { IEngineCoreConfig } from "@twin.org/engine-models";
 import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
 import {
 	AuthenticationAdminComponentType,
+	AuthenticationAuditComponentType,
 	AuthenticationComponentType,
+	AuthenticationRateComponentType,
 	HostingComponentType,
 	type IEngineServerConfig,
 	InformationComponentType,
@@ -204,6 +206,23 @@ export async function buildEngineServerConfiguration(
 	});
 
 	const authAdminProcessorType = envVars.authAdminProcessorType;
+	const authProcessorType = envVars.authProcessorType;
+
+	if (
+		authAdminProcessorType === AuthenticationAdminComponentType.EntityStorage ||
+		authProcessorType === AuthenticationComponentType.EntityStorage
+	) {
+		serverConfig.types.authenticationRateComponent ??= [];
+		serverConfig.types.authenticationRateComponent.push({
+			type: AuthenticationRateComponentType.EntityStorage
+		});
+
+		serverConfig.types.authenticationAuditComponent ??= [];
+		serverConfig.types.authenticationAuditComponent.push({
+			type: AuthenticationAuditComponentType.EntityStorage
+		});
+	}
+
 	if (authAdminProcessorType === AuthenticationAdminComponentType.EntityStorage) {
 		serverConfig.types.authenticationAdminComponent ??= [];
 		serverConfig.types.authenticationAdminComponent.push({
@@ -214,7 +233,6 @@ export async function buildEngineServerConfiguration(
 		});
 	}
 
-	const authProcessorType = envVars.authProcessorType;
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
 		availableContextIdKeys.push({
 			key: ContextIdKeys.Organization,
