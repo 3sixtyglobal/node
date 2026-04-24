@@ -1739,6 +1739,31 @@ Example: "dataspace/entities"
 
 ***
 
+### automationEnabled? {#automationenabled}
+
+> `optional` **automationEnabled?**: `string`
+
+Are the automation components enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`automationEnabled`](IEngineEnvironmentVariables.md#automationenabled)
+
+***
+
+### automationActionTypes? {#automationactiontypes}
+
+> `optional` **automationActionTypes?**: `string`
+
+The type of the automation action to create, comma separate for more than one connector.
+values: fetch
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`automationActionTypes`](IEngineEnvironmentVariables.md#automationactiontypes)
+
+***
+
 ### extensions? {#extensions}
 
 > `optional` **extensions?**: `string`
