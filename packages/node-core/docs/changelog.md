@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.33](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.32...node-core-v0.0.3-next.33) (2026-04-24)
+
+
+### Features
+
+* add automation ([cfc63b4](https://github.com/twinfoundation/node/commit/cfc63b465c139280f696877df21d54dc6a065a7e))
+
 ## [0.0.3-next.32](https://github.com/twinfoundation/node/compare/node-core-v0.0.3-next.31...node-core-v0.0.3-next.32) (2026-04-16)
 
 

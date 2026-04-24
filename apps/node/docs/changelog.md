@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.33](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.32...node-v0.0.3-next.33) (2026-04-24)
+
+
+### Features
+
+* add automation ([cfc63b4](https://github.com/twinfoundation/node/commit/cfc63b465c139280f696877df21d54dc6a065a7e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.32 to 0.0.3-next.33
+
 ## [0.0.3-next.32](https://github.com/twinfoundation/node/compare/node-v0.0.3-next.31...node-v0.0.3-next.32) (2026-04-16)
 
 
