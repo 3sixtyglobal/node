@@ -56,6 +56,7 @@
 		"schema-dts": "2.0.0"
 	},
 	"devDependencies": {
+		"@twin.org/automation-models": "next",
 		"@twin.org/entity-storage-connector-memory": "next",
 		"@twin.org/merge-locales": "next",
 		"@twin.org/nameof-transformer": "next",

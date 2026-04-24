@@ -8,6 +8,9 @@ import {
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
+	type AutomationActionConfig,
+	type AutomationActionType,
+	AutomationComponentType,
 	BackgroundTaskComponentType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
@@ -113,6 +116,7 @@ export async function buildEngineConfiguration(
 	await configureEventBus(coreConfig, envVars);
 	await configureTelemetry(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
+	await configureAutomation(coreConfig, envVars);
 
 	await configureFaucet(coreConfig, envVars);
 	await configureWallet(coreConfig, envVars);
@@ -576,6 +580,37 @@ async function configureTelemetry(
 	if (coreConfig.types.telemetryConnector.length > 0) {
 		coreConfig.types.telemetryComponent ??= [];
 		coreConfig.types.telemetryComponent.push({ type: TelemetryComponentType.Service });
+	}
+}
+
+/**
+ * Configures the automation.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureAutomation(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.automationComponent ??= [];
+
+	if (Coerce.boolean(envVars.automationEnabled) ?? false) {
+		coreConfig.types.automationComponent.push({
+			type: AutomationComponentType.Service
+		});
+
+		const automationActionTypes = commaSeparatedListToArray(envVars.automationActionTypes);
+
+		if (Is.arrayValue(automationActionTypes)) {
+			coreConfig.types.automationAction ??= [];
+
+			for (const actionType of automationActionTypes) {
+				coreConfig.types.automationAction.push({
+					type: actionType as AutomationActionType,
+					isMultiInstance: true
+				} as unknown as AutomationActionConfig);
+			}
+		}
 	}
 }
 

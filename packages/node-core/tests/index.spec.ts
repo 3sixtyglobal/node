@@ -1,6 +1,7 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { rm, writeFile } from "node:fs/promises";
+import { AutomationActionFactory } from "@twin.org/automation-models";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { DataspaceAppFactory } from "@twin.org/dataspace-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
@@ -48,7 +49,7 @@ const TEST_NODE_ID =
 const TEST_NODE_TENANT_ID = "4cfc10fd12d2a206f681ea9b01b306c0";
 
 const basePort = Math.floor(Math.random() * 1000);
-let port = 3000 + basePort;
+let port = 13000 + basePort;
 
 describe("node-core", () => {
 	beforeEach(() => {
@@ -114,7 +115,9 @@ describe("node-core", () => {
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true"
+				TWIN_MESSAGING_ENABLED: "true",
+				TWIN_AUTOMATION_ENABLED: "true",
+				TWIN_AUTOMATION_ACTION_TYPES: "fetch"
 			}
 		});
 		expect(result).toBeDefined();
@@ -177,7 +180,9 @@ describe("node-core", () => {
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true"
+				TWIN_MESSAGING_ENABLED: "true",
+				TWIN_AUTOMATION_ENABLED: "true",
+				TWIN_AUTOMATION_ACTION_TYPES: "fetch"
 			}
 		});
 		expect(result).toBeDefined();
@@ -242,7 +247,9 @@ describe("node-core", () => {
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true"
+				TWIN_MESSAGING_ENABLED: "true",
+				TWIN_AUTOMATION_ENABLED: "true",
+				TWIN_AUTOMATION_ACTION_TYPES: "fetch"
 			}
 		});
 		expect(result).toBeDefined();
@@ -354,6 +361,8 @@ describe("node-core", () => {
 			TWIN_DATASPACE_ENABLED: "true",
 			TWIN_VC_AUTHENTICATION_ENABLED: "true",
 			TWIN_MESSAGING_ENABLED: "true",
+			TWIN_AUTOMATION_ENABLED: "true",
+			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_EXTENSIONS: "./tests/apps/testApp.js"
 		};
 
@@ -406,6 +415,7 @@ describe("node-core", () => {
 			"task-scheduler-service",
 			"event-bus-service",
 			"telemetry-service",
+			"automation-service",
 			"messaging-admin-service",
 			"messaging-service",
 			"blob-storage-service",
@@ -475,6 +485,11 @@ describe("node-core", () => {
 			"DELETE   /telemetry/metric/:id",
 			"GET      /telemetry/metric",
 			"GET      /telemetry/metric/:id/value",
+			"POST     /automation/trigger/:trigger",
+			"POST     /automation",
+			"DELETE   /automation/:actionId",
+			"GET      /automation/:actionId",
+			"GET      /automation",
 			"POST     /blob",
 			"GET      /blob/:id",
 			"GET      /blob/:id/content",
@@ -624,6 +639,8 @@ describe("node-core", () => {
 
 			expect(TrustGeneratorFactory.names()).toEqual(["jwt-verifiable-credential-generator"]);
 			expect(TrustVerifierFactory.names()).toEqual(["jwt-verifiable-credential-verifier"]);
+
+			expect(AutomationActionFactory.names()).toEqual(["fetch-action"]);
 		}
 
 		await startResult?.shutdown();

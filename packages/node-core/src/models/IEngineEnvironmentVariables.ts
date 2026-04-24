@@ -723,6 +723,17 @@ export interface IEngineEnvironmentVariables {
 	dataspaceDataPlanePath?: string;
 
 	/**
+	 * Are the automation components enabled, defaults to false.
+	 */
+	automationEnabled?: string;
+
+	/**
+	 * The type of the automation action to create, comma separate for more than one connector.
+	 * values: fetch
+	 */
+	automationActionTypes?: string;
+
+	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
 	 */
 	extensions?: string;
