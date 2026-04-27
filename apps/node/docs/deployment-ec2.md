@@ -94,7 +94,7 @@ Run `sudo systemctl enable nginx` to auto start the server on instance startup.
 We clone the repo, build it and then make a copy of the relevant .env file.
 
 ```shell
-git clone https://github.com/twinfoundation/node.git
+git clone https://github.com/iotaledger/twin-node.git
 cd apps
 npm install
 npm run dist
