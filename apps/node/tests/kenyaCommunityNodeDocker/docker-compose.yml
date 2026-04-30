@@ -1,0 +1,21 @@
+services:
+  twin-kenya-node:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/kenyaCommunityNodeDocker/Dockerfile
+    container_name: twin-kenya-node
+    ports:
+      - '3040:3000'
+    env_file:
+      - env/node.env
+    volumes:
+      - kenya-data:/app/data
+    networks:
+      - twin-kenya-network
+
+volumes:
+  kenya-data:
+
+networks:
+  twin-kenya-network:
+    driver: bridge

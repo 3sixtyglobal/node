@@ -44,6 +44,9 @@ RUN rm -rf ./node_modules/@twin.org/node ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/auditable-item-graph-rest-client \
     ./node_modules/@twin.org/auditable-item-graph-service \
     ./node_modules/@twin.org/api-core \
+    ./node_modules/@twin.org/api-tenant-processor \
+    ./node_modules/@twin.org/engine-types \
+    ./node_modules/@twin.org/engine-server-types \
     ./node_modules/@twin.org/entity
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
 COPY framework/packages/entity ./node_modules/@twin.org/entity/
@@ -58,10 +61,10 @@ COPY rights-management/packages/rights-management-service ./node_modules/@twin.o
 COPY rights-management/packages/rights-management-models ./node_modules/@twin.org/rights-management-models/
 COPY rights-management/packages/rights-management-pap-service ./node_modules/@twin.org/rights-management-pap-service/
 COPY rights-management/packages/rights-management-pep-service ./node_modules/@twin.org/rights-management-pep-service/
-COPY data-space-connector/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
-COPY data-space-connector/packages/dataspace-data-plane-service ./node_modules/@twin.org/dataspace-data-plane-service/
-COPY data-space-connector/packages/dataspace-models ./node_modules/@twin.org/dataspace-models/
-COPY data-space-connector/packages/dataspace-test-app ./node_modules/@twin.org/dataspace-test-app/
+COPY dataspace/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
+COPY dataspace/packages/dataspace-data-plane-service ./node_modules/@twin.org/dataspace-data-plane-service/
+COPY dataspace/packages/dataspace-models ./node_modules/@twin.org/dataspace-models/
+COPY dataspace/packages/dataspace-test-app ./node_modules/@twin.org/dataspace-test-app/
 COPY standards/packages/standards-dataspace-protocol ./node_modules/@twin.org/standards-dataspace-protocol/
 COPY standards/packages/standards-w3c-odrl ./node_modules/@twin.org/standards-w3c-odrl/
 COPY synchronised-storage/packages/synchronised-storage-models ./node_modules/@twin.org/synchronised-storage-models/
@@ -69,6 +72,20 @@ COPY federated-catalogue/packages/federated-catalogue-service ./node_modules/@tw
 COPY federated-catalogue/packages/federated-catalogue-models ./node_modules/@twin.org/federated-catalogue-models/
 COPY data/packages/data-core ./node_modules/@twin.org/data-core/
 COPY api/packages/api-core ./node_modules/@twin.org/api-core/
+# In-flight TICKET-B/D/E packages: published versions don't yet have TenantUrlHelper export
+# (api-tenant-processor) or vaultConnectorType injection in component factories
+# (engine-types, engine-server-types). Override with local sources until ports to next + republish.
+COPY api/packages/api-tenant-processor ./node_modules/@twin.org/api-tenant-processor/
+COPY engine/packages/engine-types ./node_modules/@twin.org/engine-types/
+COPY engine/packages/engine-server-types ./node_modules/@twin.org/engine-server-types/
+
+# Our local engine-types declares deps on @twin.org/automation-* that node's
+# node_modules doesn't have (they're installed in engine/node_modules instead).
+# Bring them in so the copied engine-types can resolve its imports at runtime.
+COPY engine/node_modules/@twin.org/automation-actions ./node_modules/@twin.org/automation-actions/
+COPY engine/node_modules/@twin.org/automation-models ./node_modules/@twin.org/automation-models/
+COPY engine/node_modules/@twin.org/automation-rest-client ./node_modules/@twin.org/automation-rest-client/
+COPY engine/node_modules/@twin.org/automation-service ./node_modules/@twin.org/automation-service/
 
 # The 'node' symlink points to the app itself — create it pointing to /app
 RUN ln -s /app ./node_modules/@twin.org/node

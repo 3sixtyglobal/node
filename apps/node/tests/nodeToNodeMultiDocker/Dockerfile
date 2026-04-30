@@ -51,9 +51,9 @@ COPY rights-management/packages/rights-management-pnp-service ./node_modules/@tw
 COPY rights-management/packages/rights-management-plugins ./node_modules/@twin.org/rights-management-plugins/
 COPY rights-management/packages/rights-management-service ./node_modules/@twin.org/rights-management-service/
 COPY rights-management/packages/rights-management-models ./node_modules/@twin.org/rights-management-models/
-COPY data-space-connector/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
-COPY data-space-connector/packages/dataspace-models ./node_modules/@twin.org/dataspace-models/
-COPY data-space-connector/packages/dataspace-test-app ./node_modules/@twin.org/dataspace-test-app/
+COPY dataspace/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
+COPY dataspace/packages/dataspace-models ./node_modules/@twin.org/dataspace-models/
+COPY dataspace/packages/dataspace-test-app ./node_modules/@twin.org/dataspace-test-app/
 COPY standards/packages/standards-dataspace-protocol ./node_modules/@twin.org/standards-dataspace-protocol/
 COPY federated-catalogue/packages/federated-catalogue-service ./node_modules/@twin.org/federated-catalogue-service/
 COPY federated-catalogue/packages/federated-catalogue-models ./node_modules/@twin.org/federated-catalogue-models/

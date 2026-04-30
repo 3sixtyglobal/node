@@ -47,7 +47,7 @@ The Docker image copies packages from multiple submodules at build time (see `Do
 | Submodule              | Packages used                                                                                                   |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `node`                 | `node-core`, `apps/node`                                                                                        |
-| `data-space-connector` | `dataspace-control-plane-service`, `dataspace-data-plane-service`, `dataspace-models`, **`dataspace-test-app`** |
+| `dataspace`            | `dataspace-control-plane-service`, `dataspace-data-plane-service`, `dataspace-models`, **`dataspace-test-app`** |
 | `rights-management`    | `rights-management-*` (models, service, plugins, pap, pep, pnp, rest-client)                                    |
 | `standards`            | `standards-dataspace-protocol`, `standards-w3c-odrl`                                                            |
 | `synchronised-storage` | `synchronised-storage-models`                                                                                   |

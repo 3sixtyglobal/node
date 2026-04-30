@@ -1,14 +1,24 @@
 #!/usr/bin/env bash
 # =============================================================================
-# mobius-test.sh — 4-Node Mobius Supply Chain DSP Flow Test
+# mobius-test-step.sh — Stepwise (interactive) variant of mobius-test.sh
 # =============================================================================
 # Location: node/apps/node/tests/mobiusSupplyChainDocker/
 #
-# Simulates the Mobius freight forwarder supply chain scenario:
-#   Mobius (Freight Forwarder)            — Publisher, publishes consignment data
-#   Ashford Port Health (Border Agency)   — Consumer (UN/LOCODE: GBDVR, GBFOL)
-#   Suffolk Coastal Port Health           — Consumer (UN/LOCODE: GBFXT, GBHWR)
-#   MCP (Port Community System)           — Consumer (all locations)
+# This is an INTERACTIVE variant of mobius-test.sh built for live demos.
+# Before each phase begins, the script pauses and waits for the presenter to
+# press Enter, so the audience can follow along one phase at a time.
+#
+# The original mobius-test.sh is left untouched and continues to run straight
+# through (e.g. for CI use). All test logic in this file is identical — only
+# the `phase()` function and arg parsing differ.
+#
+# Usage:
+#   ./mobius-test-step.sh <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>
+#   ./mobius-test-step.sh --auto <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>
+#
+# Flags:
+#   --auto    Disable pauses (run straight through, like the original script).
+#             Useful for dry-runs the day before a demo.
 #
 # Phases:
 #   Phase 0: Prerequisites (IPFS + 4 node containers)
@@ -23,9 +33,6 @@
 #   Phase 9: Data Transfer — MCP pulls from Mobius
 #   Phase 10: Location filtering verification (per-consumer LOCODE check)
 #   Phase 11: Final verification
-#
-# Usage:
-#   ./mobius-test.sh <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>
 #
 # Prerequisites:
 #   - docker compose up (IPFS + all 4 nodes running)
@@ -91,6 +98,10 @@ SYNC_RETRY_DELAY="${SYNC_RETRY_DELAY:-10}"
 # Track results
 PHASE_RESULTS=()
 
+# Stepwise mode: pause before each phase unless --auto is passed.
+# Default: interactive (presenter presses Enter between phases).
+STEP_AUTO=0
+
 # ---------------------------------------------------------------------------
 # Colors and helpers
 # ---------------------------------------------------------------------------
@@ -107,6 +118,12 @@ phase() {
     echo -e "${BOLD}${BLUE}================================================================${NC}"
     echo -e "${BOLD}${BLUE}  Phase $1: $2${NC}"
     echo -e "${BOLD}${BLUE}================================================================${NC}"
+    if [ "${STEP_AUTO}" -eq 0 ]; then
+        # Interactive demo mode: wait for the presenter before running the phase.
+        # Read from /dev/tty so this still works if the script is piped.
+        echo -e "${YELLOW}  >>> Press Enter to run Phase $1 (or Ctrl-C to abort)...${NC}"
+        read -r _ </dev/tty || true
+    fi
     echo ""
 }
 
@@ -218,6 +235,12 @@ build_offer_json() {
                 }]
             }'
     else
+        # Unrestricted offer (no refinement). Permission-level target is
+        # "twin:jsonpath:$" — the arbiter's "include entire document" expression.
+        # Do NOT replace this with the dataset URL — the data plane uses this
+        # value to decide what to return, not just for validation.
+        # (Keeping the original shape; the multi-target getTargets() regression
+        # is addressed by pinning rights-management to c4191e5, not here.)
         jq -n \
             --arg uid "${offer_id}" \
             --arg assigner "${assigner}" \
@@ -292,12 +315,10 @@ negotiate_contract() {
     fi
 
     # Send ContractRequestMessage to provider
+    # callbackAddress includes the rights-management mount path (mirrors what
+    # the consumer-side PNP service's buildCallbackUrl produces in production).
     step "Sending ContractRequestMessage to provider..."
     local negotiate_body negotiate_response negotiate_http negotiate_resp_body
-    # callbackAddress must include the rights-management mount path. In production
-    # the consumer-side PNP service does this via buildCallbackUrl + _callbackPath.
-    # Here (curl) we mirror that so the provider's outbound rest-client (which uses
-    # pathPrefix: "" since the URL has the path baked in) reaches the right route.
     negotiate_body=$(jq -n \
         --arg ctx "${DSP_CONTEXT}" \
         --arg consumerPid "${consumer_pid}" \
@@ -534,6 +555,69 @@ run_dsp_transfer() {
 
     RESULT_ITEM_COUNT="${item_count}"
     RESULT_FINAL_STATE="${final_state}"
+    # Demo: keep the full filtered response so the presenter can show
+    # the audience what an actual consignment looks like.
+    RESULT_PULL_BODY="${pull_body}"
+}
+
+# ---------------------------------------------------------------------------
+# Demo helpers (mobius-test-step.sh only — not present in mobius-test.sh)
+# ---------------------------------------------------------------------------
+
+# Print one sample consignment from a pulled body, key fields only.
+# Usage: print_sample_consignment <flow_name> <pull_body_json>
+print_sample_consignment() {
+    local flow_name="$1" body="$2"
+    if [ -z "${body}" ]; then
+        return 0
+    fi
+    local sample
+    sample=$(echo "${body}" | jq -r '
+        ([(.itemListElement // [])[] | select(. != null)] | .[0]) // empty
+        | {
+            id: (."@id" // .id // "n/a"),
+            type: (."@type" // .type // "n/a"),
+            transportMode: (.transportMode // "n/a"),
+            unloadingLocation: (.unloadingLocation.id // "n/a"),
+            loadingLocation: (.loadingLocation.id // "n/a"),
+            carrier: (.carrier.name // .carrier // "n/a"),
+            vessel: (.vessel.name // .vessel // "n/a"),
+            estimatedArrival: (.estimatedArrival // .eta // "n/a"),
+            estimatedDeparture: (.estimatedDeparture // .etd // "n/a")
+          }
+        | to_entries
+        | map(select(.value != "n/a" and .value != null))
+        | .[]
+        | "    \(.key): \(.value)"
+    ' 2>/dev/null || true)
+    if [ -n "${sample}" ]; then
+        echo -e "${CYAN}  Sample consignment ${flow_name} received:${NC}"
+        echo "${sample}"
+    else
+        echo -e "${YELLOW}  (no sample consignment available — response was empty or unexpected shape)${NC}"
+    fi
+}
+
+# Print the ODRL constraint fragment of an offer JSON.
+# Usage: print_offer_constraint <label> <offer_json>
+print_offer_constraint() {
+    local label="$1" offer_json="$2"
+    local fragment
+    fragment=$(echo "${offer_json}" | jq -c '
+        .. | objects | select(has("leftOperand"))
+    ' 2>/dev/null || true)
+    if [ -n "${fragment}" ]; then
+        echo -e "${CYAN}  ${label} constraint:${NC}"
+        echo "${fragment}" | while IFS= read -r line; do
+            echo "${line}" | jq -r '
+                "    leftOperand:  \(.leftOperand // "n/a")",
+                "    operator:     \((.operator // .op // "n/a") | tostring | sub("^.*:"; ""))",
+                "    rightOperand: \(.rightOperand // "n/a")"
+            ' 2>/dev/null || true
+        done
+    else
+        echo -e "${YELLOW}  ${label}: no constraint (unrestricted offer)${NC}"
+    fi
 }
 
 # Count datasets in FC response (top-level + nested catalogs)
@@ -574,8 +658,16 @@ query_catalogue() {
 # ---------------------------------------------------------------------------
 # Argument validation
 # ---------------------------------------------------------------------------
+# Optional --auto flag must come before the four passwords.
+if [ $# -ge 1 ] && [ "$1" = "--auto" ]; then
+    STEP_AUTO=1
+    shift
+fi
+
 if [ $# -lt 4 ]; then
-    echo -e "${BOLD}Usage:${NC} $0 <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>"
+    echo -e "${BOLD}Usage:${NC} $0 [--auto] <mobius-pw> <ashford-pw> <suffolk-pw> <mcp-pw>"
+    echo ""
+    echo "  --auto    Disable interactive pauses (run straight through)."
     echo ""
     echo "  Passwords are printed during setup.sh bootstrap."
     echo "  IMPORTANT: Wrap passwords in single quotes."
@@ -590,6 +682,13 @@ MOBIUS_PASSWORD="$1"
 ASHFORD_PASSWORD="$2"
 SUFFOLK_PASSWORD="$3"
 MCP_PASSWORD="$4"
+
+if [ "${STEP_AUTO}" -eq 0 ]; then
+    echo -e "${YELLOW}Interactive demo mode: the script will pause before each phase.${NC}"
+    echo -e "${YELLOW}Pass --auto as the first argument to disable pauses.${NC}"
+else
+    echo -e "${YELLOW}--auto enabled: running straight through (no pauses).${NC}"
+fi
 
 echo -e "${BOLD}Mobius Supply Chain Docker Test (4-node)${NC}"
 echo -e "  Mobius (Freight Forwarder): ${MOBIUS_HOST} (container: ${MOBIUS_CONTAINER})"
@@ -690,14 +789,17 @@ MCP_OFFER_JSON=$(build_offer_json "${MCP_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_I
 step "Seeding Ashford offer (GBDVR only)..."
 seed_offer "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${ASHFORD_OFFER_JSON}"
 ok "Offer seeded: ${ASHFORD_OFFER_ID}"
+print_offer_constraint "Ashford offer" "${ASHFORD_OFFER_JSON}"
 
 step "Seeding Suffolk offer (GBFXT only)..."
 seed_offer "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${SUFFOLK_OFFER_JSON}"
 ok "Offer seeded: ${SUFFOLK_OFFER_ID}"
+print_offer_constraint "Suffolk offer" "${SUFFOLK_OFFER_JSON}"
 
 step "Seeding MCP offer (all locations)..."
 seed_offer "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${MCP_OFFER_JSON}"
 ok "Offer seeded: ${MCP_OFFER_ID}"
+print_offer_constraint "MCP offer" "${MCP_OFFER_JSON}"
 
 PHASE_RESULTS+=("${GREEN}[2]${NC} 3 Per-Consumer ODRL Offers Seeded (Mobius)")
 
@@ -771,7 +873,9 @@ run_dsp_transfer "ashford" "${MOBIUS_HOST}" "${ASHFORD_HOST}" \
     "${ASHFORD_TRUST}" "${MOBIUS_TRUST}" "${ASHFORD_AGREEMENT}" "${ASHFORD_INTERNAL}"
 
 ok "Ashford transfer: ${RESULT_ITEM_COUNT} entities, ports: ${RESULT_PORTS_OF_ENTRY:-n/a}, state: ${RESULT_FINAL_STATE}"
+print_sample_consignment "Ashford" "${RESULT_PULL_BODY:-}"
 ASHFORD_PORTS="${RESULT_PORTS_OF_ENTRY:-}"
+ASHFORD_ITEM_COUNT="${RESULT_ITEM_COUNT:-0}"
 PHASE_RESULTS+=("${GREEN}[7]${NC} Ashford<-Mobius (${RESULT_ITEM_COUNT} entities, ports: ${ASHFORD_PORTS:-n/a})")
 
 # ==========================================================================
@@ -784,7 +888,9 @@ run_dsp_transfer "suffolk" "${MOBIUS_HOST}" "${SUFFOLK_HOST}" \
     "${SUFFOLK_TRUST}" "${MOBIUS_TRUST}" "${SUFFOLK_AGREEMENT}" "${SUFFOLK_INTERNAL}"
 
 ok "Suffolk transfer: ${RESULT_ITEM_COUNT} entities, ports: ${RESULT_PORTS_OF_ENTRY:-n/a}, state: ${RESULT_FINAL_STATE}"
+print_sample_consignment "Suffolk" "${RESULT_PULL_BODY:-}"
 SUFFOLK_PORTS="${RESULT_PORTS_OF_ENTRY:-}"
+SUFFOLK_ITEM_COUNT="${RESULT_ITEM_COUNT:-0}"
 PHASE_RESULTS+=("${GREEN}[8]${NC} Suffolk<-Mobius (${RESULT_ITEM_COUNT} entities, ports: ${SUFFOLK_PORTS:-n/a})")
 
 # ==========================================================================
@@ -797,7 +903,9 @@ run_dsp_transfer "mcp" "${MOBIUS_HOST}" "${MCP_HOST}" \
     "${MCP_TRUST}" "${MOBIUS_TRUST}" "${MCP_AGREEMENT}" "${MCP_INTERNAL}"
 
 ok "MCP transfer: ${RESULT_ITEM_COUNT} entities, ports: ${RESULT_PORTS_OF_ENTRY:-n/a}, state: ${RESULT_FINAL_STATE}"
+print_sample_consignment "MCP" "${RESULT_PULL_BODY:-}"
 MCP_PORTS="${RESULT_PORTS_OF_ENTRY:-}"
+MCP_ITEM_COUNT="${RESULT_ITEM_COUNT:-0}"
 PHASE_RESULTS+=("${GREEN}[9]${NC} MCP<-Mobius (${RESULT_ITEM_COUNT} entities, ports: ${MCP_PORTS:-n/a})")
 
 # ==========================================================================
@@ -868,6 +976,15 @@ else
 fi
 
 # Summary for this phase
+echo ""
+# Demo: count comparison. MCP has no ODRL constraint, so its count is the
+# unfiltered total — no extra HTTP call needed.
+TOTAL_FROM_MCP="${MCP_ITEM_COUNT:-0}"
+step "Mobius dataset (unfiltered total, via MCP): ${TOTAL_FROM_MCP} consignments"
+echo -e "${CYAN}    ───────────────────────────────────────────${NC}"
+echo -e "${CYAN}    Ashford received: ${ASHFORD_ITEM_COUNT:-0}  (filtered to GBDVR / GBFOL)${NC}"
+echo -e "${CYAN}    Suffolk received: ${SUFFOLK_ITEM_COUNT:-0}  (filtered to GBFXT / GBHWR)${NC}"
+echo -e "${CYAN}    MCP     received: ${MCP_ITEM_COUNT:-0}  (no constraint)${NC}"
 echo ""
 step "Location filtering summary:"
 echo -e "    Ashford (expected: LOCODE#GBDVR only):  received ${ASHFORD_PORTS:-none}"

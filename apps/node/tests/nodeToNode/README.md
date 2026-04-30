@@ -67,7 +67,7 @@ npm run local-link "@twin.org/synchronised-storage*"
 npm run local-link "@twin.org/verifiable-storage*"
 cd ..
 
-cd data-space-connector
+cd dataspace
 npm run local-link "@twin.org/standards-dataspace-protocol"
 cd ..
 ```
@@ -76,7 +76,7 @@ Verify symlinks:
 
 ```bash
 ls -la node/node_modules/@twin.org/dataspace-models
-# Should show a symlink -> ../../../data-space-connector/packages/dataspace-models
+# Should show a symlink -> ../../../dataspace/packages/dataspace-models
 ```
 
 ### 3. Copy env files

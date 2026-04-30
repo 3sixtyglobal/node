@@ -1,0 +1,21 @@
+services:
+  twin-mt-node:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/multiTenancyDocker/Dockerfile
+    container_name: twin-mt-node
+    ports:
+      - '3030:3000'
+    env_file:
+      - env/node.env
+    volumes:
+      - mt-data:/app/data
+    networks:
+      - twin-mt-network
+
+volumes:
+  mt-data:
+
+networks:
+  twin-mt-network:
+    driver: bridge
