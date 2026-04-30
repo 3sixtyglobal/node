@@ -87,22 +87,23 @@ When you change the prefix, all variables in this document use your custom prefi
 
 ## Server and API Variables
 
-| Variable                                  | Possible Values                 | Default                            | Notes                                                         |
-| ----------------------------------------- | ------------------------------- | ---------------------------------- | ------------------------------------------------------------- |
-| `TWIN_PORT`                               | Integer                         | `3000` (web server fallback)       | API server port.                                              |
-| `TWIN_HOST`                               | Host name or IP                 | `localhost` (web server fallback)  | API server host.                                              |
-| `TWIN_PUBLIC_ORIGIN`                      | URL                             | None                               | Public API origin, for example `https://api.example.com:443`. |
-| `TWIN_CORS_ORIGINS`                       | Comma-separated origins         | `*` (if not set by runtime config) | CORS allow list.                                              |
-| `TWIN_HTTP_METHODS`                       | Comma-separated HTTP methods    | `GET,POST,PUT,DELETE,OPTIONS`      | CORS methods.                                                 |
-| `TWIN_HTTP_ALLOWED_HEADERS`               | Comma-separated headers         | Runtime dependent                  | CORS allowed headers.                                         |
-| `TWIN_HTTP_EXPOSED_HEADERS`               | Comma-separated headers         | Runtime dependent                  | CORS exposed headers.                                         |
-| `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None                               | Authentication admin processor type.                          |
-| `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None                               | Authentication processor type.                                |
-| `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`                     | Key used for auth signing operations.                         |
-| `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None                               | Additional MIME processor registrations.                      |
-| `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value                   | Includes body in route logging.                               |
-| `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`                            | Includes full base64 payloads in route logging.               |
-| `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None                               | Properties to obfuscate in route logs.                        |
+| Variable                                  | Possible Values                 | Default                            | Notes                                                          |
+| ----------------------------------------- | ------------------------------- | ---------------------------------- | -------------------------------------------------------------- |
+| `TWIN_PORT`                               | Integer                         | `3000` (web server fallback)       | API server port.                                               |
+| `TWIN_HOST`                               | Host name or IP                 | `localhost` (web server fallback)  | API server host.                                               |
+| `TWIN_PUBLIC_ORIGIN`                      | URL                             | None                               | Public API origin, for example `https://api.example.com:443`.  |
+| `TWIN_CORS_ORIGINS`                       | Comma-separated origins         | `*` (if not set by runtime config) | CORS allow list.                                               |
+| `TWIN_HTTP_METHODS`                       | Comma-separated HTTP methods    | `GET,POST,PUT,DELETE,OPTIONS`      | CORS methods.                                                  |
+| `TWIN_HTTP_ALLOWED_HEADERS`               | Comma-separated headers         | Runtime dependent                  | CORS allowed headers.                                          |
+| `TWIN_HTTP_EXPOSED_HEADERS`               | Comma-separated headers         | Runtime dependent                  | CORS exposed headers.                                          |
+| `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None                               | Authentication admin processor type.                           |
+| `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None                               | Authentication processor type.                                 |
+| `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`                     | Key used for auth signing operations.                          |
+| `TWIN_HOSTING_PARAM_ENCRYPTION_KEY_ID`    | Vault key identifier            | `param-encryption`                 | Key used for encrypting hosting parameters in auth operations. |
+| `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None                               | Additional MIME processor registrations.                       |
+| `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value                   | Includes body in route logging.                                |
+| `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`                            | Includes full base64 payloads in route logging.                |
+| `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None                               | Properties to obfuscate in route logs.                         |
 
 ## Extension Module Loading Variables
 

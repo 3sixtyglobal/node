@@ -705,11 +705,6 @@ export interface IEngineEnvironmentVariables {
 	dataspaceEnabled?: string;
 
 	/**
-	 * The id of the symmetric (ChaCha20Poly1305) vault key used to encrypt the `tenantToken` query param.
-	 */
-	tenantTokenEncryptionKeyId?: string;
-
-	/**
 	 * The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
 	 * @default 10
 	 */

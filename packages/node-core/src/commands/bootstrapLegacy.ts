@@ -198,6 +198,16 @@ export async function bootstrapLegacy(
 
 		CLIDisplay.break();
 		CLIDisplay.section(
+			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.hostingParamKeyAdd")
+		);
+		await vaultKeyCreate(engineCore, envVars, {
+			identity: nodeIdentity.did,
+			keyType: "ChaCha20Poly1305",
+			keyId: envVars.hostingParamEncryptionKeyId
+		});
+
+		CLIDisplay.break();
+		CLIDisplay.section(
 			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeIdentitySet")
 		);
 		await nodeSetIdentity(engineCore, envVars, {
@@ -206,19 +216,6 @@ export async function bootstrapLegacy(
 
 		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 		if (tenantEnabled) {
-			CLIDisplay.break();
-			CLIDisplay.section(
-				I18n.formatMessage(
-					"node.cli.commands.bootstrap-legacy.labels.tenantTokenEncryptionKeyCreate"
-				)
-			);
-			await vaultKeyCreate(engineCore, envVars, {
-				identity: nodeIdentity.did,
-				keyType: "ChaCha20Poly1305",
-				keyId: envVars.tenantTokenEncryptionKeyId,
-				overwriteMode: "skip"
-			});
-
 			if (Is.empty(tenantId)) {
 				await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
 					CLIDisplay.break();

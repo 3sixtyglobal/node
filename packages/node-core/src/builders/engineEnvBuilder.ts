@@ -1263,8 +1263,7 @@ async function configureRightsManagement(
 			options: {
 				config: {
 					callbackPath: rightsManagementPath,
-					includeErrorDetails: coreConfig.debug ?? false,
-					signingKeyName: envVars.tenantTokenEncryptionKeyId
+					includeErrorDetails: coreConfig.debug ?? false
 				}
 			},
 			isDefault: true
@@ -1458,9 +1457,7 @@ async function configureFederatedCatalogue(
 			type: FederatedCatalogueComponentType.Service,
 			options: {
 				datasetEntityStorageType: overrideEntityStorageType,
-				config: {
-					signingKeyName: envVars.tenantTokenEncryptionKeyId
-				}
+				config: {}
 			}
 		});
 
@@ -1491,8 +1488,7 @@ async function configureDataspace(
 			type: DataspaceControlPlaneComponentType.Service,
 			options: {
 				config: {
-					dataPlanePath: envVars.dataspaceDataPlanePath,
-					signingKeyName: envVars.tenantTokenEncryptionKeyId
+					dataPlanePath: envVars.dataspaceDataPlanePath
 				}
 			}
 		});

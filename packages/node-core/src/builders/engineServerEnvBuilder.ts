@@ -99,7 +99,8 @@ export async function buildEngineServerConfiguration(
 					options: {
 						config: {
 							localOrigin,
-							publicOrigin
+							publicOrigin,
+							paramEncryptionKeyName: envVars.hostingParamEncryptionKeyId
 						}
 					}
 				}
@@ -156,17 +157,13 @@ export async function buildEngineServerConfiguration(
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Tenant,
 			options: {
-				config: {
-					signingKeyName: envVars.tenantTokenEncryptionKeyId
-				}
+				config: {}
 			}
 		});
 		serverConfig.types.socketRouteProcessor.push({
 			type: SocketRouteProcessorType.Tenant,
 			options: {
-				config: {
-					signingKeyName: envVars.tenantTokenEncryptionKeyId
-				}
+				config: {}
 			}
 		});
 	}
