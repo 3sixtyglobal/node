@@ -253,7 +253,7 @@ const { ChaCha20Poly1305 } = require('@twin.org/crypto');
 const { Converter, RandomHelper } = require('@twin.org/core');
 
 const store = JSON.parse(fs.readFileSync('/app/data/vault-key/store.json', 'utf8'));
-const fullKeyName = '${KRA_DID}/tenant-token-encryption';
+const fullKeyName = '${KRA_DID}/param-encryption';
 const vaultKey = store.find(e => e.id === fullKeyName);
 if (!vaultKey) {
     console.error('Vault key not found:', fullKeyName);
@@ -261,9 +261,18 @@ if (!vaultKey) {
 }
 
 const privateKey = Converter.base64ToBytes(vaultKey.privateKey);
+// HostingService.encryptParam prepends an 8-byte salt to the plaintext before
+// encrypting (defence-in-depth against rainbow tables). decryptParam strips
+// the first 8 bytes of the decrypted output. Mirror that so vault.decrypt
+// + slice(8) on the receiving side recovers the original tenant id.
+const salt = RandomHelper.generate(8);
+const tenantBytes = Converter.utf8ToBytes('${TENANT_TRADER_TENANT_ID}');
+const plaintext = new Uint8Array(salt.length + tenantBytes.length);
+plaintext.set(salt);
+plaintext.set(tenantBytes, salt.length);
 const nonce = RandomHelper.generate(12);
 const cipher = new ChaCha20Poly1305(privateKey, nonce);
-const payload = cipher.encrypt(Converter.utf8ToBytes('${TENANT_TRADER_TENANT_ID}'));
+const payload = cipher.encrypt(plaintext);
 const encrypted = new Uint8Array(nonce.length + payload.length);
 encrypted.set(nonce);
 encrypted.set(payload, nonce.length);

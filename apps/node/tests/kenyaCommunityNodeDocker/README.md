@@ -58,17 +58,17 @@ All git-ignored. To wipe state: `./setup.sh --clean`.
 
 ## Test phases
 
-| Phase | Description                                                          | Status                                                                            |
-| ----- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 0     | Health (TenantProcessor gate) + per-tenant logins                    | ✅ Implemented                                                                    |
-| 1     | Trader queries federated catalogue (cross-tenant `[Node]` discovery) | ✅ Implemented                                                                    |
-| 2     | KRA's offer presence (seeded by `provision-storage.sh`)              | ✅ Implemented                                                                    |
-| 3     | Trader sees KRA's dataset + encrypted `twin:tenantToken` (TICKET-G)  | ✅ Implemented                                                                    |
-| 4     | Trader initiates PNP negotiation against KRA's offer                 | ✅ Implemented                                                                    |
-| 5     | Negotiation reaches FINALIZED (REQUESTED → AGREED → FINALIZED)       | ✅ Implemented                                                                    |
-| 6     | Trader requestTransfer against the agreement                         | ✅ Implemented                                                                    |
+| Phase | Description                                                                    | Status                                                                  |
+| ----- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| 0     | Health (TenantProcessor gate) + per-tenant logins                              | ✅ Implemented                                                          |
+| 1     | Trader queries federated catalogue (cross-tenant `[Node]` discovery)           | ✅ Implemented                                                          |
+| 2     | KRA's offer presence (seeded by `provision-storage.sh`)                        | ✅ Implemented                                                          |
+| 3     | Trader sees KRA's dataset + encrypted `twin:tenantToken` (TICKET-G)            | ✅ Implemented                                                          |
+| 4     | Trader initiates PNP negotiation against KRA's offer                           | ✅ Implemented                                                          |
+| 5     | Negotiation reaches FINALIZED (REQUESTED → AGREED → FINALIZED)                 | ✅ Implemented                                                          |
+| 6     | Trader requestTransfer against the agreement                                   | ✅ Implemented                                                          |
 | 7     | Trader startTransfer + encrypted `dataAddress.endpoint` (TICKET-D) + data pull | ✅ Implemented                                                          |
-| 8     | Negative-path tenant isolation                                       | ⏳ Intentionally not yet automated (awaiting stable Phase 0-7 baseline)           |
+| 8     | Negative-path tenant isolation                                                 | ⏳ Intentionally not yet automated (awaiting stable Phase 0-7 baseline) |
 
 Per-phase outcomes and run history are recorded in the master findings doc at [`../multiTenancyDocker/findings-from-first-run.md`](../multiTenancyDocker/findings-from-first-run.md) under "Kenya empirical findings".
 

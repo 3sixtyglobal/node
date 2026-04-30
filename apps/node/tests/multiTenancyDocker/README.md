@@ -78,32 +78,32 @@ docker compose down -v
 
 All files are git-ignored. To wipe state: `./setup.sh --clean`.
 
-> **Known gotcha:** if `setup.sh` writes the node-admin password unquoted and your random password contains shell-special characters (e.g. `!`, `$`, `\``), `source .node-password` in `mt-test.sh` will fail at Phase 1 login. The `kenyaCommunityNodeDocker/setup.sh` already applies a `printf '%q'` shell-escape; if you hit this, mirror that one-line patch into `multiTenancyDocker/setup.sh`.
+> **Known gotcha:** if `setup.sh` writes the node-admin password unquoted and your random password contains shell-special characters (e.g. `!`, `$`, `\``), `source .node-password`in`mt-test.sh`will fail at Phase 1 login. The`kenyaCommunityNodeDocker/setup.sh`already applies a`printf '%q'`shell-escape; if you hit this, mirror that one-line patch into`multiTenancyDocker/setup.sh`.
 
 ## Test phases
 
-| Phase | Subsystem        | Description                                                          |
-| ----- | ---------------- | -------------------------------------------------------------------- |
-| 0     | Health           | `/health` is tenant-gated by design (TenantProcessor)                |
-| 1     | Auth             | Tenant-scoped logins for both tenants' users                         |
-| 2     | Attestation      | Tenant A creates an attestation                                      |
-| 3     | Attestation      | Tenant B creates an attestation                                      |
-| 4     | Attestation      | Tenant A reads its own (200), cannot see B's                         |
-| 5     | Attestation      | Tenant B reads its own (200), cannot see A's                         |
-| 6     | Auth (negative)  | Cross-tenant JWT reuse must fail with `tenantIdMismatch`             |
-| 7     | Auth (negative)  | Missing `x-api-key` must fail at TenantProcessor                     |
+| Phase | Subsystem        | Description                                                                        |
+| ----- | ---------------- | ---------------------------------------------------------------------------------- |
+| 0     | Health           | `/health` is tenant-gated by design (TenantProcessor)                              |
+| 1     | Auth             | Tenant-scoped logins for both tenants' users                                       |
+| 2     | Attestation      | Tenant A creates an attestation                                                    |
+| 3     | Attestation      | Tenant B creates an attestation                                                    |
+| 4     | Attestation      | Tenant A reads its own (200), cannot see B's                                       |
+| 5     | Attestation      | Tenant B reads its own (200), cannot see A's                                       |
+| 6     | Auth (negative)  | Cross-tenant JWT reuse must fail with `tenantIdMismatch`                           |
+| 7     | Auth (negative)  | Missing `x-api-key` must fail at TenantProcessor                                   |
 | 8     | Storage          | On-disk partition inspection — attestation/NFT records carry distinct partitionIds |
-| 9     | NFT              | Tenant A mints an NFT directly (POST /nft/)                          |
-| 10    | NFT              | Tenant B mints an NFT directly (POST /nft/)                          |
-| 11    | NFT              | NFT cross-tenant isolation — each tenant resolves only its own NFT   |
-| 12    | Identity profile | Tenant A writes its identity profile                                 |
-| 13    | Identity profile | Tenant B writes its identity profile                                 |
-| 14    | Identity profile | Identity-profile cross-tenant isolation                              |
-| 15    | Storage          | On-disk identity-profile partition inspection                        |
-| 16    | ODRL policy      | Tenant A creates an ODRL policy (POST /rights-management/policy/admin) |
-| 17    | ODRL policy     | Tenant B creates an ODRL policy                                      |
-| 18    | ODRL policy     | PAP cross-tenant isolation — each tenant reads only its own policy   |
-| 19    | ODRL policy     | PAP list endpoint isolation — the only bulk-leak vector              |
-| 20    | Storage          | On-disk odrl-policy partition inspection                             |
+| 9     | NFT              | Tenant A mints an NFT directly (POST /nft/)                                        |
+| 10    | NFT              | Tenant B mints an NFT directly (POST /nft/)                                        |
+| 11    | NFT              | NFT cross-tenant isolation — each tenant resolves only its own NFT                 |
+| 12    | Identity profile | Tenant A writes its identity profile                                               |
+| 13    | Identity profile | Tenant B writes its identity profile                                               |
+| 14    | Identity profile | Identity-profile cross-tenant isolation                                            |
+| 15    | Storage          | On-disk identity-profile partition inspection                                      |
+| 16    | ODRL policy      | Tenant A creates an ODRL policy (POST /rights-management/policy/admin)             |
+| 17    | ODRL policy      | Tenant B creates an ODRL policy                                                    |
+| 18    | ODRL policy      | PAP cross-tenant isolation — each tenant reads only its own policy                 |
+| 19    | ODRL policy      | PAP list endpoint isolation — the only bulk-leak vector                            |
+| 20    | Storage          | On-disk odrl-policy partition inspection                                           |
 
 See [TEST-PLAN.md](TEST-PLAN.md) for open questions and known gaps to validate during first run, and [findings-from-first-run.md](findings-from-first-run.md) for run history (also the consolidated home for Kenya scaffold findings).

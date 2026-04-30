@@ -169,7 +169,7 @@ source .seeded-offer
 INTERNAL_URL="http://twin-kenya-node:3000"
 
 # Translate container-internal callback URLs to host-accessible ones for
-# follow-up curls. Strips the encrypted ?tenantToken=... query if present
+# follow-up curls. Strips the encrypted ?x-enc-tenant-token=... query if present
 # (the host curl would reach the running container which decrypts itself).
 translate_endpoint() {
     local url="$1"
@@ -201,7 +201,7 @@ else
 fi
 
 # TICKET-G: extract the encrypted tenantToken the catalogue published for this
-# dataset. Used as ?tenantToken= on subsequent PNP/DSP URLs so they route into
+# dataset. Used as ?x-enc-tenant-token= on subsequent PNP/DSP URLs so they route into
 # KRA's tenant context (not Trader's).
 KRA_TENANT_TOKEN=$(echo "${catalog_resp}" | jq -r --arg id "${KRA_DATASET_ID}" \
     '.dataset[]? | select(.["@id"] == $id) | .["twin:tenantToken"] // empty' | head -1)
@@ -263,7 +263,7 @@ offer_json=$(jq -n \
 # which includes the configured `_callbackPath` (default "rights-management").
 # We mirror that here so the path is in the URL — KRA's outbound rest-client
 # uses `pathPrefix: ""` and relies on the path already being present.
-TRADER_CALLBACK_URL="${INTERNAL_URL}/rights-management?tenantToken=${TRADER_TENANT_TOKEN}"
+TRADER_CALLBACK_URL="${INTERNAL_URL}/rights-management?x-enc-tenant-token=${TRADER_TENANT_TOKEN}"
 
 negotiate_body=$(jq -n \
     --arg ctx "${DSP_CONTEXT}" \
@@ -272,10 +272,10 @@ negotiate_body=$(jq -n \
     --arg callback "${TRADER_CALLBACK_URL}" \
     '{ "@context": [$ctx], "@type": "ContractRequestMessage", consumerPid: $consumerPid, offer: $offer, callbackAddress: $callback }')
 
-# TICKET-G: ?tenantToken=<KRA_ENCRYPTED> routes the inbound through TenantProcessor
+# TICKET-G: ?x-enc-tenant-token=<KRA_ENCRYPTED> routes the inbound through TenantProcessor
 # decryption → ContextIds[Tenant] = KRA → PNP/PAP lookup runs in KRA's partition.
 negotiate_resp=$(curl -sS -w "\n%{http_code}" -X POST \
-    "${HOST}/rights-management/negotiations/request?tenantToken=${KRA_TENANT_TOKEN}" \
+    "${HOST}/rights-management/negotiations/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
     -d "${negotiate_body}")
@@ -296,7 +296,7 @@ phase 5 "Negotiation reaches FINALIZED / VERIFIED"
 final_state=""
 for attempt in $(seq 1 15); do
     # State lives in KRA's PNAP partition → route via tenantToken
-    state_resp=$(curl -sS "${HOST}/rights-management/negotiations/${PROVIDER_NEGO_PID}?tenantToken=${KRA_TENANT_TOKEN}" \
+    state_resp=$(curl -sS "${HOST}/rights-management/negotiations/${PROVIDER_NEGO_PID}?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
         -H "Authorization: Bearer ${TRADER_TRUST_JWT}")
     current_state=$(echo "${state_resp}" | jq -r '.state // empty')
     echo "    Attempt ${attempt}/15: state=${current_state:-<unknown>}"
@@ -327,14 +327,14 @@ phase 6 "Trader requestTransfer against the agreement"
 # ============================================================================
 TRADER_DSP_PID="urn:uuid:trader-dsp-$(date +%s)-${RANDOM}"
 # DSP transfer request goes to KRA (provider) → route via tenantToken
-tr_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?tenantToken=${KRA_TENANT_TOKEN}" \
+tr_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
     -d "$(jq -n \
         --arg ctx "${DSP_CONTEXT}" \
         --arg consumerPid "${TRADER_DSP_PID}" \
         --arg agreementId "${TRADER_AGREEMENT_ID}" \
-        --arg callbackAddress "${INTERNAL_URL}/dataspace?tenantToken=${TRADER_TENANT_TOKEN}" \
+        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
         '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "Http-Pull-Query-Format", callbackAddress: $callbackAddress }')")
 
 tr_http=$(echo "${tr_resp}" | tail -1)
@@ -353,7 +353,7 @@ ok "Transfer created (providerPid: ${PROVIDER_DSP_PID})"
 phase 7 "Trader startTransfer + receives encrypted endpoint + pulls data"
 # ============================================================================
 # DSP transfer start runs on KRA (provider) side → route via tenantToken
-start_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${PROVIDER_DSP_PID}/start?tenantToken=${KRA_TENANT_TOKEN}" \
+start_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${PROVIDER_DSP_PID}/start?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
     -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${TRADER_DSP_PID}\",\"providerPid\":\"${PROVIDER_DSP_PID}\"}")
@@ -368,7 +368,7 @@ ok "Transfer started, raw endpoint: ${data_endpoint_raw}"
 
 # CRITICAL CHECK: the endpoint MUST contain the tenantToken query param —
 # that's TICKET-D's signature.
-if echo "${data_endpoint_raw}" | grep -q "tenantToken="; then
+if echo "${data_endpoint_raw}" | grep -q "tenant-token="; then
     ok "TICKET-D verified: dataAddress.endpoint carries encrypted tenantToken"
 else
     warn "TICKET-D unexpected: endpoint has NO tenantToken query — was DSP wired correctly?"

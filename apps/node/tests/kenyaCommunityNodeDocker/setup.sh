@@ -6,7 +6,7 @@
 #
 # Steps:
 #   1. Build Docker image
-#   2. Bootstrap the node (creates DID on IOTA testnet + tenant-token-encryption
+#   2. Bootstrap the node (creates DID on IOTA testnet + param-encryption
 #      vault key + node admin user)
 #   3. tenant-create twice to provision KRA and Trader
 #   4. user-create twice (one admin per tenant) using the
@@ -64,7 +64,7 @@ ok "Image built"
 # Step 2: Bootstrap node
 # -------------------------------------------------------------------------
 echo ""
-echo -e "${BOLD}Step 2: Bootstrap node (creates DID on IOTA testnet + tenant-token-encryption key, ~60s)${NC}"
+echo -e "${BOLD}Step 2: Bootstrap node (creates DID on IOTA testnet + param-encryption key, ~60s)${NC}"
 
 bootstrap_tmp=$(mktemp)
 trap "rm -f ${bootstrap_tmp}" EXIT
@@ -95,13 +95,16 @@ else
     printf 'NODE_ADMIN_PASSWORD=%q\n' "${password}" > "${PASSWORD_FILE}"
     ok "Node bootstrapped. Admin password saved to .node-password"
 
-    # Sanity-check: tenant-token-encryption vault key must have been created
-    # (TICKET-C bootstrap step). If missing, TICKETs D/E encryption sites
-    # will silently fall back to the unencrypted path → invalidates the test.
-    if grep -q "tenant-token-encryption" "${bootstrap_tmp}"; then
-        ok "tenant-token-encryption vault key created (TICKET-C verified)"
+    # Sanity-check: param-encryption vault key must have been created.
+    # Renamed from tenant-token-encryption in Martyn's HostingService refactor —
+    # the HostingService now mints/decrypts arbitrary param tokens (not just
+    # tenant tokens), so the key carries the more generic name.
+    # If missing, the HostingService encrypt/decrypt sites silently fall back
+    # to the unencrypted path → invalidates the multi-tenant routing test.
+    if grep -q "param-encryption" "${bootstrap_tmp}"; then
+        ok "param-encryption vault key created (HostingService key verified)"
     else
-        fail "tenant-token-encryption vault key NOT created in bootstrap — TICKET-C wiring is broken"
+        fail "param-encryption vault key NOT created in bootstrap — HostingService wiring is broken"
     fi
 fi
 

@@ -20,34 +20,78 @@ RUN find ./node_modules/@twin.org -maxdepth 1 -name '*.bak' -exec sh -c \
       'pkg="${1%.bak}"; rm -rf "$pkg" && mv "$1" "$pkg"' _ {} \;
 
 # node-core is a workspace package (not published independently); always copy from source.
+# Override every in-flight package with local source. Martyn's HostingService refactor +
+# ecosystem-policy removal touches many more packages than the original platform PR.
 RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/api-core \
+    ./node_modules/@twin.org/api-models \
+    ./node_modules/@twin.org/api-service \
     ./node_modules/@twin.org/api-tenant-processor \
     ./node_modules/@twin.org/dataspace-control-plane-service \
     ./node_modules/@twin.org/dataspace-data-plane-service \
     ./node_modules/@twin.org/dataspace-models \
     ./node_modules/@twin.org/dataspace-test-app \
-    ./node_modules/@twin.org/rights-management-pnp-service \
     ./node_modules/@twin.org/rights-management-models \
-    ./node_modules/@twin.org/federated-catalogue-service \
+    ./node_modules/@twin.org/rights-management-pap-service \
+    ./node_modules/@twin.org/rights-management-pdp-service \
+    ./node_modules/@twin.org/rights-management-pep-service \
+    ./node_modules/@twin.org/rights-management-pip-service \
+    ./node_modules/@twin.org/rights-management-plugins \
+    ./node_modules/@twin.org/rights-management-pmp-service \
+    ./node_modules/@twin.org/rights-management-pnp-service \
+    ./node_modules/@twin.org/rights-management-pxp-service \
+    ./node_modules/@twin.org/rights-management-rest-client \
+    ./node_modules/@twin.org/rights-management-service \
+    ./node_modules/@twin.org/federated-catalogue-filters \
     ./node_modules/@twin.org/federated-catalogue-models \
+    ./node_modules/@twin.org/federated-catalogue-rest-client \
+    ./node_modules/@twin.org/federated-catalogue-service \
+    ./node_modules/@twin.org/engine-core \
+    ./node_modules/@twin.org/engine-models \
+    ./node_modules/@twin.org/engine-server \
+    ./node_modules/@twin.org/engine-server-types \
     ./node_modules/@twin.org/engine-types \
-    ./node_modules/@twin.org/engine-server-types
+    ./node_modules/@twin.org/synchronised-storage-models \
+    ./node_modules/@twin.org/synchronised-storage-rest-client \
+    ./node_modules/@twin.org/synchronised-storage-service
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
-# api-core carries the BaseRestClient endpoint-URL fix that preserves query strings
-# (so PNP/DSP outbound callbacks with `?tenantToken=` reach the right tenant).
+# api family — BaseRestClient query-string preservation, HostingService implementation, IHostingComponent types.
 COPY api/packages/api-core ./node_modules/@twin.org/api-core/
+COPY api/packages/api-models ./node_modules/@twin.org/api-models/
+COPY api/packages/api-service ./node_modules/@twin.org/api-service/
 COPY api/packages/api-tenant-processor ./node_modules/@twin.org/api-tenant-processor/
+# dataspace family — TICKET-D, getDatasetTargets adoption, skipTenant flag removal.
 COPY dataspace/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
 COPY dataspace/packages/dataspace-data-plane-service ./node_modules/@twin.org/dataspace-data-plane-service/
 COPY dataspace/packages/dataspace-models ./node_modules/@twin.org/dataspace-models/
 COPY dataspace/packages/dataspace-test-app ./node_modules/@twin.org/dataspace-test-app/
-COPY rights-management/packages/rights-management-pnp-service ./node_modules/@twin.org/rights-management-pnp-service/
+# rights-management family — HostingService refactor, ecosystem-policy removal, skipTenant flag removal on PNP routes.
 COPY rights-management/packages/rights-management-models ./node_modules/@twin.org/rights-management-models/
-COPY federated-catalogue/packages/federated-catalogue-service ./node_modules/@twin.org/federated-catalogue-service/
+COPY rights-management/packages/rights-management-pap-service ./node_modules/@twin.org/rights-management-pap-service/
+COPY rights-management/packages/rights-management-pdp-service ./node_modules/@twin.org/rights-management-pdp-service/
+COPY rights-management/packages/rights-management-pep-service ./node_modules/@twin.org/rights-management-pep-service/
+COPY rights-management/packages/rights-management-pip-service ./node_modules/@twin.org/rights-management-pip-service/
+COPY rights-management/packages/rights-management-plugins ./node_modules/@twin.org/rights-management-plugins/
+COPY rights-management/packages/rights-management-pmp-service ./node_modules/@twin.org/rights-management-pmp-service/
+COPY rights-management/packages/rights-management-pnp-service ./node_modules/@twin.org/rights-management-pnp-service/
+COPY rights-management/packages/rights-management-pxp-service ./node_modules/@twin.org/rights-management-pxp-service/
+COPY rights-management/packages/rights-management-rest-client ./node_modules/@twin.org/rights-management-rest-client/
+COPY rights-management/packages/rights-management-service ./node_modules/@twin.org/rights-management-service/
+# federated-catalogue family — TICKET-G, HostingService-based tenantToken minting.
+COPY federated-catalogue/packages/federated-catalogue-filters ./node_modules/@twin.org/federated-catalogue-filters/
 COPY federated-catalogue/packages/federated-catalogue-models ./node_modules/@twin.org/federated-catalogue-models/
-COPY engine/packages/engine-types ./node_modules/@twin.org/engine-types/
+COPY federated-catalogue/packages/federated-catalogue-rest-client ./node_modules/@twin.org/federated-catalogue-rest-client/
+COPY federated-catalogue/packages/federated-catalogue-service ./node_modules/@twin.org/federated-catalogue-service/
+# engine family — vaultConnectorType injection, factory wiring, hosting service plumbing.
+COPY engine/packages/engine-core ./node_modules/@twin.org/engine-core/
+COPY engine/packages/engine-models ./node_modules/@twin.org/engine-models/
+COPY engine/packages/engine-server ./node_modules/@twin.org/engine-server/
 COPY engine/packages/engine-server-types ./node_modules/@twin.org/engine-server-types/
+COPY engine/packages/engine-types ./node_modules/@twin.org/engine-types/
+# synchronised-storage family — skipTenant flag removal on cross-node routes.
+COPY synchronised-storage/packages/synchronised-storage-models ./node_modules/@twin.org/synchronised-storage-models/
+COPY synchronised-storage/packages/synchronised-storage-rest-client ./node_modules/@twin.org/synchronised-storage-rest-client/
+COPY synchronised-storage/packages/synchronised-storage-service ./node_modules/@twin.org/synchronised-storage-service/
 
 # Local engine-types declares deps on @twin.org/automation-* that node's node_modules
 # doesn't have (they live in engine/node_modules). Bring them in so engine-types can
