@@ -691,24 +691,31 @@
 			}
 		},
 		"/authentication/logout": {
-			"get": {
+			"post": {
 				"operationId": "authenticationLogout",
 				"summary": "Logout from the server",
 				"tags": [
 					"Authentication"
 				],
-				"parameters": [
-					{
-						"name": "token",
-						"description": "The token to logout, if it uses a mechanism with public access.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"example": "eyJhbGciOiJIU...sw5c"
+				"requestBody": {
+					"description": "Perform a logout on the auth token.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LogoutRequest"
+							},
+							"examples": {
+								"logoutRequestExample": {
+									"summary": "The request to logout from the server.",
+									"value": {
+										"token": "eyJhbGciOiJIU...sw5c"
+									}
+								}
+							}
+						}
 					}
-				],
+				},
 				"responses": {
 					"204": {
 						"description": "The rest request ended in success with no data."
@@ -756,29 +763,36 @@
 			}
 		},
 		"/authentication/refresh": {
-			"get": {
+			"post": {
 				"operationId": "authenticationRefreshToken",
 				"summary": "Refresh an authentication token",
 				"tags": [
 					"Authentication"
-				],
-				"parameters": [
-					{
-						"name": "token",
-						"description": "The token to refresh, if it uses a mechanism with public access.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"example": "eyJhbGciOiJIU...sw5c"
-					}
 				],
 				"security": [
 					{
 						"jwtBearerAuthScheme": []
 					}
 				],
+				"requestBody": {
+					"description": "Perform a refresh of the auth token.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RefreshTokenRequest"
+							},
+							"examples": {
+								"refreshTokenRequestExample": {
+									"summary": "The request to refresh an auth token.",
+									"value": {
+										"token": "eyJhbGciOiJIU...sw5c"
+									}
+								}
+							}
+						}
+					}
+				},
 				"responses": {
 					"200": {
 						"description": "Response from a refresh on the auth token.",
@@ -2624,6 +2638,213 @@
 				}
 			}
 		},
+		"/identity/{identity}/alias": {
+			"post": {
+				"operationId": "identityAlsoKnownAsCreate",
+				"summary": "Add an alias to the alsoKnownAs property on the document",
+				"tags": [
+					"Identity"
+				],
+				"parameters": [
+					{
+						"name": "identity",
+						"description": "The identity to create the alias for.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "did:iota:tst:0xe3088ba9aa8c28e1d139708a14e8c0fdff11ee8223baac4aa5bcf3321e4bfc6a"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to create an alias for an identity.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IdentityAlsoKnownAsCreateRequest"
+							},
+							"examples": {
+								"identityAlsoKnownAsCreateRequestExample": {
+									"value": {
+										"alias": "did:example:123"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/identity/{identity}/alias/{alias}": {
+			"delete": {
+				"operationId": "identityAlsoKnownAsRemove",
+				"summary": "Remove an alias from the alsoKnownAs property on the document",
+				"tags": [
+					"Identity"
+				],
+				"parameters": [
+					{
+						"name": "identity",
+						"description": "The identity to remove the alias from.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "did:iota:tst:0xe3088ba9aa8c28e1d139708a14e8c0fdff11ee8223baac4aa5bcf3321e4bfc6a"
+					},
+					{
+						"name": "alias",
+						"description": "The alias to remove.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "did:example:123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/identity/{identity}/verifiable-credential/{verificationMethodId}": {
 			"post": {
 				"operationId": "identityVerifiableCredentialCreate",
@@ -3335,6 +3556,138 @@
 										"value": {
 											"name": "UnauthorizedError",
 											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/identity/verifiable-presentation/verify/document": {
+			"post": {
+				"operationId": "identityVerifiablePresentationVerifyDocument",
+				"summary": "Verify an identity verifiable presentation document",
+				"tags": [
+					"Identity"
+				],
+				"requestBody": {
+					"description": "Request to verify a verifiable presentation.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/w3c-did/DidVerifiablePresentation"
+							},
+							"examples": {
+								"identityVerifiablePresentationVerifyDocumentRequestExample": {
+									"value": {
+										"@context": [
+											"https://www.w3.org/2018/credentials/v1",
+											"https://schema.org"
+										],
+										"id": "https://example.com/credentials/3732",
+										"type": [
+											"VerifiableCredential",
+											"Person"
+										],
+										"verifiableCredential": [
+											{
+												"@context": [
+													"https://www.w3.org/2018/credentials/v1",
+													"https://schema.org"
+												],
+												"id": "https://example.com/credentials/3732",
+												"type": [
+													"VerifiableCredential",
+													"Person"
+												],
+												"credentialSubject": {
+													"id": "did:entity-storage:0x4757993355b921a8229bd780f30921b6a0216a72e6c3f37a09d13b8426a17def",
+													"name": "Jane Doe"
+												},
+												"issuer": "did:entity-storage:0x879c31386f992cfa29b77fe31e37256d69f6a57653cee4eb60ad4c4613c5515a",
+												"issuanceDate": "2025-01-24T09:21:51.500Z",
+												"credentialStatus": {
+													"id": "did:entity-storage:0x879c31386f992cfa29b77fe31e37256d69f6a57653cee4eb60ad4c4613c5515a#revocation",
+													"type": "BitstringStatusList",
+													"revocationBitmapIndex": "5"
+												}
+											}
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Response to verifying a verifiable presentation.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IdentityVerifiablePresentationVerifyResponse"
+								},
+								"examples": {
+									"identityVerifiablePresentationVerifyResponseExample": {
+										"value": {
+											"revoked": false,
+											"verifiablePresentation": {
+												"@context": [
+													"https://www.w3.org/2018/credentials/v1",
+													"https://schema.org"
+												],
+												"id": "presentationId",
+												"type": [
+													"VerifiablePresentation",
+													"Person"
+												],
+												"verifiableCredential": [
+													"eyJraWQiOi...D1Z3AQ"
+												],
+												"holder": "did:entity-storage:0xcea318e06e89f3fb4048160770effd84d0cfa5801fee13dfa6f9413a00429cec"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
 										}
 									}
 								}
@@ -16587,24 +16940,6 @@
 											}
 										]
 									}
-								},
-								"papCreateEcosystemPolicyRequestExample": {
-									"value": {
-										"@context": [
-											"http://www.w3.org/ns/odrl.jsonld",
-											"https://schema.twindev.org/odrl/v1/"
-										],
-										"@type": "EcosystemPolicy",
-										"profile": "https://schema.twindev.org/odrl/v1/profile",
-										"assigner": "did:example:publisher",
-										"obligation": [
-											{
-												"action": "inform",
-												"assignee": "did:example:border-agency",
-												"target": "urn:twin:asset:consignment:*"
-											}
-										]
-									}
 								}
 							}
 						}
@@ -17430,123 +17765,6 @@
 											],
 											"assignee": "did:example:receiver",
 											"assigner": "did:example:sender"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/rights-management/policy/admin/ecosystem-policy/{id}": {
-			"get": {
-				"operationId": "papGetEcosystemPolicy",
-				"summary": "Get an ecosystem policy",
-				"tags": [
-					"Policy Administration Point"
-				],
-				"parameters": [
-					{
-						"name": "id",
-						"description": "The ID of the ecosystem policy to get.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "urn:rights-management:abc123def456"
-					}
-				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "The response structure for getting an ecosystem policy.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RightsManagementEcosystemPolicy"
-								},
-								"examples": {
-									"papGetEcosystemPolicyResponseExample": {
-										"value": {
-											"@context": [
-												"http://www.w3.org/ns/odrl.jsonld",
-												"https://schema.twindev.org/odrl/v1/"
-											],
-											"@type": "EcosystemPolicy",
-											"@id": "urn:rights-management:abc123def456",
-											"profile": "https://schema.twindev.org/odrl/v1/profile",
-											"assigner": "did:example:publisher",
-											"obligation": [
-												{
-													"action": "inform",
-													"assignee": "did:example:border-agency",
-													"target": "urn:twin:asset:consignment:abc123"
-												}
-											]
 										}
 									}
 								}
@@ -20310,6 +20528,19 @@
 					}
 				]
 			},
+			"IdentityAlsoKnownAsCreateRequest": {
+				"type": "object",
+				"properties": {
+					"alias": {
+						"type": "string",
+						"description": "The alias to create for the identity."
+					}
+				},
+				"required": [
+					"alias"
+				],
+				"description": "The data for the request."
+			},
 			"IdentityCreateRequest": {
 				"type": "object",
 				"properties": {
@@ -20757,6 +20988,16 @@
 				],
 				"description": "The login response details."
 			},
+			"LogoutRequest": {
+				"type": "object",
+				"properties": {
+					"token": {
+						"type": "string",
+						"description": "The token to logout, if it uses a mechanism with public access."
+					}
+				},
+				"description": "The logout token details."
+			},
 			"MetricType": {
 				"description": "The types of metrics.",
 				"anyOf": [
@@ -21195,7 +21436,7 @@
 						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
 					},
 					"@type": {
-						"$ref": "#/components/schemas/RightsManagementPolicyType"
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicyType"
 					},
 					"@id": {
 						"type": "string",
@@ -21340,6 +21581,16 @@
 					"organizationIdentity"
 				]
 			},
+			"RefreshTokenRequest": {
+				"type": "object",
+				"properties": {
+					"token": {
+						"type": "string",
+						"description": "The token to refresh, if it uses a mechanism with public access."
+					}
+				},
+				"description": "The refresh token details."
+			},
 			"RefreshTokenResponse": {
 				"type": "object",
 				"properties": {
@@ -21364,223 +21615,8 @@
 				],
 				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
 			},
-			"RightsManagementEcosystemPolicy": {
-				"description": "TWIN EcosystemPolicy in DSP storage shape.\n\nCombines the DSP wire-format requirements (mandatory `@id`, no `uid`) from\n`IDataspaceProtocolPolicy` with a narrowed `@type` discriminant so that callers\ncan rely on the type at compile time without any `as unknown as` cast.\n\nDefined as an intersection type (rather than `extends IDataspaceProtocolPolicy`)\nso that the narrowed `\"@type\": \"EcosystemPolicy\"` can override the base\n`\"@type\": OdrlPolicyType` without a TS2430 extends-incompatibility error.\n`\"EcosystemPolicy\"` is a TWIN extension — not in the W3C ODRL `OdrlPolicyType`\nenum — so the interface hierarchy cannot express this narrowing directly.\n\nLives in `rights-management-models` (not `standards-dataspace-protocol`) because\nEcosystemPolicy is a TWIN platform extension — not a DSP specification concept —\nand `standards-dataspace-protocol` should remain a pure standards mirror.",
-				"type": "object",
-				"properties": {
-					"@context": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlContextType"
-					},
-					"profile": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						],
-						"description": "The profile(s) this policy conforms to.\nIRIs identifying the ODRL Profile(s)."
-					},
-					"assigner": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-										}
-									]
-								}
-							}
-						],
-						"description": "The assigner of the policy.\nApplies to all rules unless overridden at rule level."
-					},
-					"assignee": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlParty"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPartyCollection"
-										}
-									]
-								}
-							}
-						],
-						"description": "The assignee of the policy.\nApplies to all rules unless overridden at rule level."
-					},
-					"target": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAsset"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAssetCollection"
-										}
-									]
-								}
-							}
-						],
-						"description": "The target asset for the rule."
-					},
-					"action": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
-							},
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
-							},
-							{
-								"type": "array",
-								"items": {
-									"anyOf": [
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlActionType"
-										},
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "https://schema.twindev.org/w3c-odrl/OdrlAction"
-										}
-									]
-								}
-							}
-						],
-						"description": "The action associated with the rule."
-					},
-					"inheritFrom": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
-						],
-						"description": "The parent policy(ies) this policy inherits from.\nIRIs identifying the parent Policy(ies)."
-					},
-					"conflict": {
-						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlConflictStrategyType"
-					},
-					"permission": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPermission"
-								}
-							}
-						],
-						"description": "The permissions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
-					},
-					"prohibition": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlProhibition"
-								}
-							}
-						],
-						"description": "The prohibitions in the policy.\nAt least one of permission, prohibition, or obligation must be present."
-					},
-					"obligation": {
-						"anyOf": [
-							{
-								"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
-							},
-							{
-								"type": "array",
-								"items": {
-									"$ref": "https://schema.twindev.org/w3c-odrl/OdrlDuty"
-								}
-							}
-						],
-						"description": "The obligations in the policy.\nAt least one of permission, prohibition, or obligation must be present."
-					},
-					"@id": {
-						"type": "string",
-						"description": "Unique identifier for the policy."
-					},
-					"@type": {
-						"const": "EcosystemPolicy",
-						"description": "The type must be \"EcosystemPolicy\"."
-					}
-				},
-				"required": [
-					"@context",
-					"@id",
-					"@type"
-				]
-			},
 			"RightsManagementPolicy": {
-				"description": "Base type for any ODRL policy stored and managed by the TWIN rights-management PAP.\n\nDefined as an intersection type (rather than `extends IDataspaceProtocolPolicy`)\nbecause `IDataspaceProtocolPolicy[\"@type\"]` is constrained to `OdrlPolicyType`\n(the closed W3C ODRL enum). TWIN adds `\"EcosystemPolicy\"` as a platform extension\nvia `RightsManagementPolicyType`, which is a superset of `OdrlPolicyType`.\n\nAll standard DSP policy types (`IDataspaceProtocolAgreement`, `IDataspaceProtocolOffer`,\n`IDataspaceProtocolSet`) remain structurally assignable to this type because their\n`\"@type\"` literals are all members of `RightsManagementPolicyType`.\n\nUse this type wherever the PAP needs to accept or return any policy regardless of\nits specific subtype. Use the narrower `IRightsManagementEcosystemPolicy`,\n`IDataspaceProtocolAgreement`, etc. when the specific subtype is known.",
+				"description": "Base type for any ODRL policy stored and managed by the TWIN rights-management PAP.",
 				"type": "object",
 				"properties": {
 					"@context": {
@@ -21784,34 +21820,13 @@
 						"description": "Unique identifier for the policy."
 					},
 					"@type": {
-						"$ref": "#/components/schemas/RightsManagementPolicyType"
+						"$ref": "https://schema.twindev.org/w3c-odrl/OdrlPolicyType"
 					}
 				},
 				"required": [
 					"@context",
 					"@id",
 					"@type"
-				]
-			},
-			"RightsManagementPolicyType": {
-				"description": "TWIN rights-management policy types.",
-				"anyOf": [
-					{
-						"const": "EcosystemPolicy",
-						"description": "EcosystemPolicy type.\nA TWIN platform-level governance policy that carries obligations for data events.\nNot a bilateral contract — does not participate in DSP negotiation."
-					},
-					{
-						"const": "Policy"
-					},
-					{
-						"const": "Set"
-					},
-					{
-						"const": "Offer"
-					},
-					{
-						"const": "Agreement"
-					}
 				]
 			},
 			"Rule": {
