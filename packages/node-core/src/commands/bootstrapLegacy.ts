@@ -12,6 +12,7 @@ import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
 import { vaultKeyImport } from "./vaultKeyImport.js";
+import { isTrustRequired } from "../builders/engineEnvBuilder.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
@@ -161,7 +162,7 @@ export async function bootstrapLegacy(
 			overwriteMode: "skip"
 		});
 
-		if (Coerce.boolean(envVars.trustEnabled) ?? false) {
+		if (isTrustRequired(envVars)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
 				I18n.formatMessage(
@@ -197,6 +198,16 @@ export async function bootstrapLegacy(
 
 		CLIDisplay.break();
 		CLIDisplay.section(
+			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.hostingParamKeyAdd")
+		);
+		await vaultKeyCreate(engineCore, envVars, {
+			identity: nodeIdentity.did,
+			keyType: "ChaCha20Poly1305",
+			keyId: envVars.hostingParamEncryptionKeyId
+		});
+
+		CLIDisplay.break();
+		CLIDisplay.section(
 			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeIdentitySet")
 		);
 		await nodeSetIdentity(engineCore, envVars, {
@@ -204,28 +215,30 @@ export async function bootstrapLegacy(
 		});
 
 		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
-		if (tenantEnabled && Is.empty(tenantId)) {
-			await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
-				CLIDisplay.break();
-				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
-				);
-				const tenantDetails = await tenantCreate(engineCore, envVars, {
-					tenantId: envVars.tenantId,
-					apiKey: envVars.tenantApiKey,
-					label: "Node"
-				});
+		if (tenantEnabled) {
+			if (Is.empty(tenantId)) {
+				await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
+					CLIDisplay.break();
+					CLIDisplay.section(
+						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
+					);
+					const tenantDetails = await tenantCreate(engineCore, envVars, {
+						tenantId: envVars.tenantId,
+						apiKey: envVars.tenantApiKey,
+						label: "Node"
+					});
 
-				CLIDisplay.break();
-				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantSet")
-				);
-				await nodeSetTenant(engineCore, envVars, {
-					tenantId: tenantDetails.tenantId
-				});
+					CLIDisplay.break();
+					CLIDisplay.section(
+						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantSet")
+					);
+					await nodeSetTenant(engineCore, envVars, {
+						tenantId: tenantDetails.tenantId
+					});
 
-				tenantId = tenantDetails.tenantId;
-			});
+					tenantId = tenantDetails.tenantId;
+				});
+			}
 		}
 	}
 

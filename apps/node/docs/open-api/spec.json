@@ -48,6 +48,10 @@
 			"description": "Endpoints which are modelled to access a telemetry contract."
 		},
 		{
+			"name": "Automation",
+			"description": "Endpoints which are modelled to access an automation contract."
+		},
+		{
 			"name": "Logging",
 			"description": "Endpoints which are modelled to access a logging contract."
 		},
@@ -6176,6 +6180,556 @@
 				}
 			}
 		},
+		"/automation/trigger/{trigger}": {
+			"post": {
+				"operationId": "AutomationTrigger",
+				"summary": "Trigger an automation process.",
+				"tags": [
+					"Automation"
+				],
+				"parameters": [
+					{
+						"name": "trigger",
+						"description": "The trigger for the actions.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "my-trigger"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to trigger an automation action.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AutomationTriggerRequest"
+							},
+							"examples": {
+								"AutomationTriggerRequestExample": {
+									"value": {
+										"data": {
+											"key": "value"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/automation": {
+			"post": {
+				"operationId": "AutomationActionCreate",
+				"summary": "Create an automation action.",
+				"tags": [
+					"Automation"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to create an automation action.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AutomationActionCreateRequest"
+							},
+							"examples": {
+								"AutomationActionCreateRequestExample": {
+									"value": {
+										"actionType": "log",
+										"trigger": "onCreate",
+										"configuration": {
+											"message": "Created!"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "The rest request ended in created response.",
+						"headers": {
+							"location": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. action-123"
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "AutomationActionsQuery",
+				"summary": "Query automation actions.",
+				"tags": [
+					"Automation"
+				],
+				"parameters": [
+					{
+						"name": "trigger",
+						"description": "Filter by trigger type.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "onCreate"
+					},
+					{
+						"name": "actionType",
+						"description": "Filter by action type.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "log"
+					},
+					{
+						"name": "cursor",
+						"description": "Cursor for pagination.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "abc"
+					},
+					{
+						"name": "limit",
+						"description": "Limit the number of results returned.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "10"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response for querying automation actions.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AutomationActionsQueryResponse"
+								},
+								"examples": {
+									"AutomationActionsQueryResponseExample": {
+										"value": {
+											"entries": [
+												{
+													"id": "action-123",
+													"actionType": "log",
+													"trigger": "onCreate",
+													"configuration": {
+														"message": "Created!"
+													}
+												}
+											],
+											"cursor": "next-cursor"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/automation/{actionId}": {
+			"delete": {
+				"operationId": "AutomationActionRemove",
+				"summary": "Remove an automation action.",
+				"tags": [
+					"Automation"
+				],
+				"parameters": [
+					{
+						"name": "actionId",
+						"description": "The unique identifier of the action to remove.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "action-123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "AutomationActionGet",
+				"summary": "Get an automation action by id.",
+				"tags": [
+					"Automation"
+				],
+				"parameters": [
+					{
+						"name": "actionId",
+						"description": "The unique identifier of the action to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "action-123"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response for getting an automation action.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AutomationActionEntry"
+								},
+								"examples": {
+									"AutomationActionGetResponseExample": {
+										"value": {
+											"id": "action-123",
+											"actionType": "log",
+											"trigger": "onCreate",
+											"configuration": {
+												"message": "Created!"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/logging": {
 			"post": {
 				"operationId": "loggingEntryCreate",
@@ -6587,8 +7141,8 @@
 								"examples": {
 									"nftResolveResponseExample": {
 										"value": {
-											"issuer": "did:iota:tst:0x85ef62ea94fc4eeeeeddf6acc3b566e988e613081d0b93cc54ed831ed4c18d44",
-											"owner": "did:iota:tst:0x85ef62ea94fc4eeeeeddf6acc3b566e988e613081d0b93cc54ed831ed4c18d44",
+											"issuer": "0x85ef62ea94fc4eeeeeddf6acc3b566e988e613081d0b93cc54ed831ed4c18d44",
+											"issuerIdentityId": "0xa1d80bee7fdb4fd91ae45c6e539209f73cb743b7da9db3e21322ea75af1878c0",
 											"tag": "MY-NFT",
 											"immutableMetadata": {
 												"docName": "bill-of-lading",
@@ -6894,7 +7448,6 @@
 							"examples": {
 								"nftTransferExample": {
 									"value": {
-										"recipientIdentity": "did:iota:tst:0x85ef62ea94fc4eeeeeddf6acc3b566e988e613081d0b93cc54ed831ed4c18d44",
 										"recipientAddress": "tst1prctjk5ck0dutnsunnje6u90jk5htx03qznjjmkd6843pzltlgz87srjzzv",
 										"metadata": {
 											"data": "AAAAA"
@@ -19190,6 +19743,82 @@
 					"dateCreated"
 				]
 			},
+			"AutomationActionCreateRequest": {
+				"description": "The body parameters for the request.",
+				"type": "object",
+				"properties": {
+					"actionType": {
+						"type": "string",
+						"description": "The type of the automation action."
+					},
+					"trigger": {
+						"type": "string",
+						"description": "The trigger of the automation action."
+					},
+					"configuration": {
+						"description": "The configuration of the automation action."
+					}
+				},
+				"required": [
+					"actionType",
+					"trigger"
+				]
+			},
+			"AutomationActionEntry": {
+				"description": "Interface describing an automation action entry.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The id of the automation action."
+					},
+					"actionType": {
+						"type": "string",
+						"description": "The type of the automation action."
+					},
+					"trigger": {
+						"type": "string",
+						"description": "The trigger of the automation action."
+					},
+					"configuration": {
+						"description": "The configuration of the automation action."
+					}
+				},
+				"required": [
+					"id",
+					"actionType",
+					"trigger"
+				]
+			},
+			"AutomationActionsQueryResponse": {
+				"type": "object",
+				"properties": {
+					"entries": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AutomationActionEntry"
+						},
+						"description": "List of automation action entries matching the query."
+					},
+					"cursor": {
+						"type": "string",
+						"description": "Optional cursor for pagination."
+					}
+				},
+				"required": [
+					"entries"
+				],
+				"description": "The body of the response."
+			},
+			"AutomationTriggerRequest": {
+				"type": "object",
+				"properties": {
+					"data": {
+						"description": "Optional data to be passed to the actions."
+					}
+				},
+				"description": "The body parameters."
+			},
 			"BlobStorageCreateRequest": {
 				"type": "object",
 				"properties": {
@@ -20175,9 +20804,9 @@
 						"type": "string",
 						"description": "The issuer of the NFT."
 					},
-					"owner": {
+					"issuerIdentityId": {
 						"type": "string",
-						"description": "The owner of the NFT."
+						"description": "The on-chain Object ID of the verified IOTA Identity that minted this NFT.\nEmpty string when not minted with identity verification."
 					},
 					"tag": {
 						"type": "string",
@@ -20192,7 +20821,7 @@
 				},
 				"required": [
 					"issuer",
-					"owner",
+					"issuerIdentityId",
 					"tag"
 				],
 				"description": "The data that was resolved."
@@ -20200,10 +20829,6 @@
 			"NftTransferRequest": {
 				"type": "object",
 				"properties": {
-					"recipientIdentity": {
-						"type": "string",
-						"description": "The recipient identity for the NFT."
-					},
 					"recipientAddress": {
 						"type": "string",
 						"description": "The recipient address for the NFT."
@@ -20213,7 +20838,6 @@
 					}
 				},
 				"required": [
-					"recipientIdentity",
 					"recipientAddress"
 				],
 				"description": "The data to be used in the transfer."

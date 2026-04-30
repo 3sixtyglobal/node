@@ -616,11 +616,6 @@ export interface IEngineEnvironmentVariables {
 	federatedCatalogueFilters?: string;
 
 	/**
-	 * Is the trust management enabled, defaults to false.
-	 */
-	trustEnabled?: string;
-
-	/**
 	 * The trust generators to add to the factory, comma separated list.
 	 */
 	trustGenerators?: string;
@@ -648,7 +643,14 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementEnabled?: string;
 
 	/**
-	 * What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
+	 * Path under which the rights management service is mounted (single source
+	 * of truth). The same value drives:
+	 * - the server route mount (via engine config)
+	 * - the PNP service's callback URL builder (`buildCallbackUrl`)
+	 * - the PNP rest-client's pathPrefix (consumer side)
+	 * Defaults to `rights-management`. Set when deploying behind a reverse proxy
+	 * with path rewriting, K8s ingress with path-based routing, or any custom
+	 * mount point.
 	 */
 	rightsManagementCallbackPath?: string;
 
@@ -721,6 +723,17 @@ export interface IEngineEnvironmentVariables {
 	 * Example: "dataspace/entities"
 	 */
 	dataspaceDataPlanePath?: string;
+
+	/**
+	 * Are the automation components enabled, defaults to false.
+	 */
+	automationEnabled?: string;
+
+	/**
+	 * The type of the automation action to create, comma separate for more than one connector.
+	 * values: fetch
+	 */
+	automationActionTypes?: string;
 
 	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.

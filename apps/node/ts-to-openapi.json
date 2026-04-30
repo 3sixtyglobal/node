@@ -22,6 +22,9 @@
 			"package": "@twin.org/telemetry-service"
 		},
 		{
+			"package": "@twin.org/automation-service"
+		},
+		{
 			"package": "@twin.org/logging-service"
 		},
 		{

@@ -8,6 +8,9 @@ import {
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
+	type AutomationActionConfig,
+	type AutomationActionType,
+	AutomationComponentType,
 	BackgroundTaskComponentType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
@@ -113,6 +116,7 @@ export async function buildEngineConfiguration(
 	await configureEventBus(coreConfig, envVars);
 	await configureTelemetry(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
+	await configureAutomation(coreConfig, envVars);
 
 	await configureFaucet(coreConfig, envVars);
 	await configureWallet(coreConfig, envVars);
@@ -576,6 +580,37 @@ async function configureTelemetry(
 	if (coreConfig.types.telemetryConnector.length > 0) {
 		coreConfig.types.telemetryComponent ??= [];
 		coreConfig.types.telemetryComponent.push({ type: TelemetryComponentType.Service });
+	}
+}
+
+/**
+ * Configures the automation.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureAutomation(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.automationComponent ??= [];
+
+	if (Coerce.boolean(envVars.automationEnabled) ?? false) {
+		coreConfig.types.automationComponent.push({
+			type: AutomationComponentType.Service
+		});
+
+		const automationActionTypes = commaSeparatedListToArray(envVars.automationActionTypes);
+
+		if (Is.arrayValue(automationActionTypes)) {
+			coreConfig.types.automationAction ??= [];
+
+			for (const actionType of automationActionTypes) {
+				coreConfig.types.automationAction.push({
+					type: actionType as AutomationActionType,
+					isMultiInstance: true
+				} as unknown as AutomationActionConfig);
+			}
+		}
 	}
 }
 
@@ -1112,6 +1147,20 @@ async function configureDocumentManagement(
 }
 
 /**
+ * Checks if the trust subsystem is required.
+ * Returns true when any component that depends on the trust subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if rights-management, synchronised-storage, or dataspace is enabled.
+ */
+export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		(Coerce.boolean(envVars.rightsManagementEnabled) ?? false) ||
+		(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) ||
+		(Coerce.boolean(envVars.dataspaceEnabled) ?? false)
+	);
+}
+
+/**
  * Configures the trust components.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -1120,7 +1169,7 @@ async function configureTrust(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.trustEnabled) ?? false) {
+	if (isTrustRequired(envVars)) {
 		coreConfig.types.trustComponent ??= [];
 		coreConfig.types.trustComponent.push({
 			type: TrustComponentType.Service
@@ -1192,6 +1241,9 @@ async function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPnpComponent ??= [];
 
+		// Single source of truth for the rights-management mount path.
+		const rightsManagementPath = envVars.rightsManagementCallbackPath ?? "rights-management";
+
 		// We add a multi instance REST client for the remote negotiations
 		// use a dummy endpoint for now as the actual endpoint will be provided in the config
 		// of the policy negotiator when it is used for remote negotiations
@@ -1200,7 +1252,8 @@ async function configureRightsManagement(
 		coreConfig.types.rightsManagementPnpComponent.push({
 			type: RightsManagementPnpComponentType.RestClient,
 			options: {
-				endpoint: "http://localhost"
+				endpoint: "http://localhost",
+				pathPrefix: rightsManagementPath
 			},
 			isMultiInstance: true,
 			features: ["remote"]
@@ -1209,7 +1262,7 @@ async function configureRightsManagement(
 			type: RightsManagementPnpComponentType.Service,
 			options: {
 				config: {
-					callbackPath: envVars.rightsManagementCallbackPath ?? "",
+					callbackPath: rightsManagementPath,
 					includeErrorDetails: coreConfig.debug ?? false
 				}
 			},
@@ -1403,7 +1456,8 @@ async function configureFederatedCatalogue(
 		coreConfig.types.federatedCatalogueComponent.push({
 			type: FederatedCatalogueComponentType.Service,
 			options: {
-				datasetEntityStorageType: overrideEntityStorageType
+				datasetEntityStorageType: overrideEntityStorageType,
+				config: {}
 			}
 		});
 

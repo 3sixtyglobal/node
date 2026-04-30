@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node-core",
-	"version": "0.0.3-next.32",
+	"version": "0.0.3-next.33",
 	"description": "TWIN Node Core for serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
@@ -56,6 +56,7 @@
 		"schema-dts": "2.0.0"
 	},
 	"devDependencies": {
+		"@twin.org/automation-models": "next",
 		"@twin.org/entity-storage-connector-memory": "next",
 		"@twin.org/merge-locales": "next",
 		"@twin.org/nameof-transformer": "next",

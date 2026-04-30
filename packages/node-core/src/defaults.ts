@@ -8,6 +8,7 @@ export const SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID =
 	"synchronised-storage-blob-encryption";
 export const TRUST_VERIFICATION_METHOD_ID = "trust-assertion";
 export const AUTH_SIGNING_KEY_ID = "auth-signing";
+export const HOSTING_PARAM_ENCRYPTION_KEY_ID = "param-encryption";
 export const CONTEXT_ID_HANDLER_FEATURE_DID = "did";
 export const CONTEXT_ID_HANDLER_FEATURE_TENANT = "tenant";
 
@@ -24,7 +25,8 @@ export function getEnvDefaults(envPrefix: string): { [key: string]: string } {
 		[`${envPrefix}SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID`]:
 			SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID,
 		[`${envPrefix}TRUST_VERIFICATION_METHOD_ID`]: TRUST_VERIFICATION_METHOD_ID,
-		[`${envPrefix}AUTH_SIGNING_KEY_ID`]: AUTH_SIGNING_KEY_ID
+		[`${envPrefix}AUTH_SIGNING_KEY_ID`]: AUTH_SIGNING_KEY_ID,
+		[`${envPrefix}HOSTING_PARAM_ENCRYPTION_KEY_ID`]: HOSTING_PARAM_ENCRYPTION_KEY_ID
 	};
 	return envVars;
 }
