@@ -97,6 +97,7 @@
 						"trustVerificationMethodCreate": "Creating trust verification method for node identity",
 						"synchronisedStorageKeyAdd": "Adding synchronised storage key for node identity",
 						"nodeIdentitySet": "Setting node identity",
+						"tenantTokenEncryptionKeyCreate": "Creating tenant token encryption key for node identity",
 						"nodeTenantCreate": "Creating node tenant",
 						"nodeTenantSet": "Setting node tenant",
 						"organisationCreate": "Creating organisation identity",

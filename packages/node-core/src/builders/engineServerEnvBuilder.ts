@@ -154,10 +154,20 @@ export async function buildEngineServerConfiguration(
 		});
 
 		serverConfig.types.restRouteProcessor.push({
-			type: RestRouteProcessorType.Tenant
+			type: RestRouteProcessorType.Tenant,
+			options: {
+				config: {
+					signingKeyName: envVars.tenantTokenEncryptionKeyId
+				}
+			}
 		});
 		serverConfig.types.socketRouteProcessor.push({
-			type: SocketRouteProcessorType.Tenant
+			type: SocketRouteProcessorType.Tenant,
+			options: {
+				config: {
+					signingKeyName: envVars.tenantTokenEncryptionKeyId
+				}
+			}
 		});
 	}
 
