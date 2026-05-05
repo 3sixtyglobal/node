@@ -117,7 +117,9 @@ describe("node-core", () => {
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ENABLED: "true",
-				TWIN_AUTOMATION_ACTION_TYPES: "fetch"
+				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
+				TWIN_HEALTH_ENABLED: "true",
+				TWIN_URL_TRANSFORMER_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -181,7 +183,9 @@ describe("node-core", () => {
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ENABLED: "true",
-				TWIN_AUTOMATION_ACTION_TYPES: "fetch"
+				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
+				TWIN_HEALTH_ENABLED: "true",
+				TWIN_URL_TRANSFORMER_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -247,7 +251,9 @@ describe("node-core", () => {
 				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ENABLED: "true",
-				TWIN_AUTOMATION_ACTION_TYPES: "fetch"
+				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
+				TWIN_HEALTH_ENABLED: "true",
+				TWIN_URL_TRANSFORMER_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -301,7 +307,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/livez",
-			"/health",
+			"/readyz",
 			"/spec"
 		]);
 
@@ -360,6 +366,8 @@ describe("node-core", () => {
 			TWIN_MESSAGING_ENABLED: "true",
 			TWIN_AUTOMATION_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
+			TWIN_HEALTH_ENABLED: "true",
+			TWIN_URL_TRANSFORMER_ENABLED: "true",
 			TWIN_EXTENSIONS: "./tests/apps/testApp.js"
 		};
 
@@ -427,6 +435,8 @@ describe("node-core", () => {
 			"auditable-item-graph-service",
 			"auditable-item-stream-service",
 			"data-processing-service",
+			"health-service",
+			"url-transformer-service",
 			"document-management-service",
 			"trust-service",
 			"policy-administration-point-service",
@@ -459,8 +469,9 @@ describe("node-core", () => {
 			"GET      /favicon.ico",
 			"GET      /info",
 			"GET      /livez",
-			"GET      /health",
+			"GET      /readyz",
 			"GET      /spec",
+			"GET      /health",
 			"POST     /authentication/login",
 			"POST     /authentication/logout",
 			"POST     /authentication/refresh",
@@ -681,7 +692,11 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-			TWIN_VC_AUTHENTICATION_ENABLED: "true"
+			TWIN_VC_AUTHENTICATION_ENABLED: "true",
+			TWIN_AUTOMATION_ENABLED: "true",
+			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
+			TWIN_HEALTH_ENABLED: "true",
+			TWIN_URL_TRANSFORMER_ENABLED: "true"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -807,7 +822,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/livez",
-			"/health",
+			"/readyz",
 			"/spec"
 		]);
 
@@ -868,7 +883,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/livez",
-			"/health",
+			"/readyz",
 			"/spec"
 		]);
 
@@ -927,7 +942,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/livez",
-			"/health",
+			"/readyz",
 			"/spec"
 		]);
 
@@ -1051,7 +1066,7 @@ describe("node-core", () => {
 			"/favicon.ico",
 			"/info",
 			"/livez",
-			"/health",
+			"/readyz",
 			"/spec"
 		]);
 
