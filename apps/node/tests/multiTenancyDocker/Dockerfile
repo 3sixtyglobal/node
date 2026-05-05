@@ -26,6 +26,7 @@ RUN find ./node_modules/@twin.org -maxdepth 1 -name '*.bak' -exec sh -c \
 # (e.g., rights-management-pap-service @ .bak importing RightsManagementPolicyType from a newer models
 # that no longer exports it). Mobius Dockerfile uses the same full-family override pattern.
 RUN rm -rf ./node_modules/@twin.org/node-core \
+    ./node_modules/@twin.org/api-rest-client \
     ./node_modules/@twin.org/api-tenant-processor \
     ./node_modules/@twin.org/dataspace-control-plane-service \
     ./node_modules/@twin.org/rights-management-models \
@@ -41,9 +42,11 @@ RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/rights-management-plugins \
     ./node_modules/@twin.org/rights-management-rest-client \
     ./node_modules/@twin.org/rights-management-service \
+    ./node_modules/@twin.org/engine \
     ./node_modules/@twin.org/engine-types \
     ./node_modules/@twin.org/engine-server-types
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
+COPY api/packages/api-rest-client ./node_modules/@twin.org/api-rest-client/
 COPY api/packages/api-tenant-processor ./node_modules/@twin.org/api-tenant-processor/
 COPY dataspace/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
 COPY rights-management/packages/rights-management-models ./node_modules/@twin.org/rights-management-models/
@@ -59,6 +62,7 @@ COPY rights-management/packages/rights-management-pxp-service ./node_modules/@tw
 COPY rights-management/packages/rights-management-plugins ./node_modules/@twin.org/rights-management-plugins/
 COPY rights-management/packages/rights-management-rest-client ./node_modules/@twin.org/rights-management-rest-client/
 COPY rights-management/packages/rights-management-service ./node_modules/@twin.org/rights-management-service/
+COPY engine/packages/engine ./node_modules/@twin.org/engine/
 COPY engine/packages/engine-types ./node_modules/@twin.org/engine-types/
 COPY engine/packages/engine-server-types ./node_modules/@twin.org/engine-server-types/
 

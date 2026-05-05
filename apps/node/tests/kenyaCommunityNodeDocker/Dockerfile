@@ -25,6 +25,7 @@ RUN find ./node_modules/@twin.org -maxdepth 1 -name '*.bak' -exec sh -c \
 RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/api-core \
     ./node_modules/@twin.org/api-models \
+    ./node_modules/@twin.org/api-rest-client \
     ./node_modules/@twin.org/api-service \
     ./node_modules/@twin.org/api-tenant-processor \
     ./node_modules/@twin.org/dataspace-control-plane-service \
@@ -46,6 +47,7 @@ RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/federated-catalogue-models \
     ./node_modules/@twin.org/federated-catalogue-rest-client \
     ./node_modules/@twin.org/federated-catalogue-service \
+    ./node_modules/@twin.org/engine \
     ./node_modules/@twin.org/engine-core \
     ./node_modules/@twin.org/engine-models \
     ./node_modules/@twin.org/engine-server \
@@ -58,6 +60,7 @@ COPY node/packages/node-core ./node_modules/@twin.org/node-core/
 # api family — BaseRestClient query-string preservation, HostingService implementation, IHostingComponent types.
 COPY api/packages/api-core ./node_modules/@twin.org/api-core/
 COPY api/packages/api-models ./node_modules/@twin.org/api-models/
+COPY api/packages/api-rest-client ./node_modules/@twin.org/api-rest-client/
 COPY api/packages/api-service ./node_modules/@twin.org/api-service/
 COPY api/packages/api-tenant-processor ./node_modules/@twin.org/api-tenant-processor/
 # dataspace family — TICKET-D, getDatasetTargets adoption, skipTenant flag removal.
@@ -83,6 +86,9 @@ COPY federated-catalogue/packages/federated-catalogue-models ./node_modules/@twi
 COPY federated-catalogue/packages/federated-catalogue-rest-client ./node_modules/@twin.org/federated-catalogue-rest-client/
 COPY federated-catalogue/packages/federated-catalogue-service ./node_modules/@twin.org/federated-catalogue-service/
 # engine family — vaultConnectorType injection, factory wiring, hosting service plumbing.
+# 'engine' itself ships coreTypeInitialisers.json which now includes urlTransformerComponent
+# that has no url-transformer in its initialiser list, and PNP/CP/fedcat fail to resolve it.
+COPY engine/packages/engine ./node_modules/@twin.org/engine/
 COPY engine/packages/engine-core ./node_modules/@twin.org/engine-core/
 COPY engine/packages/engine-models ./node_modules/@twin.org/engine-models/
 COPY engine/packages/engine-server ./node_modules/@twin.org/engine-server/
