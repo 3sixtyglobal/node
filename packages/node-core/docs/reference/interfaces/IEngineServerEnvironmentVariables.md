@@ -1751,6 +1751,42 @@ Are the automation components enabled, defaults to false.
 
 ***
 
+### healthEnabled? {#healthenabled}
+
+> `optional` **healthEnabled?**: `string`
+
+Are the health components enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthEnabled`](IEngineEnvironmentVariables.md#healthenabled)
+
+***
+
+### urlTransformerEnabled? {#urltransformerenabled}
+
+> `optional` **urlTransformerEnabled?**: `string`
+
+Is the url transformer enabled, defaults to false.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`urlTransformerEnabled`](IEngineEnvironmentVariables.md#urltransformerenabled)
+
+***
+
+### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
+
+> `optional` **urlTransformerEncryptionKeyId?**: `string`
+
+The id of the key in the vault to use for encrypting parameters in url transformer.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`urlTransformerEncryptionKeyId`](IEngineEnvironmentVariables.md#urltransformerencryptionkeyid)
+
+***
+
 ### automationActionTypes? {#automationactiontypes}
 
 > `optional` **automationActionTypes?**: `string`
