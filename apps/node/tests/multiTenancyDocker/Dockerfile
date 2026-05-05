@@ -21,18 +21,44 @@ RUN find ./node_modules/@twin.org -maxdepth 1 -name '*.bak' -exec sh -c \
       'pkg="${1%.bak}"; rm -rf "$pkg" && mv "$1" "$pkg"' _ {} \;
 
 # node-core is a workspace package (not published independently of the workspace) — copy from source.
+# rights-management family is fully overridden because intra-family API drift between published .bak
+# versions and our locally-updated rights-management-models would otherwise cause runtime import errors
+# (e.g., rights-management-pap-service @ .bak importing RightsManagementPolicyType from a newer models
+# that no longer exports it). Mobius Dockerfile uses the same full-family override pattern.
 RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/api-tenant-processor \
     ./node_modules/@twin.org/dataspace-control-plane-service \
-    ./node_modules/@twin.org/rights-management-pnp-service \
     ./node_modules/@twin.org/rights-management-models \
+    ./node_modules/@twin.org/rights-management-dap-service \
+    ./node_modules/@twin.org/rights-management-pap-service \
+    ./node_modules/@twin.org/rights-management-pap-entity-storage \
+    ./node_modules/@twin.org/rights-management-pdp-service \
+    ./node_modules/@twin.org/rights-management-pep-service \
+    ./node_modules/@twin.org/rights-management-pip-service \
+    ./node_modules/@twin.org/rights-management-pmp-service \
+    ./node_modules/@twin.org/rights-management-pnp-service \
+    ./node_modules/@twin.org/rights-management-pxp-service \
+    ./node_modules/@twin.org/rights-management-plugins \
+    ./node_modules/@twin.org/rights-management-rest-client \
+    ./node_modules/@twin.org/rights-management-service \
     ./node_modules/@twin.org/engine-types \
     ./node_modules/@twin.org/engine-server-types
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
 COPY api/packages/api-tenant-processor ./node_modules/@twin.org/api-tenant-processor/
 COPY dataspace/packages/dataspace-control-plane-service ./node_modules/@twin.org/dataspace-control-plane-service/
-COPY rights-management/packages/rights-management-pnp-service ./node_modules/@twin.org/rights-management-pnp-service/
 COPY rights-management/packages/rights-management-models ./node_modules/@twin.org/rights-management-models/
+COPY rights-management/packages/rights-management-dap-service ./node_modules/@twin.org/rights-management-dap-service/
+COPY rights-management/packages/rights-management-pap-service ./node_modules/@twin.org/rights-management-pap-service/
+COPY rights-management/packages/rights-management-pap-entity-storage ./node_modules/@twin.org/rights-management-pap-entity-storage/
+COPY rights-management/packages/rights-management-pdp-service ./node_modules/@twin.org/rights-management-pdp-service/
+COPY rights-management/packages/rights-management-pep-service ./node_modules/@twin.org/rights-management-pep-service/
+COPY rights-management/packages/rights-management-pip-service ./node_modules/@twin.org/rights-management-pip-service/
+COPY rights-management/packages/rights-management-pmp-service ./node_modules/@twin.org/rights-management-pmp-service/
+COPY rights-management/packages/rights-management-pnp-service ./node_modules/@twin.org/rights-management-pnp-service/
+COPY rights-management/packages/rights-management-pxp-service ./node_modules/@twin.org/rights-management-pxp-service/
+COPY rights-management/packages/rights-management-plugins ./node_modules/@twin.org/rights-management-plugins/
+COPY rights-management/packages/rights-management-rest-client ./node_modules/@twin.org/rights-management-rest-client/
+COPY rights-management/packages/rights-management-service ./node_modules/@twin.org/rights-management-service/
 COPY engine/packages/engine-types ./node_modules/@twin.org/engine-types/
 COPY engine/packages/engine-server-types ./node_modules/@twin.org/engine-server-types/
 

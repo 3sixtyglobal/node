@@ -190,12 +190,15 @@ build_offer_json() {
     local collection_source="${4:-}" refinement_field="${5:-}" refinement_value="${6:-}"
 
     if [ -n "${refinement_field}" ]; then
+        # Canonical typed form per rights-management PR #133 (legacy "twin:jsonpath:..." removed).
+        # source is the literal "twin:jsonPath" type marker; the JSONPath expression lives in the
+        # sibling "twin:jsonPathExpression" property. Same shape for the refinement leftOperand.
         jq -n \
             --arg uid "${offer_id}" \
             --arg assigner "${assigner}" \
             --arg target "${target}" \
-            --arg source "${collection_source}" \
-            --arg field "${refinement_field}" \
+            --arg source_expr "${collection_source}" \
+            --arg field_expr "${refinement_field}" \
             --arg value "${refinement_value}" \
             '{
                 "@context": "http://www.w3.org/ns/odrl.jsonld",
@@ -208,9 +211,13 @@ build_offer_json() {
                     "action": "read",
                     "target": {
                         "@type": "AssetCollection",
-                        "source": $source,
+                        "source": "twin:jsonPath",
+                        "twin:jsonPathExpression": $source_expr,
                         "refinement": {
-                            "leftOperand": $field,
+                            "leftOperand": {
+                                "@type": "twin:jsonPath",
+                                "twin:jsonPathExpression": $field_expr
+                            },
                             "operator": "eq",
                             "rightOperand": $value
                         }
@@ -229,7 +236,13 @@ build_offer_json() {
                 "assigner": $assigner,
                 "target": $target,
                 "action": "read",
-                "permission": [{ "action": "read", "target": "twin:jsonpath:$" }]
+                "permission": [{
+                    "action": "read",
+                    "target": {
+                        "@type": "twin:jsonPath",
+                        "twin:jsonPathExpression": "$"
+                    }
+                }]
             }'
     fi
 }
@@ -674,16 +687,17 @@ PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (4 nodes)")
 # ==========================================================================
 phase 2 "Seed Per-Consumer ODRL Offers on Mobius"
 
-# Build per-consumer offers with AssetCollection refinements
-# source: JSONPath to the array being filtered; leftOperand: absolute wildcard path for per-item evaluation
+# Build per-consumer offers with AssetCollection refinements (canonical typed form, post rights-management PR #133).
+# source_expr: JSONPath to the array being filtered (placed under "twin:jsonPathExpression" sibling of source).
+# field_expr:  absolute wildcard path for per-item evaluation (placed under leftOperand's "twin:jsonPathExpression").
 # Ashford: unloadingLocation.id == unece:LOCODE#GBDVR (Dover area)
 ASHFORD_OFFER_JSON=$(build_offer_json "${ASHFORD_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
-    "twin:jsonpath:\$.itemList.itemListElement[*]" \
-    "twin:jsonpath:\$.itemList.itemListElement[*].unloadingLocation.id" "unece:LOCODE#GBDVR")
+    "\$.itemList.itemListElement[*]" \
+    "\$.itemList.itemListElement[*].unloadingLocation.id" "unece:LOCODE#GBDVR")
 # Suffolk: unloadingLocation.id == unece:LOCODE#GBFXT (Felixstowe area)
 SUFFOLK_OFFER_JSON=$(build_offer_json "${SUFFOLK_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}" \
-    "twin:jsonpath:\$.itemList.itemListElement[*]" \
-    "twin:jsonpath:\$.itemList.itemListElement[*].unloadingLocation.id" "unece:LOCODE#GBFXT")
+    "\$.itemList.itemListElement[*]" \
+    "\$.itemList.itemListElement[*].unloadingLocation.id" "unece:LOCODE#GBFXT")
 # MCP: no refinement (sees all data)
 MCP_OFFER_JSON=$(build_offer_json "${MCP_OFFER_ID}" "${MOBIUS_DID}" "${DATASET_ID}")
 

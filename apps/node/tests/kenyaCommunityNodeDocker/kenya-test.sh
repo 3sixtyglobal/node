@@ -200,16 +200,19 @@ else
     fail "Trader did NOT see KRA's dataset in catalogue"
 fi
 
-# TICKET-G: extract the encrypted tenantToken the catalogue published for this
-# dataset. Used as ?x-enc-tenant-token= on subsequent PNP/DSP URLs so they route into
-# KRA's tenant context (not Trader's).
-KRA_TENANT_TOKEN=$(echo "${catalog_resp}" | jq -r --arg id "${KRA_DATASET_ID}" \
-    '.dataset[]? | select(.["@id"] == $id) | .["twin:tenantToken"] // empty' | head -1)
+# TICKET-G (post-Martyn-2026-05-01 URL-baking direction): the catalogue bakes the
+# publishing tenant's encrypted token into each distribution's accessService URL at
+# fedcat set() time. Extract the token from the URL query string so we can re-apply
+# it as ?x-enc-tenant-token= on subsequent PNP/DSP URLs the consumer constructs.
+KRA_DIST_URL=$(echo "${catalog_resp}" | jq -r --arg id "${KRA_DATASET_ID}" \
+    '.dataset[]? | select(.["@id"] == $id) | (.distribution // .["dcat:distribution"]) | (if type == "array" then .[0] else . end) | .accessService // empty' | head -1)
+KRA_TENANT_TOKEN=$(echo "${KRA_DIST_URL}" | sed -nE 's/.*[?&]x-enc-tenant-token=([^&]+).*/\1/p')
 if [ -n "${KRA_TENANT_TOKEN}" ]; then
-    ok "Catalogue published encrypted tenantToken (TICKET-G verified, ${#KRA_TENANT_TOKEN} chars)"
+    ok "Distribution accessService URL carries encrypted tenantToken (${#KRA_TENANT_TOKEN} chars)"
 else
     info "Catalogue response: ${catalog_resp}"
-    fail "Catalogue did NOT publish twin:tenantToken on dataset ${KRA_DATASET_ID} — TICKET-G wiring missing"
+    info "Distribution URL: ${KRA_DIST_URL}"
+    fail "Distribution accessService did NOT carry x-enc-tenant-token query param — fedcat URL-baking wiring missing"
 fi
 
 # ============================================================================
