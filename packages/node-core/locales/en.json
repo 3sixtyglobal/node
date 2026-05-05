@@ -96,7 +96,6 @@
 						"nodeAuthKeyCreate": "Creating node auth key",
 						"trustVerificationMethodCreate": "Creating trust verification method for node identity",
 						"synchronisedStorageKeyAdd": "Adding synchronised storage key for node identity",
-						"hostingParamKeyAdd": "Adding hosting parameter key for node identity",
 						"nodeIdentitySet": "Setting node identity",
 						"nodeTenantCreate": "Creating node tenant",
 						"nodeTenantSet": "Setting node tenant",
@@ -105,7 +104,8 @@
 						"attestationMethodCreate": "Creating attestation method for organisation identity",
 						"immutableProofMethodCreate": "Creating immutable proof method for organisation identity",
 						"adminIdentityCreate": "Creating admin user identity",
-						"adminUserCreate": "Creating admin user"
+						"adminUserCreate": "Creating admin user",
+						"urlTransformParamKeyAdd": "Adding URL transform parameter encryption key"
 					}
 				},
 				"identity-create": {

@@ -112,6 +112,7 @@
 		"tsconfig.json",
 		"typedoc.config.mjs",
 		"vitest.config.ts",
-		"vitest.config.ts.timestamp*"
+		"vitest.config.ts.timestamp*",
+		"PULL_REQUEST_TEMPLATE.md"
 	]
 }

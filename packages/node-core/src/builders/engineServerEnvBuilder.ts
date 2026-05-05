@@ -99,8 +99,7 @@ export async function buildEngineServerConfiguration(
 					options: {
 						config: {
 							localOrigin,
-							publicOrigin,
-							paramEncryptionKeyName: envVars.hostingParamEncryptionKeyId
+							publicOrigin
 						}
 					}
 				}

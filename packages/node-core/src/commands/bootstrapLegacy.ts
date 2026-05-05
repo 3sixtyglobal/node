@@ -198,12 +198,12 @@ export async function bootstrapLegacy(
 
 		CLIDisplay.break();
 		CLIDisplay.section(
-			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.hostingParamKeyAdd")
+			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.urlTransformParamKeyAdd")
 		);
 		await vaultKeyCreate(engineCore, envVars, {
 			identity: nodeIdentity.did,
 			keyType: "ChaCha20Poly1305",
-			keyId: envVars.hostingParamEncryptionKeyId
+			keyId: envVars.urlTransformerEncryptionKeyId
 		});
 
 		CLIDisplay.break();

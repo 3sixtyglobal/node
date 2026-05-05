@@ -30,6 +30,7 @@ import {
 	FaucetConnectorType,
 	FederatedCatalogueComponentType,
 	type FederatedCatalogueFilterComponentType,
+	HealthComponentType,
 	IdentityComponentType,
 	IdentityConnectorType,
 	IdentityProfileComponentType,
@@ -72,6 +73,7 @@ import {
 	TrustComponentType,
 	type TrustGeneratorComponentType,
 	type TrustVerifierComponentType,
+	UrlTransformerComponentType,
 	VaultConnectorType,
 	VerifiableStorageComponentType,
 	VerifiableStorageConnectorType,
@@ -117,6 +119,8 @@ export async function buildEngineConfiguration(
 	await configureTelemetry(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
+	await configureHealth(coreConfig, envVars);
+	await configureUrlTransformer(coreConfig, envVars);
 
 	await configureFaucet(coreConfig, envVars);
 	await configureWallet(coreConfig, envVars);
@@ -611,6 +615,50 @@ async function configureAutomation(
 				} as unknown as AutomationActionConfig);
 			}
 		}
+	}
+}
+
+/**
+ * Configures the health.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureHealth(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.healthComponent ??= [];
+
+	if (Coerce.boolean(envVars.healthEnabled) ?? false) {
+		coreConfig.types.healthComponent.push({
+			type: HealthComponentType.Service
+		});
+	}
+}
+
+/**
+ * Configures the url transformer.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureUrlTransformer(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.urlTransformerComponent ??= [];
+
+	if (Coerce.boolean(envVars.urlTransformerEnabled) ?? false) {
+		coreConfig.types.urlTransformerComponent.push({
+			type: UrlTransformerComponentType.Service,
+			options: {
+				config: {
+					paramEncryptionKeyName: envVars.urlTransformerEncryptionKeyId,
+					queryParamNames: {
+						tenant: "tenant-token"
+					}
+				}
+			}
+		});
 	}
 }
 
