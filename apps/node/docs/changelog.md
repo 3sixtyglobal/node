@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.34](https://github.com/twinfoundation/twin-node/compare/node-v0.0.3-next.33...node-v0.0.3-next.34) (2026-05-05)
+
+
+### Features
+
+* health and url transformer ([#131](https://github.com/twinfoundation/twin-node/issues/131)) ([3658903](https://github.com/twinfoundation/twin-node/commit/36589036b9bea120880fc395b0d123a89032cf40))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.33 to 0.0.3-next.34
+
 ## [0.0.3-next.33](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.32...node-v0.0.3-next.33) (2026-04-24)
 
 
