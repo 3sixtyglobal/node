@@ -197,6 +197,16 @@ export async function bootstrapLegacy(
 
 		CLIDisplay.break();
 		CLIDisplay.section(
+			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.urlTransformParamKeyAdd")
+		);
+		await vaultKeyCreate(engineCore, envVars, {
+			identity: nodeIdentity.did,
+			keyType: "ChaCha20Poly1305",
+			keyId: envVars.urlTransformerEncryptionKeyId
+		});
+
+		CLIDisplay.break();
+		CLIDisplay.section(
 			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeIdentitySet")
 		);
 		await nodeSetIdentity(engineCore, envVars, {

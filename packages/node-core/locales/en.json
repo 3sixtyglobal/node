@@ -104,7 +104,8 @@
 						"attestationMethodCreate": "Creating attestation method for organisation identity",
 						"immutableProofMethodCreate": "Creating immutable proof method for organisation identity",
 						"adminIdentityCreate": "Creating admin user identity",
-						"adminUserCreate": "Creating admin user"
+						"adminUserCreate": "Creating admin user",
+						"urlTransformParamKeyAdd": "Adding URL transform parameter encryption key"
 					}
 				},
 				"identity-create": {

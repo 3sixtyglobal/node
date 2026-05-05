@@ -115,6 +115,12 @@ twin-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID -
 twin-node vault-key-import --load-env="node-identity.env,node-auth-key.json" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
 ```
 
+### Add a key associated with the node identity for use in hosting param encryption
+
+```shell
+twin-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID --key-id=!TWIN_URL_TRANSFORMER_ENCRYPTION_KEY_ID --key-type=ChaCha20Poly1305 --output-json="node-hosting-param-key.json" --output-env="node-hosting-param.env"
+```
+
 ### Add a key associated with the node identity for use by synchronised storage blob encryption
 
 ```shell

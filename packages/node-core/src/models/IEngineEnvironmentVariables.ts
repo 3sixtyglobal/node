@@ -728,6 +728,21 @@ export interface IEngineEnvironmentVariables {
 	automationEnabled?: string;
 
 	/**
+	 * Are the health components enabled, defaults to false.
+	 */
+	healthEnabled?: string;
+
+	/**
+	 * Is the url transformer enabled, defaults to false.
+	 */
+	urlTransformerEnabled?: string;
+
+	/**
+	 * The id of the key in the vault to use for encrypting parameters in url transformer.
+	 */
+	urlTransformerEncryptionKeyId?: string;
+
+	/**
 	 * The type of the automation action to create, comma separate for more than one connector.
 	 * values: fetch
 	 */
