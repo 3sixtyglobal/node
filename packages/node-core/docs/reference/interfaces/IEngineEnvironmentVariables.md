@@ -1183,6 +1183,30 @@ Are the automation components enabled, defaults to false.
 
 ***
 
+### healthEnabled? {#healthenabled}
+
+> `optional` **healthEnabled?**: `string`
+
+Are the health components enabled, defaults to false.
+
+***
+
+### urlTransformerEnabled? {#urltransformerenabled}
+
+> `optional` **urlTransformerEnabled?**: `string`
+
+Is the url transformer enabled, defaults to false.
+
+***
+
+### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
+
+> `optional` **urlTransformerEncryptionKeyId?**: `string`
+
+The id of the key in the vault to use for encrypting parameters in url transformer.
+
+***
+
 ### automationActionTypes? {#automationactiontypes}
 
 > `optional` **automationActionTypes?**: `string`
