@@ -120,29 +120,15 @@ ok "KRA trust JWT  (${#KRA_TRUST_JWT} chars)"
 ok "Trader trust JWT (${#TRADER_TRUST_JWT} chars)"
 
 # -----------------------------------------------------------------------------
-# Step 4: Verify the test-app dataset is in the catalogue. test-app publishes
-# at DSP startup with @id "https://twin.example.org/data-service-1" (see
-# dataspace-test-app/src/testDataspaceDataPlaneApp.ts:163).
+# Step 4: The catalogue starts empty — there's no static `datasetsHandled` to
+# pre-populate it. The dataset id is hard-coded here and KRA registers a
+# matching partial in Step 5b which inline-publishes it via fedcat.set in
+# KRA's tenant context.
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BOLD}Step 4: Verify test-app dataset is in federated catalogue${NC}"
-CATALOG_RESP=$(curl -sS -X POST "${HOST}/federated-catalogue/request" \
-    -H "Content-Type: application/json" \
-    -H "x-api-key: ${TENANT_KRA_API_KEY}" \
-    -H "Cookie: access_token=${KRA_SESSION_JWT}" \
-    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
-
-DATASET_COUNT=$(echo "${CATALOG_RESP}" | jq -r '(.dataset // []) | length // 0')
-KRA_DATASET_ID=$(echo "${CATALOG_RESP}" | jq -r '.dataset[0]["@id"] // empty')
-
-if [ -z "${KRA_DATASET_ID}" ]; then
-    warn "Catalogue still empty — dataspace-test-app may not be loaded."
-    info "Confirm TWIN_EXTENSIONS=\"@twin.org/dataspace-test-app\" is in env/node.env"
-    info "and that the node was rebuilt (./setup.sh --clean) after adding it."
-    info "Catalogue response: ${CATALOG_RESP}"
-    fail "No dataset found"
-fi
-ok "Catalogue has ${DATASET_COUNT} dataset(s); using \"${KRA_DATASET_ID}\""
+echo -e "${BOLD}Step 4: Pin dataset id (catalogue starts empty until Step 5b)${NC}"
+KRA_DATASET_ID="https://twin.example.org/data-service-1"
+ok "Dataset id pinned: \"${KRA_DATASET_ID}\""
 
 # -----------------------------------------------------------------------------
 # Step 5: KRA seeds an ODRL Offer in their PAP for that dataset. Mirrors the
@@ -199,37 +185,89 @@ fi
 ok "Offer ${KRA_OFFER_ID} seeded in KRA's PAP (HTTP ${PAP_STATUS})"
 
 # -----------------------------------------------------------------------------
-# Step 5b (test scaffold workaround): Re-tag the test-app's dataset entity in
-# the catalogue so its `tenantId` field points at KRA. The test-app publishes
-# the Consignment dataset from inside the engine startup, which runs in the
-# Node tenant context — so without this step the catalogue's `twin:tenantToken`
-# would route Trader's negotiation request back to the Node tenant rather than
-# KRA, and PAP (partitioned by [Node, Tenant]) wouldn't find KRA's offer.
+# Step 5b: Register a dataset under KRA's tenant context.
 #
-# Federated catalogue dataset storage is [Node]-only partitioned, so we only
-# need to flip the `tenantId` field — no partitionId change required. In a
-# real Kenya deployment, KRA's own dataspace app would publish the dataset in
-# KRA's tenant context (TICKET-G+1 follow-up: per-tenant publishing).
+# The Control Plane's POST /dataspace/datasets/admin route persists the dataset
+# record AND inline-publishes it via fedcat.set() wrapped in
+# ContextIdStore.run({Tenant: KRA}). fedcat then captures tenantId = KRA on
+# the Dataset entity and the URL transformer bakes the correct KRA-tenant
+# token into the distribution's accessService URL.
+#
+# This replaces the previous disk-level re-tag workaround (which only patched
+# the entity's tenantId field but left the URL-baked token pointing at the
+# wrong tenant).
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BOLD}Step 5b: Re-tag dataset tenantId to KRA (test scaffold workaround)${NC}"
-docker exec twin-kenya-node node -e "
+echo -e "${BOLD}Step 5b: Register a dataset as KRA tenant${NC}"
+
+# The dataspace-test-app's static datasetsHandled() also publishes the same
+# @id at engine startup (in the Node tenant context). Phase B of the Control
+# Plane's start() loop replays partials AFTER Phase A's legacy publish — and
+# the partial CRUD route inline-publishes on create — so the KRA-tenant
+# version always wins. The shape mirrors the test-app's static dataset.
+DATASET_RECORD_ID="kra-dataset-$(date +%s)"
+DATASET_BODY=$(jq -n \
+    --arg datasetCtx "${DSP_CONTEXT}" \
+    --arg dsId "${KRA_DATASET_ID}" \
+    --arg appId "https://twin.example.org/app1" \
+    --arg storeId "${DATASET_RECORD_ID}" \
+    --arg assigner "${KRA_DID}" \
+    '{
+        id: $storeId,
+        appId: $appId,
+        dataset: {
+            "@context": [$datasetCtx, { dcterms: "http://purl.org/dc/terms/" }],
+            "@id": $dsId,
+            "@type": "Dataset",
+            hasPolicy: [{
+                "@id": "urn:policy:kra-dataset-offer",
+                "@type": "Offer",
+                assigner: $assigner,
+                permission: [{ action: "read" }]
+            }],
+            distribution: [{
+                "@id": "https://twin.example.org/distribution-1",
+                "@type": "Distribution",
+                accessService: $dsId,
+                format: "Http-Pull-Query-Format"
+            }],
+            "dcterms:type": "https://vocabulary.uncefact.org/Consignment"
+        }
+    }')
+
+DATASET_RESP=$(curl -sS -i -X POST "${HOST}/dataspace/datasets/admin" \
+    -H "Content-Type: application/json" \
+    -H "x-api-key: ${TENANT_KRA_API_KEY}" \
+    -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
+    -d "${DATASET_BODY}" || true)
+
+DATASET_STATUS=$(echo "${DATASET_RESP}" | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
+if [ "${DATASET_STATUS}" != "201" ] && [ "${DATASET_STATUS}" != "204" ]; then
+    info "Dataset response: ${DATASET_RESP}"
+    fail "Dataset registration failed (HTTP ${DATASET_STATUS})"
+fi
+ok "Dataset ${DATASET_RECORD_ID} registered for ${KRA_DATASET_ID} as KRA (HTTP ${DATASET_STATUS})"
+
+# -----------------------------------------------------------------------------
+# Sanity check: confirm the catalogue's URL-baked tenant token now decrypts
+# to KRA's tenant id (it used to decrypt to the Node tenant — see findings).
+# -----------------------------------------------------------------------------
+DATASET_FILE="/app/data/dataset/store.json"
+RECAPTURED_TENANT=$(docker exec twin-kenya-node node -e "
 const fs = require('fs');
-const path = '/app/data/dataset/store.json';
-const store = JSON.parse(fs.readFileSync(path, 'utf8'));
+const store = JSON.parse(fs.readFileSync('${DATASET_FILE}', 'utf8'));
 const target = '${KRA_DATASET_ID}';
-const kraTenantId = '${TENANT_KRA_TENANT_ID}';
-let patched = 0;
-for (const entry of store) {
-    if (entry.id === target) {
-        entry.tenantId = kraTenantId;
-        patched++;
-    }
-}
-fs.writeFileSync(path, JSON.stringify(store, null, '\t'));
-console.log('patched=' + patched);
-" || fail "Dataset re-tag failed"
-ok "Dataset ${KRA_DATASET_ID} re-tagged with tenantId=${TENANT_KRA_TENANT_ID}"
+const entry = store.find(e => e.id === target);
+process.stdout.write(entry?.tenantId ?? '');
+" 2>/dev/null || true)
+
+if [ "${RECAPTURED_TENANT}" = "${TENANT_KRA_TENANT_ID}" ]; then
+    ok "Catalogue dataset.tenantId now equals KRA (${TENANT_KRA_TENANT_ID})"
+else
+    info "Recaptured tenantId: \"${RECAPTURED_TENANT}\""
+    info "Expected:            \"${TENANT_KRA_TENANT_ID}\""
+    fail "Partial-publish did not retag dataset.tenantId — partial-dataset wiring may be broken"
+fi
 
 # -----------------------------------------------------------------------------
 # Step 5c (test scaffold workaround): Mint an encrypted tenantToken for Trader

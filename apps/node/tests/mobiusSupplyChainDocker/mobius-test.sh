@@ -683,6 +683,56 @@ MCP_TRUST="${RESULT_TRUST_TOKEN}"; ok "MCP trust token (${#MCP_TRUST} chars)"
 PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (4 nodes)")
 
 # ==========================================================================
+# Phase 1.5: Register the Consignment dataset on Mobius
+# ==========================================================================
+# The Control Plane no longer publishes via the legacy `IDataspaceApp.datasetsHandled`
+# interface. Mobius must register its dataset via the admin REST surface;
+# the Control Plane inline-publishes it to fedcat in the calling context.
+# Mobius runs single-tenant per node so no `Tenant` context override
+# happens — the published Dataset has no `tenantId` and URL-baking is skipped,
+# which matches Mobius's pre-change behaviour.
+step "Registering Mobius Consignment dataset via /dataspace/datasets/admin..."
+DATASET_BODY=$(jq -n \
+    --arg dsId "${DATASET_ID}" \
+    --arg appId "https://twin.example.org/app1" \
+    --arg storeId "mobius-dataset-1" \
+    --arg assigner "${MOBIUS_DID}" \
+    '{
+        id: $storeId,
+        appId: $appId,
+        dataset: {
+            "@context": ["https://w3id.org/dspace/2025/1/context.jsonld", { dcterms: "http://purl.org/dc/terms/" }],
+            "@id": $dsId,
+            "@type": "Dataset",
+            "dcterms:publisher": $assigner,
+            hasPolicy: [{
+                "@id": "urn:policy:mobius-dataset-offer",
+                "@type": "Offer",
+                assigner: $assigner,
+                permission: [{ action: "read" }]
+            }],
+            distribution: [{
+                "@id": "https://twin.example.org/distribution-1",
+                "@type": "Distribution",
+                accessService: $dsId,
+                format: "Http-Pull-Query-Format"
+            }],
+            "dcterms:type": "https://vocabulary.uncefact.org/Consignment"
+        }
+    }')
+
+DATASET_HTTP=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+    "${MOBIUS_HOST}/dataspace/datasets/admin" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${MOBIUS_TOKEN}" \
+    -d "${DATASET_BODY}")
+
+if [ "${DATASET_HTTP}" != "201" ] && [ "${DATASET_HTTP}" != "204" ]; then
+    fail "Dataset registration failed (HTTP ${DATASET_HTTP})"
+fi
+ok "Mobius dataset registered (${DATASET_HTTP})"
+
+# ==========================================================================
 # Phase 2: Seed ODRL Offer on Mobius (publisher)
 # ==========================================================================
 phase 2 "Seed Per-Consumer ODRL Offers on Mobius"
