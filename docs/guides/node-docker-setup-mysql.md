@@ -10,7 +10,7 @@ In this guide, using [Docker](https://www.docker.com/get-started/), you will lea
 
 - [Docker resources and env files](https://github.com/twinfoundation-community/tutorials.101/tree/main/docker-setup)
 
-- [TWIN Open API Description](https://editor.swagger.io/?url=https://raw.githubusercontent.com/twinfoundation/node/refs/heads/next/apps/node/docs/open-api/spec.json)
+- [TWIN Open API Description](https://editor.swagger.io/?url=https://raw.githubusercontent.com/iotaledger/node/refs/heads/next/apps/node/docs/open-api/spec.json)
 
 ## Screencast
 
