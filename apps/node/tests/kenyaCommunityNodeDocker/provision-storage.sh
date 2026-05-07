@@ -187,7 +187,7 @@ ok "Offer ${KRA_OFFER_ID} seeded in KRA's PAP (HTTP ${PAP_STATUS})"
 # -----------------------------------------------------------------------------
 # Step 5b: Register a dataset under KRA's tenant context.
 #
-# The Control Plane's POST /dataspace/datasets/admin route persists the dataset
+# The Control Plane's POST /dataspace/datasets route persists the dataset
 # record AND inline-publishes it via fedcat.set() wrapped in
 # ContextIdStore.run({Tenant: KRA}). fedcat then captures tenantId = KRA on
 # the Dataset entity and the URL transformer bakes the correct KRA-tenant
@@ -205,15 +205,12 @@ echo -e "${BOLD}Step 5b: Register a dataset as KRA tenant${NC}"
 # Plane's start() loop replays partials AFTER Phase A's legacy publish — and
 # the partial CRUD route inline-publishes on create — so the KRA-tenant
 # version always wins. The shape mirrors the test-app's static dataset.
-DATASET_RECORD_ID="kra-dataset-$(date +%s)"
 DATASET_BODY=$(jq -n \
     --arg datasetCtx "${DSP_CONTEXT}" \
     --arg dsId "${KRA_DATASET_ID}" \
     --arg appId "https://twin.example.org/app1" \
-    --arg storeId "${DATASET_RECORD_ID}" \
     --arg assigner "${KRA_DID}" \
     '{
-        id: $storeId,
         appId: $appId,
         dataset: {
             "@context": [$datasetCtx, { dcterms: "http://purl.org/dc/terms/" }],
@@ -235,7 +232,7 @@ DATASET_BODY=$(jq -n \
         }
     }')
 
-DATASET_RESP=$(curl -sS -i -X POST "${HOST}/dataspace/datasets/admin" \
+DATASET_RESP=$(curl -sS -i -X POST "${HOST}/dataspace/datasets" \
     -H "Content-Type: application/json" \
     -H "x-api-key: ${TENANT_KRA_API_KEY}" \
     -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
@@ -246,7 +243,7 @@ if [ "${DATASET_STATUS}" != "201" ] && [ "${DATASET_STATUS}" != "204" ]; then
     info "Dataset response: ${DATASET_RESP}"
     fail "Dataset registration failed (HTTP ${DATASET_STATUS})"
 fi
-ok "Dataset ${DATASET_RECORD_ID} registered for ${KRA_DATASET_ID} as KRA (HTTP ${DATASET_STATUS})"
+ok "Dataset registered for ${KRA_DATASET_ID} as KRA (HTTP ${DATASET_STATUS})"
 
 # -----------------------------------------------------------------------------
 # Sanity check: confirm the catalogue's URL-baked tenant token now decrypts
