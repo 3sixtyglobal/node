@@ -1504,8 +1504,7 @@ async function configureFederatedCatalogue(
 		coreConfig.types.federatedCatalogueComponent.push({
 			type: FederatedCatalogueComponentType.Service,
 			options: {
-				datasetEntityStorageType: overrideEntityStorageType,
-				config: {}
+				datasetEntityStorageType: overrideEntityStorageType
 			}
 		});
 
