@@ -631,7 +631,12 @@ async function configureHealth(
 
 	if (Coerce.boolean(envVars.healthEnabled) ?? false) {
 		coreConfig.types.healthComponent.push({
-			type: HealthComponentType.Service
+			type: HealthComponentType.Service,
+			options: {
+				config: {
+					healthCheckInterval: (Coerce.integer(envVars.healthIntervalSeconds) ?? 60) * 1000
+				}
+			}
 		});
 	}
 }
@@ -647,7 +652,7 @@ async function configureUrlTransformer(
 ): Promise<void> {
 	coreConfig.types.urlTransformerComponent ??= [];
 
-	if (Coerce.boolean(envVars.urlTransformerEnabled) ?? false) {
+	if (isUrlTransformerRequired(envVars) ?? false) {
 		coreConfig.types.urlTransformerComponent.push({
 			type: UrlTransformerComponentType.Service,
 			options: {
@@ -1203,7 +1208,7 @@ async function configureTrust(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.trustEnabled) ?? false) {
+	if (isTrustRequired(envVars)) {
 		coreConfig.types.trustComponent ??= [];
 		coreConfig.types.trustComponent.push({
 			type: TrustComponentType.Service
@@ -1584,4 +1589,34 @@ function commaSeparatedListToArray<T>(value: string | undefined): T[] {
 		.split(",")
 		.map(item => item.trim())
 		.filter(item => item.length > 0) as T[];
+}
+
+/**
+ * Checks if the trust subsystem is required.
+ * Returns true when any component that depends on the trust subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if rights-management, synchronised-storage, or dataspace is enabled.
+ */
+export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		(Coerce.boolean(envVars.rightsManagementEnabled) ?? false) ||
+		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) ||
+		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
+		(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false)
+	);
+}
+
+/**
+ * Checks if the URL transformer subsystem is required.
+ * Returns true when any component that depends on the URL transformer subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if rights-management, dataspace, federated-catalogue, or tenant is enabled.
+ */
+export function isUrlTransformerRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		(Coerce.boolean(envVars.rightsManagementEnabled) ?? false) ||
+		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) ||
+		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
+		(Coerce.boolean(envVars.tenantEnabled) ?? false)
+	);
 }

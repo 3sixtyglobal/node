@@ -616,11 +616,6 @@ export interface IEngineEnvironmentVariables {
 	federatedCatalogueFilters?: string;
 
 	/**
-	 * Is the trust management enabled, defaults to false.
-	 */
-	trustEnabled?: string;
-
-	/**
 	 * The trust generators to add to the factory, comma separated list.
 	 */
 	trustGenerators?: string;
@@ -733,9 +728,9 @@ export interface IEngineEnvironmentVariables {
 	healthEnabled?: string;
 
 	/**
-	 * Is the url transformer enabled, defaults to false.
+	 * The interval in seconds for performing health checks, defaults to 60.
 	 */
-	urlTransformerEnabled?: string;
+	healthIntervalSeconds?: string;
 
 	/**
 	 * The id of the key in the vault to use for encrypting parameters in url transformer.

@@ -12,6 +12,7 @@ import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
 import { vaultKeyImport } from "./vaultKeyImport.js";
+import { isTrustRequired, isUrlTransformerRequired } from "../builders/engineEnvBuilder.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
@@ -161,7 +162,7 @@ export async function bootstrapLegacy(
 			overwriteMode: "skip"
 		});
 
-		if (Coerce.boolean(envVars.trustEnabled) ?? false) {
+		if (isTrustRequired(envVars) ?? false) {
 			CLIDisplay.break();
 			CLIDisplay.section(
 				I18n.formatMessage(
@@ -195,15 +196,17 @@ export async function bootstrapLegacy(
 			});
 		}
 
-		CLIDisplay.break();
-		CLIDisplay.section(
-			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.urlTransformParamKeyAdd")
-		);
-		await vaultKeyCreate(engineCore, envVars, {
-			identity: nodeIdentity.did,
-			keyType: "ChaCha20Poly1305",
-			keyId: envVars.urlTransformerEncryptionKeyId
-		});
+		if (isUrlTransformerRequired(envVars)) {
+			CLIDisplay.break();
+			CLIDisplay.section(
+				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.urlTransformParamKeyAdd")
+			);
+			await vaultKeyCreate(engineCore, envVars, {
+				identity: nodeIdentity.did,
+				keyType: "ChaCha20Poly1305",
+				keyId: envVars.urlTransformerEncryptionKeyId
+			});
+		}
 
 		CLIDisplay.break();
 		CLIDisplay.section(

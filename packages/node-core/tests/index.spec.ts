@@ -118,8 +118,7 @@ describe("node-core", () => {
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-				TWIN_HEALTH_ENABLED: "true",
-				TWIN_URL_TRANSFORMER_ENABLED: "true"
+				TWIN_HEALTH_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -165,7 +164,6 @@ describe("node-core", () => {
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
-				TWIN_TRUST_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
@@ -185,8 +183,7 @@ describe("node-core", () => {
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-				TWIN_HEALTH_ENABLED: "true",
-				TWIN_URL_TRANSFORMER_ENABLED: "true"
+				TWIN_HEALTH_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -234,7 +231,6 @@ describe("node-core", () => {
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				TWIN_BACKGROUND_TASKS_ENABLED: "true",
-				TWIN_TRUST_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
@@ -254,8 +250,7 @@ describe("node-core", () => {
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-				TWIN_HEALTH_ENABLED: "true",
-				TWIN_URL_TRANSFORMER_ENABLED: "true"
+				TWIN_HEALTH_ENABLED: "true"
 			}
 		});
 		expect(result).toBeDefined();
@@ -349,7 +344,6 @@ describe("node-core", () => {
 			TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_BACKGROUND_TASKS_ENABLED: "true",
-			TWIN_TRUST_ENABLED: "true",
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
@@ -370,7 +364,6 @@ describe("node-core", () => {
 			TWIN_AUTOMATION_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true",
-			TWIN_URL_TRANSFORMER_ENABLED: "true",
 			TWIN_EXTENSIONS: "./tests/apps/testApp.js"
 		};
 
@@ -685,7 +678,6 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
 			TWIN_BACKGROUND_TASKS_ENABLED: "true",
-			TWIN_TRUST_ENABLED: "true",
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
@@ -699,8 +691,7 @@ describe("node-core", () => {
 			TWIN_VC_AUTHENTICATION_ENABLED: "true",
 			TWIN_AUTOMATION_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-			TWIN_HEALTH_ENABLED: "true",
-			TWIN_URL_TRANSFORMER_ENABLED: "true"
+			TWIN_HEALTH_ENABLED: "true"
 		};
 
 		await initialiseLocales("./dist/locales/");
