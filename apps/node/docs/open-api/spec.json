@@ -112,6 +112,10 @@
 			"description": "DSP Transfer Process Protocol endpoints for initiating and managing data transfers."
 		},
 		{
+			"name": "Datasets",
+			"description": "Tenant-scoped CRUD over the datasets the Control Plane reads at start time to populate the federated catalogue."
+		},
+		{
 			"name": "Policy Administration Point",
 			"description": "Endpoints for managing ODRL policies in the Policy Administration Point"
 		},
@@ -147,11 +151,11 @@
 											"status": "ok",
 											"components": [
 												{
-													"name": "Database",
+													"source": "Database",
 													"status": "ok"
 												},
 												{
-													"name": "Storage",
+													"source": "Storage",
 													"status": "ok"
 												}
 											]
@@ -163,12 +167,12 @@
 											"status": "warning",
 											"components": [
 												{
-													"name": "Database",
+													"source": "Database",
 													"status": "warning",
 													"description": "slowRunning"
 												},
 												{
-													"name": "Storage",
+													"source": "Storage",
 													"status": "ok"
 												}
 											]
@@ -180,11 +184,11 @@
 											"status": "error",
 											"components": [
 												{
-													"name": "Database",
+													"source": "Database",
 													"status": "ok"
 												},
 												{
-													"name": "Storage",
+													"source": "Storage",
 													"status": "error",
 													"description": "storageFull"
 												}
@@ -4879,6 +4883,91 @@
 								"description": "e.g. blob-memory:c57d94b088f4c6d2cb32ded014813d0c786aa00134c8ee22f84b1e2545602a70"
 							}
 						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "blobStorageEmpty",
+				"summary": "Remove all entries from blob storage",
+				"tags": [
+					"Blob Storage"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to remove all entries from blob storage.",
+					"required": true,
+					"content": {
+						"text/plain": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/blob-storage/BlobStorageEmptyRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -16916,6 +17005,559 @@
 				}
 			}
 		},
+		"/dataspace-control-plane/app-datasets": {
+			"post": {
+				"operationId": "datasetCreate",
+				"summary": "Register an app dataset for the calling tenant.",
+				"tags": [
+					"Datasets"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "API request to register an app dataset.\n\nThe owning `tenantId` is captured automatically from the request's tenant\ncontext — callers do not supply it.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AppDatasetCreateRequest"
+							},
+							"examples": {
+								"datasetCreateRequestExample": {
+									"value": {
+										"appId": "https://twin.example.org/app1",
+										"dataset": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "Dataset",
+											"@id": "https://twin.example.org/data-service-1",
+											"hasPolicy": [],
+											"distribution": []
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "API response from registering an app dataset.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/AppDatasetCreateResponse"
+								}
+							}
+						},
+						"headers": {
+							"location": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. https://twin.example.org/data-service-1"
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "datasetList",
+				"summary": "List the app datasets owned by the calling tenant.",
+				"tags": [
+					"Datasets"
+				],
+				"parameters": [
+					{
+						"name": "cursor",
+						"description": "Cursor returned from a previous list call to fetch the next page.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"description": "Maximum number of entries to return (string-encoded; parsed on the server).",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "API response listing the app datasets owned by the calling tenant.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AppDatasetListResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/dataspace-control-plane/app-datasets/{id}": {
+			"get": {
+				"operationId": "datasetGet",
+				"summary": "Retrieve an app dataset owned by the calling tenant.",
+				"tags": [
+					"Datasets"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The stored app dataset id (entity primary key).",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "dataspace-app-dataset-1"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "API response for a single stored app dataset record.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DataspaceAppDataset"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"operationId": "datasetUpdate",
+				"summary": "Update an app dataset owned by the calling tenant.",
+				"tags": [
+					"Datasets"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The stored app dataset id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "dataspace-app-dataset-1"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "API request to update an existing app dataset record.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AppDatasetUpdateRequest"
+							},
+							"examples": {
+								"datasetUpdateRequestExample": {
+									"value": {
+										"appId": "https://twin.example.org/app1",
+										"dataset": {
+											"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+											"@type": "Dataset",
+											"hasPolicy": [],
+											"distribution": []
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "datasetDelete",
+				"summary": "Delete an app dataset owned by the calling tenant.",
+				"tags": [
+					"Datasets"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The stored dataset id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "dataspace-app-dataset-1"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/rights-management/policy/admin": {
 			"post": {
 				"operationId": "papCreate",
@@ -19544,6 +20186,65 @@
 					}
 				}
 			},
+			"AppDatasetCreateRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Optional explicit id for the stored dataset record. If omitted, the\nControl Plane derives the id from `dataset[\"@id\"]` if present, or\ngenerates a UUID otherwise. The resolved id is returned via the\n`Location` response header."
+					},
+					"appId": {
+						"type": "string",
+						"description": "The dataspace app this dataset belongs to. Matches the app's\nregistered name in `DataspaceAppFactory` (typically the app's URI)."
+					},
+					"dataset": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+					}
+				},
+				"required": [
+					"appId",
+					"dataset"
+				],
+				"description": "The body of the request."
+			},
+			"AppDatasetCreateResponse": {},
+			"AppDatasetListResponse": {
+				"type": "object",
+				"properties": {
+					"entities": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/DataspaceAppDataset"
+						},
+						"description": "The stored datasets."
+					},
+					"cursor": {
+						"type": "string",
+						"description": "Cursor to fetch the next page if more entries exist."
+					}
+				},
+				"required": [
+					"entities"
+				],
+				"description": "The body of the response."
+			},
+			"AppDatasetUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"appId": {
+						"type": "string",
+						"description": "The dataspace app this dataset belongs to. May change appId on\nupdate if the tenant wants to retarget the dataset."
+					},
+					"dataset": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+					}
+				},
+				"required": [
+					"appId",
+					"dataset"
+				],
+				"description": "The body of the request."
+			},
 			"AttestationCreateRequest": {
 				"type": "object",
 				"properties": {
@@ -20303,6 +21004,38 @@
 				],
 				"description": "The data to be used in the store."
 			},
+			"DataspaceAppDataset": {
+				"description": "Stored dataset record returned by the Control Plane's dataset CRUD surface.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The stored dataset id (matches the dataset's JSON-LD `@id`)."
+					},
+					"appId": {
+						"type": "string",
+						"description": "The dataspace app this dataset belongs to."
+					},
+					"dataset": {
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "Creation timestamp (ISO string)."
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "Last-modified timestamp (ISO string)."
+					}
+				},
+				"required": [
+					"id",
+					"appId",
+					"dataset",
+					"dateCreated",
+					"dateModified"
+				]
+			},
 			"DocumentManagementCreateRequest": {
 				"type": "object",
 				"properties": {
@@ -20483,33 +21216,36 @@
 				"description": "Provides health information for a component.",
 				"type": "object",
 				"properties": {
-					"name": {
+					"source": {
 						"type": "string",
-						"description": "The name of the component."
+						"description": "The source of the health information."
 					},
 					"description": {
 						"type": "string",
 						"description": "The description of the component as an i18n key."
 					},
-					"isChild": {
-						"type": "boolean",
-						"description": "Whether this entry is a child of another entry, the parent entry will report the overall status of the component."
-					},
 					"status": {
 						"$ref": "#/components/schemas/HealthStatus"
 					},
-					"details": {
+					"message": {
 						"type": "string",
-						"description": "The details for the status if there are further details to provide as an i18n key."
+						"description": "The message for the status if there are further details to provide as an i18n key."
 					},
-					"properties": {
+					"data": {
 						"type": "object",
 						"additionalProperties": {},
-						"description": "Properties to substitute in the i18n key for the details."
+						"description": "Data to substitute in the i18n key for the message."
+					},
+					"grouped": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Health"
+						},
+						"description": "The grouped child components, if any."
 					}
 				},
 				"required": [
-					"name",
+					"source",
 					"status"
 				]
 			},
@@ -22186,6 +22922,10 @@
 					"unit": {
 						"type": "string",
 						"description": "The unit the metric describes."
+					},
+					"maxHistory": {
+						"type": "number",
+						"description": "The maximum number of values to retain; oldest are trimmed on each addMetricValue call.\nUnlimited when absent."
 					}
 				},
 				"required": [

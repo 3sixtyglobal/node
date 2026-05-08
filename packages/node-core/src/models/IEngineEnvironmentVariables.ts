@@ -606,11 +606,6 @@ export interface IEngineEnvironmentVariables {
 	synchronisedStorageMaxConsolidations?: string;
 
 	/**
-	 * Is the federated catalogue enabled, defaults to false.
-	 */
-	federatedCatalogueEnabled?: string;
-
-	/**
 	 * Federated catalog filters, command separated list of filters to add.
 	 */
 	federatedCatalogueFilters?: string;
@@ -690,16 +685,6 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementPolicyObligationEnforcers?: string;
 
 	/**
-	 * Are background tasks enabled, defaults to false.
-	 */
-	backgroundTasksEnabled?: string;
-
-	/**
-	 * Is the task scheduler enabled, defaults to false.
-	 */
-	taskSchedulerEnabled?: string;
-
-	/**
 	 * Is the dataspace enabled, defaults to false.
 	 */
 	dataspaceEnabled?: string;
@@ -725,19 +710,14 @@ export interface IEngineEnvironmentVariables {
 	dataspaceDataPlanePath?: string;
 
 	/**
-	 * Are the automation components enabled, defaults to false.
-	 */
-	automationEnabled?: string;
-
-	/**
 	 * Are the health components enabled, defaults to false.
 	 */
 	healthEnabled?: string;
 
 	/**
-	 * Is the url transformer enabled, defaults to false.
+	 * The interval in seconds for performing health checks, defaults to 60.
 	 */
-	urlTransformerEnabled?: string;
+	healthIntervalSeconds?: string;
 
 	/**
 	 * The id of the key in the vault to use for encrypting parameters in url transformer.
