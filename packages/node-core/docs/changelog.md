@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.3-next.35](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.34...node-core-v0.0.3-next.35) (2026-05-08)
+
+
+### Features
+
+* env var simplification ([460b0f2](https://github.com/iotaledger/twin-node/commit/460b0f20a73cb482f7443af502f261d5f9d01759))
+* multi-tenant env wiring, trust auto-enable, tenant-token vault key, engine-driven callbackPath ([#128](https://github.com/iotaledger/twin-node/issues/128)) ([0de4d35](https://github.com/iotaledger/twin-node/commit/0de4d356fb2f825afae5469005d475700f510ee4))
+
 ## [0.0.3-next.34](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.33...node-core-v0.0.3-next.34) (2026-05-05)
 
 
