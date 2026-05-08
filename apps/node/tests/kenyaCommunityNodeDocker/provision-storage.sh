@@ -187,7 +187,7 @@ ok "Offer ${KRA_OFFER_ID} seeded in KRA's PAP (HTTP ${PAP_STATUS})"
 # -----------------------------------------------------------------------------
 # Step 5b: Register a dataset under KRA's tenant context.
 #
-# The Control Plane's POST /dataspace/datasets route persists the dataset
+# The Control Plane's POST /dataspace/app-datasets route persists the dataset
 # record AND inline-publishes it via fedcat.set() wrapped in
 # ContextIdStore.run({Tenant: KRA}). fedcat then captures tenantId = KRA on
 # the Dataset entity and the URL transformer bakes the correct KRA-tenant
@@ -232,7 +232,7 @@ DATASET_BODY=$(jq -n \
         }
     }')
 
-DATASET_RESP=$(curl -sS -i -X POST "${HOST}/dataspace/datasets" \
+DATASET_RESP=$(curl -sS -i -X POST "${HOST}/dataspace/app-datasets" \
     -H "Content-Type: application/json" \
     -H "x-api-key: ${TENANT_KRA_API_KEY}" \
     -H "Authorization: Bearer ${KRA_SESSION_JWT}" \

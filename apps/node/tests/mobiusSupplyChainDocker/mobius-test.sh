@@ -691,7 +691,7 @@ PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (4 nodes)")
 # Mobius runs single-tenant per node so no `Tenant` context override
 # happens — the published Dataset has no `tenantId` and URL-baking is skipped,
 # which matches Mobius's pre-change behaviour.
-step "Registering Mobius Consignment dataset via /dataspace/datasets..."
+step "Registering Mobius Consignment dataset via /dataspace/app-datasets..."
 DATASET_BODY=$(jq -n \
     --arg dsId "${DATASET_ID}" \
     --arg appId "https://twin.example.org/app1" \
@@ -720,7 +720,7 @@ DATASET_BODY=$(jq -n \
     }')
 
 DATASET_HTTP=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
-    "${MOBIUS_HOST}/dataspace/datasets" \
+    "${MOBIUS_HOST}/dataspace/app-datasets" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${MOBIUS_TOKEN}" \
     -d "${DATASET_BODY}")
