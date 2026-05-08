@@ -154,10 +154,16 @@ export async function buildEngineServerConfiguration(
 		});
 
 		serverConfig.types.restRouteProcessor.push({
-			type: RestRouteProcessorType.Tenant
+			type: RestRouteProcessorType.Tenant,
+			options: {
+				config: {}
+			}
 		});
 		serverConfig.types.socketRouteProcessor.push({
-			type: SocketRouteProcessorType.Tenant
+			type: SocketRouteProcessorType.Tenant,
+			options: {
+				config: {}
+			}
 		});
 	}
 
@@ -292,4 +298,17 @@ export async function buildEngineServerConfiguration(
 	}
 
 	return serverConfig;
+}
+
+/**
+ * Checks if the authentication entity storage subsystem is required.
+ * Returns true when any component that depends on the authentication entity storage subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if authentication entity storage is enabled.
+ */
+export function isAuthEntityStorageRequired(envVars: IEngineServerEnvironmentVariables): boolean {
+	return (
+		envVars.authAdminProcessorType === AuthenticationAdminComponentType.EntityStorage ||
+		envVars.authProcessorType === AuthenticationComponentType.EntityStorage
+	);
 }

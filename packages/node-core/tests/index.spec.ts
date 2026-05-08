@@ -112,11 +112,7 @@ describe("node-core", () => {
 				TWIN_AUDITABLE_ITEM_STREAM_ENABLED: "true",
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
-				TWIN_TASK_SCHEDULER_ENABLED: "true",
-				TWIN_BACKGROUND_TASKS_ENABLED: "true",
-				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
-				TWIN_AUTOMATION_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true"
 			}
@@ -162,11 +158,8 @@ describe("node-core", () => {
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
-				TWIN_TASK_SCHEDULER_ENABLED: "true",
-				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
-				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
@@ -174,14 +167,11 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATASPACE_ENABLED: "true",
-				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
-				TWIN_AUTOMATION_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true"
 			}
@@ -229,11 +219,8 @@ describe("node-core", () => {
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
-				TWIN_TASK_SCHEDULER_ENABLED: "true",
-				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
-				TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
@@ -241,14 +228,11 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 				TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 				TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 				TWIN_DATASPACE_ENABLED: "true",
-				TWIN_VC_AUTHENTICATION_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
-				TWIN_AUTOMATION_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true"
 			}
@@ -342,11 +326,8 @@ describe("node-core", () => {
 			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
-			TWIN_TASK_SCHEDULER_ENABLED: "true",
-			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
-			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
@@ -354,14 +335,11 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
 			TWIN_SYNCHRONISED_STORAGE_ENABLED: "true",
 			TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID: "test-key",
 			TWIN_DATASPACE_ENABLED: "true",
-			TWIN_VC_AUTHENTICATION_ENABLED: "true",
 			TWIN_MESSAGING_ENABLED: "true",
-			TWIN_AUTOMATION_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true",
 			TWIN_EXTENSIONS: "./tests/apps/testApp.js"
@@ -499,6 +477,7 @@ describe("node-core", () => {
 			"GET      /blob/:id/content",
 			"PUT      /blob/:id",
 			"DELETE   /blob/:id",
+			"DELETE   /blob",
 			"GET      /blob",
 			"POST     /identity",
 			"DELETE   /identity/:identity",
@@ -610,6 +589,11 @@ describe("node-core", () => {
 			"POST     /dataspace/transfers/:pid/complete",
 			"POST     /dataspace/transfers/:pid/suspend",
 			"POST     /dataspace/transfers/:pid/terminate",
+			"POST     /dataspace/app-datasets",
+			"GET      /dataspace/app-datasets",
+			"GET      /dataspace/app-datasets/:id",
+			"PUT      /dataspace/app-datasets/:id",
+			"DELETE   /dataspace/app-datasets/:id",
 			"POST     /dataspace/notify",
 			"GET      /dataspace/activity-logs/:id",
 			"GET      /dataspace/entities",
@@ -676,11 +660,8 @@ describe("node-core", () => {
 			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
-			TWIN_TASK_SCHEDULER_ENABLED: "true",
-			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
-			TWIN_RIGHTS_MANAGEMENT_ENABLED: "true",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
@@ -688,8 +669,6 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-			TWIN_VC_AUTHENTICATION_ENABLED: "true",
-			TWIN_AUTOMATION_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true"
 		};
@@ -749,8 +728,7 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_TASK_SCHEDULER_ENABLED: "false"
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -829,8 +807,7 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_TASK_SCHEDULER_ENABLED: "false"
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 		};
 
 		await initialiseLocales("./dist/locales/");

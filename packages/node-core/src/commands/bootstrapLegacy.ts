@@ -162,7 +162,7 @@ export async function bootstrapLegacy(
 			overwriteMode: "skip"
 		});
 
-		if (isTrustRequired(envVars) ?? false) {
+		if (isTrustRequired(envVars)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
 				I18n.formatMessage(
@@ -217,28 +217,30 @@ export async function bootstrapLegacy(
 		});
 
 		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
-		if (tenantEnabled && Is.empty(tenantId)) {
-			await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
-				CLIDisplay.break();
-				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
-				);
-				const tenantDetails = await tenantCreate(engineCore, envVars, {
-					tenantId: envVars.tenantId,
-					apiKey: envVars.tenantApiKey,
-					label: "Node"
-				});
+		if (tenantEnabled) {
+			if (Is.empty(tenantId)) {
+				await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
+					CLIDisplay.break();
+					CLIDisplay.section(
+						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
+					);
+					const tenantDetails = await tenantCreate(engineCore, envVars, {
+						tenantId: envVars.tenantId,
+						apiKey: envVars.tenantApiKey,
+						label: "Node"
+					});
 
-				CLIDisplay.break();
-				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantSet")
-				);
-				await nodeSetTenant(engineCore, envVars, {
-					tenantId: tenantDetails.tenantId
-				});
+					CLIDisplay.break();
+					CLIDisplay.section(
+						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantSet")
+					);
+					await nodeSetTenant(engineCore, envVars, {
+						tenantId: tenantDetails.tenantId
+					});
 
-				tenantId = tenantDetails.tenantId;
-			});
+					tenantId = tenantDetails.tenantId;
+				});
+			}
 		}
 	}
 

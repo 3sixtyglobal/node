@@ -606,11 +606,6 @@ export interface IEngineEnvironmentVariables {
 	synchronisedStorageMaxConsolidations?: string;
 
 	/**
-	 * Is the federated catalogue enabled, defaults to false.
-	 */
-	federatedCatalogueEnabled?: string;
-
-	/**
 	 * Federated catalog filters, command separated list of filters to add.
 	 */
 	federatedCatalogueFilters?: string;
@@ -638,12 +633,14 @@ export interface IEngineEnvironmentVariables {
 	trustJwtTtlSeconds?: string;
 
 	/**
-	 * Is the rights management enabled, defaults to false.
-	 */
-	rightsManagementEnabled?: string;
-
-	/**
-	 * What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
+	 * Path under which the rights management service is mounted (single source
+	 * of truth). The same value drives:
+	 * - the server route mount (via engine config)
+	 * - the PNP service's callback URL builder (`buildCallbackUrl`)
+	 * - the PNP rest-client's pathPrefix (consumer side)
+	 * Defaults to `rights-management`. Set when deploying behind a reverse proxy
+	 * with path rewriting, K8s ingress with path-based routing, or any custom
+	 * mount point.
 	 */
 	rightsManagementCallbackPath?: string;
 
@@ -683,16 +680,6 @@ export interface IEngineEnvironmentVariables {
 	rightsManagementPolicyObligationEnforcers?: string;
 
 	/**
-	 * Are background tasks enabled, defaults to false.
-	 */
-	backgroundTasksEnabled?: string;
-
-	/**
-	 * Is the task scheduler enabled, defaults to false.
-	 */
-	taskSchedulerEnabled?: string;
-
-	/**
 	 * Is the dataspace enabled, defaults to false.
 	 */
 	dataspaceEnabled?: string;
@@ -716,11 +703,6 @@ export interface IEngineEnvironmentVariables {
 	 * Example: "dataspace/entities"
 	 */
 	dataspaceDataPlanePath?: string;
-
-	/**
-	 * Are the automation components enabled, defaults to false.
-	 */
-	automationEnabled?: string;
 
 	/**
 	 * Are the health components enabled, defaults to false.

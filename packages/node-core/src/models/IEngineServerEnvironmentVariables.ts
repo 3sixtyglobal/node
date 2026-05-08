@@ -57,6 +57,11 @@ export interface IEngineServerEnvironmentVariables extends IEngineEnvironmentVar
 	authSigningKeyId?: string;
 
 	/**
+	 * The id of the key in the vault to use for encrypting hosting parameters in auth operations.
+	 */
+	hostingParamEncryptionKeyId?: string;
+
+	/**
 	 * Additional MIME type processors to include, comma separated.
 	 */
 	mimeTypeProcessors?: string;

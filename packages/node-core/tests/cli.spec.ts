@@ -62,7 +62,6 @@ async function executeCliCommand(
 				TWIN_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
 				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
-				TWIN_TASK_SCHEDULER_ENABLED: "true",
 				...additionalEnvVars
 			}
 		},

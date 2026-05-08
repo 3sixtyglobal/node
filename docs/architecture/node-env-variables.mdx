@@ -34,15 +34,15 @@ When you change the prefix, all variables in this document use your custom prefi
 
 ## Server Variables
 
-| Variable                                  | Possible Values                 | Default                            | Notes                                                         |
-| ----------------------------------------- | ------------------------------- | ---------------------------------- | ------------------------------------------------------------- |
-| `TWIN_PORT`                               | Integer                         | `3000` (web server fallback)       | API server port.                                              |
-| `TWIN_HOST`                               | Host name or IP                 | `localhost` (web server fallback)  | API server host.                                              |
-| `TWIN_PUBLIC_ORIGIN`                      | URL                             | None                               | Public API origin, for example `https://api.example.com:443`. |
-| `TWIN_CORS_ORIGINS`                       | Comma-separated origins         | `*` (if not set by runtime config) | CORS allow list.                                              |
-| `TWIN_HTTP_METHODS`                       | Comma-separated HTTP methods    | `GET,POST,PUT,DELETE,OPTIONS`      | CORS methods.                                                 |
-| `TWIN_HTTP_ALLOWED_HEADERS`               | Comma-separated headers         | Runtime dependent                  | CORS allowed headers.                                         |
-| `TWIN_HTTP_EXPOSED_HEADERS`               | Comma-separated headers         | Runtime dependent                  | CORS exposed headers.                                         |
+| Variable                    | Possible Values              | Default                            | Notes                                                         |
+| --------------------------- | ---------------------------- | ---------------------------------- | ------------------------------------------------------------- |
+| `TWIN_PORT`                 | Integer                      | `3000` (web server fallback)       | API server port.                                              |
+| `TWIN_HOST`                 | Host name or IP              | `localhost` (web server fallback)  | API server host.                                              |
+| `TWIN_PUBLIC_ORIGIN`        | URL                          | None                               | Public API origin, for example `https://api.example.com:443`. |
+| `TWIN_CORS_ORIGINS`         | Comma-separated origins      | `*` (if not set by runtime config) | CORS allow list.                                              |
+| `TWIN_HTTP_METHODS`         | Comma-separated HTTP methods | `GET,POST,PUT,DELETE,OPTIONS`      | CORS methods.                                                 |
+| `TWIN_HTTP_ALLOWED_HEADERS` | Comma-separated headers      | Runtime dependent                  | CORS allowed headers.                                         |
+| `TWIN_HTTP_EXPOSED_HEADERS` | Comma-separated headers      | Runtime dependent                  | CORS exposed headers.                                         |
 
 ## Connector and Component Selection Variables
 
@@ -91,8 +91,6 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_ATTESTATION_VERIFICATION_METHOD_ID`                  | Method id string      | `attestation-assertion`                | Default injected by node defaults.                      |
 | `TWIN_AUDITABLE_ITEM_GRAPH_ENABLED`                        | `true`, `false`       | `false`                                | Enables auditable item graph.                           |
 | `TWIN_AUDITABLE_ITEM_STREAM_ENABLED`                       | `true`, `false`       | `false`                                | Enables auditable item stream.                          |
-| `TWIN_AUTOMATION_ENABLED`                                  | `true`, `false`       | `false`                                | Enables automation components.                          |
-| `TWIN_BACKGROUND_TASKS_ENABLED`                            | `true`, `false`       | `false`                                | Enables background tasks.                               |
 | `TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION`                      | `true`, `false`       | `false`                                | Enables blob encryption in blob storage component flow. |
 | `TWIN_DATA_PROCESSING_ENABLED`                             | `true`, `false`       | `false`                                | Enables data processing.                                |
 | `TWIN_DATASPACE_ACTIVITY_LOGS_CLEAN_UP_INTERVAL`           | Integer minutes       | `60`                                   | Dataspace clean-up interval.                            |
@@ -100,14 +98,12 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_DATASPACE_ENABLED`                                   | `true`, `false`       | `false`                                | Enables dataspace features.                             |
 | `TWIN_DATASPACE_RETAIN_ACTIVITY_LOGS_FOR`                  | Integer minutes, `-1` | `10`                                   | Dataspace activity retention period.                    |
 | `TWIN_DOCUMENT_MANAGEMENT_ENABLED`                         | `true`, `false`       | `false`                                | Enables document management.                            |
-| `TWIN_FEDERATED_CATALOGUE_ENABLED`                         | `true`, `false`       | `false`                                | Enables federated catalogue.                            |
 | `TWIN_HEALTH_ENABLED`                                      | `true`, `false`       | `false`                                | Enables health components.                              |
 | `TWIN_HEALTH_INTERVAL_SECONDS`                             | Integer seconds       | `60`                                   | Interval between health checks.                         |
 | `TWIN_IDENTITY_WALLET_ADDRESS_INDEX`                       | Integer               | `0`                                    | Wallet address index used by identity workflows.        |
 | `TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`              | Method id string      | `immutable-proof-assertion`            | Default injected by node defaults.                      |
 | `TWIN_MESSAGING_ENABLED`                                   | `true`, `false`       | `false`                                | Enables messaging components.                           |
 | `TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH`                     | Path                  | None                                   | Callback path used by rights management.                |
-| `TWIN_RIGHTS_MANAGEMENT_ENABLED`                           | `true`, `false`       | `false`                                | Enables rights management.                              |
 | `TWIN_SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID` | Vault key identifier  | `synchronised-storage-blob-encryption` | Encryption key id for synchronised blobs.               |
 | `TWIN_SYNCHRONISED_STORAGE_BLOB_STORAGE_KEY`               | Base64 key value      | None                                   | Symmetric key used for synchronised blob encryption.    |
 | `TWIN_SYNCHRONISED_STORAGE_CONSOLIDATION_BATCH_SIZE`       | Integer               | `1000`                                 | Trusted-node consolidation batch size.                  |
@@ -117,22 +113,21 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_SYNCHRONISED_STORAGE_MAX_CONSOLIDATIONS`             | Integer               | `5`                                    | Number of consolidations retained.                      |
 | `TWIN_SYNCHRONISED_STORAGE_TRUSTED_URL`                    | URL                   | None                                   | Trusted synchronised storage node URL.                  |
 | `TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID`      | String                | None                                   | Key id for synchronised verifiable storage pointers.    |
-| `TWIN_TASK_SCHEDULER_ENABLED`                              | `true`, `false`       | `false`                                | Enables task scheduler.                                 |
 | `TWIN_TRUST_JWT_TTL_SECONDS`                               | Integer seconds       | None                                   | Leave unset for non-expiring JWT generation.            |
 | `TWIN_TRUST_VERIFICATION_METHOD_ID`                        | Method id string      | `trust-assertion`                      | Default injected by node defaults.                      |
 
 ## Hosting Variables
 
-| Variable                                  | Possible Values                 | Default                            | Notes                                                         |
-| ----------------------------------------- | ------------------------------- | ---------------------------------- | ------------------------------------------------------------- |
-| `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None                               | Authentication admin processor type.                          |
-| `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None                               | Authentication processor type.                                |
-| `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`                     | Key used for auth signing operations.                         |
-| `TWIN_URL_TRANSFORMER_ENCRYPTION_KEY_ID`  | Vault key identifier            | `param-encryption`                 | Key used for encrypting parameters in URL transformer.        |
-| `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None                               | Additional MIME processor registrations.                      |
-| `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value                   | Includes body in route logging.                               |
-| `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`                            | Includes full base64 payloads in route logging.               |
-| `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None                               | Properties to obfuscate in route logs.                        |
+| Variable                                  | Possible Values                 | Default            | Notes                                                  |
+| ----------------------------------------- | ------------------------------- | ------------------ | ------------------------------------------------------ |
+| `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None               | Authentication admin processor type.                   |
+| `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None               | Authentication processor type.                         |
+| `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`     | Key used for auth signing operations.                  |
+| `TWIN_URL_TRANSFORMER_ENCRYPTION_KEY_ID`  | Vault key identifier            | `param-encryption` | Key used for encrypting parameters in URL transformer. |
+| `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None               | Additional MIME processor registrations.               |
+| `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value   | Includes body in route logging.                        |
+| `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`            | Includes full base64 payloads in route logging.        |
+| `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None               | Properties to obfuscate in route logs.                 |
 
 ## Extension Module Loading Variables
 

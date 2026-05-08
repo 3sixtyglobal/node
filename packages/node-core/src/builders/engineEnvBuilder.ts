@@ -80,6 +80,7 @@ import {
 	WalletConnectorType
 } from "@twin.org/engine-types";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
 /**
@@ -127,6 +128,7 @@ export async function buildEngineConfiguration(
 	await configureNft(coreConfig, envVars);
 	await configureNotarization(coreConfig, envVars);
 	await configureVerifiableStorage(coreConfig, envVars);
+	await configureImmutableProof(coreConfig, envVars);
 	await configureIdentity(coreConfig, envVars);
 	await configureIdentityResolver(coreConfig, envVars);
 	await configureIdentityProfile(coreConfig, envVars);
@@ -534,7 +536,7 @@ async function configureBackgroundTask(
 ): Promise<void> {
 	coreConfig.types.backgroundTaskComponent ??= [];
 
-	if (Coerce.boolean(envVars.backgroundTasksEnabled) ?? false) {
+	if (isBackgroundTasksRequired(envVars)) {
 		coreConfig.types.backgroundTaskComponent.push({
 			type: BackgroundTaskComponentType.Service
 		});
@@ -598,7 +600,7 @@ async function configureAutomation(
 ): Promise<void> {
 	coreConfig.types.automationComponent ??= [];
 
-	if (Coerce.boolean(envVars.automationEnabled) ?? false) {
+	if (isAutomationRequired(envVars)) {
 		coreConfig.types.automationComponent.push({
 			type: AutomationComponentType.Service
 		});
@@ -966,7 +968,19 @@ async function configureVerifiableStorage(
 		coreConfig.types.verifiableStorageComponent.push({
 			type: VerifiableStorageComponentType.Service
 		});
+	}
+}
 
+/**
+ * Configures the immutable proof.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureImmutableProof(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	if (isImmutableProofRequired(envVars)) {
 		coreConfig.types.immutableProofComponent ??= [];
 		coreConfig.types.immutableProofComponent.push({
 			type: ImmutableProofComponentType.Service,
@@ -1247,7 +1261,7 @@ async function configureRightsManagement(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.rightsManagementEnabled) ?? false) {
+	if (isRightsManagementRequired(envVars)) {
 		coreConfig.types.rightsManagementPapComponent ??= [];
 		coreConfig.types.rightsManagementPapComponent.push({
 			type: RightsManagementPapComponentType.Service
@@ -1280,6 +1294,9 @@ async function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPnpComponent ??= [];
 
+		// Single source of truth for the rights-management mount path.
+		const rightsManagementPath = envVars.rightsManagementCallbackPath ?? "rights-management";
+
 		// We add a multi instance REST client for the remote negotiations
 		// use a dummy endpoint for now as the actual endpoint will be provided in the config
 		// of the policy negotiator when it is used for remote negotiations
@@ -1288,7 +1305,8 @@ async function configureRightsManagement(
 		coreConfig.types.rightsManagementPnpComponent.push({
 			type: RightsManagementPnpComponentType.RestClient,
 			options: {
-				endpoint: "http://localhost"
+				endpoint: "http://localhost",
+				pathPrefix: rightsManagementPath
 			},
 			isMultiInstance: true,
 			features: ["remote"]
@@ -1297,7 +1315,7 @@ async function configureRightsManagement(
 			type: RightsManagementPnpComponentType.Service,
 			options: {
 				config: {
-					callbackPath: envVars.rightsManagementCallbackPath ?? "",
+					callbackPath: rightsManagementPath,
 					includeErrorDetails: coreConfig.debug ?? false
 				}
 			},
@@ -1388,7 +1406,7 @@ async function configureTaskScheduler(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.taskSchedulerEnabled) ?? false) {
+	if (isTaskSchedulerRequired(envVars)) {
 		coreConfig.types.taskSchedulerComponent ??= [];
 		coreConfig.types.taskSchedulerComponent.push({
 			type: TaskSchedulerComponentType.Service
@@ -1459,7 +1477,7 @@ async function configureFederatedCatalogue(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) {
+	if (isFederatedCatalogueRequired(envVars)) {
 		// If synchronised storage is enabled, then we need to add an entity storage connector
 		// using synchronised storage for the federated catalogue component
 		// as it relies on the synchronised storage to sync the data between the different instances of the federated catalogue
@@ -1599,8 +1617,7 @@ function commaSeparatedListToArray<T>(value: string | undefined): T[] {
  */
 export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		(Coerce.boolean(envVars.rightsManagementEnabled) ?? false) ||
-		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) ||
+		isRightsManagementRequired(envVars) ||
 		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
 		(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false)
 	);
@@ -1614,9 +1631,77 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
  */
 export function isUrlTransformerRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		(Coerce.boolean(envVars.rightsManagementEnabled) ?? false) ||
-		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) ||
+		isRightsManagementRequired(envVars) ||
 		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
-		(Coerce.boolean(envVars.tenantEnabled) ?? false)
+		(Coerce.boolean(envVars.tenantEnabled) ?? false) ||
+		isFederatedCatalogueRequired(envVars)
 	);
+}
+
+/**
+ * Checks if the background tasks subsystem is required.
+ * Returns true when any component that depends on the background tasks subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if dataspace or verifiable storage is enabled.
+ */
+export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (Coerce.boolean(envVars.dataspaceEnabled) ?? false) || isImmutableProofRequired(envVars);
+}
+
+/**
+ * Checks if the immutable proof subsystem is required.
+ * Returns true when any component that depends on the immutable proof subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if verifiable storage is enabled.
+ */
+export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		envVars.verifiableStorageConnector === VerifiableStorageConnectorType.EntityStorage ||
+		envVars.verifiableStorageConnector === VerifiableStorageConnectorType.Iota
+	);
+}
+
+/**
+ * Checks if the immutable proof subsystem is required.
+ * Returns true when any component that depends on the immutable proof subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if verifiable storage is enabled.
+ */
+export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return Coerce.boolean(envVars.dataspaceEnabled) ?? false;
+}
+
+/**
+ * Checks if the rights management subsystem is required.
+ * Returns true when any component that depends on the rights management subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if rights management is enabled.
+ */
+export function isRightsManagementRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return Coerce.boolean(envVars.dataspaceEnabled) ?? false;
+}
+
+/**
+ * Checks if the task scheduler subsystem is required.
+ * Returns true when any component that depends on the task scheduler subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if task scheduler is enabled.
+ */
+export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
+		(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) ||
+		isRightsManagementRequired(envVars) ||
+		isAuthEntityStorageRequired(envVars)
+	);
+}
+
+/**
+ * Checks if the automation subsystem is required.
+ * Returns true when any component that depends on the automation subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if automation is enabled.
+ */
+export function isAutomationRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return isRightsManagementRequired(envVars);
 }
