@@ -1458,18 +1458,6 @@ The maximum number of consolidations to keep in storage, only used if this is a 
 
 ***
 
-### federatedCatalogueEnabled? {#federatedcatalogueenabled}
-
-> `optional` **federatedCatalogueEnabled?**: `string`
-
-Is the federated catalogue enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`federatedCatalogueEnabled`](IEngineEnvironmentVariables.md#federatedcatalogueenabled)
-
-***
-
 ### federatedCatalogueFilters? {#federatedcataloguefilters}
 
 > `optional` **federatedCatalogueFilters?**: `string`
@@ -1479,18 +1467,6 @@ Federated catalog filters, command separated list of filters to add.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`federatedCatalogueFilters`](IEngineEnvironmentVariables.md#federatedcataloguefilters)
-
-***
-
-### trustEnabled? {#trustenabled}
-
-> `optional` **trustEnabled?**: `string`
-
-Is the trust management enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`trustEnabled`](IEngineEnvironmentVariables.md#trustenabled)
 
 ***
 
@@ -1544,23 +1520,18 @@ Defaults to undefined for never expiring.
 
 ***
 
-### rightsManagementEnabled? {#rightsmanagementenabled}
-
-> `optional` **rightsManagementEnabled?**: `string`
-
-Is the rights management enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementEnabled`](IEngineEnvironmentVariables.md#rightsmanagementenabled)
-
-***
-
 ### rightsManagementCallbackPath? {#rightsmanagementcallbackpath}
 
 > `optional` **rightsManagementCallbackPath?**: `string`
 
-What is the callback path for rights management negotiations, will be combined with hosting public url e.g. /callback.
+Path under which the rights management service is mounted (single source
+of truth). The same value drives:
+- the server route mount (via engine config)
+- the PNP service's callback URL builder (`buildCallbackUrl`)
+- the PNP rest-client's pathPrefix (consumer side)
+Defaults to `rights-management`. Set when deploying behind a reverse proxy
+with path rewriting, K8s ingress with path-based routing, or any custom
+mount point.
 
 #### Inherited from
 
@@ -1652,30 +1623,6 @@ The rights management policy obligation enforcers to add to the factory.
 
 ***
 
-### backgroundTasksEnabled? {#backgroundtasksenabled}
-
-> `optional` **backgroundTasksEnabled?**: `string`
-
-Are background tasks enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`backgroundTasksEnabled`](IEngineEnvironmentVariables.md#backgroundtasksenabled)
-
-***
-
-### taskSchedulerEnabled? {#taskschedulerenabled}
-
-> `optional` **taskSchedulerEnabled?**: `string`
-
-Is the task scheduler enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`taskSchedulerEnabled`](IEngineEnvironmentVariables.md#taskschedulerenabled)
-
-***
-
 ### dataspaceEnabled? {#dataspaceenabled}
 
 > `optional` **dataspaceEnabled?**: `string`
@@ -1739,18 +1686,6 @@ Example: "dataspace/entities"
 
 ***
 
-### automationEnabled? {#automationenabled}
-
-> `optional` **automationEnabled?**: `string`
-
-Are the automation components enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`automationEnabled`](IEngineEnvironmentVariables.md#automationenabled)
-
-***
-
 ### healthEnabled? {#healthenabled}
 
 > `optional` **healthEnabled?**: `string`
@@ -1763,15 +1698,15 @@ Are the health components enabled, defaults to false.
 
 ***
 
-### urlTransformerEnabled? {#urltransformerenabled}
+### healthIntervalSeconds? {#healthintervalseconds}
 
-> `optional` **urlTransformerEnabled?**: `string`
+> `optional` **healthIntervalSeconds?**: `string`
 
-Is the url transformer enabled, defaults to false.
+The interval in seconds for performing health checks, defaults to 60.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`urlTransformerEnabled`](IEngineEnvironmentVariables.md#urltransformerenabled)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthIntervalSeconds`](IEngineEnvironmentVariables.md#healthintervalseconds)
 
 ***
 
@@ -1889,6 +1824,14 @@ The type of auth processor to use on the API: entity-storage.
 > `optional` **authSigningKeyId?**: `string`
 
 The id of the key in the vault to use for signing in auth operations.
+
+***
+
+### hostingParamEncryptionKeyId? {#hostingparamencryptionkeyid}
+
+> `optional` **hostingParamEncryptionKeyId?**: `string`
+
+The id of the key in the vault to use for encrypting hosting parameters in auth operations.
 
 ***
 

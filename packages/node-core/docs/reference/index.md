@@ -41,7 +41,16 @@
 ## Functions
 
 - [buildEngineConfiguration](functions/buildEngineConfiguration.md)
+- [isTrustRequired](functions/isTrustRequired.md)
+- [isUrlTransformerRequired](functions/isUrlTransformerRequired.md)
+- [isBackgroundTasksRequired](functions/isBackgroundTasksRequired.md)
+- [isImmutableProofRequired](functions/isImmutableProofRequired.md)
+- [isFederatedCatalogueRequired](functions/isFederatedCatalogueRequired.md)
+- [isRightsManagementRequired](functions/isRightsManagementRequired.md)
+- [isTaskSchedulerRequired](functions/isTaskSchedulerRequired.md)
+- [isAutomationRequired](functions/isAutomationRequired.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
+- [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)
 - [extensionsInitialiseEngine](functions/extensionsInitialiseEngine.md)
 - [extensionsInitialiseEngineServer](functions/extensionsInitialiseEngineServer.md)
