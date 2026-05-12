@@ -423,6 +423,26 @@ export interface IEngineEnvironmentVariables {
 	telemetryConnector?: string;
 
 	/**
+	 * The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+	 */
+	openTelemetryMeterName?: string;
+
+	/**
+	 * The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+	 */
+	openTelemetryMeterVersion?: string;
+
+	/**
+	 * The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+	 */
+	openTelemetryReader?: string;
+
+	/**
+	 * The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+	 */
+	openTelemetryPrometheusPort?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;

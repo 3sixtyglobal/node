@@ -79,6 +79,10 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
+import {
+	type IOpenTelemetryTelemetryConnectorConfig,
+	OpenTelemetryReaderTypes
+} from "@twin.org/telemetry-connector-opentelemetry";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
@@ -580,6 +584,26 @@ async function configureTelemetry(
 	if (envVars.telemetryConnector === TelemetryConnectorType.EntityStorage) {
 		coreConfig.types.telemetryConnector.push({
 			type: TelemetryConnectorType.EntityStorage
+		});
+	} else if (envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
+		let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
+		if (envVars.openTelemetryReader === "prometheus") {
+			readers = {
+				prometheus: {
+					type: OpenTelemetryReaderTypes.Prometheus,
+					port: Coerce.integer(envVars.openTelemetryPrometheusPort)
+				}
+			};
+		}
+		coreConfig.types.telemetryConnector.push({
+			type: TelemetryConnectorType.OpenTelemetry,
+			options: {
+				config: {
+					meterName: envVars.openTelemetryMeterName,
+					meterVersion: envVars.openTelemetryMeterVersion,
+					readers
+				}
+			}
 		});
 	}
 

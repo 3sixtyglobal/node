@@ -258,7 +258,7 @@ async function mnemonicCreate(
 		throw new GeneralError("identityCreate", "invalidMnemonic");
 	}
 	let mnemonic = providedMnemonic;
-	let storeMnemonic = false;
+	let storeMnemonic;
 
 	CLIDisplay.section(
 		I18n.formatMessage("node.cli.commands.identity-create.labels.processingMnemonic")
@@ -326,6 +326,12 @@ async function mnemonicFinalise(
 	if (tempIdentity !== identity) {
 		const mnemonic = await vaultConnector.getSecret(`${tempIdentity}/mnemonic`);
 		await vaultConnector.setSecret(`${identity}/mnemonic`, mnemonic);
+
+		try {
+			// not all accounts have account entries in the vault, so wrap this in a try catch
+			const accountChunk = await vaultConnector.getSecret(`${tempIdentity}/account/0/0/0`);
+			await vaultConnector.setSecret(`${identity}/account/0/0/0`, accountChunk);
+		} catch {}
 	}
 }
 
@@ -338,6 +344,10 @@ async function mnemonicFinalise(
 async function mnemonicRemove(vaultConnector: IVaultConnector, identity: string): Promise<void> {
 	try {
 		await vaultConnector.removeSecret(`${identity}/mnemonic`);
+	} catch {}
+
+	try {
+		await vaultConnector.removeSecret(`${identity}/account/0/0/0`);
 	} catch {}
 }
 
