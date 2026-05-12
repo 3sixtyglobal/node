@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.3-next.36](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.35...node-core-v0.0.3-next.36) (2026-05-12)
+
+
+### Features
+
+* don't override existing env vars with env files ([ebccac2](https://github.com/iotaledger/twin-node/commit/ebccac297c3156076f17c246a8abd994f8f20e61))
+* typescript 6 update ([ce2e3ca](https://github.com/iotaledger/twin-node/commit/ce2e3ca5219587709f7b9cf6c65909b48fba11b5))
+
 ## [0.0.3-next.35](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.34...node-core-v0.0.3-next.35) (2026-05-08)
 
 

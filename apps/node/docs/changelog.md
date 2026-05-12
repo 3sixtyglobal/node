@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.36](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.35...node-v0.0.3-next.36) (2026-05-12)
+
+
+### Features
+
+* typescript 6 update ([ce2e3ca](https://github.com/iotaledger/twin-node/commit/ce2e3ca5219587709f7b9cf6c65909b48fba11b5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.35 to 0.0.3-next.36
+
 ## [0.0.3-next.35](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.34...node-v0.0.3-next.35) (2026-05-08)
 
 
