@@ -247,7 +247,13 @@ export async function buildConfiguration(
 		}
 
 		if (Is.objectValue(output.parsed)) {
-			Object.assign(processEnv, output.parsed);
+			for (const [key, value] of Object.entries(output.parsed)) {
+				// Only set environment variables that are not already set in
+				// the process environment or provided via options.envVars
+				if (Is.empty(processEnv[key])) {
+					processEnv[key] = value;
+				}
+			}
 		}
 	}
 
