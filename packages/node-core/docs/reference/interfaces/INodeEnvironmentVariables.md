@@ -1006,6 +1006,54 @@ The type of telemetry connector: entity-storage.
 
 ***
 
+### openTelemetryMeterName? {#opentelemetrymetername}
+
+> `optional` **openTelemetryMeterName?**: `string`
+
+The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryMeterName`](IEngineServerEnvironmentVariables.md#opentelemetrymetername)
+
+***
+
+### openTelemetryMeterVersion? {#opentelemetrymeterversion}
+
+> `optional` **openTelemetryMeterVersion?**: `string`
+
+The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryMeterVersion`](IEngineServerEnvironmentVariables.md#opentelemetrymeterversion)
+
+***
+
+### openTelemetryReader? {#opentelemetryreader}
+
+> `optional` **openTelemetryReader?**: `string`
+
+The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryReader`](IEngineServerEnvironmentVariables.md#opentelemetryreader)
+
+***
+
+### openTelemetryPrometheusPort? {#opentelemetryprometheusport}
+
+> `optional` **openTelemetryPrometheusPort?**: `string`
+
+The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryPrometheusPort`](IEngineServerEnvironmentVariables.md#opentelemetryprometheusport)
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`
