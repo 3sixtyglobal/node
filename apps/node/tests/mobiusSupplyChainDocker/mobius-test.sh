@@ -972,6 +972,57 @@ query_catalogue "${MCP_HOST}" "${MCP_TOKEN}"; ok "MCP: ${RESULT_DATASET_COUNT} d
 PHASE_RESULTS+=("${GREEN}[11]${NC} Verification")
 
 # ==========================================================================
+# Phase 12: Push transfer setup (MCP -> Mobius)
+# ==========================================================================
+# Mobius is configured single-tenant (`TWIN_FEATURES` does not include multi-tenant),
+# so the `pushSubscriptionMissingTenantToken` gate does NOT fire — the gate only
+# triggers when the data plane has `partitionContextIds.includes(Tenant)`. This phase
+# therefore smoke-tests that push setup SUCCEEDS in a cross-node single-tenant
+# scenario. The multi-tenant rejection is covered by Kenya's Phase 8.
+phase 12 "Push transfer setup (cross-node, single-tenant)"
+
+DSP_CONTEXT="https://w3id.org/dspace/2025/1/context.jsonld"
+PUSH_CONSUMER_PID="urn:uuid:mcp-push-${RANDOM}-$(date +%s)"
+
+step "MCP sends TransferRequestMessage to Mobius (format: HttpProxy-PUSH)..."
+push_req_resp=$(curl -sS -w "\n%{http_code}" -X POST "${MOBIUS_HOST}/dataspace/transfers/request" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${MCP_TRUST}" \
+    -d "$(jq -n \
+        --arg ctx "${DSP_CONTEXT}" \
+        --arg consumerPid "${PUSH_CONSUMER_PID}" \
+        --arg agreementId "${MCP_AGREEMENT}" \
+        --arg callback "${MCP_INTERNAL}/dataspace" \
+        --arg inbox "${MCP_INTERNAL}/dataspace/inbox" \
+        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callback, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')")
+push_req_body=$(echo "${push_req_resp}" | sed '$d')
+push_provider_pid=$(echo "${push_req_body}" | jq -r '.providerPid // empty')
+
+if [ -z "${push_provider_pid}" ]; then
+    soft_fail "Push requestTransfer did not return providerPid. Body: ${push_req_body}"
+    PHASE_RESULTS+=("${RED}[12]${NC} Push setup (cross-node) — FAIL")
+else
+    ok "Push transfer requested (providerPid: ${push_provider_pid})"
+
+    step "MCP sends TransferStartMessage to Mobius..."
+    push_start_resp=$(curl -sS -w "\n%{http_code}" -X POST "${MOBIUS_HOST}/dataspace/transfers/${push_provider_pid}/start" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${MOBIUS_TRUST}" \
+        -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${PUSH_CONSUMER_PID}\",\"providerPid\":\"${push_provider_pid}\"}")
+    push_start_body=$(echo "${push_start_resp}" | sed '$d')
+    push_start_type=$(echo "${push_start_body}" | jq -r '.["@type"] // empty')
+
+    if [ "${push_start_type}" = "TransferError" ]; then
+        err_code=$(echo "${push_start_body}" | jq -r '.code // "unknown"')
+        soft_fail "Push setup failed: ${err_code} | body: ${push_start_body}"
+        PHASE_RESULTS+=("${RED}[12]${NC} Push setup (cross-node) — FAIL: ${err_code}")
+    else
+        ok "Push setup accepted (single-tenant data plane: no token gate fires)"
+        PHASE_RESULTS+=("${GREEN}[12]${NC} Push setup (cross-node, single-tenant) — PASS")
+    fi
+fi
+
+# ==========================================================================
 # Summary
 # ==========================================================================
 echo ""

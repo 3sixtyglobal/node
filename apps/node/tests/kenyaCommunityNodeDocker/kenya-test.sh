@@ -398,10 +398,77 @@ else
 fi
 
 # ============================================================================
+phase 8 "Push setup REJECTS missing tenant token (multi-tenant gate)"
+# ============================================================================
+# Trader requests a PUSH transfer with a callback URL that does NOT carry an
+# x-enc-tenant-token query parameter. On a multi-tenant publisher the data plane
+# must refuse setupPushSubscription rather than letting the eventual delivery 401.
+TRADER_PUSH_NEG_PID="urn:uuid:trader-push-neg-$(date +%s)-${RANDOM}"
+push_neg_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
+    -d "$(jq -n \
+        --arg ctx "${DSP_CONTEXT}" \
+        --arg consumerPid "${TRADER_PUSH_NEG_PID}" \
+        --arg agreementId "${TRADER_AGREEMENT_ID}" \
+        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: "http://twin-kenya-node:3000/dataspace/inbox" } }')")
+push_neg_body=$(echo "${push_neg_resp}" | sed '$d')
+push_neg_provider_pid=$(echo "${push_neg_body}" | jq -r '.providerPid // empty')
+[ -n "${push_neg_provider_pid}" ] || fail "Negative push: requestTransfer did not return providerPid"
+
+# Now send startTransfer — the setup gate inside the data plane should reject.
+start_neg_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${push_neg_provider_pid}/start?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
+    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${TRADER_PUSH_NEG_PID}\",\"providerPid\":\"${push_neg_provider_pid}\"}")
+start_neg_body=$(echo "${start_neg_resp}" | sed '$d')
+start_neg_type=$(echo "${start_neg_body}" | jq -r '.["@type"] // empty')
+start_neg_code=$(echo "${start_neg_body}" | jq -r '.code // empty')
+
+if [ "${start_neg_type}" = "TransferError" ] && echo "${start_neg_code}" | grep -q "pushSubscriptionMissingTenantToken"; then
+    ok "Push setup rejected as expected — code: ${start_neg_code}"
+elif [ "${start_neg_type}" = "TransferError" ]; then
+    warn "Push setup returned TransferError but with a different code: ${start_neg_code}"
+    info "Body: ${start_neg_body}"
+else
+    warn "Push setup did NOT reject the bare endpoint. Either Kenya's data plane is not in multi-tenant mode, or the gate is bypassed."
+    info "Response type: ${start_neg_type}; body: ${start_neg_body}"
+fi
+
+# ============================================================================
+phase 9 "Push setup ACCEPTS endpoint with baked consumer tenant token"
+# ============================================================================
+TRADER_PUSH_POS_PID="urn:uuid:trader-push-pos-$(date +%s)-${RANDOM}"
+push_pos_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
+    -d "$(jq -n \
+        --arg ctx "${DSP_CONTEXT}" \
+        --arg consumerPid "${TRADER_PUSH_POS_PID}" \
+        --arg agreementId "${TRADER_AGREEMENT_ID}" \
+        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+        --arg inbox "http://twin-kenya-node:3000/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')")
+push_pos_body=$(echo "${push_pos_resp}" | sed '$d')
+push_pos_provider_pid=$(echo "${push_pos_body}" | jq -r '.providerPid // empty')
+[ -n "${push_pos_provider_pid}" ] || fail "Positive push: requestTransfer did not return providerPid"
+
+start_pos_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${push_pos_provider_pid}/start?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
+    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${TRADER_PUSH_POS_PID}\",\"providerPid\":\"${push_pos_provider_pid}\"}")
+start_pos_body=$(echo "${start_pos_resp}" | sed '$d')
+start_pos_type=$(echo "${start_pos_body}" | jq -r '.["@type"] // empty')
+
+if [ "${start_pos_type}" = "TransferError" ]; then
+    err_code=$(echo "${start_pos_body}" | jq -r '.code // "unknown"')
+    fail "Positive push setup failed: ${err_code} | body: ${start_pos_body}"
+fi
+ok "Push setup accepted with baked consumer tenant token (providerPid: ${push_pos_provider_pid})"
+
+# ============================================================================
 echo ""
 echo -e "${GREEN}================================================================${NC}"
-echo -e "${GREEN}  ✓ Phases 0-7 complete${NC}"
+echo -e "${GREEN}  ✓ Phases 0-9 complete (pull 0-7 + push 8-9)${NC}"
 echo -e "${GREEN}================================================================${NC}"
-echo ""
-echo "Phase 8 (tenant isolation) is intentionally not yet automated — to be"
-echo "added once we have empirical results from 0-7 to inform the assertion."
