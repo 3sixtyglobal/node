@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.37](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.36...node-core-v0.0.3-next.37) (2026-05-19)
+
+
+### Bug Fixes
+
+* only register DID context keys when nodeIdentityEnabled is true ([#140](https://github.com/iotaledger/twin-node/issues/140)) ([21f1c10](https://github.com/iotaledger/twin-node/commit/21f1c107adbd715518414f7255ead970b809b4b3))
+
 ## [0.0.3-next.36](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.35...node-core-v0.0.3-next.36) (2026-05-12)
 
 
