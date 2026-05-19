@@ -33,6 +33,27 @@ warn() { echo -e "${YELLOW}  [WARN] $1${NC}"; }
 PASSWORD_FILE="${SCRIPT_DIR}/.node-password"
 TENANTS_FILE="${SCRIPT_DIR}/.tenants"
 USERS_FILE="${SCRIPT_DIR}/.tenant-users"
+IDENTITIES_FILE="${SCRIPT_DIR}/.tenant-identities"
+
+# -----------------------------------------------------------------------------
+# Pre-funded test mnemonics (override via env vars below to use the faucet)
+# -----------------------------------------------------------------------------
+# Each identity-create + bootstrap call on IOTA testnet needs gas to publish a
+# DID. By default we mint a fresh wallet and request funds from the testnet
+# faucet — which is rate-limited and often empty during heavy testing.
+#
+# These three TWIN test mnemonics already have substantial testnet balances
+# (verified 2026-05-19: Primary ~2,149 IOTA, Secondary ~1,219 IOTA, NFT-test
+# ~107 IOTA). Each is a public mnemonic checked into multiple `.env.dev` files
+# across the workspace (`wallet/`, `identity/`, `nft/`, `dlt/` …). Using them
+# here makes setup work even when the faucet is empty AND gives us three
+# distinct wallets per scaffold (closer to production shape than sharing one).
+#
+# To force the faucet path instead, set each variable to the empty string:
+#   TWIN_KENYA_NODE_MNEMONIC="" TWIN_KENYA_KRA_MNEMONIC="" TWIN_KENYA_TRADER_MNEMONIC="" ./setup.sh
+TWIN_KENYA_NODE_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC-school left lawn urban oxygen cram unveil alpha space puzzle humble leisure fatigue high width auto deputy beach various style mammal kid cube liar}"
+TWIN_KENYA_KRA_MNEMONIC="${TWIN_KENYA_KRA_MNEMONIC-undo boss jewel dog announce mistake cry brass stock debris arrest patrol recipe annual clown honey icon twist modify quarter warm lock anchor cigar}"
+TWIN_KENYA_TRADER_MNEMONIC="${TWIN_KENYA_TRADER_MNEMONIC-hunt supply sun write waste imitate device bless heavy solve install basic bar assault invite globe umbrella fury drum diet inform under element banner}"
 
 echo -e "${BOLD}Kenya Community Node Setup (1 node, 2 tenants: KRA + Trader)${NC}"
 echo ""
@@ -43,7 +64,7 @@ echo ""
 if [ "${1:-}" = "--clean" ]; then
     echo -e "${BOLD}Step 0: Clean slate (--clean)${NC}"
     docker compose down -v 2>/dev/null || true
-    rm -f "${PASSWORD_FILE}" "${TENANTS_FILE}" "${USERS_FILE}"
+    rm -f "${PASSWORD_FILE}" "${TENANTS_FILE}" "${USERS_FILE}" "${IDENTITIES_FILE}"
     ok "Volumes, containers, and saved state removed"
     shift
 else
@@ -82,7 +103,25 @@ if echo "${existing_state}" | grep -q "nodeId"; then
     fi
 else
     set +e
-    docker compose run --rm -T twin-kenya-node node src/index.js bootstrap-legacy 2>&1 | tee "${bootstrap_tmp}"
+    if [ -n "${TWIN_KENYA_NODE_MNEMONIC}" ]; then
+        # bootstrap-legacy mints THREE identities: node, organization, admin user.
+        # Each call goes through identityCreate → generateWallet (because
+        # node-wallet feature is enabled), which calls ensureBalance against the
+        # mnemonic's derived address. With a pre-funded mnemonic, ensureBalance
+        # sees existing balance and skips the faucet entirely. We point all three
+        # at the same NFT-test mnemonic so the same wallet pays for all three
+        # DID creations (107 IOTA covers them easily; each DID is still distinct
+        # on-chain because identityConnector.createDocument mints a fresh doc).
+        step "Using pre-funded NFT-test mnemonic for node + org + admin-user DIDs (skips faucet)"
+        docker compose run --rm -T \
+            -e TWIN_NODE_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC}" \
+            -e TWIN_ORGANIZATION_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC}" \
+            -e TWIN_ADMIN_USER_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC}" \
+            twin-kenya-node node src/index.js bootstrap-legacy 2>&1 | tee "${bootstrap_tmp}"
+    else
+        step "No TWIN_KENYA_NODE_MNEMONIC set — minting fresh node DID via faucet"
+        docker compose run --rm -T twin-kenya-node node src/index.js bootstrap-legacy 2>&1 | tee "${bootstrap_tmp}"
+    fi
     exit_code=$?
     set -e
     [ ${exit_code} -eq 0 ] || fail "Bootstrap failed (exit ${exit_code})"
@@ -169,8 +208,9 @@ source "${TENANTS_FILE}"
 echo ""
 echo -e "${BOLD}Step 4: Create admin user inside KRA and Trader${NC}"
 
-if [ -s "${USERS_FILE}" ] && grep -q "TENANT_KRA_USER_EMAIL" "${USERS_FILE}"; then
-    ok "Tenant users already provisioned — skipping (delete .tenant-users to recreate)"
+if [ -s "${USERS_FILE}" ] && grep -q "TENANT_KRA_USER_EMAIL" "${USERS_FILE}" \
+        && [ -s "${IDENTITIES_FILE}" ] && grep -q "TENANT_KRA_DID" "${IDENTITIES_FILE}"; then
+    ok "Tenant users + identities already provisioned — skipping (delete .tenant-users and .tenant-identities to recreate)"
 else
     node_state_json=$(docker compose run --rm -T --no-deps twin-kenya-node \
         sh -c 'cat /app/data/engine-state.json' 2>/dev/null || true)
@@ -184,28 +224,71 @@ else
 
     TENANT_USER_PASSWORD="TestUserPass123!"
     : > "${USERS_FILE}"
+    : > "${IDENTITIES_FILE}"
 
-    create_tenant_user() {
-        local prefix="$1" tenant_id="$2" email="$3"
-        local tmp
+    # S1 (2026-05-19 stand-up): mint a distinct org DID per tenant so the
+    # identity-based authorization on transfer-mutation routes can actually
+    # distinguish callers. Previously KRA and Trader users were both created
+    # with --user-identity=$NODE_DID --organization-identity=$NODE_DID, which
+    # made trustInfo.identity identical for both tenants and degenerated the
+    # validateCallerIsConsumer / validateCallerIsTransferParty checks.
+    create_tenant_identity_and_user() {
+        local prefix="$1" tenant_id="$2" email="$3" tenant_mnemonic="$4"
+        local tmp identity_tmp
         tmp=$(mktemp)
-        trap "rm -f ${tmp}" RETURN
+        identity_tmp=$(mktemp)
+        trap "rm -f ${tmp} ${identity_tmp}" RETURN
 
         step "Switching node tenant to ${tenant_id}"
         docker compose run --rm -T twin-kenya-node \
             node src/index.js node-set-tenant --tenant-id="${tenant_id}" 2>&1 | tail -5 \
             || fail "node-set-tenant to ${tenant_id} failed"
 
-        step "Creating user ${email}"
+        step "Minting tenant DID for ${prefix} (identity-create on IOTA testnet, ~60s)"
+        set +e
+        if [ -n "${tenant_mnemonic}" ]; then
+            step "  using pre-funded mnemonic for ${prefix} (skips faucet)"
+            docker compose run --rm -T twin-kenya-node \
+                node src/index.js identity-create \
+                    --mnemonic="${tenant_mnemonic}" \
+                    --fund-wallet=true 2>&1 | tee "${identity_tmp}"
+        else
+            step "  no pre-funded mnemonic for ${prefix} — minting fresh wallet via faucet"
+            docker compose run --rm -T twin-kenya-node \
+                node src/index.js identity-create --fund-wallet=true 2>&1 | tee "${identity_tmp}"
+        fi
+        local ec=$?
+        set -e
+        [ ${ec} -eq 0 ] || fail "identity-create for ${prefix} failed"
+
+        local tenant_did
+        tenant_did=$(grep -oE 'did:iota:[a-z0-9:]+0x[a-f0-9]+' "${identity_tmp}" | head -1)
+        [ -n "${tenant_did}" ] || fail "Could not extract tenant DID for ${prefix} from identity-create output"
+        echo "${prefix}_DID=${tenant_did}" >> "${IDENTITIES_FILE}"
+        ok "${prefix} tenant DID: ${tenant_did}"
+
+        # Bootstrap adds a `trust-assertion` verification method on the node
+        # DID so trust JWT-VCs can be issued. Tenant DIDs need the same VM
+        # before /identity/:did/verifiable-credential/trust-assertion can sign.
+        step "Adding trust-assertion VM to ${prefix} DID"
+        docker compose run --rm -T twin-kenya-node \
+            node src/index.js identity-verification-method-create \
+                --identity="${tenant_did}" \
+                --verification-method-type="assertionMethod" \
+                --verification-method-id="trust-assertion" 2>&1 | tail -10 \
+            || fail "identity-verification-method-create failed for ${prefix}"
+        ok "${prefix} trust-assertion VM added"
+
+        step "Creating user ${email} (user-identity + org-identity = ${prefix}_DID)"
         set +e
         docker compose run --rm -T twin-kenya-node \
             node src/index.js user-create \
                 --email="${email}" \
                 --password="${TENANT_USER_PASSWORD}" \
-                --user-identity="${NODE_DID}" \
-                --organization-identity="${NODE_DID}" \
+                --user-identity="${tenant_did}" \
+                --organization-identity="${tenant_did}" \
                 --scope="tenant-admin" 2>&1 | tee "${tmp}"
-        local ec=$?
+        ec=$?
         set -e
         [ ${ec} -eq 0 ] || fail "user-create for ${email} failed"
 
@@ -222,8 +305,8 @@ else
     }
     trap restore_node_tenant EXIT
 
-    create_tenant_user "TENANT_KRA"    "${TENANT_KRA_TENANT_ID}"    "admin@kra"
-    create_tenant_user "TENANT_TRADER" "${TENANT_TRADER_TENANT_ID}" "admin@trader"
+    create_tenant_identity_and_user "TENANT_KRA"    "${TENANT_KRA_TENANT_ID}"    "admin@kra"    "${TWIN_KENYA_KRA_MNEMONIC}"
+    create_tenant_identity_and_user "TENANT_TRADER" "${TENANT_TRADER_TENANT_ID}" "admin@trader" "${TWIN_KENYA_TRADER_MNEMONIC}"
 
     restore_node_tenant
     trap - EXIT
@@ -239,6 +322,7 @@ echo -e "${BOLD}${GREEN}========================================================
 echo ""
 cat "${PASSWORD_FILE}"
 cat "${TENANTS_FILE}"
+cat "${IDENTITIES_FILE}"
 cat "${USERS_FILE}"
 echo ""
 echo -e "${BOLD}Next:${NC}"

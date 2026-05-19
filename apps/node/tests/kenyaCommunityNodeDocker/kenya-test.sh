@@ -192,7 +192,11 @@ catalog_resp=$(curl -sS -X POST "${HOST}/federated-catalogue/request" \
     -H "Cookie: access_token=${TRADER_SESSION_JWT}" \
     -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
 
-found_id=$(echo "${catalog_resp}" | jq -r '.dataset[]?["@id"] // empty' | grep -F "${KRA_DATASET_ID}" || true)
+# S1 (2026-05-19): with distinct per-tenant DIDs in Kenya, the catalogue now nests
+# datasets in a per-publisher sub-catalog (DCAT-AP correct behaviour). Traverse
+# both top-level (.dataset[]) and sub-catalog (.catalog[].dataset[]) so the
+# assertion works whether tenants share NODE_DID or have distinct DIDs.
+found_id=$(echo "${catalog_resp}" | jq -r '(.dataset[]?, .catalog[]?.dataset[]?) | .["@id"] // empty' | grep -F "${KRA_DATASET_ID}" || true)
 if [ -n "${found_id}" ]; then
     ok "Trader sees dataset ${KRA_DATASET_ID} (cross-tenant catalogue discovery works)"
 else
@@ -205,7 +209,7 @@ fi
 # fedcat set() time. Extract the token from the URL query string so we can re-apply
 # it as ?x-enc-tenant-token= on subsequent PNP/DSP URLs the consumer constructs.
 KRA_DIST_URL=$(echo "${catalog_resp}" | jq -r --arg id "${KRA_DATASET_ID}" \
-    '.dataset[]? | select(.["@id"] == $id) | (.distribution // .["dcat:distribution"]) | (if type == "array" then .[0] else . end) | .accessService // empty' | head -1)
+    '(.dataset[]?, .catalog[]?.dataset[]?) | select(.["@id"] == $id) | (.distribution // .["dcat:distribution"]) | (if type == "array" then .[0] else . end) | .accessService // empty' | head -1)
 KRA_TENANT_TOKEN=$(echo "${KRA_DIST_URL}" | sed -nE 's/.*[?&]x-enc-tenant-token=([^&]+).*/\1/p')
 if [ -n "${KRA_TENANT_TOKEN}" ]; then
     ok "Distribution accessService URL carries encrypted tenantToken (${#KRA_TENANT_TOKEN} chars)"

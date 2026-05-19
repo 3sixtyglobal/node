@@ -38,9 +38,10 @@ fail() { echo -e "${RED}  [FAIL] $1${NC}"; exit 1; }
 warn() { echo -e "${YELLOW}  [WARN] $1${NC}"; }
 info() { echo -e "${BLUE}  $1${NC}"; }
 
-[ -s .node-password ]  || fail "Missing .node-password — run ./setup.sh first"
-[ -s .tenants ]        || fail "Missing .tenants — run ./setup.sh first"
-[ -s .tenant-users ]   || fail "Missing .tenant-users — run ./setup.sh first"
+[ -s .node-password ]      || fail "Missing .node-password — run ./setup.sh first"
+[ -s .tenants ]            || fail "Missing .tenants — run ./setup.sh first"
+[ -s .tenant-users ]       || fail "Missing .tenant-users — run ./setup.sh first"
+[ -s .tenant-identities ]  || fail "Missing .tenant-identities — run ./setup.sh first (S1: per-tenant DIDs)"
 
 # shellcheck disable=SC1091
 source .node-password
@@ -48,6 +49,8 @@ source .node-password
 source .tenants
 # shellcheck disable=SC1091
 source .tenant-users
+# shellcheck disable=SC1091
+source .tenant-identities
 
 HOST="http://localhost:3040"
 DSP_CONTEXT="https://w3id.org/dspace/2025/1/context.jsonld"
@@ -101,11 +104,15 @@ TRADER_SESSION_JWT=$(login_session "${TENANT_TRADER_API_KEY}" "${TENANT_TRADER_U
 ok "KRA session JWT  (${#KRA_SESSION_JWT} chars)"
 ok "Trader session JWT (${#TRADER_SESSION_JWT} chars)"
 
-# Both per-tenant users were created with --user-identity=NODE_DID and
-# --organization-identity=NODE_DID (mt-test pattern, see setup.sh comment).
-# So both KRA's and Trader's organization identity is the node DID for now.
-KRA_DID="${NODE_DID}"
-TRADER_DID="${NODE_DID}"
+# S1 (2026-05-19): KRA and Trader now have distinct DIDs minted via
+# identity-create inside each tenant's context during setup.sh. Sourced
+# from .tenant-identities above as TENANT_KRA_DID and TENANT_TRADER_DID.
+KRA_DID="${TENANT_KRA_DID}"
+TRADER_DID="${TENANT_TRADER_DID}"
+[ -n "${KRA_DID}" ]    || fail "TENANT_KRA_DID empty — re-run ./setup.sh --clean"
+[ -n "${TRADER_DID}" ] || fail "TENANT_TRADER_DID empty — re-run ./setup.sh --clean"
+ok "KRA DID:    ${KRA_DID}"
+ok "Trader DID: ${TRADER_DID}"
 
 # -----------------------------------------------------------------------------
 # Step 3: Generate trust JWTs.
@@ -288,7 +295,11 @@ const { ChaCha20Poly1305 } = require('@twin.org/crypto');
 const { Converter, RandomHelper } = require('@twin.org/core');
 
 const store = JSON.parse(fs.readFileSync('/app/data/vault-key/store.json', 'utf8'));
-const fullKeyName = '${KRA_DID}/param-encryption';
+// The param-encryption vault key was created at bootstrap time and is keyed
+// by NODE_DID (it's a node-level key used for tenant-token URL baking, not
+// per-tenant). When KRA_DID was identical to NODE_DID this lookup happened
+// to work; with distinct per-tenant DIDs from S1 it must explicitly use NODE_DID.
+const fullKeyName = '${NODE_DID}/param-encryption';
 const vaultKey = store.find(e => e.id === fullKeyName);
 if (!vaultKey) {
     console.error('Vault key not found:', fullKeyName);
