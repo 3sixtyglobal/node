@@ -443,6 +443,21 @@ export interface IEngineEnvironmentVariables {
 	openTelemetryPrometheusPort?: string;
 
 	/**
+	 * Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+	 */
+	telemetryMetricsCollectorIntervalSeconds?: string;
+
+	/**
+	 * The type of telemetry metrics producers, can be a comma separated list: system, process.
+	 */
+	telemetryMetricsProducers?: string;
+
+	/**
+	 * Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+	 */
+	telemetryMetricsProducerMaxHistory?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;

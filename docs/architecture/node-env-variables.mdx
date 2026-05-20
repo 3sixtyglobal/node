@@ -61,6 +61,7 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_MESSAGING_SMS_CONNECTOR`                         | `entity-storage`, `aws`                                                                                             | None                  | Messaging SMS connector type.                      |
 | `TWIN_MESSAGING_PUSH_NOTIFICATION_CONNECTOR`           | `entity-storage`, `aws`                                                                                             | None                  | Messaging push connector type.                     |
 | `TWIN_TELEMETRY_CONNECTOR`                             | `entity-storage`, `open-telemetry`                                                                                  | None                  | Telemetry connector type.                          |
+| `TWIN_TELEMETRY_METRICS_PRODUCERS`                     | `system`, `process` (comma-separated)                                                                               | `system,process`      | Metrics producer types to enable.                  |
 | `TWIN_FAUCET_CONNECTOR`                                | `entity-storage`, `iota`                                                                                            | None                  | Faucet connector type.                             |
 | `TWIN_WALLET_CONNECTOR`                                | `entity-storage`, `iota`                                                                                            | None                  | Wallet connector type.                             |
 | `TWIN_NFT_CONNECTOR`                                   | `entity-storage`, `iota`                                                                                            | None                  | NFT connector type.                                |
@@ -113,6 +114,8 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_SYNCHRONISED_STORAGE_MAX_CONSOLIDATIONS`             | Integer               | `5`                                    | Number of consolidations retained.                      |
 | `TWIN_SYNCHRONISED_STORAGE_TRUSTED_URL`                    | URL                   | None                                   | Trusted synchronised storage node URL.                  |
 | `TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID`      | String                | None                                   | Key id for synchronised verifiable storage pointers.    |
+| `TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS`        | Integer seconds       | `60`                                   | Polling interval between metrics collection runs.       |
+| `TWIN_TELEMETRY_METRICS_PRODUCER_MAX_HISTORY`              | Integer               | `1440`                                 | Maximum number of values retained per metric.           |
 | `TWIN_TRUST_JWT_TTL_SECONDS`                               | Integer seconds       | None                                   | Leave unset for non-expiring JWT generation.            |
 | `TWIN_TRUST_VERIFICATION_METHOD_ID`                        | Method id string      | `trust-assertion`                      | Default injected by node defaults.                      |
 
