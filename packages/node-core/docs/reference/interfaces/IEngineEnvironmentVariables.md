@@ -706,6 +706,30 @@ The port to use for the Open Telemetry Prometheus metrics server, only required 
 
 ***
 
+### telemetryMetricsCollectorIntervalSeconds? {#telemetrymetricscollectorintervalseconds}
+
+> `optional` **telemetryMetricsCollectorIntervalSeconds?**: `string`
+
+Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+
+***
+
+### telemetryMetricsProducers? {#telemetrymetricsproducers}
+
+> `optional` **telemetryMetricsProducers?**: `string`
+
+The type of telemetry metrics producers, can be a comma separated list: system, process.
+
+***
+
+### telemetryMetricsProducerMaxHistory? {#telemetrymetricsproducermaxhistory}
+
+> `optional` **telemetryMetricsProducerMaxHistory?**: `string`
+
+Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`

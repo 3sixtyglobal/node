@@ -1054,6 +1054,42 @@ The port to use for the Open Telemetry Prometheus metrics server, only required 
 
 ***
 
+### telemetryMetricsCollectorIntervalSeconds? {#telemetrymetricscollectorintervalseconds}
+
+> `optional` **telemetryMetricsCollectorIntervalSeconds?**: `string`
+
+Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`telemetryMetricsCollectorIntervalSeconds`](IEngineServerEnvironmentVariables.md#telemetrymetricscollectorintervalseconds)
+
+***
+
+### telemetryMetricsProducers? {#telemetrymetricsproducers}
+
+> `optional` **telemetryMetricsProducers?**: `string`
+
+The type of telemetry metrics producers, can be a comma separated list: system, process.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`telemetryMetricsProducers`](IEngineServerEnvironmentVariables.md#telemetrymetricsproducers)
+
+***
+
+### telemetryMetricsProducerMaxHistory? {#telemetrymetricsproducermaxhistory}
+
+> `optional` **telemetryMetricsProducerMaxHistory?**: `string`
+
+Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`telemetryMetricsProducerMaxHistory`](IEngineServerEnvironmentVariables.md#telemetrymetricsproducermaxhistory)
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`

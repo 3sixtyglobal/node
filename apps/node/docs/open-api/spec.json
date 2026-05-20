@@ -12253,6 +12253,282 @@
 				}
 			}
 		},
+		"/aig/{id}/versions/{versionId}": {
+			"get": {
+				"operationId": "auditableItemGraphVersionGet",
+				"summary": "Get a graph vertex at a specific version",
+				"tags": [
+					"Auditable Item Graph"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the vertex.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "aig:1234567890"
+					},
+					{
+						"name": "versionId",
+						"description": "The id of the version (changeset id) to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "changeset:1234567890"
+					},
+					{
+						"name": "accept",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "application/json"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response to getting an auditable item graph vertex at a specific version.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertex"
+								},
+								"examples": {
+									"auditableItemGraphVersionGetResponseExample": {
+										"value": {
+											"@context": [
+												"https://schema.twindev.org/aig/",
+												"https://schema.twindev.org/common/",
+												"https://schema.org"
+											],
+											"type": "AuditableItemGraphVertex",
+											"id": "aig:1234567890",
+											"dateCreated": "2024-08-22T11:55:16.271Z",
+											"version": 1
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/aig/{id}/versions": {
+			"get": {
+				"operationId": "auditableItemGraphVersionList",
+				"summary": "Get all versions of a graph vertex",
+				"tags": [
+					"Auditable Item Graph"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the vertex.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "aig:1234567890"
+					},
+					{
+						"name": "after",
+						"description": "Only return versions created after this ISO 8601 timestamp (exclusive).",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "before",
+						"description": "Only return versions created before this ISO 8601 timestamp (exclusive).",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "accept",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "application/json"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response to getting all versions of an auditable item graph vertex.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertexVersionList"
+								},
+								"examples": {
+									"auditableItemGraphVersionListResponseExample": {
+										"value": {
+											"@context": [
+												"https://schema.org",
+												"https://schema.twindev.org/aig/",
+												"https://schema.twindev.org/common/"
+											],
+											"type": [
+												"ItemList",
+												"AuditableItemGraphVertexVersionList"
+											],
+											"itemListElement": [
+												0,
+												1,
+												2
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/aig/{id}/changesets/{changesetId}": {
 			"get": {
 				"operationId": "auditableItemGraphChangesetGet",
@@ -20420,6 +20696,10 @@
 					"verified": {
 						"type": "boolean",
 						"description": "Is the vertex verified, will only be populated when verification is requested."
+					},
+					"version": {
+						"type": "number",
+						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
 					}
 				},
 				"required": [
@@ -20494,6 +20774,10 @@
 					"verified": {
 						"type": "boolean",
 						"description": "Is the vertex verified, will only be populated when verification is requested."
+					},
+					"version": {
+						"type": "number",
+						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
 					}
 				},
 				"required": [
@@ -21736,6 +22020,19 @@
 				},
 				"description": "The logout token details."
 			},
+			"MetricCounterOperation": {
+				"description": "The types of metric counter operations.",
+				"anyOf": [
+					{
+						"const": "inc",
+						"description": "Increment Counter."
+					},
+					{
+						"const": "dec",
+						"description": "Decrement Counter."
+					}
+				]
+			},
 			"MetricType": {
 				"description": "The types of metrics.",
 				"anyOf": [
@@ -22581,7 +22878,10 @@
 					},
 					"target": {
 						"type": "string",
-						"description": "The target path of where to store the extracted data.\nSupports simple dotted path notation, and numeric index notation."
+						"description": "The target path of where to store the extracted data.\nSupports simple dotted path notation, and numeric index notation.",
+						"examples": [
+							"\"path.to.data\" or \"path.to.data.0\""
+						]
 					},
 					"retainPathDepth": {
 						"type": "number",
@@ -22842,10 +23142,7 @@
 					"value": {
 						"anyOf": [
 							{
-								"const": "inc"
-							},
-							{
-								"const": "dec"
+								"$ref": "#/components/schemas/MetricCounterOperation"
 							},
 							{
 								"type": "number"

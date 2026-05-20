@@ -49,6 +49,7 @@
 - [isRightsManagementRequired](functions/isRightsManagementRequired.md)
 - [isTaskSchedulerRequired](functions/isTaskSchedulerRequired.md)
 - [isAutomationRequired](functions/isAutomationRequired.md)
+- [isTelemetryRequired](functions/isTelemetryRequired.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)
