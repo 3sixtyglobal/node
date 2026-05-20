@@ -204,7 +204,7 @@ else
     fail "Trader did NOT see KRA's dataset in catalogue"
 fi
 
-# TICKET-G (post-Martyn-2026-05-01 URL-baking direction): the catalogue bakes the
+# TICKET-G: the catalogue bakes the
 # publishing tenant's encrypted token into each distribution's accessService URL at
 # fedcat set() time. Extract the token from the URL query string so we can re-apply
 # it as ?x-enc-tenant-token= on subsequent PNP/DSP URLs the consumer constructs.
@@ -472,7 +472,67 @@ fi
 ok "Push setup accepted with baked consumer tenant token (providerPid: ${push_pos_provider_pid})"
 
 # ============================================================================
+phase 10 "S4 — composite publisher fallback on boot republish (no-user context)"
+# ============================================================================
+# Verifies S4's composite-fallback in populateDefaults: when the engine
+# republishes a stored DataspaceAppDataset on restart, there's no logged-in
+# user → ContextIdKeys.Organization is undefined → populateDefaults falls back
+# to the `nodeId:tenantId` composite for `dcterms:publisher`.
+#
+# Why this works: the stored entity's `dataset` payload never carries a
+# publisher field (it's stamped at publish time, not stored). On a fresh
+# create (Step 5b, user-authenticated) the publisher is the user's org DID.
+# On restart, populateDefaults runs in node-tenant context (no user) →
+# composite path fires. This is exactly the no-user flow flagged
+# (2026-05-20) that motivated S4.
+
+step "Reading expected nodeId from container engine-state.json + tenantId from .tenants"
+NODE_DID_FROM_STATE=$(docker exec twin-kenya-node sh -c 'cat /app/data/engine-state.json' \
+    | jq -r '.nodeId // empty')
+[ -n "${NODE_DID_FROM_STATE}" ] || fail "Could not read nodeId from engine-state.json"
+EXPECTED_COMPOSITE="${NODE_DID_FROM_STATE}:${TENANT_KRA_TENANT_ID}"
+info "Expected composite publisher: ${EXPECTED_COMPOSITE}"
+
+step "Restarting node container to trigger boot republish"
+docker compose restart twin-kenya-node 2>&1 | tail -3 \
+    || fail "Container restart failed"
+
+# Wait for the engine to finish populating the catalogue.
+sleep 12
+
+step "Re-logging in as KRA after restart (sessions are in-memory, restart invalidates)"
+KRA_SESSION_JWT_PHASE10=$(curl -sS -i -X POST "${HOST}/authentication/login" \
+    -H "Content-Type: application/json" \
+    -H "x-api-key: ${TENANT_KRA_API_KEY}" \
+    -d "$(jq -n --arg e "${TENANT_KRA_USER_EMAIL}" --arg p "${TENANT_KRA_USER_PASSWORD}" '{email:$e,password:$p}')" \
+    | grep -i "^set-cookie:" | grep -oE "access_token=[^;]+" | head -1 | cut -d= -f2-)
+[ -n "${KRA_SESSION_JWT_PHASE10}" ] || fail "KRA re-login after restart failed"
+ok "KRA re-logged in after restart"
+
+step "Querying catalogue + decoding dcterms:publisher"
+catalog_resp_phase10=$(curl -sS -X POST "${HOST}/federated-catalogue/request" \
+    -H "Content-Type: application/json" \
+    -H "x-api-key: ${TENANT_KRA_API_KEY}" \
+    -H "Cookie: access_token=${KRA_SESSION_JWT_PHASE10}" \
+    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
+
+actual_publisher=$(echo "${catalog_resp_phase10}" | jq -r --arg id "${KRA_DATASET_ID}" \
+    '(.dataset[]?, .catalog[]?.dataset[]?) | select(.["@id"] == $id) | (.["dct:publisher"] // .["dcterms:publisher"]) // empty' | head -1)
+
+if [ -z "${actual_publisher}" ]; then
+    info "Catalogue response: ${catalog_resp_phase10}"
+    fail "Could not extract dcterms:publisher from catalogue for ${KRA_DATASET_ID}"
+fi
+
+info "Actual publisher: ${actual_publisher}"
+if [ "${actual_publisher}" = "${EXPECTED_COMPOSITE}" ]; then
+    ok "S4 composite-fallback fired correctly: publisher = nodeId:tenantId composite"
+else
+    fail "S4 composite-fallback did NOT fire. Expected ${EXPECTED_COMPOSITE}, got ${actual_publisher}"
+fi
+
+# ============================================================================
 echo ""
 echo -e "${GREEN}================================================================${NC}"
-echo -e "${GREEN}  ✓ Phases 0-9 complete (pull 0-7 + push 8-9)${NC}"
+echo -e "${GREEN}  ✓ Phases 0-10 complete (pull 0-7 + push 8-9 + S4 verify 10)${NC}"
 echo -e "${GREEN}================================================================${NC}"
