@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.39](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.38...node-core-v0.0.3-next.39) (2026-05-21)
+
+
+### Features
+
+* tenant-id in user create and update ([#148](https://github.com/iotaledger/twin-node/issues/148)) ([1143e30](https://github.com/iotaledger/twin-node/commit/1143e30fb0d2056d113367d0c5ea251f07695da1))
+
 ## [0.0.3-next.38](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.37...node-core-v0.0.3-next.38) (2026-05-20)
 
 
