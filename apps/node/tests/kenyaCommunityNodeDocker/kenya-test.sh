@@ -260,7 +260,7 @@ offer_json=$(jq -n \
     --arg assigner "${KRA_DID}" \
     --arg target "${KRA_DATASET_ID}" \
     '{ "@context": $ctx, "@type": "Offer", uid: $uid, assigner: $assigner, target: $target,
-       action: "read", permission: [{ action: "read", target: "twin:jsonpath:$" }] }')
+       action: "read", permission: [{ action: "read", target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" } }] }')
 
 # Embed Trader's encrypted tenantToken in the callbackAddress so that when KRA
 # (the provider) calls back to Trader's PNAP, the receiving handler decrypts it,

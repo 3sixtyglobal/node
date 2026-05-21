@@ -20,7 +20,7 @@ RUN find ./node_modules/@twin.org -maxdepth 1 -name '*.bak' -exec sh -c \
       'pkg="${1%.bak}"; rm -rf "$pkg" && mv "$1" "$pkg"' _ {} \;
 
 # node-core is a workspace package (not published independently); always copy from source.
-# Override every in-flight package with local source. Martyn's HostingService refactor +
+# Override every in-flight package with local source. HostingService refactor +
 # ecosystem-policy removal touches many more packages than the original platform PR.
 RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/api-core \
@@ -55,8 +55,19 @@ RUN rm -rf ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/engine-types \
     ./node_modules/@twin.org/synchronised-storage-models \
     ./node_modules/@twin.org/synchronised-storage-rest-client \
-    ./node_modules/@twin.org/synchronised-storage-service
+    ./node_modules/@twin.org/synchronised-storage-service \
+    ./node_modules/@twin.org/trust-models \
+    ./node_modules/@twin.org/trust-service \
+    ./node_modules/@twin.org/trust-generators \
+    ./node_modules/@twin.org/trust-verifiers
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
+# Identity stays as the npm-installed version (bulk-copied via node/node_modules) to
+# avoid pulling in the full identity + telemetry chain; backwards-compat is what we
+# validate here.
+COPY trust/packages/trust-models ./node_modules/@twin.org/trust-models/
+COPY trust/packages/trust-service ./node_modules/@twin.org/trust-service/
+COPY trust/packages/trust-generators ./node_modules/@twin.org/trust-generators/
+COPY trust/packages/trust-verifiers ./node_modules/@twin.org/trust-verifiers/
 # api family — BaseRestClient query-string preservation, HostingService implementation, IHostingComponent types.
 COPY api/packages/api-core ./node_modules/@twin.org/api-core/
 COPY api/packages/api-models ./node_modules/@twin.org/api-models/

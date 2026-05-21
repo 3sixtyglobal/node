@@ -21,7 +21,7 @@ RUN find ./node_modules/@twin.org -maxdepth 1 -name '*.bak' -exec sh -c \
       'pkg="${1%.bak}"; rm -rf "$pkg" && mv "$1" "$pkg"' _ {} \;
 
 # Step 2: Override packages that have local source changes.
-# Expanded for Martyn's HostingService refactor + ecosystem-policy removal —
+# Expanded for HostingService refactor + ecosystem-policy removal —
 # many more @twin.org/* packages are in flight than originally listed.
 RUN rm -rf ./node_modules/@twin.org/node ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/verifiable-storage-connector-iota \
@@ -64,9 +64,20 @@ RUN rm -rf ./node_modules/@twin.org/node ./node_modules/@twin.org/node-core \
     ./node_modules/@twin.org/engine-server \
     ./node_modules/@twin.org/engine-server-types \
     ./node_modules/@twin.org/engine-types \
-    ./node_modules/@twin.org/entity
+    ./node_modules/@twin.org/entity \
+    ./node_modules/@twin.org/trust-models \
+    ./node_modules/@twin.org/trust-service \
+    ./node_modules/@twin.org/trust-generators \
+    ./node_modules/@twin.org/trust-verifiers
 COPY node/packages/node-core ./node_modules/@twin.org/node-core/
 COPY framework/packages/entity ./node_modules/@twin.org/entity/
+# Identity stays as the npm-installed version (bulk-copied via node/node_modules) to
+# avoid pulling in the full identity + telemetry chain; backwards-compat is what we
+# validate here.
+COPY trust/packages/trust-models ./node_modules/@twin.org/trust-models/
+COPY trust/packages/trust-service ./node_modules/@twin.org/trust-service/
+COPY trust/packages/trust-generators ./node_modules/@twin.org/trust-generators/
+COPY trust/packages/trust-verifiers ./node_modules/@twin.org/trust-verifiers/
 COPY auditable-item-graph/packages/auditable-item-graph-models ./node_modules/@twin.org/auditable-item-graph-models/
 COPY auditable-item-graph/packages/auditable-item-graph-rest-client ./node_modules/@twin.org/auditable-item-graph-rest-client/
 COPY auditable-item-graph/packages/auditable-item-graph-service ./node_modules/@twin.org/auditable-item-graph-service/

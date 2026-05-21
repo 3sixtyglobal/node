@@ -159,7 +159,7 @@ OFFER_BODY=$(jq -n \
         assigner: $assigner,
         target: $target,
         action: "read",
-        permission: [{ action: "read", target: "twin:jsonpath:$" }]
+        permission: [{ action: "read", target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" } }]
     }')
 
 # PAP admin endpoints accept the local session JWT (signed with auth-signing key).
