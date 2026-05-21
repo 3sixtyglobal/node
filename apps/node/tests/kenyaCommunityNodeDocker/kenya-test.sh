@@ -8,7 +8,7 @@
 #   - docker compose up -d (node running on host port 3040)
 #   - jq installed
 #
-# Phases (all green as of 2026-04-29):
+# Phases:
 #   0. Health check (tenant-gated by design) + per-tenant logins
 #   1. Trader queries federated catalogue → cross-tenant [Node] discovery
 #   2. KRA's offer presence (seeded by provision-storage.sh)
@@ -17,7 +17,10 @@
 #   5. Negotiation reaches FINALIZED (REQUESTED → AGREED → FINALIZED)
 #   6. Trader requestTransfer against the agreement
 #   7. Trader startTransfer + encrypted dataAddress.endpoint (TICKET-D) + pull
-#   8. Tenant isolation negatives — intentionally not yet automated
+#   8. Push setup REJECTS missing tenant token (multi-tenant gate)
+#   9. Push setup ACCEPTS endpoint with baked consumer tenant token
+#  10. S4 composite publisher fallback fires on boot republish (no-user context)
+#  11. Negative-path tenant isolation (Trader denied from KRA-only resources)
 #
 # Findings recorded in ../multiTenancyDocker/findings-from-first-run.md
 # under "Kenya empirical findings".
@@ -532,7 +535,118 @@ else
 fi
 
 # ============================================================================
+phase 11 "Negative-path tenant isolation (Trader denied from KRA-only resources)"
+# ============================================================================
+# These assertions prove the multi-tenant security boundary is enforced at
+# runtime — not just that Trader can do their own things (Phases 0-10) but
+# that Trader CANNOT do KRA's things. Each assertion targets a different
+# layer of the isolation defense so that an isolation regression at any
+# one layer surfaces here instead of in production.
+#
+# Layers exercised:
+#   11.1 — TenantProcessor at login (api-key + email must agree on tenant)
+#   11.2 — AuthHeaderProcessor on authenticated routes (api-key + session JWT tid match)
+#   11.3 — Entity storage [Node, Tenant] partition on app-dataset list
+#   11.4 — Entity storage [Node, Tenant] partition on PAP direct-fetch
+#   11.5 — Entity storage [Node, Tenant] partition on app-dataset direct-fetch
+
+# Phase 10 restarts the container and re-logs in KRA. Trader's session JWT
+# from Phase 0 is now invalid (sessions are in-memory). Re-login Trader so
+# 11.2–11.5 actually test authorization logic, not stale-token rejection.
+step "Re-logging in as Trader after Phase 10 restart (sessions are in-memory, restart invalidates)"
+JWT_TRADER=$(login "${TENANT_TRADER_API_KEY}" "${TENANT_TRADER_USER_EMAIL}" "${TENANT_TRADER_USER_PASSWORD}")
+[ -n "${JWT_TRADER}" ] || fail "Trader re-login after restart failed"
+ok "Trader re-logged in after restart"
+
+# ---------------------------------------------------------------------------
+# 11.1 — Login: Trader email + KRA api-key (mismatched tenant context)
+# ---------------------------------------------------------------------------
+# TenantProcessor pins the request's tenant from the api-key BEFORE auth runs.
+# The login service then looks up the user by email within that tenant's
+# user partition. Trader's email does not exist in KRA's partition →
+# userNotFound → 401.
+
+step "Login attempt with Trader email + KRA api-key (cross-tenant credential mix)"
+status_11_1=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/authentication/login" \
+    -H "Content-Type: application/json" \
+    -H "x-api-key: ${TENANT_KRA_API_KEY}" \
+    -d "$(jq -n --arg e "${TENANT_TRADER_USER_EMAIL}" --arg p "${TENANT_TRADER_USER_PASSWORD}" '{email:$e,password:$p}')")
+[ "${status_11_1}" = "401" ] && ok "Trader email + KRA api-key → 401 (TenantProcessor scoped lookup to KRA partition, user not found)" \
+    || fail "Expected 401 for cross-tenant credential mix at login, got ${status_11_1}"
+
+# ---------------------------------------------------------------------------
+# 11.2 — Authenticated route: Trader session JWT + KRA api-key
+# ---------------------------------------------------------------------------
+# AuthHeaderProcessor enforces session.tid === contextIds[Tenant]. Trader's
+# session JWT carries tid=TRADER_TENANT_ID; the request's api-key sets the
+# context tenant to KRA. The mismatch raises tenantIdMismatch → 401.
+
+step "Authenticated route with Trader session JWT + KRA api-key (tenant mismatch)"
+status_11_2=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/rights-management/policy/admin/${KRA_OFFER_ID}" \
+    -H "x-api-key: ${TENANT_KRA_API_KEY}" \
+    -H "Cookie: access_token=${JWT_TRADER}")
+[ "${status_11_2}" = "401" ] && ok "Trader session + KRA api-key → 401 (AuthHeaderProcessor tenantIdMismatch)" \
+    || fail "Expected 401 for session/api-key tenant mismatch, got ${status_11_2}"
+
+# ---------------------------------------------------------------------------
+# 11.3 — App-dataset list scoped to Trader's partition (no KRA dataset leak)
+# ---------------------------------------------------------------------------
+# Trader queries the app-datasets listing with valid Trader credentials.
+# Entity storage is partitioned by [Node, Tenant]; the response must contain
+# only Trader's app-datasets (zero, since Trader didn't seed any). KRA's
+# dataset id MUST NOT appear in the body.
+
+step "Trader queries /dataspace/app-datasets (should NOT see KRA's dataset)"
+list_resp_11_3=$(curl -sS "${HOST}/dataspace/app-datasets" \
+    -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
+    -H "Cookie: access_token=${JWT_TRADER}")
+if echo "${list_resp_11_3}" | grep -qF "${KRA_DATASET_ID}"; then
+    info "List response: ${list_resp_11_3}"
+    fail "Cross-tenant leak: Trader's app-dataset listing contains KRA's dataset ${KRA_DATASET_ID}"
+fi
+ok "Trader's app-dataset listing does NOT contain KRA's dataset (storage partition isolation intact)"
+
+# ---------------------------------------------------------------------------
+# 11.4 — Direct fetch of KRA's offer by URN (storage partition isolation)
+# ---------------------------------------------------------------------------
+# Trader knows the URN of KRA's seeded offer (via Phase 3 catalogue discovery,
+# which is intentionally [Node]-shared). But the PAP storage holding the
+# stored offer object is [Node, Tenant]-partitioned, so a direct PAP GET by
+# id from Trader's context must NOT find KRA's offer.
+
+step "Trader tries to fetch KRA's offer by URN via PAP admin route (expect 404)"
+status_11_4=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/rights-management/policy/admin/${KRA_OFFER_ID}" \
+    -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
+    -H "Cookie: access_token=${JWT_TRADER}")
+[ "${status_11_4}" = "404" ] && ok "Direct fetch of KRA's offer by URN from Trader context → 404 (PAP partition hides it)" \
+    || fail "Expected 404 for cross-tenant PAP fetch, got ${status_11_4} (potential cross-tenant read leak)"
+
+# ---------------------------------------------------------------------------
+# 11.5 — Direct fetch of KRA's app-dataset by id (explicit tenant-equality check)
+# ---------------------------------------------------------------------------
+# Different defense pattern from 11.4. `getAppDataset` does a global storage
+# `get(id)` then an explicit `entity.tenantId !== callingTenantId` check that
+# throws UnauthorizedError("datasetWrongTenant") → HTTP 401. Same S2-style
+# defense-in-depth pattern we shipped for transfer-mutation routes. So we
+# assert 401 + the specific error message, not 404.
+# KRA_DATASET_ID is a URL; jq's @uri encodes it for use as a path param.
+
+kra_dataset_encoded=$(jq -rn --arg id "${KRA_DATASET_ID}" '$id | @uri')
+step "Trader tries to fetch KRA's app-dataset by id (URL-encoded) (expect 401 datasetWrongTenant)"
+response_11_5=$(curl -sS -w "\n%{http_code}" "${HOST}/dataspace/app-datasets/${kra_dataset_encoded}" \
+    -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
+    -H "Cookie: access_token=${JWT_TRADER}")
+status_11_5=$(echo "${response_11_5}" | tail -1)
+body_11_5=$(echo "${response_11_5}" | sed '$d')
+if [ "${status_11_5}" = "401" ] && echo "${body_11_5}" | grep -q "datasetWrongTenant"; then
+    ok "Direct fetch of KRA's app-dataset by id from Trader context → 401 datasetWrongTenant (explicit tenant-equality check fires)"
+else
+    info "Response: ${body_11_5}"
+    fail "Expected 401 with datasetWrongTenant for cross-tenant app-dataset fetch, got ${status_11_5}"
+fi
+
+# ============================================================================
 echo ""
 echo -e "${GREEN}================================================================${NC}"
-echo -e "${GREEN}  ✓ Phases 0-10 complete (pull 0-7 + push 8-9 + S4 verify 10)${NC}"
+echo -e "${GREEN}  ✓ Phases 0-11 complete (pull 0-7 + push 8-9 + S4 verify 10 + negative-path isolation 11)${NC}"
 echo -e "${GREEN}================================================================${NC}"

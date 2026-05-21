@@ -39,6 +39,18 @@ warn() { echo -e "${YELLOW}  [WARN] $1${NC}"; }
 
 PASSWORD_FILE="${SCRIPT_DIR}/.node-passwords"
 
+# -------------------------------------------------------------------------
+# Pre-funded test mnemonics (lifted from Kenya scaffold pattern)
+# These public mnemonics already carry testnet balances, so bootstrap-legacy
+# can skip the faucet entirely. To force faucet flow, override each one with
+# an empty string: TWIN_MOBIUS_*_MNEMONIC="" ./setup.sh
+# Each of the 4 nodes needs a distinct mnemonic so wallets don't collide.
+# -------------------------------------------------------------------------
+TWIN_MOBIUS_NODE_MNEMONIC="${TWIN_MOBIUS_NODE_MNEMONIC-undo boss jewel dog announce mistake cry brass stock debris arrest patrol recipe annual clown honey icon twist modify quarter warm lock anchor cigar}"
+TWIN_MOBIUS_ASHFORD_MNEMONIC="${TWIN_MOBIUS_ASHFORD_MNEMONIC-hunt supply sun write waste imitate device bless heavy solve install basic bar assault invite globe umbrella fury drum diet inform under element banner}"
+TWIN_MOBIUS_SUFFOLK_MNEMONIC="${TWIN_MOBIUS_SUFFOLK_MNEMONIC-school left lawn urban oxygen cram unveil alpha space puzzle humble leisure fatigue high width auto deputy beach various style mammal kid cube liar}"
+TWIN_MOBIUS_MCP_MNEMONIC="${TWIN_MOBIUS_MCP_MNEMONIC-clog peasant gallery mouse tobacco lawn giraffe fuel cousin record burst enlist fiber fantasy indoor clog divorce music canoe reopen gorilla mutual fan loan}"
+
 echo -e "${BOLD}Mobius Supply Chain Docker Setup (4 nodes)${NC}"
 echo -e "  Mobius (Freight Forwarder):          port 3020 (trusted)"
 echo -e "  Ashford Port Health (Border Agency): port 3021"
@@ -102,6 +114,7 @@ bootstrap_node() {
     local node_label="$1"
     local service_name="$2"
     local password_key="$3"
+    local mnemonic="${4:-}"
     local tmpfile
 
     tmpfile=$(mktemp)
@@ -124,7 +137,17 @@ bootstrap_node() {
     fi
 
     set +e
-    docker compose run --rm -T "${service_name}" node src/index.js bootstrap-legacy 2>&1 | tee "${tmpfile}"
+    if [ -n "${mnemonic}" ]; then
+        step "Using pre-funded mnemonic for ${node_label} (skips faucet)"
+        docker compose run --rm -T \
+            -e TWIN_NODE_MNEMONIC="${mnemonic}" \
+            -e TWIN_ORGANIZATION_MNEMONIC="${mnemonic}" \
+            -e TWIN_ADMIN_USER_MNEMONIC="${mnemonic}" \
+            "${service_name}" node src/index.js bootstrap-legacy 2>&1 | tee "${tmpfile}"
+    else
+        step "No pre-funded mnemonic for ${node_label} — minting fresh DID via faucet"
+        docker compose run --rm -T "${service_name}" node src/index.js bootstrap-legacy 2>&1 | tee "${tmpfile}"
+    fi
     local exit_code=$?
     set -e
 
@@ -156,19 +179,19 @@ bootstrap_node() {
 echo ""
 echo -e "${BOLD}Step 3: Bootstrapping Mobius — Freight Forwarder (creates IOTA identity, ~60s)...${NC}"
 step "This creates a DID on IOTA testnet and generates an admin password"
-bootstrap_node "Mobius" "twin-mobius" "MOBIUS"
+bootstrap_node "Mobius" "twin-mobius" "MOBIUS" "${TWIN_MOBIUS_NODE_MNEMONIC}"
 
 echo ""
 echo -e "${BOLD}Step 4: Bootstrapping Ashford — Port Health (creates IOTA identity, ~60s)...${NC}"
-bootstrap_node "Ashford" "twin-ashford" "ASHFORD"
+bootstrap_node "Ashford" "twin-ashford" "ASHFORD" "${TWIN_MOBIUS_ASHFORD_MNEMONIC}"
 
 echo ""
 echo -e "${BOLD}Step 5: Bootstrapping Suffolk — Coastal Port Health (creates IOTA identity, ~60s)...${NC}"
-bootstrap_node "Suffolk" "twin-suffolk" "SUFFOLK"
+bootstrap_node "Suffolk" "twin-suffolk" "SUFFOLK" "${TWIN_MOBIUS_SUFFOLK_MNEMONIC}"
 
 echo ""
 echo -e "${BOLD}Step 6: Bootstrapping MCP — Port Community System (creates IOTA identity, ~60s)...${NC}"
-bootstrap_node "MCP" "twin-mcp" "MCP"
+bootstrap_node "MCP" "twin-mcp" "MCP" "${TWIN_MOBIUS_MCP_MNEMONIC}"
 
 # -------------------------------------------------------------------------
 # Summary
