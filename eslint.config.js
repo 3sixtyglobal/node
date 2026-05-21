@@ -17,12 +17,16 @@ import unicornPlugin from 'eslint-plugin-unicorn';
 import unusedImportsPlugin from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import { fileExists } from './scripts/common.mjs';
-import { repoStructurePlugin } from './scripts/eslint-plugin-repo-structure.mjs';
+import { noDeepTypeNestingPlugin } from './scripts/eslint/eslint-plugin-no-deep-type-nesting.mjs';
+import { noMultipleDeclarationsPlugin } from './scripts/eslint/eslint-plugin-no-multiple-declarations.mjs';
+import { repoStructurePlugin } from './scripts/eslint/eslint-plugin-repo-structure.mjs';
 
 let customModule;
 if (await fileExists('./eslint.config-custom.js')) {
 	customModule = await import('./eslint.config-custom.js');
 }
+
+const isCI = process.env.CI === 'true';
 
 headerPlugin.rules.header.meta.schema = false;
 
@@ -332,6 +336,11 @@ const tsRules = {
 		{
 			selector: 'class',
 			format: ['PascalCase']
+		},
+		{
+			selector: 'parameter',
+			format: ['camelCase'],
+			leadingUnderscore: 'forbid'
 		}
 	],
 	'@typescript-eslint/no-array-constructor': 'error',
@@ -362,7 +371,7 @@ const tsRules = {
 	'@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
 	'@typescript-eslint/no-unnecessary-qualifier': 'error',
 	'@typescript-eslint/no-unnecessary-type-arguments': 'error',
-	'@typescript-eslint/no-unnecessary-type-assertion': 'error',
+	'@typescript-eslint/no-unnecessary-type-assertion': isCI ? 'off' : 'error',
 	'@typescript-eslint/no-unused-expressions': 'error',
 	'@typescript-eslint/no-unused-private-class-members': 'error',
 	'@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
@@ -497,6 +506,7 @@ const jsDocRules = {
 	'jsdoc/match-description': 'error',
 	'jsdoc/multiline-blocks': ['error', { noSingleLineBlocks: true }],
 	'jsdoc/no-bad-blocks': 'error',
+	'jsdoc/no-blank-blocks': 'error',
 	'jsdoc/no-defaults': 'error',
 	'jsdoc/no-types': 'error',
 	'jsdoc/no-undefined-types': 'error',
@@ -594,10 +604,10 @@ const config = [
 	{
 		files: ['scripts/eslint-plugin-repo-structure.mjs'],
 		plugins: {
-			'repo-structure': repoStructurePlugin
+			'@twin.org': { rules: { ...repoStructurePlugin.rules } }
 		},
 		rules: {
-			'repo-structure/validate-repo-structure': 'error'
+			'@twin.org/validate-repo-structure': 'error'
 		}
 	},
 
@@ -672,7 +682,14 @@ const config = [
 			'unused-imports': unusedImportsPlugin,
 			'simple-import-sort': simpleImportSortPlugin,
 			header: headerPlugin,
-			'@stylistic': stylistic
+			'@stylistic': stylistic,
+			'@twin.org': {
+				rules: {
+					...repoStructurePlugin.rules,
+					...noMultipleDeclarationsPlugin.rules,
+					...noDeepTypeNestingPlugin.rules
+				}
+			}
 		},
 		rules: {
 			// Extend recommended TypeScript rules
@@ -701,7 +718,11 @@ const config = [
 			...headerRules,
 
 			// Stylistic
-			...stylisticRules
+			...stylisticRules,
+
+			// Repo structure rules
+			'@twin.org/no-multiple-declarations': 'error',
+			'@twin.org/no-deep-type-nesting': 'error'
 		},
 		settings: {
 			jsdoc: {
@@ -721,7 +742,9 @@ const config = [
 			'unicorn/consistent-function-scoping': 'off',
 			'unicorn/no-useless-undefined': 'off',
 			'no-restricted-syntax': ['error', ...tsRestrictedSyntax],
-			'@typescript-eslint/unbound-method': 'off'
+			'@typescript-eslint/unbound-method': 'off',
+			'@twin.org/no-multiple-declarations': 'off',
+			'@twin.org/no-deep-type-nesting': 'off'
 		}
 	}
 ];

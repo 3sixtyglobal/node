@@ -15,7 +15,7 @@ vi.mock("../src/builders/engineServerEnvBuilder.js", () => ({
 }));
 
 vi.mock("../src/builders/extensionsBuilder.js", () => ({
-	extensionsConfiguration: vi.fn().mockImplementation(async (_e: unknown, cfg: unknown) => cfg)
+	extensionsConfiguration: vi.fn().mockImplementation(async (e: unknown, cfg: unknown) => cfg)
 }));
 
 const SERVER_INFO: IServerInfo = { name: "test-node", version: "0.0.0" };
