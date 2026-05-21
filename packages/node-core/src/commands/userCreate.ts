@@ -5,6 +5,7 @@ import type {
 	IAuthenticationUser
 } from "@twin.org/api-auth-entity-storage-models";
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import { PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
@@ -49,6 +50,14 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 				extendedType: "DID",
 				description: I18n.formatMessage(
 					"node.cli.commands.user-create.params.organization-identity.description"
+				)
+			},
+			{
+				key: "tenant-id",
+				type: "string",
+				extendedType: "hex(32)",
+				description: I18n.formatMessage(
+					"node.cli.commands.user-create.params.tenant-id.description"
 				)
 			},
 			{
@@ -141,6 +150,7 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.userIdentity The DID for the user.
  * @param params.organizationIdentity The organization DID for the user.
+ * @param params.tenantId The tenant ID for the user.
  * @param params.email The email for the user.
  * @param params.password The password for the user.
  * @param params.scope The scope for the user.
@@ -158,6 +168,7 @@ export async function userCreate(
 	params: {
 		userIdentity?: string;
 		organizationIdentity?: string;
+		tenantId?: string;
 		email?: string;
 		password?: string;
 		scope?: string;
@@ -180,9 +191,17 @@ export async function userCreate(
 	  }
 	| undefined
 > {
-	Guards.email("userCreate", "email", params.email);
-	Did.guard("userCreate", "user-identity", params.userIdentity);
-	Did.guard("userCreate", "organization-identity", params.organizationIdentity);
+	const paramsEmail = params.email;
+	const paramsUserIdentity = params.userIdentity;
+	const paramsOrganizationIdentity = params.organizationIdentity;
+	Guards.email("userCreate", "email", paramsEmail);
+	Did.guard("userCreate", "user-identity", paramsUserIdentity);
+	Did.guard("userCreate", "organization-identity", paramsOrganizationIdentity);
+	if (Is.stringValue(params.tenantId)) {
+		Guards.stringHexLength("userCreate", "tenant-id", params.tenantId, 32);
+	} else if (envVars.tenantEnabled ?? false) {
+		throw new GeneralError("userCreate", "tenantIdRequired");
+	}
 
 	if (Is.stringValue(params.password) && params.password.length < 16) {
 		throw new GeneralError("userCreate", "passwordTooShort", { minLength: 16 });
@@ -204,104 +223,127 @@ export async function userCreate(
 
 	let createUser = true;
 
-	let existingUser;
-	try {
-		existingUser = await authenticationAdminComponent.get(params.email);
-	} catch {}
+	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
+	const returnJson = await ContextIdStore.run(
+		{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
+		async () => {
+			let existingUser: IAuthenticationUser | undefined;
+			try {
+				existingUser = await authenticationAdminComponent.get(paramsEmail);
+			} catch {}
 
-	if (!Is.empty(existingUser)) {
-		if (params.overwriteMode === "error") {
-			throw new GeneralError("userCreate", "userAlreadyExists");
-		} else if (params.overwriteMode === "skip") {
-			createUser = false;
-			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.skipping"));
-		} else if (params.overwriteMode === "overwrite") {
-			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.overwriting"));
-			await authenticationAdminComponent.remove(existingUser.email);
-			await identityProfileConnector.remove(existingUser.userIdentity);
+			if (!Is.empty(existingUser)) {
+				if (params.overwriteMode === "error") {
+					throw new GeneralError("userCreate", "userAlreadyExists");
+				} else if (params.overwriteMode === "skip") {
+					createUser = false;
+					CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.skipping"));
+				} else if (params.overwriteMode === "overwrite") {
+					CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.overwriting"));
+					const userToRemove = existingUser;
+					await ContextIdStore.run(
+						{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
+						async () => {
+							await authenticationAdminComponent.remove(userToRemove.email);
+						}
+					);
+					await identityProfileConnector.remove(userToRemove.userIdentity);
+					existingUser = undefined;
+				}
+			}
+
+			let json;
+			if (createUser) {
+				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.creating"));
+
+				const user: IAuthenticationUser & { password: string } = {
+					email: paramsEmail,
+					password: params.password ?? PasswordGenerator.generate(16),
+					userIdentity: paramsUserIdentity,
+					organizationIdentity: paramsOrganizationIdentity,
+					scope: params.scope?.split(",").map(s => s.trim()) ?? []
+				};
+
+				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
+
+				await ContextIdStore.run(
+					{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
+					async () => {
+						if (existingUser) {
+							await authenticationAdminComponent.update(user);
+						} else {
+							await authenticationAdminComponent.create(user);
+						}
+					}
+				);
+
+				const name = `${params.givenName ?? ""} ${params.familyName ?? ""}`.trim();
+				const publicProfile: WithContext<Person> = {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					name: name.length > 0 ? name : undefined
+				};
+				const privateProfile: WithContext<Person> = {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					givenName: params.givenName,
+					familyName: params.familyName,
+					email: paramsEmail
+				};
+
+				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingProfile"));
+				await identityProfileConnector.create(paramsUserIdentity, publicProfile, privateProfile);
+
+				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.userCreated"));
+
+				CLIDisplay.value(
+					I18n.formatMessage("node.cli.commands.user-create.labels.email"),
+					user.email
+				);
+
+				CLIDisplay.value(
+					I18n.formatMessage("node.cli.commands.user-create.labels.password"),
+					user.password
+				);
+
+				CLIDisplay.break();
+
+				json = {
+					did: paramsUserIdentity,
+					organizationDid: paramsOrganizationIdentity,
+					email: paramsEmail,
+					password: user.password,
+					scope: params.scope?.split(",").map(s => s.trim()) ?? [],
+					givenName: params.givenName ?? "",
+					familyName: params.familyName ?? ""
+				};
+
+				if (Is.stringValue(params.outputJson)) {
+					await CLIUtils.writeJsonFile(params.outputJson, json, false);
+				}
+
+				if (Is.stringValue(params.outputEnv)) {
+					await CLIUtils.writeEnvFile(
+						params.outputEnv,
+						[
+							`${params.outputEnvPrefix}DID="${params.userIdentity}"`,
+							`${params.outputEnvPrefix}ORGANIZATION_DID="${params.organizationIdentity}"`,
+							`${params.outputEnvPrefix}EMAIL="${paramsEmail}"`,
+							`${params.outputEnvPrefix}PASSWORD="${user.password}"`,
+							`${params.outputEnvPrefix}SCOPE="${params.scope ?? ""}"`,
+							`${params.outputEnvPrefix}GIVEN_NAME="${params.givenName ?? ""}"`,
+							`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`
+						],
+						false
+					);
+				}
+			}
+
+			CLIDisplay.done();
+
+			return json;
 		}
-	}
+	);
 
-	let json;
-	if (createUser) {
-		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.creating"));
-
-		const user: Omit<IAuthenticationUser, "salt"> = {
-			email: params.email,
-			password: params.password ?? PasswordGenerator.generate(16),
-			userIdentity: params.userIdentity,
-			organizationIdentity: params.organizationIdentity,
-			scope: params.scope?.split(",").map(s => s.trim()) ?? []
-		};
-
-		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
-
-		if (existingUser) {
-			await authenticationAdminComponent.update(user);
-		} else {
-			await authenticationAdminComponent.create(user);
-		}
-
-		const name = `${params.givenName ?? ""} ${params.familyName ?? ""}`.trim();
-		const publicProfile: WithContext<Person> = {
-			"@context": "https://schema.org",
-			"@type": "Person",
-			name: name.length > 0 ? name : undefined
-		};
-		const privateProfile: WithContext<Person> = {
-			"@context": "https://schema.org",
-			"@type": "Person",
-			givenName: params.givenName,
-			familyName: params.familyName,
-			email: params.email
-		};
-
-		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingProfile"));
-		await identityProfileConnector.create(params.userIdentity, publicProfile, privateProfile);
-
-		CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.userCreated"));
-
-		CLIDisplay.value(I18n.formatMessage("node.cli.commands.user-create.labels.email"), user.email);
-
-		CLIDisplay.value(
-			I18n.formatMessage("node.cli.commands.user-create.labels.password"),
-			user.password
-		);
-
-		CLIDisplay.break();
-
-		json = {
-			did: params.userIdentity,
-			organizationDid: params.organizationIdentity,
-			email: params.email,
-			password: user.password,
-			scope: params.scope?.split(",").map(s => s.trim()) ?? [],
-			givenName: params.givenName ?? "",
-			familyName: params.familyName ?? ""
-		};
-
-		if (Is.stringValue(params.outputJson)) {
-			await CLIUtils.writeJsonFile(params.outputJson, json, false);
-		}
-
-		if (Is.stringValue(params.outputEnv)) {
-			await CLIUtils.writeEnvFile(
-				params.outputEnv,
-				[
-					`${params.outputEnvPrefix}DID="${params.userIdentity}"`,
-					`${params.outputEnvPrefix}ORGANIZATION_DID="${params.organizationIdentity}"`,
-					`${params.outputEnvPrefix}EMAIL="${params.email}"`,
-					`${params.outputEnvPrefix}PASSWORD="${user.password}"`,
-					`${params.outputEnvPrefix}SCOPE="${params.scope ?? ""}"`,
-					`${params.outputEnvPrefix}GIVEN_NAME="${params.givenName ?? ""}"`,
-					`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`
-				],
-				false
-			);
-		}
-	}
-
-	CLIDisplay.done();
-
-	return json;
+	return returnJson;
 }

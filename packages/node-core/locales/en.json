@@ -42,7 +42,11 @@
 		},
 		"userCreate": {
 			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
-			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\"."
+			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\".",
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+		},
+		"userUpdate": {
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
 		},
 		"vaultKeyCreate": {
 			"vaultKeyAlreadyExists": "The vault key with ID already exists and overwriteMode is set to \"error\"."
@@ -457,6 +461,9 @@
 						"organization-identity": {
 							"description": "The organization DID to associate the user with."
 						},
+						"tenant-id": {
+							"description": "The tenant ID to associate the user with."
+						},
 						"email": {
 							"description": "The email address of the user."
 						},
@@ -511,6 +518,9 @@
 						},
 						"organization-identity": {
 							"description": "The organization DID to associate the user with."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to associate the user with."
 						},
 						"email": {
 							"description": "The email address of the user."
