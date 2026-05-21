@@ -1224,7 +1224,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AdminUserGetResponse"
+									"$ref": "#/components/schemas/AuthenticationUser"
 								},
 								"examples": {
 									"getUserResponseExample": {
@@ -1529,7 +1529,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AdminUserGetResponse"
+									"$ref": "#/components/schemas/AuthenticationUser"
 								},
 								"examples": {
 									"getUserResponseExample": {
@@ -20358,71 +20358,21 @@
 				]
 			},
 			"AdminUserCreateRequest": {
-				"description": "The body of the request.",
 				"type": "object",
 				"properties": {
-					"email": {
-						"type": "string",
-						"description": "The user e-mail address."
-					},
 					"password": {
-						"type": "string",
-						"description": "The encrypted password for the user."
-					},
-					"userIdentity": {
-						"type": "string",
-						"description": "The user identity."
-					},
-					"organizationIdentity": {
-						"type": "string",
-						"description": "The users organization."
-					},
-					"scope": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The scope assigned to the user, comma separated."
+						"type": "string"
 					}
 				},
 				"required": [
-					"email",
-					"password",
-					"userIdentity",
-					"organizationIdentity",
-					"scope"
-				]
-			},
-			"AdminUserGetResponse": {
-				"description": "The body of the request.",
-				"type": "object",
-				"properties": {
-					"email": {
-						"type": "string",
-						"description": "The user e-mail address."
-					},
-					"userIdentity": {
-						"type": "string",
-						"description": "The user identity."
-					},
-					"organizationIdentity": {
-						"type": "string",
-						"description": "The users organization."
-					},
-					"scope": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The scope assigned to the user, comma separated."
+					"password"
+				],
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/AuthenticationUser"
 					}
-				},
-				"required": [
-					"email",
-					"userIdentity",
-					"organizationIdentity",
-					"scope"
-				]
+				],
+				"description": "The body of the request."
 			},
 			"AdminUserUpdatePasswordRequest": {
 				"type": "object",
@@ -20952,6 +20902,37 @@
 					"id",
 					"event",
 					"dateCreated"
+				]
+			},
+			"AuthenticationUser": {
+				"description": "Contract definition for authentication user.",
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user e-mail address."
+					},
+					"userIdentity": {
+						"type": "string",
+						"description": "The user identity."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The users organization."
+					},
+					"scope": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The scope assigned to the user, comma separated."
+					}
+				},
+				"required": [
+					"email",
+					"userIdentity",
+					"organizationIdentity",
+					"scope"
 				]
 			},
 			"AutomationActionCreateRequest": {
@@ -21744,6 +21725,20 @@
 					"expirationDate": {
 						"type": "string",
 						"description": "The date the verifiable credential is valid until."
+					},
+					"jwtHeaderFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT when creating the verifiable credential in jwt format."
+					},
+					"jwtPayloadFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT payload when creating the verifiable credential in jwt format."
 					}
 				},
 				"required": [
@@ -21825,6 +21820,20 @@
 					"expirationDate": {
 						"type": "string",
 						"description": "The expiration date/time for the presentation."
+					},
+					"jwtHeaderFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT header when creating the verifiable presentation in jwt format."
+					},
+					"jwtPayloadFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT payload when creating the verifiable presentation in jwt format."
 					}
 				},
 				"required": [

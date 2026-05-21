@@ -20,9 +20,9 @@
 
 - [CliCommandParamType](type-aliases/CliCommandParamType.md)
 - [ModuleProtocol](type-aliases/ModuleProtocol.md)
-- [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
+- [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionShutdownMethod](type-aliases/NodeExtensionShutdownMethod.md)
 
 ## Variables
