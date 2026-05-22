@@ -1,4 +1,4 @@
-name: TWIN Node Docker Image CI/CD
+name: Docker Publish Image
 
 on:
   workflow_dispatch:
