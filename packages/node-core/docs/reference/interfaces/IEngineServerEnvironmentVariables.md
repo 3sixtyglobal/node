@@ -1794,6 +1794,19 @@ The interval in seconds for performing health checks, defaults to 60.
 
 ***
 
+### healthStartupIntervalSeconds? {#healthstartupintervalseconds}
+
+> `optional` **healthStartupIntervalSeconds?**: `string`
+
+The interval in seconds for performing health checks at startup, defaults to 2.
+This allows components that take a long time to initialize to be healthy before the first health check is performed.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthStartupIntervalSeconds`](IEngineEnvironmentVariables.md#healthstartupintervalseconds)
+
+***
+
 ### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
 
 > `optional` **urlTransformerEncryptionKeyId?**: `string`

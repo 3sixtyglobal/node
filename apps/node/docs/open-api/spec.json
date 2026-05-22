@@ -7996,7 +7996,7 @@
 								"notarizationCreateExample": {
 									"value": {
 										"mode": "dynamic",
-										"data": {},
+										"data": "aGVsbG8gd29ybGQ=",
 										"description": "My first notarization"
 									}
 								}
@@ -8107,7 +8107,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Notarization"
+									"$ref": "#/components/schemas/NotarizationGetResponse"
 								},
 								"examples": {
 									"notarizationGetResponseExample": {
@@ -8115,7 +8115,7 @@
 											"id": "123",
 											"mode": "dynamic",
 											"dateCreated": "2026-01-01T00:00:00.000Z",
-											"data": {},
+											"data": "aGVsbG8gd29ybGQ=",
 											"description": "A notarization"
 										}
 									}
@@ -8299,7 +8299,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Notarization"
+								"$ref": "#/components/schemas/NotarizationUpdateRequest"
 							},
 							"examples": {
 								"notarizationUpdateExample": {
@@ -8307,7 +8307,7 @@
 										"id": "123",
 										"mode": "dynamic",
 										"dateCreated": "2026-01-01T00:00:00.000Z",
-										"data": {},
+										"data": "aGVsbG8gd29ybGQ=",
 										"description": "Updated notarization"
 									}
 								}
@@ -8643,7 +8643,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8669,7 +8668,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8703,7 +8701,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8729,7 +8726,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8914,7 +8910,6 @@
 							"examples": {
 								"attestationTransferRequestExample": {
 									"value": {
-										"holderIdentity": "did:iota:tst:0x06ae1034f9f4af1b408a0b54e877bb476259666a14f221400d3746aecefa7105",
 										"holderAddress": "tst1prctjk5ck0dutnsunnje6u90jk5htx03qznjjmkd6843pzltlgz87srjzzv"
 									}
 								}
@@ -12253,7 +12248,7 @@
 				}
 			}
 		},
-		"/aig/{id}/versions/{versionId}": {
+		"/aig/{id}/versions/{version}": {
 			"get": {
 				"operationId": "auditableItemGraphVersionGet",
 				"summary": "Get a graph vertex at a specific version",
@@ -12273,15 +12268,15 @@
 						"example": "aig:1234567890"
 					},
 					{
-						"name": "versionId",
-						"description": "The id of the version (changeset id) to get.",
+						"name": "version",
+						"description": "The version number to get.",
 						"in": "path",
 						"required": true,
 						"schema": {
 							"type": "string"
 						},
 						"style": "simple",
-						"example": "changeset:1234567890"
+						"example": "1"
 					},
 					{
 						"name": "accept",
@@ -12459,9 +12454,18 @@
 												"AuditableItemGraphVertexVersionList"
 											],
 											"itemListElement": [
-												0,
-												1,
-												2
+												{
+													"version": 0,
+													"dateCreated": "2024-08-22T11:55:16.271Z"
+												},
+												{
+													"version": 1,
+													"dateCreated": "2024-08-22T11:56:00.000Z"
+												},
+												{
+													"version": 2,
+													"dateCreated": "2024-08-22T11:57:00.000Z"
+												}
 											]
 										}
 									}
@@ -20490,17 +20494,12 @@
 			"AttestationTransferRequest": {
 				"type": "object",
 				"properties": {
-					"holderIdentity": {
-						"type": "string",
-						"description": "The new holder identity."
-					},
 					"holderAddress": {
 						"type": "string",
 						"description": "The new holder address."
 					}
 				},
 				"required": [
-					"holderIdentity",
 					"holderAddress"
 				],
 				"description": "The parameters to be used in the transfer."
@@ -22151,8 +22150,52 @@
 				],
 				"description": "The body which contains the error."
 			},
-			"Notarization": {
-				"description": "Interface describing a notarization.",
+			"NotarizationCreateRequest": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"$ref": "#/components/schemas/NotarizationMode"
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
+					},
+					"immutableDescription": {
+						"type": "string",
+						"description": "An optional description of the notarization that cannot be changed after creation."
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description of the notarization that can be modified until the notarization is locked."
+					},
+					"deleteLockDateTime": {
+						"type": "string",
+						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
+					},
+					"transferLockUntilDestroyed": {
+						"type": "boolean",
+						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
+					},
+					"transferLockDateTime": {
+						"type": "string",
+						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"data": {
+						"type": "string",
+						"description": "The notarization data as a base64 encoded string."
+					},
+					"namespace": {
+						"type": "string",
+						"description": "The namespace of the connector to use for the notarization, defaults to component configured namespace."
+					}
+				},
+				"required": [
+					"mode",
+					"data"
+				],
+				"description": "The request data."
+			},
+			"NotarizationGetResponse": {
 				"type": "object",
 				"properties": {
 					"id": {
@@ -22170,13 +22213,6 @@
 						"type": "string",
 						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
 					},
-					"data": {
-						"type": "array",
-						"items": {
-							"type": "number"
-						},
-						"description": "The notarization data as a byte array."
-					},
 					"immutableDescription": {
 						"type": "string",
 						"description": "An optional description of the notarization that cannot be changed after creation."
@@ -22196,6 +22232,10 @@
 					"transferLockDateTime": {
 						"type": "string",
 						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"data": {
+						"type": "string",
+						"description": "The notarization data as a base64 encoded string."
 					}
 				},
 				"required": [
@@ -22203,55 +22243,8 @@
 					"mode",
 					"dateCreated",
 					"data"
-				]
-			},
-			"NotarizationCreateRequest": {
-				"type": "object",
-				"properties": {
-					"mode": {
-						"$ref": "#/components/schemas/NotarizationMode"
-					},
-					"dateModified": {
-						"type": "string",
-						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
-					},
-					"data": {
-						"type": "array",
-						"items": {
-							"type": "number"
-						},
-						"description": "The notarization data as a byte array."
-					},
-					"immutableDescription": {
-						"type": "string",
-						"description": "An optional description of the notarization that cannot be changed after creation."
-					},
-					"description": {
-						"type": "string",
-						"description": "An optional description of the notarization that can be modified until the notarization is locked."
-					},
-					"deleteLockDateTime": {
-						"type": "string",
-						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
-					},
-					"transferLockUntilDestroyed": {
-						"type": "boolean",
-						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
-					},
-					"transferLockDateTime": {
-						"type": "string",
-						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
-					},
-					"namespace": {
-						"type": "string",
-						"description": "The namespace of the connector to use for the notarization, defaults to component configured namespace."
-					}
-				},
-				"required": [
-					"mode",
-					"data"
 				],
-				"description": "The request data."
+				"description": "The response body."
 			},
 			"NotarizationMode": {
 				"description": "Supported notarization mode values.",
@@ -22276,6 +22269,57 @@
 				},
 				"required": [
 					"recipientAddress"
+				],
+				"description": "The request data."
+			},
+			"NotarizationUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The unique identifier of the notarization."
+					},
+					"mode": {
+						"$ref": "#/components/schemas/NotarizationMode"
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "The date and time when the notarization was created, in ISO 8601 format."
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
+					},
+					"immutableDescription": {
+						"type": "string",
+						"description": "An optional description of the notarization that cannot be changed after creation."
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description of the notarization that can be modified until the notarization is locked."
+					},
+					"deleteLockDateTime": {
+						"type": "string",
+						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
+					},
+					"transferLockUntilDestroyed": {
+						"type": "boolean",
+						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
+					},
+					"transferLockDateTime": {
+						"type": "string",
+						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"data": {
+						"type": "string",
+						"description": "The notarization data as a base64 encoded string."
+					}
+				},
+				"required": [
+					"id",
+					"mode",
+					"dateCreated",
+					"data"
 				],
 				"description": "The request data."
 			},
@@ -23331,6 +23375,14 @@
 					"identity": {
 						"type": "string",
 						"description": "The identity associated with the payload."
+					},
+					"tenantId": {
+						"type": "string",
+						"description": "The tenant that issued the payload, if multi-tenancy was active at generation time."
+					},
+					"organizationId": {
+						"type": "string",
+						"description": "The organisation that issued the payload, if an authenticated user context was available at generation time."
 					},
 					"data": {
 						"type": "object",
