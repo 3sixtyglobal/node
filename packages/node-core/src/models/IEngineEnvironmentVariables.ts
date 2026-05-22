@@ -750,6 +750,12 @@ export interface IEngineEnvironmentVariables {
 	healthIntervalSeconds?: string;
 
 	/**
+	 * The interval in seconds for performing health checks at startup, defaults to 2.
+	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
+	 */
+	healthStartupIntervalSeconds?: string;
+
+	/**
 	 * The id of the key in the vault to use for encrypting parameters in url transformer.
 	 */
 	urlTransformerEncryptionKeyId?: string;

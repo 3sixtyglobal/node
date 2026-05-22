@@ -528,7 +528,7 @@ describe("node-core", () => {
 			"DELETE   /attestation/:id",
 			"POST     /aig",
 			"GET      /aig/:id",
-			"GET      /aig/:id/versions/:versionId",
+			"GET      /aig/:id/versions/:version",
 			"GET      /aig/:id/versions",
 			"GET      /aig/:id/changesets/:changesetId",
 			"GET      /aig/:id/changesets",

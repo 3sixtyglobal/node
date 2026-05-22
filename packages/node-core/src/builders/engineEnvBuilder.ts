@@ -698,7 +698,8 @@ async function configureHealth(
 			type: HealthComponentType.Service,
 			options: {
 				config: {
-					healthCheckInterval: (Coerce.integer(envVars.healthIntervalSeconds) ?? 60) * 1000
+					healthCheckInterval: (Coerce.integer(envVars.healthIntervalSeconds) ?? 60) * 1000,
+					initialInterval: (Coerce.integer(envVars.healthStartupIntervalSeconds) ?? 2) * 1000
 				}
 			}
 		});

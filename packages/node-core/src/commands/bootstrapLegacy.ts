@@ -324,7 +324,7 @@ export async function bootstrapLegacy(
 					tenantId,
 					email: envVars.adminUserName ?? "admin@node",
 					password: envVars.adminUserPassword,
-					scope: "tenant-admin",
+					scope: ["tenant-admin", "user-admin"].join(","),
 					givenName: "Node",
 					familyName: "Admin",
 					overwriteMode: "skip"

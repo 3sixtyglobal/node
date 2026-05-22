@@ -1,0 +1,87 @@
+{
+	"group": "Document Management",
+	"steps": [
+		{
+			"description": "POST /documents — 400 missing blob",
+			"method": "POST",
+			"path": "/documents",
+			"body": {
+				"documentId": "{{docId}}",
+				"documentIdFormat": "PLAIN",
+				"documentCode": "unece:DocumentCodeList#1"
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /documents — 400 missing documentId",
+			"method": "POST",
+			"path": "/documents",
+			"body": {
+				"documentIdFormat": "PLAIN",
+				"documentCode": "unece:DocumentCodeList#1",
+				"blob": "dGVzdCBkb2N1bWVudA=="
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /documents",
+			"method": "POST",
+			"path": "/documents",
+			"body": {
+				"documentId": "{{docId}}",
+				"documentIdFormat": "PLAIN",
+				"documentCode": "unece:DocumentCodeList#1",
+				"blob": "dGVzdCBkb2N1bWVudA=="
+			},
+			"expectedStatus": 201,
+			"capture": { "docGraphId": "location-last-segment" }
+		},
+		{
+			"description": "GET /documents/:id — 404 for unknown id",
+			"method": "GET",
+			"path": "/documents/aig:nonexistent",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /documents/:id",
+			"method": "GET",
+			"path": "/documents/{{docGraphId}}",
+			"expectedStatus": 200,
+			"capture": { "documentRevision": "body.itemListElement.[0].documentRevision" }
+		},
+		{
+			"description": "GET /documents/:id/:revision",
+			"method": "GET",
+			"path": "/documents/{{docGraphId}}/{{documentRevision}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /documents/:id",
+			"method": "PUT",
+			"path": "/documents/{{docGraphId}}",
+			"body": {
+				"blob": "dXBkYXRlZCBkb2N1bWVudA=="
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /documents — list by documentId",
+			"method": "GET",
+			"path": "/documents?documentId={{docId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /documents/:id/:revision",
+			"method": "DELETE",
+			"path": "/documents/{{docGraphId}}/{{documentRevision}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /documents/:id/:revision — dateDeleted set after delete",
+			"method": "GET",
+			"path": "/documents/{{docGraphId}}/{{documentRevision}}",
+			"expectedStatus": 200,
+			"assert": { "body.dateDeleted": "isDefined" }
+		}
+	]
+}

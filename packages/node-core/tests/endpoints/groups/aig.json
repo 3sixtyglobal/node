@@ -1,0 +1,89 @@
+{
+	"group": "Auditable Item Graph",
+	"steps": [
+		{
+			"description": "POST /aig — 400 missing type",
+			"method": "POST",
+			"path": "/aig",
+			"body": {
+				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"]
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /aig — create vertex",
+			"method": "POST",
+			"path": "/aig",
+			"body": {
+				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"],
+				"type": "AuditableItemGraphVertex"
+			},
+			"expectedStatus": 201,
+			"capture": { "vertexId": "location-last-segment" }
+		},
+		{
+			"description": "GET /aig/:id — 404 for unknown id",
+			"method": "GET",
+			"path": "/aig/aig:nonexistent",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /aig/:id",
+			"method": "GET",
+			"path": "/aig/{{vertexId}}?includeChangesets=true",
+			"expectedStatus": 200,
+			"assert": { "body.id": "isDefined" }
+		},
+		{
+			"description": "PUT /aig/:id — update with annotation",
+			"method": "PUT",
+			"path": "/aig/{{vertexId}}",
+			"body": {
+				"@context": [
+					"https://schema.twindev.org/aig/",
+					"https://schema.twindev.org/common/",
+					"https://schema.org"
+				],
+				"type": "AuditableItemGraphVertex",
+				"annotationObject": {
+					"@context": "https://schema.org",
+					"@type": "Note",
+					"name": "Updated vertex annotation"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /aig/:id/versions",
+			"method": "GET",
+			"path": "/aig/{{vertexId}}/versions",
+			"expectedStatus": 200,
+			"capture": { "version": "body.itemListElement.[0].version" }
+		},
+		{
+			"description": "GET /aig/:id/changesets",
+			"method": "GET",
+			"path": "/aig/{{vertexId}}/changesets",
+			"expectedStatus": 200,
+			"capture": { "changesetId": "body.itemListElement.[0].id|last-colon" }
+		},
+		{
+			"description": "GET /aig/:id/changesets/:changesetId",
+			"method": "GET",
+			"path": "/aig/{{vertexId}}/changesets/{{changesetId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /aig/:id/versions/:version",
+			"method": "GET",
+			"path": "/aig/{{vertexId}}/versions/{{version}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /aig — list vertices",
+			"method": "GET",
+			"path": "/aig",
+			"expectedStatus": 200
+		}
+	]
+}

@@ -1,0 +1,65 @@
+{
+	"group": "Notarization",
+	"steps": [
+		{
+			"description": "POST /notarization — 400 missing data",
+			"method": "POST",
+			"path": "/notarization",
+			"body": { "mode": "dynamic" },
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /notarization",
+			"method": "POST",
+			"path": "/notarization",
+			"body": {
+				"mode": "dynamic",
+				"data": "dGVzdA=="
+			},
+			"expectedStatus": 201,
+			"capture": { "notarizationId": "location-last-segment" }
+		},
+		{
+			"description": "GET /notarization/:id",
+			"method": "GET",
+			"path": "/notarization/{{notarizationId}}",
+			"expectedStatus": 200,
+			"capture": {
+				"notarizationMode": "body.mode",
+				"notarizationData": "body.data",
+				"notarizationDateCreated": "body.dateCreated"
+			}
+		},
+		{
+			"description": "PUT /notarization/:id",
+			"method": "PUT",
+			"path": "/notarization/{{notarizationId}}",
+			"body": {
+				"mode": "{{notarizationMode}}",
+				"data": "{{notarizationData}}",
+				"dateCreated": "{{notarizationDateCreated}}",
+				"description": "Updated notarization"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /notarization/:id/transfer",
+			"method": "POST",
+			"path": "/notarization/{{notarizationId}}/transfer",
+			"body": { "recipientAddress": "{{transferAddress}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /notarization/:id",
+			"method": "DELETE",
+			"path": "/notarization/{{notarizationId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /notarization/:id — 404 after delete",
+			"method": "GET",
+			"path": "/notarization/{{notarizationId}}",
+			"expectedStatus": 404
+		}
+	]
+}

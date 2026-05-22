@@ -4,7 +4,7 @@ import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { Coerce, GeneralError, I18n, Is, RandomHelper, StringHelper } from "@twin.org/core";
 import { Bip39 } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
-import { WalletConnectorType } from "@twin.org/engine-types";
+import { IdentityConnectorType, WalletConnectorType } from "@twin.org/engine-types";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
@@ -193,7 +193,10 @@ export async function identityCreate(
 			I18n.formatMessage("node.cli.commands.identity-create.labels.did"),
 			workingIdentity
 		);
-		if (Is.stringValue(envVars.iotaExplorerEndpoint)) {
+		if (
+			Is.stringValue(envVars.iotaExplorerEndpoint) &&
+			envVars.identityConnector === IdentityConnectorType.Iota
+		) {
 			const idParts = Did.parse(workingIdentity);
 			if (Is.stringValue(walletAddress)) {
 				CLIDisplay.value(

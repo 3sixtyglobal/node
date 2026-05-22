@@ -1,0 +1,26 @@
+{
+	"group": "Authentication - Login",
+	"steps": [
+		{
+			"description": "POST /authentication/login",
+			"method": "POST",
+			"path": "/authentication/login",
+			"auth": false,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" },
+			"assert": { "body.expiry": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email — capture identities",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 200,
+			"capture": {
+				"adminUserIdentity": "body.userIdentity",
+				"adminOrgIdentity": "body.organizationIdentity"
+			},
+			"assert": { "body.userIdentity": "isDefined" }
+		}
+	]
+}

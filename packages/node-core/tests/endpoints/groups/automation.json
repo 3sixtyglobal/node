@@ -1,0 +1,71 @@
+{
+	"group": "Automation",
+	"steps": [
+		{
+			"description": "POST /automation — 400 missing actionType",
+			"method": "POST",
+			"path": "/automation",
+			"body": {
+				"trigger": "manual",
+				"configuration": { "url": "https://example.com/test", "method": "GET" }
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /automation — 400 missing trigger",
+			"method": "POST",
+			"path": "/automation",
+			"body": {
+				"actionType": "fetch",
+				"configuration": { "url": "https://example.com/test", "method": "GET" }
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /automation",
+			"method": "POST",
+			"path": "/automation",
+			"body": {
+				"actionType": "fetch",
+				"trigger": "manual",
+				"configuration": {
+					"url": "https://example.com/test",
+					"method": "GET"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "automationActionId": "location-last-segment" }
+		},
+		{
+			"description": "GET /automation/:actionId",
+			"method": "GET",
+			"path": "/automation/{{automationActionId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /automation — list",
+			"method": "GET",
+			"path": "/automation",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /automation/trigger/:trigger",
+			"method": "POST",
+			"path": "/automation/trigger/manual",
+			"body": {},
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /automation/:actionId",
+			"method": "DELETE",
+			"path": "/automation/{{automationActionId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /automation/:actionId — 404 after delete",
+			"method": "GET",
+			"path": "/automation/{{automationActionId}}",
+			"expectedStatus": 404
+		}
+	]
+}

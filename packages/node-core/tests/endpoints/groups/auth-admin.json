@@ -1,0 +1,98 @@
+{
+	"group": "Authentication Admin",
+	"steps": [
+		{
+			"description": "GET /authentication/admin/users/:email",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 200,
+			"assert": { "body.email": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/admin/users/identity/:identity",
+			"method": "GET",
+			"path": "/authentication/admin/users/identity/{{adminUserIdentity}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /authentication/admin/users — 400 missing email",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": {
+				"password": "{{testUserPassword}}",
+				"userIdentity": "{{testIdentity}}",
+				"organizationIdentity": "{{adminOrgIdentity}}",
+				"scope": ["read-only"]
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /authentication/admin/users — 400 missing password",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": {
+				"email": "{{testUserEmail}}",
+				"userIdentity": "{{testIdentity}}",
+				"organizationIdentity": "{{adminOrgIdentity}}",
+				"scope": ["read-only"]
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /authentication/admin/users — create test user",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": {
+				"email": "{{testUserEmail}}",
+				"password": "{{testUserPassword}}",
+				"userIdentity": "{{testIdentity}}",
+				"organizationIdentity": "{{adminOrgIdentity}}",
+				"scope": ["read-only"]
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:testUserEmail",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /authentication/admin/users/identity/:testIdentity",
+			"method": "GET",
+			"path": "/authentication/admin/users/identity/{{testIdentity}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /authentication/admin/users/:testUserEmail — update",
+			"method": "PUT",
+			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"body": {
+				"email": "{{testUserEmail}}",
+				"userIdentity": "{{testIdentity}}",
+				"organizationIdentity": "{{adminOrgIdentity}}",
+				"scope": ["read-only", "write"]
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "PUT /authentication/admin/users/:testUserEmail/password",
+			"method": "PUT",
+			"path": "/authentication/admin/users/{{testUserEmail}}/password",
+			"body": { "newPassword": "NewTestUser@678901!" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users/:testUserEmail",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /identity/:testIdentity — cleanup test identity",
+			"method": "DELETE",
+			"path": "/identity/{{testIdentity}}",
+			"expectedStatus": 204
+		}
+	]
+}

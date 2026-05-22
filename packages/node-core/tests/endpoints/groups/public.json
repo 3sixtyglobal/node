@@ -1,0 +1,35 @@
+{
+	"group": "Public endpoints",
+	"steps": [
+		{
+			"description": "GET /info",
+			"method": "GET",
+			"path": "/info",
+			"auth": false,
+			"expectedStatus": 200,
+			"assert": { "body.name": "isDefined" }
+		},
+		{
+			"description": "GET /spec",
+			"method": "GET",
+			"path": "/spec",
+			"auth": false,
+			"expectedStatus": 200,
+			"assert": { "body.openapi": "isDefined" }
+		},
+		{
+			"description": "GET /livez",
+			"method": "GET",
+			"path": "/livez",
+			"auth": false,
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /readyz",
+			"method": "GET",
+			"path": "/readyz",
+			"auth": false,
+			"expectedStatus": 200
+		}
+	]
+}
