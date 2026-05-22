@@ -93,7 +93,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ./apps/node
-          file: ./apps/node/deploy/Dockerfile
+          file: ./apps/node/deploy/dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.docker-tags.outputs.tags }}
