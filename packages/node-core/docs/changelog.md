@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.40](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.39...node-core-v0.0.3-next.40) (2026-05-22)
+
+
+### Features
+
+* endpoints-runner ([#153](https://github.com/iotaledger/twin-node/issues/153)) ([cca42d0](https://github.com/iotaledger/twin-node/commit/cca42d07d6655d401c909308e8b73606fef05248))
+
 ## [0.0.3-next.39](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.38...node-core-v0.0.3-next.39) (2026-05-21)
 
 
