@@ -282,12 +282,14 @@ negotiate_contract() {
     pnap_body=$(jq -n \
         --arg id "${consumer_pid}" \
         --arg dateCreated "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
+        --arg nodeIdentity "${consumer_did}" \
         --arg organizationIdentity "${consumer_did}" \
         '{
             "id": $id,
             "correlationId": "",
             "dateCreated": $dateCreated,
             "state": "REQUESTED",
+            "nodeIdentity": $nodeIdentity,
             "organizationIdentity": $organizationIdentity
         }')
 

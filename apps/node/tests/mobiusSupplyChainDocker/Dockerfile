@@ -134,6 +134,12 @@ COPY engine/node_modules/@twin.org/automation-models ./node_modules/@twin.org/au
 COPY engine/node_modules/@twin.org/automation-rest-client ./node_modules/@twin.org/automation-rest-client/
 COPY engine/node_modules/@twin.org/automation-service ./node_modules/@twin.org/automation-service/
 
+# @twin.org/crypto became a runtime dep of dataspace-control-plane-service +
+# rights-management-pnp-service (BLAKE2b hashing for tid/composite identifier
+# under the node/tenant identifier model). Pull from the dataspace submodule's
+# install since the workspace root doesn't have a flat node_modules.
+COPY dataspace/node_modules/@twin.org/crypto ./node_modules/@twin.org/crypto/
+
 # The 'node' symlink points to the app itself — create it pointing to /app
 RUN ln -s /app ./node_modules/@twin.org/node
 

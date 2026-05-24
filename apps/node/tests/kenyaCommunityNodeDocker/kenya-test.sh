@@ -234,8 +234,9 @@ step "Pre-injecting Trader negotiation entry into PNAP..."
 pnap_body=$(jq -n \
     --arg id "${TRADER_CONSUMER_PID}" \
     --arg dateCreated "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
+    --arg nodeIdentity "${TRADER_DID}" \
     --arg organizationIdentity "${TRADER_DID}" \
-    '{ id: $id, correlationId: "", dateCreated: $dateCreated, state: "REQUESTED", organizationIdentity: $organizationIdentity }')
+    '{ id: $id, correlationId: "", dateCreated: $dateCreated, state: "REQUESTED", nodeIdentity: $nodeIdentity, organizationIdentity: $organizationIdentity }')
 
 # PNAP /admin/* routes accept the local session JWT (mobius pattern).
 # Trust JWT is reserved for cross-tenant DSP/PNP messages on /request and friends.
@@ -336,19 +337,24 @@ fi
 phase 6 "Trader requestTransfer against the agreement"
 # ============================================================================
 TRADER_DSP_PID="urn:uuid:trader-dsp-$(date +%s)-${RANDOM}"
-# DSP transfer request goes to KRA (provider) → route via tenantToken
-tr_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
-    -d "$(jq -n \
-        --arg ctx "${DSP_CONTEXT}" \
-        --arg consumerPid "${TRADER_DSP_PID}" \
-        --arg agreementId "${TRADER_AGREEMENT_ID}" \
-        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "Http-Pull-Query-Format", callbackAddress: $callbackAddress }')")
-
-tr_http=$(echo "${tr_resp}" | tail -1)
-tr_body=$(echo "${tr_resp}" | sed '$d')
+# DSP transfer request goes to KRA (provider) → route via tenantToken.
+# Uses scripts/dsp-client.mjs which wraps DataspaceControlPlaneRestClient —
+# exercises the production rest-client URL construction + endpoint-level
+# query preservation + Bearer header handling (P2).
+transfer_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${TRADER_DSP_PID}" \
+    --arg agreementId "${TRADER_AGREEMENT_ID}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "Http-Pull-Query-Format", callbackAddress: $callbackAddress }')
+tr_resp=$(node scripts/dsp-client.mjs requestTransfer \
+    --host "${HOST}" \
+    --tenant-token "${KRA_TENANT_TOKEN}" \
+    --trust-payload "${TRADER_TRUST_JWT}" \
+    --body "${transfer_msg}")
+tr_ok=$(echo "${tr_resp}" | jq -r '.ok')
+[ "${tr_ok}" = "true" ] || fail "DSP rest-client requestTransfer failed: $(echo "${tr_resp}" | jq -r '.errorMessage')"
+tr_body=$(echo "${tr_resp}" | jq -c '.body')
 tr_type=$(echo "${tr_body}" | jq -r '.["@type"] // empty')
 
 if [ "${tr_type}" = "TransferError" ]; then
@@ -363,12 +369,20 @@ ok "Transfer created (providerPid: ${PROVIDER_DSP_PID})"
 phase 7 "Trader startTransfer + receives encrypted endpoint + pulls data"
 # ============================================================================
 # DSP transfer start runs on KRA (provider) side → route via tenantToken
-start_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${PROVIDER_DSP_PID}/start?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
-    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${TRADER_DSP_PID}\",\"providerPid\":\"${PROVIDER_DSP_PID}\"}")
-start_http=$(echo "${start_resp}" | tail -1)
-start_body=$(echo "${start_resp}" | sed '$d')
+# Uses scripts/dsp-client.mjs (DataspaceControlPlaneRestClient wrapper, P2).
+start_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${TRADER_DSP_PID}" \
+    --arg providerPid "${PROVIDER_DSP_PID}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
+start_resp=$(node scripts/dsp-client.mjs startTransfer \
+    --host "${HOST}" \
+    --tenant-token "${KRA_TENANT_TOKEN}" \
+    --trust-payload "${KRA_TRUST_JWT}" \
+    --body "${start_msg}")
+start_ok=$(echo "${start_resp}" | jq -r '.ok')
+[ "${start_ok}" = "true" ] || fail "DSP rest-client startTransfer failed: $(echo "${start_resp}" | jq -r '.errorMessage')"
+start_body=$(echo "${start_resp}" | jq -c '.body')
 
 data_endpoint_raw=$(echo "${start_body}" | jq -r '.dataAddress.endpoint // empty')
 data_token=$(echo "${start_body}" | jq -r '(.dataAddress.endpointProperties // [])[] | select(.name == "authorization") | .value // empty' | head -1)
@@ -411,25 +425,41 @@ phase 8 "Push setup REJECTS missing tenant token (multi-tenant gate)"
 # x-enc-tenant-token query parameter. On a multi-tenant publisher the data plane
 # must refuse setupPushSubscription rather than letting the eventual delivery 401.
 TRADER_PUSH_NEG_PID="urn:uuid:trader-push-neg-$(date +%s)-${RANDOM}"
-push_neg_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
-    -d "$(jq -n \
-        --arg ctx "${DSP_CONTEXT}" \
-        --arg consumerPid "${TRADER_PUSH_NEG_PID}" \
-        --arg agreementId "${TRADER_AGREEMENT_ID}" \
-        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: "http://twin-kenya-node:3000/dataspace/inbox" } }')")
-push_neg_body=$(echo "${push_neg_resp}" | sed '$d')
+push_neg_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${TRADER_PUSH_NEG_PID}" \
+    --arg agreementId "${TRADER_AGREEMENT_ID}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: "http://twin-kenya-node:3000/dataspace/inbox" } }')
+push_neg_resp=$(node scripts/dsp-client.mjs requestTransfer \
+    --host "${HOST}" \
+    --tenant-token "${KRA_TENANT_TOKEN}" \
+    --trust-payload "${TRADER_TRUST_JWT}" \
+    --body "${push_neg_msg}")
+push_neg_ok=$(echo "${push_neg_resp}" | jq -r '.ok')
+[ "${push_neg_ok}" = "true" ] || fail "Negative push requestTransfer failed: $(echo "${push_neg_resp}" | jq -r '.errorMessage')"
+push_neg_body=$(echo "${push_neg_resp}" | jq -c '.body')
 push_neg_provider_pid=$(echo "${push_neg_body}" | jq -r '.providerPid // empty')
 [ -n "${push_neg_provider_pid}" ] || fail "Negative push: requestTransfer did not return providerPid"
 
 # Now send startTransfer — the setup gate inside the data plane should reject.
-start_neg_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${push_neg_provider_pid}/start?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
-    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${TRADER_PUSH_NEG_PID}\",\"providerPid\":\"${push_neg_provider_pid}\"}")
-start_neg_body=$(echo "${start_neg_resp}" | sed '$d')
+# The platform may return EITHER:
+#   - HTTP 200 + body { "@type": "TransferError", code: "..." } (DSP-spec shape), or
+#   - HTTP 5xx + same body (current TWIN behaviour — GeneralError thrown from data plane
+#     bubbles through error handler with 500 status but the body still carries the
+#     TransferError envelope). The dsp-client wrapper captures the response body
+#     in either shape, so we read .body regardless of .ok.
+start_neg_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${TRADER_PUSH_NEG_PID}" \
+    --arg providerPid "${push_neg_provider_pid}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
+start_neg_resp=$(node scripts/dsp-client.mjs startTransfer \
+    --host "${HOST}" \
+    --tenant-token "${KRA_TENANT_TOKEN}" \
+    --trust-payload "${KRA_TRUST_JWT}" \
+    --body "${start_neg_msg}")
+start_neg_body=$(echo "${start_neg_resp}" | jq -c '.body')
 start_neg_type=$(echo "${start_neg_body}" | jq -r '.["@type"] // empty')
 start_neg_code=$(echo "${start_neg_body}" | jq -r '.code // empty')
 
@@ -447,25 +477,37 @@ fi
 phase 9 "Push setup ACCEPTS endpoint with baked consumer tenant token"
 # ============================================================================
 TRADER_PUSH_POS_PID="urn:uuid:trader-push-pos-$(date +%s)-${RANDOM}"
-push_pos_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/request?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
-    -d "$(jq -n \
-        --arg ctx "${DSP_CONTEXT}" \
-        --arg consumerPid "${TRADER_PUSH_POS_PID}" \
-        --arg agreementId "${TRADER_AGREEMENT_ID}" \
-        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-        --arg inbox "http://twin-kenya-node:3000/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')")
-push_pos_body=$(echo "${push_pos_resp}" | sed '$d')
+push_pos_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${TRADER_PUSH_POS_PID}" \
+    --arg agreementId "${TRADER_AGREEMENT_ID}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg inbox "http://twin-kenya-node:3000/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+push_pos_resp=$(node scripts/dsp-client.mjs requestTransfer \
+    --host "${HOST}" \
+    --tenant-token "${KRA_TENANT_TOKEN}" \
+    --trust-payload "${TRADER_TRUST_JWT}" \
+    --body "${push_pos_msg}")
+push_pos_ok=$(echo "${push_pos_resp}" | jq -r '.ok')
+[ "${push_pos_ok}" = "true" ] || fail "Positive push requestTransfer failed: $(echo "${push_pos_resp}" | jq -r '.errorMessage')"
+push_pos_body=$(echo "${push_pos_resp}" | jq -c '.body')
 push_pos_provider_pid=$(echo "${push_pos_body}" | jq -r '.providerPid // empty')
 [ -n "${push_pos_provider_pid}" ] || fail "Positive push: requestTransfer did not return providerPid"
 
-start_pos_resp=$(curl -sS -w "\n%{http_code}" -X POST "${HOST}/dataspace/transfers/${push_pos_provider_pid}/start?x-enc-tenant-token=${KRA_TENANT_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
-    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"TransferStartMessage\",\"consumerPid\":\"${TRADER_PUSH_POS_PID}\",\"providerPid\":\"${push_pos_provider_pid}\"}")
-start_pos_body=$(echo "${start_pos_resp}" | sed '$d')
+start_pos_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${TRADER_PUSH_POS_PID}" \
+    --arg providerPid "${push_pos_provider_pid}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
+start_pos_resp=$(node scripts/dsp-client.mjs startTransfer \
+    --host "${HOST}" \
+    --tenant-token "${KRA_TENANT_TOKEN}" \
+    --trust-payload "${KRA_TRUST_JWT}" \
+    --body "${start_pos_msg}")
+start_pos_ok=$(echo "${start_pos_resp}" | jq -r '.ok')
+[ "${start_pos_ok}" = "true" ] || fail "Positive push startTransfer failed: $(echo "${start_pos_resp}" | jq -r '.errorMessage')"
+start_pos_body=$(echo "${start_pos_resp}" | jq -c '.body')
 start_pos_type=$(echo "${start_pos_body}" | jq -r '.["@type"] // empty')
 
 if [ "${start_pos_type}" = "TransferError" ]; then
@@ -493,7 +535,19 @@ step "Reading expected nodeId from container engine-state.json + tenantId from .
 NODE_DID_FROM_STATE=$(docker exec twin-kenya-node sh -c 'cat /app/data/engine-state.json' \
     | jq -r '.nodeId // empty')
 [ -n "${NODE_DID_FROM_STATE}" ] || fail "Could not read nodeId from engine-state.json"
-EXPECTED_COMPOSITE="${NODE_DID_FROM_STATE}:${TENANT_KRA_TENANT_ID}"
+# Path B: the composite identifier carries a BLAKE2b-256 hash of the tenantId
+# (base64url-encoded, no padding) rather than the plaintext tenantId. Compute
+# the expected hash via the in-container Node.js runtime so we don't need a
+# separate crypto dep on the host.
+TENANT_HASH=$(docker exec twin-kenya-node node -e "
+const { Blake2b } = require('/app/node_modules/@twin.org/crypto');
+const { Converter } = require('/app/node_modules/@twin.org/core');
+process.stdout.write(
+  Converter.bytesToBase64Url(Blake2b.sum256(Converter.utf8ToBytes('${TENANT_KRA_TENANT_ID}')))
+);
+")
+[ -n "${TENANT_HASH}" ] || fail "Could not compute tenantId hash"
+EXPECTED_COMPOSITE="${NODE_DID_FROM_STATE}:${TENANT_HASH}"
 info "Expected composite publisher: ${EXPECTED_COMPOSITE}"
 
 step "Restarting node container to trigger boot republish"
@@ -596,11 +650,14 @@ status_11_2=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/rights-management
 # only Trader's app-datasets (zero, since Trader didn't seed any). KRA's
 # dataset id MUST NOT appear in the body.
 
-step "Trader queries /dataspace/app-datasets (should NOT see KRA's dataset)"
-list_resp_11_3=$(curl -sS "${HOST}/dataspace/app-datasets" \
-    -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
-    -H "Cookie: access_token=${JWT_TRADER}")
-if echo "${list_resp_11_3}" | grep -qF "${KRA_DATASET_ID}"; then
+step "Trader queries /dataspace/app-datasets via DSP rest-client (should NOT see KRA's dataset)"
+list_resp_11_3=$(node scripts/dsp-client.mjs listAppDatasets \
+    --host "${HOST}" \
+    --api-key "${TENANT_TRADER_API_KEY}" \
+    --session-jwt "${JWT_TRADER}")
+list_ok_11_3=$(echo "${list_resp_11_3}" | jq -r '.ok')
+[ "${list_ok_11_3}" = "true" ] || fail "DSP rest-client listAppDatasets failed: $(echo "${list_resp_11_3}" | jq -r '.errorMessage')"
+if echo "${list_resp_11_3}" | jq -c '.body' | grep -qF "${KRA_DATASET_ID}"; then
     info "List response: ${list_resp_11_3}"
     fail "Cross-tenant leak: Trader's app-dataset listing contains KRA's dataset ${KRA_DATASET_ID}"
 fi
@@ -631,18 +688,20 @@ status_11_4=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/rights-management
 # assert 401 + the specific error message, not 404.
 # KRA_DATASET_ID is a URL; jq's @uri encodes it for use as a path param.
 
-kra_dataset_encoded=$(jq -rn --arg id "${KRA_DATASET_ID}" '$id | @uri')
-step "Trader tries to fetch KRA's app-dataset by id (URL-encoded) (expect 401 datasetWrongTenant)"
-response_11_5=$(curl -sS -w "\n%{http_code}" "${HOST}/dataspace/app-datasets/${kra_dataset_encoded}" \
-    -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
-    -H "Cookie: access_token=${JWT_TRADER}")
-status_11_5=$(echo "${response_11_5}" | tail -1)
-body_11_5=$(echo "${response_11_5}" | sed '$d')
-if [ "${status_11_5}" = "401" ] && echo "${body_11_5}" | grep -q "datasetWrongTenant"; then
+step "Trader tries to fetch KRA's app-dataset by id via DSP rest-client (expect 401 datasetWrongTenant)"
+# DSP rest-client handles URL path-param encoding internally — no need to manually @uri-encode.
+response_11_5=$(node scripts/dsp-client.mjs getAppDataset \
+    --host "${HOST}" \
+    --id "${KRA_DATASET_ID}" \
+    --api-key "${TENANT_TRADER_API_KEY}" \
+    --session-jwt "${JWT_TRADER}")
+status_11_5=$(echo "${response_11_5}" | jq -r '.status')
+errorMessage_11_5=$(echo "${response_11_5}" | jq -r '.errorMessage // ""')
+if [ "${status_11_5}" = "401" ] && echo "${errorMessage_11_5}" | grep -q "datasetWrongTenant"; then
     ok "Direct fetch of KRA's app-dataset by id from Trader context → 401 datasetWrongTenant (explicit tenant-equality check fires)"
 else
-    info "Response: ${body_11_5}"
-    fail "Expected 401 with datasetWrongTenant for cross-tenant app-dataset fetch, got ${status_11_5}"
+    info "Response: ${response_11_5}"
+    fail "Expected 401 with datasetWrongTenant for cross-tenant app-dataset fetch, got status ${status_11_5} (${errorMessage_11_5})"
 fi
 
 # ============================================================================
