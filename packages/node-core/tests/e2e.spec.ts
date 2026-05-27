@@ -158,8 +158,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should download, install, and import a real TWIN module", async () => {
-		// Using @twin.org/core - we know it has core exports from code usage
-		const packageName = "@twin.org/core@0.0.3-next.23";
+		// Using @twin.org/core - we know it has core exports from code usage.
+		// Use the `next` dist-tag so the shared download cache holds the same core
+		// version that other downloaded extensions (e.g. dataspace-test-app) resolve;
+		// pinning an old exact version here poisons the cache for later tests.
+		const packageName = "@twin.org/core@next";
 
 		// 1. Download/install the package
 		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
@@ -190,7 +193,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should download and verify real TWIN extension with lifecycle hooks", async () => {
-		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.15";
+		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.30";
 
 		// 1. Download real TWIN extension
 		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
