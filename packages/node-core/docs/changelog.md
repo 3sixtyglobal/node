@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.41](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.40...node-core-v0.0.3-next.41) (2026-05-27)
+
+
+### Bug Fixes
+
+* bump [@twin](https://github.com/twin).org deps to next.30 stack, fix node-core route snapshot ([#159](https://github.com/iotaledger/twin-node/issues/159)) ([73ad77f](https://github.com/iotaledger/twin-node/commit/73ad77f862050cb8dfcf42c484332bdacf026092))
+
 ## [0.0.3-next.40](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.39...node-core-v0.0.3-next.40) (2026-05-22)
 
 
