@@ -321,9 +321,10 @@ export async function bootstrapLegacy(
 				await userCreate(engineCore, envVars, {
 					userIdentity: adminUserIdentity.did,
 					organizationIdentity: organisation.did,
+					tenantId,
 					email: envVars.adminUserName ?? "admin@node",
 					password: envVars.adminUserPassword,
-					scope: "tenant-admin",
+					scope: ["tenant-admin", "user-admin"].join(","),
 					givenName: "Node",
 					familyName: "Admin",
 					overwriteMode: "skip"

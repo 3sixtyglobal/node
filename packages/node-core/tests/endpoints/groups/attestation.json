@@ -1,0 +1,51 @@
+{
+	"group": "Attestation",
+	"steps": [
+		{
+			"description": "POST /attestation — 400 missing attestationObject",
+			"method": "POST",
+			"path": "/attestation",
+			"body": {},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /attestation",
+			"method": "POST",
+			"path": "/attestation",
+			"body": {
+				"attestationObject": {
+					"@context": "https://schema.org",
+					"@type": "Thing",
+					"name": "Test Attestation"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "attestationId": "location-last-segment" }
+		},
+		{
+			"description": "GET /attestation/:id",
+			"method": "GET",
+			"path": "/attestation/{{attestationId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /attestation/:id/transfer",
+			"method": "PUT",
+			"path": "/attestation/{{attestationId}}/transfer",
+			"body": { "holderAddress": "{{transferAddress}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /attestation/:id",
+			"method": "DELETE",
+			"path": "/attestation/{{attestationId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /attestation/:id — 404 after delete",
+			"method": "GET",
+			"path": "/attestation/{{attestationId}}",
+			"expectedStatus": 404
+		}
+	]
+}

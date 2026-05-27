@@ -53,7 +53,12 @@
 		"TLIP",
 		"Unece",
 		"whereis",
-		"postgre"
+		"postgre",
+		"Math",
+		"decgbytes",
+		"decmbytes",
+		"timepicker",
+		"timezone"
 	],
 	"ignoreRegExpList": [
 		"/from\\s+(['\"]).*\\1/",

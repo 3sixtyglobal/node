@@ -1,0 +1,23 @@
+{
+	"group": "Logging",
+	"steps": [
+		{
+			"description": "POST /logging",
+			"method": "POST",
+			"path": "/logging",
+			"body": {
+				"level": "info",
+				"source": "endpoint-test",
+				"ts": 1722327947842,
+				"message": "Test log entry from endpoint test"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /logging",
+			"method": "GET",
+			"path": "/logging",
+			"expectedStatus": 200
+		}
+	]
+}

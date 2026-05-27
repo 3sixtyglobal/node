@@ -36,18 +36,22 @@ function valueFromEnv(line?: string): string | undefined {
  * @param args The CLI args.
  * @param state The initial state.
  * @param additionalEnvVars Additional environment variables to set.
+ * @param runOptions Additional options for the run function.
+ * @param runOptions.disableProcessExitOnFailure Disable process exit on failure and throw instead.
  * @returns The state storage.
  */
 async function executeCliCommand(
 	args: string[],
 	state: INodeEngineState,
-	additionalEnvVars?: { [key: string]: string }
+	additionalEnvVars?: { [key: string]: string },
+	runOptions?: { disableProcessExitOnFailure?: boolean }
 ): Promise<INodeEngineState> {
 	const stateStorage = new MemoryStateStorage(false, state);
 	await run(
 		{
 			localesDirectory: "./dist/locales/",
 			stateStorage,
+			disableProcessExitOnFailure: runOptions?.disableProcessExitOnFailure,
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
@@ -276,6 +280,23 @@ describe("node-core", () => {
 			{ nodeId: nodeIdentityJson?.did }
 		);
 		expect(nodeState.nodeTenantId).toEqual(nodeTenantJson?.tenantId);
+	});
+
+	test("Can update the node tenant", async () => {
+		await executeCliCommand(
+			[
+				"tenant-update",
+				`--load-env=${OUTPUT_TMP_DIR}node-tenant.env`,
+				"--tenant-id=!NODE_TENANT_ID",
+				"--label=updated-node",
+				"--public-origin=https://api.updated.com:5678"
+			],
+			{ nodeId: nodeIdentityJson?.did }
+		);
+
+		const dbTable = await CLIUtils.readJsonFile<any>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		expect(dbTable?.[1]?.label).toEqual("updated-node");
+		expect(dbTable?.[1]?.publicOrigin).toEqual("https://api.updated.com:5678");
 	});
 
 	test("Can create the organization identity", async () => {
@@ -567,6 +588,7 @@ describe("node-core", () => {
 				`--load-env=${envParts.join(",")}`,
 				"--user-identity=!USER_DID",
 				"--organization-identity=!ORGANIZATION_DID",
+				"--tenant-id=!NODE_TENANT_ID",
 				"--email=admin@node",
 				"--scope=tenant-admin,doo",
 				`--output-json=${OUTPUT_TMP_DIR}user-account-admin.json`,
@@ -603,6 +625,273 @@ describe("node-core", () => {
 			Converter.hexToBytes(nodeTenantJson?.tenantId)
 		);
 		expect(dbTable?.[1]?.partitionId).toEqual(`${nodePartitionId}/${tenantPartitionId}`);
+	});
+
+	test("user-create throws when multi-tenancy is enabled and tenant-id is missing", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`
+		];
+		await expect(
+			executeCliCommand(
+				[
+					"user-create",
+					`--load-env=${envParts.join(",")}`,
+					"--user-identity=!USER_DID",
+					"--organization-identity=!ORGANIZATION_DID",
+					"--email=admin-no-tenant@node"
+				],
+				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("user-create works when multi-tenancy is enabled and tenant-id is provided", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		// Use skip mode with the already-created email to confirm the tenantId check passes
+		// and the command runs through to user lookup without throwing tenantIdRequired.
+		await executeCliCommand(
+			[
+				"user-create",
+				`--load-env=${envParts.join(",")}`,
+				"--user-identity=!USER_DID",
+				"--organization-identity=!ORGANIZATION_DID",
+				"--tenant-id=!NODE_TENANT_ID",
+				"--email=admin@node",
+				"--overwrite-mode=skip"
+			],
+			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+		);
+	});
+
+	test("user-update throws when multi-tenancy is enabled and tenant-id is missing", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`
+		];
+		await expect(
+			executeCliCommand(
+				["user-update", `--load-env=${envParts.join(",")}`, "--email=admin@node"],
+				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("user-update works when multi-tenancy is enabled and tenant-id is provided", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		await executeCliCommand(
+			[
+				"user-update",
+				`--load-env=${envParts.join(",")}`,
+				"--tenant-id=!NODE_TENANT_ID",
+				"--email=admin@node",
+				"--scope=tenant-admin,doo",
+				"--given-name=Admin",
+				"--family-name=Node"
+			],
+			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+		);
+	});
+
+	test("user-create throws with overwrite-mode error when user already exists", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		await expect(
+			executeCliCommand(
+				[
+					"user-create",
+					`--load-env=${envParts.join(",")}`,
+					"--user-identity=!USER_DID",
+					"--organization-identity=!ORGANIZATION_DID",
+					"--tenant-id=!NODE_TENANT_ID",
+					"--email=admin@node",
+					"--overwrite-mode=error"
+				],
+				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("user-create replaces user with overwrite-mode overwrite", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		await executeCliCommand(
+			[
+				"user-create",
+				`--load-env=${envParts.join(",")}`,
+				"--user-identity=!USER_DID",
+				"--organization-identity=!ORGANIZATION_DID",
+				"--tenant-id=!NODE_TENANT_ID",
+				"--email=admin@node",
+				"--scope=tenant-admin",
+				"--overwrite-mode=overwrite",
+				`--output-json=${OUTPUT_TMP_DIR}user-account-overwrite.json`
+			],
+			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+		);
+
+		const userJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}user-account-overwrite.json`
+		);
+		expect(userJson?.email).toEqual("admin@node");
+		expect(userJson?.scope).toEqual(["tenant-admin"]);
+	});
+
+	test("user-create throws when password is too short", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		await expect(
+			executeCliCommand(
+				[
+					"user-create",
+					`--load-env=${envParts.join(",")}`,
+					"--user-identity=!USER_DID",
+					"--organization-identity=!ORGANIZATION_DID",
+					"--tenant-id=!NODE_TENANT_ID",
+					"--email=admin-short-pw@node",
+					"--password=tooshort"
+				],
+				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("user-update throws when user is not found", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		await expect(
+			executeCliCommand(
+				[
+					"user-update",
+					`--load-env=${envParts.join(",")}`,
+					"--tenant-id=!NODE_TENANT_ID",
+					"--email=nonexistent@node"
+				],
+				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("vault-key-create throws with overwrite-mode error when key already exists", async () => {
+		await expect(
+			executeCliCommand(
+				[
+					"vault-key-create",
+					`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
+					"--identity=!NODE_DID",
+					"--key-id=!TWIN_AUTH_SIGNING_KEY_ID",
+					"--overwrite-mode=error"
+				],
+				{ nodeId: nodeIdentityJson?.did },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("vault-key-create recreates key with overwrite-mode overwrite", async () => {
+		await executeCliCommand(
+			[
+				"vault-key-create",
+				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
+				"--identity=!NODE_DID",
+				"--key-id=test-overwrite-key",
+				"--key-type=Ed25519",
+				"--overwrite-mode=skip"
+			],
+			{ nodeId: nodeIdentityJson?.did }
+		);
+		await executeCliCommand(
+			[
+				"vault-key-create",
+				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
+				"--identity=!NODE_DID",
+				"--key-id=test-overwrite-key",
+				"--key-type=Ed25519",
+				"--overwrite-mode=overwrite",
+				`--output-json=${OUTPUT_TMP_DIR}vault-key-overwrite-test.json`
+			],
+			{ nodeId: nodeIdentityJson?.did }
+		);
+
+		const overwriteKeyJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}vault-key-overwrite-test.json`
+		);
+		expect(overwriteKeyJson?.keyType).toEqual("Ed25519");
+		expect(overwriteKeyJson?.privateKeyHex).toBeDefined();
+		expect(overwriteKeyJson?.publicKeyHex).toBeDefined();
+	});
+
+	test("identity-verification-method-create throws with overwrite-mode error when method already exists", async () => {
+		await expect(
+			executeCliCommand(
+				[
+					"identity-verification-method-create",
+					`--load-env=${OUTPUT_TMP_DIR}node-identity.env,${OUTPUT_TMP_DIR}organization-identity.env`,
+					"--identity=!ORGANIZATION_DID",
+					"--controller=!NODE_DID",
+					"--verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID",
+					"--overwrite-mode=error"
+				],
+				{},
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("identity-verification-method-create recreates method with overwrite-mode overwrite", async () => {
+		await executeCliCommand(
+			[
+				"identity-verification-method-create",
+				`--load-env=${OUTPUT_TMP_DIR}node-identity.env,${OUTPUT_TMP_DIR}organization-identity.env`,
+				"--identity=!ORGANIZATION_DID",
+				"--controller=!NODE_DID",
+				"--verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID",
+				"--overwrite-mode=overwrite",
+				`--output-json=${OUTPUT_TMP_DIR}organization-attestation-overwrite.json`
+			],
+			{}
+		);
+
+		const attestationJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}organization-attestation-overwrite.json`
+		);
+		expect(attestationJson?.verificationMethodId).toEqual(
+			`${organizationIdentityJson.did}#attestation-assertion`
+		);
+		expect(attestationJson?.privateKeyHex).toBeDefined();
+		expect(attestationJson?.publicKeyHex).toBeDefined();
 	});
 
 	test("Can re-create a verification method when vault key is missing in skip mode", async () => {

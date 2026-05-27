@@ -1,0 +1,45 @@
+{
+	"group": "Verifiable Storage",
+	"steps": [
+		{
+			"description": "POST /verifiable — 400 missing data",
+			"method": "POST",
+			"path": "/verifiable",
+			"body": {},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /verifiable",
+			"method": "POST",
+			"path": "/verifiable",
+			"body": { "data": "dGVzdCB2ZXJpZmlhYmxlIGRhdGE=" },
+			"expectedStatus": 201,
+			"capture": { "verifiableId": "location-last-segment" }
+		},
+		{
+			"description": "GET /verifiable/:id",
+			"method": "GET",
+			"path": "/verifiable/{{verifiableId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /verifiable/:id",
+			"method": "PUT",
+			"path": "/verifiable/{{verifiableId}}",
+			"body": { "data": "dXBkYXRlZCB2ZXJpZmlhYmxlIGRhdGE=" },
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /verifiable/:id",
+			"method": "DELETE",
+			"path": "/verifiable/{{verifiableId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /verifiable/:id — 404 after delete",
+			"method": "GET",
+			"path": "/verifiable/{{verifiableId}}",
+			"expectedStatus": 404
+		}
+	]
+}

@@ -674,6 +674,62 @@ The type of telemetry connector: entity-storage.
 
 ***
 
+### openTelemetryMeterName? {#opentelemetrymetername}
+
+> `optional` **openTelemetryMeterName?**: `string`
+
+The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+
+***
+
+### openTelemetryMeterVersion? {#opentelemetrymeterversion}
+
+> `optional` **openTelemetryMeterVersion?**: `string`
+
+The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+
+***
+
+### openTelemetryReader? {#opentelemetryreader}
+
+> `optional` **openTelemetryReader?**: `string`
+
+The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+
+***
+
+### openTelemetryPrometheusPort? {#opentelemetryprometheusport}
+
+> `optional` **openTelemetryPrometheusPort?**: `string`
+
+The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+
+***
+
+### telemetryMetricsCollectorIntervalSeconds? {#telemetrymetricscollectorintervalseconds}
+
+> `optional` **telemetryMetricsCollectorIntervalSeconds?**: `string`
+
+Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+
+***
+
+### telemetryMetricsProducers? {#telemetrymetricsproducers}
+
+> `optional` **telemetryMetricsProducers?**: `string`
+
+The type of telemetry metrics producers, can be a comma separated list: system, process.
+
+***
+
+### telemetryMetricsProducerMaxHistory? {#telemetrymetricsproducermaxhistory}
+
+> `optional` **telemetryMetricsProducerMaxHistory?**: `string`
+
+Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`
@@ -1155,6 +1211,15 @@ Are the health components enabled, defaults to false.
 > `optional` **healthIntervalSeconds?**: `string`
 
 The interval in seconds for performing health checks, defaults to 60.
+
+***
+
+### healthStartupIntervalSeconds? {#healthstartupintervalseconds}
+
+> `optional` **healthStartupIntervalSeconds?**: `string`
+
+The interval in seconds for performing health checks at startup, defaults to 2.
+This allows components that take a long time to initialize to be healthy before the first health check is performed.
 
 ***
 

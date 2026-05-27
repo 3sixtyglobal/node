@@ -1010,6 +1010,90 @@ The type of telemetry connector: entity-storage.
 
 ***
 
+### openTelemetryMeterName? {#opentelemetrymetername}
+
+> `optional` **openTelemetryMeterName?**: `string`
+
+The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`openTelemetryMeterName`](IEngineEnvironmentVariables.md#opentelemetrymetername)
+
+***
+
+### openTelemetryMeterVersion? {#opentelemetrymeterversion}
+
+> `optional` **openTelemetryMeterVersion?**: `string`
+
+The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`openTelemetryMeterVersion`](IEngineEnvironmentVariables.md#opentelemetrymeterversion)
+
+***
+
+### openTelemetryReader? {#opentelemetryreader}
+
+> `optional` **openTelemetryReader?**: `string`
+
+The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`openTelemetryReader`](IEngineEnvironmentVariables.md#opentelemetryreader)
+
+***
+
+### openTelemetryPrometheusPort? {#opentelemetryprometheusport}
+
+> `optional` **openTelemetryPrometheusPort?**: `string`
+
+The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`openTelemetryPrometheusPort`](IEngineEnvironmentVariables.md#opentelemetryprometheusport)
+
+***
+
+### telemetryMetricsCollectorIntervalSeconds? {#telemetrymetricscollectorintervalseconds}
+
+> `optional` **telemetryMetricsCollectorIntervalSeconds?**: `string`
+
+Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`telemetryMetricsCollectorIntervalSeconds`](IEngineEnvironmentVariables.md#telemetrymetricscollectorintervalseconds)
+
+***
+
+### telemetryMetricsProducers? {#telemetrymetricsproducers}
+
+> `optional` **telemetryMetricsProducers?**: `string`
+
+The type of telemetry metrics producers, can be a comma separated list: system, process.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`telemetryMetricsProducers`](IEngineEnvironmentVariables.md#telemetrymetricsproducers)
+
+***
+
+### telemetryMetricsProducerMaxHistory? {#telemetrymetricsproducermaxhistory}
+
+> `optional` **telemetryMetricsProducerMaxHistory?**: `string`
+
+Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`telemetryMetricsProducerMaxHistory`](IEngineEnvironmentVariables.md#telemetrymetricsproducermaxhistory)
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`
@@ -1707,6 +1791,19 @@ The interval in seconds for performing health checks, defaults to 60.
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthIntervalSeconds`](IEngineEnvironmentVariables.md#healthintervalseconds)
+
+***
+
+### healthStartupIntervalSeconds? {#healthstartupintervalseconds}
+
+> `optional` **healthStartupIntervalSeconds?**: `string`
+
+The interval in seconds for performing health checks at startup, defaults to 2.
+This allows components that take a long time to initialize to be healthy before the first health check is performed.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthStartupIntervalSeconds`](IEngineEnvironmentVariables.md#healthstartupintervalseconds)
 
 ***
 

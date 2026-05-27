@@ -423,6 +423,41 @@ export interface IEngineEnvironmentVariables {
 	telemetryConnector?: string;
 
 	/**
+	 * The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+	 */
+	openTelemetryMeterName?: string;
+
+	/**
+	 * The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+	 */
+	openTelemetryMeterVersion?: string;
+
+	/**
+	 * The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+	 */
+	openTelemetryReader?: string;
+
+	/**
+	 * The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+	 */
+	openTelemetryPrometheusPort?: string;
+
+	/**
+	 * Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+	 */
+	telemetryMetricsCollectorIntervalSeconds?: string;
+
+	/**
+	 * The type of telemetry metrics producers, can be a comma separated list: system, process.
+	 */
+	telemetryMetricsProducers?: string;
+
+	/**
+	 * Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+	 */
+	telemetryMetricsProducerMaxHistory?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;
@@ -718,6 +753,12 @@ export interface IEngineEnvironmentVariables {
 	 * The interval in seconds for performing health checks, defaults to 60.
 	 */
 	healthIntervalSeconds?: string;
+
+	/**
+	 * The interval in seconds for performing health checks at startup, defaults to 2.
+	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
+	 */
+	healthStartupIntervalSeconds?: string;
 
 	/**
 	 * The id of the key in the vault to use for encrypting parameters in url transformer.

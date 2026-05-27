@@ -6,12 +6,10 @@ import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { ModuleHelper } from "@twin.org/modules";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
-import type {
-	NodeExtensionInitialiseMethod,
-	NodeExtensionInitialiseEngineMethod,
-	NodeExtensionInitialiseEngineServerMethod,
-	NodeExtensionShutdownMethod
-} from "../models/nodeExtensionMethods.js";
+import type { NodeExtensionInitialiseEngineMethod } from "../models/nodeExtensionInitialiseEngineMethod.js";
+import type { NodeExtensionInitialiseEngineServerMethod } from "../models/nodeExtensionInitialiseEngineServerMethod.js";
+import type { NodeExtensionInitialiseMethod } from "../models/nodeExtensionInitialiseMethod.js";
+import type { NodeExtensionShutdownMethod } from "../models/nodeExtensionShutdownMethod.js";
 
 const extensionState: { [id: string]: { initialised: boolean } } = {};
 

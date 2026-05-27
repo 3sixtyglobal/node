@@ -13,5 +13,9 @@ vitest.config.ts.timestamp*
 .vercel
 .env
 .env.prod
+.env.local
+.env.local.*
+.env.bootstrap
+.env.bootstrap.*
 .vercel
 working

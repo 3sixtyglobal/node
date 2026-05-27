@@ -1224,7 +1224,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AdminUserGetResponse"
+									"$ref": "#/components/schemas/AuthenticationUser"
 								},
 								"examples": {
 									"getUserResponseExample": {
@@ -1529,7 +1529,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AdminUserGetResponse"
+									"$ref": "#/components/schemas/AuthenticationUser"
 								},
 								"examples": {
 									"getUserResponseExample": {
@@ -7996,7 +7996,7 @@
 								"notarizationCreateExample": {
 									"value": {
 										"mode": "dynamic",
-										"data": {},
+										"data": "aGVsbG8gd29ybGQ=",
 										"description": "My first notarization"
 									}
 								}
@@ -8107,7 +8107,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Notarization"
+									"$ref": "#/components/schemas/NotarizationGetResponse"
 								},
 								"examples": {
 									"notarizationGetResponseExample": {
@@ -8115,7 +8115,7 @@
 											"id": "123",
 											"mode": "dynamic",
 											"dateCreated": "2026-01-01T00:00:00.000Z",
-											"data": {},
+											"data": "aGVsbG8gd29ybGQ=",
 											"description": "A notarization"
 										}
 									}
@@ -8299,7 +8299,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Notarization"
+								"$ref": "#/components/schemas/NotarizationUpdateRequest"
 							},
 							"examples": {
 								"notarizationUpdateExample": {
@@ -8307,7 +8307,7 @@
 										"id": "123",
 										"mode": "dynamic",
 										"dateCreated": "2026-01-01T00:00:00.000Z",
-										"data": {},
+										"data": "aGVsbG8gd29ybGQ=",
 										"description": "Updated notarization"
 									}
 								}
@@ -8643,7 +8643,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8669,7 +8668,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8703,7 +8701,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8729,7 +8726,6 @@
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
 											"dateCreated": "2024-06-18T13:34:51Z",
 											"ownerIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
-											"holderIdentity": "did:iota:tst:0x8992c426116f21b2a4c7a2854300748d3e94a8ce089d5be62e11f105bd2a0f9e",
 											"attestationObject": {
 												"@context": "https://schema.org",
 												"type": "DigitalDocument",
@@ -8914,7 +8910,6 @@
 							"examples": {
 								"attestationTransferRequestExample": {
 									"value": {
-										"holderIdentity": "did:iota:tst:0x06ae1034f9f4af1b408a0b54e877bb476259666a14f221400d3746aecefa7105",
 										"holderAddress": "tst1prctjk5ck0dutnsunnje6u90jk5htx03qznjjmkd6843pzltlgz87srjzzv"
 									}
 								}
@@ -12192,6 +12187,291 @@
 				"responses": {
 					"204": {
 						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/aig/{id}/versions/{version}": {
+			"get": {
+				"operationId": "auditableItemGraphVersionGet",
+				"summary": "Get a graph vertex at a specific version",
+				"tags": [
+					"Auditable Item Graph"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the vertex.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "aig:1234567890"
+					},
+					{
+						"name": "version",
+						"description": "The version number to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "1"
+					},
+					{
+						"name": "accept",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "application/json"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response to getting an auditable item graph vertex at a specific version.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertex"
+								},
+								"examples": {
+									"auditableItemGraphVersionGetResponseExample": {
+										"value": {
+											"@context": [
+												"https://schema.twindev.org/aig/",
+												"https://schema.twindev.org/common/",
+												"https://schema.org"
+											],
+											"type": "AuditableItemGraphVertex",
+											"id": "aig:1234567890",
+											"dateCreated": "2024-08-22T11:55:16.271Z",
+											"version": 1
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/aig/{id}/versions": {
+			"get": {
+				"operationId": "auditableItemGraphVersionList",
+				"summary": "Get all versions of a graph vertex",
+				"tags": [
+					"Auditable Item Graph"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the vertex.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "aig:1234567890"
+					},
+					{
+						"name": "after",
+						"description": "Only return versions created after this ISO 8601 timestamp (exclusive).",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "before",
+						"description": "Only return versions created before this ISO 8601 timestamp (exclusive).",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "accept",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "application/json"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response to getting all versions of an auditable item graph vertex.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertexVersionList"
+								},
+								"examples": {
+									"auditableItemGraphVersionListResponseExample": {
+										"value": {
+											"@context": [
+												"https://schema.org",
+												"https://schema.twindev.org/aig/",
+												"https://schema.twindev.org/common/"
+											],
+											"type": [
+												"ItemList",
+												"AuditableItemGraphVertexVersionList"
+											],
+											"itemListElement": [
+												{
+													"version": 0,
+													"dateCreated": "2024-08-22T11:55:16.271Z"
+												},
+												{
+													"version": 1,
+													"dateCreated": "2024-08-22T11:56:00.000Z"
+												},
+												{
+													"version": 2,
+													"dateCreated": "2024-08-22T11:57:00.000Z"
+												}
+											]
+										}
+									}
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -20082,71 +20362,21 @@
 				]
 			},
 			"AdminUserCreateRequest": {
-				"description": "The body of the request.",
 				"type": "object",
 				"properties": {
-					"email": {
-						"type": "string",
-						"description": "The user e-mail address."
-					},
 					"password": {
-						"type": "string",
-						"description": "The encrypted password for the user."
-					},
-					"userIdentity": {
-						"type": "string",
-						"description": "The user identity."
-					},
-					"organizationIdentity": {
-						"type": "string",
-						"description": "The users organization."
-					},
-					"scope": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The scope assigned to the user, comma separated."
+						"type": "string"
 					}
 				},
 				"required": [
-					"email",
-					"password",
-					"userIdentity",
-					"organizationIdentity",
-					"scope"
-				]
-			},
-			"AdminUserGetResponse": {
-				"description": "The body of the request.",
-				"type": "object",
-				"properties": {
-					"email": {
-						"type": "string",
-						"description": "The user e-mail address."
-					},
-					"userIdentity": {
-						"type": "string",
-						"description": "The user identity."
-					},
-					"organizationIdentity": {
-						"type": "string",
-						"description": "The users organization."
-					},
-					"scope": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The scope assigned to the user, comma separated."
+					"password"
+				],
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/AuthenticationUser"
 					}
-				},
-				"required": [
-					"email",
-					"userIdentity",
-					"organizationIdentity",
-					"scope"
-				]
+				],
+				"description": "The body of the request."
 			},
 			"AdminUserUpdatePasswordRequest": {
 				"type": "object",
@@ -20264,17 +20494,12 @@
 			"AttestationTransferRequest": {
 				"type": "object",
 				"properties": {
-					"holderIdentity": {
-						"type": "string",
-						"description": "The new holder identity."
-					},
 					"holderAddress": {
 						"type": "string",
 						"description": "The new holder address."
 					}
 				},
 				"required": [
-					"holderIdentity",
 					"holderAddress"
 				],
 				"description": "The parameters to be used in the transfer."
@@ -20420,6 +20645,10 @@
 					"verified": {
 						"type": "boolean",
 						"description": "Is the vertex verified, will only be populated when verification is requested."
+					},
+					"version": {
+						"type": "number",
+						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
 					}
 				},
 				"required": [
@@ -20494,6 +20723,10 @@
 					"verified": {
 						"type": "boolean",
 						"description": "Is the vertex verified, will only be populated when verification is requested."
+					},
+					"version": {
+						"type": "number",
+						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
 					}
 				},
 				"required": [
@@ -20668,6 +20901,37 @@
 					"id",
 					"event",
 					"dateCreated"
+				]
+			},
+			"AuthenticationUser": {
+				"description": "Contract definition for authentication user.",
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user e-mail address."
+					},
+					"userIdentity": {
+						"type": "string",
+						"description": "The user identity."
+					},
+					"organizationIdentity": {
+						"type": "string",
+						"description": "The users organization."
+					},
+					"scope": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The scope assigned to the user, comma separated."
+					}
+				},
+				"required": [
+					"email",
+					"userIdentity",
+					"organizationIdentity",
+					"scope"
 				]
 			},
 			"AutomationActionCreateRequest": {
@@ -21460,6 +21724,20 @@
 					"expirationDate": {
 						"type": "string",
 						"description": "The date the verifiable credential is valid until."
+					},
+					"jwtHeaderFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT when creating the verifiable credential in jwt format."
+					},
+					"jwtPayloadFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT payload when creating the verifiable credential in jwt format."
 					}
 				},
 				"required": [
@@ -21541,6 +21819,20 @@
 					"expirationDate": {
 						"type": "string",
 						"description": "The expiration date/time for the presentation."
+					},
+					"jwtHeaderFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT header when creating the verifiable presentation in jwt format."
+					},
+					"jwtPayloadFields": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						},
+						"description": "Additional fields to include in the JWT payload when creating the verifiable presentation in jwt format."
 					}
 				},
 				"required": [
@@ -21736,6 +22028,19 @@
 				},
 				"description": "The logout token details."
 			},
+			"MetricCounterOperation": {
+				"description": "The types of metric counter operations.",
+				"anyOf": [
+					{
+						"const": "inc",
+						"description": "Increment Counter."
+					},
+					{
+						"const": "dec",
+						"description": "Decrement Counter."
+					}
+				]
+			},
 			"MetricType": {
 				"description": "The types of metrics.",
 				"anyOf": [
@@ -21845,8 +22150,52 @@
 				],
 				"description": "The body which contains the error."
 			},
-			"Notarization": {
-				"description": "Interface describing a notarization.",
+			"NotarizationCreateRequest": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"$ref": "#/components/schemas/NotarizationMode"
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
+					},
+					"immutableDescription": {
+						"type": "string",
+						"description": "An optional description of the notarization that cannot be changed after creation."
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description of the notarization that can be modified until the notarization is locked."
+					},
+					"deleteLockDateTime": {
+						"type": "string",
+						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
+					},
+					"transferLockUntilDestroyed": {
+						"type": "boolean",
+						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
+					},
+					"transferLockDateTime": {
+						"type": "string",
+						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"data": {
+						"type": "string",
+						"description": "The notarization data as a base64 encoded string."
+					},
+					"namespace": {
+						"type": "string",
+						"description": "The namespace of the connector to use for the notarization, defaults to component configured namespace."
+					}
+				},
+				"required": [
+					"mode",
+					"data"
+				],
+				"description": "The request data."
+			},
+			"NotarizationGetResponse": {
 				"type": "object",
 				"properties": {
 					"id": {
@@ -21864,13 +22213,6 @@
 						"type": "string",
 						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
 					},
-					"data": {
-						"type": "array",
-						"items": {
-							"type": "number"
-						},
-						"description": "The notarization data as a byte array."
-					},
 					"immutableDescription": {
 						"type": "string",
 						"description": "An optional description of the notarization that cannot be changed after creation."
@@ -21890,6 +22232,10 @@
 					"transferLockDateTime": {
 						"type": "string",
 						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"data": {
+						"type": "string",
+						"description": "The notarization data as a base64 encoded string."
 					}
 				},
 				"required": [
@@ -21897,55 +22243,8 @@
 					"mode",
 					"dateCreated",
 					"data"
-				]
-			},
-			"NotarizationCreateRequest": {
-				"type": "object",
-				"properties": {
-					"mode": {
-						"$ref": "#/components/schemas/NotarizationMode"
-					},
-					"dateModified": {
-						"type": "string",
-						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
-					},
-					"data": {
-						"type": "array",
-						"items": {
-							"type": "number"
-						},
-						"description": "The notarization data as a byte array."
-					},
-					"immutableDescription": {
-						"type": "string",
-						"description": "An optional description of the notarization that cannot be changed after creation."
-					},
-					"description": {
-						"type": "string",
-						"description": "An optional description of the notarization that can be modified until the notarization is locked."
-					},
-					"deleteLockDateTime": {
-						"type": "string",
-						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
-					},
-					"transferLockUntilDestroyed": {
-						"type": "boolean",
-						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
-					},
-					"transferLockDateTime": {
-						"type": "string",
-						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
-					},
-					"namespace": {
-						"type": "string",
-						"description": "The namespace of the connector to use for the notarization, defaults to component configured namespace."
-					}
-				},
-				"required": [
-					"mode",
-					"data"
 				],
-				"description": "The request data."
+				"description": "The response body."
 			},
 			"NotarizationMode": {
 				"description": "Supported notarization mode values.",
@@ -21970,6 +22269,57 @@
 				},
 				"required": [
 					"recipientAddress"
+				],
+				"description": "The request data."
+			},
+			"NotarizationUpdateRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The unique identifier of the notarization."
+					},
+					"mode": {
+						"$ref": "#/components/schemas/NotarizationMode"
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "The date and time when the notarization was created, in ISO 8601 format."
+					},
+					"dateModified": {
+						"type": "string",
+						"description": "The date and time when the notarization was last modified, in ISO 8601 format."
+					},
+					"immutableDescription": {
+						"type": "string",
+						"description": "An optional description of the notarization that cannot be changed after creation."
+					},
+					"description": {
+						"type": "string",
+						"description": "An optional description of the notarization that can be modified until the notarization is locked."
+					},
+					"deleteLockDateTime": {
+						"type": "string",
+						"description": "An optional lock date, in ISO 8601 format, that prevents deletion until the date is reached.\nUsed only in Locked Notarization, it prevents the object from being deleted until the lock expires."
+					},
+					"transferLockUntilDestroyed": {
+						"type": "boolean",
+						"description": "An optional flag indicating transfer lock is active until the notarization is destroyed.\nUsed only in Dynamic Notarization."
+					},
+					"transferLockDateTime": {
+						"type": "string",
+						"description": "An optional transfer lock date-time, in ISO 8601 format.\nUsed only in Dynamic Notarization."
+					},
+					"data": {
+						"type": "string",
+						"description": "The notarization data as a base64 encoded string."
+					}
+				},
+				"required": [
+					"id",
+					"mode",
+					"dateCreated",
+					"data"
 				],
 				"description": "The request data."
 			},
@@ -22581,7 +22931,10 @@
 					},
 					"target": {
 						"type": "string",
-						"description": "The target path of where to store the extracted data.\nSupports simple dotted path notation, and numeric index notation."
+						"description": "The target path of where to store the extracted data.\nSupports simple dotted path notation, and numeric index notation.",
+						"examples": [
+							"\"path.to.data\" or \"path.to.data.0\""
+						]
 					},
 					"retainPathDepth": {
 						"type": "number",
@@ -22842,10 +23195,7 @@
 					"value": {
 						"anyOf": [
 							{
-								"const": "inc"
-							},
-							{
-								"const": "dec"
+								"$ref": "#/components/schemas/MetricCounterOperation"
 							},
 							{
 								"type": "number"
@@ -23025,6 +23375,14 @@
 					"identity": {
 						"type": "string",
 						"description": "The identity associated with the payload."
+					},
+					"tenantId": {
+						"type": "string",
+						"description": "The tenant that issued the payload, if multi-tenancy was active at generation time."
+					},
+					"organizationId": {
+						"type": "string",
+						"description": "The organisation that issued the payload, if an authenticated user context was available at generation time."
 					},
 					"data": {
 						"type": "object",

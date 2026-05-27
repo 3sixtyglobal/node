@@ -1,0 +1,426 @@
+{
+	"__inputs": [],
+	"__requires": [
+		{ "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+		{ "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" },
+		{ "type": "panel", "id": "timeseries", "name": "Time series", "version": "" },
+		{ "type": "panel", "id": "stat", "name": "Stat", "version": "" },
+		{ "type": "panel", "id": "table", "name": "Table", "version": "" }
+	],
+	"annotations": { "list": [] },
+	"editable": false,
+	"fiscalYearStartMonth": 0,
+	"graphTooltip": 1,
+	"id": null,
+	"links": [],
+	"liveNow": false,
+	"panels": [
+		{
+			"collapsed": false,
+			"gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+			"id": 1,
+			"title": "Host Metrics (system_*)",
+			"type": "row"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "percent",
+					"min": 0,
+					"max": 100
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 0, "y": 1 },
+			"id": 2,
+			"options": {
+				"legend": { "calcs": ["last", "max"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "system_cpu_usage_percent",
+					"legendFormat": "cpu %",
+					"refId": "A"
+				}
+			],
+			"title": "CPU Usage %",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "decgbytes",
+					"min": 0
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 6, "y": 1 },
+			"id": 3,
+			"options": {
+				"legend": { "calcs": ["last"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "system_memory_used_bytes / 1024 / 1024 / 1024",
+					"legendFormat": "used",
+					"refId": "A"
+				},
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "system_memory_total_bytes / 1024 / 1024 / 1024",
+					"legendFormat": "total",
+					"refId": "B"
+				}
+			],
+			"title": "Memory (GB)",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "percent",
+					"min": 0,
+					"max": 100
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 12, "y": 1 },
+			"id": 4,
+			"options": {
+				"legend": { "calcs": ["last", "max"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "system_memory_usage_percent",
+					"legendFormat": "mem %",
+					"refId": "A"
+				}
+			],
+			"title": "Memory Usage %",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "thresholds" },
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [{ "color": "blue", "value": null }]
+					},
+					"unit": "h"
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 18, "y": 1 },
+			"id": 5,
+			"options": {
+				"reduceOptions": { "calcs": ["lastNotNull"] },
+				"orientation": "auto",
+				"textMode": "auto",
+				"colorMode": "background"
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "system_uptime_seconds / 3600",
+					"legendFormat": "uptime",
+					"refId": "A"
+				}
+			],
+			"title": "System Uptime",
+			"type": "stat"
+		},
+		{
+			"collapsed": false,
+			"gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+			"id": 6,
+			"title": "Process Metrics (process_*)",
+			"type": "row"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "decmbytes",
+					"min": 0
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 0, "y": 10 },
+			"id": 7,
+			"options": {
+				"legend": { "calcs": ["last", "max"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "process_memory_rss_bytes / 1024 / 1024",
+					"legendFormat": "rss",
+					"refId": "A"
+				}
+			],
+			"title": "Process RSS (MB)",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "decmbytes",
+					"min": 0
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 6, "y": 10 },
+			"id": 8,
+			"options": {
+				"legend": { "calcs": ["last", "max"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "process_memory_heap_used_bytes / 1024 / 1024",
+					"legendFormat": "heap used",
+					"refId": "A"
+				}
+			],
+			"title": "Heap Used (MB)",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "decmbytes",
+					"min": 0
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 12, "y": 10 },
+			"id": 9,
+			"options": {
+				"legend": { "calcs": ["last"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "process_memory_heap_used_bytes / 1024 / 1024",
+					"legendFormat": "used",
+					"refId": "A"
+				},
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "process_memory_heap_total_bytes / 1024 / 1024",
+					"legendFormat": "total",
+					"refId": "B"
+				}
+			],
+			"title": "Heap Used vs Total (MB)",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "thresholds" },
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [{ "color": "blue", "value": null }]
+					},
+					"unit": "h"
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 18, "y": 10 },
+			"id": 10,
+			"options": {
+				"reduceOptions": { "calcs": ["lastNotNull"] },
+				"orientation": "auto",
+				"textMode": "auto",
+				"colorMode": "background"
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "process_uptime_seconds / 3600",
+					"legendFormat": "uptime",
+					"refId": "A"
+				}
+			],
+			"title": "Process Uptime",
+			"type": "stat"
+		},
+		{
+			"collapsed": false,
+			"gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+			"id": 11,
+			"title": "App Demo Metrics (app_*) — copy src/metrics/ for your own app",
+			"type": "row"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "ms",
+					"min": 0
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
+			"id": 12,
+			"options": {
+				"legend": { "calcs": ["last", "max"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "app_event_loop_lag_mean_ms",
+					"legendFormat": "mean lag",
+					"refId": "A"
+				}
+			],
+			"title": "Event Loop Lag — Mean (ms)",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "palette-classic" },
+					"custom": { "lineWidth": 2, "fillOpacity": 10 },
+					"unit": "ms",
+					"min": 0
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
+			"id": 13,
+			"options": {
+				"legend": { "calcs": ["last", "max"], "displayMode": "list", "placement": "bottom" },
+				"tooltip": { "mode": "multi" }
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "app_event_loop_lag_max_ms",
+					"legendFormat": "max lag",
+					"refId": "A"
+				}
+			],
+			"title": "Event Loop Lag — Max (ms)",
+			"type": "timeseries"
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "thresholds" },
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [{ "color": "text", "value": null }]
+					},
+					"custom": { "displayMode": "auto" }
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 18, "x": 0, "y": 27 },
+			"id": 14,
+			"options": {
+				"frameIndex": 0,
+				"showHeader": true
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "app_info",
+					"legendFormat": "",
+					"refId": "A",
+					"instant": true,
+					"format": "table"
+				}
+			],
+			"title": "App Info (version / platform / nodeEnv — customData labels)",
+			"type": "table",
+			"transformations": [
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"names": ["version", "nodeEnv", "platform", "nodeVersion", "Value"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"datasource": { "type": "prometheus", "uid": "prometheus" },
+			"fieldConfig": {
+				"defaults": {
+					"color": { "mode": "thresholds" },
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [{ "color": "green", "value": null }]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": { "h": 8, "w": 6, "x": 18, "y": 27 },
+			"id": 15,
+			"options": {
+				"reduceOptions": { "calcs": ["lastNotNull"] },
+				"orientation": "auto",
+				"textMode": "auto",
+				"colorMode": "background"
+			},
+			"targets": [
+				{
+					"datasource": { "type": "prometheus", "uid": "prometheus" },
+					"expr": "app_startups_total",
+					"legendFormat": "startups",
+					"refId": "A"
+				}
+			],
+			"title": "App Startups (Counter)",
+			"type": "stat"
+		}
+	],
+	"refresh": "15s",
+	"schemaVersion": 38,
+	"tags": ["twin", "node", "telemetry", "opentelemetry"],
+	"templating": { "list": [] },
+	"time": { "from": "now-15m", "to": "now" },
+	"timepicker": {},
+	"timezone": "browser",
+	"title": "Twin Node",
+	"uid": "twin-node-metrics",
+	"version": 1
+}

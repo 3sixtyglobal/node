@@ -46,6 +46,8 @@ import {
 	MessagingEmailConnectorType,
 	MessagingPushNotificationConnectorType,
 	MessagingSmsConnectorType,
+	MetricsCollectorComponentType,
+	MetricsProducerComponentType,
 	NftComponentType,
 	NftConnectorType,
 	NotarizationComponentType,
@@ -79,6 +81,10 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
+import {
+	type IOpenTelemetryTelemetryConnectorConfig,
+	OpenTelemetryReaderTypes
+} from "@twin.org/telemetry-connector-opentelemetry";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
@@ -118,6 +124,7 @@ export async function buildEngineConfiguration(
 	await configureTaskScheduler(coreConfig, envVars);
 	await configureEventBus(coreConfig, envVars);
 	await configureTelemetry(coreConfig, envVars);
+	await configureMetricsCollector(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
 	await configureHealth(coreConfig, envVars);
@@ -581,11 +588,66 @@ async function configureTelemetry(
 		coreConfig.types.telemetryConnector.push({
 			type: TelemetryConnectorType.EntityStorage
 		});
+	} else if (envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
+		let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
+		if (envVars.openTelemetryReader === "prometheus") {
+			readers = {
+				prometheus: {
+					type: OpenTelemetryReaderTypes.Prometheus,
+					port: Coerce.integer(envVars.openTelemetryPrometheusPort)
+				}
+			};
+		}
+		coreConfig.types.telemetryConnector.push({
+			type: TelemetryConnectorType.OpenTelemetry,
+			options: {
+				config: {
+					meterName: envVars.openTelemetryMeterName,
+					meterVersion: envVars.openTelemetryMeterVersion,
+					readers
+				}
+			}
+		});
 	}
 
 	if (coreConfig.types.telemetryConnector.length > 0) {
 		coreConfig.types.telemetryComponent ??= [];
 		coreConfig.types.telemetryComponent.push({ type: TelemetryComponentType.Service });
+	}
+}
+
+/**
+ * Configures the metrics producers and orchestrator service.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ */
+async function configureMetricsCollector(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	if (isTelemetryRequired(envVars)) {
+		const intervalSec = Coerce.integer(envVars.telemetryMetricsCollectorIntervalSeconds) ?? 60;
+
+		coreConfig.types.metricsCollectorComponent ??= [];
+		coreConfig.types.metricsCollectorComponent.push({
+			type: MetricsCollectorComponentType.Service,
+			options: { config: { intervalMs: intervalSec * 1000 } }
+		});
+
+		const maxHistory = Coerce.integer(envVars.telemetryMetricsProducerMaxHistory) ?? 1440;
+		coreConfig.types.metricsProducerComponent ??= [];
+
+		const metricsProducers = commaSeparatedListToArray(
+			envVars.telemetryMetricsProducers ??
+				[MetricsProducerComponentType.System, MetricsProducerComponentType.Process].join(",")
+		);
+
+		for (const producerType of metricsProducers) {
+			coreConfig.types.metricsProducerComponent.push({
+				type: producerType as MetricsProducerComponentType,
+				options: { maxHistory }
+			});
+		}
 	}
 }
 
@@ -636,7 +698,8 @@ async function configureHealth(
 			type: HealthComponentType.Service,
 			options: {
 				config: {
-					healthCheckInterval: (Coerce.integer(envVars.healthIntervalSeconds) ?? 60) * 1000
+					healthCheckInterval: (Coerce.integer(envVars.healthIntervalSeconds) ?? 60) * 1000,
+					initialInterval: (Coerce.integer(envVars.healthStartupIntervalSeconds) ?? 2) * 1000
 				}
 			}
 		});
@@ -1704,4 +1767,17 @@ export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): b
  */
 export function isAutomationRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return isRightsManagementRequired(envVars);
+}
+
+/**
+ * Checks if the telemetry subsystem is required.
+ * Returns true when any component that depends on the telemetry subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if telemetry is enabled.
+ */
+export function isTelemetryRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		envVars.telemetryConnector === TelemetryConnectorType.EntityStorage ||
+		envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry
+	);
 }

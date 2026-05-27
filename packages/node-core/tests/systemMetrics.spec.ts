@@ -1,0 +1,74 @@
+// Copyright 2026 IOTA Stiftung.
+// SPDX-License-Identifier: Apache-2.0.
+import { ComponentFactory, Factory } from "@twin.org/core";
+import { MemoryStateStorage } from "@twin.org/engine-core";
+import { EntityStorageConnectorType } from "@twin.org/engine-types";
+import type { ITelemetryComponent } from "@twin.org/telemetry-models";
+import { run } from "../src/node.js";
+
+const BASE_PORT = 4500 + Math.floor(Math.random() * 400);
+
+const LIBRARY_METRIC_IDS = [
+	"system_cpu_usage_percent",
+	"system_memory_total_bytes",
+	"system_memory_used_bytes",
+	"system_memory_free_bytes",
+	"system_memory_usage_percent",
+	"system_uptime_seconds",
+	"process_uptime_seconds",
+	"process_memory_rss_bytes",
+	"process_memory_heap_total_bytes",
+	"process_memory_heap_used_bytes"
+];
+
+describe("System metrics E2E", () => {
+	let shutdown: (() => Promise<void>) | undefined;
+	let telemetry: ITelemetryComponent | undefined;
+
+	beforeAll(async () => {
+		const result = await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, {}),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_NODE_IDENTITY_ENABLED: "false",
+					TWIN_PORT: BASE_PORT.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_TELEMETRY_CONNECTOR: "entity-storage",
+					// Large interval so only the startup tick fires during the test
+					TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS: "3600"
+				}
+			},
+			["node", "index.js"]
+		);
+
+		shutdown = result?.shutdown;
+
+		const telemetryType = result?.engine.getRegisteredInstanceType("telemetryComponent");
+		if (telemetryType) {
+			telemetry = ComponentFactory.get<ITelemetryComponent>(telemetryType);
+		}
+	}, 60_000);
+
+	afterAll(async () => {
+		await shutdown?.();
+		Factory.clearFactories();
+	});
+
+	test("telemetry component is registered when enabled", () => {
+		expect(telemetry).toBeDefined();
+	});
+
+	test.each(LIBRARY_METRIC_IDS)(
+		"metric '%s' is registered and has at least one value",
+		async id => {
+			expect(telemetry).toBeDefined();
+			const result = await (telemetry as ITelemetryComponent).getMetric(id);
+			expect(result).toBeDefined();
+			expect(result.metric).toBeDefined();
+			expect(result.metric.id).toBe(id);
+		}
+	);
+});

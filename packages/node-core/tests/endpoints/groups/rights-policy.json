@@ -1,0 +1,104 @@
+{
+	"group": "Rights Management - Policy Admin",
+	"steps": [
+		{
+			"description": "POST /rights-management/policy/admin — create Set policy",
+			"method": "POST",
+			"path": "/rights-management/policy/admin",
+			"body": {
+				"@context": "http://www.w3.org/ns/odrl.jsonld",
+				"@type": "Set",
+				"permission": [{ "target": "http://example.com/asset/1", "action": "use" }]
+			},
+			"expectedStatus": 201,
+			"capture": { "setPolicyId": "location-last-segment" }
+		},
+		{
+			"description": "GET /rights-management/policy/admin/:id — 404 for unknown id",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/rights-management:nonexistent",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /rights-management/policy/admin/:id",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/{{setPolicyId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /rights-management/policy/admin/set/:id",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/set/{{setPolicyId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /rights-management/policy/admin — create Offer policy",
+			"method": "POST",
+			"path": "/rights-management/policy/admin",
+			"body": {
+				"@context": "http://www.w3.org/ns/odrl.jsonld",
+				"@type": "Offer",
+				"assigner": "urn:provider:test",
+				"permission": [{ "target": "http://example.com/asset/1", "action": "use" }]
+			},
+			"expectedStatus": 201,
+			"capture": { "offerPolicyId": "location-last-segment" }
+		},
+		{
+			"description": "GET /rights-management/policy/admin/offer/:id",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/offer/{{offerPolicyId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /rights-management/policy/admin — create Agreement policy",
+			"method": "POST",
+			"path": "/rights-management/policy/admin",
+			"body": {
+				"@context": "http://www.w3.org/ns/odrl.jsonld",
+				"@type": "Agreement",
+				"assigner": "urn:provider:test",
+				"assignee": "urn:consumer:test",
+				"permission": [{ "target": "http://example.com/asset/1", "action": "use" }]
+			},
+			"expectedStatus": 201,
+			"capture": { "agreementPolicyId": "location-last-segment" }
+		},
+		{
+			"description": "GET /rights-management/policy/admin/agreement/:id",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/agreement/{{agreementPolicyId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /rights-management/policy/admin/:id",
+			"method": "PUT",
+			"path": "/rights-management/policy/admin/{{setPolicyId}}",
+			"body": {
+				"@context": "http://www.w3.org/ns/odrl.jsonld",
+				"@type": "Set",
+				"@id": "{{setPolicyId}}",
+				"permission": [{ "target": "http://example.com/asset/1", "action": "read" }]
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /rights-management/policy/admin",
+			"method": "GET",
+			"path": "/rights-management/policy/admin",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /rights-management/policy/admin/:id",
+			"method": "DELETE",
+			"path": "/rights-management/policy/admin/{{setPolicyId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /rights-management/policy/admin/:id — 404 after delete",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/{{setPolicyId}}",
+			"expectedStatus": 404
+		}
+	]
+}

@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { BaseError, Coerce, EnvHelper, GeneralError, Is, ObjectHelper } from "@twin.org/core";
+import { Coerce, EnvHelper, GeneralError, Is } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
@@ -57,12 +57,13 @@ export async function run(
 	| undefined
 > {
 	let showErrorDetails = true;
+	let debugEnabled = true;
 	try {
 		nodeOptions ??= {};
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.0.3-next.35" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.0.3-next.40" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
@@ -159,6 +160,8 @@ export async function run(
 			serverInfo
 		);
 
+		debugEnabled = Coerce.boolean(nodeEnvVars.debug) ?? debugEnabled;
+
 		CLIDisplay.break();
 
 		const startResult = await start(
@@ -192,11 +195,7 @@ export async function run(
 		}
 
 		if (showErrorDetails) {
-			const baseError = BaseError.fromError(err);
-			if (baseError.source === "node") {
-				ObjectHelper.propertyDelete(err, "stack");
-			}
-			CLIDisplay.error(err);
+			CLIDisplay.error(err, true, { includeAdditional: true, includeStack: debugEnabled });
 		}
 
 		// eslint-disable-next-line unicorn/no-process-exit
@@ -247,7 +246,11 @@ export async function buildConfiguration(
 		}
 
 		if (Is.objectValue(output.parsed)) {
-			Object.assign(processEnv, output.parsed);
+			for (const [key, value] of Object.entries(output.parsed)) {
+				// Only set environment variables that are not already set in
+				// the process environment or provided via options.envVars
+				processEnv[key] ??= value;
+			}
 		}
 	}
 

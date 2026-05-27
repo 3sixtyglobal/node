@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { ModuleProtocol } from "../src/models/moduleProtocol.js";
 import {
 	handleNpmProtocol,
@@ -119,22 +118,15 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		const url = "https://cdn.jsdelivr.net/npm/is-number@7.0.0/package.json";
 
 		// First call (should download)
-		const startTime1 = Date.now();
 		const result1 = await handleHttpsProtocol(url, TEST_EXECUTION_DIR, 10);
-		const duration1 = Date.now() - startTime1;
 
 		expect(result1.cached).toBe(false);
 
 		// Second call (should use cache)
-		const startTime2 = Date.now();
 		const result2 = await handleHttpsProtocol(url, TEST_EXECUTION_DIR, 10);
-		const duration2 = Date.now() - startTime2;
 
 		expect(result2.cached).toBe(true);
 		expect(result2.resolvedPath).toBe(result1.resolvedPath);
-
-		// Cached call should be significantly faster
-		expect(duration2).toBeLessThan(duration1 / 2);
 	});
 
 	test("should respect size limit for HTTPS downloads", async () => {

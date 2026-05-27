@@ -1,0 +1,79 @@
+{
+	"group": "Telemetry",
+	"steps": [
+		{
+			"description": "POST /telemetry/metric — 400 missing id",
+			"method": "POST",
+			"path": "/telemetry/metric",
+			"body": {
+				"label": "Test Counter",
+				"type": 0,
+				"unit": "count"
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /telemetry/metric",
+			"method": "POST",
+			"path": "/telemetry/metric",
+			"body": {
+				"id": "{{metricId}}",
+				"label": "Test Counter",
+				"type": 0,
+				"description": "A test counter metric",
+				"unit": "count"
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /telemetry/metric/:id",
+			"method": "GET",
+			"path": "/telemetry/metric/{{metricId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /telemetry/metric/:id",
+			"method": "PUT",
+			"path": "/telemetry/metric/{{metricId}}",
+			"body": {
+				"id": "{{metricId}}",
+				"label": "Test Counter Updated",
+				"type": 0,
+				"unit": "count"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /telemetry/metric/:id/value — 400 missing value",
+			"method": "POST",
+			"path": "/telemetry/metric/{{metricId}}/value",
+			"body": {},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /telemetry/metric/:id/value",
+			"method": "POST",
+			"path": "/telemetry/metric/{{metricId}}/value",
+			"body": { "value": "inc" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /telemetry/metric/:id/value",
+			"method": "GET",
+			"path": "/telemetry/metric/{{metricId}}/value",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /telemetry/metric",
+			"method": "GET",
+			"path": "/telemetry/metric",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /telemetry/metric/:id",
+			"method": "DELETE",
+			"path": "/telemetry/metric/{{metricId}}",
+			"expectedStatus": 204
+		}
+	]
+}

@@ -1,0 +1,55 @@
+{
+	"group": "NFT",
+	"steps": [
+		{
+			"description": "POST /nft — 400 missing tag",
+			"method": "POST",
+			"path": "/nft",
+			"body": { "immutableMetadata": { "@type": "TestNFT", "name": "Test NFT" } },
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /nft",
+			"method": "POST",
+			"path": "/nft",
+			"body": {
+				"tag": "TEST_NFT",
+				"immutableMetadata": { "@type": "TestNFT", "name": "Test NFT" }
+			},
+			"expectedStatus": 201,
+			"capture": { "nftId": "location-last-segment" }
+		},
+		{
+			"description": "GET /nft/:id",
+			"method": "GET",
+			"path": "/nft/{{nftId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /nft/:id",
+			"method": "PUT",
+			"path": "/nft/{{nftId}}",
+			"body": { "metadata": { "updated": true } },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /nft/:id/transfer",
+			"method": "POST",
+			"path": "/nft/{{nftId}}/transfer",
+			"body": { "recipientAddress": "{{transferAddress}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /nft/:id",
+			"method": "DELETE",
+			"path": "/nft/{{nftId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /nft/:id — 404 after delete",
+			"method": "GET",
+			"path": "/nft/{{nftId}}",
+			"expectedStatus": 404
+		}
+	]
+}

@@ -1006,6 +1006,90 @@ The type of telemetry connector: entity-storage.
 
 ***
 
+### openTelemetryMeterName? {#opentelemetrymetername}
+
+> `optional` **openTelemetryMeterName?**: `string`
+
+The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryMeterName`](IEngineServerEnvironmentVariables.md#opentelemetrymetername)
+
+***
+
+### openTelemetryMeterVersion? {#opentelemetrymeterversion}
+
+> `optional` **openTelemetryMeterVersion?**: `string`
+
+The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryMeterVersion`](IEngineServerEnvironmentVariables.md#opentelemetrymeterversion)
+
+***
+
+### openTelemetryReader? {#opentelemetryreader}
+
+> `optional` **openTelemetryReader?**: `string`
+
+The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryReader`](IEngineServerEnvironmentVariables.md#opentelemetryreader)
+
+***
+
+### openTelemetryPrometheusPort? {#opentelemetryprometheusport}
+
+> `optional` **openTelemetryPrometheusPort?**: `string`
+
+The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`openTelemetryPrometheusPort`](IEngineServerEnvironmentVariables.md#opentelemetryprometheusport)
+
+***
+
+### telemetryMetricsCollectorIntervalSeconds? {#telemetrymetricscollectorintervalseconds}
+
+> `optional` **telemetryMetricsCollectorIntervalSeconds?**: `string`
+
+Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`telemetryMetricsCollectorIntervalSeconds`](IEngineServerEnvironmentVariables.md#telemetrymetricscollectorintervalseconds)
+
+***
+
+### telemetryMetricsProducers? {#telemetrymetricsproducers}
+
+> `optional` **telemetryMetricsProducers?**: `string`
+
+The type of telemetry metrics producers, can be a comma separated list: system, process.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`telemetryMetricsProducers`](IEngineServerEnvironmentVariables.md#telemetrymetricsproducers)
+
+***
+
+### telemetryMetricsProducerMaxHistory? {#telemetrymetricsproducermaxhistory}
+
+> `optional` **telemetryMetricsProducerMaxHistory?**: `string`
+
+Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`telemetryMetricsProducerMaxHistory`](IEngineServerEnvironmentVariables.md#telemetrymetricsproducermaxhistory)
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`
@@ -1703,6 +1787,19 @@ The interval in seconds for performing health checks, defaults to 60.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`healthIntervalSeconds`](IEngineServerEnvironmentVariables.md#healthintervalseconds)
+
+***
+
+### healthStartupIntervalSeconds? {#healthstartupintervalseconds}
+
+> `optional` **healthStartupIntervalSeconds?**: `string`
+
+The interval in seconds for performing health checks at startup, defaults to 2.
+This allows components that take a long time to initialize to be healthy before the first health check is performed.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`healthStartupIntervalSeconds`](IEngineServerEnvironmentVariables.md#healthstartupintervalseconds)
 
 ***
 

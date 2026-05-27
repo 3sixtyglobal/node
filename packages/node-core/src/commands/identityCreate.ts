@@ -4,7 +4,7 @@ import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { Coerce, GeneralError, I18n, Is, RandomHelper, StringHelper } from "@twin.org/core";
 import { Bip39 } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
-import { WalletConnectorType } from "@twin.org/engine-types";
+import { IdentityConnectorType, WalletConnectorType } from "@twin.org/engine-types";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
@@ -193,7 +193,10 @@ export async function identityCreate(
 			I18n.formatMessage("node.cli.commands.identity-create.labels.did"),
 			workingIdentity
 		);
-		if (Is.stringValue(envVars.iotaExplorerEndpoint)) {
+		if (
+			Is.stringValue(envVars.iotaExplorerEndpoint) &&
+			envVars.identityConnector === IdentityConnectorType.Iota
+		) {
 			const idParts = Did.parse(workingIdentity);
 			if (Is.stringValue(walletAddress)) {
 				CLIDisplay.value(
@@ -258,7 +261,7 @@ async function mnemonicCreate(
 		throw new GeneralError("identityCreate", "invalidMnemonic");
 	}
 	let mnemonic = providedMnemonic;
-	let storeMnemonic = false;
+	let storeMnemonic;
 
 	CLIDisplay.section(
 		I18n.formatMessage("node.cli.commands.identity-create.labels.processingMnemonic")
@@ -326,6 +329,12 @@ async function mnemonicFinalise(
 	if (tempIdentity !== identity) {
 		const mnemonic = await vaultConnector.getSecret(`${tempIdentity}/mnemonic`);
 		await vaultConnector.setSecret(`${identity}/mnemonic`, mnemonic);
+
+		try {
+			// not all accounts have account entries in the vault, so wrap this in a try catch
+			const accountChunk = await vaultConnector.getSecret(`${tempIdentity}/account/0/0/0`);
+			await vaultConnector.setSecret(`${identity}/account/0/0/0`, accountChunk);
+		} catch {}
 	}
 }
 
@@ -338,6 +347,10 @@ async function mnemonicFinalise(
 async function mnemonicRemove(vaultConnector: IVaultConnector, identity: string): Promise<void> {
 	try {
 		await vaultConnector.removeSecret(`${identity}/mnemonic`);
+	} catch {}
+
+	try {
+		await vaultConnector.removeSecret(`${identity}/account/0/0/0`);
 	} catch {}
 }
 

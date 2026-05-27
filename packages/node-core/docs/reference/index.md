@@ -20,9 +20,9 @@
 
 - [CliCommandParamType](type-aliases/CliCommandParamType.md)
 - [ModuleProtocol](type-aliases/ModuleProtocol.md)
-- [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
+- [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
 - [NodeExtensionShutdownMethod](type-aliases/NodeExtensionShutdownMethod.md)
 
 ## Variables
@@ -49,6 +49,7 @@
 - [isRightsManagementRequired](functions/isRightsManagementRequired.md)
 - [isTaskSchedulerRequired](functions/isTaskSchedulerRequired.md)
 - [isAutomationRequired](functions/isAutomationRequired.md)
+- [isTelemetryRequired](functions/isTelemetryRequired.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)

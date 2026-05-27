@@ -1,0 +1,23 @@
+[
+	"public",
+	"login",
+	"logging",
+	"telemetry",
+	"blob",
+	"identity",
+	"nft",
+	"notarization",
+	"verifiable",
+	"immutable-proof",
+	"attestation",
+	"aig",
+	"ais",
+	"data-processing",
+	"documents",
+	"automation",
+	"auth-admin",
+	"auth-ops",
+	"rights-policy",
+	"rights-negotiations",
+	"health-logout"
+]

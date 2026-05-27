@@ -240,14 +240,16 @@ export async function buildEngineServerConfiguration(
 	}
 
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
-		availableContextIdKeys.push({
-			key: ContextIdKeys.Organization,
-			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
-		});
-		availableContextIdKeys.push({
-			key: ContextIdKeys.User,
-			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
-		});
+		if (nodeIdentityEnabled) {
+			availableContextIdKeys.push({
+				key: ContextIdKeys.Organization,
+				requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+			});
+			availableContextIdKeys.push({
+				key: ContextIdKeys.User,
+				requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+			});
+		}
 
 		serverConfig.types.authenticationComponent ??= [];
 		serverConfig.types.authenticationComponent.push({

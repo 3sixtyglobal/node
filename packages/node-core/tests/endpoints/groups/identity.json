@@ -1,0 +1,171 @@
+{
+	"group": "Identity",
+	"steps": [
+		{
+			"description": "POST /identity — create test identity",
+			"method": "POST",
+			"path": "/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "testIdentity": "body.id" }
+		},
+		{
+			"description": "GET /identity/:identity",
+			"method": "GET",
+			"path": "/identity/{{testIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.id": "isDefined" }
+		},
+		{
+			"description": "POST /identity/:identity/verification-method",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/verification-method",
+			"body": {
+				"verificationMethodType": "assertionMethod",
+				"verificationMethodId": "{{vmFragmentId}}"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/:identity/service",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/service",
+			"body": {
+				"serviceId": "{{serviceId}}",
+				"type": "LinkedDomain",
+				"endpoint": "https://example.com"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/:identity/alias",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/alias",
+			"body": { "alias": "{{aliasId}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /identity/:identity/verifiable-credential/:vmId",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/verifiable-credential/{{vmFragmentId}}",
+			"body": {
+				"credentialId": "vc-test-001",
+				"subject": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Test Person"
+				},
+				"revocationIndex": 1
+			},
+			"expectedStatus": 200,
+			"capture": { "vcJwt": "body.jwt", "vcDocument": "body.verifiableCredential" }
+		},
+		{
+			"description": "POST /identity/:identity/verifiable-presentation/:vmId",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/verifiable-presentation/{{vmFragmentId}}",
+			"body": {
+				"presentationId": "vp-test-001",
+				"verifiableCredentials": ["{{vcJwt}}"]
+			},
+			"expectedStatus": 200,
+			"capture": { "vpDocument": "body.verifiablePresentation" }
+		},
+		{
+			"description": "POST /identity/:identity/proof/:vmId",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/proof/{{vmFragmentId}}",
+			"body": {
+				"proofType": "DataIntegrityProof",
+				"document": {
+					"@context": "https://schema.org",
+					"@type": "Thing",
+					"name": "test-proof-document"
+				}
+			},
+			"expectedStatus": 200,
+			"capture": { "proofData": "body" }
+		},
+		{
+			"description": "GET /identity/:identity/verifiable-credential/revoke/1",
+			"method": "GET",
+			"path": "/identity/{{testIdentity}}/verifiable-credential/revoke/1",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /identity/:identity/verifiable-credential/unrevoke/1",
+			"method": "GET",
+			"path": "/identity/{{testIdentity}}/verifiable-credential/unrevoke/1",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /identity/verifiable-credential/verify/document",
+			"method": "POST",
+			"path": "/identity/verifiable-credential/verify/document",
+			"body": "{{vcDocument}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/verifiable-presentation/verify/document",
+			"method": "POST",
+			"path": "/identity/verifiable-presentation/verify/document",
+			"body": "{{vpDocument}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/proof/verify",
+			"method": "POST",
+			"path": "/identity/proof/verify",
+			"body": {
+				"document": {
+					"@context": "https://schema.org",
+					"@type": "Thing",
+					"name": "test-proof-document"
+				},
+				"proof": "{{proofData}}"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /identity/profile",
+			"method": "GET",
+			"path": "/identity/profile",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /identity/profile/:identity/public",
+			"method": "GET",
+			"path": "/identity/profile/{{adminUserIdentity}}/public",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /identity/profile",
+			"method": "PUT",
+			"path": "/identity/profile",
+			"body": {
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "Updated Admin Name"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /identity/profile/query",
+			"method": "GET",
+			"path": "/identity/profile/query",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /identity/:identity/alias/:alias",
+			"method": "DELETE",
+			"path": "/identity/{{testIdentity}}/alias/{{aliasId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /identity/:identity/service/:serviceId",
+			"method": "DELETE",
+			"path": "/identity/{{testIdentity}}/service/{{serviceId}}",
+			"expectedStatus": 204
+		}
+	]
+}

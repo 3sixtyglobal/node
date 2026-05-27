@@ -1,0 +1,130 @@
+{
+	"group": "Rights Management - Negotiations",
+	"steps": [
+		{
+			"description": "POST /rights-management/negotiations/request — 400 missing consumerPid",
+			"method": "POST",
+			"path": "/rights-management/negotiations/request",
+			"auth": false,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"callbackAddress": "https://example.com/callback",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}"
+				}
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /rights-management/negotiations/request — initiate negotiation",
+			"method": "POST",
+			"path": "/rights-management/negotiations/request",
+			"auth": false,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"callbackAddress": "https://example.com/callback",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "negotiationProviderPid": "body.providerPid" }
+		},
+		{
+			"description": "GET /rights-management/negotiations/:id",
+			"method": "GET",
+			"path": "/rights-management/negotiations/{{negotiationProviderPid}}",
+			"auth": false,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/request — consumer counter-request",
+			"method": "POST",
+			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/request",
+			"auth": false,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"providerPid": "{{negotiationProviderPid}}",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"callbackAddress": "https://example.com/callback",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}"
+				}
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/termination — terminate negotiation",
+			"method": "POST",
+			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/termination",
+			"auth": false,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractNegotiationTerminationMessage",
+				"providerPid": "{{negotiationProviderPid}}",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /rights-management/negotiations/admin",
+			"method": "GET",
+			"path": "/rights-management/negotiations/admin",
+			"expectedStatus": 200,
+			"capture": { "negotiationAdminId": "body.[0].id" }
+		},
+		{
+			"description": "GET /rights-management/negotiations/admin/:id",
+			"method": "GET",
+			"path": "/rights-management/negotiations/admin/{{negotiationAdminId}}",
+			"expectedStatus": 200,
+			"capture": { "negotiationRecord": "body" }
+		},
+		{
+			"description": "PUT /rights-management/negotiations/admin/:id",
+			"method": "PUT",
+			"path": "/rights-management/negotiations/admin/{{negotiationAdminId}}",
+			"body": "{{negotiationRecord}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /rights-management/negotiations/admin/:id",
+			"method": "DELETE",
+			"path": "/rights-management/negotiations/admin/{{negotiationAdminId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /rights-management/negotiations/admin/:id — 404 after delete",
+			"method": "GET",
+			"path": "/rights-management/negotiations/admin/{{negotiationAdminId}}",
+			"expectedStatus": 404
+		}
+	]
+}

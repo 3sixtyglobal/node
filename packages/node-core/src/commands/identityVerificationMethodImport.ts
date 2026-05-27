@@ -190,12 +190,7 @@ export async function identityVerificationMethodImport(
 	if (Is.empty(vaultKey)) {
 		const privateKeyBytes = Converter.hexToBytes(HexHelper.stripPrefix(params.privateKeyHex));
 		const publicKeyBytes = Ed25519.publicKeyFromPrivateKey(privateKeyBytes);
-		vaultKey = await vaultConnector.addKey(
-			vaultKeyId,
-			VaultKeyType.Ed25519,
-			privateKeyBytes,
-			publicKeyBytes
-		);
+		await vaultConnector.addKey(vaultKeyId, VaultKeyType.Ed25519, privateKeyBytes, publicKeyBytes);
 	}
 
 	await identityConnector.addVerificationMethod(
