@@ -16168,17 +16168,12 @@
 				}
 			}
 		},
-		"/dataspace-data-plane/notify": {
+		"/dataspace-data-plane/inbox": {
 			"post": {
 				"operationId": "activityStreamNotify",
 				"summary": "Notify of a new Activity",
 				"tags": [
 					"Dataspace Data Plane"
-				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
 				],
 				"requestBody": {
 					"description": "Activity Stream Notify Request.",
@@ -16234,24 +16229,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -19835,6 +19812,7 @@
 											"correlationId": "cid",
 											"dateCreated": "2025-09-03T00:00:00.000Z",
 											"state": "REQUESTED",
+											"nodeIdentity": "did:iota:nodexyz",
 											"organizationIdentity": "did:iota:123456789abcdefghi"
 										}
 									}
@@ -19940,6 +19918,7 @@
 										"correlationId": "cid",
 										"dateCreated": "2025-09-03T00:00:00.000Z",
 										"state": "REQUESTED",
+										"nodeIdentity": "did:iota:nodexyz",
 										"organizationIdentity": "did:iota:123456789abcdefghi"
 									}
 								}
@@ -20148,6 +20127,7 @@
 												"correlationId": "cid",
 												"dateCreated": "2025-09-03T00:00:00.000Z",
 												"state": "REQUESTED",
+												"nodeIdentity": "did:iota:nodexyz",
 												"organizationIdentity": "did:iota:123456789abcdefghi"
 											}
 										]
@@ -22600,9 +22580,13 @@
 						"type": "string",
 						"description": "The tenant id this negotiation belongs to."
 					},
+					"nodeIdentity": {
+						"type": "string",
+						"description": "The node identity (DID) used to sign trust payloads."
+					},
 					"organizationIdentity": {
 						"type": "string",
-						"description": "Organization identity to be used when sending trust payloads."
+						"description": "Organization identity (the org DID of the user who initiated or received\nthe negotiation, when a user context was available)."
 					},
 					"offer": {
 						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
@@ -22670,7 +22654,7 @@
 					"correlationId",
 					"dateCreated",
 					"state",
-					"organizationIdentity"
+					"nodeIdentity"
 				]
 			},
 			"RefreshTokenRequest": {
