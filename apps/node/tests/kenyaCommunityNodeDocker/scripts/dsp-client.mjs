@@ -20,7 +20,7 @@
 // Always exits 0 — the test harness reads .status from the JSON to decide
 // pass/fail. This keeps bash plumbing simple (`result=$(node dsp-client.mjs ...)`).
 
-import { DataspaceControlPlaneRestClient } from "@twin.org/dataspace-control-plane-rest-client";
+import { DataspaceControlPlaneRestClient } from '@twin.org/dataspace-control-plane-rest-client';
 
 function parseArgs(argv) {
 	const command = argv[2];
@@ -28,7 +28,7 @@ function parseArgs(argv) {
 	for (let i = 3; i < argv.length; i += 2) {
 		const k = argv[i];
 		const v = argv[i + 1];
-		if (k?.startsWith("--")) {
+		if (k?.startsWith('--')) {
 			opts[k.slice(2)] = v;
 		}
 	}
@@ -45,7 +45,7 @@ function buildEndpoint(host, tenantToken) {
 		return host;
 	}
 	const url = new URL(host);
-	url.searchParams.set("x-enc-tenant-token", tenantToken);
+	url.searchParams.set('x-enc-tenant-token', tenantToken);
 	return url.toString();
 }
 
@@ -57,33 +57,33 @@ function makeClient(opts) {
 	//      x-api-key + session JWT cookie. Set them as static headers in
 	//      the config so every request carries them.
 	const headers = {};
-	if (opts["api-key"]) {
-		headers["x-api-key"] = opts["api-key"];
+	if (opts['api-key']) {
+		headers['x-api-key'] = opts['api-key'];
 	}
-	if (opts["session-jwt"]) {
-		headers.Cookie = `access_token=${opts["session-jwt"]}`;
+	if (opts['session-jwt']) {
+		headers.Cookie = `access_token=${opts['session-jwt']}`;
 	}
 	return new DataspaceControlPlaneRestClient({
-		endpoint: buildEndpoint(opts.host, opts["tenant-token"]),
-		pathPrefix: "dataspace",
+		endpoint: buildEndpoint(opts.host, opts['tenant-token']),
+		pathPrefix: 'dataspace',
 		headers: Object.keys(headers).length > 0 ? headers : undefined
 	});
 }
 
 function parseBody(raw) {
-	if (raw === undefined || raw === null || raw === "") {
-		return undefined;
+	if (raw === undefined || raw === null || raw === '') {
+		return;
 	}
 	try {
 		return JSON.parse(raw);
 	} catch (err) {
-		throw new Error(`Invalid --body JSON: ${err.message}`);
+		throw new Error(`Invalid --body JSON: ${err.message}`, { cause: err });
 	}
 }
 
 function emit(result) {
 	process.stdout.write(JSON.stringify(result));
-	process.stdout.write("\n");
+	process.stdout.write('\n');
 }
 
 // Map TWIN core error class names to HTTP status codes. BaseRestClient
@@ -102,7 +102,7 @@ const ERROR_NAME_STATUS = {
 };
 
 function classifyError(err) {
-	const errorName = err?.name ?? "Error";
+	const errorName = err?.name ?? 'Error';
 	const errorMessage = err?.message ?? String(err);
 
 	// Dig the response body out of wherever it might live. FetchError stores
@@ -111,10 +111,10 @@ function classifyError(err) {
 	let body = null;
 	try {
 		const candidates = [err?.properties, err?.cause?.properties];
-		if (typeof err?.toJsonObject === "function") {
+		if (typeof err?.toJsonObject === 'function') {
 			candidates.push(err.toJsonObject()?.properties);
 		}
-		if (typeof err?.cause?.toJsonObject === "function") {
+		if (typeof err?.cause?.toJsonObject === 'function') {
 			candidates.push(err.cause.toJsonObject()?.properties);
 		}
 		for (const c of candidates) {
@@ -135,20 +135,28 @@ function classifyError(err) {
 		err?.cause?.statusCode ??
 		err?.cause?.status ??
 		err?.properties?.httpStatus ??
-		(typeof err?.toJsonObject === "function" ? err.toJsonObject()?.properties?.httpStatus : undefined) ??
+		(typeof err?.toJsonObject === 'function'
+			? err.toJsonObject()?.properties?.httpStatus
+			: undefined) ??
 		ERROR_NAME_STATUS[errorName] ??
 		0;
-	return { ok: false, status: typeof status === "number" ? status : 0, errorName, errorMessage, body };
+	return {
+		ok: false,
+		status: typeof status === 'number' ? status : 0,
+		errorName,
+		errorMessage,
+		body
+	};
 }
 
 async function main() {
 	const { command, opts } = parseArgs(process.argv);
 	if (!command) {
-		emit({ ok: false, status: 0, errorName: "Usage", errorMessage: "No command given" });
+		emit({ ok: false, status: 0, errorName: 'Usage', errorMessage: 'No command given' });
 		return;
 	}
 	if (!opts.host) {
-		emit({ ok: false, status: 0, errorName: "Usage", errorMessage: "Missing --host" });
+		emit({ ok: false, status: 0, errorName: 'Usage', errorMessage: 'Missing --host' });
 		return;
 	}
 
@@ -157,32 +165,49 @@ async function main() {
 	try {
 		let body;
 		switch (command) {
-			case "requestTransfer": {
+			case 'requestTransfer': {
 				const message = parseBody(opts.body);
-				if (!message) throw new Error("requestTransfer requires --body <json>");
-				if (!opts["trust-payload"]) throw new Error("requestTransfer requires --trust-payload <jwt>");
-				body = await client.requestTransfer(message, opts["trust-payload"]);
+				if (!message) {
+					throw new Error('requestTransfer requires --body <json>');
+				}
+				if (!opts['trust-payload']) {
+					throw new Error('requestTransfer requires --trust-payload <jwt>');
+				}
+				body = await client.requestTransfer(message, opts['trust-payload']);
 				break;
 			}
-			case "startTransfer": {
+			case 'startTransfer': {
 				const message = parseBody(opts.body);
-				if (!message) throw new Error("startTransfer requires --body <json>");
-				if (!opts["trust-payload"]) throw new Error("startTransfer requires --trust-payload <jwt>");
-				body = await client.startTransfer(message, opts["trust-payload"]);
+				if (!message) {
+					throw new Error('startTransfer requires --body <json>');
+				}
+				if (!opts['trust-payload']) {
+					throw new Error('startTransfer requires --trust-payload <jwt>');
+				}
+				body = await client.startTransfer(message, opts['trust-payload']);
 				break;
 			}
-			case "getTransferProcess": {
-				if (!opts.pid) throw new Error("getTransferProcess requires --pid <consumerPid>");
-				if (!opts["trust-payload"]) throw new Error("getTransferProcess requires --trust-payload <jwt>");
-				body = await client.getTransferProcess(opts.pid, opts["trust-payload"]);
+			case 'getTransferProcess': {
+				if (!opts.pid) {
+					throw new Error('getTransferProcess requires --pid <consumerPid>');
+				}
+				if (!opts['trust-payload']) {
+					throw new Error('getTransferProcess requires --trust-payload <jwt>');
+				}
+				body = await client.getTransferProcess(opts.pid, opts['trust-payload']);
 				break;
 			}
-			case "listAppDatasets": {
-				body = await client.listAppDatasets(opts.cursor, opts.limit ? Number(opts.limit) : undefined);
+			case 'listAppDatasets': {
+				body = await client.listAppDatasets(
+					opts.cursor,
+					opts.limit ? Number(opts.limit) : undefined
+				);
 				break;
 			}
-			case "getAppDataset": {
-				if (!opts.id) throw new Error("getAppDataset requires --id <datasetId>");
+			case 'getAppDataset': {
+				if (!opts.id) {
+					throw new Error('getAppDataset requires --id <datasetId>');
+				}
 				body = await client.getAppDataset(opts.id);
 				break;
 			}

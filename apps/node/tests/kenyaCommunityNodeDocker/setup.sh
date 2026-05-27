@@ -287,6 +287,7 @@ else
                 --password="${TENANT_USER_PASSWORD}" \
                 --user-identity="${tenant_did}" \
                 --organization-identity="${tenant_did}" \
+                --tenant-id="${tenant_id}" \
                 --scope="tenant-admin" 2>&1 | tee "${tmp}"
         ec=$?
         set -e
