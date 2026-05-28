@@ -948,10 +948,14 @@ async function configureNft(
 			"dltConfig",
 			DltConfigType.Iota
 		);
+		const config = {
+			...(dltConfig?.options?.config as IIotaConfig),
+			deploymentPkgId: Is.stringValue(envVars.nftPackageId) ? envVars.nftPackageId : undefined
+		};
 		coreConfig.types.nftConnector.push({
 			type: NftConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config
 			}
 		});
 	}
@@ -1018,10 +1022,17 @@ async function configureVerifiableStorage(
 			"dltConfig",
 			DltConfigType.Iota
 		);
+
+		const config = {
+			...(dltConfig?.options?.config as IIotaConfig),
+			deploymentPkgId: Is.stringValue(envVars.verifiableStoragePackageId)
+				? envVars.verifiableStoragePackageId
+				: undefined
+		};
 		coreConfig.types.verifiableStorageConnector.push({
 			type: VerifiableStorageConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config
 			}
 		});
 	}
@@ -1082,6 +1093,9 @@ async function configureIdentity(
 			options: {
 				config: {
 					...(dltConfig?.options?.config ?? ({} as IIotaConfig)),
+					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
+						? envVars.iotaIdentityPackageId
+						: undefined,
 					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0
 				}
 			}
@@ -1118,7 +1132,12 @@ async function configureIdentityResolver(
 		coreConfig.types.identityResolverConnector.push({
 			type: IdentityResolverConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config: {
+					...(dltConfig?.options?.config as IIotaConfig),
+					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
+						? envVars.iotaIdentityPackageId
+						: undefined
+				}
 			}
 		});
 	} else if (envVars.identityResolverConnector === IdentityResolverConnectorType.Universal) {
@@ -1719,8 +1738,8 @@ export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables):
  */
 export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envVars.verifiableStorageConnector === VerifiableStorageConnectorType.EntityStorage ||
-		envVars.verifiableStorageConnector === VerifiableStorageConnectorType.Iota
+		envVars.notarizationConnector === NotarizationConnectorType.EntityStorage ||
+		envVars.notarizationConnector === NotarizationConnectorType.Iota
 	);
 }
 

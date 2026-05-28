@@ -533,6 +533,7 @@ describe("node-core", () => {
 			"GET      /aig/:id/changesets/:changesetId",
 			"GET      /aig/:id/changesets",
 			"PUT      /aig/:id",
+			"PATCH    /aig/:id",
 			"GET      /aig",
 			"POST     /ais",
 			"GET      /ais/:id",
