@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.43](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.42...node-core-v0.0.3-next.43) (2026-05-28)
+
+
+### Bug Fixes
+
+* immutable proof requirements ([2940579](https://github.com/iotaledger/twin-node/commit/29405798b24053c017adaaf08a2537ea6b1c8d0f))
+
 ## [0.0.3-next.42](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.41...node-core-v0.0.3-next.42) (2026-05-28)
 
 
