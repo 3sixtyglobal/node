@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3-next.42](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.41...node-core-v0.0.3-next.42) (2026-05-28)
+
+
+### Features
+
+* immutable proof gate and additional config ([#157](https://github.com/iotaledger/twin-node/issues/157)) ([1d1fbb7](https://github.com/iotaledger/twin-node/commit/1d1fbb7c53525af848761dc25b42e9e676929972))
+
+
+### Bug Fixes
+
+* example typo for vault-key-create ([eed5844](https://github.com/iotaledger/twin-node/commit/eed58448b8e6d057fa964822d337cb2898d5bb54))
+
 ## [0.0.3-next.41](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.40...node-core-v0.0.3-next.41) (2026-05-27)
 
 
