@@ -1126,6 +1126,18 @@ The type of NFT connector: entity-storage, iota.
 
 ***
 
+### nftPackageId? {#nftpackageid}
+
+> `optional` **nftPackageId?**: `string`
+
+The NFT deployed package id, for custom deployments.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`nftPackageId`](IEngineServerEnvironmentVariables.md#nftpackageid)
+
+***
+
 ### notarizationConnector? {#notarizationconnector}
 
 > `optional` **notarizationConnector?**: `string`
@@ -1183,6 +1195,18 @@ The type of verifiable storage connector: entity-storage, iota.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`verifiableStorageConnector`](IEngineServerEnvironmentVariables.md#verifiablestorageconnector)
+
+***
+
+### verifiableStoragePackageId? {#verifiablestoragepackageid}
+
+> `optional` **verifiableStoragePackageId?**: `string`
+
+The verifiable storage deployed package id, for custom deployments.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`verifiableStoragePackageId`](IEngineServerEnvironmentVariables.md#verifiablestoragepackageid)
 
 ***
 
@@ -1267,6 +1291,18 @@ IOTA Gas Station Authentication Token.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`iotaGasStationAuthToken`](IEngineServerEnvironmentVariables.md#iotagasstationauthtoken)
+
+***
+
+### iotaIdentityPackageId? {#iotaidentitypackageid}
+
+> `optional` **iotaIdentityPackageId?**: `string`
+
+The IOTA Identity deployed package id, for custom deployments.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`iotaIdentityPackageId`](IEngineServerEnvironmentVariables.md#iotaidentitypackageid)
 
 ***
 
