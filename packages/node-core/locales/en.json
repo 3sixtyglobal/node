@@ -547,7 +547,7 @@
 				},
 				"vault-key-create": {
 					"description": "Create a vault key for an identity",
-					"example": "vault-key-create --identity=\"did:iota:....\" --key-id=\"my-key\" --type=\"Ed25519\"",
+					"example": "vault-key-create --identity=\"did:iota:....\" --key-id=\"my-key\" --key-type=\"Ed25519\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
