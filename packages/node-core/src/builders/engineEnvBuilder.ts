@@ -1738,8 +1738,9 @@ export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables):
  */
 export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envVars.notarizationConnector === NotarizationConnectorType.EntityStorage ||
-		envVars.notarizationConnector === NotarizationConnectorType.Iota
+		(Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) ||
+		(Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) ||
+		(Coerce.boolean(envVars.documentManagementEnabled) ?? false)
 	);
 }
 
