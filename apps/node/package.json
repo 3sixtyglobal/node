@@ -4,7 +4,7 @@
 	"description": "TWIN Node serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/iotaledger/node.git",
+		"url": "git+https://github.com/iotaledger/twin-node.git",
 		"directory": "apps/node"
 	},
 	"author": "martyn.janes@iota.org",
@@ -54,7 +54,7 @@
 		"vitest": "4.1.7"
 	},
 	"bugs": {
-		"url": "git+https://github.com/iotaledger/node/issues"
+		"url": "git+https://github.com/iotaledger/twin-node/issues"
 	},
 	"homepage": "https://twindev.org",
 	"main": "./src/index.js",
