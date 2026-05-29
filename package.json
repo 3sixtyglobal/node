@@ -4,7 +4,7 @@
 	"description": "Core runtime toolkit and executable application for running service workloads through a consistent Node.js server model",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/iotaledger/node.git"
+		"url": "git+https://github.com/iotaledger/twin-node.git"
 	},
 	"author": "martyn.janes@iota.org",
 	"license": "Apache-2.0",
@@ -59,7 +59,7 @@
 	],
 	"type": "module",
 	"bugs": {
-		"url": "git+https://github.com/iotaledger/node/issues"
+		"url": "git+https://github.com/iotaledger/twin-node/issues"
 	},
 	"homepage": "https://twindev.org"
 }
