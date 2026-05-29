@@ -522,6 +522,8 @@ describe("node-core", () => {
 			"POST     /immutable-proof",
 			"GET      /immutable-proof/:id",
 			"GET      /immutable-proof/:id/verify",
+			"DELETE   /immutable-proof/:id",
+			"DELETE   /immutable-proof/:id/notarization",
 			"POST     /attestation",
 			"GET      /attestation/:id",
 			"PUT      /attestation/:id/transfer",
