@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.45](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.44...node-core-v0.0.3-next.45) (2026-06-02)
+
+
+### Features
+
+* bump [@twin](https://github.com/twin).org/* to latest next ([#172](https://github.com/iotaledger/twin-node/issues/172)) ([45862d5](https://github.com/iotaledger/twin-node/commit/45862d555e4958f1c12da357817b7b87642d7aba))
+
 ## [0.0.3-next.44](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.43...node-core-v0.0.3-next.44) (2026-06-02)
 
 
