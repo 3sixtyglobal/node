@@ -147,6 +147,7 @@ External Systems                    Supply Chain Node
 +------------------+                                              |
                                                            Adds inspection docs
                                                            to KRA's consignment
+
                            Federated Catalogue
                            +------------------+
                            | Dataset: consignment |
@@ -200,3 +201,4 @@ KRA creates the consignment in their tenant. KPA, KENTRADE, and AFA each operate
 - How do agencies in their own tenant add documents to a consignment owned by KRA's tenant? The current DSP protocol doesn't support cross-tenant write operations for same-node tenants.
 - Where do the documents live? Should all documents end up on KRA's consignment (single source of truth), or can they be stored in each agency's tenant separately?
 - When the trader pulls the shared consignment, they should see all documents from all agencies in a single view? How will this data remain in sync?
+- How should pagination work when listing a mix of own and shared consignments? The trader's `consignmentOverviews()` returns both their own consignments and shared ones pulled from the catalogue. These come from different storage sources — own consignments from the trader's entity storage and shared ones pulled via DSP. How should cursor-based pagination work across these two sources?

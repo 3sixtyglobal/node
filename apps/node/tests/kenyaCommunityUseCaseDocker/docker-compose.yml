@@ -1,0 +1,21 @@
+services:
+  twin-kenya-usecase-node:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/kenyaCommunityUseCaseDocker/Dockerfile
+    container_name: twin-kenya-usecase-node
+    ports:
+      - '3041:3000'
+    env_file:
+      - env/node.env
+    volumes:
+      - kenya-usecase-data:/app/data
+    networks:
+      - twin-kenya-usecase-network
+
+volumes:
+  kenya-usecase-data:
+
+networks:
+  twin-kenya-usecase-network:
+    driver: bridge

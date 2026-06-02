@@ -1,0 +1,86 @@
+[
+	{
+		"@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld",
+		"type": "Consignment",
+		"id": "urn:ucr:KE-KRA-2026-CUSTOMS-0001",
+		"identifier": "KRA-CD-0001",
+		"globalId": "5-KE-IMPORT-KRA0001",
+		"destinationCountry": {
+			"type": "Country",
+			"countryId": "unece:CountryId#KE"
+		},
+		"loadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#NLRTM",
+			"name": "Rotterdam"
+		},
+		"unloadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#KEMBA",
+			"name": "Mombasa"
+		}
+	},
+	{
+		"@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld",
+		"type": "Consignment",
+		"id": "urn:ucr:KE-KPA-2026-PORT-0002",
+		"identifier": "KPA-BERTH-0002",
+		"globalId": "5-KE-IMPORT-KPA0002",
+		"destinationCountry": {
+			"type": "Country",
+			"countryId": "unece:CountryId#KE"
+		},
+		"loadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#AEJEA",
+			"name": "Jebel Ali"
+		},
+		"unloadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#KEMBA",
+			"name": "Mombasa"
+		}
+	},
+	{
+		"@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld",
+		"type": "Consignment",
+		"id": "urn:ucr:KE-KENTRADE-2026-PERMIT-0003",
+		"identifier": "KENTRADE-IMP-0003",
+		"globalId": "5-KE-IMPORT-KENTRADE0003",
+		"destinationCountry": {
+			"type": "Country",
+			"countryId": "unece:CountryId#KE"
+		},
+		"loadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#INNSA",
+			"name": "Nhava Sheva"
+		},
+		"unloadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#KEMBA",
+			"name": "Mombasa"
+		}
+	},
+	{
+		"@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld",
+		"type": "Consignment",
+		"id": "urn:ucr:KE-AFA-2026-PHYTO-0004",
+		"identifier": "AFA-PHYTO-0004",
+		"globalId": "5-KE-IMPORT-AFA0004",
+		"destinationCountry": {
+			"type": "Country",
+			"countryId": "unece:CountryId#KE"
+		},
+		"loadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#CNSHA",
+			"name": "Shanghai"
+		},
+		"unloadingLocation": {
+			"type": "LogisticsLocation",
+			"id": "unece:LOCODE#KEMBA",
+			"name": "Mombasa"
+		}
+	}
+]

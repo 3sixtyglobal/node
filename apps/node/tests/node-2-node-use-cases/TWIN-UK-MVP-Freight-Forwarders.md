@@ -1,9 +1,5 @@
 # Freight Forwarders → Government Border Agencies / Port Operators data sharing
 
-By Ian Clark
-
-Status: 1 min — 4 thumbs up — 1 App Icon Tasks
-
 ## Purpose
 
 This page describes the data sharing requirements for scenarios where Freight Forwarders publish data to TWIN that Government Border Agencies / Port Operators consume securely, with strict isolation between publishers.
@@ -15,6 +11,13 @@ The following types of organisation are involved in this process:
 - Freight Forwarders (Publishers)
 - Government Border Agencies (Consumers): Customs, Port Health, etc.
 - Port / Location Operators (Consumers): Ports, airports, rail terminals, etc.
+
+## Data Scope
+
+This use case is based on providing the ability to share:
+
+- Documents via API, where those documents are attached to a Goods Load.
+- Visibility of the goods load, events and attached documents via the UI.
 
 ## Sharing & Visibility Rules
 
@@ -29,5 +32,3 @@ The following types of organisation are involved in this process:
 - Data sharing permissions for location operators and border agencies shall be based on the system role that the organisation holds, e.g.
   - UK Government Border Agency
   - UK Location of Entry / Exit Operator
-
-## Related content
