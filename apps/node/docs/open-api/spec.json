@@ -136,6 +136,11 @@
 				"tags": [
 					"Health"
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "The health of the server.",
@@ -214,6 +219,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -709,6 +732,11 @@
 				"tags": [
 					"Authentication"
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"requestBody": {
 					"description": "Perform a logout on the auth token.",
 					"required": true,
@@ -747,6 +775,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -1930,6 +1976,11 @@
 						"example": "did:iota:tst:0xe3088ba9aa8c28e1d139708a14e8c0fdff11ee8223baac4aa5bcf3321e4bfc6a"
 					}
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "Response to resolving an identity.",
@@ -1971,6 +2022,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3025,6 +3094,11 @@
 				"tags": [
 					"Identity"
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"requestBody": {
 					"description": "Request to verify a verifiable credential.",
 					"required": true,
@@ -3123,6 +3197,24 @@
 							}
 						}
 					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
 					"500": {
 						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
 						"content": {
@@ -3161,6 +3253,11 @@
 							"type": "string"
 						},
 						"example": "eyJraWQiOi...D1Z3AQ"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
 					}
 				],
 				"responses": {
@@ -3218,6 +3315,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3602,6 +3717,11 @@
 				"tags": [
 					"Identity"
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"requestBody": {
 					"description": "Request to verify a verifiable presentation.",
 					"required": true,
@@ -3706,6 +3826,24 @@
 							}
 						}
 					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
 					"500": {
 						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
 						"content": {
@@ -3744,6 +3882,11 @@
 							"type": "string"
 						},
 						"example": "eyJraWQiOi...D1Z3AQ"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
 					}
 				],
 				"responses": {
@@ -3794,6 +3937,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -3988,6 +4149,11 @@
 				"tags": [
 					"Identity"
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"requestBody": {
 					"description": "Request to verify a proof.",
 					"required": true,
@@ -4066,6 +4232,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -4606,6 +4790,11 @@
 						"example": "role,email,name"
 					}
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "Response to get an identity public profile.",
@@ -4650,6 +4839,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -8623,6 +8830,11 @@
 						"style": "simple"
 					}
 				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"responses": {
 					"200": {
 						"description": "The response to verifying the attestation.",
@@ -8760,6 +8972,24 @@
 											"properties": {
 												"foo": "bar"
 											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
 										}
 									}
 								}
@@ -9596,7 +9826,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
+									"$ref": "https://schema.twindev.org/immutable-proof/ImmutableProofCredential"
 								},
 								"examples": {
 									"immutableProofGetResponseExample": {
@@ -9630,7 +9860,7 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
+									"$ref": "https://schema.twindev.org/immutable-proof/ImmutableProofCredential"
 								},
 								"examples": {
 									"immutableProofJsonLdGetResponseExample": {
@@ -9671,6 +9901,114 @@
 								"description": "e.g. application/ld+json"
 							}
 						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "immutableProofRemove",
+				"summary": "Remove a proof",
+				"tags": [
+					"Immutable Proof"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the immutable proof to remove.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "immutable-proof:1234567890"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -9814,6 +10152,116 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/immutable-proof/{id}/notarization": {
+			"delete": {
+				"operationId": "immutableProofRemoveNotarization",
+				"summary": "Remove the notarization for a proof",
+				"tags": [
+					"Immutable Proof"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the immutable proof to remove the notarization from.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "immutable-proof:1234567890"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -16320,7 +16768,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ActivityLogEntry"
+									"$ref": "#/components/schemas/ActivityLogEntryWithError"
 								}
 							}
 						}
@@ -16340,24 +16788,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"422": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnprocessableError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -20363,6 +20793,20 @@
 				"allOf": [
 					{
 						"$ref": "#/components/schemas/ActivityLogDetails"
+					}
+				]
+			},
+			"ActivityLogEntryWithError": {
+				"description": "Activity log entry extended with a top-level RFC 9457 error field.\nReturned as the response body for 422/500 inline-processing failures.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"$ref": "#/components/schemas/Error"
+					}
+				},
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/ActivityLogEntry"
 					}
 				]
 			},
