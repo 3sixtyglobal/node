@@ -5,10 +5,10 @@
 			"description": "POST /authentication/login",
 			"method": "POST",
 			"path": "/authentication/login",
-			"auth": false,
+			"apiKey": true,
 			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
 			"expectedStatus": 200,
-			"capture": { "authToken": "cookie:access_token" },
+			"capture": { "authToken": "cookie:access_token", "tenantToken": "jwt-claim:tid" },
 			"assert": { "body.expiry": "isDefined" }
 		},
 		{

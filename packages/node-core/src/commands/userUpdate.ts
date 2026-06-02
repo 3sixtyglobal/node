@@ -6,7 +6,7 @@ import type {
 } from "@twin.org/api-auth-entity-storage-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
+import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
 import type { Person, WithContext } from "schema-dts";
@@ -153,7 +153,7 @@ export async function userUpdate(
 	}
 	if (Is.stringValue(params.tenantId)) {
 		Guards.stringHexLength("userUpdate", "tenant-id", params.tenantId, 32);
-	} else if (envVars.tenantEnabled ?? false) {
+	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
 		throw new GeneralError("userUpdate", "tenantIdRequired");
 	}
 

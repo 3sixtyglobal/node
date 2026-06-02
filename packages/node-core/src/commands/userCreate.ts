@@ -6,7 +6,7 @@ import type {
 } from "@twin.org/api-auth-entity-storage-models";
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
+import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import { PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
@@ -199,7 +199,7 @@ export async function userCreate(
 	Did.guard("userCreate", "organization-identity", paramsOrganizationIdentity);
 	if (Is.stringValue(params.tenantId)) {
 		Guards.stringHexLength("userCreate", "tenant-id", params.tenantId, 32);
-	} else if (envVars.tenantEnabled ?? false) {
+	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
 		throw new GeneralError("userCreate", "tenantIdRequired");
 	}
 

@@ -2,10 +2,31 @@
 	"group": "Rights Management - Negotiations",
 	"steps": [
 		{
-			"description": "POST /rights-management/negotiations/request — 400 missing consumerPid",
+			"description": "POST /rights-management/negotiations/request — 401 missing tenant token",
+			"skipIfTenantParamOmitted": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
-			"auth": false,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"callbackAddress": "https://example.com/callback",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}"
+				}
+			},
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /rights-management/negotiations/request — 400 missing consumerPid",
+			"appendTenantParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/request",
 			"headers": {
 				"authorization": "{{trustAuthorization}}",
 				"accept": "application/ld+json"
@@ -23,9 +44,9 @@
 		},
 		{
 			"description": "POST /rights-management/negotiations/request — initiate negotiation",
+			"appendTenantParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
-			"auth": false,
 			"headers": {
 				"authorization": "{{trustAuthorization}}",
 				"accept": "application/ld+json"
@@ -34,7 +55,7 @@
 				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
 				"@type": "ContractRequestMessage",
 				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
-				"callbackAddress": "https://example.com/callback",
+				"callbackAddress": "http://127.0.0.1:19999/callback",
 				"offer": {
 					"@type": "Offer",
 					"@id": "{{offerPolicyId}}"
@@ -45,9 +66,9 @@
 		},
 		{
 			"description": "GET /rights-management/negotiations/:id",
+			"appendTenantParam": true,
 			"method": "GET",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}",
-			"auth": false,
 			"headers": {
 				"authorization": "{{trustAuthorization}}",
 				"accept": "application/ld+json"
@@ -56,9 +77,9 @@
 		},
 		{
 			"description": "POST /rights-management/negotiations/:id/request — consumer counter-request",
+			"appendTenantParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/request",
-			"auth": false,
 			"headers": {
 				"authorization": "{{trustAuthorization}}",
 				"accept": "application/ld+json"
@@ -78,9 +99,9 @@
 		},
 		{
 			"description": "POST /rights-management/negotiations/:id/termination — terminate negotiation",
+			"appendTenantParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/termination",
-			"auth": false,
 			"headers": {
 				"authorization": "{{trustAuthorization}}",
 				"accept": "application/ld+json"

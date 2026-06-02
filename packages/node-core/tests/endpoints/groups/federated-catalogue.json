@@ -1,0 +1,41 @@
+{
+	"group": "Federated Catalogue",
+	"steps": [
+		{
+			"description": "POST /federated-catalogue/request — 400 missing @type",
+			"method": "POST",
+			"path": "/federated-catalogue/request",
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"]
+			},
+			"expectedStatus": 400,
+			"assert": { "body.@type": "CatalogError" }
+		},
+		{
+			"description": "POST /federated-catalogue/request — 400 filter not an array",
+			"method": "POST",
+			"path": "/federated-catalogue/request",
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "CatalogRequestMessage",
+				"filter": "not-an-array"
+			},
+			"expectedStatus": 400,
+			"assert": { "body.@type": "CatalogError" }
+		},
+		{
+			"description": "GET /federated-catalogue/datasets/:datasetId — 200 known dataset",
+			"method": "GET",
+			"path": "/federated-catalogue/datasets/{{fedCatDatasetId}}",
+			"expectedStatus": 200,
+			"assert": { "body.@type": "Dataset" }
+		},
+		{
+			"description": "GET /federated-catalogue/datasets/:datasetId — 404 unknown dataset",
+			"method": "GET",
+			"path": "/federated-catalogue/datasets/{{fakeId}}",
+			"expectedStatus": 404,
+			"assert": { "body.@type": "CatalogError" }
+		}
+	]
+}

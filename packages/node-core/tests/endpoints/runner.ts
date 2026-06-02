@@ -2,135 +2,49 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { Is } from "@twin.org/core";
+import { Converter, Is } from "@twin.org/core";
+export type { GroupDefinition } from "./models/groupDefinition.js";
+export type { RunnerContext } from "./models/runnerContext.js";
+export type { StepDefinition } from "./models/stepDefinition.js";
+import type { GroupDefinition } from "./models/groupDefinition.js";
+import type { RunnerContext } from "./models/runnerContext.js";
+import type { StepDefinition } from "./models/stepDefinition.js";
 
 /**
- * Defines a test step with request details, expected outcomes, and variable capture/assertion rules.
+ * Reads an index file that lists group filenames, loads each group JSON from the groups/
+ * subdirectory alongside the index, and runs them in order.
+ * Groups share the same RunnerContext so variables captured in one group are available in all
+ * subsequent groups.
+ * @param indexFile Absolute path to the index JSON file listing group names.
+ * @param ctx The shared runner context providing variables and auth state.
  */
-export interface StepDefinition {
-	/**
-	 * A brief description of the step, used in logs and error messages.
-	 */
-	description: string;
+export async function loadAndRunGroups(indexFile: string, ctx: RunnerContext): Promise<void> {
+	const groupDir = path.dirname(indexFile);
+	const groupNames = JSON.parse(await readFile(indexFile, "utf8")) as string[];
 
-	/**
-	 * HTTP method to use for the request (e.g., "GET", "POST", "PUT", "DELETE").
-	 */
-	method: string;
-
-	/**
-	 * URL path template; {{varName}} segments are URL-encoded.
-	 */
-	path: string;
-
-	/**
-	 * Default true — adds cookie: access_token={{authToken}}.
-	 * Set to false for unauthenticated requests such as login.
-	 */
-	auth?: boolean;
-
-	/**
-	 * Default true — appends ?x-api-key=... query param.
-	 * Set to false when testing endpoints that do not require an API key.
-	 */
-	apiKey?: boolean;
-
-	/**
-	 * Additional request headers.
-	 * Header values support {{varName}} interpolation.
-	 */
-	headers?: { [key: string]: string };
-
-	/**
-	 * Request body; {{varName}} values are NOT URL-encoded.
-	 * A lone {{varName}} at the top level sends the captured value verbatim (already JSON-serialised).
-	 * A lone {{varName}} inside a field whose captured value starts with { or [ is re-parsed
-	 * as a native object before the body is serialised, so nested JSON is not double-encoded.
-	 */
-	body?: unknown;
-
-	/**
-	 * Expected HTTP status code from the response.
-	 */
-	expectedStatus: number;
-
-	/**
-	 * Capture response data into named context variables.
-	 * Spec strings:
-	 * "location-last-segment" — decodeURIComponent of last path segment of Location header
-	 * "header.location" — raw Location header value
-	 * "cookie:<name>" — named cookie from Set-Cookie header
-	 * "body" — entire JSON response body (serialised; re-parsed as object when used in body fields)
-	 * "body.<dot.path>" — dot-path into JSON response (supports [n] array indexing)
-	 * "body.<dot.path>|last-colon" — as above, then takes the last colon-delimited segment
-	 * "response-text" — full response as plain text
-	 */
-	capture?: { [key: string]: string };
-
-	/**
-	 * Assert values after capture.
-	 * Key: "body.<dot.path>" | "body" | "text"
-	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | literal
-	 */
-	assert?: { [key: string]: unknown };
-
-	/**
-	 * Milliseconds to wait (relative to serverStartTime) before executing this step.
-	 * Used to ensure slow-starting services are ready.
-	 */
-	timeBarrier?: number;
-
-	/**
-	 * Non-falsy string = skip this step with reason; false/omit = run.
-	 */
-	skip?: string | false;
+	for (const groupName of groupNames) {
+		const groupFile = path.join(groupDir, "groups", `${groupName}.json`);
+		const group = JSON.parse(await readFile(groupFile, "utf8")) as GroupDefinition;
+		await runGroup(group, ctx);
+	}
 }
 
 /**
- * A named group of steps that are executed sequentially.
+ * Runs all steps in a group sequentially, logging skipped steps rather than executing them.
+ * @param group The group definition containing the ordered steps.
+ * @param ctx The shared runner context providing variables and auth state.
  */
-export interface GroupDefinition {
-	/**
-	 * Display name for the group, shown in console output.
-	 */
-	group: string;
-
-	/**
-	 * Ordered list of steps to run within the group.
-	 */
-	steps: StepDefinition[];
-}
-
-/**
- * Shared mutable state threaded through every step in a test run.
- * Variables captured by one step are immediately available to subsequent steps.
- */
-export interface RunnerContext {
-	/**
-	 * Root URL of the server under test (e.g. "http://localhost:3000").
-	 */
-	baseUrl: string;
-
-	/**
-	 * Pre-formatted query string appended to authenticated requests (e.g. "x-api-key=abc123").
-	 */
-	apiKeyQuery: string;
-
-	/**
-	 * Current auth token; updated whenever a step captures "cookie:access_token".
-	 */
-	authToken: string;
-
-	/**
-	 * Named string variables populated by capture specs and referenced via {{varName}} in
-	 * subsequent path templates and request bodies.
-	 */
-	vars: { [key: string]: string };
-
-	/**
-	 * Unix timestamp (ms) recorded when the server process started, used by timeBarrier steps.
-	 */
-	serverStartTime: number;
+export async function runGroup(group: GroupDefinition, ctx: RunnerContext): Promise<void> {
+	console.debug(`\n=== ${group.group} ===`);
+	for (const step of group.steps) {
+		if (step.skip) {
+			console.debug(`  [SKIP] ${step.description}: ${step.skip}`);
+		} else if (step.skipIfTenantParamOmitted && ctx.appendTenantParam === false) {
+			console.debug(`  [SKIP] ${step.description}: not applicable in single-tenant mode`);
+		} else {
+			await runStep(step, ctx);
+		}
+	}
 }
 
 /**
@@ -219,7 +133,7 @@ function getNestedValue(obj: unknown, dotPath: string): unknown {
  * @param step The step definition to execute.
  * @param ctx The shared runner context providing variables and auth state.
  */
-export async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> {
+async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> {
 	// Honour the time barrier — some steps must not run until the server has had a chance to
 	// fully initialise (e.g. health checks that depend on background indexing).
 	if (step.timeBarrier) {
@@ -229,17 +143,28 @@ export async function runStep(step: StepDefinition, ctx: RunnerContext): Promise
 		}
 	}
 
-	const useAuth = step.auth !== false;
-	const useApiKey = step.apiKey !== false;
+	const useApiKey = step.apiKey === true;
 
-	const resolvedPath = interpolatePath(step.path, ctx.vars);
-	let urlStr = `${ctx.baseUrl}${resolvedPath}`;
-	if (useApiKey) {
-		urlStr += `${urlStr.includes("?") ? "&" : "?"}${ctx.apiKeyQuery}`;
+	let resolvedPath = interpolatePath(step.path, ctx.vars);
+	if (step.appendTenantParam && ctx.appendTenantParam !== false) {
+		const token = encodeURIComponent(ctx.vars.tenantToken ?? "");
+		const sep = resolvedPath.includes("?") ? "&" : "?";
+		resolvedPath += `${sep}x-enc-tenant-token=${token}`;
 	}
+	const urlStr = `${ctx.baseUrl}${resolvedPath}`;
 
 	const headers: { [key: string]: string } = {};
-	if (useAuth && ctx.authToken) {
+	if (useApiKey && ctx.apiKeyQuery) {
+		// Send as a request header so the server-side URL regex (/login$/) matches
+		// the clean path without a trailing query string.
+		const eqIdx = ctx.apiKeyQuery.indexOf("=");
+		if (eqIdx > 0) {
+			headers[ctx.apiKeyQuery.slice(0, eqIdx)] = ctx.apiKeyQuery.slice(eqIdx + 1);
+		}
+	}
+	// Always send the JWT cookie when one is available so the server can extract the
+	// tenant ID from it on every route, including those marked skipAuth:true.
+	if (ctx.authToken) {
 		headers.cookie = `access_token=${ctx.authToken}`;
 	}
 	if (step.headers) {
@@ -316,14 +241,32 @@ export async function runStep(step: StepDefinition, ctx: RunnerContext): Promise
 				const colonTransform = spec.endsWith("|last-colon");
 				const dotPath = colonTransform ? spec.slice(5, -11) : spec.slice(5);
 				const val = getNestedValue(responseJson, dotPath);
-				if (val !== undefined && val !== null) {
-					const raw = typeof val === "string" ? val : JSON.stringify(val);
+				if (!Is.empty(val)) {
+					const raw = Is.string(val) ? val : JSON.stringify(val);
 					// |last-colon extracts the final segment of a colon-delimited URN, e.g.
 					// "aig:uuid:changeset:changesetUUID" → "changesetUUID".
 					captured = colonTransform ? raw.split(":").pop() : raw;
 				}
 			} else if (spec === "response-text") {
 				captured = responseText;
+			} else if (spec.startsWith("jwt-claim:")) {
+				// Decode the current authToken JWT and extract a payload claim without
+				// signature verification — e.g. "jwt-claim:tid" yields the encrypted tenant ID.
+				const claimKey = spec.slice(10);
+				const jwt = ctx.authToken;
+				if (Is.stringValue(jwt)) {
+					try {
+						const payloadB64 = jwt.split(".")[1];
+						const json = Converter.bytesToUtf8(Converter.base64UrlToBytes(payloadB64));
+						const payload = JSON.parse(json) as { [key: string]: unknown };
+						const val = payload[claimKey];
+						if (!Is.empty(val)) {
+							captured = Is.string(val) ? val : JSON.stringify(val);
+						}
+					} catch {
+						// malformed JWT — skip
+					}
+				}
 			}
 
 			if (captured) {
@@ -369,40 +312,5 @@ export async function runStep(step: StepDefinition, ctx: RunnerContext): Promise
 				);
 			}
 		}
-	}
-}
-
-/**
- * Runs all steps in a group sequentially, logging skipped steps rather than executing them.
- * @param group The group definition containing the ordered steps.
- * @param ctx The shared runner context providing variables and auth state.
- */
-export async function runGroup(group: GroupDefinition, ctx: RunnerContext): Promise<void> {
-	console.debug(`\n=== ${group.group} ===`);
-	for (const step of group.steps) {
-		if (step.skip) {
-			console.debug(`  [SKIP] ${step.description}: ${step.skip}`);
-		} else {
-			await runStep(step, ctx);
-		}
-	}
-}
-
-/**
- * Reads an index file that lists group filenames, loads each group JSON from the groups/
- * subdirectory alongside the index, and runs them in order.
- * Groups share the same RunnerContext so variables captured in one group are available in all
- * subsequent groups.
- * @param indexFile Absolute path to the index JSON file listing group names.
- * @param ctx The shared runner context providing variables and auth state.
- */
-export async function loadAndRunGroups(indexFile: string, ctx: RunnerContext): Promise<void> {
-	const groupDir = path.dirname(indexFile);
-	const groupNames = JSON.parse(await readFile(indexFile, "utf8")) as string[];
-
-	for (const groupName of groupNames) {
-		const groupFile = path.join(groupDir, "groups", `${groupName}.json`);
-		const group = JSON.parse(await readFile(groupFile, "utf8")) as GroupDefinition;
-		await runGroup(group, ctx);
 	}
 }

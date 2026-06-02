@@ -1709,14 +1709,15 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
  * Checks if the URL transformer subsystem is required.
  * Returns true when any component that depends on the URL transformer subsystem is enabled.
  * @param envVars The environment variables.
- * @returns True if rights-management, dataspace, federated-catalogue, or tenant is enabled.
+ * @returns True if rights-management, dataspace, federated-catalogue, tenant, or auth entity storage is enabled.
  */
 export function isUrlTransformerRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
 		isRightsManagementRequired(envVars) ||
 		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
 		(Coerce.boolean(envVars.tenantEnabled) ?? false) ||
-		isFederatedCatalogueRequired(envVars)
+		isFederatedCatalogueRequired(envVars) ||
+		isAuthEntityStorageRequired(envVars)
 	);
 }
 

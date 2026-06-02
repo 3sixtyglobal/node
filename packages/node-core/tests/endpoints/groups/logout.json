@@ -1,14 +1,6 @@
 {
-	"group": "Health and Logout",
+	"group": "Logout",
 	"steps": [
-		{
-			"description": "GET /health — waits at least 5s since server start",
-			"method": "GET",
-			"path": "/health",
-			"auth": false,
-			"expectedStatus": 200,
-			"healthBarrier": 5000
-		},
 		{
 			"description": "POST /authentication/refresh",
 			"method": "POST",
