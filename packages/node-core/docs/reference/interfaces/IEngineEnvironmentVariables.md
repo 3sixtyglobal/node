@@ -754,6 +754,14 @@ The type of NFT connector: entity-storage, iota.
 
 ***
 
+### nftPackageId? {#nftpackageid}
+
+> `optional` **nftPackageId?**: `string`
+
+The NFT deployed package id, for custom deployments.
+
+***
+
 ### notarizationConnector? {#notarizationconnector}
 
 > `optional` **notarizationConnector?**: `string`
@@ -791,6 +799,14 @@ The type of identity resolver connector: entity-storage, iota.
 > `optional` **verifiableStorageConnector?**: `string`
 
 The type of verifiable storage connector: entity-storage, iota.
+
+***
+
+### verifiableStoragePackageId? {#verifiablestoragepackageid}
+
+> `optional` **verifiableStoragePackageId?**: `string`
+
+The verifiable storage deployed package id, for custom deployments.
 
 ***
 
@@ -847,6 +863,14 @@ IOTA Gas Station Endpoint.
 > `optional` **iotaGasStationAuthToken?**: `string`
 
 IOTA Gas Station Authentication Token.
+
+***
+
+### iotaIdentityPackageId? {#iotaidentitypackageid}
+
+> `optional` **iotaIdentityPackageId?**: `string`
+
+The IOTA Identity deployed package id, for custom deployments.
 
 ***
 

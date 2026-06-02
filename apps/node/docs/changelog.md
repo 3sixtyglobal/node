@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.0.3-next.45](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.44...node-v0.0.3-next.45) (2026-06-02)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.44 to 0.0.3-next.45
+
+## [0.0.3-next.44](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.43...node-v0.0.3-next.44) (2026-06-02)
+
+
+### Features
+
+* new tenant auth mechanisms ([#168](https://github.com/iotaledger/twin-node/issues/168)) ([686f111](https://github.com/iotaledger/twin-node/commit/686f1118e79e6f26a8dc72a5e9172584057f4518))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.43 to 0.0.3-next.44
+
+## [0.0.3-next.43](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.42...node-v0.0.3-next.43) (2026-05-28)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.42 to 0.0.3-next.43
+
+## [0.0.3-next.42](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.41...node-v0.0.3-next.42) (2026-05-28)
+
+
+### Features
+
+* immutable proof gate and additional config ([#157](https://github.com/iotaledger/twin-node/issues/157)) ([1d1fbb7](https://github.com/iotaledger/twin-node/commit/1d1fbb7c53525af848761dc25b42e9e676929972))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.41 to 0.0.3-next.42
+
 ## [0.0.3-next.41](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.40...node-v0.0.3-next.41) (2026-05-27)
 
 

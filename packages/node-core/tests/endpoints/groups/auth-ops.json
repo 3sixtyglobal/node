@@ -12,7 +12,7 @@
 			"description": "POST /authentication/login — re-login with new password",
 			"method": "POST",
 			"path": "/authentication/login",
-			"auth": false,
+			"apiKey": true,
 			"body": { "email": "{{adminEmail}}", "password": "NewPassword@123456!" },
 			"expectedStatus": 200,
 			"capture": { "authToken": "cookie:access_token" }

@@ -948,10 +948,14 @@ async function configureNft(
 			"dltConfig",
 			DltConfigType.Iota
 		);
+		const config = {
+			...(dltConfig?.options?.config as IIotaConfig),
+			deploymentPkgId: Is.stringValue(envVars.nftPackageId) ? envVars.nftPackageId : undefined
+		};
 		coreConfig.types.nftConnector.push({
 			type: NftConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config
 			}
 		});
 	}
@@ -1018,10 +1022,17 @@ async function configureVerifiableStorage(
 			"dltConfig",
 			DltConfigType.Iota
 		);
+
+		const config = {
+			...(dltConfig?.options?.config as IIotaConfig),
+			deploymentPkgId: Is.stringValue(envVars.verifiableStoragePackageId)
+				? envVars.verifiableStoragePackageId
+				: undefined
+		};
 		coreConfig.types.verifiableStorageConnector.push({
 			type: VerifiableStorageConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config
 			}
 		});
 	}
@@ -1082,6 +1093,9 @@ async function configureIdentity(
 			options: {
 				config: {
 					...(dltConfig?.options?.config ?? ({} as IIotaConfig)),
+					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
+						? envVars.iotaIdentityPackageId
+						: undefined,
 					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0
 				}
 			}
@@ -1118,7 +1132,12 @@ async function configureIdentityResolver(
 		coreConfig.types.identityResolverConnector.push({
 			type: IdentityResolverConnectorType.Iota,
 			options: {
-				config: dltConfig?.options?.config ?? ({} as IIotaConfig)
+				config: {
+					...(dltConfig?.options?.config as IIotaConfig),
+					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
+						? envVars.iotaIdentityPackageId
+						: undefined
+				}
 			}
 		});
 	} else if (envVars.identityResolverConnector === IdentityResolverConnectorType.Universal) {
@@ -1690,14 +1709,15 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
  * Checks if the URL transformer subsystem is required.
  * Returns true when any component that depends on the URL transformer subsystem is enabled.
  * @param envVars The environment variables.
- * @returns True if rights-management, dataspace, federated-catalogue, or tenant is enabled.
+ * @returns True if rights-management, dataspace, federated-catalogue, tenant, or auth entity storage is enabled.
  */
 export function isUrlTransformerRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
 		isRightsManagementRequired(envVars) ||
 		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
 		(Coerce.boolean(envVars.tenantEnabled) ?? false) ||
-		isFederatedCatalogueRequired(envVars)
+		isFederatedCatalogueRequired(envVars) ||
+		isAuthEntityStorageRequired(envVars)
 	);
 }
 
@@ -1719,8 +1739,9 @@ export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables):
  */
 export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envVars.verifiableStorageConnector === VerifiableStorageConnectorType.EntityStorage ||
-		envVars.verifiableStorageConnector === VerifiableStorageConnectorType.Iota
+		(Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) ||
+		(Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) ||
+		(Coerce.boolean(envVars.documentManagementEnabled) ?? false)
 	);
 }
 
@@ -1737,6 +1758,9 @@ export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariable
 /**
  * Checks if the rights management subsystem is required.
  * Returns true when any component that depends on the rights management subsystem is enabled.
+ * Note: rights management has no standalone enable flag — it is gated entirely on
+ * `dataspaceEnabled`. Setting `TWIN_RIGHTS_MANAGEMENT_*` env var in isolation does not
+ * enable the subsystem; `TWIN_DATASPACE_ENABLED` must also be true.
  * @param envVars The environment variables.
  * @returns True if rights management is enabled.
  */

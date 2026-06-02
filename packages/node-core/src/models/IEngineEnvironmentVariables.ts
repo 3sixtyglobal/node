@@ -473,6 +473,11 @@ export interface IEngineEnvironmentVariables {
 	nftConnector?: string;
 
 	/**
+	 * The NFT deployed package id, for custom deployments.
+	 */
+	nftPackageId?: string;
+
+	/**
 	 * The type of notarization connector: entity-storage, iota.
 	 */
 	notarizationConnector?: string;
@@ -496,6 +501,11 @@ export interface IEngineEnvironmentVariables {
 	 * The type of verifiable storage connector: entity-storage, iota.
 	 */
 	verifiableStorageConnector?: string;
+
+	/**
+	 * The verifiable storage deployed package id, for custom deployments.
+	 */
+	verifiableStoragePackageId?: string;
 
 	/**
 	 * IOTA Faucet Endpoint.
@@ -531,6 +541,11 @@ export interface IEngineEnvironmentVariables {
 	 * IOTA Gas Station Authentication Token.
 	 */
 	iotaGasStationAuthToken?: string;
+
+	/**
+	 * The IOTA Identity deployed package id, for custom deployments.
+	 */
+	iotaIdentityPackageId?: string;
 
 	/**
 	 * Universal Resolver Endpoint.

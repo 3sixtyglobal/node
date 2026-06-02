@@ -65,11 +65,13 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_FAUCET_CONNECTOR`                                | `entity-storage`, `iota`                                                                                            | None                  | Faucet connector type.                             |
 | `TWIN_WALLET_CONNECTOR`                                | `entity-storage`, `iota`                                                                                            | None                  | Wallet connector type.                             |
 | `TWIN_NFT_CONNECTOR`                                   | `entity-storage`, `iota`                                                                                            | None                  | NFT connector type.                                |
+| `TWIN_NFT_PACKAGE_ID`                                  | String                                                                                                              | None                  | Custom deployed package id for the NFT contract.   |
 | `TWIN_NOTARIZATION_CONNECTOR`                          | `entity-storage`, `iota`                                                                                            | None                  | Notarization connector type.                       |
 | `TWIN_IDENTITY_CONNECTOR`                              | `entity-storage`, `iota`                                                                                            | None                  | Identity connector type.                           |
 | `TWIN_IDENTITY_RESOLVER_CONNECTOR`                     | `entity-storage`, `iota`, `universal`                                                                               | None                  | Identity resolver connector type.                  |
 | `TWIN_IDENTITY_PROFILE_CONNECTOR`                      | `entity-storage`                                                                                                    | None                  | Identity profile connector type.                   |
 | `TWIN_VERIFIABLE_STORAGE_CONNECTOR`                    | `entity-storage`, `iota`                                                                                            | None                  | Verifiable storage connector type.                 |
+| `TWIN_VERIFIABLE_STORAGE_PACKAGE_ID`                   | String                                                                                                              | None                  | Custom deployed package id for verifiable storage. |
 | `TWIN_ATTESTATION_CONNECTOR`                           | `nft`                                                                                                               | None                  | Attestation connector type.                        |
 | `TWIN_DATA_CONVERTER_CONNECTORS`                       | `json`, `xml`                                                                                                       | None                  | Comma-separated list allowed.                      |
 | `TWIN_DATA_EXTRACTOR_CONNECTORS`                       | `json-path`                                                                                                         | None                  | Comma-separated list allowed.                      |
@@ -101,6 +103,7 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_DOCUMENT_MANAGEMENT_ENABLED`                         | `true`, `false`       | `false`                                | Enables document management.                            |
 | `TWIN_HEALTH_ENABLED`                                      | `true`, `false`       | `false`                                | Enables health components.                              |
 | `TWIN_HEALTH_INTERVAL_SECONDS`                             | Integer seconds       | `60`                                   | Interval between health checks.                         |
+| `TWIN_HEALTH_STARTUP_INTERVAL_SECONDS`                     | Integer seconds       | `2`                                    | Initial delay before the first health check runs.       |
 | `TWIN_IDENTITY_WALLET_ADDRESS_INDEX`                       | Integer               | `0`                                    | Wallet address index used by identity workflows.        |
 | `TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`              | Method id string      | `immutable-proof-assertion`            | Default injected by node defaults.                      |
 | `TWIN_MESSAGING_ENABLED`                                   | `true`, `false`       | `false`                                | Enables messaging components.                           |
@@ -131,6 +134,8 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value   | Includes body in route logging.                        |
 | `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`            | Includes full base64 payloads in route logging.        |
 | `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None               | Properties to obfuscate in route logs.                 |
+
+REST component paths can also be overridden with `TWIN_REST_PATH_<COMPONENT>`, where `<COMPONENT>` is the upper snake case name of the component without the `Component` suffix. Current examples include `TWIN_REST_PATH_LOGGING`, `TWIN_REST_PATH_DATASPACE_CONTROL_PLANE`, and `TWIN_REST_PATH_DATASPACE_DATA_PLANE`.
 
 ## Extension Module Loading Variables
 
@@ -215,6 +220,7 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_IOTA_EXPLORER_ENDPOINT`                       | URL                                    | None              | IOTA explorer endpoint.                                                                                |
 | `TWIN_IOTA_GAS_STATION_ENDPOINT`                    | URL                                    | None              | IOTA gas station endpoint.                                                                             |
 | `TWIN_IOTA_GAS_STATION_AUTH_TOKEN`                  | String                                 | None              | IOTA gas station auth token.                                                                           |
+| `TWIN_IOTA_IDENTITY_PACKAGE_ID`                     | String                                 | None              | Custom deployed package id for the IOTA identity contract.                                             |
 | `TWIN_UNIVERSAL_RESOLVER_ENDPOINT`                  | URL                                    | None              | Universal resolver endpoint.                                                                           |
 | `TWIN_OPEN_TELEMETRY_METER_NAME`                    | String                                 | `twin-node`       | OpenTelemetry meter name. Only used when `TWIN_TELEMETRY_CONNECTOR=open-telemetry`.                    |
 | `TWIN_OPEN_TELEMETRY_METER_VERSION`                 | String                                 | `1.0.0`           | OpenTelemetry metrics specification version. Only used when `TWIN_TELEMETRY_CONNECTOR=open-telemetry`. |

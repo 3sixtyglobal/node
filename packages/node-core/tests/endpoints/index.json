@@ -19,5 +19,7 @@
 	"auth-ops",
 	"rights-policy",
 	"rights-negotiations",
-	"health-logout"
+	"federated-catalogue",
+	"health",
+	"logout"
 ]

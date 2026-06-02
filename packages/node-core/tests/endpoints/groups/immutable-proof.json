@@ -39,6 +39,24 @@
 			"method": "GET",
 			"path": "/immutable-proof/{{immutableProofId}}/verify",
 			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /immutable-proof/:id/notarization",
+			"method": "DELETE",
+			"path": "/immutable-proof/{{immutableProofId}}/notarization",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /immutable-proof/:id",
+			"method": "DELETE",
+			"path": "/immutable-proof/{{immutableProofId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /immutable-proof/:id — 404 after delete",
+			"method": "GET",
+			"path": "/immutable-proof/{{immutableProofId}}",
+			"expectedStatus": 404
 		}
 	]
 }

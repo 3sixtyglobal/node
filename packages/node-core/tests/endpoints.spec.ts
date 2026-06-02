@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
+import { ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
+import type { IEngineCore } from "@twin.org/engine-models";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
@@ -26,16 +28,19 @@ import {
 	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import type { ITrustComponent } from "@twin.org/trust-models";
+import { TrustHelper, type ITrustComponent } from "@twin.org/trust-models";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 import { loadAndRunGroups } from "./endpoints/runner.js";
 
 const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
+const TEST_PORT_ST = TEST_PORT + 1000;
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_ADMIN_EMAIL = "admin@node";
 const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
+const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
 const OUTPUT_TMP_DIR = "./tests/.tmp-endpoints/";
+const OUTPUT_TMP_DIR_ST = "./tests/.tmp-endpoints-st/";
 
 const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
@@ -83,6 +88,50 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through"
 };
+
+async function seedFederatedCatalogueDataset(
+	engine: IEngineCore,
+	nodeId: string,
+	tenantId?: string
+): Promise<void> {
+	const componentType = engine.getRegisteredInstanceType("federatedCatalogueComponent");
+	const component = ComponentFactory.get(componentType ?? "") as unknown as {
+		set(dataSet: unknown): Promise<void>;
+	};
+	const contextIds: { [key: string]: string } = { node: nodeId };
+	if (tenantId) {
+		contextIds.tenant = tenantId;
+	}
+	await ContextIdStore.run(contextIds, async () => {
+		await component.set({
+			"@context": {
+				dcat: "http://www.w3.org/ns/dcat#",
+				dcterms: "http://purl.org/dc/terms/",
+				odrl: "http://www.w3.org/ns/odrl/2/"
+			},
+			"@id": TEST_FEDCAT_DATASET_ID,
+			"@type": "dcat:Dataset",
+			"dcterms:title": "Test Dataset",
+			"dcterms:publisher": nodeId,
+			"odrl:hasPolicy": [
+				{
+					"@context": "http://www.w3.org/ns/odrl.jsonld",
+					"@type": "Offer",
+					uid: "urn:uuid:test-offer-endpoint-001",
+					assigner: nodeId,
+					permission: [{ action: "use" }]
+				}
+			],
+			"dcat:distribution": [
+				{
+					"@type": "dcat:Distribution",
+					"dcterms:format": "application/json",
+					"dcat:accessService": "https://example.com/data-access"
+				}
+			]
+		});
+	});
+}
 
 describe("node-core", () => {
 	test("Can bootstrap the node and exercise all connected endpoints", async () => {
@@ -132,11 +181,22 @@ describe("node-core", () => {
 		expect(trustComponentType).toBeDefined();
 
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
-		const trustBearerToken = await trustComponent.generate(bootstrapState.nodeId ?? "", undefined, {
-			subject: {}
-		});
+		const trustBearerToken = await trustComponent.generate(
+			bootstrapState.nodeId ?? "",
+			undefined,
+			{ subject: {} },
+			TrustHelper.hashTenantId(bootstrapState.nodeTenantId)
+		);
 
 		const serverStartTime = Date.now();
+
+		if (serverResult?.engine) {
+			await seedFederatedCatalogueDataset(
+				serverResult.engine,
+				bootstrapState.nodeId ?? "",
+				bootstrapState.nodeTenantId
+			);
+		}
 
 		// Phase 3: Exercise endpoints as a client, using the test definitions in tests/endpoints.
 		try {
@@ -144,6 +204,7 @@ describe("node-core", () => {
 				baseUrl: `http://localhost:${TEST_PORT}`,
 				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
 				authToken: "",
+				appendTenantParam: true,
 				vars: {
 					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
 					adminEmail: TEST_ADMIN_EMAIL,
@@ -157,13 +218,110 @@ describe("node-core", () => {
 					serviceId: "service-test-001",
 					aliasId: "did:example:alias001",
 					transferAddress: "0x0000000000000000000000000000000000000000000000000000000000000001",
-					fakeId: "fake:nonexistent-resource-id"
+					fakeId: "fake:nonexistent-resource-id",
+					fedCatDatasetId: TEST_FEDCAT_DATASET_ID
 				},
 				serverStartTime
 			});
 		} finally {
 			await serverResult?.shutdown();
 			await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
+		}
+	});
+
+	test("Can bootstrap the node and exercise all connected endpoints on a single-tenant node", async () => {
+		const singleTenantEnvVars: { [id: string]: string } = {
+			...SHARED_ENV_VARS,
+			TWIN_TENANT_ENABLED: "false",
+			TWIN_PORT: TEST_PORT_ST.toString(),
+			TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR_ST}db`
+		};
+
+		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+		Factory.clearFactories();
+
+		// Phase 1: Bootstrap — creates node identity and admin user (no tenant in single-tenant mode).
+		const bootstrapState: INodeEngineState = {};
+		await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, bootstrapState),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...singleTenantEnvVars,
+					TWIN_FEATURES: "node-identity,node-admin-user",
+					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
+					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
+					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
+					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500"
+				}
+			},
+			["node", "index.js", "bootstrap-legacy"]
+		);
+
+		expect(bootstrapState.nodeId).toBeDefined();
+
+		Factory.clearFactories();
+
+		// Phase 2: Start the server using the bootstrapped identity state.
+		const serverResult = await run({
+			localesDirectory: "./dist/locales/",
+			openApiSpecFile: path.resolve("../../apps/node/docs/open-api/spec.json"),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: bootstrapState.nodeId
+			}),
+			envVars: singleTenantEnvVars
+		});
+
+		expect(serverResult).toBeDefined();
+		expect(serverResult?.engine).toBeDefined();
+
+		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
+		expect(trustComponentType).toBeDefined();
+
+		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
+		const trustBearerToken = await trustComponent.generate(
+			bootstrapState.nodeId ?? "",
+			undefined,
+			{ subject: {} },
+			undefined
+		);
+
+		const serverStartTime = Date.now();
+
+		if (serverResult?.engine) {
+			await seedFederatedCatalogueDataset(serverResult.engine, bootstrapState.nodeId ?? "");
+		}
+
+		// Phase 3: Exercise endpoints using the single-tenant group index.
+		try {
+			await loadAndRunGroups(path.resolve("tests/endpoints/index.json"), {
+				baseUrl: `http://localhost:${TEST_PORT_ST}`,
+				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
+				authToken: "",
+				appendTenantParam: false,
+				vars: {
+					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
+					adminEmail: TEST_ADMIN_EMAIL,
+					adminPassword: TEST_ADMIN_PASSWORD,
+					metricId: "test-counter",
+					ruleGroupId: "test-rule-group",
+					docId: "DOC-TEST-001",
+					testUserEmail: "test-user@node",
+					testUserPassword: "TestUser@123456!",
+					vmFragmentId: "test-vm",
+					serviceId: "service-test-001",
+					aliasId: "did:example:alias001",
+					transferAddress: "0x0000000000000000000000000000000000000000000000000000000000000001",
+					fakeId: "fake:nonexistent-resource-id",
+					fedCatDatasetId: TEST_FEDCAT_DATASET_ID
+				},
+				serverStartTime
+			});
+		} finally {
+			await serverResult?.shutdown();
+			await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		}
 	});
 });

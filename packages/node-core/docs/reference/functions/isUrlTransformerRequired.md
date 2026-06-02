@@ -17,4 +17,4 @@ The environment variables.
 
 `boolean`
 
-True if rights-management, dataspace, federated-catalogue, or tenant is enabled.
+True if rights-management, dataspace, federated-catalogue, tenant, or auth entity storage is enabled.

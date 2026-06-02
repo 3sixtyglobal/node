@@ -54,6 +54,21 @@
 			"expectedStatus": 204
 		},
 		{
+			"description": "PATCH /aig/:id — partial update of annotation",
+			"method": "PATCH",
+			"path": "/aig/{{vertexId}}",
+			"body": {
+				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"],
+				"type": "AuditableItemGraphVertex",
+				"annotationObject": {
+					"@context": "https://schema.org",
+					"@type": "Note",
+					"name": "Patched vertex annotation"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
 			"description": "GET /aig/:id/versions",
 			"method": "GET",
 			"path": "/aig/{{vertexId}}/versions",
