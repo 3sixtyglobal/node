@@ -245,9 +245,15 @@ export async function handleNpmProtocol(
 	cacheDirectory?: string
 ): Promise<IProtocolHandlerResult> {
 	const cacheDir = getExtensionsCacheDir(executionDirectory, ModuleProtocol.Npm, cacheDirectory);
-	// Extract just the package name (without version) for the directory
-	// e.g. "picocolors@1.0.0" becomes "picocolors"
-	// e.g. "@scope/package@1.0.0" becomes "@scope/package"
+	// Strip the version suffix to get the bare package name. We use lastIndexOf
+	// (not indexOf) so the leading "@" of a scoped package is preserved — for
+	// "@scope/pkg@1.0.0" the last "@" is the version separator at the end, not
+	// the scope prefix at position 0. The `> 0` (not `>= 0`) check then leaves
+	// unversioned scoped names like "@scope/pkg" untouched, since their only "@"
+	// sits at index 0.
+	// e.g. "picocolors@1.0.0"   → "picocolors"
+	// e.g. "@scope/pkg@1.0.0"   → "@scope/pkg"
+	// e.g. "@scope/pkg"         → "@scope/pkg"   (unchanged)
 	const lastAtIndex = packageName.lastIndexOf("@");
 	const packageNameOnly = lastAtIndex > 0 ? packageName.slice(0, lastAtIndex) : packageName;
 	const packageDir = path.join(cacheDir, "node_modules", packageNameOnly);
