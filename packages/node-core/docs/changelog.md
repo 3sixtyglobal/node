@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.3-next.46](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.45...node-core-v0.0.3-next.46) (2026-06-03)
+
+
+### Features
+
+* cli tenant-token command ([#177](https://github.com/iotaledger/twin-node/issues/177)) ([b3f68a4](https://github.com/iotaledger/twin-node/commit/b3f68a4972d065e865372230c078b4657dfabc1a))
+* update dependencies ([#178](https://github.com/iotaledger/twin-node/issues/178)) ([0d346ec](https://github.com/iotaledger/twin-node/commit/0d346ec57f43f418b73fe71fcd2b187d769a53e9))
+
 ## [0.0.3-next.45](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.44...node-core-v0.0.3-next.45) (2026-06-02)
 
 
