@@ -445,6 +445,9 @@
 						"api-key": {
 							"description": "The API key to look up the tenant ID from."
 						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
 						"output-json": {
 							"description": "Path to a .json file to store the command output."
 						}

@@ -41,6 +41,14 @@ export function getCommandDefinitionTenantToken(commandDefinitions: {
 				required: false
 			},
 			{
+				key: "load-env",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-token.params.load-env.description"
+				),
+				required: false
+			},
+			{
 				key: "output-json",
 				type: "string",
 				description: I18n.formatMessage(
