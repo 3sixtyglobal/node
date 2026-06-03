@@ -62,10 +62,14 @@ Same test logic as `kenya-usecase-test.sh`; only the per-phase pause differs.
 2. The four datasets carry four **distinct** publisher attributions
 3. Per authority: negotiate → FINALIZED → transfer → pull its slice (scoped by `?id=`)
 4. Aggregation: all four **distinct** consignment slices were pulled
-5. Negative-path isolation (cross-tenant credential mix is rejected)
+5. Push setup REJECTS missing tenant token (multi-tenant gate, KRA proof)
+6. Push setup ACCEPTS endpoint with baked consumer tenant token (KRA proof)
+7. Negative-path isolation (cross-tenant credential mix is rejected)
 
-Push-mode, S4 boot-republish and the full 5-layer isolation matrix are **not**
-re-tested here — they're covered by the base `kenyaCommunityNodeDocker` scaffold.
+Push is exercised once against KRA — symmetric for the other three publishers,
+covered for a single tenant pair in the base `kenyaCommunityNodeDocker` scaffold.
+S4 boot-republish and the full 5-layer isolation matrix remain **not** re-tested
+here — they're covered by the base scaffold.
 
 ## Out of scope
 

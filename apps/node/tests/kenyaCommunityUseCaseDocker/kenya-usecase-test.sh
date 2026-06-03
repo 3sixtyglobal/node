@@ -72,10 +72,10 @@ ODRL_CONTEXT="http://www.w3.org/ns/odrl.jsonld"
 login() {
     local api_key="$1" email="$2" password="$3"
     curl -sS -i -X POST "${HOST}/authentication/login" \
-        -H "Content-Type: application/json" \
-        -H "x-api-key: ${api_key}" \
-        -d "$(jq -n --arg e "$email" --arg p "$password" '{email:$e,password:$p}')" \
-        | grep -i "^set-cookie:" | grep -oE "access_token=[^;]+" | head -1 | cut -d= -f2-
+    -H "Content-Type: application/json" \
+    -H "x-api-key: ${api_key}" \
+    -d "$(jq -n --arg e "$email" --arg p "$password" '{email:$e,password:$p}')" \
+    | grep -i "^set-cookie:" | grep -oE "access_token=[^;]+" | head -1 | cut -d= -f2-
 }
 
 translate_endpoint() {
@@ -88,11 +88,13 @@ phase 0 "Health check + per-tenant logins"
 # ============================================================================
 status=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/health")
 [ "${status}" = "401" ] && ok "Keyless GET /health → 401 (TenantProcessor gate intact)" \
-    || fail "Keyless GET /health expected 401, got ${status}"
+|| fail "Keyless GET /health expected 401, got ${status}"
 
 status=$(curl -sS -o /dev/null -w "%{http_code}" -H "x-api-key: ${TENANT_KRA_API_KEY}" "${HOST}/health")
-[ "${status}" = "200" ] && ok "GET /health with KRA api-key → 200" \
-    || fail "GET /health with KRA api-key expected 200, got ${status}"
+# ("feat: tenant id in jwt") /health no longer has skipAuth: true — api-key
+# alone is rejected (session JWT required). 401 here proves both gates are intact.
+[ "${status}" = "401" ] && ok "GET /health with KRA api-key (no session) → 401 (auth gate intact)" \
+|| fail "GET /health with KRA api-key (no session) expected 401, got ${status}"
 
 JWT_TRADER=$(login "${TENANT_TRADER_API_KEY}" "${TENANT_TRADER_USER_EMAIL}" "${TENANT_TRADER_USER_PASSWORD}")
 [ -n "${JWT_TRADER}" ] || fail "Trader login did not return a JWT"
@@ -250,6 +252,8 @@ negotiate_and_pull() {
     agreement_id=$(echo "${nego_admin_resp}" | jq -r '.agreement["@id"] // .agreement.uid // empty')
     [ -n "${agreement_id}" ] || agreement_id="${offer_id}"
     ok "[${pub}] negotiation ${final_state} (agreement ${agreement_id})"
+    # Save the agreement id globally for the push phases below.
+    printf -v "AGREEMENT_${pub}" '%s' "${agreement_id}"
     if [ "${pub}" = "KRA" ]; then
         local ag_action
         ag_action=$(echo "${nego_admin_resp}" | jq -r '.agreement.permission[0].action // .agreement.action // "read"')
@@ -350,7 +354,103 @@ else
 fi
 
 # ============================================================================
-phase 5 "Negative-path tenant isolation (cross-tenant credential mix rejected)"
+phase 5 "Push setup REJECTS missing tenant token (multi-tenant gate, KRA proof)"
+# ============================================================================
+# Push transfer where dataAddress.endpoint (the consumer's inbox) carries NO
+# x-enc-tenant-token. On a multi-tenant publisher the data plane must refuse
+# setupPushSubscription rather than letting the eventual delivery 401 silently.
+# We exercise the proof against KRA — symmetric for the other three publishers.
+KRA_PUSH_NEG_PID="urn:uuid:trader-KRA-push-neg-$(date +%s)-${RANDOM}"
+push_neg_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${KRA_PUSH_NEG_PID}" \
+    --arg agreementId "${AGREEMENT_KRA}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+push_neg_resp=$(node scripts/dsp-client.mjs requestTransfer \
+    --host "${HOST}" \
+    --tenant-token "${PUB_TOKEN_KRA}" \
+    --trust-payload "${TRADER_TRUST_JWT}" \
+    --body "${push_neg_msg}")
+[ "$(echo "${push_neg_resp}" | jq -r '.ok')" = "true" ] \
+    || fail "[KRA push-neg] requestTransfer failed: $(echo "${push_neg_resp}" | jq -r '.errorMessage')"
+push_neg_provider_pid=$(echo "${push_neg_resp}" | jq -r '.body.providerPid // empty')
+[ -n "${push_neg_provider_pid}" ] || fail "[KRA push-neg] requestTransfer did not return providerPid"
+
+# startTransfer — the data plane setup gate should reject (response body may be
+# DSP-spec shape with HTTP 200 OR HTTP 5xx; both forms carry the TransferError envelope).
+start_neg_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${KRA_PUSH_NEG_PID}" \
+    --arg providerPid "${push_neg_provider_pid}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
+start_neg_resp=$(node scripts/dsp-client.mjs startTransfer \
+    --host "${HOST}" \
+    --tenant-token "${PUB_TOKEN_KRA}" \
+    --trust-payload "${KRA_TRUST_JWT}" \
+    --body "${start_neg_msg}")
+start_neg_body=$(echo "${start_neg_resp}" | jq -c '.body')
+start_neg_type=$(echo "${start_neg_body}" | jq -r '.["@type"] // empty')
+start_neg_code=$(echo "${start_neg_body}" | jq -r '.code // empty')
+
+if [ "${start_neg_type}" = "TransferError" ] && echo "${start_neg_code}" | grep -q "pushSubscriptionMissingTenantToken"; then
+    ok "[KRA] Push setup rejected as expected — code: ${start_neg_code}"
+elif [ "${start_neg_type}" = "TransferError" ]; then
+    info "[KRA] Push setup returned TransferError but with a different code: ${start_neg_code}"
+    info "Body: ${start_neg_body}"
+    fail "[KRA] Push setup error code mismatch — expected pushSubscriptionMissingTenantToken"
+else
+    info "[KRA] Response type: ${start_neg_type}; body: ${start_neg_body}"
+    fail "[KRA] Push setup did NOT reject the bare endpoint — multi-tenant gate is bypassed"
+fi
+
+# ============================================================================
+phase 6 "Push setup ACCEPTS endpoint with baked consumer tenant token (KRA proof)"
+# ============================================================================
+# Same shape as Phase 5 but dataAddress.endpoint now carries Trader's
+# x-enc-tenant-token, satisfying the data plane's multi-tenant gate.
+KRA_PUSH_POS_PID="urn:uuid:trader-KRA-push-pos-$(date +%s)-${RANDOM}"
+push_pos_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${KRA_PUSH_POS_PID}" \
+    --arg agreementId "${AGREEMENT_KRA}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+push_pos_resp=$(node scripts/dsp-client.mjs requestTransfer \
+    --host "${HOST}" \
+    --tenant-token "${PUB_TOKEN_KRA}" \
+    --trust-payload "${TRADER_TRUST_JWT}" \
+    --body "${push_pos_msg}")
+[ "$(echo "${push_pos_resp}" | jq -r '.ok')" = "true" ] \
+    || fail "[KRA push-pos] requestTransfer failed: $(echo "${push_pos_resp}" | jq -r '.errorMessage')"
+push_pos_provider_pid=$(echo "${push_pos_resp}" | jq -r '.body.providerPid // empty')
+[ -n "${push_pos_provider_pid}" ] || fail "[KRA push-pos] requestTransfer did not return providerPid"
+
+start_pos_msg=$(jq -c -n \
+    --arg ctx "${DSP_CONTEXT}" \
+    --arg consumerPid "${KRA_PUSH_POS_PID}" \
+    --arg providerPid "${push_pos_provider_pid}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
+start_pos_resp=$(node scripts/dsp-client.mjs startTransfer \
+    --host "${HOST}" \
+    --tenant-token "${PUB_TOKEN_KRA}" \
+    --trust-payload "${KRA_TRUST_JWT}" \
+    --body "${start_pos_msg}")
+[ "$(echo "${start_pos_resp}" | jq -r '.ok')" = "true" ] \
+    || fail "[KRA push-pos] startTransfer failed: $(echo "${start_pos_resp}" | jq -r '.errorMessage')"
+start_pos_body=$(echo "${start_pos_resp}" | jq -c '.body')
+start_pos_type=$(echo "${start_pos_body}" | jq -r '.["@type"] // empty')
+
+if [ "${start_pos_type}" = "TransferError" ]; then
+    err_code=$(echo "${start_pos_body}" | jq -r '.code // "unknown"')
+    fail "[KRA push-pos] Push setup failed: ${err_code} | body: ${start_pos_body}"
+fi
+ok "[KRA] Push setup accepted with baked consumer tenant token (providerPid: ${push_pos_provider_pid})"
+
+# ============================================================================
+phase 7 "Negative-path tenant isolation (cross-tenant credential mix rejected)"
 # ============================================================================
 # Trader's email under KRA's api-key must fail: TenantProcessor scopes the user
 # lookup to KRA's partition where the Trader user does not exist.
