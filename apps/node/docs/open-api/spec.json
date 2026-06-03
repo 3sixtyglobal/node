@@ -16768,7 +16768,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ActivityLogEntryWithError"
+									"$ref": "#/components/schemas/ActivityLogEntry"
 								}
 							}
 						}
@@ -20793,20 +20793,6 @@
 				"allOf": [
 					{
 						"$ref": "#/components/schemas/ActivityLogDetails"
-					}
-				]
-			},
-			"ActivityLogEntryWithError": {
-				"description": "Activity log entry extended with a top-level RFC 9457 error field.\nReturned as the response body for 422/500 inline-processing failures.",
-				"type": "object",
-				"properties": {
-					"error": {
-						"$ref": "#/components/schemas/Error"
-					}
-				},
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/ActivityLogEntry"
 					}
 				]
 			},
