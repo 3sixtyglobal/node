@@ -34,6 +34,11 @@
 		"tenantCreate": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
+		"tenantToken": {
+			"tenantIdOrApiKeyRequired": "Either a tenant ID or an API key must be provided.",
+			"urlTransformerComponentNotRegistered": "The URL transformer component is not registered, ensure the node is configured correctly.",
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
 		"tenantImport": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
@@ -428,6 +433,27 @@
 					"labels": {
 						"updating": "Updating tenant",
 						"updated": "Updated tenant"
+					}
+				},
+				"tenant-token": {
+					"description": "Generate the x-enc-tenant-id token value for a tenant",
+					"example": "tenant-token --tenant-id=\"0011..aabb\"",
+					"params": {
+						"tenant-id": {
+							"description": "The tenant ID to generate the token for."
+						},
+						"api-key": {
+							"description": "The API key to look up the tenant ID from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						}
+					},
+					"labels": {
+						"lookingUp": "Looking up tenant",
+						"generating": "Generating tenant token",
+						"tenantId": "Tenant ID",
+						"token": "Token"
 					}
 				},
 				"node-set-tenant": {

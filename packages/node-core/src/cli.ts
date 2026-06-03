@@ -16,6 +16,7 @@ import { getCommandDefinitionNodeSetIdentity } from "./commands/nodeSetIdentity.
 import { getCommandDefinitionNodeSetTenant } from "./commands/nodeSetTenant.js";
 import { getCommandDefinitionTenantCreate } from "./commands/tenantCreate.js";
 import { getCommandDefinitionTenantImport } from "./commands/tenantImport.js";
+import { getCommandDefinitionTenantToken } from "./commands/tenantToken.js";
 import { getCommandDefinitionTenantUpdate } from "./commands/tenantUpdate.js";
 import { getCommandDefinitionUserCreate } from "./commands/userCreate.js";
 import { getCommandDefinitionUserUpdate } from "./commands/userUpdate.js";
@@ -305,6 +306,7 @@ export function registerCommands(): void {
 	getCommandDefinitionNodeSetTenant(commandDefinitions);
 	getCommandDefinitionTenantCreate(commandDefinitions);
 	getCommandDefinitionTenantImport(commandDefinitions);
+	getCommandDefinitionTenantToken(commandDefinitions);
 	getCommandDefinitionTenantUpdate(commandDefinitions);
 	getCommandDefinitionUserCreate(commandDefinitions);
 	getCommandDefinitionUserUpdate(commandDefinitions);

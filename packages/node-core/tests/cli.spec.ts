@@ -299,6 +299,61 @@ describe("node-core", () => {
 		expect(dbTable?.[1]?.publicOrigin).toEqual("https://api.updated.com:5678");
 	});
 
+	test("Can create the url transformer encryption key", async () => {
+		await executeCliCommand(
+			[
+				"vault-key-create",
+				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
+				"--identity=!NODE_DID",
+				"--key-type=ChaCha20Poly1305",
+				"--key-id=!TWIN_URL_TRANSFORMER_ENCRYPTION_KEY_ID"
+			],
+			{ nodeId: nodeIdentityJson?.did }
+		);
+	});
+
+	test("Can generate tenant token from tenant ID", async () => {
+		await executeCliCommand(
+			[
+				"tenant-token",
+				`--tenant-id=${nodeTenantJson?.tenantId}`,
+				`--output-json=${OUTPUT_TMP_DIR}node-tenant-token.json`
+			],
+			{ nodeId: nodeIdentityJson?.did }
+		);
+
+		const tokenJson = await CLIUtils.readJsonFile<any>(`${OUTPUT_TMP_DIR}node-tenant-token.json`);
+		expect(tokenJson?.tenantId).toEqual(nodeTenantJson?.tenantId);
+		expect(tokenJson?.token).toBeDefined();
+		expect(tokenJson?.token.length).toBeGreaterThan(0);
+	});
+
+	test("Can generate tenant token from api key", async () => {
+		await executeCliCommand(
+			[
+				"tenant-token",
+				`--api-key=${nodeTenantJson?.apiKey}`,
+				`--output-json=${OUTPUT_TMP_DIR}node-tenant-token-by-apikey.json`
+			],
+			{ nodeId: nodeIdentityJson?.did }
+		);
+
+		const tokenJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}node-tenant-token-by-apikey.json`
+		);
+		expect(tokenJson?.tenantId).toEqual(nodeTenantJson?.tenantId);
+		expect(tokenJson?.token).toBeDefined();
+		expect(tokenJson?.token.length).toBeGreaterThan(0);
+	});
+
+	test("tenant-token throws when neither tenant-id nor api-key is provided", async () => {
+		await expect(
+			executeCliCommand(["tenant-token"], { nodeId: nodeIdentityJson?.did }, undefined, {
+				disableProcessExitOnFailure: true
+			})
+		).rejects.toThrow();
+	});
+
 	test("Can create the organization identity", async () => {
 		await executeCliCommand(
 			[
