@@ -85,17 +85,3 @@ Indicates whether the engine needs the node identity to be set if configured to 
 ```ts
 true
 ```
-
-***
-
-### requiresTenantId? {#requirestenantid}
-
-> `optional` **requiresTenantId?**: `boolean`
-
-Indicates whether the engine needs the tenant id to be set if configured to use.
-
-#### Default
-
-```ts
-true
-```
