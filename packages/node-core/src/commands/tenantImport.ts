@@ -20,7 +20,6 @@ export function getCommandDefinitionTenantImport(commandDefinitions: {
 		command: COMMAND_NAME,
 		description: I18n.formatMessage("node.cli.commands.tenant-import.description"),
 		example: I18n.formatMessage("node.cli.commands.tenant-import.example"),
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",
@@ -125,8 +124,7 @@ export async function tenantImport(
 		id: tenantId,
 		apiKey,
 		label,
-		publicOrigin,
-		isNodeTenant: false
+		publicOrigin
 	});
 	CLIDisplay.spinnerStop();
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-import.labels.imported"));

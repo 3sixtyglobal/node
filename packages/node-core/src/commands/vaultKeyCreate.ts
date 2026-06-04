@@ -24,7 +24,6 @@ export function getCommandDefinitionVaultKeyCreate(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.vault-key-create.description"),
 		example: I18n.formatMessage("node.cli.commands.vault-key-create.example"),
 		requiresNodeIdentity: false,
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",

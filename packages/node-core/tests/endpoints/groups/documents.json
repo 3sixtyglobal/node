@@ -56,8 +56,8 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "PUT /documents/:id",
-			"method": "PUT",
+			"description": "PATCH /documents/:id",
+			"method": "PATCH",
 			"path": "/documents/{{docGraphId}}",
 			"body": {
 				"blob": "dXBkYXRlZCBkb2N1bWVudA=="

@@ -37,7 +37,6 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.identity-create.description"),
 		example: I18n.formatMessage("node.cli.commands.identity-create.example"),
 		requiresNodeIdentity: false,
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",

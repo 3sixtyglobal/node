@@ -2,7 +2,6 @@
 	"error": {
 		"node": {
 			"nodeIdentityNotSet": "The node identity is enabled in config but is not set, please set it using the \"node-set-identity\" CLI command.",
-			"nodeTenantNotSet": "Multi-tenancy is enabled but node tenant is not set, please set it using the \"node-set-tenant\" CLI command.",
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
 			"extensionLoadingError": "Failed to load extension \"{extension}\"",
 			"insecureProtocol": "Cannot load extension from insecure protocol: {protocol}. Only HTTPS is allowed for remote extensions.",
@@ -56,9 +55,6 @@
 		"vaultKeyCreate": {
 			"vaultKeyAlreadyExists": "The vault key with ID already exists and overwriteMode is set to \"error\"."
 		},
-		"nodeSetTenant": {
-			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
-		},
 		"nodeSetIdentity": {
 			"identityNotFound": "The identity with DID \"{notFoundId}\" was not found in the system."
 		}
@@ -107,7 +103,6 @@
 						"synchronisedStorageKeyAdd": "Adding synchronised storage key for node identity",
 						"nodeIdentitySet": "Setting node identity",
 						"nodeTenantCreate": "Creating node tenant",
-						"nodeTenantSet": "Setting node tenant",
 						"organisationCreate": "Creating organisation identity",
 						"blobStorageKeyCreate": "Creating blob storage encryption key for organisation identity",
 						"attestationMethodCreate": "Creating attestation method for organisation identity",
@@ -436,7 +431,7 @@
 					}
 				},
 				"tenant-token": {
-					"description": "Generate the x-enc-tenant-id token value for a tenant",
+					"description": "Generate the x-enc-tenant-token token value for a tenant",
 					"example": "tenant-token --tenant-id=\"0011..aabb\"",
 					"params": {
 						"tenant-id": {
@@ -444,6 +439,9 @@
 						},
 						"api-key": {
 							"description": "The API key to look up the tenant ID from."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
 						},
 						"output-json": {
 							"description": "Path to a .json file to store the command output."
@@ -454,24 +452,6 @@
 						"generating": "Generating tenant token",
 						"tenantId": "Tenant ID",
 						"token": "Token"
-					}
-				},
-				"node-set-tenant": {
-					"description": "Set the node tenant",
-					"example": "node-set-tenant --tenant-id=\"0011..aabb\"",
-					"params": {
-						"env-prefix": {
-							"description": "Prefix to use for standard .env files e.g. TWIN_."
-						},
-						"tenant-id": {
-							"description": "The tenant ID to add. If not provided a random tenant id will be generated."
-						},
-						"load-env": {
-							"description": "Comma separated list of paths to .env files to read input parameters from."
-						}
-					},
-					"labels": {
-						"stored": "The tenant id has been stored"
 					}
 				},
 				"user-create": {

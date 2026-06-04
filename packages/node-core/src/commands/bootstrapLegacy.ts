@@ -7,7 +7,6 @@ import type { IEngineCore } from "@twin.org/engine-models";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
 import { nodeSetIdentity } from "./nodeSetIdentity.js";
-import { nodeSetTenant } from "./nodeSetTenant.js";
 import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
@@ -32,7 +31,6 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.bootstrap-legacy.description"),
 		example: I18n.formatMessage("node.cli.commands.bootstrap-legacy.example"),
 		requiresNodeIdentity: false,
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",
@@ -130,8 +128,8 @@ export async function bootstrapLegacy(
 
 	const state = engineCore.getState();
 	const requireWallet = features.includes("node-wallet");
-	let tenantId = state.nodeTenantId;
 	let nodeId = state.nodeId;
+	let tenantId = (Coerce.boolean(envVars.tenantEnabled) ?? false) ? envVars.tenantId : undefined;
 
 	if (features.length === 0) {
 		throw new GeneralError("bootstrapLegacy", "noFeaturesEnabled");
@@ -218,29 +216,19 @@ export async function bootstrapLegacy(
 
 		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 		if (tenantEnabled) {
-			if (Is.empty(tenantId)) {
-				await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
-					CLIDisplay.break();
-					CLIDisplay.section(
-						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
-					);
-					const tenantDetails = await tenantCreate(engineCore, envVars, {
-						tenantId: envVars.tenantId,
-						apiKey: envVars.tenantApiKey,
-						label: "Node"
-					});
-
-					CLIDisplay.break();
-					CLIDisplay.section(
-						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantSet")
-					);
-					await nodeSetTenant(engineCore, envVars, {
-						tenantId: tenantDetails.tenantId
-					});
-
-					tenantId = tenantDetails.tenantId;
+			await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
+				CLIDisplay.break();
+				CLIDisplay.section(
+					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
+				);
+				const tenantDetails = await tenantCreate(engineCore, envVars, {
+					tenantId: envVars.tenantId,
+					apiKey: envVars.tenantApiKey,
+					label: "Node"
 				});
-			}
+
+				tenantId = tenantDetails.tenantId;
+			});
 		}
 	}
 

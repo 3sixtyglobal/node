@@ -20,7 +20,6 @@ export function getCommandDefinitionTenantToken(commandDefinitions: {
 		command: COMMAND_NAME,
 		description: I18n.formatMessage("node.cli.commands.tenant-token.description"),
 		example: I18n.formatMessage("node.cli.commands.tenant-token.example"),
-		requiresTenantId: false,
 		params: [
 			{
 				key: "tenant-id",
@@ -41,6 +40,14 @@ export function getCommandDefinitionTenantToken(commandDefinitions: {
 				required: false
 			},
 			{
+				key: "load-env",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-token.params.load-env.description"
+				),
+				required: false
+			},
+			{
 				key: "output-json",
 				type: "string",
 				description: I18n.formatMessage(
@@ -54,7 +61,7 @@ export function getCommandDefinitionTenantToken(commandDefinitions: {
 }
 
 /**
- * Command for generating the x-enc-tenant-id token value for a tenant.
+ * Command for generating the x-enc-tenant-token token value for a tenant.
  * @param engineCore The engine core.
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.

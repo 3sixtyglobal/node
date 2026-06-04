@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.48](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.47...node-core-v0.0.3-next.48) (2026-06-04)
+
+
+### Features
+
+* remove set-tenant ([#186](https://github.com/iotaledger/twin-node/issues/186)) ([1fc1909](https://github.com/iotaledger/twin-node/commit/1fc1909e6335dea51dfec3bb91fba4badaa9790a))
+
+## [0.0.3-next.47](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.46...node-core-v0.0.3-next.47) (2026-06-03)
+
+
+### Bug Fixes
+
+* support load-env for tenant-token cli command ([34059c0](https://github.com/iotaledger/twin-node/commit/34059c052a685decdd689beb16d2b250e9a83643))
+
 ## [0.0.3-next.46](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.45...node-core-v0.0.3-next.46) (2026-06-03)
 
 

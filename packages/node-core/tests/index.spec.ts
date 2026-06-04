@@ -187,13 +187,13 @@ describe("node-core", () => {
 		const result = await run({
 			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, {
-				nodeId: TEST_NODE_ID,
-				nodeTenantId: TEST_NODE_TENANT_ID
+				nodeId: TEST_NODE_ID
 			}),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
 				TWIN_TENANT_ENABLED: "true",
+				TWIN_TENANT_ID: TEST_NODE_TENANT_ID,
 				TWIN_PORT: port.toString(),
 				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
@@ -565,7 +565,7 @@ describe("node-core", () => {
 			"POST     /data-processing/convert",
 			"GET      /data-processing/rule-group",
 			"POST     /documents",
-			"PUT      /documents/:auditableItemGraphDocumentId",
+			"PATCH    /documents/:auditableItemGraphDocumentId",
 			"GET      /documents/:auditableItemGraphDocumentId",
 			"GET      /documents/:auditableItemGraphDocumentId/:revision",
 			"DELETE   /documents/:auditableItemGraphDocumentId/:revision",

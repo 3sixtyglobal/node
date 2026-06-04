@@ -20,7 +20,6 @@ export function getCommandDefinitionTenantUpdate(commandDefinitions: {
 		command: COMMAND_NAME,
 		description: I18n.formatMessage("node.cli.commands.tenant-update.description"),
 		example: I18n.formatMessage("node.cli.commands.tenant-update.example"),
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",

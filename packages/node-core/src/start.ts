@@ -52,7 +52,6 @@ export async function start(
 
 	const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
 	const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;
-	const requiresTenantId = cliCommand?.definition?.requiresTenantId ?? true;
 
 	// If the blob storage or entity storage is configured with file connectors
 	// then we need to make sure the storageFileRoot is set
@@ -75,13 +74,7 @@ export async function start(
 			? (nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""))
 			: undefined,
 		customBootstrap: async (engineCore, context) => {
-			configureContextIds(
-				engineCore,
-				envVars,
-				requiresEngineStarted,
-				requiresNodeIdentity,
-				requiresTenantId
-			);
+			configureContextIds(engineCore, envVars, requiresEngineStarted, requiresNodeIdentity);
 		}
 	});
 
@@ -138,15 +131,13 @@ export async function start(
  * @param envVars The environment variables.
  * @param requiresEngineStarted Whether the engine is required to be started.
  * @param requiresNodeIdentity Whether the node identity is required.
- * @param requiresTenantId Whether the tenant id is required.
  * @throws GeneralError Throws if the node identity or tenant is required but not set.
  */
 function configureContextIds(
 	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
 	envVars: INodeEnvironmentVariables,
 	requiresEngineStarted: boolean,
-	requiresNodeIdentity: boolean,
-	requiresTenantId: boolean
+	requiresNodeIdentity: boolean
 ): void {
 	const state = engine.getState();
 
@@ -157,17 +148,6 @@ function configureContextIds(
 				engine.addContextId(ContextIdKeys.Node, state.nodeId);
 			} else {
 				throw new GeneralError("node", "nodeIdentityNotSet");
-			}
-		}
-	}
-
-	if (requiresEngineStarted && requiresTenantId) {
-		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
-		if (tenantEnabled) {
-			if (Is.stringValue(state.nodeTenantId)) {
-				engine.addContextId(ContextIdKeys.Tenant, state.nodeTenantId);
-			} else {
-				throw new GeneralError("node", "nodeTenantNotSet");
 			}
 		}
 	}
