@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.48](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.47...node-v0.0.3-next.48) (2026-06-04)
+
+
+### Features
+
+* remove set-tenant ([#186](https://github.com/iotaledger/twin-node/issues/186)) ([1fc1909](https://github.com/iotaledger/twin-node/commit/1fc1909e6335dea51dfec3bb91fba4badaa9790a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.47 to 0.0.3-next.48
+
 ## [0.0.3-next.47](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.46...node-v0.0.3-next.47) (2026-06-03)
 
 
