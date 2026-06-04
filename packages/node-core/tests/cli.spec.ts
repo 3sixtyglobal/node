@@ -270,18 +270,6 @@ describe("node-core", () => {
 		);
 	});
 
-	test("Can set the node tenant", async () => {
-		const nodeState = await executeCliCommand(
-			[
-				"node-set-tenant",
-				`--load-env=${OUTPUT_TMP_DIR}node-tenant.env`,
-				"--tenant-id=!NODE_TENANT_ID"
-			],
-			{ nodeId: nodeIdentityJson?.did }
-		);
-		expect(nodeState.nodeTenantId).toEqual(nodeTenantJson?.tenantId);
-	});
-
 	test("Can update the node tenant", async () => {
 		await executeCliCommand(
 			[
@@ -650,7 +638,7 @@ describe("node-core", () => {
 				`--output-env=${OUTPUT_TMP_DIR}user-account-admin.env`,
 				"--output-env-prefix=admin"
 			],
-			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+			{ nodeId: nodeIdentityJson?.did }
 		);
 
 		const userAccountAdminJson = await CLIUtils.readJsonFile<any>(
@@ -696,7 +684,7 @@ describe("node-core", () => {
 					"--organization-identity=!ORGANIZATION_DID",
 					"--email=admin-no-tenant@node"
 				],
-				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				{ nodeId: nodeIdentityJson?.did },
 				undefined,
 				{ disableProcessExitOnFailure: true }
 			)
@@ -721,7 +709,7 @@ describe("node-core", () => {
 				"--email=admin@node",
 				"--overwrite-mode=skip"
 			],
-			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+			{ nodeId: nodeIdentityJson?.did }
 		);
 	});
 
@@ -733,7 +721,7 @@ describe("node-core", () => {
 		await expect(
 			executeCliCommand(
 				["user-update", `--load-env=${envParts.join(",")}`, "--email=admin@node"],
-				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				{ nodeId: nodeIdentityJson?.did },
 				undefined,
 				{ disableProcessExitOnFailure: true }
 			)
@@ -756,7 +744,7 @@ describe("node-core", () => {
 				"--given-name=Admin",
 				"--family-name=Node"
 			],
-			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+			{ nodeId: nodeIdentityJson?.did }
 		);
 	});
 
@@ -777,7 +765,7 @@ describe("node-core", () => {
 					"--email=admin@node",
 					"--overwrite-mode=error"
 				],
-				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				{ nodeId: nodeIdentityJson?.did },
 				undefined,
 				{ disableProcessExitOnFailure: true }
 			)
@@ -802,7 +790,7 @@ describe("node-core", () => {
 				"--overwrite-mode=overwrite",
 				`--output-json=${OUTPUT_TMP_DIR}user-account-overwrite.json`
 			],
-			{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId }
+			{ nodeId: nodeIdentityJson?.did }
 		);
 
 		const userJson = await CLIUtils.readJsonFile<any>(
@@ -829,7 +817,7 @@ describe("node-core", () => {
 					"--email=admin-short-pw@node",
 					"--password=tooshort"
 				],
-				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				{ nodeId: nodeIdentityJson?.did },
 				undefined,
 				{ disableProcessExitOnFailure: true }
 			)
@@ -850,7 +838,7 @@ describe("node-core", () => {
 					"--tenant-id=!NODE_TENANT_ID",
 					"--email=nonexistent@node"
 				],
-				{ nodeId: nodeIdentityJson?.did, nodeTenantId: nodeTenantJson?.tenantId },
+				{ nodeId: nodeIdentityJson?.did },
 				undefined,
 				{ disableProcessExitOnFailure: true }
 			)

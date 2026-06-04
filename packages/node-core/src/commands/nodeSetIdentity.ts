@@ -23,7 +23,6 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.node-set-identity.description"),
 		example: I18n.formatMessage("node.cli.commands.node-set-identity.example"),
 		requiresNodeIdentity: false,
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",

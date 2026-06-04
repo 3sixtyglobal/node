@@ -10,9 +10,4 @@ export interface INodeEngineState extends IEngineState {
 	 * The identity for the node.
 	 */
 	nodeId?: string;
-
-	/**
-	 * The tenant id for the node.
-	 */
-	nodeTenantId?: string;
 }

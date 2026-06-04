@@ -21,7 +21,6 @@ export function getCommandDefinitionTenantCreate(commandDefinitions: {
 		command: COMMAND_NAME,
 		description: I18n.formatMessage("node.cli.commands.tenant-create.description"),
 		example: I18n.formatMessage("node.cli.commands.tenant-create.example"),
-		requiresTenantId: false,
 		params: [
 			{
 				key: "env-prefix",
@@ -161,8 +160,7 @@ export async function tenantCreate(
 		id: tenantId,
 		apiKey,
 		label,
-		publicOrigin,
-		isNodeTenant: false
+		publicOrigin
 	});
 
 	CLIDisplay.break();

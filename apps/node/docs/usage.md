@@ -32,9 +32,9 @@ identity-verification-method-create: Create an identity verification method
 identity-verification-method-import: Import an identity verification method
 identity-verifiable-credential-create: Create a verifiable credential
 node-set-identity: Set the node identity
-node-set-tenant: Set the node tenant
 tenant-create: Create a tenant with associated api key
 tenant-import: Import a tenant with associated api key
+tenant-token: Generate the x-enc-tenant-token token value for a tenant
 tenant-update: Update a tenant with associated api key
 user-create: Create a user
 user-update: Update a user
@@ -149,12 +149,6 @@ twin-node tenant-import --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_I
 
 ```shell
 twin-node tenant-update --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --label="New Label"
-```
-
-### Associate the tenant with the node
-
-```shell
-twin-node node-set-tenant --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID
 ```
 
 ### Create an organisation identity

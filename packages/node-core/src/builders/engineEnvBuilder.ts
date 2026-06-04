@@ -72,6 +72,7 @@ import {
 	TelemetryComponentType,
 	TelemetryConnectorType,
 	TenantAdminComponentType,
+	TenantComponentType,
 	TrustComponentType,
 	type TrustGeneratorComponentType,
 	type TrustVerifierComponentType,
@@ -742,13 +743,15 @@ async function configureTenant(
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
 	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+		coreConfig.types.tenantComponent ??= [];
+		coreConfig.types.tenantComponent.push({
+			type: TenantComponentType.Service
+		});
+
 		coreConfig.types.tenantAdminComponent ??= [];
 		coreConfig.types.tenantAdminComponent.push({
 			type: TenantAdminComponentType.Service
 		});
-
-		coreConfig.types.tenantComponent ??= [];
-		coreConfig.types.tenantComponent.push({ type: TenantAdminComponentType.Service });
 	}
 }
 

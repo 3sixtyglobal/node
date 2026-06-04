@@ -13,7 +13,6 @@ import { getCommandDefinitionIdentityVerifiableCredentialCreate } from "./comman
 import { getCommandDefinitionIdentityVerificationMethodCreate } from "./commands/identityVerificationMethodCreate.js";
 import { getCommandDefinitionIdentityVerificationMethodImport } from "./commands/identityVerificationMethodImport.js";
 import { getCommandDefinitionNodeSetIdentity } from "./commands/nodeSetIdentity.js";
-import { getCommandDefinitionNodeSetTenant } from "./commands/nodeSetTenant.js";
 import { getCommandDefinitionTenantCreate } from "./commands/tenantCreate.js";
 import { getCommandDefinitionTenantImport } from "./commands/tenantImport.js";
 import { getCommandDefinitionTenantToken } from "./commands/tenantToken.js";
@@ -303,7 +302,6 @@ export function registerCommands(): void {
 	getCommandDefinitionIdentityVerificationMethodImport(commandDefinitions);
 	getCommandDefinitionIdentityVerifiableCredentialCreate(commandDefinitions);
 	getCommandDefinitionNodeSetIdentity(commandDefinitions);
-	getCommandDefinitionNodeSetTenant(commandDefinitions);
 	getCommandDefinitionTenantCreate(commandDefinitions);
 	getCommandDefinitionTenantImport(commandDefinitions);
 	getCommandDefinitionTenantToken(commandDefinitions);

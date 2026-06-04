@@ -49,10 +49,4 @@ export interface ICliCommandDefinition {
 	 * @default true
 	 */
 	requiresNodeIdentity?: boolean;
-
-	/**
-	 * Indicates whether the engine needs the tenant id to be set if configured to use.
-	 * @default true
-	 */
-	requiresTenantId?: boolean;
 }

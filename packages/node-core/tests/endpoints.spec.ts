@@ -36,6 +36,7 @@ import { loadAndRunGroups } from "./endpoints/runner.js";
 const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
 const TEST_PORT_ST = TEST_PORT + 1000;
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
+const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_ADMIN_EMAIL = "admin@node";
 const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
@@ -46,6 +47,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
 	TWIN_SILENT: "true",
 	TWIN_TENANT_ENABLED: "true",
+	TWIN_TENANT_ID: TEST_TENANT_ID,
 	TWIN_PORT: TEST_PORT.toString(),
 	TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR}db`,
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
@@ -149,6 +151,7 @@ describe("node-core", () => {
 					...SHARED_ENV_VARS,
 					TWIN_FEATURES: "node-identity,node-admin-user",
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
+					TWIN_TENANT_ID: TEST_TENANT_ID,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
@@ -159,7 +162,6 @@ describe("node-core", () => {
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
-		expect(bootstrapState.nodeTenantId).toBeDefined();
 
 		Factory.clearFactories();
 
@@ -168,8 +170,7 @@ describe("node-core", () => {
 			localesDirectory: "./dist/locales/",
 			openApiSpecFile: path.resolve("../../apps/node/docs/open-api/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
-				nodeId: bootstrapState.nodeId,
-				nodeTenantId: bootstrapState.nodeTenantId
+				nodeId: bootstrapState.nodeId
 			}),
 			envVars: SHARED_ENV_VARS
 		});
@@ -185,7 +186,7 @@ describe("node-core", () => {
 			bootstrapState.nodeId ?? "",
 			undefined,
 			{ subject: {} },
-			TrustHelper.hashTenantId(bootstrapState.nodeTenantId)
+			TrustHelper.hashTenantId(TEST_TENANT_ID)
 		);
 
 		const serverStartTime = Date.now();
@@ -194,7 +195,7 @@ describe("node-core", () => {
 			await seedFederatedCatalogueDataset(
 				serverResult.engine,
 				bootstrapState.nodeId ?? "",
-				bootstrapState.nodeTenantId
+				TEST_TENANT_ID
 			);
 		}
 
