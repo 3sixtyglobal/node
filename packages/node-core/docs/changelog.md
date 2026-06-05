@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.49](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.48...node-core-v0.0.3-next.49) (2026-06-05)
+
+
+### Bug Fixes
+
+* register dataspace control plane rest client as multi-instance ([#191](https://github.com/iotaledger/twin-node/issues/191)) ([4548f5c](https://github.com/iotaledger/twin-node/commit/4548f5c6e7f1d65fd147e502e57d5686e60e5195))
+
 ## [0.0.3-next.48](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.47...node-core-v0.0.3-next.48) (2026-06-04)
 
 
