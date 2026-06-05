@@ -213,10 +213,10 @@ source "${TENANTS_FILE}"
 # -------------------------------------------------------------------------
 # Step 4: Create one admin user inside each tenant.
 #
-# Same CLI workaround as multiTenancyDocker — POST /authentication-admin/users
-# enforces tid-match between caller JWT and tenant context. Workaround:
-# temporarily repoint the node's own tenantId at the target tenant, run
-# user-create, then repoint back.
+# Post-#186 (remove set-tenant): user-create takes --tenant-id directly, so the
+# old "repoint the node's own tenant at the target, run user-create, repoint back"
+# dance is gone — and node-set-tenant no longer exists. The node's own tenant is
+# fixed via TWIN_TENANT_ID (env), not read from engine-state.
 # -------------------------------------------------------------------------
 echo ""
 echo -e "${BOLD}Step 4: Create admin user + minted DID inside each of the 5 tenants${NC}"
@@ -228,12 +228,9 @@ else
     node_state_json=$(docker compose run --rm -T --no-deps twin-kenya-usecase-node \
         sh -c 'cat /app/data/engine-state.json' 2>/dev/null || true)
     NODE_DID=$(echo "${node_state_json}" | jq -r '.nodeId // empty')
-    NODE_TENANT_ID=$(echo "${node_state_json}" | jq -r '.nodeTenantId // empty')
 
-    [ -n "${NODE_DID}" ]       || fail "Could not read nodeId from engine-state.json"
-    [ -n "${NODE_TENANT_ID}" ] || fail "Could not read nodeTenantId from engine-state.json"
-    step "Node DID:       ${NODE_DID}"
-    step "Node tenant id: ${NODE_TENANT_ID}"
+    [ -n "${NODE_DID}" ] || fail "Could not read nodeId from engine-state.json"
+    step "Node DID: ${NODE_DID}"
 
     TENANT_USER_PASSWORD="TestUserPass123!"
     : > "${USERS_FILE}"
@@ -251,11 +248,6 @@ else
         tmp=$(mktemp)
         identity_tmp=$(mktemp)
         trap "rm -f ${tmp} ${identity_tmp}" RETURN
-
-        step "Switching node tenant to ${tenant_id}"
-        docker compose run --rm -T twin-kenya-usecase-node \
-            node src/index.js node-set-tenant --tenant-id="${tenant_id}" 2>&1 | tail -5 \
-            || fail "node-set-tenant to ${tenant_id} failed"
 
         step "Minting tenant DID for ${prefix} (identity-create on IOTA testnet, ~60s)"
         set +e
@@ -311,22 +303,11 @@ else
         ok "User ${email} created in tenant ${tenant_id}"
     }
 
-    restore_node_tenant() {
-        step "Restoring node tenant (${NODE_TENANT_ID})"
-        docker compose run --rm -T twin-kenya-usecase-node \
-            node src/index.js node-set-tenant --tenant-id="${NODE_TENANT_ID}" 2>&1 | tail -5 \
-            || warn "node-set-tenant restore failed — fix manually: docker compose run --rm twin-kenya-usecase-node node src/index.js node-set-tenant --tenant-id=${NODE_TENANT_ID}"
-    }
-    trap restore_node_tenant EXIT
-
     create_tenant_identity_and_user "TENANT_KRA"      "${TENANT_KRA_TENANT_ID}"      "admin@kra"      "${TWIN_KENYA_KRA_MNEMONIC}"
     create_tenant_identity_and_user "TENANT_KPA"      "${TENANT_KPA_TENANT_ID}"      "admin@kpa"      "${TWIN_KENYA_KPA_MNEMONIC}"
     create_tenant_identity_and_user "TENANT_KENTRADE" "${TENANT_KENTRADE_TENANT_ID}" "admin@kentrade" "${TWIN_KENYA_KENTRADE_MNEMONIC}"
     create_tenant_identity_and_user "TENANT_AFA"      "${TENANT_AFA_TENANT_ID}"      "admin@afa"      "${TWIN_KENYA_AFA_MNEMONIC}"
     create_tenant_identity_and_user "TENANT_TRADER"   "${TENANT_TRADER_TENANT_ID}"   "admin@trader"   "${TWIN_KENYA_TRADER_MNEMONIC}"
-
-    restore_node_tenant
-    trap - EXIT
 fi
 
 # -------------------------------------------------------------------------
