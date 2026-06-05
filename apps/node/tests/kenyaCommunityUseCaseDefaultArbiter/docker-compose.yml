@@ -1,0 +1,21 @@
+services:
+  twin-kenya-defaultarb-node:
+    build:
+      context: ../../../../..
+      dockerfile: node/apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile
+    container_name: twin-kenya-defaultarb-node
+    ports:
+      - '3042:3000'
+    env_file:
+      - env/node.env
+    volumes:
+      - kenya-defaultarb-data:/app/data
+    networks:
+      - twin-kenya-defaultarb-network
+
+volumes:
+  kenya-defaultarb-data:
+
+networks:
+  twin-kenya-defaultarb-network:
+    driver: bridge

@@ -5,7 +5,7 @@
 # Run from this directory: ./kenya-usecase-test.sh
 # Prereqs:
 #   - ./setup.sh completed (5 tenants: KRA, KPA, KENTRADE, AFA, Trader)
-#   - docker compose up -d (node on host port 3041)
+#   - docker compose up -d (node on host port 3042)
 #   - ./provision-storage.sh completed (4 publisher datasets + offers seeded)
 #   - jq installed
 #
@@ -64,8 +64,8 @@ source .tenant-users
 # shellcheck disable=SC1091
 source .tenant-identities
 
-HOST="http://localhost:3041"
-INTERNAL_URL="http://twin-kenya-usecase-node:3000"
+HOST="http://localhost:3042"
+INTERNAL_URL="http://twin-kenya-defaultarb-node:3000"
 DSP_CONTEXT="https://w3id.org/dspace/2025/1/context.jsonld"
 ODRL_CONTEXT="http://www.w3.org/ns/odrl.jsonld"
 
@@ -463,42 +463,250 @@ status=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/authentication
     || fail "Cross-tenant credential mix expected 401, got ${status}"
 
 # ============================================================================
-phase 8 "Inbox delivery exercises the PEP gate (consumer-generated write, KRA)"
+phase 8 "Inbox PEP gate under the DEFAULT arbiter — read GRANTED, write DENIED"
 # ============================================================================
 # Phase 6 left a STARTED push transfer in KRA's tenant (consumerPid =
-# KRA_PUSH_POS_PID, identities provider=KRA / consumer=Trader). Here Trader (the
-# consumer, holding a read agreement) actually POSTs an Activity Streams Create
-# to KRA's /dataspace/inbox — a genuine cross-tenant write. This is the only step
-# that reaches notifyActivity → the inbox PEP gate. With generator = consumerPid,
-# the gate resolves generatorIsConsumer=true and derives action=write, then runs
-# the agreement through the PEP. The node runs the pass-through arbiter+processor,
-# so the gate GRANTS and dispatches (HTTP 202). The deny path needs the default
-# arbiter + write-scoped offers and is covered by the unit tests.
-inbox_activity=$(jq -c -n \
+# KRA_PUSH_POS_PID, providerPid = push_pos_provider_pid, identities provider=KRA /
+# consumer=Trader, agreement = read-only). This node runs the DEFAULT arbiter, so
+# the inbox gate's interceptWithPolicy actually evaluates the action against the
+# agreement — unlike the pass-through scaffold, which grants everything. Both
+# deliveries hit notifyActivity → enforceInboxPolicy on the SAME transfer.
+
+# 8a — provider-generated READ delivery (generator = providerPid → action=read).
+# The read-only agreement permits read, so the default arbiter GRANTS (HTTP 202).
+read_activity=$(jq -c -n \
+    --arg gen "${push_pos_provider_pid}" \
+    --arg cons "${KRA_CONSIGNMENT_ID:-urn:ucr:KE-KRA-2026-CUSTOMS-0001}" \
+    --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{ "@context": "https://www.w3.org/ns/activitystreams", type: "Create", generator: $gen,
+       object: { "@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld", type: "Consignment", globalId: $cons },
+       updated: $ts }')
+read_file=$(mktemp)
+read_http=$(curl -sS -o "${read_file}" -w "%{http_code}" \
+    -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
+    -d "${read_activity}")
+read_body=$(cat "${read_file}"); rm -f "${read_file}"
+if [ "${read_http}" = "202" ] || [ "${read_http}" = "201" ]; then
+    ok "[KRA] 8a Read delivery GRANTED by the default arbiter (HTTP ${read_http}) — action=read matches the read agreement"
+elif echo "${read_body}" | grep -q "ruleTargetNotSupported"; then
+    info "Body: ${read_body}"
+    fail "[KRA] 8a Default arbiter threw ruleTargetNotSupported — the offer's permission target needs a typed twin:jsonPath form"
+else
+    info "HTTP ${read_http} | Body: ${read_body}"
+    fail "[KRA] 8a Read delivery not granted (HTTP ${read_http}) — the default arbiter should grant read on a read agreement"
+fi
+
+# 8b — consumer-generated WRITE (generator = consumerPid → action=write). The
+# consumer holds only a read agreement, so the default arbiter finds no write
+# permission and DENIES; the gate returns 401 pushActivityNotPermittedByPolicy.
+# This is the #124 headline proven with a real arbiter.
+write_activity=$(jq -c -n \
     --arg gen "${KRA_PUSH_POS_PID}" \
     --arg cons "${KRA_CONSIGNMENT_ID:-urn:ucr:KE-KRA-2026-CUSTOMS-0001}" \
     --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     '{ "@context": "https://www.w3.org/ns/activitystreams", type: "Create", generator: $gen,
        object: { "@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld", type: "Consignment", globalId: $cons },
        updated: $ts }')
-
-inbox_body_file=$(mktemp)
-trap 'rm -f "${inbox_body_file}"' RETURN 2>/dev/null || true
-inbox_http=$(curl -sS -o "${inbox_body_file}" -w "%{http_code}" \
+write_file=$(mktemp)
+write_http=$(curl -sS -o "${write_file}" -w "%{http_code}" \
     -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
-    -d "${inbox_activity}")
-inbox_body=$(cat "${inbox_body_file}"); rm -f "${inbox_body_file}"
-
-if [ "${inbox_http}" = "202" ] || [ "${inbox_http}" = "201" ]; then
-    ok "[KRA] Inbox write ACCEPTED by the PEP gate (HTTP ${inbox_http}) — action=write, pass-through grants, activity dispatched"
-elif echo "${inbox_body}" | grep -q "pushActivityNotPermittedByPolicy"; then
-    info "Body: ${inbox_body}"
-    fail "[KRA] PEP gate DENIED a write the pass-through arbiter should grant — regression in the inbox gate"
+    -d "${write_activity}")
+write_body=$(cat "${write_file}"); rm -f "${write_file}"
+if echo "${write_body}" | grep -q "pushActivityNotPermittedByPolicy"; then
+    ok "[KRA] 8b Cross-tenant WRITE DENIED by the default arbiter (HTTP ${write_http}) — read holder has no write permission (#124 enforced)"
+elif [ "${write_http}" = "202" ] || [ "${write_http}" = "201" ]; then
+    info "Body: ${write_body}"
+    fail "[KRA] 8b Cross-tenant write was GRANTED under the default arbiter — the inbox gate is NOT enforcing #124"
+elif echo "${write_body}" | grep -q "ruleTargetNotSupported"; then
+    info "Body: ${write_body}"
+    fail "[KRA] 8b Default arbiter threw ruleTargetNotSupported — the offer's permission target needs a typed twin:jsonPath form"
 else
-    info "HTTP ${inbox_http} | Body: ${inbox_body}"
-    fail "[KRA] Inbox delivery did not reach the PEP gate (auth/tenant routing, not the gate itself)"
+    info "HTTP ${write_http} | Body: ${write_body}"
+    fail "[KRA] 8b Unexpected response on the write delivery (HTTP ${write_http})"
+fi
+
+# ============================================================================
+phase 9 "Constraint-based filtering at the inbox gate (default arbiter)"
+# ============================================================================
+# Seed a CONSTRAINED read offer (KRA): read is permitted only when the payload's
+# destinationCountry is KE. Negotiate it into an agreement, set up a push transfer,
+# then deliver two provider-generated READ activities to KRA's inbox — both action=
+# read, differing only in destinationCountry. The default arbiter evaluates the
+# permission's constraint against the payload: KE satisfies → GRANTED (202); a
+# non-KE payload fails the constraint → the permission does not apply → DENIED (401).
+C9_OFFER_ID="urn:policy:kra-constrained-offer-$(date +%s)-${RANDOM}"
+c9_offer=$(jq -n \
+    --arg ctx "${ODRL_CONTEXT}" --arg uid "${C9_OFFER_ID}" --arg assigner "${KRA_DID}" --arg target "${KRA_DATASET_ID}" \
+    '{ "@context": $ctx, "@type": "Offer", uid: $uid, assigner: $assigner, target: $target, action: "read",
+       permission: [{ action: "read",
+                      target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" },
+                      constraint: [{ leftOperand: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$.object.destinationCountry.countryId" },
+                                     operator: "eq", rightOperand: "unece:CountryId#KE" }] }] }')
+
+# Seed the constrained offer in KRA's PAP.
+c9_pap=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/rights-management/policy/admin" \
+    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_KRA_API_KEY}" -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
+    -d "${c9_offer}")
+{ [ "${c9_pap}" = "201" ] || [ "${c9_pap}" = "204" ]; } || fail "[KRA] 9 constrained offer seed failed (HTTP ${c9_pap})"
+
+# Negotiate it (Trader = consumer); pass-through negotiator copies the offer's rules.
+C9_NEG_PID="urn:contract-negotiation:trader-kra-c9-$(date +%s)-${RANDOM}"
+c9_pnap=$(jq -n --arg id "${C9_NEG_PID}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg ni "${TRADER_DID}" \
+    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", nodeIdentity: $ni, organizationIdentity: $ni }')
+curl -sS -o /dev/null -X PUT "${HOST}/rights-management/negotiations/admin/${C9_NEG_PID}" \
+    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${c9_pnap}"
+c9_neg_body=$(jq -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_NEG_PID}" --argjson offer "${c9_offer}" \
+    --arg cb "${INTERNAL_URL}/rights-management?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "ContractRequestMessage", consumerPid: $cp, offer: $offer, callbackAddress: $cb }')
+c9_neg=$(curl -sS -X POST "${HOST}/rights-management/negotiations/request?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_TRUST_JWT}" -d "${c9_neg_body}")
+c9_prov_pid=$(echo "${c9_neg}" | jq -r '.providerPid // empty')
+[ -n "${c9_prov_pid}" ] || { info "Nego: ${c9_neg}"; fail "[KRA] 9 negotiation returned no providerPid"; }
+c9_state=""
+for _ in $(seq 1 15); do
+    c9_state=$(curl -sS "${HOST}/rights-management/negotiations/${c9_prov_pid}?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+        -H "Authorization: Bearer ${TRADER_TRUST_JWT}" | jq -r '.state // empty')
+    { [ "${c9_state}" = "FINALIZED" ] || [ "${c9_state}" = "VERIFIED" ]; } && break
+    sleep 2
+done
+{ [ "${c9_state}" = "FINALIZED" ] || [ "${c9_state}" = "VERIFIED" ]; } || fail "[KRA] 9 negotiation not FINALIZED (last: ${c9_state:-none})"
+c9_admin=$(curl -sS "${HOST}/rights-management/negotiations/admin/${C9_NEG_PID}" \
+    -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
+C9_AGREEMENT=$(echo "${c9_admin}" | jq -r '.agreement["@id"] // .agreement.uid // empty')
+[ -n "${C9_AGREEMENT}" ] || C9_AGREEMENT="${C9_OFFER_ID}"
+c9_constraints=$(echo "${c9_admin}" | jq -r '[.agreement.permission[]?.constraint // empty] | flatten | length')
+
+# Push transfer against the constrained agreement.
+C9_PUSH_PID="urn:uuid:trader-kra-c9-push-$(date +%s)-${RANDOM}"
+c9_req=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_PUSH_PID}" --arg ag "${C9_AGREEMENT}" \
+    --arg cb "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpProxy-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+c9_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c9_req}")
+[ "$(echo "${c9_req_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 9 requestTransfer failed: $(echo "${c9_req_resp}" | jq -r '.errorMessage')"
+c9_push_prov=$(echo "${c9_req_resp}" | jq -r '.body.providerPid // empty')
+[ -n "${c9_push_prov}" ] || fail "[KRA] 9 requestTransfer returned no providerPid"
+c9_start=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_PUSH_PID}" --arg pp "${c9_push_prov}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $cp, providerPid: $pp }')
+c9_start_resp=$(node scripts/dsp-client.mjs startTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${KRA_TRUST_JWT}" --body "${c9_start}")
+[ "$(echo "${c9_start_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 9 startTransfer failed: $(echo "${c9_start_resp}" | jq -r '.errorMessage')"
+
+# Deliver a provider-generated read activity carrying the given destinationCountry.
+# $1 = destinationCountry id, $2 = file to write the response body into; prints the
+# HTTP status to stdout (the body can't go through a global — the call runs in a
+# command-substitution subshell).
+deliver_c9() {
+    local country="$1" bodyfile="$2" act
+    act=$(jq -c -n --arg gen "${c9_push_prov}" --arg cid "${KRA_CONSIGNMENT_ID}" --arg cc "${country}" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        '{ "@context": "https://www.w3.org/ns/activitystreams", type: "Create", generator: $gen,
+           object: { "@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld", type: "Consignment", globalId: $cid, destinationCountry: { type: "Country", countryId: $cc } },
+           updated: $ts }')
+    curl -sS -o "${bodyfile}" -w "%{http_code}" -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+        -H "Content-Type: application/json" -H "Authorization: Bearer ${KRA_TRUST_JWT}" -d "${act}"
+}
+
+c9_sat_file=$(mktemp); c9_vio_file=$(mktemp)
+c9_sat=$(deliver_c9 "unece:CountryId#KE" "${c9_sat_file}")
+c9_vio=$(deliver_c9 "unece:CountryId#XX" "${c9_vio_file}")
+c9_sat_body=$(cat "${c9_sat_file}"); c9_vio_body=$(cat "${c9_vio_file}")
+rm -f "${c9_sat_file}" "${c9_vio_file}"
+
+if [ "${c9_constraints}" = "0" ]; then
+    warn "[KRA] 9 Negotiated agreement carried no constraint (pass-through negotiator did not preserve it) — constraint enforcement not asserted (sat=${c9_sat} vio=${c9_vio})"
+elif { [ "${c9_sat}" = "202" ] || [ "${c9_sat}" = "201" ]; } && echo "${c9_vio_body}" | grep -q "pushActivityNotPermittedByPolicy"; then
+    ok "[KRA] 9 Constraint ENFORCED by the default arbiter — KE payload GRANTED (${c9_sat}), non-KE payload DENIED (${c9_vio})"
+elif { [ "${c9_sat}" = "202" ] || [ "${c9_sat}" = "201" ]; } && { [ "${c9_vio}" = "202" ] || [ "${c9_vio}" = "201" ]; }; then
+    info "sat=${c9_sat} vio=${c9_vio} | vio body: ${c9_vio_body}"
+    fail "[KRA] 9 Constraint NOT enforced — non-KE payload was granted; the default arbiter should have denied it"
+else
+    info "sat=${c9_sat} sat body: ${c9_sat_body} | vio=${c9_vio} vio body: ${c9_vio_body}"
+    fail "[KRA] 9 Unexpected constraint-test outcome"
+fi
+
+# ============================================================================
+phase 10 "Write-scoped agreement at the inbox gate — a write contribution SUCCEEDS"
+# ============================================================================
+# The symmetric positive of 8b (ticket #124 req 3: "a writer holding a write agreement
+# succeeds"). Seed a WRITE-scoped offer (permission action=write), negotiate it into a
+# write agreement, set up a push transfer, then the consumer (Trader) pushes a write
+# activity. generator=consumerPid → the gate derives action=write; the agreement permits
+# write, so the default arbiter GRANTS (202). 8b showed a read-only holder is rejected;
+# this shows a holder of a write agreement is allowed — the two halves of req 3.
+C10_OFFER_ID="urn:policy:kra-write-offer-$(date +%s)-${RANDOM}"
+c10_offer=$(jq -n \
+    --arg ctx "${ODRL_CONTEXT}" --arg uid "${C10_OFFER_ID}" --arg assigner "${KRA_DID}" --arg target "${KRA_DATASET_ID}" \
+    '{ "@context": $ctx, "@type": "Offer", uid: $uid, assigner: $assigner, target: $target, action: "write",
+       permission: [{ action: "write", target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" } }] }')
+
+c10_pap=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/rights-management/policy/admin" \
+    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_KRA_API_KEY}" -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
+    -d "${c10_offer}")
+{ [ "${c10_pap}" = "201" ] || [ "${c10_pap}" = "204" ]; } || fail "[KRA] 10 write offer seed failed (HTTP ${c10_pap})"
+
+C10_NEG_PID="urn:contract-negotiation:trader-kra-c10-$(date +%s)-${RANDOM}"
+c10_pnap=$(jq -n --arg id "${C10_NEG_PID}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg ni "${TRADER_DID}" \
+    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", nodeIdentity: $ni, organizationIdentity: $ni }')
+curl -sS -o /dev/null -X PUT "${HOST}/rights-management/negotiations/admin/${C10_NEG_PID}" \
+    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${c10_pnap}"
+c10_neg_body=$(jq -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_NEG_PID}" --argjson offer "${c10_offer}" \
+    --arg cb "${INTERNAL_URL}/rights-management?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "ContractRequestMessage", consumerPid: $cp, offer: $offer, callbackAddress: $cb }')
+c10_neg=$(curl -sS -X POST "${HOST}/rights-management/negotiations/request?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_TRUST_JWT}" -d "${c10_neg_body}")
+c10_prov_pid=$(echo "${c10_neg}" | jq -r '.providerPid // empty')
+[ -n "${c10_prov_pid}" ] || { info "Nego: ${c10_neg}"; fail "[KRA] 10 negotiation returned no providerPid"; }
+c10_state=""
+for _ in $(seq 1 15); do
+    c10_state=$(curl -sS "${HOST}/rights-management/negotiations/${c10_prov_pid}?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+        -H "Authorization: Bearer ${TRADER_TRUST_JWT}" | jq -r '.state // empty')
+    { [ "${c10_state}" = "FINALIZED" ] || [ "${c10_state}" = "VERIFIED" ]; } && break
+    sleep 2
+done
+{ [ "${c10_state}" = "FINALIZED" ] || [ "${c10_state}" = "VERIFIED" ]; } || fail "[KRA] 10 negotiation not FINALIZED (last: ${c10_state:-none})"
+c10_admin=$(curl -sS "${HOST}/rights-management/negotiations/admin/${C10_NEG_PID}" \
+    -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
+C10_AGREEMENT=$(echo "${c10_admin}" | jq -r '.agreement["@id"] // .agreement.uid // empty')
+[ -n "${C10_AGREEMENT}" ] || C10_AGREEMENT="${C10_OFFER_ID}"
+c10_action=$(echo "${c10_admin}" | jq -r '.agreement.permission[0].action // .agreement.action // "unknown"')
+
+C10_PUSH_PID="urn:uuid:trader-kra-c10-push-$(date +%s)-${RANDOM}"
+c10_req=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_PUSH_PID}" --arg ag "${C10_AGREEMENT}" \
+    --arg cb "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpProxy-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+c10_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c10_req}")
+[ "$(echo "${c10_req_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 10 requestTransfer failed: $(echo "${c10_req_resp}" | jq -r '.errorMessage')"
+c10_push_prov=$(echo "${c10_req_resp}" | jq -r '.body.providerPid // empty')
+[ -n "${c10_push_prov}" ] || fail "[KRA] 10 requestTransfer returned no providerPid"
+c10_start=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_PUSH_PID}" --arg pp "${c10_push_prov}" \
+    '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $cp, providerPid: $pp }')
+c10_start_resp=$(node scripts/dsp-client.mjs startTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${KRA_TRUST_JWT}" --body "${c10_start}")
+[ "$(echo "${c10_start_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 10 startTransfer failed: $(echo "${c10_start_resp}" | jq -r '.errorMessage')"
+
+# Consumer (Trader) pushes a WRITE into KRA's inbox. generator=consumerPid → action=write.
+c10_write=$(jq -c -n --arg gen "${C10_PUSH_PID}" --arg cid "${KRA_CONSIGNMENT_ID}" --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '{ "@context": "https://www.w3.org/ns/activitystreams", type: "Create", generator: $gen,
+       object: { "@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld", type: "Consignment", globalId: $cid },
+       updated: $ts }')
+c10_file=$(mktemp)
+c10_http=$(curl -sS -o "${c10_file}" -w "%{http_code}" -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_TRUST_JWT}" -d "${c10_write}")
+c10_body=$(cat "${c10_file}"); rm -f "${c10_file}"
+
+if [ "${c10_action}" != "write" ]; then
+    warn "[KRA] 10 Negotiated agreement action='${c10_action}' (expected write) — negotiator did not preserve the write action; cannot assert (HTTP ${c10_http})"
+elif [ "${c10_http}" = "202" ] || [ "${c10_http}" = "201" ]; then
+    ok "[KRA] 10 Write contribution GRANTED by the default arbiter (HTTP ${c10_http}) — consumer holds a WRITE agreement (action=write permitted)"
+elif echo "${c10_body}" | grep -q "pushActivityNotPermittedByPolicy"; then
+    info "Body: ${c10_body}"
+    fail "[KRA] 10 Write DENIED despite a write agreement — the gate is over-rejecting permitted writes"
+else
+    info "HTTP ${c10_http} | Body: ${c10_body}"
+    fail "[KRA] 10 Unexpected response on the write-agreement delivery (HTTP ${c10_http})"
 fi
 
 echo ""
