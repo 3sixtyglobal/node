@@ -425,6 +425,7 @@ describe("node-core", () => {
 			"policy-negotiation-point-service",
 			"synchronised-storage-service",
 			"federated-catalogue-service",
+			"dataspace-control-plane-rest-client",
 			"dataspace-control-plane-service",
 			"dataspace-data-plane-service",
 			"did-context-id-handler",

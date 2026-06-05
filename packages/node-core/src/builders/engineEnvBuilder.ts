@@ -1621,13 +1621,23 @@ async function configureDataspace(
 ): Promise<void> {
 	if (Coerce.boolean(envVars.dataspaceEnabled) ?? false) {
 		coreConfig.types.dataspaceControlPlaneComponent ??= [];
+		// We add a multi instance REST client for remote/consumer-initiated transfers.
+		coreConfig.types.dataspaceControlPlaneComponent.push({
+			type: DataspaceControlPlaneComponentType.RestClient,
+			options: {
+				endpoint: "http://localhost"
+			},
+			isMultiInstance: true,
+			features: ["remote"]
+		});
 		coreConfig.types.dataspaceControlPlaneComponent.push({
 			type: DataspaceControlPlaneComponentType.Service,
 			options: {
 				config: {
 					dataPlanePath: envVars.dataspaceDataPlanePath
 				}
-			}
+			},
+			isDefault: true
 		});
 
 		coreConfig.types.dataspaceDataPlaneComponent ??= [];
