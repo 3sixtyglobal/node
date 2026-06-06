@@ -1,18 +1,19 @@
 # Kenya Community Use Case — Default Arbiter
 
 A copy of `kenyaCommunityUseCaseDocker` configured with the **default** policy arbiter
-+ enforcement processor (the pass-through scaffold uses no-op stamps). Its purpose is
-to prove the inbox PEP gate (ticket #124) under a **real** arbiter, in the same-node
-multi-tenant topology the Kenya use case actually uses.
+
+- enforcement processor (the pass-through scaffold uses no-op stamps). Its purpose is
+  to prove the inbox PEP gate (ticket #124) under a **real** arbiter, in the same-node
+  multi-tenant topology the Kenya use case actually uses.
 
 ## What differs from the base scaffold
 
-| | base (`kenyaCommunityUseCaseDocker`) | this folder |
-|---|---|---|
-| arbiter / enforcement processor | `pass-through` | **`default`** |
-| host port | 3041 | **3042** |
-| container / volume / network | `twin-kenya-usecase-*` | `twin-kenya-defaultarb-*` |
-| Phase 8 | accept-only (pass-through grants all) | **read GRANTED + write DENIED** |
+|                                 | base (`kenyaCommunityUseCaseDocker`)  | this folder                     |
+| ------------------------------- | ------------------------------------- | ------------------------------- |
+| arbiter / enforcement processor | `pass-through`                        | **`default`**                   |
+| host port                       | 3041                                  | **3042**                        |
+| container / volume / network    | `twin-kenya-usecase-*`                | `twin-kenya-defaultarb-*`       |
+| Phase 8                         | accept-only (pass-through grants all) | **read GRANTED + write DENIED** |
 
 Negotiator/requester stay `pass-through` (so read agreements are created), exactly
 matching `mobiusSupplyChainDocker`'s proven default-arbiter config.
