@@ -15811,11 +15811,16 @@
 						"schema": {
 							"type": "string"
 						}
-					}
-				],
-				"security": [
+					},
 					{
-						"jwtBearerAuthScheme": []
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
 					}
 				],
 				"requestBody": {
@@ -15923,24 +15928,6 @@
 							}
 						}
 					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
 					"500": {
 						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
 						"content": {
@@ -15980,11 +15967,16 @@
 						},
 						"style": "simple",
 						"example": "urn:uuid:dataset-123"
-					}
-				],
-				"security": [
+					},
 					{
-						"jwtBearerAuthScheme": []
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
 					}
 				],
 				"responses": {
@@ -15993,7 +15985,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetDatasetResponse"
+									"$ref": "#/components/schemas/DatasetGetResponse"
 								},
 								"examples": {
 									"getDatasetResponseExample": {
@@ -16030,8 +16022,8 @@
 							}
 						}
 					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -16040,8 +16032,165 @@
 								"examples": {
 									"exampleResponse": {
 										"value": {
-											"name": "UnauthorizedError",
+											"name": "InternalServerError",
 											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "removeDataset",
+				"summary": "Remove a dataset from the catalogue by ID",
+				"tags": [
+					"Federated Catalogue"
+				],
+				"parameters": [
+					{
+						"name": "datasetId",
+						"description": "The unique identifier of the dataset.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:uuid:dataset-123"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response payload for the remove dataset method.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/catalog/datasets": {
+			"post": {
+				"operationId": "setDataset",
+				"summary": "Insert or update a dataset in the catalogue",
+				"tags": [
+					"Federated Catalogue"
+				],
+				"parameters": [
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
+					}
+				],
+				"requestBody": {
+					"description": "The request parameters for the set dataset method.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dcat/DcatDataset"
+							},
+							"examples": {
+								"setDatasetRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@id": "urn:uuid:dataset-123",
+										"@type": "dcat:Dataset",
+										"dcterms:title": "Energy Consumption Data",
+										"dcterms:description": "Historical energy consumption data"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The response payload for the set dataset method.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
 										}
 									}
 								}
@@ -21196,6 +21345,17 @@
 				],
 				"description": "The data to be used in the store."
 			},
+			"DatasetGetResponse": {
+				"anyOf": [
+					{
+						"$ref": "https://schema.twindev.org/dcat/DcatDataset"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+					}
+				],
+				"description": "The response payload containing the dataset or error."
+			},
 			"DataspaceAppDataset": {
 				"description": "Stored dataset record returned by the Control Plane's dataset CRUD surface.",
 				"type": "object",
@@ -21366,17 +21526,6 @@
 					"type",
 					"q"
 				]
-			},
-			"GetDatasetResponse": {
-				"anyOf": [
-					{
-						"$ref": "https://schema.twindev.org/dcat/DcatDataset"
-					},
-					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
-					}
-				],
-				"description": "The response payload containing the dataset or error."
 			},
 			"GetTransferProcessResponse": {
 				"oneOf": [
@@ -23230,108 +23379,6 @@
 					"newPassword"
 				],
 				"description": "The body of the request."
-			},
-			"VerifiableStorageCreateRequest": {
-				"type": "object",
-				"properties": {
-					"data": {
-						"type": "string",
-						"description": "The data for the verifiable storage item, this is a string serialized as base64."
-					},
-					"allowList": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The list of identities that are allowed to modify the item."
-					},
-					"maxAllowListSize": {
-						"type": "number",
-						"description": "The maximum size of the allow list.",
-						"default": 100
-					},
-					"namespace": {
-						"type": "string",
-						"description": "The namespace of the connector to use for the verifiable storage item, defaults to component configured namespace."
-					}
-				},
-				"required": [
-					"data"
-				],
-				"description": "The data to be stored."
-			},
-			"VerifiableStorageCreateResponse": {
-				"type": "object",
-				"properties": {
-					"receipt": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					},
-					"id": {
-						"type": "string",
-						"description": "The id of the verifiable storage item."
-					}
-				},
-				"required": [
-					"receipt",
-					"id"
-				],
-				"description": "The data that was stored."
-			},
-			"VerifiableStorageGetRequest": {
-				"type": "object",
-				"properties": {
-					"includeData": {
-						"type": "boolean",
-						"description": "The flag to include the data.",
-						"default": true
-					},
-					"includeAllowList": {
-						"type": "boolean",
-						"description": "The flag to include the allow list.",
-						"default": true
-					}
-				},
-				"description": "The body optional param."
-			},
-			"VerifiableStorageGetResponse": {
-				"type": "object",
-				"properties": {
-					"receipt": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					},
-					"data": {
-						"type": "string",
-						"description": "The data of the verifiable storage item, this is a string serialized as base64."
-					},
-					"allowList": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The list of identities that are allowed to modify the item."
-					}
-				},
-				"required": [
-					"receipt"
-				],
-				"description": "The data that was obtained."
-			},
-			"VerifiableStorageUpdateRequest": {
-				"type": "object",
-				"properties": {
-					"data": {
-						"type": "string",
-						"description": "The data which is a string serialized as base64, leave empty if just updating the allow list."
-					},
-					"allowList": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "An updated list of identities that are allowed to modify the item, send an empty list to remove all entries."
-					}
-				},
-				"description": "The data to be updated."
 			},
 			"VerifyDepth": {
 				"description": "How deep to verify the signatures.",
