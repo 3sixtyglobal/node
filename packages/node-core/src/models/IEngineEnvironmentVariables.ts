@@ -243,11 +243,6 @@ export interface IEngineEnvironmentVariables {
 	blobStorageConnectorDefault?: string;
 
 	/**
-	 * Blog storage connector which has public access.
-	 */
-	blobStorageConnectorPublic?: string;
-
-	/**
 	 * Enable encryption for the blob storage.
 	 */
 	blobStorageEnableEncryption?: string;
@@ -498,16 +493,6 @@ export interface IEngineEnvironmentVariables {
 	identityResolverConnector?: string;
 
 	/**
-	 * The type of verifiable storage connector: entity-storage, iota.
-	 */
-	verifiableStorageConnector?: string;
-
-	/**
-	 * The verifiable storage deployed package id, for custom deployments.
-	 */
-	verifiableStoragePackageId?: string;
-
-	/**
 	 * IOTA Faucet Endpoint.
 	 */
 	iotaFaucetEndpoint?: string;
@@ -603,62 +588,19 @@ export interface IEngineEnvironmentVariables {
 	documentManagementEnabled?: string;
 
 	/**
-	 * Is the synchronised storage enabled, defaults to false.
+	 * Enable the federated catalogue, defaults to false, automatically enabled if remote endpoint, filters or dataspace is enabled.
 	 */
-	synchronisedStorageEnabled?: string;
-
-	/**
-	 * Url which points to the api for a trusted synchronised storage node, not required if this is a trusted node.
-	 */
-	synchronisedStorageTrustedUrl?: string;
-
-	/**
-	 * The key for the smart contract which contains the verifiable storage pointer store for synchronised storage.
-	 * This only required if using a custom verifiable storage item, otherwise it will default to the network name.
-	 */
-	synchronisedStorageVerifiableStorageKeyId?: string;
-
-	/**
-	 * The key from the vault which is used to encrypt the synchronised storage blobs.
-	 * Only required for trusted nodes, as regular nodes will request from the trusted nodes.
-	 * Defaults to synchronised-storage-blob-encryption
-	 */
-	synchronisedStorageBlobStorageEncryptionKeyId?: string;
-
-	/**
-	 * The key used for blob encryption, should be ChaCha20Poly1305 encoded as base64.
-	 * Only required for trusted nodes, as regular nodes will not write encrypted data.
-	 */
-	synchronisedStorageBlobStorageKey?: string;
-
-	/**
-	 * How often to check for entity updates in minutes.
-	 * @default 5
-	 */
-	synchronisedStorageEntityUpdateIntervalMinutes?: string;
-
-	/**
-	 * Interval to perform consolidation of changesets, only used if this is a trusted node.
-	 * @default 60
-	 */
-	synchronisedStorageConsolidationIntervalMinutes?: string;
-
-	/**
-	 * The number of entities to process in a single consolidation batch, only used if this is a trusted node.
-	 * @default 1000
-	 */
-	synchronisedStorageConsolidationBatchSize?: string;
-
-	/**
-	 * The maximum number of consolidations to keep in storage, only used if this is a trusted node.
-	 * @default 5
-	 */
-	synchronisedStorageMaxConsolidations?: string;
+	federatedCatalogueEnabled?: string;
 
 	/**
 	 * Federated catalog filters, command separated list of filters to add.
 	 */
 	federatedCatalogueFilters?: string;
+
+	/**
+	 * Federated catalog remote endpoint, if set will use a REST client instead of local service.
+	 */
+	federatedCatalogueRemoteEndpoint?: string;
 
 	/**
 	 * The trust generators to add to the factory, comma separated list.
@@ -681,6 +623,16 @@ export interface IEngineEnvironmentVariables {
 	 * Defaults to undefined for never expiring.
 	 */
 	trustJwtTtlSeconds?: string;
+
+	/**
+	 * The allow lists for the trust identity verifier, comma separated list of identities.
+	 */
+	trustIdentitiesAllow?: string;
+
+	/**
+	 * The deny lists for the trust identity verifier, comma separated list of identities.
+	 */
+	trustIdentitiesDeny?: string;
 
 	/**
 	 * Path under which the rights management service is mounted (single source

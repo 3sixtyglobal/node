@@ -2,9 +2,48 @@
 	"group": "Federated Catalogue",
 	"steps": [
 		{
+			"description": "POST /federated-catalogue/datasets — create dataset",
+			"method": "POST",
+			"path": "/federated-catalogue/datasets",
+			"headers": {
+				"authorization": "{{trustAuthorization}}"
+			},
+			"body": {
+				"@context": {
+					"dcat": "http://www.w3.org/ns/dcat#",
+					"dcterms": "http://purl.org/dc/terms/",
+					"odrl": "http://www.w3.org/ns/odrl/2/"
+				},
+				"@id": "{{fedCatDatasetId}}",
+				"@type": "dcat:Dataset",
+				"dcterms:title": "Test Dataset",
+				"dcterms:publisher": "https://example.com/publisher",
+				"odrl:hasPolicy": [
+					{
+						"@context": "http://www.w3.org/ns/odrl.jsonld",
+						"@type": "Offer",
+						"uid": "urn:uuid:test-offer-endpoint-001",
+						"assigner": "https://example.com/assigner",
+						"permission": [{ "action": "use" }]
+					}
+				],
+				"dcat:distribution": [
+					{
+						"@type": "dcat:Distribution",
+						"dcterms:format": "application/json",
+						"dcat:accessService": "https://example.com/data-access"
+					}
+				]
+			},
+			"expectedStatus": 201
+		},
+		{
 			"description": "POST /federated-catalogue/request — 400 missing @type",
 			"method": "POST",
 			"path": "/federated-catalogue/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}"
+			},
 			"body": {
 				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"]
 			},
@@ -15,6 +54,9 @@
 			"description": "POST /federated-catalogue/request — 400 filter not an array",
 			"method": "POST",
 			"path": "/federated-catalogue/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}"
+			},
 			"body": {
 				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
 				"@type": "CatalogRequestMessage",
@@ -27,6 +69,9 @@
 			"description": "GET /federated-catalogue/datasets/:datasetId — 200 known dataset",
 			"method": "GET",
 			"path": "/federated-catalogue/datasets/{{fedCatDatasetId}}",
+			"headers": {
+				"authorization": "{{trustAuthorization}}"
+			},
 			"expectedStatus": 200,
 			"assert": { "body.@type": "Dataset" }
 		},
@@ -34,8 +79,20 @@
 			"description": "GET /federated-catalogue/datasets/:datasetId — 404 unknown dataset",
 			"method": "GET",
 			"path": "/federated-catalogue/datasets/{{fakeId}}",
+			"headers": {
+				"authorization": "{{trustAuthorization}}"
+			},
 			"expectedStatus": 404,
 			"assert": { "body.@type": "CatalogError" }
+		},
+		{
+			"description": "DELETE /federated-catalogue/datasets/:datasetId — delete dataset",
+			"method": "DELETE",
+			"path": "/federated-catalogue/datasets/{{fedCatDatasetId}}",
+			"headers": {
+				"authorization": "{{trustAuthorization}}"
+			},
+			"expectedStatus": 204
 		}
 	]
 }

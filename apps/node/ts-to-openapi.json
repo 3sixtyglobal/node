@@ -37,9 +37,6 @@
 			"package": "@twin.org/attestation-service"
 		},
 		{
-			"package": "@twin.org/verifiable-storage-service"
-		},
-		{
 			"package": "@twin.org/immutable-proof-service"
 		},
 		{
@@ -68,9 +65,6 @@
 		},
 		{
 			"package": "@twin.org/document-management-service"
-		},
-		{
-			"package": "@twin.org/synchronised-storage-service"
 		},
 		{
 			"package": "@twin.org/federated-catalogue-service"

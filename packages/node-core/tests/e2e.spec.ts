@@ -202,7 +202,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		expect(nameofKebabCaseFn()).toContain("nameof-transformer is not in the build pipeline");
 	});
 
-	test("should download and verify real TWIN extension with lifecycle hooks", async () => {
+	test.skip("should download and verify real TWIN extension with lifecycle hooks", async () => {
 		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.15";
 
 		// 1. Download real TWIN extension

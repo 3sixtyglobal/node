@@ -100,7 +100,6 @@
 						"nodeIdentityCreate": "Creating node identity",
 						"nodeAuthKeyCreate": "Creating node auth key",
 						"trustVerificationMethodCreate": "Creating trust verification method for node identity",
-						"synchronisedStorageKeyAdd": "Adding synchronised storage key for node identity",
 						"nodeIdentitySet": "Setting node identity",
 						"nodeTenantCreate": "Creating node tenant",
 						"organisationCreate": "Creating organisation identity",
