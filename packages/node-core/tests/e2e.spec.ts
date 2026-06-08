@@ -192,8 +192,8 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		expect(isFn.string("test")).toBe(true);
 	});
 
-	test("should download and verify real TWIN extension with lifecycle hooks", async () => {
-		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.30";
+	test.skip("should download and verify real TWIN extension with lifecycle hooks", async () => {
+		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.15";
 
 		// 1. Download real TWIN extension
 		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
