@@ -52,7 +52,6 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_ENTITY_STORAGE_CONNECTOR_DEFAULT`                | Any configured entity storage type                                                                                  | First configured type | Default entity storage connector.                  |
 | `TWIN_BLOB_STORAGE_CONNECTOR_TYPE`                     | `memory`, `file`, `ipfs`, `aws-s3`, `azure-storage`, `gcp-storage`                                                  | None                  | Comma-separated list allowed.                      |
 | `TWIN_BLOB_STORAGE_CONNECTOR_DEFAULT`                  | Any configured blob storage type                                                                                    | First configured type | Default blob storage connector.                    |
-| `TWIN_BLOB_STORAGE_CONNECTOR_PUBLIC`                   | Any configured blob storage type                                                                                    | None                  | Marks the public blob connector feature.           |
 | `TWIN_VAULT_CONNECTOR`                                 | `entity-storage`, `hashicorp`                                                                                       | None                  | Selects vault backend.                             |
 | `TWIN_LOGGING_CONNECTOR`                               | `console`, `entity-storage`                                                                                         | None                  | Comma-separated list allowed.                      |
 | `TWIN_EVENT_BUS_CONNECTOR`                             | `local`                                                                                                             | None                  | Selects event bus connector.                       |
@@ -70,8 +69,6 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_IDENTITY_CONNECTOR`                              | `entity-storage`, `iota`                                                                                            | None                  | Identity connector type.                           |
 | `TWIN_IDENTITY_RESOLVER_CONNECTOR`                     | `entity-storage`, `iota`, `universal`                                                                               | None                  | Identity resolver connector type.                  |
 | `TWIN_IDENTITY_PROFILE_CONNECTOR`                      | `entity-storage`                                                                                                    | None                  | Identity profile connector type.                   |
-| `TWIN_VERIFIABLE_STORAGE_CONNECTOR`                    | `entity-storage`, `iota`                                                                                            | None                  | Verifiable storage connector type.                 |
-| `TWIN_VERIFIABLE_STORAGE_PACKAGE_ID`                   | String                                                                                                              | None                  | Custom deployed package id for verifiable storage. |
 | `TWIN_ATTESTATION_CONNECTOR`                           | `nft`                                                                                                               | None                  | Attestation connector type.                        |
 | `TWIN_DATA_CONVERTER_CONNECTORS`                       | `json`, `xml`                                                                                                       | None                  | Comma-separated list allowed.                      |
 | `TWIN_DATA_EXTRACTOR_CONNECTORS`                       | `json-path`                                                                                                         | None                  | Comma-separated list allowed.                      |
@@ -89,38 +86,33 @@ When you change the prefix, all variables in this document use your custom prefi
 
 ## Feature Toggle and Behaviour Variables
 
-| Variable                                                   | Possible Values       | Default                                | Notes                                                   |
-| ---------------------------------------------------------- | --------------------- | -------------------------------------- | ------------------------------------------------------- |
-| `TWIN_ATTESTATION_VERIFICATION_METHOD_ID`                  | Method id string      | `attestation-assertion`                | Default injected by node defaults.                      |
-| `TWIN_AUDITABLE_ITEM_GRAPH_ENABLED`                        | `true`, `false`       | `false`                                | Enables auditable item graph.                           |
-| `TWIN_AUDITABLE_ITEM_STREAM_ENABLED`                       | `true`, `false`       | `false`                                | Enables auditable item stream.                          |
-| `TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION`                      | `true`, `false`       | `false`                                | Enables blob encryption in blob storage component flow. |
-| `TWIN_DATA_PROCESSING_ENABLED`                             | `true`, `false`       | `false`                                | Enables data processing.                                |
-| `TWIN_DATASPACE_ACTIVITY_LOGS_CLEAN_UP_INTERVAL`           | Integer minutes       | `60`                                   | Dataspace clean-up interval.                            |
-| `TWIN_DATASPACE_DATA_PLANE_PATH`                           | Path                  | None                                   | Dataspace PULL transfer path (path only).               |
-| `TWIN_DATASPACE_ENABLED`                                   | `true`, `false`       | `false`                                | Enables dataspace features.                             |
-| `TWIN_DATASPACE_RETAIN_ACTIVITY_LOGS_FOR`                  | Integer minutes, `-1` | `10`                                   | Dataspace activity retention period.                    |
-| `TWIN_DOCUMENT_MANAGEMENT_ENABLED`                         | `true`, `false`       | `false`                                | Enables document management.                            |
-| `TWIN_HEALTH_ENABLED`                                      | `true`, `false`       | `false`                                | Enables health components.                              |
-| `TWIN_HEALTH_INTERVAL_SECONDS`                             | Integer seconds       | `60`                                   | Interval between health checks.                         |
-| `TWIN_HEALTH_STARTUP_INTERVAL_SECONDS`                     | Integer seconds       | `2`                                    | Initial delay before the first health check runs.       |
-| `TWIN_IDENTITY_WALLET_ADDRESS_INDEX`                       | Integer               | `0`                                    | Wallet address index used by identity workflows.        |
-| `TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`              | Method id string      | `immutable-proof-assertion`            | Default injected by node defaults.                      |
-| `TWIN_MESSAGING_ENABLED`                                   | `true`, `false`       | `false`                                | Enables messaging components.                           |
-| `TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH`                     | Path                  | None                                   | Callback path used by rights management.                |
-| `TWIN_SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID` | Vault key identifier  | `synchronised-storage-blob-encryption` | Encryption key id for synchronised blobs.               |
-| `TWIN_SYNCHRONISED_STORAGE_BLOB_STORAGE_KEY`               | Base64 key value      | None                                   | Symmetric key used for synchronised blob encryption.    |
-| `TWIN_SYNCHRONISED_STORAGE_CONSOLIDATION_BATCH_SIZE`       | Integer               | `1000`                                 | Trusted-node consolidation batch size.                  |
-| `TWIN_SYNCHRONISED_STORAGE_CONSOLIDATION_INTERVAL_MINUTES` | Integer minutes       | `60`                                   | Trusted-node consolidation interval.                    |
-| `TWIN_SYNCHRONISED_STORAGE_ENABLED`                        | `true`, `false`       | `false`                                | Enables synchronised storage.                           |
-| `TWIN_SYNCHRONISED_STORAGE_ENTITY_UPDATE_INTERVAL_MINUTES` | Integer minutes       | `5`                                    | Polling interval for synchronised updates.              |
-| `TWIN_SYNCHRONISED_STORAGE_MAX_CONSOLIDATIONS`             | Integer               | `5`                                    | Number of consolidations retained.                      |
-| `TWIN_SYNCHRONISED_STORAGE_TRUSTED_URL`                    | URL                   | None                                   | Trusted synchronised storage node URL.                  |
-| `TWIN_SYNCHRONISED_STORAGE_VERIFIABLE_STORAGE_KEY_ID`      | String                | None                                   | Key id for synchronised verifiable storage pointers.    |
-| `TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS`        | Integer seconds       | `60`                                   | Polling interval between metrics collection runs.       |
-| `TWIN_TELEMETRY_METRICS_PRODUCER_MAX_HISTORY`              | Integer               | `1440`                                 | Maximum number of values retained per metric.           |
-| `TWIN_TRUST_JWT_TTL_SECONDS`                               | Integer seconds       | None                                   | Leave unset for non-expiring JWT generation.            |
-| `TWIN_TRUST_VERIFICATION_METHOD_ID`                        | Method id string      | `trust-assertion`                      | Default injected by node defaults.                      |
+| Variable                                            | Possible Values       | Default                     | Notes                                                   |
+| --------------------------------------------------- | --------------------- | --------------------------- | ------------------------------------------------------- |
+| `TWIN_ATTESTATION_VERIFICATION_METHOD_ID`           | Method id string      | `attestation-assertion`     | Default injected by node defaults.                      |
+| `TWIN_AUDITABLE_ITEM_GRAPH_ENABLED`                 | `true`, `false`       | `false`                     | Enables auditable item graph.                           |
+| `TWIN_AUDITABLE_ITEM_STREAM_ENABLED`                | `true`, `false`       | `false`                     | Enables auditable item stream.                          |
+| `TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION`               | `true`, `false`       | `false`                     | Enables blob encryption in blob storage component flow. |
+| `TWIN_DATA_PROCESSING_ENABLED`                      | `true`, `false`       | `false`                     | Enables data processing.                                |
+| `TWIN_DATASPACE_ACTIVITY_LOGS_CLEAN_UP_INTERVAL`    | Integer minutes       | `60`                        | Dataspace clean-up interval.                            |
+| `TWIN_DATASPACE_DATA_PLANE_PATH`                    | Path                  | None                        | Dataspace PULL transfer path (path only).               |
+| `TWIN_DATASPACE_ENABLED`                            | `true`, `false`       | `false`                     | Enables dataspace features.                             |
+| `TWIN_DATASPACE_RETAIN_ACTIVITY_LOGS_FOR`           | Integer minutes, `-1` | `10`                        | Dataspace activity retention period.                    |
+| `TWIN_DOCUMENT_MANAGEMENT_ENABLED`                  | `true`, `false`       | `false`                     | Enables document management.                            |
+| `TWIN_FEDERATED_CATALOGUE_ENABLED`                  | `true`, `false`       | `false`                     | Enables federated catalogue features.                   |
+| `TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT`          | URL                   | None                        | Uses a remote federated catalogue REST client.          |
+| `TWIN_HEALTH_ENABLED`                               | `true`, `false`       | `false`                     | Enables health components.                              |
+| `TWIN_HEALTH_INTERVAL_SECONDS`                      | Integer seconds       | `60`                        | Interval between health checks.                         |
+| `TWIN_HEALTH_STARTUP_INTERVAL_SECONDS`              | Integer seconds       | `2`                         | Initial delay before the first health check runs.       |
+| `TWIN_IDENTITY_WALLET_ADDRESS_INDEX`                | Integer               | `0`                         | Wallet address index used by identity workflows.        |
+| `TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`       | Method id string      | `immutable-proof-assertion` | Default injected by node defaults.                      |
+| `TWIN_MESSAGING_ENABLED`                            | `true`, `false`       | `false`                     | Enables messaging components.                           |
+| `TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH`              | Path                  | None                        | Callback path used by rights management.                |
+| `TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS` | Integer seconds       | `60`                        | Polling interval between metrics collection runs.       |
+| `TWIN_TELEMETRY_METRICS_PRODUCER_MAX_HISTORY`       | Integer               | `1440`                      | Maximum number of values retained per metric.           |
+| `TWIN_TRUST_IDENTITIES_ALLOW`                       | Comma-separated list  | None                        | Allow list for trust identity verification.             |
+| `TWIN_TRUST_IDENTITIES_DENY`                        | Comma-separated list  | None                        | Deny list for trust identity verification.              |
+| `TWIN_TRUST_JWT_TTL_SECONDS`                        | Integer seconds       | None                        | Leave unset for non-expiring JWT generation.            |
+| `TWIN_TRUST_VERIFICATION_METHOD_ID`                 | Method id string      | `trust-assertion`           | Default injected by node defaults.                      |
 
 ## Hosting Variables
 

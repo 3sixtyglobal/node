@@ -72,10 +72,6 @@
 			"description": "Endpoints which are modelled to access an attestation contract."
 		},
 		{
-			"name": "VerifiableStorage",
-			"description": "Endpoints which are modelled to access a verifiable storage."
-		},
-		{
 			"name": "Immutable Proof",
 			"description": "Endpoints which are modelled to access an immutable proof contract."
 		},
@@ -94,10 +90,6 @@
 		{
 			"name": "Auditable Item Stream",
 			"description": "Endpoints which are modelled to access an auditable item stream contract."
-		},
-		{
-			"name": "Synchronised Storage",
-			"description": "Endpoints which are modelled to access a synchronised storage contract."
 		},
 		{
 			"name": "Federated Catalogue",
@@ -9211,453 +9203,6 @@
 				}
 			}
 		},
-		"/verifiable": {
-			"post": {
-				"operationId": "verifiableStorageCreate",
-				"summary": "Create an item in verifiable storage",
-				"tags": [
-					"VerifiableStorage"
-				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
-				"requestBody": {
-					"description": "Store the data and return the verifiable storage item id.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/VerifiableStorageCreateRequest"
-							},
-							"examples": {
-								"verifiableStorageCreateRequestExample": {
-									"value": {
-										"data": "SGVsbG8gd29ybGQ="
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Response to storing the verifiable storage item.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/VerifiableStorageCreateResponse"
-								},
-								"examples": {
-									"verifiableStorageCreateResponseExample": {
-										"value": {
-											"receipt": {
-												"@context": "https://schema.twindev.org/verifiable-storage/",
-												"type": "VerifiableStorageIotaReceipt2026"
-											},
-											"id": "verifiable:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg=="
-										}
-									}
-								}
-							}
-						},
-						"headers": {
-							"location": {
-								"schema": {
-									"type": "string"
-								},
-								"description": "e.g. verifiable:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg=="
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/verifiable/{id}": {
-			"put": {
-				"operationId": "verifiableStorageUpdate",
-				"summary": "Update an item in verifiable storage",
-				"tags": [
-					"VerifiableStorage"
-				],
-				"parameters": [
-					{
-						"name": "id",
-						"description": "The id of the verifiable storage item to update.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "verifiable:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg=="
-					}
-				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
-				"requestBody": {
-					"description": "Update the data and return the receipt.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/VerifiableStorageUpdateRequest"
-							},
-							"examples": {
-								"verifiableStorageUpdateRequestExample": {
-									"value": {
-										"data": "SGVsbG8gd29ybGQ="
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Response to updating the verifiable storage item.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-								},
-								"examples": {
-									"verifiableStorageUpdateResponseExample": {
-										"value": {
-											"@context": "https://schema.twindev.org/verifiable-storage/",
-											"type": "VerifiableStorageIotaReceipt2026"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"get": {
-				"operationId": "verifiableStorageGet",
-				"summary": "Get an verifiable storage item",
-				"tags": [
-					"VerifiableStorage"
-				],
-				"parameters": [
-					{
-						"name": "id",
-						"description": "The id of the verifiable storage item to resolve.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "verifiable:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg=="
-					}
-				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
-				"requestBody": {
-					"description": "Get the verifiable storage item.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/VerifiableStorageGetRequest"
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Response to getting the verifiable storage item.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/VerifiableStorageGetResponse"
-								},
-								"examples": {
-									"verifiableStorageGetResponseExample": {
-										"value": {
-											"data": "SGVsbG8gd29ybGQ=",
-											"receipt": {
-												"@context": "https://www.w3.org/ns/activitystreams",
-												"type": "Create",
-												"actor": "https://example.org/actor",
-												"object": "https://example.org/object"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"operationId": "verifiableStorageRemove",
-				"summary": "Remove an item from verifiable storage",
-				"tags": [
-					"VerifiableStorage"
-				],
-				"parameters": [
-					{
-						"name": "id",
-						"description": "The id of the verifiable storage item to remove.",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "verifiable:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg=="
-					}
-				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
-				"responses": {
-					"204": {
-						"description": "The rest request ended in success with no data."
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
 		"/immutable-proof": {
 			"post": {
 				"operationId": "immutableProofCreate",
@@ -16241,209 +15786,6 @@
 				}
 			}
 		},
-		"/synchronised-storage/sync-changeset": {
-			"post": {
-				"operationId": "synchronisedStorageSyncChangeSetRequest",
-				"summary": "Request that the node perform a sync request for a changeset.",
-				"tags": [
-					"Synchronised Storage"
-				],
-				"parameters": [
-					{
-						"name": "accept",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple"
-					},
-					{
-						"name": "authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"style": "simple",
-						"example": "z3V32BP9ShC...z3V32BP9ShC"
-					}
-				],
-				"requestBody": {
-					"description": "Request a trusted node to perform a sync request for a changeset.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SyncChangeSet"
-							},
-							"examples": {
-								"synchronisedStorageSyncChangeSetRequestExample": {
-									"value": {
-										"@context": "https://schema.twindev.org/synchronised-storage/",
-										"type": "ChangeSet",
-										"id": "0909090909090909090909090909090909090909090909090909090909090909",
-										"dateCreated": "2025-05-29T01:00:00.000Z",
-										"dateModified": "2025-05-29T01:00:00.000Z",
-										"nodeIdentity": "did:entity-storage:0xd2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2",
-										"changes": [
-											{
-												"entity": {
-													"dateModified": "2025-01-01T00:00:00.000Z"
-												},
-												"id": "test-id-1",
-												"operation": "set"
-											}
-										],
-										"storageKey": "test-type"
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"204": {
-						"description": "The rest request ended in success with no data."
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/synchronised-storage/decryption-key": {
-			"post": {
-				"operationId": "synchronisedStorageGetDecryptionKeyRequest",
-				"summary": "Request the decryption key.",
-				"tags": [
-					"Synchronised Storage"
-				],
-				"requestBody": {
-					"description": "Request a trusted node to perform a sync request for a changeset.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/SyncChangeSet"
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Response to a request for the decryption key for the synchronised storage.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/SyncDecryptionKeyResponse"
-								},
-								"examples": {
-									"synchronisedStorageSyncGetDecryptionKeyResponseExample": {
-										"value": {
-											"decryptionKey": "z5efBErQs3YBLZoH7jgKMQaRc9YjAxA5XSYKmW3FmTBDw9WionT2NS2x1SMvcRyBvw53cSSoaCT1xQH9tkWngGCX3"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The server cannot process the request, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "GeneralError",
-											"message": "errorMessage",
-											"properties": {
-												"foo": "bar"
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "InternalServerError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
 		"/catalog/request": {
 			"post": {
 				"operationId": "catalogRequest",
@@ -16469,11 +15811,16 @@
 						"schema": {
 							"type": "string"
 						}
-					}
-				],
-				"security": [
+					},
 					{
-						"jwtBearerAuthScheme": []
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
 					}
 				],
 				"requestBody": {
@@ -16581,24 +15928,6 @@
 							}
 						}
 					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
-										}
-									}
-								}
-							}
-						}
-					},
 					"500": {
 						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
 						"content": {
@@ -16638,11 +15967,16 @@
 						},
 						"style": "simple",
 						"example": "urn:uuid:dataset-123"
-					}
-				],
-				"security": [
+					},
 					{
-						"jwtBearerAuthScheme": []
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
 					}
 				],
 				"responses": {
@@ -16651,7 +15985,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/GetDatasetResponse"
+									"$ref": "#/components/schemas/DatasetGetResponse"
 								},
 								"examples": {
 									"getDatasetResponseExample": {
@@ -16688,8 +16022,8 @@
 							}
 						}
 					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -16698,8 +16032,165 @@
 								"examples": {
 									"exampleResponse": {
 										"value": {
-											"name": "UnauthorizedError",
+											"name": "InternalServerError",
 											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "removeDataset",
+				"summary": "Remove a dataset from the catalogue by ID",
+				"tags": [
+					"Federated Catalogue"
+				],
+				"parameters": [
+					{
+						"name": "datasetId",
+						"description": "The unique identifier of the dataset.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "urn:uuid:dataset-123"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The response payload for the remove dataset method.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/catalog/datasets": {
+			"post": {
+				"operationId": "setDataset",
+				"summary": "Insert or update a dataset in the catalogue",
+				"tags": [
+					"Federated Catalogue"
+				],
+				"parameters": [
+					{
+						"name": "authorization",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "Bearer <trust-token>"
+					}
+				],
+				"requestBody": {
+					"description": "The request parameters for the set dataset method.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "https://schema.twindev.org/dcat/DcatDataset"
+							},
+							"examples": {
+								"setDatasetRequestExample": {
+									"value": {
+										"@context": "https://w3id.org/dspace/2025/1/context.jsonld",
+										"@id": "urn:uuid:dataset-123",
+										"@type": "dcat:Dataset",
+										"dcterms:title": "Energy Consumption Data",
+										"dcterms:description": "Historical energy consumption data"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The response payload for the set dataset method.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
 										}
 									}
 								}
@@ -21854,6 +21345,17 @@
 				],
 				"description": "The data to be used in the store."
 			},
+			"DatasetGetResponse": {
+				"anyOf": [
+					{
+						"$ref": "https://schema.twindev.org/dcat/DcatDataset"
+					},
+					{
+						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+					}
+				],
+				"description": "The response payload containing the dataset or error."
+			},
 			"DataspaceAppDataset": {
 				"description": "Stored dataset record returned by the Control Plane's dataset CRUD surface.",
 				"type": "object",
@@ -22024,17 +21526,6 @@
 					"type",
 					"q"
 				]
-			},
-			"GetDatasetResponse": {
-				"anyOf": [
-					{
-						"$ref": "https://schema.twindev.org/dcat/DcatDataset"
-					},
-					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
-					}
-				],
-				"description": "The response payload containing the dataset or error."
 			},
 			"GetTransferProcessResponse": {
 				"oneOf": [
@@ -23664,116 +23155,6 @@
 				],
 				"description": "Transfer Process (DSP compliant) with state SUSPENDED, or error."
 			},
-			"SyncChange": {
-				"description": "The object definition for a sync change.",
-				"type": "object",
-				"properties": {
-					"operation": {
-						"$ref": "#/components/schemas/SyncChangeOperation"
-					},
-					"id": {
-						"type": "string",
-						"description": "The item id."
-					},
-					"entity": {
-						"$ref": "#/components/schemas/SynchronisedEntityCore"
-					}
-				},
-				"required": [
-					"operation",
-					"id"
-				]
-			},
-			"SyncChangeOperation": {
-				"description": "The operations for a change",
-				"anyOf": [
-					{
-						"const": "set",
-						"description": "An item was set in the storage."
-					},
-					{
-						"const": "delete",
-						"description": "An item was deleted from the storage."
-					}
-				]
-			},
-			"SyncChangeSet": {
-				"description": "The object definition for a sync change set.",
-				"type": "object",
-				"properties": {
-					"@context": {
-						"const": "https://schema.twindev.org/synchronised-storage/",
-						"description": "The LD Context for the change set."
-					},
-					"type": {
-						"const": "ChangeSet",
-						"description": "The LD Type for the change set."
-					},
-					"id": {
-						"type": "string",
-						"description": "The id of the change set."
-					},
-					"storageKey": {
-						"type": "string",
-						"description": "The storage key of the change set. This is used to identify the entities being synchronised."
-					},
-					"dateCreated": {
-						"type": "string",
-						"description": "The date the change set was created."
-					},
-					"dateModified": {
-						"type": "string",
-						"description": "The date the change set was last modified."
-					},
-					"nodeIdentity": {
-						"type": "string",
-						"description": "The identity of the node that created the change set."
-					},
-					"changes": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/SyncChange"
-						},
-						"description": "The changes to apply after a snapshot."
-					}
-				},
-				"required": [
-					"@context",
-					"type",
-					"id",
-					"storageKey",
-					"dateCreated",
-					"dateModified",
-					"nodeIdentity",
-					"changes"
-				]
-			},
-			"SyncDecryptionKeyResponse": {
-				"type": "object",
-				"properties": {
-					"decryptionKey": {
-						"type": "string",
-						"description": "The decryption key for the synchronised storage as base64."
-					}
-				},
-				"required": [
-					"decryptionKey"
-				],
-				"description": "The body of the response."
-			},
-			"SynchronisedEntityCore": {
-				"description": "The base definition for synchronised entries.",
-				"type": "object",
-				"properties": {
-					"dateModified": {
-						"type": "string",
-						"description": "The date the entry was modified."
-					}
-				},
-				"required": [
-					"dateModified"
-				]
-			},
 			"TelemetryAddMetricValueRequest": {
 				"type": "object",
 				"properties": {
@@ -23998,108 +23379,6 @@
 					"newPassword"
 				],
 				"description": "The body of the request."
-			},
-			"VerifiableStorageCreateRequest": {
-				"type": "object",
-				"properties": {
-					"data": {
-						"type": "string",
-						"description": "The data for the verifiable storage item, this is a string serialized as base64."
-					},
-					"allowList": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The list of identities that are allowed to modify the item."
-					},
-					"maxAllowListSize": {
-						"type": "number",
-						"description": "The maximum size of the allow list.",
-						"default": 100
-					},
-					"namespace": {
-						"type": "string",
-						"description": "The namespace of the connector to use for the verifiable storage item, defaults to component configured namespace."
-					}
-				},
-				"required": [
-					"data"
-				],
-				"description": "The data to be stored."
-			},
-			"VerifiableStorageCreateResponse": {
-				"type": "object",
-				"properties": {
-					"receipt": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					},
-					"id": {
-						"type": "string",
-						"description": "The id of the verifiable storage item."
-					}
-				},
-				"required": [
-					"receipt",
-					"id"
-				],
-				"description": "The data that was stored."
-			},
-			"VerifiableStorageGetRequest": {
-				"type": "object",
-				"properties": {
-					"includeData": {
-						"type": "boolean",
-						"description": "The flag to include the data.",
-						"default": true
-					},
-					"includeAllowList": {
-						"type": "boolean",
-						"description": "The flag to include the allow list.",
-						"default": true
-					}
-				},
-				"description": "The body optional param."
-			},
-			"VerifiableStorageGetResponse": {
-				"type": "object",
-				"properties": {
-					"receipt": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
-					},
-					"data": {
-						"type": "string",
-						"description": "The data of the verifiable storage item, this is a string serialized as base64."
-					},
-					"allowList": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The list of identities that are allowed to modify the item."
-					}
-				},
-				"required": [
-					"receipt"
-				],
-				"description": "The data that was obtained."
-			},
-			"VerifiableStorageUpdateRequest": {
-				"type": "object",
-				"properties": {
-					"data": {
-						"type": "string",
-						"description": "The data which is a string serialized as base64, leave empty if just updating the allow list."
-					},
-					"allowList": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "An updated list of identities that are allowed to modify the item, send an empty list to remove all entries."
-					}
-				},
-				"description": "The data to be updated."
 			},
 			"VerifyDepth": {
 				"description": "How deep to verify the signatures.",

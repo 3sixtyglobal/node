@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
-import { ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
-import type { IEngineCore } from "@twin.org/engine-models";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
@@ -25,7 +23,6 @@ import {
 	NotarizationConnectorType,
 	TelemetryConnectorType,
 	VaultConnectorType,
-	VerifiableStorageConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
 import { TrustHelper, type ITrustComponent } from "@twin.org/trust-models";
@@ -41,6 +38,7 @@ const TEST_ADMIN_EMAIL = "admin@node";
 const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
 const OUTPUT_TMP_DIR = "./tests/.tmp-endpoints/";
+
 const OUTPUT_TMP_DIR_ST = "./tests/.tmp-endpoints-st/";
 
 const SHARED_ENV_VARS: { [id: string]: string } = {
@@ -52,7 +50,6 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR}db`,
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
 	TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
-	TWIN_BLOB_STORAGE_CONNECTOR_PUBLIC: BlobStorageConnectorType.Memory,
 	TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 	TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
@@ -61,7 +58,6 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
 	TWIN_NFT_CONNECTOR: NftConnectorType.EntityStorage,
 	TWIN_NOTARIZATION_CONNECTOR: NotarizationConnectorType.EntityStorage,
-	TWIN_VERIFIABLE_STORAGE_CONNECTOR: VerifiableStorageConnectorType.EntityStorage,
 	TWIN_ATTESTATION_CONNECTOR: AttestationConnectorType.Nft,
 	TWIN_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
 	TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
@@ -90,50 +86,6 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through"
 };
-
-async function seedFederatedCatalogueDataset(
-	engine: IEngineCore,
-	nodeId: string,
-	tenantId?: string
-): Promise<void> {
-	const componentType = engine.getRegisteredInstanceType("federatedCatalogueComponent");
-	const component = ComponentFactory.get(componentType ?? "") as unknown as {
-		set(dataSet: unknown): Promise<void>;
-	};
-	const contextIds: { [key: string]: string } = { node: nodeId };
-	if (tenantId) {
-		contextIds.tenant = tenantId;
-	}
-	await ContextIdStore.run(contextIds, async () => {
-		await component.set({
-			"@context": {
-				dcat: "http://www.w3.org/ns/dcat#",
-				dcterms: "http://purl.org/dc/terms/",
-				odrl: "http://www.w3.org/ns/odrl/2/"
-			},
-			"@id": TEST_FEDCAT_DATASET_ID,
-			"@type": "dcat:Dataset",
-			"dcterms:title": "Test Dataset",
-			"dcterms:publisher": nodeId,
-			"odrl:hasPolicy": [
-				{
-					"@context": "http://www.w3.org/ns/odrl.jsonld",
-					"@type": "Offer",
-					uid: "urn:uuid:test-offer-endpoint-001",
-					assigner: nodeId,
-					permission: [{ action: "use" }]
-				}
-			],
-			"dcat:distribution": [
-				{
-					"@type": "dcat:Distribution",
-					"dcterms:format": "application/json",
-					"dcat:accessService": "https://example.com/data-access"
-				}
-			]
-		});
-	});
-}
 
 describe("node-core", () => {
 	test("Can bootstrap the node and exercise all connected endpoints", async () => {
@@ -190,14 +142,6 @@ describe("node-core", () => {
 		);
 
 		const serverStartTime = Date.now();
-
-		if (serverResult?.engine) {
-			await seedFederatedCatalogueDataset(
-				serverResult.engine,
-				bootstrapState.nodeId ?? "",
-				TEST_TENANT_ID
-			);
-		}
 
 		// Phase 3: Exercise endpoints as a client, using the test definitions in tests/endpoints.
 		try {
@@ -290,10 +234,6 @@ describe("node-core", () => {
 		);
 
 		const serverStartTime = Date.now();
-
-		if (serverResult?.engine) {
-			await seedFederatedCatalogueDataset(serverResult.engine, bootstrapState.nodeId ?? "");
-		}
 
 		// Phase 3: Exercise endpoints using the single-tenant group index.
 		try {

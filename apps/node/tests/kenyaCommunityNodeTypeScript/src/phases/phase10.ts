@@ -144,7 +144,7 @@ export async function runPhase10(context: IKenyaContext): Promise<void> {
 		apiKey: context.kraApiKey,
 		sessionJwt: context.kraSessionJwt
 	});
-	const { result } = await catalogue.query([]);
+	const { result } = await catalogue.query([], undefined, undefined, undefined);
 	if (result["@type"] !== DataspaceProtocolCatalogTypes.Catalog) {
 		fail(`Unexpected catalogue response @type=${String(result["@type"])}`);
 	}

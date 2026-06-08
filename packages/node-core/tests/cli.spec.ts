@@ -190,44 +190,6 @@ describe("node-core", () => {
 		);
 	});
 
-	test("Can create the node synchronised storage encryption key", async () => {
-		await executeCliCommand(
-			[
-				"vault-key-create",
-				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
-				"--identity=!NODE_DID",
-				"--key-id=!TWIN_SYNCHRONISED_STORAGE_BLOB_STORAGE_ENCRYPTION_KEY_ID",
-				"--key-type=ChaCha20Poly1305",
-				`--output-json=${OUTPUT_TMP_DIR}node-synchronised-storage-encryption-key.json`,
-				`--output-env=${OUTPUT_TMP_DIR}node-synchronised-storage-encryption-key.env`
-			],
-			{ nodeId: nodeIdentityJson?.did }
-		);
-
-		const nodeSynchronisedStorageBlobEncryptionJson = await CLIUtils.readJsonFile<any>(
-			`${OUTPUT_TMP_DIR}node-synchronised-storage-encryption-key.json`
-		);
-		const nodeSynchronisedStorageBlobEncryptionEnv = await CLIUtils.readLinesFile(
-			`${OUTPUT_TMP_DIR}node-synchronised-storage-encryption-key.env`
-		);
-		expect(nodeSynchronisedStorageBlobEncryptionJson?.identity).toEqual(nodeIdentityJson?.did);
-		expect(nodeSynchronisedStorageBlobEncryptionJson?.identity).toEqual(
-			valueFromEnv(nodeSynchronisedStorageBlobEncryptionEnv?.[0])
-		);
-		expect(nodeSynchronisedStorageBlobEncryptionJson?.keyId).toEqual(
-			valueFromEnv(nodeSynchronisedStorageBlobEncryptionEnv?.[1])
-		);
-		expect(nodeSynchronisedStorageBlobEncryptionJson?.keyType).toEqual(
-			valueFromEnv(nodeSynchronisedStorageBlobEncryptionEnv?.[2])
-		);
-		expect(nodeSynchronisedStorageBlobEncryptionJson?.privateKeyBase64).toEqual(
-			valueFromEnv(nodeSynchronisedStorageBlobEncryptionEnv?.[3])
-		);
-		expect(nodeSynchronisedStorageBlobEncryptionJson?.privateKeyHex).toEqual(
-			valueFromEnv(nodeSynchronisedStorageBlobEncryptionEnv?.[4])
-		);
-	});
-
 	test("Can create the tenant for the node", async () => {
 		await executeCliCommand(
 			[

@@ -17,4 +17,4 @@ The environment variables.
 
 `boolean`
 
-True if rights-management, synchronised-storage, or dataspace is enabled.
+True if rights-management, or dataspace is enabled.

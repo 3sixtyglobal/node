@@ -574,18 +574,6 @@ The default blob storage connector to use, defaults to the first one in the list
 
 ***
 
-### blobStorageConnectorPublic? {#blobstorageconnectorpublic}
-
-> `optional` **blobStorageConnectorPublic?**: `string`
-
-Blog storage connector which has public access.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`blobStorageConnectorPublic`](IEngineServerEnvironmentVariables.md#blobstorageconnectorpublic)
-
-***
-
 ### blobStorageEnableEncryption? {#blobstorageenableencryption}
 
 > `optional` **blobStorageEnableEncryption?**: `string`
@@ -1186,30 +1174,6 @@ The type of identity resolver connector: entity-storage, iota.
 
 ***
 
-### verifiableStorageConnector? {#verifiablestorageconnector}
-
-> `optional` **verifiableStorageConnector?**: `string`
-
-The type of verifiable storage connector: entity-storage, iota.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`verifiableStorageConnector`](IEngineServerEnvironmentVariables.md#verifiablestorageconnector)
-
-***
-
-### verifiableStoragePackageId? {#verifiablestoragepackageid}
-
-> `optional` **verifiableStoragePackageId?**: `string`
-
-The verifiable storage deployed package id, for custom deployments.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`verifiableStoragePackageId`](IEngineServerEnvironmentVariables.md#verifiablestoragepackageid)
-
-***
-
 ### iotaFaucetEndpoint? {#iotafaucetendpoint}
 
 > `optional` **iotaFaucetEndpoint?**: `string`
@@ -1438,139 +1402,15 @@ Is the document management enabled, defaults to false.
 
 ***
 
-### synchronisedStorageEnabled? {#synchronisedstorageenabled}
+### federatedCatalogueEnabled? {#federatedcatalogueenabled}
 
-> `optional` **synchronisedStorageEnabled?**: `string`
+> `optional` **federatedCatalogueEnabled?**: `string`
 
-Is the synchronised storage enabled, defaults to false.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageEnabled`](IEngineServerEnvironmentVariables.md#synchronisedstorageenabled)
-
-***
-
-### synchronisedStorageTrustedUrl? {#synchronisedstoragetrustedurl}
-
-> `optional` **synchronisedStorageTrustedUrl?**: `string`
-
-Url which points to the api for a trusted synchronised storage node, not required if this is a trusted node.
+Enable the federated catalogue, defaults to false, automatically enabled if remote endpoint, filters or dataspace is enabled.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageTrustedUrl`](IEngineServerEnvironmentVariables.md#synchronisedstoragetrustedurl)
-
-***
-
-### synchronisedStorageVerifiableStorageKeyId? {#synchronisedstorageverifiablestoragekeyid}
-
-> `optional` **synchronisedStorageVerifiableStorageKeyId?**: `string`
-
-The key for the smart contract which contains the verifiable storage pointer store for synchronised storage.
-This only required if using a custom verifiable storage item, otherwise it will default to the network name.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageVerifiableStorageKeyId`](IEngineServerEnvironmentVariables.md#synchronisedstorageverifiablestoragekeyid)
-
-***
-
-### synchronisedStorageBlobStorageEncryptionKeyId? {#synchronisedstorageblobstorageencryptionkeyid}
-
-> `optional` **synchronisedStorageBlobStorageEncryptionKeyId?**: `string`
-
-The key from the vault which is used to encrypt the synchronised storage blobs.
-Only required for trusted nodes, as regular nodes will request from the trusted nodes.
-Defaults to synchronised-storage-blob-encryption
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageBlobStorageEncryptionKeyId`](IEngineServerEnvironmentVariables.md#synchronisedstorageblobstorageencryptionkeyid)
-
-***
-
-### synchronisedStorageBlobStorageKey? {#synchronisedstorageblobstoragekey}
-
-> `optional` **synchronisedStorageBlobStorageKey?**: `string`
-
-The key used for blob encryption, should be ChaCha20Poly1305 encoded as base64.
-Only required for trusted nodes, as regular nodes will not write encrypted data.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageBlobStorageKey`](IEngineServerEnvironmentVariables.md#synchronisedstorageblobstoragekey)
-
-***
-
-### synchronisedStorageEntityUpdateIntervalMinutes? {#synchronisedstorageentityupdateintervalminutes}
-
-> `optional` **synchronisedStorageEntityUpdateIntervalMinutes?**: `string`
-
-How often to check for entity updates in minutes.
-
-#### Default
-
-```ts
-5
-```
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageEntityUpdateIntervalMinutes`](IEngineServerEnvironmentVariables.md#synchronisedstorageentityupdateintervalminutes)
-
-***
-
-### synchronisedStorageConsolidationIntervalMinutes? {#synchronisedstorageconsolidationintervalminutes}
-
-> `optional` **synchronisedStorageConsolidationIntervalMinutes?**: `string`
-
-Interval to perform consolidation of changesets, only used if this is a trusted node.
-
-#### Default
-
-```ts
-60
-```
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageConsolidationIntervalMinutes`](IEngineServerEnvironmentVariables.md#synchronisedstorageconsolidationintervalminutes)
-
-***
-
-### synchronisedStorageConsolidationBatchSize? {#synchronisedstorageconsolidationbatchsize}
-
-> `optional` **synchronisedStorageConsolidationBatchSize?**: `string`
-
-The number of entities to process in a single consolidation batch, only used if this is a trusted node.
-
-#### Default
-
-```ts
-1000
-```
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageConsolidationBatchSize`](IEngineServerEnvironmentVariables.md#synchronisedstorageconsolidationbatchsize)
-
-***
-
-### synchronisedStorageMaxConsolidations? {#synchronisedstoragemaxconsolidations}
-
-> `optional` **synchronisedStorageMaxConsolidations?**: `string`
-
-The maximum number of consolidations to keep in storage, only used if this is a trusted node.
-
-#### Default
-
-```ts
-5
-```
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`synchronisedStorageMaxConsolidations`](IEngineServerEnvironmentVariables.md#synchronisedstoragemaxconsolidations)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`federatedCatalogueEnabled`](IEngineServerEnvironmentVariables.md#federatedcatalogueenabled)
 
 ***
 
@@ -1583,6 +1423,18 @@ Federated catalog filters, command separated list of filters to add.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`federatedCatalogueFilters`](IEngineServerEnvironmentVariables.md#federatedcataloguefilters)
+
+***
+
+### federatedCatalogueRemoteEndpoint? {#federatedcatalogueremoteendpoint}
+
+> `optional` **federatedCatalogueRemoteEndpoint?**: `string`
+
+Federated catalog remote endpoint, if set will use a REST client instead of local service.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`federatedCatalogueRemoteEndpoint`](IEngineServerEnvironmentVariables.md#federatedcatalogueremoteendpoint)
 
 ***
 
@@ -1633,6 +1485,30 @@ Defaults to undefined for never expiring.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustJwtTtlSeconds`](IEngineServerEnvironmentVariables.md#trustjwtttlseconds)
+
+***
+
+### trustIdentitiesAllow? {#trustidentitiesallow}
+
+> `optional` **trustIdentitiesAllow?**: `string`
+
+The allow lists for the trust identity verifier, comma separated list of identities.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustIdentitiesAllow`](IEngineServerEnvironmentVariables.md#trustidentitiesallow)
+
+***
+
+### trustIdentitiesDeny? {#trustidentitiesdeny}
+
+> `optional` **trustIdentitiesDeny?**: `string`
+
+The deny lists for the trust identity verifier, comma separated list of identities.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`trustIdentitiesDeny`](IEngineServerEnvironmentVariables.md#trustidentitiesdeny)
 
 ***
 

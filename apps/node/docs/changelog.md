@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.50](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.49...node-v0.0.3-next.50) (2026-06-08)
+
+
+### Features
+
+* federated catalogue trust mode ([#194](https://github.com/iotaledger/twin-node/issues/194)) ([c18e6fb](https://github.com/iotaledger/twin-node/commit/c18e6fbe0014eb5faf8084d16169d86f3d3b23a6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.49 to 0.0.3-next.50
+
 ## [0.0.3-next.49](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.48...node-v0.0.3-next.49) (2026-06-05)
 
 

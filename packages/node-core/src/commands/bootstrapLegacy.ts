@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, Converter, GeneralError, I18n, Is } from "@twin.org/core";
+import { Coerce, GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
@@ -10,7 +10,6 @@ import { nodeSetIdentity } from "./nodeSetIdentity.js";
 import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
-import { vaultKeyImport } from "./vaultKeyImport.js";
 import { isTrustRequired, isUrlTransformerRequired } from "../builders/engineEnvBuilder.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -173,24 +172,6 @@ export async function bootstrapLegacy(
 				verificationMethodType: "assertionMethod",
 				verificationMethodId: envVars.trustVerificationMethodId,
 				overwriteMode: "skip"
-			});
-		}
-
-		if (
-			(Coerce.boolean(envVars.synchronisedStorageEnabled) ?? false) &&
-			Is.stringBase64(envVars.synchronisedStorageBlobStorageKey)
-		) {
-			CLIDisplay.break();
-			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.synchronisedStorageKeyAdd")
-			);
-			await vaultKeyImport(engineCore, envVars, {
-				identity: nodeIdentity.did,
-				keyType: "ChaCha20Poly1305",
-				keyId: envVars.synchronisedStorageBlobStorageEncryptionKeyId,
-				privateKeyHex: Converter.bytesToHex(
-					Converter.base64ToBytes(envVars.synchronisedStorageBlobStorageKey)
-				)
 			});
 		}
 

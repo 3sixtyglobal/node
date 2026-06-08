@@ -25,7 +25,7 @@ export async function runPhase1(context: IKenyaContext): Promise<void> {
 	});
 
 	try {
-		const { result } = await catalogue.query([]);
+		const { result } = await catalogue.query([], undefined, undefined, undefined);
 
 		// Service may return either a Catalog (with or without datasets) or
 		// an empty-payload variant. The bash test treats all of these as

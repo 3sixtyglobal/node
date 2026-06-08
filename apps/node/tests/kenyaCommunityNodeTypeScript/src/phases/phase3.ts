@@ -108,7 +108,7 @@ export async function runPhase3(context: IKenyaContext): Promise<void> {
 		sessionJwt: context.traderSessionJwt
 	});
 
-	const { result } = await catalogue.query([]);
+	const { result } = await catalogue.query([], undefined, undefined, undefined);
 	if (result["@type"] !== DataspaceProtocolCatalogTypes.Catalog) {
 		fail(`Unexpected catalogue response: @type=${String(result["@type"])}`);
 	}
