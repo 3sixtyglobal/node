@@ -224,7 +224,7 @@ async function configureEntityStorage(
 					credentials: envVars.gcpFirestoreCredentials ?? "",
 					databaseId: envVars.gcpFirestoreDatabaseId ?? "",
 					collectionName: envVars.gcpFirestoreCollectionName ?? "",
-					endpoint: envVars.gcpFirestoreApiEndpoint ?? ""
+					endpoint: envVars.gcpFirestoreEndpoint ?? ""
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -392,7 +392,7 @@ async function configureBlobStorage(
 					projectId: envVars.gcpStorageProjectId ?? "",
 					credentials: envVars.gcpStorageCredentials ?? "",
 					bucketName: envVars.gcpStorageBucketName ?? "",
-					apiEndpoint: envVars.gcpFirestoreApiEndpoint
+					apiEndpoint: envVars.gcpFirestoreEndpoint
 				},
 				storagePrefix: envVars.blobStoragePrefix
 			}
@@ -455,7 +455,13 @@ async function configureLogging(
 			additionalConnectorCount++;
 		} else if (loggingConnector === LoggingConnectorType.EntityStorage) {
 			coreConfig.types.loggingConnector.push({
-				type: LoggingConnectorType.EntityStorage
+				type: LoggingConnectorType.EntityStorage,
+				options: {
+					config: {
+						batchSize: Coerce.integer(envVars.loggingBatchSize),
+						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushIntervalSeconds) ?? 5) * 1000
+					}
+				}
 			});
 			additionalConnectorCount++;
 		}
@@ -1529,7 +1535,7 @@ async function configureDataspace(
 			options: {
 				config: {
 					retainActivityLogsFor: Coerce.number(envVars.dataspaceRetainActivityLogsFor),
-					activityLogsCleanUpInterval: Coerce.number(envVars.dataspaceActivityLogsCleanUpInterval)
+					activityLogsCleanUpInterval: Coerce.number(envVars.dataspaceActivityLogsCleanupInterval)
 				}
 			}
 		});

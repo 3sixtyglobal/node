@@ -119,7 +119,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * GCP Firestore endpoint.
 	 */
-	gcpFirestoreApiEndpoint?: string;
+	gcpFirestoreEndpoint?: string;
 
 	/**
 	 * GCP Firestore project id.
@@ -351,6 +351,16 @@ export interface IEngineEnvironmentVariables {
 	 * The type of logging task connector, can be a comma separated list: console, entity-storage.
 	 */
 	loggingConnector?: string;
+
+	/**
+	 * The batch size for the logging task, set to 1 for no batching.
+	 */
+	loggingBatchSize?: string;
+
+	/**
+	 * The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+	 */
+	loggingBatchFlushIntervalSeconds?: string;
 
 	/**
 	 * The type of event bus connector: local.
@@ -696,7 +706,7 @@ export interface IEngineEnvironmentVariables {
 	 * The interval for cleaning up the activity logs.
 	 * @default 60
 	 */
-	dataspaceActivityLogsCleanUpInterval?: string;
+	dataspaceActivityLogsCleanupInterval?: string;
 
 	/**
 	 * The data plane path for PULL transfers (path only, not full URL).
