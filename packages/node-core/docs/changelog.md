@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.52](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.51...node-core-v0.0.3-next.52) (2026-06-09)
+
+
+### Bug Fixes
+
+* recover tenant id on bootstrap-legacy restart when TENANT_ID is unset ([#198](https://github.com/iotaledger/twin-node/issues/198)) ([d9451e1](https://github.com/iotaledger/twin-node/commit/d9451e188fe4fd20d5cfd0408b0dc226ddf25cd8))
+
 ## [0.0.3-next.51](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.50...node-core-v0.0.3-next.51) (2026-06-09)
 
 
