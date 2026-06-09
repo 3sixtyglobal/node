@@ -1,8 +1,9 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, GeneralError, I18n, Is } from "@twin.org/core";
+import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
@@ -127,8 +128,9 @@ export async function bootstrapLegacy(
 
 	const state = engineCore.getState();
 	const requireWallet = features.includes("node-wallet");
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	let nodeId = state.nodeId;
-	let tenantId = (Coerce.boolean(envVars.tenantEnabled) ?? false) ? envVars.tenantId : undefined;
+	let tenantId = tenantEnabled ? envVars.tenantId : undefined;
 
 	if (features.length === 0) {
 		throw new GeneralError("bootstrapLegacy", "noFeaturesEnabled");
@@ -195,7 +197,6 @@ export async function bootstrapLegacy(
 			identity: nodeId
 		});
 
-		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 		if (tenantEnabled) {
 			await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
 				CLIDisplay.break();
@@ -211,6 +212,10 @@ export async function bootstrapLegacy(
 				tenantId = tenantDetails.tenantId;
 			});
 		}
+	} else if (tenantEnabled && Is.empty(tenantId) && Is.stringValue(nodeId)) {
+		await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
+			tenantId = await resolveBootstrapTenantId(engineCore);
+		});
 	}
 
 	if (features.includes("node-admin-user")) {
@@ -301,4 +306,44 @@ export async function bootstrapLegacy(
 			}
 		);
 	}
+}
+
+/**
+ * Resolve an existing tenant id for re-bootstrap when multi-tenancy is enabled.
+ * @param engineCore The engine core.
+ * @returns The tenant id if one exists in storage.
+ * @internal
+ */
+async function resolveBootstrapTenantId(
+	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>
+): Promise<string | undefined> {
+	const tenantAdminServiceComponentType =
+		engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
+
+	if (!Is.stringValue(tenantAdminServiceComponentType)) {
+		return undefined;
+	}
+
+	const tenantAdminService = ComponentFactory.get<ITenantAdminComponent>(
+		tenantAdminServiceComponentType
+	);
+
+	let cursor: string | undefined;
+	let firstTenantId: string | undefined;
+
+	do {
+		const result = await tenantAdminService.query(["id", "label"], cursor);
+		const nodeTenant = result.tenants.find(tenant => tenant.label === "Node");
+		if (nodeTenant) {
+			return nodeTenant.id;
+		}
+
+		if (Is.empty(firstTenantId) && !Is.empty(result.tenants)) {
+			firstTenantId = result.tenants[0]?.id;
+		}
+
+		cursor = result.cursor;
+	} while (Is.stringValue(cursor));
+
+	return firstTenantId;
 }

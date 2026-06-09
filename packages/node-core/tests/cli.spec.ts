@@ -108,6 +108,23 @@ describe("node-core", () => {
 		);
 	});
 
+	test("bootstrap-legacy is idempotent with multi-tenancy when TENANT_ID is not set", async () => {
+		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-idempotent/`;
+		await rm(bootstrapDir, { recursive: true, force: true });
+
+		const runBootstrap = async (state: INodeEngineState): Promise<INodeEngineState> =>
+			executeCliCommand(["bootstrap-legacy"], state, {
+				TWIN_FEATURES: "node-identity,node-wallet,node-admin-user",
+				TWIN_STORAGE_FILE_ROOT: `${bootstrapDir}db`
+			});
+
+		const stateAfterFirst = await runBootstrap({});
+		expect(stateAfterFirst.nodeId).toBeDefined();
+
+		const stateAfterSecond = await runBootstrap(stateAfterFirst);
+		expect(stateAfterSecond.nodeId).toEqual(stateAfterFirst.nodeId);
+	});
+
 	test("Can create the node identity", async () => {
 		await executeCliCommand(
 			[
