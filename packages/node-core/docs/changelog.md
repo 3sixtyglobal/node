@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.51](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.50...node-core-v0.0.3-next.51) (2026-06-09)
+
+
+### Features
+
+* migration testing ([#199](https://github.com/iotaledger/twin-node/issues/199)) ([97a731c](https://github.com/iotaledger/twin-node/commit/97a731c520d66ab0588d80987a0f88d388ce51ae))
+
 ## [0.0.3-next.50](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.49...node-core-v0.0.3-next.50) (2026-06-08)
 
 
