@@ -277,15 +277,15 @@ GCP Firestore database id.
 
 ***
 
-### gcpFirestoreApiEndpoint? {#gcpfirestoreapiendpoint}
+### gcpFirestoreEndpoint? {#gcpfirestoreendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint?**: `string`
+> `optional` **gcpFirestoreEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`gcpFirestoreApiEndpoint`](IEngineEnvironmentVariables.md#gcpfirestoreapiendpoint)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`gcpFirestoreEndpoint`](IEngineEnvironmentVariables.md#gcpfirestoreendpoint)
 
 ***
 
@@ -839,6 +839,30 @@ The type of logging task connector, can be a comma separated list: console, enti
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingConnector`](IEngineEnvironmentVariables.md#loggingconnector)
+
+***
+
+### loggingBatchSize? {#loggingbatchsize}
+
+> `optional` **loggingBatchSize?**: `string`
+
+The batch size for the logging task, set to 1 for no batching.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingBatchSize`](IEngineEnvironmentVariables.md#loggingbatchsize)
+
+***
+
+### loggingBatchFlushIntervalSeconds? {#loggingbatchflushintervalseconds}
+
+> `optional` **loggingBatchFlushIntervalSeconds?**: `string`
+
+The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingBatchFlushIntervalSeconds`](IEngineEnvironmentVariables.md#loggingbatchflushintervalseconds)
 
 ***
 
@@ -1649,9 +1673,9 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 ***
 
-### dataspaceActivityLogsCleanUpInterval? {#dataspaceactivitylogscleanupinterval}
+### dataspaceActivityLogsCleanupInterval? {#dataspaceactivitylogscleanupinterval}
 
-> `optional` **dataspaceActivityLogsCleanUpInterval?**: `string`
+> `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
 The interval for cleaning up the activity logs.
 
@@ -1663,7 +1687,7 @@ The interval for cleaning up the activity logs.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceActivityLogsCleanUpInterval`](IEngineEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceActivityLogsCleanupInterval`](IEngineEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
 
 ***
 

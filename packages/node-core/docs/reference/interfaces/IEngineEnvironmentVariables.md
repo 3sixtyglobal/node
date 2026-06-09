@@ -185,9 +185,9 @@ GCP Firestore database id.
 
 ***
 
-### gcpFirestoreApiEndpoint? {#gcpfirestoreapiendpoint}
+### gcpFirestoreEndpoint? {#gcpfirestoreendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint?**: `string`
+> `optional` **gcpFirestoreEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
@@ -559,6 +559,22 @@ Hashicorp Vault endpoint.
 > `optional` **loggingConnector?**: `string`
 
 The type of logging task connector, can be a comma separated list: console, entity-storage.
+
+***
+
+### loggingBatchSize? {#loggingbatchsize}
+
+> `optional` **loggingBatchSize?**: `string`
+
+The batch size for the logging task, set to 1 for no batching.
+
+***
+
+### loggingBatchFlushIntervalSeconds? {#loggingbatchflushintervalseconds}
+
+> `optional` **loggingBatchFlushIntervalSeconds?**: `string`
+
+The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
 
 ***
 
@@ -1105,9 +1121,9 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 ***
 
-### dataspaceActivityLogsCleanUpInterval? {#dataspaceactivitylogscleanupinterval}
+### dataspaceActivityLogsCleanupInterval? {#dataspaceactivitylogscleanupinterval}
 
-> `optional` **dataspaceActivityLogsCleanUpInterval?**: `string`
+> `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
 The interval for cleaning up the activity logs.
 
