@@ -232,7 +232,7 @@ seed_publisher() {
     local recaptured
     recaptured=$(docker exec twin-kenya-defaultarb-node node -e "
 const fs = require('fs');
-const store = JSON.parse(fs.readFileSync('/app/data/dataset/store.json', 'utf8'));
+const store = JSON.parse(fs.readFileSync('/app/data/dataspace-app-dataset/store.json', 'utf8'));
 const entry = store.find(e => e.id === '${dataset_id}');
 process.stdout.write(entry?.tenantId ?? '');
 " 2>/dev/null || true)

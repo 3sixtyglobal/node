@@ -122,6 +122,7 @@ catalog_resp=$(curl -sS -X POST "${HOST}/federated-catalogue/request" \
     -H "Content-Type: application/json" \
     -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
     -H "Cookie: access_token=${TRADER_SESSION_JWT}" \
+    -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
     -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
 
 # Per publisher: confirm its dataset is discoverable and capture its TICKET-G
