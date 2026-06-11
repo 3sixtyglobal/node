@@ -2,6 +2,8 @@
 	"error": {
 		"node": {
 			"nodeIdentityNotSet": "The node identity is enabled in config but is not set, please set it using the \"node-set-identity\" CLI command.",
+			"nodeOrganizationIdNotSet": "The node organization is not set, please set it using the \"set-node-org-id\".",
+			"tenantsWithoutOrganizationId": "The following tenants have no organization ID assigned. Use the \"set-tenant-org-id\" command to assign one before starting the node: {tenantIds}",
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
 			"extensionLoadingError": "Failed to load extension \"{extension}\"",
 			"insecureProtocol": "Cannot load extension from insecure protocol: {protocol}. Only HTTPS is allowed for remote extensions.",
@@ -15,10 +17,12 @@
 			"invalidPublicOrigin": "The public origin \"{publicOrigin}\" is not a valid origin URL, it should be in the format \"protocol://host[:port]\"."
 		},
 		"bootstrapLegacy": {
-			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled."
+			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled.",
+			"organizationNotSet": "The organisation identity has not been set. Run bootstrap with the \"node-identity\" feature first."
 		},
 		"identityCreate": {
-			"invalidMnemonic": "The mnemonic is invalid, it should be 24 words from the standard wordlist."
+			"invalidMnemonic": "The mnemonic is invalid, it should be 24 words from the standard wordlist.",
+			"nodeOrganizationIdNotAvailableInMultiTenantMode": "The node-organization-id option is not available in multi-tenant mode, use tenant-organization-id instead."
 		},
 		"identityImport": {
 			"identityNotFound": "The identity was not found, it must be created on-chain already.",
@@ -31,11 +35,6 @@
 			"subjectJsonLoadFailed": "Failed to load subject JSON from file: \"{subjectFilename}\""
 		},
 		"tenantCreate": {
-			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
-		},
-		"tenantToken": {
-			"tenantIdOrApiKeyRequired": "Either a tenant ID or an API key must be provided.",
-			"urlTransformerComponentNotRegistered": "The URL transformer component is not registered, ensure the node is configured correctly.",
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
 		"tenantImport": {
@@ -57,6 +56,17 @@
 		},
 		"nodeSetIdentity": {
 			"identityNotFound": "The identity with DID \"{notFoundId}\" was not found in the system."
+		},
+		"setNodeOrgId": {
+			"notAvailableInMultiTenantMode": "The set-node-org-id command is not available in multi-tenant mode, use set-tenant-org-id instead."
+		},
+		"applyOrganizationIdToTenant": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
+			"organizationIdAlreadyInUse": "The organization ID \"{organizationId}\" is already assigned to tenant \"{conflictingTenantId}\"."
+		},
+		"removeTenantOrgAlias": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
+			"aliasNotFound": "The alias \"{alias}\" was not found in the tenant organization legacy list."
 		}
 	},
 	"node": {
@@ -71,6 +81,7 @@
 		"extensionHttpsDownloading": "Downloading HTTPS extension",
 		"extensionCacheExpired": "Cache expired for extension: {url}",
 		"extensionForceRefresh": "Force refresh enabled for extension: {url}",
+		"tenantOrganizationIdAutoAssigned": "Legacy migration: automatically assigned organization ID \"{organizationId}\" to tenant \"{tenantId}\".",
 		"cli": {
 			"commands": {
 				"command": "Command",
@@ -99,16 +110,18 @@
 					"labels": {
 						"nodeIdentityCreate": "Creating node identity",
 						"nodeAuthKeyCreate": "Creating node auth key",
-						"trustVerificationMethodCreate": "Creating trust verification method for node identity",
+						"trustVerificationMethodCreate": "Creating trust verification method for organisation identity",
 						"nodeIdentitySet": "Setting node identity",
 						"nodeTenantCreate": "Creating node tenant",
 						"organisationCreate": "Creating organisation identity",
 						"blobStorageKeyCreate": "Creating blob storage encryption key for organisation identity",
 						"attestationMethodCreate": "Creating attestation method for organisation identity",
 						"immutableProofMethodCreate": "Creating immutable proof method for organisation identity",
+						"nodeOrganizationIdSet": "Setting node organisation ID",
+						"tenantOrganizationIdSet": "Setting tenant organisation ID",
 						"adminIdentityCreate": "Creating admin user identity",
 						"adminUserCreate": "Creating admin user",
-						"urlTransformParamKeyAdd": "Adding URL transform parameter encryption key"
+						"tenantFallback": "No Node-labelled tenant found; using first available tenant"
 					}
 				},
 				"identity-create": {
@@ -141,6 +154,12 @@
 						},
 						"output-env-prefix": {
 							"description": "Prefix to use for variables in the output .env file."
+						},
+						"node-organization-id": {
+							"description": "If true, set the created identity DID as the node organization ID (not available in multi-tenant mode)."
+						},
+						"tenant-organization-id": {
+							"description": "The tenant ID to set the created identity DID as the organization ID for (requires multi-tenant mode)."
 						}
 					},
 					"labels": {
@@ -335,7 +354,7 @@
 				},
 				"tenant-create": {
 					"description": "Create a tenant with associated api key",
-					"example": "tenant-create --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
+					"example": "tenant-create --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --organization-id=\"did:iota:...\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -345,6 +364,9 @@
 						},
 						"api-key": {
 							"description": "The API key to associate with the tenant id. If not provided, a random key will be generated."
+						},
+						"organization-id": {
+							"description": "The organization DID to associate with the tenant."
 						},
 						"label": {
 							"description": "A descriptive label for the tenant."
@@ -369,6 +391,7 @@
 						"creating": "Creating tenant",
 						"tenantId": "Tenant ID",
 						"apiKey": "API Key",
+						"organizationId": "Organization ID",
 						"label": "Label",
 						"publicOrigin": "Public Origin"
 					}
@@ -427,30 +450,6 @@
 					"labels": {
 						"updating": "Updating tenant",
 						"updated": "Updated tenant"
-					}
-				},
-				"tenant-token": {
-					"description": "Generate the x-enc-tenant-token token value for a tenant",
-					"example": "tenant-token --tenant-id=\"0011..aabb\"",
-					"params": {
-						"tenant-id": {
-							"description": "The tenant ID to generate the token for."
-						},
-						"api-key": {
-							"description": "The API key to look up the tenant ID from."
-						},
-						"load-env": {
-							"description": "Comma separated list of paths to .env files to read input parameters from."
-						},
-						"output-json": {
-							"description": "Path to a .json file to store the command output."
-						}
-					},
-					"labels": {
-						"lookingUp": "Looking up tenant",
-						"generating": "Generating tenant token",
-						"tenantId": "Tenant ID",
-						"token": "Token"
 					}
 				},
 				"user-create": {
@@ -593,6 +592,69 @@
 						"publicKeyBase64": "Public Key Base64",
 						"privateKeyHex": "Private Key Hex",
 						"publicKeyHex": "Public Key Hex"
+					}
+				},
+				"set-node-org-id": {
+					"description": "Set the node organization ID",
+					"example": "set-node-org-id --organization-id=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"organization-id": {
+							"description": "The organization DID to set as the node organization ID."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"stored": "The node organization ID has been stored"
+					}
+				},
+				"set-tenant-org-id": {
+					"description": "Set the organization ID for a tenant",
+					"example": "set-tenant-org-id --tenant-id=\"0011..aabb\" --organization-id=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to update."
+						},
+						"organization-id": {
+							"description": "The organization DID to set as the tenant organization ID."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating tenant organization ID",
+						"stored": "The tenant organization ID has been stored"
+					}
+				},
+				"remove-tenant-org-alias": {
+					"description": "Remove an alias from the tenant organization ID legacy list",
+					"example": "remove-tenant-org-alias --tenant-id=\"0011..aabb\" --alias=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to update."
+						},
+						"alias": {
+							"description": "The organization DID alias to remove from the legacy list."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"reading": "Reading tenant",
+						"updating": "Removing alias from tenant organization legacy list",
+						"removed": "The alias has been removed from the tenant organization legacy list"
 					}
 				},
 				"vault-key-import": {

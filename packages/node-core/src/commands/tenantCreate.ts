@@ -5,6 +5,8 @@ import { TenantIdHelper } from "@twin.org/api-tenant-processor";
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
+import { Did } from "@twin.org/identity-models";
+import { assertOrganizationIdUnique } from "./setTenantOrgId.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
@@ -47,6 +49,15 @@ export function getCommandDefinitionTenantCreate(commandDefinitions: {
 					"node.cli.commands.tenant-create.params.api-key.description"
 				),
 				required: false
+			},
+			{
+				key: "organization-id",
+				type: "string",
+				extendedType: "did",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-create.params.organization-id.description"
+				),
+				required: true
 			},
 			{
 				key: "public-origin",
@@ -107,6 +118,7 @@ export function getCommandDefinitionTenantCreate(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.apiKey The api key to add.
  * @param params.tenantId The tenant ID to add the api key to.
+ * @param params.organizationId The organization DID to associate with the tenant.
  * @param params.label The label for the api key.
  * @param params.publicOrigin The public URL origin for the tenant.
  * @param params.outputJson The output .json file to store the command output.
@@ -120,19 +132,30 @@ export async function tenantCreate(
 	params: {
 		apiKey?: string;
 		tenantId?: string;
+		organizationId?: string;
 		label?: string;
 		publicOrigin?: string;
 		outputJson?: string;
 		outputEnv?: string;
 		outputEnvPrefix?: string;
 	}
-): Promise<{ apiKey: string; tenantId: string; label: string; publicOrigin: string }> {
+): Promise<{
+	apiKey: string;
+	tenantId: string;
+	organizationId?: string;
+	label: string;
+	publicOrigin: string;
+}> {
 	if (Is.stringValue(params.tenantId)) {
 		Guards.stringHexLength("tenantCreate", "tenant-id", params.tenantId, 32);
 	}
 
 	if (Is.stringValue(params.apiKey)) {
 		Guards.stringHexLength("tenantCreate", "api-key", params.apiKey, 32);
+	}
+
+	if (Is.stringValue(params.organizationId)) {
+		Did.guard("tenantCreate", "organization-id", params.organizationId);
 	}
 
 	if (Is.stringValue(params.publicOrigin)) {
@@ -150,15 +173,21 @@ export async function tenantCreate(
 		tenantAdminServiceComponentType
 	);
 
+	if (Is.stringValue(params.organizationId)) {
+		await assertOrganizationIdUnique(tenantAdminService, params.organizationId);
+	}
+
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-create.labels.creating"));
 
 	const apiKey = params.apiKey ?? TenantIdHelper.generateApiKey();
 	const tenantId = params.tenantId ?? TenantIdHelper.generateTenantId();
+	const organizationId = params.organizationId;
 	const label = params.label ?? "";
 	const publicOrigin = params.publicOrigin ?? "";
 	await tenantAdminService.create({
 		id: tenantId,
 		apiKey,
+		organizationId,
 		label,
 		publicOrigin
 	});
@@ -166,6 +195,12 @@ export async function tenantCreate(
 	CLIDisplay.break();
 	CLIDisplay.value(I18n.formatMessage("node.cli.commands.tenant-create.labels.tenantId"), tenantId);
 	CLIDisplay.value(I18n.formatMessage("node.cli.commands.tenant-create.labels.apiKey"), apiKey);
+	if (Is.stringValue(organizationId)) {
+		CLIDisplay.value(
+			I18n.formatMessage("node.cli.commands.tenant-create.labels.organizationId"),
+			organizationId
+		);
+	}
 	CLIDisplay.value(I18n.formatMessage("node.cli.commands.tenant-create.labels.label"), label);
 	CLIDisplay.value(
 		I18n.formatMessage("node.cli.commands.tenant-create.labels.publicOrigin"),
@@ -173,22 +208,37 @@ export async function tenantCreate(
 	);
 	CLIDisplay.break();
 
-	const json = { apiKey, tenantId, label, publicOrigin };
+	const json: {
+		apiKey: string;
+		tenantId: string;
+		organizationId?: string;
+		label: string;
+		publicOrigin: string;
+	} = {
+		apiKey,
+		tenantId,
+		label,
+		publicOrigin
+	};
+	if (Is.stringValue(organizationId)) {
+		json.organizationId = organizationId;
+	}
 	if (Is.stringValue(params.outputJson)) {
 		await CLIUtils.writeJsonFile(params.outputJson, json, false);
 	}
 
 	if (Is.stringValue(params.outputEnv)) {
-		await CLIUtils.writeEnvFile(
-			params.outputEnv,
-			[
-				`${params.outputEnvPrefix}API_KEY="${apiKey}"`,
-				`${params.outputEnvPrefix}TENANT_ID="${tenantId}"`,
-				`${params.outputEnvPrefix}LABEL="${label}"`,
-				`${params.outputEnvPrefix}PUBLIC_ORIGIN="${publicOrigin}"`
-			],
-			false
-		);
+		const prefix = params.outputEnvPrefix ?? "";
+		const envLines = [
+			`${prefix}API_KEY="${apiKey}"`,
+			`${prefix}TENANT_ID="${tenantId}"`,
+			`${prefix}LABEL="${label}"`,
+			`${prefix}PUBLIC_ORIGIN="${publicOrigin}"`
+		];
+		if (Is.stringValue(organizationId)) {
+			envLines.splice(2, 0, `${prefix}ORGANIZATION_ID="${organizationId}"`);
+		}
+		await CLIUtils.writeEnvFile(params.outputEnv, envLines, false);
 	}
 
 	CLIDisplay.done();

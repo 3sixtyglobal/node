@@ -8,10 +8,10 @@ import type { IEngineCore } from "@twin.org/engine-models";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
 import { nodeSetIdentity } from "./nodeSetIdentity.js";
+import { applyOrganizationIdToTenant } from "./setTenantOrgId.js";
 import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
-import { isTrustRequired, isUrlTransformerRequired } from "../builders/engineEnvBuilder.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
@@ -31,6 +31,7 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.bootstrap-legacy.description"),
 		example: I18n.formatMessage("node.cli.commands.bootstrap-legacy.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",
@@ -89,12 +90,12 @@ export async function bootstrapLegacy(
 		tenantApiKey?: string;
 
 		/**
-		 * If the node-admin-user feature is enabled, this will be the organization of the user, if one is not provided it will be generated
+		 * If the node-identity feature is enabled, this will be the organisation identity. If not provided it will be generated.
 		 */
 		organizationIdentity?: string;
 
 		/**
-		 * The mnemonic for the organization, if empty and node-admin-user feature is enabled it will be randomly generated.
+		 * The mnemonic for the organisation, if empty and node-identity feature is enabled it will be randomly generated.
 		 */
 		organizationMnemonic?: string;
 
@@ -161,40 +162,53 @@ export async function bootstrapLegacy(
 			overwriteMode: "skip"
 		});
 
-		if (isTrustRequired(envVars)) {
-			CLIDisplay.break();
-			CLIDisplay.section(
-				I18n.formatMessage(
-					"node.cli.commands.bootstrap-legacy.labels.trustVerificationMethodCreate"
-				)
-			);
-
-			await identityVerificationMethodCreate(engineCore, envVars, {
-				identity: nodeIdentity.did,
-				verificationMethodType: "assertionMethod",
-				verificationMethodId: envVars.trustVerificationMethodId,
-				overwriteMode: "skip"
-			});
-		}
-
-		if (isUrlTransformerRequired(envVars)) {
-			CLIDisplay.break();
-			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.urlTransformParamKeyAdd")
-			);
-			await vaultKeyCreate(engineCore, envVars, {
-				identity: nodeIdentity.did,
-				keyType: "ChaCha20Poly1305",
-				keyId: envVars.urlTransformerEncryptionKeyId
-			});
-		}
-
 		CLIDisplay.break();
 		CLIDisplay.section(
 			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeIdentitySet")
 		);
 		await nodeSetIdentity(engineCore, envVars, {
 			identity: nodeId
+		});
+
+		// Always create the organisation identity first so it can be associated with
+		// the tenant (multi-tenant) or the node (single-tenant) immediately after.
+		// The trust verification method is always added to the organisation identity.
+		let orgDid: string | undefined;
+		await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
+			CLIDisplay.break();
+			CLIDisplay.section(
+				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.organisationCreate")
+			);
+			const organisation = await identityCreate(engineCore, envVars, {
+				identity: envVars.organizationIdentity,
+				mnemonic: envVars.organizationMnemonic,
+				fundWallet: requireWallet
+			});
+			orgDid = organisation.did;
+
+			CLIDisplay.break();
+			CLIDisplay.section(
+				I18n.formatMessage(
+					"node.cli.commands.bootstrap-legacy.labels.trustVerificationMethodCreate"
+				)
+			);
+			await identityVerificationMethodCreate(engineCore, envVars, {
+				identity: organisation.did,
+				verificationMethodType: "assertionMethod",
+				verificationMethodId: envVars.trustVerificationMethodId,
+				overwriteMode: "skip"
+			});
+
+			// Always record the bootstrapped org DID in state so callers can reference it.
+			if (!Is.stringValue(state.nodeOrganizationId)) {
+				CLIDisplay.break();
+				CLIDisplay.section(
+					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeOrganizationIdSet")
+				);
+				state.nodeOrganizationId = organisation.did;
+				engineCore.setStateDirty();
+				CLIDisplay.done();
+			}
 		});
 
 		if (tenantEnabled) {
@@ -210,6 +224,15 @@ export async function bootstrapLegacy(
 				});
 
 				tenantId = tenantDetails.tenantId;
+
+				if (Is.stringValue(orgDid)) {
+					await applyOrganizationIdToTenant(engineCore, tenantId, orgDid, {
+						sectionLabel: I18n.formatMessage(
+							"node.cli.commands.bootstrap-legacy.labels.tenantOrganizationIdSet"
+						),
+						required: false
+					});
+				}
 			});
 		}
 	} else if (tenantEnabled && Is.empty(tenantId) && Is.stringValue(nodeId)) {
@@ -222,15 +245,8 @@ export async function bootstrapLegacy(
 		await ContextIdStore.run(
 			{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenantId },
 			async () => {
-				CLIDisplay.break();
-				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.organisationCreate")
-				);
-				const organisation = await identityCreate(engineCore, envVars, {
-					identity: envVars.organizationIdentity,
-					mnemonic: envVars.organizationMnemonic,
-					fundWallet: requireWallet
-				});
+				// Resolve the organisation DID that was created during node-identity bootstrap.
+				const orgDid = await resolveOrganizationDid(engineCore, tenantEnabled, tenantId);
 
 				if (Coerce.boolean(envVars.blobStorageEnableEncryption) ?? false) {
 					CLIDisplay.break();
@@ -238,7 +254,7 @@ export async function bootstrapLegacy(
 						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.blobStorageKeyCreate")
 					);
 					await vaultKeyCreate(engineCore, envVars, {
-						identity: organisation.did,
+						identity: orgDid,
 						keyType: "ChaCha20Poly1305",
 						keyId: envVars.blobStorageEncryptionKeyId,
 						overwriteMode: "skip"
@@ -253,7 +269,7 @@ export async function bootstrapLegacy(
 						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.attestationMethodCreate")
 					);
 					await identityVerificationMethodCreate(engineCore, envVars, {
-						identity: organisation.did,
+						identity: orgDid,
 						verificationMethodType: "assertionMethod",
 						verificationMethodId: envVars.attestationVerificationMethodId,
 						overwriteMode: "skip"
@@ -271,7 +287,7 @@ export async function bootstrapLegacy(
 						)
 					);
 					await identityVerificationMethodCreate(engineCore, envVars, {
-						identity: organisation.did,
+						identity: orgDid,
 						verificationMethodType: "assertionMethod",
 						verificationMethodId: envVars.immutableProofVerificationMethodId,
 						overwriteMode: "skip"
@@ -285,7 +301,7 @@ export async function bootstrapLegacy(
 				const adminUserIdentity = await identityCreate(engineCore, envVars, {
 					identity: envVars.adminUserIdentity,
 					mnemonic: envVars.adminUserMnemonic,
-					controller: organisation.did
+					controller: orgDid
 				});
 
 				CLIDisplay.break();
@@ -294,7 +310,7 @@ export async function bootstrapLegacy(
 				);
 				await userCreate(engineCore, envVars, {
 					userIdentity: adminUserIdentity.did,
-					organizationIdentity: organisation.did,
+					organizationIdentity: orgDid,
 					tenantId,
 					email: envVars.adminUserName ?? "admin@node",
 					password: envVars.adminUserPassword,
@@ -306,6 +322,43 @@ export async function bootstrapLegacy(
 			}
 		);
 	}
+}
+
+/**
+ * Resolve the organisation DID from node state (single-tenant) or the tenant entry (multi-tenant).
+ * @param engineCore The engine core.
+ * @param tenantEnabled Whether multi-tenancy is enabled.
+ * @param tenantId The active tenant ID (multi-tenant only).
+ * @returns The organisation DID.
+ * @throws GeneralError if the organisation has not been associated yet.
+ * @internal
+ */
+async function resolveOrganizationDid(
+	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
+	tenantEnabled: boolean,
+	tenantId: string | undefined
+): Promise<string> {
+	if (tenantEnabled) {
+		if (Is.stringValue(tenantId)) {
+			const tenantAdminComponentType =
+				engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
+			if (Is.stringValue(tenantAdminComponentType)) {
+				const tenantAdminComponent =
+					ComponentFactory.get<ITenantAdminComponent>(tenantAdminComponentType);
+				const tenant = await tenantAdminComponent.get(tenantId);
+				if (Is.stringValue(tenant.organizationId)) {
+					return tenant.organizationId;
+				}
+			}
+		}
+	} else {
+		const state = engineCore.getState();
+		if (Is.stringValue(state.nodeOrganizationId)) {
+			return state.nodeOrganizationId;
+		}
+	}
+
+	throw new GeneralError("bootstrapLegacy", "organizationNotSet");
 }
 
 /**
@@ -332,7 +385,7 @@ async function resolveBootstrapTenantId(
 	let firstTenantId: string | undefined;
 
 	do {
-		const result = await tenantAdminService.query(["id", "label"], cursor);
+		const result = await tenantAdminService.query(undefined, ["id", "label"], cursor);
 		const nodeTenant = result.tenants.find(tenant => tenant.label === "Node");
 		if (nodeTenant) {
 			return nodeTenant.id;
@@ -344,6 +397,13 @@ async function resolveBootstrapTenantId(
 
 		cursor = result.cursor;
 	} while (Is.stringValue(cursor));
+
+	if (Is.stringValue(firstTenantId)) {
+		CLIDisplay.value(
+			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.tenantFallback"),
+			firstTenantId
+		);
+	}
 
 	return firstTenantId;
 }

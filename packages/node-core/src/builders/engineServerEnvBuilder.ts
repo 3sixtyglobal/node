@@ -149,6 +149,10 @@ export async function buildEngineServerConfiguration(
 
 	if (tenantEnabled) {
 		availableContextIdKeys.push({
+			key: ContextIdKeys.Organization,
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		});
+		availableContextIdKeys.push({
 			key: ContextIdKeys.Tenant,
 			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
 		});
@@ -164,6 +168,18 @@ export async function buildEngineServerConfiguration(
 			options: {
 				config: {}
 			}
+		});
+	} else if (nodeIdentityEnabled) {
+		availableContextIdKeys.push({
+			key: ContextIdKeys.Organization,
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		});
+
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.SingleTenant
+		});
+		serverConfig.types.socketRouteProcessor.push({
+			type: SocketRouteProcessorType.SingleTenant
 		});
 	}
 
@@ -241,10 +257,6 @@ export async function buildEngineServerConfiguration(
 
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
 		if (nodeIdentityEnabled) {
-			availableContextIdKeys.push({
-				key: ContextIdKeys.Organization,
-				requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
-			});
 			availableContextIdKeys.push({
 				key: ContextIdKeys.User,
 				requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]

@@ -286,7 +286,7 @@ export async function buildConfiguration(
 	}
 
 	// Build the engine configuration from the environment variables.
-	const coreConfig = await buildEngineConfiguration(envVars, availableContextIdKeys);
+	const coreConfig = await buildEngineConfiguration(envVars);
 	const engineServerConfig = await buildEngineServerConfiguration(
 		envVars,
 		availableContextIdKeys,

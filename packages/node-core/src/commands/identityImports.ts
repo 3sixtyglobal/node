@@ -25,6 +25,7 @@ export function getCommandDefinitionIdentityImport(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.identity-import.description"),
 		example: I18n.formatMessage("node.cli.commands.identity-import.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",

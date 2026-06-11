@@ -33,6 +33,7 @@ export function getCommandDefinitionIdentityVerificationMethodCreate(commandDefi
 		),
 		example: I18n.formatMessage("node.cli.commands.identity-verification-method-create.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",

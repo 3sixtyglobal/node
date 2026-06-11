@@ -2,8 +2,9 @@
 	"group": "Rights Management - Negotiations",
 	"steps": [
 		{
-			"description": "POST /rights-management/negotiations/request — 401 missing tenant token",
-			"skipIfTenantParamOmitted": true,
+			"description": "POST /rights-management/negotiations/request — 400 without organization context",
+			"skipIfOrgParamOmitted": true,
+			"appendOrgParam": false,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
 			"headers": {
@@ -20,11 +21,11 @@
 					"@id": "{{offerPolicyId}}"
 				}
 			},
-			"expectedStatus": 401
+			"expectedStatus": 400
 		},
 		{
 			"description": "POST /rights-management/negotiations/request — 400 missing consumerPid",
-			"appendTenantParam": true,
+			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
 			"headers": {
@@ -44,7 +45,7 @@
 		},
 		{
 			"description": "POST /rights-management/negotiations/request — initiate negotiation",
-			"appendTenantParam": true,
+			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
 			"headers": {
@@ -66,7 +67,7 @@
 		},
 		{
 			"description": "GET /rights-management/negotiations/:id",
-			"appendTenantParam": true,
+			"appendOrgParam": true,
 			"method": "GET",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}",
 			"headers": {
@@ -77,7 +78,7 @@
 		},
 		{
 			"description": "POST /rights-management/negotiations/:id/request — consumer counter-request",
-			"appendTenantParam": true,
+			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/request",
 			"headers": {
@@ -99,7 +100,7 @@
 		},
 		{
 			"description": "POST /rights-management/negotiations/:id/termination — terminate negotiation",
-			"appendTenantParam": true,
+			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/termination",
 			"headers": {

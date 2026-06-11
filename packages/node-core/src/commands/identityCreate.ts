@@ -18,6 +18,7 @@ import { nameofKebabCase } from "@twin.org/nameof";
 import { type IVaultConnector, VaultConnectorFactory } from "@twin.org/vault-models";
 import type { WalletAddress } from "@twin.org/wallet-connector-entity-storage";
 import { WalletConnectorFactory } from "@twin.org/wallet-models";
+import { applyOrganizationIdToTenant } from "./setTenantOrgId.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
@@ -37,6 +38,7 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.identity-create.description"),
 		example: I18n.formatMessage("node.cli.commands.identity-create.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",
@@ -113,6 +115,24 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
 					"node.cli.commands.identity-create.params.output-env-prefix.description"
 				),
 				required: false
+			},
+			{
+				key: "node-organization-id",
+				type: "boolean",
+				description: I18n.formatMessage(
+					"node.cli.commands.identity-create.params.node-organization-id.description"
+				),
+				required: false,
+				defaultValue: false
+			},
+			{
+				key: "tenant-organization-id",
+				type: "string",
+				extendedType: "hex(32)",
+				description: I18n.formatMessage(
+					"node.cli.commands.identity-create.params.tenant-organization-id.description"
+				),
+				required: false
 			}
 		],
 		action: async (engineCore, envVars, params) => identityCreate(engineCore, envVars, params)
@@ -128,6 +148,8 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
  * @param params.identity The DID of the identity to create.
  * @param params.controller The controller DID for the identity.
  * @param params.fundWallet Whether to fund the wallet associated with the identity from a faucet.
+ * @param params.nodeOrganizationId If true, set the created DID as the node organization ID.
+ * @param params.tenantOrganizationId The tenant ID to set the created DID as the organization ID for.
  * @param params.outputJson The output .json file to store the command output.
  * @param params.outputEnv The output .env file to store the command output.
  * @param params.outputEnvPrefix The prefix to use for variables in the output .env file.
@@ -141,6 +163,8 @@ export async function identityCreate(
 		identity?: string;
 		controller?: string;
 		fundWallet?: boolean;
+		nodeOrganizationId?: boolean;
+		tenantOrganizationId?: string;
 		outputJson?: string;
 		outputEnv?: string;
 		outputEnvPrefix?: string;
@@ -180,6 +204,19 @@ export async function identityCreate(
 			await mnemonicFinalise(vaultConnector, tempIdentity, workingIdentity);
 
 			await walletFinalise(engineCore, workingIdentity, walletAddress);
+		}
+
+		if (params.nodeOrganizationId) {
+			if (Coerce.boolean(envVars.tenantEnabled)) {
+				throw new GeneralError("identityCreate", "nodeOrganizationIdNotAvailableInMultiTenantMode");
+			}
+			const state = engineCore.getState();
+			state.nodeOrganizationId = workingIdentity;
+			engineCore.setStateDirty();
+		}
+
+		if (Is.stringValue(params.tenantOrganizationId)) {
+			await applyOrganizationIdToTenant(engineCore, params.tenantOrganizationId, workingIdentity);
 		}
 
 		CLIDisplay.break();

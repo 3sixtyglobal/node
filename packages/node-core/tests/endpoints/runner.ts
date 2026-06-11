@@ -39,7 +39,7 @@ export async function runGroup(group: GroupDefinition, ctx: RunnerContext): Prom
 	for (const step of group.steps) {
 		if (step.skip) {
 			console.debug(`  [SKIP] ${step.description}: ${step.skip}`);
-		} else if (step.skipIfTenantParamOmitted && ctx.appendTenantParam === false) {
+		} else if (step.skipIfOrgParamOmitted && ctx.isSingleTenant === true) {
 			console.debug(`  [SKIP] ${step.description}: not applicable in single-tenant mode`);
 		} else {
 			await runStep(step, ctx);
@@ -146,10 +146,14 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 	const useApiKey = step.apiKey === true;
 
 	let resolvedPath = interpolatePath(step.path, ctx.vars);
-	if (step.appendTenantParam && ctx.appendTenantParam !== false) {
-		const token = encodeURIComponent(ctx.vars.tenantToken ?? "");
+	if (
+		step.appendOrgParam !== false &&
+		!useApiKey &&
+		ctx.appendOrgParam !== false &&
+		Is.stringValue(ctx.vars.organizationId)
+	) {
 		const sep = resolvedPath.includes("?") ? "&" : "?";
-		resolvedPath += `${sep}x-enc-tenant-token=${token}`;
+		resolvedPath += `${sep}organization=${encodeURIComponent(ctx.vars.organizationId)}`;
 	}
 	const urlStr = `${ctx.baseUrl}${resolvedPath}`;
 
@@ -251,7 +255,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 				captured = responseText;
 			} else if (spec.startsWith("jwt-claim:")) {
 				// Decode the current authToken JWT and extract a payload claim without
-				// signature verification — e.g. "jwt-claim:tid" yields the encrypted tenant ID.
+				// signature verification — e.g. "jwt-claim:org" yields the organization DID.
 				const claimKey = spec.slice(10);
 				const jwt = ctx.authToken;
 				if (Is.stringValue(jwt)) {

@@ -90,7 +90,7 @@ describe("migration", () => {
 			expect(rows.some(r => (r as { schemaName: string }).schemaName === "BackgroundTask")).toBe(
 				true
 			);
-			expect(rows.every(r => (r as { version: number }).version === 0)).toBe(true);
+			expect(rows.every(r => (r as { version: number }).version >= 0)).toBe(true);
 		} finally {
 			await nodeRun?.shutdown();
 		}

@@ -32,9 +32,11 @@ identity-verification-method-create: Create an identity verification method
 identity-verification-method-import: Import an identity verification method
 identity-verifiable-credential-create: Create a verifiable credential
 node-set-identity: Set the node identity
+remove-tenant-org-alias: Remove an alias from the tenant organization ID legacy list
+set-node-org-id: Set the node organization ID
+set-tenant-org-id: Set the organization ID for a tenant
 tenant-create: Create a tenant with associated api key
 tenant-import: Import a tenant with associated api key
-tenant-token: Generate the x-enc-tenant-token token value for a tenant
 tenant-update: Update a tenant with associated api key
 user-create: Create a user
 user-update: Update a user
@@ -115,22 +117,22 @@ twin-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID -
 twin-node vault-key-import --load-env="node-identity.env,node-auth-key.json" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
 ```
 
-### Add a key associated with the node identity for use in hosting param encryption
-
-```shell
-twin-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID --key-id=!TWIN_URL_TRANSFORMER_ENCRYPTION_KEY_ID --key-type=ChaCha20Poly1305 --output-json="node-hosting-param-key.json" --output-env="node-hosting-param.env"
-```
-
 ### Import an existing key associated with the node identity for use in authentication signing
 
 ```shell
 twin-node vault-key-import --load-env="node-identity.env,my-key.json" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
 ```
 
+### Create an organisation identity
+
+```shell
+twin-node identity-create --load-env="node-identity.env" --fund-wallet=true --output-json="organization-identity.json" --output-env="organization-identity.env" --output-env-prefix=organization
+```
+
 ### Create a tenant to be used by the node
 
 ```shell
-twin-node tenant-create --label="node" --public-origin="https://api.example.com" --output-env-prefix=node --output-json="node-tenant.json" --output-env="node-tenant.env"
+twin-node tenant-create --load-env="organization-identity.env" --label="node" --public-origin="https://api.example.com" --organization-id=!ORGANIZATION_DID --output-env-prefix=node --output-json="node-tenant.json" --output-env="node-tenant.env"
 ```
 
 ### Import a tenant to be used by the node
@@ -145,10 +147,22 @@ twin-node tenant-import --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_I
 twin-node tenant-update --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --label="New Label"
 ```
 
-### Create an organisation identity
+### Set the organization ID on the node
 
 ```shell
-twin-node identity-create --load-env="node-identity.env" --fund-wallet=true --output-json="organization-identity.json" --output-env="organization-identity.env" --output-env-prefix=organization
+twin-node set-node-org-id --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
+```
+
+### Set the organization ID on a tenant
+
+```shell
+twin-node set-tenant-org-id --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
+```
+
+### Remove an alias from the tenant organization ID legacy list
+
+```shell
+twin-node remove-tenant-org-alias --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --alias=!OLD_ORGANIZATION_DID
 ```
 
 ### Add a verification method to the organisation identity for attestation

@@ -25,7 +25,7 @@ import {
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import { TrustHelper, type ITrustComponent } from "@twin.org/trust-models";
+import type { ITrustComponent } from "@twin.org/trust-models";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 import { loadAndRunGroups } from "./endpoints/runner.js";
@@ -120,7 +120,7 @@ describe("node-core", () => {
 		// Phase 2: Start the server using the bootstrapped identity/tenant state.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("../../apps/node/docs/open-api/spec.json"),
+			openApiSpecFile: path.resolve("./tests/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: bootstrapState.nodeId
 			}),
@@ -135,10 +135,9 @@ describe("node-core", () => {
 
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
 		const trustBearerToken = await trustComponent.generate(
-			bootstrapState.nodeId ?? "",
+			bootstrapState.nodeOrganizationId ?? "",
 			undefined,
-			{ subject: {} },
-			TrustHelper.hashTenantId(TEST_TENANT_ID)
+			{ subject: {} }
 		);
 
 		const serverStartTime = Date.now();
@@ -149,7 +148,7 @@ describe("node-core", () => {
 				baseUrl: `http://localhost:${TEST_PORT}`,
 				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
 				authToken: "",
-				appendTenantParam: true,
+				appendOrgParam: true,
 				vars: {
 					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
 					adminEmail: TEST_ADMIN_EMAIL,
@@ -209,12 +208,13 @@ describe("node-core", () => {
 
 		Factory.clearFactories();
 
-		// Phase 2: Start the server using the bootstrapped identity state.
+		// Phase 2: Start the server using the bootstrapped identity/org state.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("../../apps/node/docs/open-api/spec.json"),
+			openApiSpecFile: path.resolve("./tests/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
-				nodeId: bootstrapState.nodeId
+				nodeId: bootstrapState.nodeId,
+				nodeOrganizationId: bootstrapState.nodeOrganizationId
 			}),
 			envVars: singleTenantEnvVars
 		});
@@ -227,10 +227,9 @@ describe("node-core", () => {
 
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
 		const trustBearerToken = await trustComponent.generate(
-			bootstrapState.nodeId ?? "",
+			bootstrapState.nodeOrganizationId ?? "",
 			undefined,
-			{ subject: {} },
-			undefined
+			{ subject: {} }
 		);
 
 		const serverStartTime = Date.now();
@@ -241,7 +240,7 @@ describe("node-core", () => {
 				baseUrl: `http://localhost:${TEST_PORT_ST}`,
 				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
 				authToken: "",
-				appendTenantParam: false,
+				isSingleTenant: true,
 				vars: {
 					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
 					adminEmail: TEST_ADMIN_EMAIL,

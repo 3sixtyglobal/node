@@ -45,6 +45,8 @@ import { initialiseLocales } from "../src/utils.js";
 
 const TEST_NODE_ID =
 	"did:iota:testnet:0x8f7b71cedde408974606e404bce76980fd17a570d03ec319788fefd5eabbe9e8";
+const TEST_NODE_ORG_ID =
+	"did:iota:testnet:0x7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b";
 const TEST_NODE_TENANT_ID = "4cfc10fd12d2a206f681ea9b01b306c0";
 
 const basePort = Math.floor(Math.random() * 1000);
@@ -66,11 +68,12 @@ describe("node-core", () => {
 	test("Can run the node with minimal config and shut it down", async () => {
 		const result = await run({
 			localesDirectory: "./dist/locales/",
-			stateStorage: new MemoryStateStorage(false, {}),
+			stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_NODE_ORG_ID }),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
-				TWIN_NODE_IDENTITY_ENABLED: "false"
+				TWIN_NODE_IDENTITY_ENABLED: "false",
+				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 			}
 		});
 		expect(result).toBeDefined();
@@ -81,7 +84,7 @@ describe("node-core", () => {
 	test("Can run the node with config with no node id", async () => {
 		const result = await run({
 			localesDirectory: "./dist/locales/",
-			stateStorage: new MemoryStateStorage(false, {}),
+			stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_NODE_ORG_ID }),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
@@ -123,7 +126,8 @@ describe("node-core", () => {
 		const result = await run({
 			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, {
-				nodeId: TEST_NODE_ID
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
 			}),
 			envVars: {
 				TWIN_DEBUG: "true",
@@ -162,7 +166,7 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
@@ -219,7 +223,7 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
@@ -235,13 +239,15 @@ describe("node-core", () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
-			TWIN_PORT: port.toString()
+			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
@@ -266,6 +272,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"platform-service",
 			"did-context-id-handler",
 			"information-service",
 			"hosting-service"
@@ -322,7 +329,7 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-example",
+			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 			TWIN_DATASPACE_ENABLED: "true",
 			TWIN_MESSAGING_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
@@ -333,7 +340,8 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage<INodeEngineState>(false, {
-			nodeId: TEST_NODE_ID
+			nodeId: TEST_NODE_ID,
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -374,6 +382,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"platform-service",
 			"logging-service",
 			"background-task-service",
 			"task-scheduler-service",
@@ -395,7 +404,6 @@ describe("node-core", () => {
 			"auditable-item-stream-service",
 			"data-processing-service",
 			"health-service",
-			"url-transformer-service",
 			"document-management-service",
 			"trust-service",
 			"policy-administration-point-service",
@@ -517,6 +525,7 @@ describe("node-core", () => {
 			"PUT      /aig/:id",
 			"PATCH    /aig/:id",
 			"GET      /aig",
+			"DELETE   /aig/:id/proof",
 			"POST     /ais",
 			"GET      /ais/:id",
 			"PUT      /ais/:id",
@@ -532,6 +541,7 @@ describe("node-core", () => {
 			"GET      /ais/entries",
 			"GET      /ais/:id/entries/objects",
 			"GET      /ais/entries/objects",
+			"DELETE   /ais/:id/proof",
 			"PUT      /data-processing/rule-group/:id",
 			"GET      /data-processing/rule-group/:id",
 			"DELETE   /data-processing/rule-group/:id",
@@ -596,7 +606,7 @@ describe("node-core", () => {
 		if (startResult?.engine) {
 			expect(DataspaceAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
 
-			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByExample"]);
+			expect(FederatedCatalogueFilterFactory.names()).toEqual(["FilterByMetadata"]);
 
 			expect(PolicyArbiterFactory.names()).toEqual(["pass-through-policy-arbiter"]);
 			expect(PolicyEnforcementProcessorFactory.names()).toEqual([
@@ -661,7 +671,8 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage<INodeEngineState>(false, {
-			nodeId: TEST_NODE_ID
+			nodeId: TEST_NODE_ID,
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
@@ -687,7 +698,8 @@ describe("node-core", () => {
 			const mem = await memoryStateStorage.load(startResult?.engine);
 
 			const memoryStateStorage2 = new MemoryStateStorage<INodeEngineState>(false, {
-				nodeId: mem?.nodeId
+				nodeId: mem?.nodeId,
+				nodeOrganizationId: mem?.nodeOrganizationId
 			});
 
 			const startResult2 = await start(
@@ -703,7 +715,8 @@ describe("node-core", () => {
 			const memory = await memoryStateStorage.load(startResult?.engine);
 
 			expect(memory).toEqual({
-				nodeId: TEST_NODE_ID
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
 			});
 		}
 	});
@@ -719,7 +732,8 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		let extendEnvVarsCalled = false;
@@ -769,6 +783,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"platform-service",
 			"did-context-id-handler",
 			"information-service",
 			"hosting-service"
@@ -798,7 +813,8 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -829,6 +845,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"platform-service",
 			"did-context-id-handler",
 			"information-service",
 			"hosting-service"
@@ -851,13 +868,15 @@ describe("node-core", () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
-			TWIN_PORT: port.toString()
+			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -888,6 +907,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"platform-service",
 			"did-context-id-handler",
 			"information-service",
 			"hosting-service"
@@ -911,13 +931,15 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_TEST_EMBEDDED: "@text:tests/embedded.txt"
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -943,13 +965,15 @@ describe("node-core", () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_TEST_EMBEDDED: "@json:tests/embedded.json"
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -978,13 +1002,15 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_EXTENSIONS: "./tests/extensions/myExtension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
@@ -1012,6 +1038,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"platform-service",
 			"did-context-id-handler",
 			"information-service",
 			"hosting-service"
@@ -1035,13 +1062,15 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_EXTENSIONS: "http://example.com/insecure-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -1114,6 +1143,7 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_EXTENSIONS:
 				"./tests/extensions/first-extension.js,./tests/extensions/second-extension.js"
 		};
@@ -1121,7 +1151,8 @@ describe("node-core", () => {
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -1203,13 +1234,15 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_EXTENSIONS: "./tests/extensions/lifecycle-test.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -1273,13 +1306,15 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_EXTENSIONS: "./tests/extensions/failing-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
 
 		const memoryStateStorage = new MemoryStateStorage(false, {
-			nodeId: "bob"
+			nodeId: "bob",
+			nodeOrganizationId: TEST_NODE_ORG_ID
 		});
 
 		const nodeOptions: INodeOptions = {
@@ -1316,15 +1351,17 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_STORAGE_FILE_ROOT: "./.local-data",
-			TWIN_STORAGE_ENTITY_STORAGE_CONNECTOR: "memory",
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_EXTENSIONS: "./tests/extensions/cache-test.js",
 			TWIN_EXTENSIONS_CACHE_DIRECTORY: customCacheDir
 		};
 
 		await initialiseLocales("./dist/locales/");
 
-		const memoryStateStorage = new MemoryStateStorage(false, { nodeId: TEST_NODE_ID });
+		const memoryStateStorage = new MemoryStateStorage(false, {
+			nodeId: TEST_NODE_ID,
+			nodeOrganizationId: TEST_NODE_ORG_ID
+		});
 
 		const nodeOptions: INodeOptions = {
 			envPrefix: "TWIN_",

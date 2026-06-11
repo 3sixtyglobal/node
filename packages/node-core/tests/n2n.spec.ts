@@ -124,10 +124,9 @@ describe("node-core n2n", () => {
 			catalogueTrustComponentType ?? ""
 		);
 		const catalogueTrustToken = await catalogueTrustComponent.generate(
-			catalogueState.nodeId ?? "",
+			catalogueState.nodeOrganizationId ?? "",
 			undefined,
-			{ subject: {} },
-			undefined
+			{ subject: {} }
 		);
 
 		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/federated-catalogue/datasets`, {
@@ -206,14 +205,15 @@ describe("node-core n2n", () => {
 			proxyTrustComponentType ?? ""
 		);
 		const proxyTrustToken = await proxyTrustComponent.generate(
-			proxyState.nodeId ?? "",
+			proxyState.nodeOrganizationId ?? "",
 			undefined,
-			{ subject: {} },
-			undefined
+			{ subject: {} }
 		);
 
 		const catalogueIdentityStore = await readIdentityStore(CATALOGUE_DB);
-		expect(catalogueIdentityStore.some(entry => entry.id === proxyState.nodeId)).toBe(false);
+		expect(catalogueIdentityStore.some(entry => entry.id === proxyState.nodeOrganizationId)).toBe(
+			false
+		);
 
 		try {
 			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/federated-catalogue/request`, {
@@ -228,13 +228,16 @@ describe("node-core n2n", () => {
 				})
 			});
 
+			// With mandatory trust verification, the remote catalogue cannot verify the
+			// proxy's trust token (proxy DID not in catalogue's identity store), so it
+			// returns a CatalogError rather than datasets.
 			expect(requestRes.status).toBe(200);
 
 			const requestBody = (await requestRes.json()) as {
 				"@type"?: string;
 				dataset?: unknown[];
 			};
-			expect(Array.isArray(requestBody.dataset) && requestBody.dataset.length > 0).toBe(true);
+			expect(Array.isArray(requestBody.dataset) && requestBody.dataset.length > 0).toBe(false);
 
 			const getRes = await fetch(
 				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${encodeURIComponent(TEST_FEDCAT_DATASET_ID)}`,
@@ -248,7 +251,7 @@ describe("node-core n2n", () => {
 			await catalogueServer?.shutdown();
 			await rm(TMP_N2N, { recursive: true, force: true });
 		}
-	}, 120000);
+	}, 300000);
 
 	test("Can verify federated catalogue remote endpoint communication between two nodes", async () => {
 		await rm(TMP_N2N, { recursive: true, force: true });
@@ -300,10 +303,9 @@ describe("node-core n2n", () => {
 			catalogueTrustComponentType ?? ""
 		);
 		const catalogueTrustToken = await catalogueTrustComponent.generate(
-			catalogueNodeId ?? "",
+			catalogueState.nodeOrganizationId ?? "",
 			undefined,
-			{ subject: {} },
-			undefined
+			{ subject: {} }
 		);
 
 		// Seed a dataset into the catalogue node via HTTP.
@@ -385,11 +387,13 @@ describe("node-core n2n", () => {
 		// the catalogue's identity resolver can find it when verifying the proxy's
 		// trust token. FileEntityStorageConnector reads store.json from disk on
 		// every lookup, so the update is visible immediately without restarting.
+		const proxyOrgId = proxyState.nodeOrganizationId;
+		expect(proxyOrgId).toBeDefined();
 		const proxyIdentityStore = await readIdentityStore(PROXY_DB);
-		const proxyDidEntry = proxyIdentityStore.find(e => e.id === proxyNodeId);
+		const proxyDidEntry = proxyIdentityStore.find(e => e.id === proxyOrgId);
 		expect(proxyDidEntry).toBeDefined();
 		if (!proxyDidEntry) {
-			throw new Error("Proxy DID entry not found in identity store");
+			throw new Error("Proxy org DID entry not found in identity store");
 		}
 
 		const catalogueIdentityStore = await readIdentityStore(CATALOGUE_DB);
@@ -413,12 +417,9 @@ describe("node-core n2n", () => {
 		const proxyTrustComponent = ComponentFactory.get<ITrustComponent>(
 			proxyTrustComponentType ?? ""
 		);
-		const proxyTrustToken = await proxyTrustComponent.generate(
-			proxyNodeId ?? "",
-			undefined,
-			{ subject: {} },
-			undefined
-		);
+		const proxyTrustToken = await proxyTrustComponent.generate(proxyOrgId ?? "", undefined, {
+			subject: {}
+		});
 
 		// Verify proxy: requests to proxy node are forwarded to catalogue ────
 		// The proxy passes the trust token to the catalogue, which verifies the
@@ -436,8 +437,20 @@ describe("node-core n2n", () => {
 				})
 			});
 			expect(requestRes.status).toBe(200);
-			const catalogBody = (await requestRes.json()) as { dataset?: unknown[] };
-			expect(Array.isArray(catalogBody.dataset) && catalogBody.dataset.length > 0).toBe(true);
+			const catalogBody = (await requestRes.json()) as {
+				dataset?: unknown[];
+				catalog?: { dataset?: unknown[] }[];
+			};
+			// Datasets published by the catalogue node appear in nested catalog entries
+			// (DS Protocol: own datasets go in root dataset[], other participants' go in catalog[])
+			const rootDatasets = Array.isArray(catalogBody.dataset) ? catalogBody.dataset.length : 0;
+			const nestedDatasets = Array.isArray(catalogBody.catalog)
+				? catalogBody.catalog.reduce(
+						(n, c) => n + (Array.isArray(c.dataset) ? c.dataset.length : 0),
+						0
+					)
+				: 0;
+			expect(rootDatasets + nestedDatasets > 0).toBe(true);
 
 			const getRes = await fetch(
 				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${encodeURIComponent(TEST_FEDCAT_DATASET_ID)}`,

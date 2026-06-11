@@ -21,9 +21,9 @@ export interface StepDefinition {
 	path: string;
 
 	/**
-	 * Default false — set to true to append ?x-api-key=... query param.
+	 * Default false — set to true to append the api key as a request header.
 	 * Only the login endpoint accepts an API key; all other endpoints use the
-	 * encrypted tenant ID (tid) embedded in the JWT access_token cookie.
+	 * organization DID (from the JWT access_token org claim) for tenant resolution.
 	 */
 	apiKey?: boolean;
 
@@ -79,16 +79,17 @@ export interface StepDefinition {
 	skip?: string | false;
 
 	/**
-	 * When true, the runner appends ?x-enc-tenant-token=<tenantToken> to the resolved path
-	 * before sending the request, provided ctx.appendTenantParam is not false.
-	 * Use this instead of embedding the token directly in the path string.
+	 * Controls whether ?organization=<orgDid> is appended to this step's URL.
+	 * The runner appends it automatically for all non-apiKey requests when ctx.appendOrgParam
+	 * is not false and an organizationId is captured. Set to false to explicitly suppress the
+	 * organization param on steps that test missing-tenant-token error cases.
 	 */
-	appendTenantParam?: boolean;
+	appendOrgParam?: boolean;
 
 	/**
-	 * When true, this step is skipped automatically when ctx.appendTenantParam is false.
+	 * When true, this step is skipped automatically when ctx.isSingleTenant is true.
 	 * Use for steps that only make sense on multi-tenant nodes (e.g. verifying that a
-	 * missing tenant token produces a 401).
+	 * missing org param produces a particular error code that differs in single-tenant mode).
 	 */
-	skipIfTenantParamOmitted?: boolean;
+	skipIfOrgParamOmitted?: boolean;
 }

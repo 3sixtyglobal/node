@@ -363,6 +363,11 @@ export interface IEngineEnvironmentVariables {
 	loggingBatchFlushIntervalSeconds?: string;
 
 	/**
+	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	loggingSilentComponents?: string;
+
+	/**
 	 * The type of event bus connector: local.
 	 */
 	eventBusConnector?: string;
@@ -583,6 +588,11 @@ export interface IEngineEnvironmentVariables {
 	dataExtractorConnectors?: string;
 
 	/**
+	 * Enable the task scheduler regardless of which other components are active, defaults to false.
+	 */
+	taskSchedulerEnabled?: string;
+
+	/**
 	 * Is the auditable item graph enabled, defaults to false.
 	 */
 	auditableItemGraphEnabled?: string;
@@ -731,11 +741,6 @@ export interface IEngineEnvironmentVariables {
 	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
 	 */
 	healthStartupIntervalSeconds?: string;
-
-	/**
-	 * The id of the key in the vault to use for encrypting parameters in url transformer.
-	 */
-	urlTransformerEncryptionKeyId?: string;
 
 	/**
 	 * The type of the automation action to create, comma separate for more than one connector.

@@ -77,7 +77,13 @@ async function executeCliCommand(
 let nodeIdentityJson: { mnemonic: string; did: string; walletAddress: string };
 let organizationIdentityJson: { mnemonic: string; did: string; walletAddress: string };
 let userIdentityJson: { mnemonic: string; did: string; walletAddress: string };
-let nodeTenantJson: { apiKey: string; tenantId: string; label: string; publicOrigin: string };
+let nodeTenantJson: {
+	apiKey: string;
+	tenantId: string;
+	organizationId?: string;
+	label: string;
+	publicOrigin: string;
+};
 
 describe("node-core", () => {
 	beforeAll(async () => {
@@ -207,10 +213,39 @@ describe("node-core", () => {
 		);
 	});
 
+	test("Can create the organization identity", async () => {
+		await executeCliCommand(
+			[
+				"identity-create",
+				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
+				"--fund-wallet=true",
+				"--controller=!NODE_DID",
+				`--output-json=${OUTPUT_TMP_DIR}organization-identity.json`,
+				`--output-env=${OUTPUT_TMP_DIR}organization-identity.env`,
+				"--output-env-prefix=organization"
+			],
+			{}
+		);
+
+		organizationIdentityJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}organization-identity.json`
+		);
+		const organizationIdentityEnv = await CLIUtils.readLinesFile(
+			`${OUTPUT_TMP_DIR}organization-identity.env`
+		);
+		expect(organizationIdentityJson?.mnemonic).toEqual(valueFromEnv(organizationIdentityEnv?.[0]));
+		expect(organizationIdentityJson?.did).toEqual(valueFromEnv(organizationIdentityEnv?.[1]));
+		expect(organizationIdentityJson?.walletAddress).toEqual(
+			valueFromEnv(organizationIdentityEnv?.[2])
+		);
+	});
+
 	test("Can create the tenant for the node", async () => {
 		await executeCliCommand(
 			[
 				"tenant-create",
+				`--load-env=${OUTPUT_TMP_DIR}organization-identity.env`,
+				"--organization-id=!ORGANIZATION_DID",
 				`--output-json=${OUTPUT_TMP_DIR}node-tenant.json`,
 				`--output-env=${OUTPUT_TMP_DIR}node-tenant.env`,
 				"--label=node",
@@ -224,8 +259,9 @@ describe("node-core", () => {
 		const nodeTenantEnv = await CLIUtils.readLinesFile(`${OUTPUT_TMP_DIR}node-tenant.env`);
 		expect(nodeTenantJson?.apiKey).toEqual(valueFromEnv(nodeTenantEnv?.[0]));
 		expect(nodeTenantJson?.tenantId).toEqual(valueFromEnv(nodeTenantEnv?.[1]));
-		expect(nodeTenantJson?.label).toEqual(valueFromEnv(nodeTenantEnv?.[2]));
-		expect(nodeTenantJson?.publicOrigin).toEqual(valueFromEnv(nodeTenantEnv?.[3]));
+		expect(nodeTenantJson?.organizationId).toEqual(valueFromEnv(nodeTenantEnv?.[2]));
+		expect(nodeTenantJson?.label).toEqual(valueFromEnv(nodeTenantEnv?.[3]));
+		expect(nodeTenantJson?.publicOrigin).toEqual(valueFromEnv(nodeTenantEnv?.[4]));
 
 		const dbTable = await CLIUtils.readJsonFile<any>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
 		expect(dbTable?.[1]?.label).toEqual("node");
@@ -264,88 +300,6 @@ describe("node-core", () => {
 		const dbTable = await CLIUtils.readJsonFile<any>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
 		expect(dbTable?.[1]?.label).toEqual("updated-node");
 		expect(dbTable?.[1]?.publicOrigin).toEqual("https://api.updated.com:5678");
-	});
-
-	test("Can create the url transformer encryption key", async () => {
-		await executeCliCommand(
-			[
-				"vault-key-create",
-				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
-				"--identity=!NODE_DID",
-				"--key-type=ChaCha20Poly1305",
-				"--key-id=!TWIN_URL_TRANSFORMER_ENCRYPTION_KEY_ID"
-			],
-			{ nodeId: nodeIdentityJson?.did }
-		);
-	});
-
-	test("Can generate tenant token from tenant ID", async () => {
-		await executeCliCommand(
-			[
-				"tenant-token",
-				`--tenant-id=${nodeTenantJson?.tenantId}`,
-				`--output-json=${OUTPUT_TMP_DIR}node-tenant-token.json`
-			],
-			{ nodeId: nodeIdentityJson?.did }
-		);
-
-		const tokenJson = await CLIUtils.readJsonFile<any>(`${OUTPUT_TMP_DIR}node-tenant-token.json`);
-		expect(tokenJson?.tenantId).toEqual(nodeTenantJson?.tenantId);
-		expect(tokenJson?.token).toBeDefined();
-		expect(tokenJson?.token.length).toBeGreaterThan(0);
-	});
-
-	test("Can generate tenant token from api key", async () => {
-		await executeCliCommand(
-			[
-				"tenant-token",
-				`--api-key=${nodeTenantJson?.apiKey}`,
-				`--output-json=${OUTPUT_TMP_DIR}node-tenant-token-by-apikey.json`
-			],
-			{ nodeId: nodeIdentityJson?.did }
-		);
-
-		const tokenJson = await CLIUtils.readJsonFile<any>(
-			`${OUTPUT_TMP_DIR}node-tenant-token-by-apikey.json`
-		);
-		expect(tokenJson?.tenantId).toEqual(nodeTenantJson?.tenantId);
-		expect(tokenJson?.token).toBeDefined();
-		expect(tokenJson?.token.length).toBeGreaterThan(0);
-	});
-
-	test("tenant-token throws when neither tenant-id nor api-key is provided", async () => {
-		await expect(
-			executeCliCommand(["tenant-token"], { nodeId: nodeIdentityJson?.did }, undefined, {
-				disableProcessExitOnFailure: true
-			})
-		).rejects.toThrow();
-	});
-
-	test("Can create the organization identity", async () => {
-		await executeCliCommand(
-			[
-				"identity-create",
-				`--load-env=${OUTPUT_TMP_DIR}node-identity.env`,
-				"--fund-wallet=true",
-				"--controller=!NODE_DID",
-				`--output-json=${OUTPUT_TMP_DIR}organization-identity.json`,
-				`--output-env=${OUTPUT_TMP_DIR}organization-identity.env`,
-				"--output-env-prefix=organization"
-			],
-			{}
-		);
-
-		organizationIdentityJson = await CLIUtils.readJsonFile<any>(
-			`${OUTPUT_TMP_DIR}organization-identity.json`
-		);
-		const organizationIdentityEnv = await CLIUtils.readLinesFile(
-			`${OUTPUT_TMP_DIR}organization-identity.env`
-		);
-		expect(organizationIdentityJson?.mnemonic).toEqual(valueFromEnv(organizationIdentityEnv?.[0]));
-		expect(organizationIdentityJson?.did).toEqual(valueFromEnv(organizationIdentityEnv?.[1]));
-		expect(organizationIdentityJson?.walletAddress).toEqual(
-			valueFromEnv(organizationIdentityEnv?.[2])
-		);
 	});
 
 	test("Can create the organization attestation verification method", async () => {
@@ -914,6 +868,180 @@ describe("node-core", () => {
 		);
 		expect(attestationJson?.privateKeyHex).toBeDefined();
 		expect(attestationJson?.publicKeyHex).toBeDefined();
+	});
+
+	// set-node-org-id
+
+	test("Can set the node organization ID", async () => {
+		const state = await executeCliCommand(
+			["set-node-org-id", `--organization-id=${organizationIdentityJson.did}`],
+			{},
+			{ TWIN_TENANT_ENABLED: "false" }
+		);
+		expect(state.nodeOrganizationId).toEqual(organizationIdentityJson.did);
+	});
+
+	test("set-node-org-id throws in multi-tenant mode", async () => {
+		await expect(
+			executeCliCommand(
+				["set-node-org-id", `--organization-id=${organizationIdentityJson.did}`],
+				{},
+				{},
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	// set-tenant-org-id
+
+	test("Can set the tenant organization ID", async () => {
+		await executeCliCommand(
+			[
+				"set-tenant-org-id",
+				`--tenant-id=${nodeTenantJson.tenantId}`,
+				`--organization-id=${organizationIdentityJson.did}`
+			],
+			{ nodeId: nodeIdentityJson.did }
+		);
+
+		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
+		expect(tenant?.organizationId).toEqual(organizationIdentityJson.did);
+		expect(tenant?.organizationIdLegacy).toBeUndefined();
+	});
+
+	test("set-tenant-org-id moves existing organization ID to legacy on update", async () => {
+		await executeCliCommand(
+			[
+				"set-tenant-org-id",
+				`--tenant-id=${nodeTenantJson.tenantId}`,
+				`--organization-id=${nodeIdentityJson.did}`
+			],
+			{ nodeId: nodeIdentityJson.did }
+		);
+
+		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
+		expect(tenant?.organizationId).toEqual(nodeIdentityJson.did);
+		expect(tenant?.organizationIdLegacy).toEqual(`|${organizationIdentityJson.did}|`);
+	});
+
+	test("set-tenant-org-id removes updated ID from legacy if already present", async () => {
+		await executeCliCommand(
+			[
+				"set-tenant-org-id",
+				`--tenant-id=${nodeTenantJson.tenantId}`,
+				`--organization-id=${organizationIdentityJson.did}`
+			],
+			{ nodeId: nodeIdentityJson.did }
+		);
+
+		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
+		expect(tenant?.organizationId).toEqual(organizationIdentityJson.did);
+		expect(tenant?.organizationIdLegacy).toEqual(`|${nodeIdentityJson.did}|`);
+	});
+
+	test("set-tenant-org-id throws when multi-tenant is not enabled", async () => {
+		await expect(
+			executeCliCommand(
+				[
+					"set-tenant-org-id",
+					`--tenant-id=${nodeTenantJson.tenantId}`,
+					`--organization-id=${organizationIdentityJson.did}`
+				],
+				{ nodeId: nodeIdentityJson.did },
+				{ TWIN_TENANT_ENABLED: "false" },
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	// remove-tenant-org-alias
+	// Prerequisite: after "set-tenant-org-id removes updated ID from legacy if already present",
+	// the tenant has organizationId=organizationIdentityJson.did and organizationIdLegacy=[nodeIdentityJson.did]
+
+	test("Can remove an alias from the tenant organization legacy list", async () => {
+		await executeCliCommand(
+			[
+				"remove-tenant-org-alias",
+				`--tenant-id=${nodeTenantJson.tenantId}`,
+				`--alias=${nodeIdentityJson.did}`
+			],
+			{ nodeId: nodeIdentityJson.did }
+		);
+
+		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
+		expect(tenant?.organizationIdLegacy).toBeUndefined();
+		expect(tenant?.organizationId).toEqual(organizationIdentityJson.did);
+	});
+
+	test("remove-tenant-org-alias throws when alias is not found", async () => {
+		await expect(
+			executeCliCommand(
+				[
+					"remove-tenant-org-alias",
+					`--tenant-id=${nodeTenantJson.tenantId}`,
+					`--alias=${nodeIdentityJson.did}`
+				],
+				{ nodeId: nodeIdentityJson.did },
+				{},
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("remove-tenant-org-alias throws when multi-tenant is not enabled", async () => {
+		await expect(
+			executeCliCommand(
+				[
+					"remove-tenant-org-alias",
+					`--tenant-id=${nodeTenantJson.tenantId}`,
+					`--alias=${organizationIdentityJson.did}`
+				],
+				{ nodeId: nodeIdentityJson.did },
+				{ TWIN_TENANT_ENABLED: "false" },
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	// identity-create with org ID flags
+
+	test("identity-create with --node-organization-id sets the node organization ID", async () => {
+		const state = await executeCliCommand(
+			[
+				"identity-create",
+				"--node-organization-id=true",
+				`--output-json=${OUTPUT_TMP_DIR}node-org-id-identity.json`
+			],
+			{},
+			{ TWIN_TENANT_ENABLED: "false" }
+		);
+
+		const identityJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}node-org-id-identity.json`
+		);
+		expect(state.nodeOrganizationId).toEqual(identityJson?.did);
+	});
+
+	test("identity-create with --tenant-organization-id sets the tenant organization ID", async () => {
+		await executeCliCommand(
+			[
+				"identity-create",
+				`--tenant-organization-id=${nodeTenantJson.tenantId}`,
+				`--output-json=${OUTPUT_TMP_DIR}tenant-org-id-identity.json`
+			],
+			{ nodeId: nodeIdentityJson.did }
+		);
+
+		const identityJson = await CLIUtils.readJsonFile<any>(
+			`${OUTPUT_TMP_DIR}tenant-org-id-identity.json`
+		);
+		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
+		expect(tenant?.organizationId).toEqual(identityJson?.did);
 	});
 
 	test("Can re-create a verification method when vault key is missing in skip mode", async () => {
