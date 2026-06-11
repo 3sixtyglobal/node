@@ -578,6 +578,14 @@ The batch flush interval in seconds for the logging task, how often to flush the
 
 ***
 
+### loggingSilentComponents? {#loggingsilentcomponents}
+
+> `optional` **loggingSilentComponents?**: `string`
+
+A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
 ### eventBusConnector? {#eventbusconnector}
 
 > `optional` **eventBusConnector?**: `string`
@@ -930,6 +938,14 @@ The type of the default data extractor, can be a comma separated list: json-path
 
 ***
 
+### taskSchedulerEnabled? {#taskschedulerenabled}
+
+> `optional` **taskSchedulerEnabled?**: `string`
+
+Enable the task scheduler regardless of which other components are active, defaults to false.
+
+***
+
 ### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
 > `optional` **auditableItemGraphEnabled?**: `string`
@@ -1168,14 +1184,6 @@ The interval in seconds for performing health checks, defaults to 60.
 
 The interval in seconds for performing health checks at startup, defaults to 2.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
-
-***
-
-### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
-
-> `optional` **urlTransformerEncryptionKeyId?**: `string`
-
-The id of the key in the vault to use for encrypting parameters in url transformer.
 
 ***
 

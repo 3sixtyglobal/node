@@ -866,6 +866,18 @@ The batch flush interval in seconds for the logging task, how often to flush the
 
 ***
 
+### loggingSilentComponents? {#loggingsilentcomponents}
+
+> `optional` **loggingSilentComponents?**: `string`
+
+A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingSilentComponents`](IEngineEnvironmentVariables.md#loggingsilentcomponents)
+
+***
+
 ### eventBusConnector? {#eventbusconnector}
 
 > `optional` **eventBusConnector?**: `string`
@@ -1394,6 +1406,18 @@ The type of the default data extractor, can be a comma separated list: json-path
 
 ***
 
+### taskSchedulerEnabled? {#taskschedulerenabled}
+
+> `optional` **taskSchedulerEnabled?**: `string`
+
+Enable the task scheduler regardless of which other components are active, defaults to false.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`taskSchedulerEnabled`](IEngineEnvironmentVariables.md#taskschedulerenabled)
+
+***
+
 ### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
 > `optional` **auditableItemGraphEnabled?**: `string`
@@ -1740,18 +1764,6 @@ This allows components that take a long time to initialize to be healthy before 
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthStartupIntervalSeconds`](IEngineEnvironmentVariables.md#healthstartupintervalseconds)
-
-***
-
-### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
-
-> `optional` **urlTransformerEncryptionKeyId?**: `string`
-
-The id of the key in the vault to use for encrypting parameters in url transformer.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`urlTransformerEncryptionKeyId`](IEngineEnvironmentVariables.md#urltransformerencryptionkeyid)
 
 ***
 

@@ -32,7 +32,6 @@
 - [BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
 - [TRUST\_VERIFICATION\_METHOD\_ID](variables/TRUST_VERIFICATION_METHOD_ID.md)
 - [AUTH\_SIGNING\_KEY\_ID](variables/AUTH_SIGNING_KEY_ID.md)
-- [URL\_TRANSFORMER\_ENCRYPTION\_KEY\_ID](variables/URL_TRANSFORMER_ENCRYPTION_KEY_ID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_DID](variables/CONTEXT_ID_HANDLER_FEATURE_DID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_TENANT](variables/CONTEXT_ID_HANDLER_FEATURE_TENANT.md)
 - [ModuleProtocol](variables/ModuleProtocol.md)
@@ -41,7 +40,6 @@
 
 - [buildEngineConfiguration](functions/buildEngineConfiguration.md)
 - [isTrustRequired](functions/isTrustRequired.md)
-- [isUrlTransformerRequired](functions/isUrlTransformerRequired.md)
 - [isBackgroundTasksRequired](functions/isBackgroundTasksRequired.md)
 - [isImmutableProofRequired](functions/isImmutableProofRequired.md)
 - [isFederatedCatalogueRequired](functions/isFederatedCatalogueRequired.md)
