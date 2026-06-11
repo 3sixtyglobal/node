@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.53](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.52...node-core-v0.0.3-next.53) (2026-06-11)
+
+
+### Features
+
+* organization identifiers ([#203](https://github.com/iotaledger/twin-node/issues/203)) ([1a6b176](https://github.com/iotaledger/twin-node/commit/1a6b1760d9f8e43a769407668426c70e1c8e1aa8))
+
 ## [0.0.3-next.52](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.51...node-core-v0.0.3-next.52) (2026-06-09)
 
 

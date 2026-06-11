@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.53](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.52...node-v0.0.3-next.53) (2026-06-11)
+
+
+### Features
+
+* organization identifiers ([#203](https://github.com/iotaledger/twin-node/issues/203)) ([1a6b176](https://github.com/iotaledger/twin-node/commit/1a6b1760d9f8e43a769407668426c70e1c8e1aa8))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.52 to 0.0.3-next.53
+
 ## [0.0.3-next.52](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.51...node-v0.0.3-next.52) (2026-06-09)
 
 
