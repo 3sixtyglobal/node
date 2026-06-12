@@ -60,18 +60,6 @@ The name of the state file.
 
 ***
 
-### nodeIdentityEnabled? {#nodeidentityenabled}
-
-> `optional` **nodeIdentityEnabled?**: `string`
-
-Does the node have a unique ID, defaults to true.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`nodeIdentityEnabled`](IEngineEnvironmentVariables.md#nodeidentityenabled)
-
-***
-
 ### tenantEnabled? {#tenantenabled}
 
 > `optional` **tenantEnabled?**: `string`
@@ -1869,6 +1857,14 @@ The type of auth processor to use on the API: entity-storage.
 > `optional` **authSigningKeyId?**: `string`
 
 The id of the key in the vault to use for signing in auth operations.
+
+***
+
+### authApiKeyHeader? {#authapikeyheader}
+
+> `optional` **authApiKeyHeader?**: `string`
+
+The HTTP header name used to pass the API key on requests, defaults to x-api-key.
 
 ***
 

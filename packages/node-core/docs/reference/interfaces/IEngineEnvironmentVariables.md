@@ -40,14 +40,6 @@ The name of the state file.
 
 ***
 
-### nodeIdentityEnabled? {#nodeidentityenabled}
-
-> `optional` **nodeIdentityEnabled?**: `string`
-
-Does the node have a unique ID, defaults to true.
-
-***
-
 ### tenantEnabled? {#tenantenabled}
 
 > `optional` **tenantEnabled?**: `string`

@@ -56,18 +56,6 @@ The name of the state file.
 
 ***
 
-### nodeIdentityEnabled? {#nodeidentityenabled}
-
-> `optional` **nodeIdentityEnabled?**: `string`
-
-Does the node have a unique ID, defaults to true.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`nodeIdentityEnabled`](IEngineServerEnvironmentVariables.md#nodeidentityenabled)
-
-***
-
 ### tenantEnabled? {#tenantenabled}
 
 > `optional` **tenantEnabled?**: `string`
@@ -1905,6 +1893,18 @@ The id of the key in the vault to use for signing in auth operations.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`authSigningKeyId`](IEngineServerEnvironmentVariables.md#authsigningkeyid)
+
+***
+
+### authApiKeyHeader? {#authapikeyheader}
+
+> `optional` **authApiKeyHeader?**: `string`
+
+The HTTP header name used to pass the API key on requests, defaults to x-api-key.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`authApiKeyHeader`](IEngineServerEnvironmentVariables.md#authapikeyheader)
 
 ***
 
