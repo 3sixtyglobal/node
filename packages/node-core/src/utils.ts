@@ -246,7 +246,7 @@ export async function handleNpmProtocol(
 ): Promise<IProtocolHandlerResult> {
 	const cacheDir = getExtensionsCacheDir(executionDirectory, ModuleProtocol.Npm, cacheDirectory);
 	// Strip the version suffix to get the bare package name. We use lastIndexOf
-	// (not indexOf) so the leading "@" of a scoped package is preserved — for
+	// (not indexOf) so the leading "@" of a scoped package is preserved - for
 	// "@scope/pkg@1.0.0" the last "@" is the version separator at the end, not
 	// the scope prefix at position 0. The `> 0` (not `>= 0`) check then leaves
 	// unversioned scoped names like "@scope/pkg" untouched, since their only "@"

@@ -63,7 +63,7 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.0.3-next.50" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.0.3-next.54" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
@@ -286,7 +286,7 @@ export async function buildConfiguration(
 	}
 
 	// Build the engine configuration from the environment variables.
-	const coreConfig = await buildEngineConfiguration(envVars, availableContextIdKeys);
+	const coreConfig = await buildEngineConfiguration(envVars);
 	const engineServerConfig = await buildEngineServerConfiguration(
 		envVars,
 		availableContextIdKeys,

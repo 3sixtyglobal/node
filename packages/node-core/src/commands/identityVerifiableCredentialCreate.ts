@@ -28,6 +28,7 @@ export function getCommandDefinitionIdentityVerifiableCredentialCreate(commandDe
 		),
 		example: I18n.formatMessage("node.cli.commands.identity-verifiable-credential-create.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",

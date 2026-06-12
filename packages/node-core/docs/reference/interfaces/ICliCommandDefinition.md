@@ -85,3 +85,17 @@ Indicates whether the engine needs the node identity to be set if configured to 
 ```ts
 true
 ```
+
+***
+
+### requiresOrgIdentity? {#requiresorgidentity}
+
+> `optional` **requiresOrgIdentity?**: `boolean`
+
+Indicates whether the engine needs the organization identity to be set.
+
+#### Default
+
+```ts
+true
+```

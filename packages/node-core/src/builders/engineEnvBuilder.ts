@@ -52,6 +52,7 @@ import {
 	NftConnectorType,
 	NotarizationComponentType,
 	NotarizationConnectorType,
+	PlatformComponentType,
 	RightsManagementPapComponentType,
 	RightsManagementPdpComponentType,
 	RightsManagementPepComponentType,
@@ -71,11 +72,9 @@ import {
 	TelemetryComponentType,
 	TelemetryConnectorType,
 	TenantAdminComponentType,
-	TenantComponentType,
 	TrustComponentType,
 	type TrustGeneratorComponentType,
 	TrustVerifierComponentType,
-	UrlTransformerComponentType,
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
@@ -90,12 +89,10 @@ import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVa
 /**
  * Build the engine core configuration from environment variables.
  * @param envVars The environment variables.
- * @param contextIdKeys The context ID keys.
  * @returns The config for the core.
  */
 export async function buildEngineConfiguration(
-	envVars: IEngineEnvironmentVariables,
-	contextIdKeys: { key: string; requiredHandlerFeatures: string[] }[]
+	envVars: IEngineEnvironmentVariables
 ): Promise<IEngineConfig> {
 	if (Is.stringValue(envVars.storageFileRoot)) {
 		envVars.stateFilename ??= "engine-state.json";
@@ -106,9 +103,11 @@ export async function buildEngineConfiguration(
 	const coreConfig: IEngineConfig = {
 		debug: Coerce.boolean(envVars.debug) ?? false,
 		silent: Coerce.boolean(envVars.silent) ?? false,
+		silentLoggers: commaSeparatedListToArray(envVars.loggingSilentComponents),
 		types: {}
 	};
 
+	await configurePlatform(coreConfig, envVars);
 	await configureTenant(coreConfig, envVars);
 	await configureContextIdHandlers(coreConfig, envVars);
 
@@ -126,7 +125,6 @@ export async function buildEngineConfiguration(
 	await configureMessaging(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
 	await configureHealth(coreConfig, envVars);
-	await configureUrlTransformer(coreConfig, envVars);
 
 	await configureFaucet(coreConfig, envVars);
 	await configureWallet(coreConfig, envVars);
@@ -224,7 +222,7 @@ async function configureEntityStorage(
 					credentials: envVars.gcpFirestoreCredentials ?? "",
 					databaseId: envVars.gcpFirestoreDatabaseId ?? "",
 					collectionName: envVars.gcpFirestoreCollectionName ?? "",
-					endpoint: envVars.gcpFirestoreApiEndpoint ?? ""
+					endpoint: envVars.gcpFirestoreEndpoint ?? ""
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -392,7 +390,7 @@ async function configureBlobStorage(
 					projectId: envVars.gcpStorageProjectId ?? "",
 					credentials: envVars.gcpStorageCredentials ?? "",
 					bucketName: envVars.gcpStorageBucketName ?? "",
-					apiEndpoint: envVars.gcpFirestoreApiEndpoint
+					apiEndpoint: envVars.gcpFirestoreEndpoint
 				},
 				storagePrefix: envVars.blobStoragePrefix
 			}
@@ -455,7 +453,13 @@ async function configureLogging(
 			additionalConnectorCount++;
 		} else if (loggingConnector === LoggingConnectorType.EntityStorage) {
 			coreConfig.types.loggingConnector.push({
-				type: LoggingConnectorType.EntityStorage
+				type: LoggingConnectorType.EntityStorage,
+				options: {
+					config: {
+						batchSize: Coerce.integer(envVars.loggingBatchSize),
+						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushIntervalSeconds) ?? 5) * 1000
+					}
+				}
 			});
 			additionalConnectorCount++;
 		}
@@ -694,29 +698,25 @@ async function configureHealth(
 }
 
 /**
- * Configures the url transformer.
+ * Configures the platform.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
  */
-async function configureUrlTransformer(
+async function configurePlatform(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	coreConfig.types.urlTransformerComponent ??= [];
+	const isTenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 
-	if (isUrlTransformerRequired(envVars) ?? false) {
-		coreConfig.types.urlTransformerComponent.push({
-			type: UrlTransformerComponentType.Service,
-			options: {
-				config: {
-					paramEncryptionKeyName: envVars.urlTransformerEncryptionKeyId,
-					queryParamNames: {
-						tenant: "tenant-token"
-					}
-				}
+	coreConfig.types.platformComponent ??= [];
+	coreConfig.types.platformComponent.push({
+		type: PlatformComponentType.Service,
+		options: {
+			config: {
+				isMultiTenant: isTenantEnabled
 			}
-		});
-	}
+		}
+	});
 }
 
 /**
@@ -728,12 +728,9 @@ async function configureTenant(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
-		coreConfig.types.tenantComponent ??= [];
-		coreConfig.types.tenantComponent.push({
-			type: TenantComponentType.Service
-		});
+	const isTenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 
+	if (isTenantEnabled) {
 		coreConfig.types.tenantAdminComponent ??= [];
 		coreConfig.types.tenantAdminComponent.push({
 			type: TenantAdminComponentType.Service
@@ -1529,7 +1526,7 @@ async function configureDataspace(
 			options: {
 				config: {
 					retainActivityLogsFor: Coerce.number(envVars.dataspaceRetainActivityLogsFor),
-					activityLogsCleanUpInterval: Coerce.number(envVars.dataspaceActivityLogsCleanUpInterval)
+					activityLogsCleanUpInterval: Coerce.number(envVars.dataspaceActivityLogsCleanupInterval)
 				}
 			}
 		});
@@ -1602,22 +1599,6 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
 }
 
 /**
- * Checks if the URL transformer subsystem is required.
- * Returns true when any component that depends on the URL transformer subsystem is enabled.
- * @param envVars The environment variables.
- * @returns True if rights-management, dataspace, federated-catalogue, tenant, or auth entity storage is enabled.
- */
-export function isUrlTransformerRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return (
-		isRightsManagementRequired(envVars) ||
-		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
-		(Coerce.boolean(envVars.tenantEnabled) ?? false) ||
-		isFederatedCatalogueRequired(envVars) ||
-		isAuthEntityStorageRequired(envVars)
-	);
-}
-
-/**
  * Checks if the background tasks subsystem is required.
  * Returns true when any component that depends on the background tasks subsystem is enabled.
  * @param envVars The environment variables.
@@ -1659,7 +1640,7 @@ export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariable
 /**
  * Checks if the rights management subsystem is required.
  * Returns true when any component that depends on the rights management subsystem is enabled.
- * Note: rights management has no standalone enable flag — it is gated entirely on
+ * Note: rights management has no standalone enable flag - it is gated entirely on
  * `dataspaceEnabled`. Setting `TWIN_RIGHTS_MANAGEMENT_*` env var in isolation does not
  * enable the subsystem; `TWIN_DATASPACE_ENABLED` must also be true.
  * @param envVars The environment variables.
@@ -1677,6 +1658,7 @@ export function isRightsManagementRequired(envVars: IEngineEnvironmentVariables)
  */
 export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
+		(Coerce.boolean(envVars.taskSchedulerEnabled) ?? false) ||
 		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
 		isRightsManagementRequired(envVars) ||
 		isAuthEntityStorageRequired(envVars)

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
+import type { ITenantAdminComponent } from "@twin.org/api-models";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
@@ -25,7 +27,7 @@ import {
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import { TrustHelper, type ITrustComponent } from "@twin.org/trust-models";
+import type { ITrustComponent } from "@twin.org/trust-models";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 import { loadAndRunGroups } from "./endpoints/runner.js";
@@ -39,7 +41,7 @@ const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
 const OUTPUT_TMP_DIR = "./tests/.tmp-endpoints/";
 
-const OUTPUT_TMP_DIR_ST = "./tests/.tmp-endpoints-st/";
+const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
 
 const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
@@ -92,7 +94,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — creates node identity, auth signing key, tenant, admin user.
+		// Phase 1: Bootstrap - creates node identity, auth signing key, tenant, admin user.
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -101,7 +103,7 @@ describe("node-core", () => {
 				disableProcessExitOnFailure: true,
 				envVars: {
 					...SHARED_ENV_VARS,
-					TWIN_FEATURES: "node-identity,node-admin-user",
+					TWIN_FEATURES: "admin-user",
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_TENANT_ID: TEST_TENANT_ID,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
@@ -120,7 +122,7 @@ describe("node-core", () => {
 		// Phase 2: Start the server using the bootstrapped identity/tenant state.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("../../apps/node/docs/open-api/spec.json"),
+			openApiSpecFile: path.resolve("./tests/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: bootstrapState.nodeId
 			}),
@@ -133,13 +135,22 @@ describe("node-core", () => {
 		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
 		expect(trustComponentType).toBeDefined();
 
+		// In multi-tenant mode, the org DID is on the tenant, not in node state — look it up.
+		const tenantAdminType =
+			serverResult?.engine.getRegisteredInstanceTypeOptional("tenantAdminComponent");
+		expect(tenantAdminType).toBeDefined();
+		let orgDid: string | undefined;
+		await ContextIdStore.run({ [ContextIdKeys.Node]: bootstrapState.nodeId ?? "" }, async () => {
+			const tenantAdmin = ComponentFactory.get<ITenantAdminComponent>(tenantAdminType ?? "");
+			const tenant = await tenantAdmin.get(TEST_TENANT_ID);
+			orgDid = tenant.organizationId;
+		});
+		expect(orgDid).toBeDefined();
+
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
-		const trustBearerToken = await trustComponent.generate(
-			bootstrapState.nodeId ?? "",
-			undefined,
-			{ subject: {} },
-			TrustHelper.hashTenantId(TEST_TENANT_ID)
-		);
+		const trustBearerToken = await trustComponent.generate(orgDid ?? "", undefined, {
+			subject: {}
+		});
 
 		const serverStartTime = Date.now();
 
@@ -149,7 +160,7 @@ describe("node-core", () => {
 				baseUrl: `http://localhost:${TEST_PORT}`,
 				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
 				authToken: "",
-				appendTenantParam: true,
+				appendOrgParam: true,
 				vars: {
 					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
 					adminEmail: TEST_ADMIN_EMAIL,
@@ -185,7 +196,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — creates node identity and admin user (no tenant in single-tenant mode).
+		// Phase 1: Bootstrap - creates node identity and admin user (no tenant in single-tenant mode).
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -194,7 +205,7 @@ describe("node-core", () => {
 				disableProcessExitOnFailure: true,
 				envVars: {
 					...singleTenantEnvVars,
-					TWIN_FEATURES: "node-identity,node-admin-user",
+					TWIN_FEATURES: "admin-user",
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
@@ -209,12 +220,13 @@ describe("node-core", () => {
 
 		Factory.clearFactories();
 
-		// Phase 2: Start the server using the bootstrapped identity state.
+		// Phase 2: Start the server using the bootstrapped identity/org state.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("../../apps/node/docs/open-api/spec.json"),
+			openApiSpecFile: path.resolve("./tests/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
-				nodeId: bootstrapState.nodeId
+				nodeId: bootstrapState.nodeId,
+				nodeOrganizationId: bootstrapState.nodeOrganizationId
 			}),
 			envVars: singleTenantEnvVars
 		});
@@ -227,10 +239,9 @@ describe("node-core", () => {
 
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
 		const trustBearerToken = await trustComponent.generate(
-			bootstrapState.nodeId ?? "",
+			bootstrapState.nodeOrganizationId ?? "",
 			undefined,
-			{ subject: {} },
-			undefined
+			{ subject: {} }
 		);
 
 		const serverStartTime = Date.now();
@@ -241,7 +252,7 @@ describe("node-core", () => {
 				baseUrl: `http://localhost:${TEST_PORT_ST}`,
 				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
 				authToken: "",
-				appendTenantParam: false,
+				isSingleTenant: true,
 				vars: {
 					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
 					adminEmail: TEST_ADMIN_EMAIL,

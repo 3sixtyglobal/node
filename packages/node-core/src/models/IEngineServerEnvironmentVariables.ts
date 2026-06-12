@@ -57,6 +57,11 @@ export interface IEngineServerEnvironmentVariables extends IEngineEnvironmentVar
 	authSigningKeyId?: string;
 
 	/**
+	 * The HTTP header name used to pass the API key on requests, defaults to x-api-key.
+	 */
+	authApiKeyHeader?: string;
+
+	/**
 	 * The id of the key in the vault to use for encrypting hosting parameters in auth operations.
 	 */
 	hostingParamEncryptionKeyId?: string;

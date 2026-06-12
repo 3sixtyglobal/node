@@ -40,14 +40,6 @@ The name of the state file.
 
 ***
 
-### nodeIdentityEnabled? {#nodeidentityenabled}
-
-> `optional` **nodeIdentityEnabled?**: `string`
-
-Does the node have a unique ID, defaults to true.
-
-***
-
 ### tenantEnabled? {#tenantenabled}
 
 > `optional` **tenantEnabled?**: `string`
@@ -185,9 +177,9 @@ GCP Firestore database id.
 
 ***
 
-### gcpFirestoreApiEndpoint? {#gcpfirestoreapiendpoint}
+### gcpFirestoreEndpoint? {#gcpfirestoreendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint?**: `string`
+> `optional` **gcpFirestoreEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
@@ -562,6 +554,30 @@ The type of logging task connector, can be a comma separated list: console, enti
 
 ***
 
+### loggingBatchSize? {#loggingbatchsize}
+
+> `optional` **loggingBatchSize?**: `string`
+
+The batch size for the logging task, set to 1 for no batching.
+
+***
+
+### loggingBatchFlushIntervalSeconds? {#loggingbatchflushintervalseconds}
+
+> `optional` **loggingBatchFlushIntervalSeconds?**: `string`
+
+The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+
+***
+
+### loggingSilentComponents? {#loggingsilentcomponents}
+
+> `optional` **loggingSilentComponents?**: `string`
+
+A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
 ### eventBusConnector? {#eventbusconnector}
 
 > `optional` **eventBusConnector?**: `string`
@@ -914,6 +930,14 @@ The type of the default data extractor, can be a comma separated list: json-path
 
 ***
 
+### taskSchedulerEnabled? {#taskschedulerenabled}
+
+> `optional` **taskSchedulerEnabled?**: `string`
+
+Enable the task scheduler regardless of which other components are active, defaults to false.
+
+***
+
 ### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
 > `optional` **auditableItemGraphEnabled?**: `string`
@@ -1105,9 +1129,9 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 ***
 
-### dataspaceActivityLogsCleanUpInterval? {#dataspaceactivitylogscleanupinterval}
+### dataspaceActivityLogsCleanupInterval? {#dataspaceactivitylogscleanupinterval}
 
-> `optional` **dataspaceActivityLogsCleanUpInterval?**: `string`
+> `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
 The interval for cleaning up the activity logs.
 
@@ -1152,14 +1176,6 @@ The interval in seconds for performing health checks, defaults to 60.
 
 The interval in seconds for performing health checks at startup, defaults to 2.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
-
-***
-
-### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
-
-> `optional` **urlTransformerEncryptionKeyId?**: `string`
-
-The id of the key in the vault to use for encrypting parameters in url transformer.
 
 ***
 

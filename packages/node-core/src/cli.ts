@@ -13,9 +13,11 @@ import { getCommandDefinitionIdentityVerifiableCredentialCreate } from "./comman
 import { getCommandDefinitionIdentityVerificationMethodCreate } from "./commands/identityVerificationMethodCreate.js";
 import { getCommandDefinitionIdentityVerificationMethodImport } from "./commands/identityVerificationMethodImport.js";
 import { getCommandDefinitionNodeSetIdentity } from "./commands/nodeSetIdentity.js";
+import { getCommandDefinitionRemoveTenantOrgAlias } from "./commands/removeTenantOrgAlias.js";
+import { getCommandDefinitionSetNodeOrgId } from "./commands/setNodeOrgId.js";
+import { getCommandDefinitionSetTenantOrgId } from "./commands/setTenantOrgId.js";
 import { getCommandDefinitionTenantCreate } from "./commands/tenantCreate.js";
 import { getCommandDefinitionTenantImport } from "./commands/tenantImport.js";
-import { getCommandDefinitionTenantToken } from "./commands/tenantToken.js";
 import { getCommandDefinitionTenantUpdate } from "./commands/tenantUpdate.js";
 import { getCommandDefinitionUserCreate } from "./commands/userCreate.js";
 import { getCommandDefinitionUserUpdate } from "./commands/userUpdate.js";
@@ -302,9 +304,11 @@ export function registerCommands(): void {
 	getCommandDefinitionIdentityVerificationMethodImport(commandDefinitions);
 	getCommandDefinitionIdentityVerifiableCredentialCreate(commandDefinitions);
 	getCommandDefinitionNodeSetIdentity(commandDefinitions);
+	getCommandDefinitionSetNodeOrgId(commandDefinitions);
+	getCommandDefinitionSetTenantOrgId(commandDefinitions);
+	getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions);
 	getCommandDefinitionTenantCreate(commandDefinitions);
 	getCommandDefinitionTenantImport(commandDefinitions);
-	getCommandDefinitionTenantToken(commandDefinitions);
 	getCommandDefinitionTenantUpdate(commandDefinitions);
 	getCommandDefinitionUserCreate(commandDefinitions);
 	getCommandDefinitionUserUpdate(commandDefinitions);

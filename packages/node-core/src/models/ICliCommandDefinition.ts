@@ -49,4 +49,10 @@ export interface ICliCommandDefinition {
 	 * @default true
 	 */
 	requiresNodeIdentity?: boolean;
+
+	/**
+	 * Indicates whether the engine needs the organization identity to be set.
+	 * @default true
+	 */
+	requiresOrgIdentity?: boolean;
 }

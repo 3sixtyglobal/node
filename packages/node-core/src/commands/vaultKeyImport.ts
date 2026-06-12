@@ -25,6 +25,7 @@ export function getCommandDefinitionVaultKeyImport(commandDefinitions: {
 		description: I18n.formatMessage("node.cli.commands.vault-key-import.description"),
 		example: I18n.formatMessage("node.cli.commands.vault-key-import.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",

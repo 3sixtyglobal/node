@@ -26,11 +26,6 @@ export interface IEngineEnvironmentVariables {
 	stateFilename?: string;
 
 	/**
-	 * Does the node have a unique ID, defaults to true.
-	 */
-	nodeIdentityEnabled?: string;
-
-	/**
 	 * Is multi-tenant support enabled, defaults to false.
 	 */
 	tenantEnabled?: string;
@@ -119,7 +114,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * GCP Firestore endpoint.
 	 */
-	gcpFirestoreApiEndpoint?: string;
+	gcpFirestoreEndpoint?: string;
 
 	/**
 	 * GCP Firestore project id.
@@ -353,6 +348,21 @@ export interface IEngineEnvironmentVariables {
 	loggingConnector?: string;
 
 	/**
+	 * The batch size for the logging task, set to 1 for no batching.
+	 */
+	loggingBatchSize?: string;
+
+	/**
+	 * The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+	 */
+	loggingBatchFlushIntervalSeconds?: string;
+
+	/**
+	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	loggingSilentComponents?: string;
+
+	/**
 	 * The type of event bus connector: local.
 	 */
 	eventBusConnector?: string;
@@ -573,6 +583,11 @@ export interface IEngineEnvironmentVariables {
 	dataExtractorConnectors?: string;
 
 	/**
+	 * Enable the task scheduler regardless of which other components are active, defaults to false.
+	 */
+	taskSchedulerEnabled?: string;
+
+	/**
 	 * Is the auditable item graph enabled, defaults to false.
 	 */
 	auditableItemGraphEnabled?: string;
@@ -701,7 +716,7 @@ export interface IEngineEnvironmentVariables {
 	 * The interval for cleaning up the activity logs.
 	 * @default 60
 	 */
-	dataspaceActivityLogsCleanUpInterval?: string;
+	dataspaceActivityLogsCleanupInterval?: string;
 
 	/**
 	 * The data plane path for PULL transfers (path only, not full URL).
@@ -726,11 +741,6 @@ export interface IEngineEnvironmentVariables {
 	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
 	 */
 	healthStartupIntervalSeconds?: string;
-
-	/**
-	 * The id of the key in the vault to use for encrypting parameters in url transformer.
-	 */
-	urlTransformerEncryptionKeyId?: string;
 
 	/**
 	 * The type of the automation action to create, comma separate for more than one connector.

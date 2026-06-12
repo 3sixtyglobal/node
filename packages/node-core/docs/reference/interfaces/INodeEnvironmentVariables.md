@@ -56,18 +56,6 @@ The name of the state file.
 
 ***
 
-### nodeIdentityEnabled? {#nodeidentityenabled}
-
-> `optional` **nodeIdentityEnabled?**: `string`
-
-Does the node have a unique ID, defaults to true.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`nodeIdentityEnabled`](IEngineServerEnvironmentVariables.md#nodeidentityenabled)
-
-***
-
 ### tenantEnabled? {#tenantenabled}
 
 > `optional` **tenantEnabled?**: `string`
@@ -273,15 +261,15 @@ GCP Firestore database id.
 
 ***
 
-### gcpFirestoreApiEndpoint? {#gcpfirestoreapiendpoint}
+### gcpFirestoreEndpoint? {#gcpfirestoreendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint?**: `string`
+> `optional` **gcpFirestoreEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`gcpFirestoreApiEndpoint`](IEngineServerEnvironmentVariables.md#gcpfirestoreapiendpoint)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`gcpFirestoreEndpoint`](IEngineServerEnvironmentVariables.md#gcpfirestoreendpoint)
 
 ***
 
@@ -838,6 +826,42 @@ The type of logging task connector, can be a comma separated list: console, enti
 
 ***
 
+### loggingBatchSize? {#loggingbatchsize}
+
+> `optional` **loggingBatchSize?**: `string`
+
+The batch size for the logging task, set to 1 for no batching.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`loggingBatchSize`](IEngineServerEnvironmentVariables.md#loggingbatchsize)
+
+***
+
+### loggingBatchFlushIntervalSeconds? {#loggingbatchflushintervalseconds}
+
+> `optional` **loggingBatchFlushIntervalSeconds?**: `string`
+
+The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`loggingBatchFlushIntervalSeconds`](IEngineServerEnvironmentVariables.md#loggingbatchflushintervalseconds)
+
+***
+
+### loggingSilentComponents? {#loggingsilentcomponents}
+
+> `optional` **loggingSilentComponents?**: `string`
+
+A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`loggingSilentComponents`](IEngineServerEnvironmentVariables.md#loggingsilentcomponents)
+
+***
+
 ### eventBusConnector? {#eventbusconnector}
 
 > `optional` **eventBusConnector?**: `string`
@@ -1366,6 +1390,18 @@ The type of the default data extractor, can be a comma separated list: json-path
 
 ***
 
+### taskSchedulerEnabled? {#taskschedulerenabled}
+
+> `optional` **taskSchedulerEnabled?**: `string`
+
+Enable the task scheduler regardless of which other components are active, defaults to false.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`taskSchedulerEnabled`](IEngineServerEnvironmentVariables.md#taskschedulerenabled)
+
+***
+
 ### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
 > `optional` **auditableItemGraphEnabled?**: `string`
@@ -1645,9 +1681,9 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 ***
 
-### dataspaceActivityLogsCleanUpInterval? {#dataspaceactivitylogscleanupinterval}
+### dataspaceActivityLogsCleanupInterval? {#dataspaceactivitylogscleanupinterval}
 
-> `optional` **dataspaceActivityLogsCleanUpInterval?**: `string`
+> `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
 The interval for cleaning up the activity logs.
 
@@ -1659,7 +1695,7 @@ The interval for cleaning up the activity logs.
 
 #### Inherited from
 
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceActivityLogsCleanUpInterval`](IEngineServerEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceActivityLogsCleanupInterval`](IEngineServerEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
 
 ***
 
@@ -1712,18 +1748,6 @@ This allows components that take a long time to initialize to be healthy before 
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`healthStartupIntervalSeconds`](IEngineServerEnvironmentVariables.md#healthstartupintervalseconds)
-
-***
-
-### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
-
-> `optional` **urlTransformerEncryptionKeyId?**: `string`
-
-The id of the key in the vault to use for encrypting parameters in url transformer.
-
-#### Inherited from
-
-[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`urlTransformerEncryptionKeyId`](IEngineServerEnvironmentVariables.md#urltransformerencryptionkeyid)
 
 ***
 
@@ -1869,6 +1893,18 @@ The id of the key in the vault to use for signing in auth operations.
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`authSigningKeyId`](IEngineServerEnvironmentVariables.md#authsigningkeyid)
+
+***
+
+### authApiKeyHeader? {#authapikeyheader}
+
+> `optional` **authApiKeyHeader?**: `string`
+
+The HTTP header name used to pass the API key on requests, defaults to x-api-key.
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`authApiKeyHeader`](IEngineServerEnvironmentVariables.md#authapikeyheader)
 
 ***
 

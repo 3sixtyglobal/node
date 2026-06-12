@@ -1,7 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { ContextIdKeys } from "@twin.org/context";
-import { Coerce, GeneralError, I18n, Is } from "@twin.org/core";
+import type { ITenantAdminComponent } from "@twin.org/api-models";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
+import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
 import { Engine } from "@twin.org/engine";
 import { FileStateStorage } from "@twin.org/engine-core";
 import {
@@ -52,6 +53,7 @@ export async function start(
 
 	const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
 	const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;
+	const requiresOrgIdentity = cliCommand?.definition?.requiresOrgIdentity ?? true;
 
 	// If the blob storage or entity storage is configured with file connectors
 	// then we need to make sure the storageFileRoot is set
@@ -73,8 +75,19 @@ export async function start(
 		stateStorage: requiresEngineStarted
 			? (nodeOptions?.stateStorage ?? new FileStateStorage(envVars.stateFilename ?? ""))
 			: undefined,
-		customBootstrap: async (engineCore, context) => {
-			configureContextIds(engineCore, envVars, requiresEngineStarted, requiresNodeIdentity);
+		customBootstrap: async engineCore => {
+			configureContextIds(
+				engineCore,
+				envVars,
+				requiresEngineStarted,
+				requiresNodeIdentity,
+				requiresOrgIdentity
+			);
+			if (!Is.objectValue(cliCommand) && requiresEngineStarted) {
+				await ContextIdStore.run(engineCore.getContextIds() ?? {}, async () => {
+					await enforceTenantOrganizationIds(engineCore, envVars);
+				});
+			}
 		}
 	});
 
@@ -131,23 +144,31 @@ export async function start(
  * @param envVars The environment variables.
  * @param requiresEngineStarted Whether the engine is required to be started.
  * @param requiresNodeIdentity Whether the node identity is required.
+ * @param requiresOrgIdentity Whether the organization identity is required.
  * @throws GeneralError Throws if the node identity or tenant is required but not set.
  */
 function configureContextIds(
 	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
 	envVars: INodeEnvironmentVariables,
 	requiresEngineStarted: boolean,
-	requiresNodeIdentity: boolean
+	requiresNodeIdentity: boolean,
+	requiresOrgIdentity: boolean
 ): void {
 	const state = engine.getState();
 
-	if (requiresEngineStarted && requiresNodeIdentity) {
-		const nodeIdentityEnabled = Coerce.boolean(envVars.nodeIdentityEnabled) ?? true;
-		if (nodeIdentityEnabled) {
-			if (Is.stringValue(state.nodeId)) {
-				engine.addContextId(ContextIdKeys.Node, state.nodeId);
-			} else {
-				throw new GeneralError("node", "nodeIdentityNotSet");
+	if (requiresEngineStarted) {
+		if (Is.stringValue(state.nodeId)) {
+			engine.addContextId(ContextIdKeys.Node, state.nodeId);
+		} else if (requiresNodeIdentity) {
+			throw new GeneralError("node", "nodeIdentityNotSet");
+		}
+
+		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+		if (!tenantEnabled) {
+			if (Is.stringValue(state.nodeOrganizationId)) {
+				engine.addContextId(ContextIdKeys.Organization, state.nodeOrganizationId);
+			} else if (requiresOrgIdentity) {
+				throw new GeneralError("node", "nodeOrganizationIdNotSet");
 			}
 		}
 	}
@@ -175,4 +196,71 @@ function configureContextIdKeys(
 			}
 		}
 	}
+}
+
+/**
+ * Scan all tenants for a missing organization ID.
+ * If exactly one tenant is missing and the node's own organization ID is available in state,
+ * the value is automatically applied and persisted (legacy migration path).
+ * If multiple tenants are missing, or the single missing tenant cannot be auto-recovered,
+ * startup is blocked with an error listing the affected tenant IDs.
+ * @param engineCore The engine core.
+ * @param envVars The environment variables.
+ */
+async function enforceTenantOrganizationIds(
+	engineCore: IEngineCore<IEngineCoreConfig, INodeEngineState>,
+	envVars: INodeEnvironmentVariables
+): Promise<void> {
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+	if (!tenantEnabled) {
+		return;
+	}
+
+	const type = engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
+	if (!Is.stringValue(type)) {
+		return;
+	}
+
+	const tenantAdminComponent = ComponentFactory.get<ITenantAdminComponent>(type);
+	const missingIds: string[] = [];
+	let cursor: string | undefined;
+
+	do {
+		const { tenants, cursor: next } = await tenantAdminComponent.query(
+			undefined,
+			["id", "organizationId"],
+			cursor
+		);
+		for (const tenant of tenants) {
+			if (Is.stringValue(tenant.id) && !Is.stringValue(tenant.organizationId)) {
+				missingIds.push(tenant.id);
+			}
+		}
+		cursor = next;
+	} while (Is.stringValue(cursor));
+
+	if (missingIds.length === 0) {
+		return;
+	}
+
+	if (missingIds.length === 1) {
+		const state = engineCore.getState();
+		if (Is.stringValue(state.nodeOrganizationId)) {
+			engineCore.logInfo(
+				I18n.formatMessage("node.tenantOrganizationIdAutoAssigned", {
+					tenantId: missingIds[0],
+					organizationId: state.nodeOrganizationId
+				})
+			);
+			await tenantAdminComponent.update({
+				id: missingIds[0],
+				organizationId: state.nodeOrganizationId
+			});
+			return;
+		}
+	}
+
+	throw new GeneralError("node", "tenantsWithoutOrganizationId", {
+		tenantIds: missingIds.join(", ")
+	});
 }

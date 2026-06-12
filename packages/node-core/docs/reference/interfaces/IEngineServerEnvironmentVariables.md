@@ -60,18 +60,6 @@ The name of the state file.
 
 ***
 
-### nodeIdentityEnabled? {#nodeidentityenabled}
-
-> `optional` **nodeIdentityEnabled?**: `string`
-
-Does the node have a unique ID, defaults to true.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`nodeIdentityEnabled`](IEngineEnvironmentVariables.md#nodeidentityenabled)
-
-***
-
 ### tenantEnabled? {#tenantenabled}
 
 > `optional` **tenantEnabled?**: `string`
@@ -277,15 +265,15 @@ GCP Firestore database id.
 
 ***
 
-### gcpFirestoreApiEndpoint? {#gcpfirestoreapiendpoint}
+### gcpFirestoreEndpoint? {#gcpfirestoreendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint?**: `string`
+> `optional` **gcpFirestoreEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`gcpFirestoreApiEndpoint`](IEngineEnvironmentVariables.md#gcpfirestoreapiendpoint)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`gcpFirestoreEndpoint`](IEngineEnvironmentVariables.md#gcpfirestoreendpoint)
 
 ***
 
@@ -842,6 +830,42 @@ The type of logging task connector, can be a comma separated list: console, enti
 
 ***
 
+### loggingBatchSize? {#loggingbatchsize}
+
+> `optional` **loggingBatchSize?**: `string`
+
+The batch size for the logging task, set to 1 for no batching.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingBatchSize`](IEngineEnvironmentVariables.md#loggingbatchsize)
+
+***
+
+### loggingBatchFlushIntervalSeconds? {#loggingbatchflushintervalseconds}
+
+> `optional` **loggingBatchFlushIntervalSeconds?**: `string`
+
+The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingBatchFlushIntervalSeconds`](IEngineEnvironmentVariables.md#loggingbatchflushintervalseconds)
+
+***
+
+### loggingSilentComponents? {#loggingsilentcomponents}
+
+> `optional` **loggingSilentComponents?**: `string`
+
+A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingSilentComponents`](IEngineEnvironmentVariables.md#loggingsilentcomponents)
+
+***
+
 ### eventBusConnector? {#eventbusconnector}
 
 > `optional` **eventBusConnector?**: `string`
@@ -1370,6 +1394,18 @@ The type of the default data extractor, can be a comma separated list: json-path
 
 ***
 
+### taskSchedulerEnabled? {#taskschedulerenabled}
+
+> `optional` **taskSchedulerEnabled?**: `string`
+
+Enable the task scheduler regardless of which other components are active, defaults to false.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`taskSchedulerEnabled`](IEngineEnvironmentVariables.md#taskschedulerenabled)
+
+***
+
 ### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
 > `optional` **auditableItemGraphEnabled?**: `string`
@@ -1649,9 +1685,9 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 ***
 
-### dataspaceActivityLogsCleanUpInterval? {#dataspaceactivitylogscleanupinterval}
+### dataspaceActivityLogsCleanupInterval? {#dataspaceactivitylogscleanupinterval}
 
-> `optional` **dataspaceActivityLogsCleanUpInterval?**: `string`
+> `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
 The interval for cleaning up the activity logs.
 
@@ -1663,7 +1699,7 @@ The interval for cleaning up the activity logs.
 
 #### Inherited from
 
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceActivityLogsCleanUpInterval`](IEngineEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceActivityLogsCleanupInterval`](IEngineEnvironmentVariables.md#dataspaceactivitylogscleanupinterval)
 
 ***
 
@@ -1716,18 +1752,6 @@ This allows components that take a long time to initialize to be healthy before 
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`healthStartupIntervalSeconds`](IEngineEnvironmentVariables.md#healthstartupintervalseconds)
-
-***
-
-### urlTransformerEncryptionKeyId? {#urltransformerencryptionkeyid}
-
-> `optional` **urlTransformerEncryptionKeyId?**: `string`
-
-The id of the key in the vault to use for encrypting parameters in url transformer.
-
-#### Inherited from
-
-[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`urlTransformerEncryptionKeyId`](IEngineEnvironmentVariables.md#urltransformerencryptionkeyid)
 
 ***
 
@@ -1833,6 +1857,14 @@ The type of auth processor to use on the API: entity-storage.
 > `optional` **authSigningKeyId?**: `string`
 
 The id of the key in the vault to use for signing in auth operations.
+
+***
+
+### authApiKeyHeader? {#authapikeyheader}
+
+> `optional` **authApiKeyHeader?**: `string`
+
+The HTTP header name used to pass the API key on requests, defaults to x-api-key.
 
 ***
 

@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.3-next.54](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.53...node-core-v0.0.3-next.54) (2026-06-12)
+
+
+### Features
+
+* improved cli commands ([#206](https://github.com/iotaledger/twin-node/issues/206)) ([cf00850](https://github.com/iotaledger/twin-node/commit/cf0085023a66e187aaaaf3889128c845c73a1faf))
+
+## [0.0.3-next.53](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.52...node-core-v0.0.3-next.53) (2026-06-11)
+
+
+### Features
+
+* organization identifiers ([#203](https://github.com/iotaledger/twin-node/issues/203)) ([1a6b176](https://github.com/iotaledger/twin-node/commit/1a6b1760d9f8e43a769407668426c70e1c8e1aa8))
+
+## [0.0.3-next.52](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.51...node-core-v0.0.3-next.52) (2026-06-09)
+
+
+### Bug Fixes
+
+* recover tenant id on bootstrap-legacy restart when TENANT_ID is unset ([#198](https://github.com/iotaledger/twin-node/issues/198)) ([d9451e1](https://github.com/iotaledger/twin-node/commit/d9451e188fe4fd20d5cfd0408b0dc226ddf25cd8))
+
+## [0.0.3-next.51](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.50...node-core-v0.0.3-next.51) (2026-06-09)
+
+
+### Features
+
+* migration testing ([#199](https://github.com/iotaledger/twin-node/issues/199)) ([97a731c](https://github.com/iotaledger/twin-node/commit/97a731c520d66ab0588d80987a0f88d388ce51ae))
+
 ## [0.0.3-next.50](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.49...node-core-v0.0.3-next.50) (2026-06-08)
 
 

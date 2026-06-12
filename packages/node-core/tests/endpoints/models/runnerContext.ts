@@ -36,9 +36,17 @@ export interface RunnerContext {
 	serverStartTime: number;
 
 	/**
-	 * When false, the x-enc-tenant-token query parameter is stripped from every path before
-	 * the request is sent. Use false for single-tenant nodes where there is no tenant to
-	 * identify. Defaults to true when omitted.
+	 * When false, the ?organization=<orgDid> query parameter is not appended to requests.
+	 * Defaults to true (appended) when omitted. Both multi-tenant and single-tenant nodes
+	 * accept ?organization=; set this to false only in steps or contexts that explicitly
+	 * test the absence of the parameter.
 	 */
-	appendTenantParam?: boolean;
+	appendOrgParam?: boolean;
+
+	/**
+	 * When true, steps with skipIfOrgParamOmitted are skipped.
+	 * Use true for single-tenant nodes where multi-tenant-specific negative tests
+	 * (e.g. verifying that a missing org param produces a particular error) do not apply.
+	 */
+	isSingleTenant?: boolean;
 }

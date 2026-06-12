@@ -8,7 +8,7 @@
 			"apiKey": true,
 			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
 			"expectedStatus": 200,
-			"capture": { "authToken": "cookie:access_token", "tenantToken": "jwt-claim:tid" },
+			"capture": { "authToken": "cookie:access_token", "organizationId": "jwt-claim:org" },
 			"assert": { "body.expiry": "isDefined" }
 		},
 		{

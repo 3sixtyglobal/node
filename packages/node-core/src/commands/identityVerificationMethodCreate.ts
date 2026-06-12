@@ -33,6 +33,7 @@ export function getCommandDefinitionIdentityVerificationMethodCreate(commandDefi
 		),
 		example: I18n.formatMessage("node.cli.commands.identity-verification-method-create.example"),
 		requiresNodeIdentity: false,
+		requiresOrgIdentity: false,
 		params: [
 			{
 				key: "env-prefix",
@@ -291,64 +292,66 @@ export async function identityVerificationMethodCreate(
 		const jwk = await Jwk.fromEd25519Private(keyPair.privateKey);
 		const kid = await Jwk.generateKid(jwk);
 
-		CLIDisplay.break();
+		if (createMethod) {
+			CLIDisplay.break();
 
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.verificationMethodId"
-			),
-			verificationMethod.id
-		);
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.verificationMethodType"
-			),
-			verificationMethod.type
-		);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.verificationMethodId"
+				),
+				verificationMethod.id
+			);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.verificationMethodType"
+				),
+				verificationMethod.type
+			);
 
-		CLIDisplay.value(
-			I18n.formatMessage("node.cli.commands.identity-verification-method-create.labels.kid"),
-			kid
-		);
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.privateKeyBase64Url"
-			),
-			privateKeyBase64Url
-		);
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.publicKeyBase64Url"
-			),
-			publicKeyBase64Url
-		);
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.privateKeyBase64"
-			),
-			privateKeyBase64
-		);
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.publicKeyBase64"
-			),
-			publicKeyBase64
-		);
+			CLIDisplay.value(
+				I18n.formatMessage("node.cli.commands.identity-verification-method-create.labels.kid"),
+				kid
+			);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.privateKeyBase64Url"
+				),
+				privateKeyBase64Url
+			);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.publicKeyBase64Url"
+				),
+				publicKeyBase64Url
+			);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.privateKeyBase64"
+				),
+				privateKeyBase64
+			);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.publicKeyBase64"
+				),
+				publicKeyBase64
+			);
 
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.privateKeyHex"
-			),
-			privateKeyHex
-		);
-		CLIDisplay.value(
-			I18n.formatMessage(
-				"node.cli.commands.identity-verification-method-create.labels.publicKeyHex"
-			),
-			publicKeyHex
-		);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.privateKeyHex"
+				),
+				privateKeyHex
+			);
+			CLIDisplay.value(
+				I18n.formatMessage(
+					"node.cli.commands.identity-verification-method-create.labels.publicKeyHex"
+				),
+				publicKeyHex
+			);
 
-		CLIDisplay.break();
+			CLIDisplay.break();
+		}
 
 		json = {
 			verificationMethodId: verificationMethod.id,
