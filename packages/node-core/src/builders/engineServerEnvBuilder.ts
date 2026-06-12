@@ -67,12 +67,12 @@ export async function buildEngineServerConfiguration(
 		}
 	}
 
-	const nodeIdentityEnabled = Coerce.boolean(envVars.nodeIdentityEnabled) ?? true;
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+	const apiKeyHeader = envVars.authApiKeyHeader ?? "x-api-key";
 	if (tenantEnabled) {
 		webServerOptions.allowedHeaders ??= [];
-		if (!webServerOptions.allowedHeaders.includes("x-api-key")) {
-			webServerOptions.allowedHeaders.push("x-api-key");
+		if (!webServerOptions.allowedHeaders.includes(apiKeyHeader)) {
+			webServerOptions.allowedHeaders.push(apiKeyHeader);
 		}
 	}
 
@@ -123,29 +123,27 @@ export async function buildEngineServerConfiguration(
 	serverConfig.types.restRouteProcessor ??= [];
 	serverConfig.types.socketRouteProcessor ??= [];
 
-	if (nodeIdentityEnabled) {
-		availableContextIdKeys.push({
-			key: ContextIdKeys.Node,
-			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
-		});
+	availableContextIdKeys.push({
+		key: ContextIdKeys.Node,
+		requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+	});
 
-		serverConfig.types.restRouteProcessor.push({
-			type: RestRouteProcessorType.ContextId,
-			options: {
-				config: {
-					key: ContextIdKeys.Node
-				}
+	serverConfig.types.restRouteProcessor.push({
+		type: RestRouteProcessorType.ContextId,
+		options: {
+			config: {
+				key: ContextIdKeys.Node
 			}
-		});
-		serverConfig.types.socketRouteProcessor.push({
-			type: SocketRouteProcessorType.ContextId,
-			options: {
-				config: {
-					key: ContextIdKeys.Node
-				}
+		}
+	});
+	serverConfig.types.socketRouteProcessor.push({
+		type: SocketRouteProcessorType.ContextId,
+		options: {
+			config: {
+				key: ContextIdKeys.Node
 			}
-		});
-	}
+		}
+	});
 
 	if (tenantEnabled) {
 		availableContextIdKeys.push({
@@ -160,16 +158,20 @@ export async function buildEngineServerConfiguration(
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Tenant,
 			options: {
-				config: {}
+				config: {
+					apiKeyName: apiKeyHeader
+				}
 			}
 		});
 		serverConfig.types.socketRouteProcessor.push({
 			type: SocketRouteProcessorType.Tenant,
 			options: {
-				config: {}
+				config: {
+					apiKeyName: apiKeyHeader
+				}
 			}
 		});
-	} else if (nodeIdentityEnabled) {
+	} else {
 		availableContextIdKeys.push({
 			key: ContextIdKeys.Organization,
 			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
@@ -256,12 +258,10 @@ export async function buildEngineServerConfiguration(
 	}
 
 	if (authProcessorType === AuthenticationComponentType.EntityStorage) {
-		if (nodeIdentityEnabled) {
-			availableContextIdKeys.push({
-				key: ContextIdKeys.User,
-				requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
-			});
-		}
+		availableContextIdKeys.push({
+			key: ContextIdKeys.User,
+			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		});
 
 		serverConfig.types.authenticationComponent ??= [];
 		serverConfig.types.authenticationComponent.push({

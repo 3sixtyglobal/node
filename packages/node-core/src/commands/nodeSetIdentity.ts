@@ -88,6 +88,12 @@ export async function nodeSetIdentity(
 	}
 
 	const state = engineCore.getState();
+
+	if (state.nodeId === params.identity) {
+		CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-set-identity.labels.skipping"));
+		return;
+	}
+
 	state.nodeId = params.identity;
 	engineCore.setStateDirty();
 

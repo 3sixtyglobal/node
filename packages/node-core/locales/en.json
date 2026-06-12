@@ -18,10 +18,11 @@
 		},
 		"bootstrapLegacy": {
 			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled.",
-			"organizationNotSet": "The organisation identity has not been set. Run bootstrap with the \"node-identity\" feature first."
+			"organizationNotSet": "The organisation identity has not been set. Run \"set-node-org-id\"."
 		},
 		"identityCreate": {
 			"invalidMnemonic": "The mnemonic is invalid, it should be 24 words from the standard wordlist.",
+			"onlyOneAssignmentOptionAllowed": "Only one of node-id, node-organization-id, or tenant-organization-id can be set at the same time.",
 			"nodeOrganizationIdNotAvailableInMultiTenantMode": "The node-organization-id option is not available in multi-tenant mode, use tenant-organization-id instead."
 		},
 		"identityImport": {
@@ -111,14 +112,12 @@
 						"nodeIdentityCreate": "Creating node identity",
 						"nodeAuthKeyCreate": "Creating node auth key",
 						"trustVerificationMethodCreate": "Creating trust verification method for organisation identity",
-						"nodeIdentitySet": "Setting node identity",
 						"nodeTenantCreate": "Creating node tenant",
 						"organisationCreate": "Creating organisation identity",
 						"blobStorageKeyCreate": "Creating blob storage encryption key for organisation identity",
 						"attestationMethodCreate": "Creating attestation method for organisation identity",
 						"immutableProofMethodCreate": "Creating immutable proof method for organisation identity",
 						"nodeOrganizationIdSet": "Setting node organisation ID",
-						"tenantOrganizationIdSet": "Setting tenant organisation ID",
 						"adminIdentityCreate": "Creating admin user identity",
 						"adminUserCreate": "Creating admin user",
 						"tenantFallback": "No Node-labelled tenant found; using first available tenant"
@@ -155,6 +154,9 @@
 						"output-env-prefix": {
 							"description": "Prefix to use for variables in the output .env file."
 						},
+						"node-id": {
+							"description": "If true, set the created identity DID as the node identity."
+						},
 						"node-organization-id": {
 							"description": "If true, set the created identity DID as the node organization ID (not available in multi-tenant mode)."
 						},
@@ -167,12 +169,12 @@
 						"processingMnemonic": "Processing mnemonic",
 						"readingMnemonic": "Reading mnemonic",
 						"storingMnemonic": "Storing mnemonic",
-						"existingMnemonic": "Mnemonic already exists",
+						"existingMnemonic": "Mnemonic already exists, skipping creation",
 						"noExistingMnemonic": "No existing mnemonic found",
 						"generatingMnemonic": "Generating mnemonic",
 						"processingIdentity": "Processing identity",
 						"resolvingIdentity": "Resolving identity",
-						"existingIdentity": "Identity already exists",
+						"existingIdentity": "Identity already exists, skipping creation",
 						"noIdentityFound": "No identity found",
 						"creatingIdentity": "Creating identity",
 						"createdIdentity": "Created identity",
@@ -349,7 +351,8 @@
 					},
 					"labels": {
 						"resolvingIdentity": "Resolving identity",
-						"stored": "The node identity has been stored"
+						"stored": "The node identity has been stored",
+						"skipping": "The node identity has not changed, skipping"
 					}
 				},
 				"tenant-create": {

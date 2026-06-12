@@ -22,15 +22,14 @@ When you change the prefix, all variables in this document use your custom prefi
 
 ## Core Runtime Variables
 
-| Variable                     | Possible Values             | Default                                        | Notes                                                                    |
-| ---------------------------- | --------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
-| `TWIN_DEBUG`                 | `true`, `false`             | `false`                                        | Enables engine debug mode.                                               |
-| `TWIN_SILENT`                | `true`, `false`             | `false`                                        | Suppresses console output.                                               |
-| `TWIN_STORAGE_FILE_ROOT`     | File system path            | None                                           | Root directory for file-based state and storage.                         |
-| `TWIN_STATE_FILENAME`        | File name or path           | `engine-state.json` (when storage root is set) | State file used by node state storage.                                   |
-| `TWIN_NODE_IDENTITY_ENABLED` | `true`, `false`             | `true`                                         | Enables node context identity flow.                                      |
-| `TWIN_TENANT_ENABLED`        | `true`, `false`             | `false`                                        | Enables tenant-scoped flow.                                              |
-| `TWIN_EXTENSIONS`            | Comma-separated module list | None                                           | Extension modules to load. Supports local, `npm:`, and `https:` entries. |
+| Variable                 | Possible Values             | Default                                        | Notes                                                                    |
+| ------------------------ | --------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `TWIN_DEBUG`             | `true`, `false`             | `false`                                        | Enables engine debug mode.                                               |
+| `TWIN_SILENT`            | `true`, `false`             | `false`                                        | Suppresses console output.                                               |
+| `TWIN_STORAGE_FILE_ROOT` | File system path            | None                                           | Root directory for file-based state and storage.                         |
+| `TWIN_STATE_FILENAME`    | File name or path           | `engine-state.json` (when storage root is set) | State file used by node state storage.                                   |
+| `TWIN_TENANT_ENABLED`    | `true`, `false`             | `false`                                        | Enables tenant-scoped flow.                                              |
+| `TWIN_EXTENSIONS`        | Comma-separated module list | None                                           | Extension modules to load. Supports local, `npm:`, and `https:` entries. |
 
 ## Server Variables
 
@@ -125,6 +124,7 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None             | Authentication admin processor type.            |
 | `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None             | Authentication processor type.                  |
 | `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`   | Key used for auth signing operations.           |
+| `TWIN_AUTH_API_KEY_HEADER`                | Header name string              | `x-api-key`      | HTTP header name for the API key on requests.   |
 | `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None             | Additional MIME processor registrations.        |
 | `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value | Includes body in route logging.                 |
 | `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`          | Includes full base64 payloads in route logging. |

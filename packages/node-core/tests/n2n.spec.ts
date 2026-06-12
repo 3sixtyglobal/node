@@ -359,7 +359,7 @@ describe("node-core n2n", () => {
 
 		// TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT in the bootstrap env makes
 		// isTrustRequired()=true so the proxy's DID gets a trust verification
-		// method key. The endpoint is the base URL — BaseRestClient appends
+		// method key. The endpoint is the base URL - BaseRestClient appends
 		// "/federated-catalogue" automatically.
 		const proxyRemoteEndpoint = `http://localhost:${CATALOGUE_PORT}`;
 		const proxyState: INodeEngineState = {};

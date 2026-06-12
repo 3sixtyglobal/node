@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
+import type { ITenantAdminComponent } from "@twin.org/api-models";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
@@ -39,7 +41,7 @@ const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
 const OUTPUT_TMP_DIR = "./tests/.tmp-endpoints/";
 
-const OUTPUT_TMP_DIR_ST = "./tests/.tmp-endpoints-st/";
+const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
 
 const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
@@ -92,7 +94,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — creates node identity, auth signing key, tenant, admin user.
+		// Phase 1: Bootstrap - creates node identity, auth signing key, tenant, admin user.
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -101,7 +103,7 @@ describe("node-core", () => {
 				disableProcessExitOnFailure: true,
 				envVars: {
 					...SHARED_ENV_VARS,
-					TWIN_FEATURES: "node-identity,node-admin-user",
+					TWIN_FEATURES: "admin-user",
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_TENANT_ID: TEST_TENANT_ID,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
@@ -133,12 +135,22 @@ describe("node-core", () => {
 		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
 		expect(trustComponentType).toBeDefined();
 
+		// In multi-tenant mode, the org DID is on the tenant, not in node state — look it up.
+		const tenantAdminType =
+			serverResult?.engine.getRegisteredInstanceTypeOptional("tenantAdminComponent");
+		expect(tenantAdminType).toBeDefined();
+		let orgDid: string | undefined;
+		await ContextIdStore.run({ [ContextIdKeys.Node]: bootstrapState.nodeId ?? "" }, async () => {
+			const tenantAdmin = ComponentFactory.get<ITenantAdminComponent>(tenantAdminType ?? "");
+			const tenant = await tenantAdmin.get(TEST_TENANT_ID);
+			orgDid = tenant.organizationId;
+		});
+		expect(orgDid).toBeDefined();
+
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
-		const trustBearerToken = await trustComponent.generate(
-			bootstrapState.nodeOrganizationId ?? "",
-			undefined,
-			{ subject: {} }
-		);
+		const trustBearerToken = await trustComponent.generate(orgDid ?? "", undefined, {
+			subject: {}
+		});
 
 		const serverStartTime = Date.now();
 
@@ -184,7 +196,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — creates node identity and admin user (no tenant in single-tenant mode).
+		// Phase 1: Bootstrap - creates node identity and admin user (no tenant in single-tenant mode).
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -193,7 +205,7 @@ describe("node-core", () => {
 				disableProcessExitOnFailure: true,
 				envVars: {
 					...singleTenantEnvVars,
-					TWIN_FEATURES: "node-identity,node-admin-user",
+					TWIN_FEATURES: "admin-user",
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,

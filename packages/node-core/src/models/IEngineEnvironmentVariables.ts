@@ -26,11 +26,6 @@ export interface IEngineEnvironmentVariables {
 	stateFilename?: string;
 
 	/**
-	 * Does the node have a unique ID, defaults to true.
-	 */
-	nodeIdentityEnabled?: string;
-
-	/**
 	 * Is multi-tenant support enabled, defaults to false.
 	 */
 	tenantEnabled?: string;

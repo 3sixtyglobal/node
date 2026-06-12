@@ -18,6 +18,7 @@ import { nameofKebabCase } from "@twin.org/nameof";
 import { type IVaultConnector, VaultConnectorFactory } from "@twin.org/vault-models";
 import type { WalletAddress } from "@twin.org/wallet-connector-entity-storage";
 import { WalletConnectorFactory } from "@twin.org/wallet-models";
+import { nodeSetIdentity } from "./nodeSetIdentity.js";
 import { applyOrganizationIdToTenant } from "./setTenantOrgId.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -117,6 +118,15 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
 				required: false
 			},
 			{
+				key: "node-id",
+				type: "boolean",
+				description: I18n.formatMessage(
+					"node.cli.commands.identity-create.params.node-id.description"
+				),
+				required: false,
+				defaultValue: false
+			},
+			{
 				key: "node-organization-id",
 				type: "boolean",
 				description: I18n.formatMessage(
@@ -148,6 +158,7 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
  * @param params.identity The DID of the identity to create.
  * @param params.controller The controller DID for the identity.
  * @param params.fundWallet Whether to fund the wallet associated with the identity from a faucet.
+ * @param params.nodeId If true, set the created DID as the node identity.
  * @param params.nodeOrganizationId If true, set the created DID as the node organization ID.
  * @param params.tenantOrganizationId The tenant ID to set the created DID as the organization ID for.
  * @param params.outputJson The output .json file to store the command output.
@@ -163,6 +174,7 @@ export async function identityCreate(
 		identity?: string;
 		controller?: string;
 		fundWallet?: boolean;
+		nodeId?: boolean;
 		nodeOrganizationId?: boolean;
 		tenantOrganizationId?: string;
 		outputJson?: string;
@@ -170,6 +182,14 @@ export async function identityCreate(
 		outputEnvPrefix?: string;
 	}
 ): Promise<{ mnemonic: string; did: string; walletAddress?: string }> {
+	const assignmentCount =
+		(params.nodeId ? 1 : 0) +
+		(params.nodeOrganizationId ? 1 : 0) +
+		(Is.stringValue(params.tenantOrganizationId) ? 1 : 0);
+	if (assignmentCount > 1) {
+		throw new GeneralError("identityCreate", "onlyOneAssignmentOptionAllowed");
+	}
+
 	let workingIdentity = params?.identity;
 	let tempIdentity;
 	if (!Is.stringValue(workingIdentity)) {
@@ -206,6 +226,10 @@ export async function identityCreate(
 			await walletFinalise(engineCore, workingIdentity, walletAddress);
 		}
 
+		if (params.nodeId) {
+			await nodeSetIdentity(engineCore, envVars, { identity: workingIdentity });
+		}
+
 		if (params.nodeOrganizationId) {
 			if (Coerce.boolean(envVars.tenantEnabled)) {
 				throw new GeneralError("identityCreate", "nodeOrganizationIdNotAvailableInMultiTenantMode");
@@ -219,16 +243,18 @@ export async function identityCreate(
 			await applyOrganizationIdToTenant(engineCore, params.tenantOrganizationId, workingIdentity);
 		}
 
-		CLIDisplay.break();
+		if (mnemonicStored) {
+			CLIDisplay.break();
 
-		CLIDisplay.value(
-			I18n.formatMessage("node.cli.commands.identity-create.labels.mnemonic"),
-			mnemonicResult.mnemonic
-		);
-		CLIDisplay.value(
-			I18n.formatMessage("node.cli.commands.identity-create.labels.did"),
-			workingIdentity
-		);
+			CLIDisplay.value(
+				I18n.formatMessage("node.cli.commands.identity-create.labels.mnemonic"),
+				mnemonicResult.mnemonic
+			);
+			CLIDisplay.value(
+				I18n.formatMessage("node.cli.commands.identity-create.labels.did"),
+				workingIdentity
+			);
+		}
 		if (
 			Is.stringValue(envVars.iotaExplorerEndpoint) &&
 			envVars.identityConnector === IdentityConnectorType.Iota

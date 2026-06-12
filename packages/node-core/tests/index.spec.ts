@@ -68,11 +68,13 @@ describe("node-core", () => {
 	test("Can run the node with minimal config and shut it down", async () => {
 		const result = await run({
 			localesDirectory: "./dist/locales/",
-			stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_NODE_ORG_ID }),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
-				TWIN_NODE_IDENTITY_ENABLED: "false",
 				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 			}
 		});
@@ -81,14 +83,16 @@ describe("node-core", () => {
 		await result?.shutdown();
 	});
 
-	test("Can run the node with config with no node id", async () => {
+	test("Can run the node with config", async () => {
 		const result = await run({
 			localesDirectory: "./dist/locales/",
-			stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_NODE_ORG_ID }),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
-				TWIN_NODE_IDENTITY_ENABLED: "false",
 				TWIN_PORT: port.toString(),
 				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,

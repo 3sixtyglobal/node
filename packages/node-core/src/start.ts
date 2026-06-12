@@ -157,17 +157,14 @@ function configureContextIds(
 	const state = engine.getState();
 
 	if (requiresEngineStarted) {
-		const nodeIdentityEnabled = Coerce.boolean(envVars.nodeIdentityEnabled) ?? true;
-		if (nodeIdentityEnabled) {
-			if (Is.stringValue(state.nodeId)) {
-				engine.addContextId(ContextIdKeys.Node, state.nodeId);
-			} else if (requiresNodeIdentity) {
-				throw new GeneralError("node", "nodeIdentityNotSet");
-			}
+		if (Is.stringValue(state.nodeId)) {
+			engine.addContextId(ContextIdKeys.Node, state.nodeId);
+		} else if (requiresNodeIdentity) {
+			throw new GeneralError("node", "nodeIdentityNotSet");
 		}
 
 		const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
-		if (!tenantEnabled && nodeIdentityEnabled) {
+		if (!tenantEnabled) {
 			if (Is.stringValue(state.nodeOrganizationId)) {
 				engine.addContextId(ContextIdKeys.Organization, state.nodeOrganizationId);
 			} else if (requiresOrgIdentity) {

@@ -21,7 +21,7 @@ export interface StepDefinition {
 	path: string;
 
 	/**
-	 * Default false — set to true to append the api key as a request header.
+	 * Default false - set to true to append the api key as a request header.
 	 * Only the login endpoint accepts an API key; all other endpoints use the
 	 * organization DID (from the JWT access_token org claim) for tenant resolution.
 	 */
@@ -49,14 +49,14 @@ export interface StepDefinition {
 	/**
 	 * Capture response data into named context variables.
 	 * Spec strings:
-	 * "location-last-segment" — decodeURIComponent of last path segment of Location header
-	 * "header.location" — raw Location header value
-	 * "cookie:<name>" — named cookie from Set-Cookie header
-	 * "body" — entire JSON response body (serialised; re-parsed as object when used in body fields)
-	 * "body.<dot.path>" — dot-path into JSON response (supports [n] array indexing)
-	 * "body.<dot.path>|last-colon" — as above, then takes the last colon-delimited segment
-	 * "response-text" — full response as plain text
-	 * "jwt-claim:<name>" — decodes the current authToken JWT and returns the named payload claim
+	 * "location-last-segment" - decodeURIComponent of last path segment of Location header
+	 * "header.location" - raw Location header value
+	 * "cookie:<name>" - named cookie from Set-Cookie header
+	 * "body" - entire JSON response body (serialised; re-parsed as object when used in body fields)
+	 * "body.<dot.path>" - dot-path into JSON response (supports [n] array indexing)
+	 * "body.<dot.path>|last-colon" - as above, then takes the last colon-delimited segment
+	 * "response-text" - full response as plain text
+	 * "jwt-claim:<name>" - decodes the current authToken JWT and returns the named payload claim
 	 */
 	capture?: { [key: string]: string };
 

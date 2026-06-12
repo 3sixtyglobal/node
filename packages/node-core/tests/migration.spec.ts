@@ -44,18 +44,19 @@ class MigrationTestEntity {
 }
 
 const LOCALES_DIR = "./dist/locales/";
+const TEST_NODE_ID = "did:iota:0x123";
+const TEST_NODE_ORG_ID = "did:iota:0x456";
 
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
-	TWIN_NODE_IDENTITY_ENABLED: "false",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
 };
 
 describe("migration", () => {
 	beforeAll(() => {
 		ContextIdStore.getContextIds = vi.fn().mockImplementation(() => ({
-			node: "did:iota:0x123",
-			tenant: "00000000000000000000000000000123"
+			node: TEST_NODE_ID,
+			organization: TEST_NODE_ORG_ID
 		}));
 	});
 
@@ -68,7 +69,10 @@ describe("migration", () => {
 
 		const nodeRun = await run({
 			localesDirectory: LOCALES_DIR,
-			stateStorage: new MemoryStateStorage(),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
 			disableProcessExitOnFailure: true,
 			envVars: { ...BASE_ENV, TWIN_PORT: String(port) },
 			extendConfig: async (unusedEnvVars, config) => {
@@ -120,7 +124,10 @@ describe("migration", () => {
 		// record to v0 and seed v0 entity data so that run 2 triggers the real migration.
 		const run1 = await run({
 			localesDirectory: LOCALES_DIR,
-			stateStorage: new MemoryStateStorage(),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
 			disableProcessExitOnFailure: true,
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) },
 			extendConfig: async (envVars, config) => {
@@ -159,7 +166,7 @@ describe("migration", () => {
 		await run1?.shutdown();
 
 		// Run 2: restart the node reusing the existing connectors from run 1. New connectors are
-		// not created because EntityStorageConnectorFactory already has them registered — the
+		// not created because EntityStorageConnectorFactory already has them registered - the
 		// engine skips re-registration when a connector name is already present.
 		// SchemaVersionService detects that MigrationTestEntity is at v0 but the schema is v1,
 		// and runs the registered migration against the three pre-seeded entities.
@@ -170,7 +177,10 @@ describe("migration", () => {
 		try {
 			run2 = await run({
 				localesDirectory: LOCALES_DIR,
-				stateStorage: new MemoryStateStorage(),
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
 				disableProcessExitOnFailure: true,
 				envVars: {
 					...BASE_ENV,

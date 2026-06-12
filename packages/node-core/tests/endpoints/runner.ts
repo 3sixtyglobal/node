@@ -82,7 +82,7 @@ function interpolateDeep(value: unknown, vars: { [key: string]: string }): unkno
 				try {
 					return JSON.parse(raw);
 				} catch {
-					// not valid JSON — fall through and return as string
+					// not valid JSON - fall through and return as string
 				}
 			}
 			return raw;
@@ -134,7 +134,7 @@ function getNestedValue(obj: unknown, dotPath: string): unknown {
  * @param ctx The shared runner context providing variables and auth state.
  */
 async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> {
-	// Honour the time barrier — some steps must not run until the server has had a chance to
+	// Honour the time barrier - some steps must not run until the server has had a chance to
 	// fully initialise (e.g. health checks that depend on background indexing).
 	if (step.timeBarrier) {
 		const delay = Math.max(0, step.timeBarrier - (Date.now() - ctx.serverStartTime));
@@ -184,7 +184,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 	const fetchOptions: RequestInit = { method: step.method, headers };
 	if (hasBody) {
 		const interpolated = interpolateDeep(step.body, ctx.vars);
-		// A top-level string body means step.body was "{{varName}}" — the captured value
+		// A top-level string body means step.body was "{{varName}}" - the captured value
 		// is already a JSON string (e.g. a serialized object), so send it verbatim.
 		fetchOptions.body =
 			typeof interpolated === "string" ? interpolated : JSON.stringify(interpolated);
@@ -192,7 +192,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 
 	const res = await fetch(urlStr, fetchOptions);
 
-	// Parse response body — skip for 204 No Content; otherwise prefer JSON when the
+	// Parse response body - skip for 204 No Content; otherwise prefer JSON when the
 	// content-type indicates it, falling back to plain text.
 	let responseJson: unknown;
 	let responseText: string | undefined;
@@ -220,7 +220,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 		...(responseText !== undefined ? { text: responseText } : {})
 	});
 
-	// Capture — extract values from the response and store them in ctx.vars so they can be
+	// Capture - extract values from the response and store them in ctx.vars so they can be
 	// referenced via {{varName}} in subsequent steps.
 	if (step.capture) {
 		for (const [varName, spec] of Object.entries(step.capture)) {
@@ -255,7 +255,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 				captured = responseText;
 			} else if (spec.startsWith("jwt-claim:")) {
 				// Decode the current authToken JWT and extract a payload claim without
-				// signature verification — e.g. "jwt-claim:org" yields the organization DID.
+				// signature verification - e.g. "jwt-claim:org" yields the organization DID.
 				const claimKey = spec.slice(10);
 				const jwt = ctx.authToken;
 				if (Is.stringValue(jwt)) {
@@ -268,7 +268,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 							captured = Is.string(val) ? val : JSON.stringify(val);
 						}
 					} catch {
-						// malformed JWT — skip
+						// malformed JWT - skip
 					}
 				}
 			}
@@ -283,7 +283,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 		}
 	}
 
-	// Assert — validate captured or response values against expected literals, context
+	// Assert - validate captured or response values against expected literals, context
 	// variables, or the sentinel "isDefined".
 	if (step.assert) {
 		for (const [spec, expected] of Object.entries(step.assert)) {

@@ -9,6 +9,7 @@ import { run } from "../src/node.js";
 
 const LOCALES_DIR = "./dist/locales/";
 
+const TEST_NODE_ID = "did:iota:testnet:0x1234";
 const TEST_ORG_ID =
 	"did:iota:testnet:0x7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b";
 const TEST_TENANT_ID_A = "a0000000000000000000000000000001";
@@ -18,7 +19,6 @@ const TEST_API_KEY_B = "d0000000000000000000000000000002";
 
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
-	TWIN_NODE_IDENTITY_ENABLED: "false",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 	TWIN_TENANT_ENABLED: "true"
 };
@@ -56,7 +56,7 @@ describe("startup - tenant organization ID enforcement", () => {
 		// Run 1: start with an empty tenant table, then create a tenant without an org ID.
 		const run1 = await run({
 			localesDirectory: LOCALES_DIR,
-			stateStorage: new MemoryStateStorage(),
+			stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
 			disableProcessExitOnFailure: true,
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) }
 		});
@@ -69,7 +69,10 @@ describe("startup - tenant organization ID enforcement", () => {
 		// Run 2: nodeOrganizationId is in state → the sole tenant should be auto-recovered.
 		const run2 = await run({
 			localesDirectory: LOCALES_DIR,
-			stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_ORG_ID }),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_ORG_ID
+			}),
 			disableProcessExitOnFailure: true,
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_2) }
 		});
@@ -91,7 +94,7 @@ describe("startup - tenant organization ID enforcement", () => {
 		// Run 1: seed a tenant without an org ID.
 		const run1 = await run({
 			localesDirectory: LOCALES_DIR,
-			stateStorage: new MemoryStateStorage(),
+			stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
 			disableProcessExitOnFailure: true,
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) }
 		});
@@ -104,11 +107,11 @@ describe("startup - tenant organization ID enforcement", () => {
 
 		await run1?.shutdown();
 
-		// Run 2: no nodeOrganizationId in state — cannot auto-recover, must throw.
+		// Run 2: no nodeOrganizationId in state - cannot auto-recover, must throw.
 		await expect(
 			run({
 				localesDirectory: LOCALES_DIR,
-				stateStorage: new MemoryStateStorage(),
+				stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
 				disableProcessExitOnFailure: true,
 				envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_2) }
 			})
@@ -122,7 +125,10 @@ describe("startup - tenant organization ID enforcement", () => {
 		// Run 1: seed two tenants, neither with an org ID.
 		const run1 = await run({
 			localesDirectory: LOCALES_DIR,
-			stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_ORG_ID }),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_ORG_ID
+			}),
 			disableProcessExitOnFailure: true,
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) }
 		});
@@ -137,7 +143,10 @@ describe("startup - tenant organization ID enforcement", () => {
 		await expect(
 			run({
 				localesDirectory: LOCALES_DIR,
-				stateStorage: new MemoryStateStorage(false, { nodeOrganizationId: TEST_ORG_ID }),
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_ORG_ID
+				}),
 				disableProcessExitOnFailure: true,
 				envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_2) }
 			})
