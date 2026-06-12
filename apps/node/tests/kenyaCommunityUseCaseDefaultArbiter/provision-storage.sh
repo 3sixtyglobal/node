@@ -231,7 +231,9 @@ seed_publisher() {
         -H "Authorization: Bearer ${session_jwt}" \
         -d "${dataset_body}" || true)
     dataset_status=$(echo "${dataset_resp}" | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
-    if [ "${dataset_status}" != "201" ] && [ "${dataset_status}" != "204" ]; then
+    # 409 = dataset already registered by a previous provision run (same id,
+    # same body) — acceptable for idempotent re-runs on a preserved volume.
+    if [ "${dataset_status}" != "201" ] && [ "${dataset_status}" != "204" ] && [ "${dataset_status}" != "409" ]; then
         info "Dataset response: ${dataset_resp}"
         fail "[${prefix}] dataset registration failed (HTTP ${dataset_status})"
     fi

@@ -268,7 +268,9 @@ seed_offer() {
 
     http_code=$(echo "${response}" | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
 
-    if [ "${http_code}" != "201" ]; then
+    # 409 = offer with this fixed id already seeded by a previous run —
+    # acceptable for idempotent re-runs on a preserved volume.
+    if [ "${http_code}" != "201" ] && [ "${http_code}" != "409" ]; then
         echo "  HTTP Status: ${http_code}"
         echo "${response}"
         fail "Failed to seed offer into PAP at ${host} (HTTP ${http_code})"
@@ -739,7 +741,9 @@ DATASET_HTTP=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
     -H "Authorization: Bearer ${MOBIUS_TOKEN}" \
     -d "${DATASET_BODY}")
 
-if [ "${DATASET_HTTP}" != "201" ] && [ "${DATASET_HTTP}" != "204" ]; then
+# 409 = dataset already registered by a previous run (same id, same body) —
+# acceptable for idempotent re-runs on a preserved volume.
+if [ "${DATASET_HTTP}" != "201" ] && [ "${DATASET_HTTP}" != "204" ] && [ "${DATASET_HTTP}" != "409" ]; then
     fail "Dataset registration failed (HTTP ${DATASET_HTTP})"
 fi
 ok "Mobius dataset registered (${DATASET_HTTP})"
