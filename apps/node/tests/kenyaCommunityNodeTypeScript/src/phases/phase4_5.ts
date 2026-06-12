@@ -90,12 +90,13 @@ async function runPhase4(context: IKenyaContext): Promise<{
 		apiKey: context.traderApiKey,
 		sessionJwt: context.traderSessionJwt
 	});
+	// Post-#203 (organization identifiers): IPolicyNegotiation has no
+	// nodeIdentity field and organizationIdentity is required.
 	const traderPnapEntry: IPolicyNegotiation = {
 		id: traderConsumerPid,
 		correlationId: "",
 		dateCreated: new Date().toISOString(),
 		state: DataspaceProtocolContractNegotiationStateType.REQUESTED,
-		nodeIdentity: context.traderDid,
 		organizationIdentity: context.traderDid
 	};
 	await traderPnap.set(traderPnapEntry);
