@@ -30,8 +30,12 @@
 # Prerequisites:
 #   - docker compose up (IPFS + all 4 nodes running)
 #   - All nodes bootstrapped via setup.sh
-#   - StorageItem provisioned via provision-storage.sh
 #   - jq installed
+#
+# Post-#194/#203: the synchronised-storage StorageItem provisioning step is
+# GONE — consumer nodes reach the publisher's catalogue directly via
+# TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT (fedcat REST client, trust-token
+# auth). provision-storage.sh is now a no-op kept only as a signpost.
 # =============================================================================
 
 set -euo pipefail
@@ -140,14 +144,18 @@ login_node() {
     RESULT_TOKEN="${token}"
 }
 
-# Read DID from a container's engine-state.json
+# Read the node's ORGANISATION DID from a container's engine-state.json.
+# Post-#203 (organization identifiers) the org DID — not the node DID — is the
+# trust identity: bootstrap-legacy puts the trust-assertion VM on the org
+# identity and stores it as state.nodeOrganizationId. Offers, negotiation
+# records and trust tokens must all use this DID.
 read_did() {
     local container="$1"
     local did
 
-    did=$(docker exec "${container}" cat /app/data/engine-state.json 2>/dev/null | jq -r '.nodeId // empty' 2>/dev/null)
+    did=$(docker exec "${container}" cat /app/data/engine-state.json 2>/dev/null | jq -r '.nodeOrganizationId // empty' 2>/dev/null)
     if [ -z "${did}" ]; then
-        fail "Could not read DID from ${container}. Is it bootstrapped?"
+        fail "Could not read org DID (nodeOrganizationId) from ${container}. Is it bootstrapped post-#203?"
     fi
 
     RESULT_DID="${did}"
@@ -279,17 +287,17 @@ negotiate_contract() {
     # Pre-inject consumer-side negotiation entry (race condition fix)
     step "Pre-injecting consumer negotiation entry..."
     local pnap_body pnap_response pnap_http
+    # Post-#203: IPolicyNegotiation has no nodeIdentity field and
+    # organizationIdentity (the consumer's org DID) is REQUIRED.
     pnap_body=$(jq -n \
         --arg id "${consumer_pid}" \
         --arg dateCreated "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
-        --arg nodeIdentity "${consumer_did}" \
         --arg organizationIdentity "${consumer_did}" \
         '{
             "id": $id,
             "correlationId": "",
             "dateCreated": $dateCreated,
             "state": "REQUESTED",
-            "nodeIdentity": $nodeIdentity,
             "organizationIdentity": $organizationIdentity
         }')
 
@@ -566,14 +574,18 @@ translate_endpoint() {
     echo "${url}"
 }
 
-# Query federated catalogue and return dataset count
+# Query federated catalogue and return dataset count.
+# Post-#194 trust mode the catalogue query verifies a TRUST JWT (Bearer); the
+# session JWT rides in the cookie for the auth gate. On consumer nodes the
+# fedcat component is a REST client proxying to the publisher's catalogue.
 query_catalogue() {
-    local host="$1" token="$2"
+    local host="$1" token="$2" trust="$3"
     local response http_code body
 
     response=$(curl -s -w "\n%{http_code}" -X POST "${host}/federated-catalogue/request" \
         -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${token}" \
+        -H "Cookie: access_token=${token}" \
+        -H "Authorization: Bearer ${trust}" \
         -d "{
             \"@context\": [\"${DSP_CONTEXT}\"],
             \"@type\": \"CatalogRequestMessage\",
@@ -771,7 +783,7 @@ PHASE_RESULTS+=("${GREEN}[2]${NC} 3 Per-Consumer ODRL Offers Seeded (Mobius)")
 phase 3 "Discovery (Federated Catalogue)"
 
 step "Verifying Mobius has datasets registered..."
-query_catalogue "${MOBIUS_HOST}" "${MOBIUS_TOKEN}"
+query_catalogue "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${MOBIUS_TRUST}"
 if [ "${RESULT_DATASET_COUNT}" -ge 1 ] 2>/dev/null; then
     ok "Mobius: ${RESULT_DATASET_COUNT} dataset(s)"
 else
@@ -780,9 +792,9 @@ fi
 
 # Also check consumer catalogues (they should have their own from the test app)
 step "Checking consumer catalogues..."
-query_catalogue "${ASHFORD_HOST}" "${ASHFORD_TOKEN}"; echo -e "    Ashford: ${RESULT_DATASET_COUNT} dataset(s)"
-query_catalogue "${SUFFOLK_HOST}" "${SUFFOLK_TOKEN}"; echo -e "    Suffolk: ${RESULT_DATASET_COUNT} dataset(s)"
-query_catalogue "${MCP_HOST}" "${MCP_TOKEN}"; echo -e "    MCP: ${RESULT_DATASET_COUNT} dataset(s)"
+query_catalogue "${ASHFORD_HOST}" "${ASHFORD_TOKEN}" "${ASHFORD_TRUST}"; echo -e "    Ashford: ${RESULT_DATASET_COUNT} dataset(s)"
+query_catalogue "${SUFFOLK_HOST}" "${SUFFOLK_TOKEN}" "${SUFFOLK_TRUST}"; echo -e "    Suffolk: ${RESULT_DATASET_COUNT} dataset(s)"
+query_catalogue "${MCP_HOST}" "${MCP_TOKEN}" "${MCP_TRUST}"; echo -e "    MCP: ${RESULT_DATASET_COUNT} dataset(s)"
 
 PHASE_RESULTS+=("${GREEN}[3]${NC} Discovery")
 
@@ -966,25 +978,27 @@ if [ -n "${IPFS_STATS}" ]; then
 fi
 
 step "Final catalogue check (all 4 nodes)..."
-query_catalogue "${MOBIUS_HOST}" "${MOBIUS_TOKEN}"; ok "Mobius: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
-query_catalogue "${ASHFORD_HOST}" "${ASHFORD_TOKEN}"; ok "Ashford: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
-query_catalogue "${SUFFOLK_HOST}" "${SUFFOLK_TOKEN}"; ok "Suffolk: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
-query_catalogue "${MCP_HOST}" "${MCP_TOKEN}"; ok "MCP: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${MOBIUS_HOST}" "${MOBIUS_TOKEN}" "${MOBIUS_TRUST}"; ok "Mobius: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${ASHFORD_HOST}" "${ASHFORD_TOKEN}" "${ASHFORD_TRUST}"; ok "Ashford: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${SUFFOLK_HOST}" "${SUFFOLK_TOKEN}" "${SUFFOLK_TRUST}"; ok "Suffolk: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
+query_catalogue "${MCP_HOST}" "${MCP_TOKEN}" "${MCP_TRUST}"; ok "MCP: ${RESULT_DATASET_COUNT} dataset(s) in catalogue"
 
 PHASE_RESULTS+=("${GREEN}[11]${NC} Verification")
 
 # ==========================================================================
 # Phase 12: Push transfer setup (MCP -> Mobius)
 # ==========================================================================
-# Mobius is configured single-tenant (`TWIN_FEATURES` does not include multi-tenant),
-# so the `pushSubscriptionMissingTenantToken` gate does NOT fire — the gate only
-# triggers when the data plane has `partitionContextIds.includes(Tenant)`. This phase
-# therefore smoke-tests that push setup SUCCEEDS in a cross-node single-tenant
-# scenario. The multi-tenant rejection is covered by Kenya's Phase 8.
-phase 12 "Push transfer setup (cross-node, single-tenant)"
+# Post-#203 the data plane REQUIRES ?organization=<org-did> on the consumer's
+# inbox endpoint unconditionally (pushSubscriptionMissingOrganizationId,
+# renamed from the old tenant-token gate which only fired in multi-tenant).
+# The consumer (MCP) therefore bakes ITS org DID into the inbox URL so the
+# provider can deliver cross-node. The multi-tenant rejection negative is
+# covered by Kenya's Phase 5.
+phase 12 "Push transfer setup (cross-node, org-routed inbox)"
 
 DSP_CONTEXT="https://w3id.org/dspace/2025/1/context.jsonld"
 PUSH_CONSUMER_PID="urn:uuid:mcp-push-${RANDOM}-$(date +%s)"
+MCP_ORG_ENC=$(jq -rn --arg v "${MCP_DID}" '$v|@uri')
 
 step "MCP sends TransferRequestMessage to Mobius (format: HttpProxy-PUSH)..."
 push_req_resp=$(curl -sS -w "\n%{http_code}" -X POST "${MOBIUS_HOST}/dataspace/transfers/request" \
@@ -995,7 +1009,7 @@ push_req_resp=$(curl -sS -w "\n%{http_code}" -X POST "${MOBIUS_HOST}/dataspace/t
         --arg consumerPid "${PUSH_CONSUMER_PID}" \
         --arg agreementId "${MCP_AGREEMENT}" \
         --arg callback "${MCP_INTERNAL}/dataspace" \
-        --arg inbox "${MCP_INTERNAL}/dataspace/inbox" \
+        --arg inbox "${MCP_INTERNAL}/dataspace/inbox?organization=${MCP_ORG_ENC}" \
         '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callback, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')")
 push_req_body=$(echo "${push_req_resp}" | sed '$d')
 push_provider_pid=$(echo "${push_req_body}" | jq -r '.providerPid // empty')
@@ -1019,8 +1033,8 @@ else
         soft_fail "Push setup failed: ${err_code} | body: ${push_start_body}"
         PHASE_RESULTS+=("${RED}[12]${NC} Push setup (cross-node) — FAIL: ${err_code}")
     else
-        ok "Push setup accepted (single-tenant data plane: no token gate fires)"
-        PHASE_RESULTS+=("${GREEN}[12]${NC} Push setup (cross-node, single-tenant) — PASS")
+        ok "Push setup accepted (org-routed inbox endpoint satisfied the data-plane gate)"
+        PHASE_RESULTS+=("${GREEN}[12]${NC} Push setup (cross-node, org-routed inbox) — PASS")
     fi
 fi
 

@@ -7,11 +7,12 @@
 #
 # Steps:
 #   1. Build Docker image
-#   2. Bootstrap the node (creates DID on IOTA testnet + param-encryption
-#      vault key + node admin user)
-#   3. tenant-create x5 — four publisher authorities + one consumer
-#   4. user-create x5 (one admin per tenant, each with its own minted DID)
-#      using the "switch node tenant + create user + restore" CLI workaround
+#   2. Bootstrap the node (creates node + organization + admin-user DIDs on
+#      IOTA testnet; post-#203 the org DID is bound to the node's own tenant)
+#   3. Per tenant (x5 — four publisher authorities + one consumer):
+#      identity-create (mint the tenant's org DID) →
+#      tenant-create --organization-id=<did> (REQUIRED post-#203) →
+#      trust-assertion VM → user-create
 #
 # This is the multi-publisher Kenya use-case scaffold (publish-and-aggregate):
 # the four authorities each publish their own consignment slice; Trader
@@ -143,113 +144,59 @@ else
     printf 'NODE_ADMIN_PASSWORD=%q\n' "${password}" > "${PASSWORD_FILE}"
     ok "Node bootstrapped. Admin password saved to .node-password"
 
-    # Sanity-check: param-encryption vault key must have been created.
-    # Renamed from tenant-token-encryption in Martyn's HostingService refactor —
-    # the HostingService now mints/decrypts arbitrary param tokens (not just
-    # tenant tokens), so the key carries the more generic name.
-    # If missing, the HostingService encrypt/decrypt sites silently fall back
-    # to the unencrypted path → invalidates the multi-tenant routing test.
-    if grep -q "param-encryption" "${bootstrap_tmp}"; then
-        ok "param-encryption vault key created (HostingService key verified)"
-    else
-        fail "param-encryption vault key NOT created in bootstrap — HostingService wiring is broken"
-    fi
+    # Post-#203: the param-encryption vault key no longer exists by design —
+    # encrypted tenant tokens were replaced by the cleartext ?organization=
+    # routing param, so the old sanity check for it is gone too.
 fi
 
 # -------------------------------------------------------------------------
-# Step 3: Create KRA and Trader tenants
-# -------------------------------------------------------------------------
-echo ""
-echo -e "${BOLD}Step 3: Provision KRA, KPA, KENTRADE, AFA + Trader via tenant-create${NC}"
-
-if [ -s "${TENANTS_FILE}" ] && grep -q "TENANT_KRA_API_KEY" "${TENANTS_FILE}"; then
-    ok "Tenants already provisioned — skipping (delete .tenants to recreate)"
-else
-    : > "${TENANTS_FILE}"
-
-    create_tenant() {
-        local prefix="$1" label="$2" origin="$3"
-        local tmp
-        tmp=$(mktemp)
-        trap "rm -f ${tmp}" RETURN
-
-        step "Creating tenant ${label}"
-        set +e
-        docker compose run --rm -T twin-kenya-defaultarb-node \
-            node src/index.js tenant-create \
-                --label="${label}" \
-                --public-origin="${origin}" 2>&1 | tee "${tmp}"
-        local ec=$?
-        set -e
-        [ ${ec} -eq 0 ] || fail "tenant-create failed for ${label}"
-
-        local tid key
-        tid=$(grep -iE "tenant.?id" "${tmp}" | grep -oE '[0-9a-f]{32}' | head -1)
-        key=$(grep -iE "api.?key"   "${tmp}" | grep -oE '[0-9a-f]{32}' | head -1)
-        [ -n "${tid}" ] || fail "Could not extract tenantId for ${label}"
-        [ -n "${key}" ] || fail "Could not extract apiKey for ${label}"
-
-        echo "${prefix}_TENANT_ID=${tid}"        >> "${TENANTS_FILE}"
-        echo "${prefix}_API_KEY=${key}"          >> "${TENANTS_FILE}"
-        echo "${prefix}_LABEL=${label}"          >> "${TENANTS_FILE}"
-        echo "${prefix}_PUBLIC_ORIGIN=${origin}" >> "${TENANTS_FILE}"
-        ok "${label}  tenantId=${tid}  apiKey=${key}"
-    }
-
-    # All tenants live on the same node. PUBLIC_ORIGIN points back to the
-    # container hostname so encrypted callback URLs route to this node.
-    # Four publisher authorities + one consumer.
-    create_tenant "TENANT_KRA"      "kra"      "http://twin-kenya-defaultarb-node:3000"
-    create_tenant "TENANT_KPA"      "kpa"      "http://twin-kenya-defaultarb-node:3000"
-    create_tenant "TENANT_KENTRADE" "kentrade" "http://twin-kenya-defaultarb-node:3000"
-    create_tenant "TENANT_AFA"      "afa"      "http://twin-kenya-defaultarb-node:3000"
-    create_tenant "TENANT_TRADER"   "trader"   "http://twin-kenya-defaultarb-node:3000"
-fi
-
-# Source the tenants we just (or previously) created for use in Step 4
-# shellcheck disable=SC1090
-source "${TENANTS_FILE}"
-
-# -------------------------------------------------------------------------
-# Step 4: Create one admin user inside each tenant.
+# Step 3: Per tenant — mint org DID, create the tenant bound to it, add the
+# trust-assertion VM, create the tenant-admin user.
 #
-# Post-#186 (remove set-tenant): user-create takes --tenant-id directly, so the
-# old "repoint the node's own tenant at the target, run user-create, repoint back"
-# dance is gone — and node-set-tenant no longer exists. The node's own tenant is
-# fixed via TWIN_TENANT_ID (env), not read from engine-state.
+# Post-#203 (organization identifiers): tenant-create REQUIRES
+# --organization-id and the node refuses to start if any tenant lacks one
+# ("tenantsWithoutOrganizationId"), so the per-tenant DID (previously minted
+# AFTER tenant-create, in the old step 4) is now minted FIRST and becomes the
+# tenant's organization id. The same DID remains the admin user's user/org
+# identity, and ?organization=<did> is how all non-login REST calls route to
+# the tenant (encrypted tenant tokens are gone).
+#
+# Post-#186 (remove set-tenant): user-create takes --tenant-id directly; the
+# node's own tenant is fixed via TWIN_TENANT_ID (env), not engine-state.
 # -------------------------------------------------------------------------
 echo ""
-echo -e "${BOLD}Step 4: Create admin user + minted DID inside each of the 5 tenants${NC}"
+echo -e "${BOLD}Step 3: Provision 5 tenants (org DID + tenant + VM + admin user each)${NC}"
 
-if [ -s "${USERS_FILE}" ] && grep -q "TENANT_KRA_USER_EMAIL" "${USERS_FILE}" \
+if [ -s "${TENANTS_FILE}" ] && grep -q "TENANT_KRA_API_KEY" "${TENANTS_FILE}" \
+        && [ -s "${USERS_FILE}" ] && grep -q "TENANT_KRA_USER_EMAIL" "${USERS_FILE}" \
         && [ -s "${IDENTITIES_FILE}" ] && grep -q "TENANT_KRA_DID" "${IDENTITIES_FILE}"; then
-    ok "Tenant users + identities already provisioned — skipping (delete .tenant-users and .tenant-identities to recreate)"
+    ok "Tenants, identities and users already provisioned — skipping (delete .tenants/.tenant-users/.tenant-identities to recreate)"
 else
     node_state_json=$(docker compose run --rm -T --no-deps twin-kenya-defaultarb-node \
         sh -c 'cat /app/data/engine-state.json' 2>/dev/null || true)
     NODE_DID=$(echo "${node_state_json}" | jq -r '.nodeId // empty')
-
     [ -n "${NODE_DID}" ] || fail "Could not read nodeId from engine-state.json"
     step "Node DID: ${NODE_DID}"
 
     TENANT_USER_PASSWORD="TestUserPass123!"
+    : > "${TENANTS_FILE}"
     : > "${USERS_FILE}"
     : > "${IDENTITIES_FILE}"
 
-    # S1 (2026-05-19 stand-up): mint a distinct org DID per tenant so the
+    # S1 (2026-05-19 stand-up): each tenant gets a DISTINCT DID so the
     # identity-based authorization on transfer-mutation routes can actually
-    # distinguish callers. Previously KRA and Trader users were both created
-    # with --user-identity=$NODE_DID --organization-identity=$NODE_DID, which
-    # made trustInfo.identity identical for both tenants and degenerated the
-    # validateCallerIsConsumer / validateCallerIsTransferParty checks.
-    create_tenant_identity_and_user() {
-        local prefix="$1" tenant_id="$2" email="$3" tenant_mnemonic="$4"
+    # distinguish callers (trustInfo.identity differs per tenant). Post-#203
+    # that DID is also the tenant's organization id, its proof signer, and its
+    # public URL routing token — org-DID uniqueness across tenants is enforced
+    # by tenant-create.
+    create_tenant_full() {
+        local prefix="$1" label="$2" origin="$3" email="$4" tenant_mnemonic="$5"
         local tmp identity_tmp
         tmp=$(mktemp)
         identity_tmp=$(mktemp)
         trap "rm -f ${tmp} ${identity_tmp}" RETURN
 
-        step "Minting tenant DID for ${prefix} (identity-create on IOTA testnet, ~60s)"
+        step "Minting org DID for ${prefix} (identity-create on IOTA testnet, ~60s)"
         set +e
         if [ -n "${tenant_mnemonic}" ]; then
             step "  using pre-funded mnemonic for ${prefix} (skips faucet)"
@@ -268,13 +215,35 @@ else
 
         local tenant_did
         tenant_did=$(grep -oE 'did:iota:[a-z0-9:]+0x[a-f0-9]+' "${identity_tmp}" | head -1)
-        [ -n "${tenant_did}" ] || fail "Could not extract tenant DID for ${prefix} from identity-create output"
+        [ -n "${tenant_did}" ] || fail "Could not extract org DID for ${prefix} from identity-create output"
         echo "${prefix}_DID=${tenant_did}" >> "${IDENTITIES_FILE}"
-        ok "${prefix} tenant DID: ${tenant_did}"
+        ok "${prefix} org DID: ${tenant_did}"
 
-        # Bootstrap adds a `trust-assertion` verification method on the node
-        # DID so trust JWT-VCs can be issued. Tenant DIDs need the same VM
-        # before /identity/:did/verifiable-credential/trust-assertion can sign.
+        step "Creating tenant ${label} (organization-id=${tenant_did})"
+        set +e
+        docker compose run --rm -T twin-kenya-defaultarb-node \
+            node src/index.js tenant-create \
+                --label="${label}" \
+                --public-origin="${origin}" \
+                --organization-id="${tenant_did}" 2>&1 | tee "${tmp}"
+        ec=$?
+        set -e
+        [ ${ec} -eq 0 ] || fail "tenant-create failed for ${label}"
+
+        local tid key
+        tid=$(grep -iE "tenant.?id" "${tmp}" | grep -oE '[0-9a-f]{32}' | head -1)
+        key=$(grep -iE "api.?key"   "${tmp}" | grep -oE '[0-9a-f]{32}' | head -1)
+        [ -n "${tid}" ] || fail "Could not extract tenantId for ${label}"
+        [ -n "${key}" ] || fail "Could not extract apiKey for ${label}"
+        echo "${prefix}_TENANT_ID=${tid}"        >> "${TENANTS_FILE}"
+        echo "${prefix}_API_KEY=${key}"          >> "${TENANTS_FILE}"
+        echo "${prefix}_LABEL=${label}"          >> "${TENANTS_FILE}"
+        echo "${prefix}_PUBLIC_ORIGIN=${origin}" >> "${TENANTS_FILE}"
+        ok "${label}  tenantId=${tid}  apiKey=${key}"
+
+        # Trust JWT-VCs are issued via /identity/:did/verifiable-credential/
+        # trust-assertion, which needs an assertionMethod VM on the org DID
+        # (bootstrap only adds one to the node DID).
         step "Adding trust-assertion VM to ${prefix} DID"
         docker compose run --rm -T twin-kenya-defaultarb-node \
             node src/index.js identity-verification-method-create \
@@ -292,22 +261,25 @@ else
                 --password="${TENANT_USER_PASSWORD}" \
                 --user-identity="${tenant_did}" \
                 --organization-identity="${tenant_did}" \
-                --tenant-id="${tenant_id}" \
+                --tenant-id="${tid}" \
                 --scope="tenant-admin" 2>&1 | tee "${tmp}"
         ec=$?
         set -e
         [ ${ec} -eq 0 ] || fail "user-create for ${email} failed"
 
-        echo "${prefix}_USER_EMAIL=${email}"               >> "${USERS_FILE}"
+        echo "${prefix}_USER_EMAIL=${email}"                   >> "${USERS_FILE}"
         echo "${prefix}_USER_PASSWORD=${TENANT_USER_PASSWORD}" >> "${USERS_FILE}"
-        ok "User ${email} created in tenant ${tenant_id}"
+        ok "User ${email} created in tenant ${tid}"
     }
 
-    create_tenant_identity_and_user "TENANT_KRA"      "${TENANT_KRA_TENANT_ID}"      "admin@kra"      "${TWIN_KENYA_KRA_MNEMONIC}"
-    create_tenant_identity_and_user "TENANT_KPA"      "${TENANT_KPA_TENANT_ID}"      "admin@kpa"      "${TWIN_KENYA_KPA_MNEMONIC}"
-    create_tenant_identity_and_user "TENANT_KENTRADE" "${TENANT_KENTRADE_TENANT_ID}" "admin@kentrade" "${TWIN_KENYA_KENTRADE_MNEMONIC}"
-    create_tenant_identity_and_user "TENANT_AFA"      "${TENANT_AFA_TENANT_ID}"      "admin@afa"      "${TWIN_KENYA_AFA_MNEMONIC}"
-    create_tenant_identity_and_user "TENANT_TRADER"   "${TENANT_TRADER_TENANT_ID}"   "admin@trader"   "${TWIN_KENYA_TRADER_MNEMONIC}"
+    # All tenants live on the same node. PUBLIC_ORIGIN points back to the
+    # container hostname so callback URLs route to this node.
+    # Four publisher authorities + one consumer.
+    create_tenant_full "TENANT_KRA"      "kra"      "http://twin-kenya-defaultarb-node:3000" "admin@kra"      "${TWIN_KENYA_KRA_MNEMONIC}"
+    create_tenant_full "TENANT_KPA"      "kpa"      "http://twin-kenya-defaultarb-node:3000" "admin@kpa"      "${TWIN_KENYA_KPA_MNEMONIC}"
+    create_tenant_full "TENANT_KENTRADE" "kentrade" "http://twin-kenya-defaultarb-node:3000" "admin@kentrade" "${TWIN_KENYA_KENTRADE_MNEMONIC}"
+    create_tenant_full "TENANT_AFA"      "afa"      "http://twin-kenya-defaultarb-node:3000" "admin@afa"      "${TWIN_KENYA_AFA_MNEMONIC}"
+    create_tenant_full "TENANT_TRADER"   "trader"   "http://twin-kenya-defaultarb-node:3000" "admin@trader"   "${TWIN_KENYA_TRADER_MNEMONIC}"
 fi
 
 # -------------------------------------------------------------------------

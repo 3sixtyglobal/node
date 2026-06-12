@@ -32,11 +32,20 @@ decides per action + constraint against the transfer's agreement:
 holder succeeds"); 9 is Martyn's country-constraint example. The pass-through scaffold
 can only show accepts — only a real arbiter produces the denials.
 
+## Post-#203 (organization identifiers)
+
+Migrated 2026-06-11 for the org-identifiers refactor (twin-node#19 / PR #203) — see
+[`findings-from-second-run.md`](findings-from-second-run.md). Highlights: tenants are
+created with `--organization-id=<did>` (their minted DID), all non-login routes are
+tenant-routed via `?organization=<org-did>` (encrypted tenant tokens are gone), the
+catalogue bakes the publisher org DID into distributions, trust tokens are
+identity-only, and the Docker image consumes only the published npm packages.
+
 ## Run
 
 ```bash
 ./setup.sh --clean        # bootstrap node + 5 tenants (IOTA testnet, pre-funded mnemonics)
 docker compose up -d
 ./provision-storage.sh    # seed the 4 publisher offers/datasets
-./kenya-usecase-test.sh   # Phases 1-7 (discover/negotiate/pull/aggregate) + Phase 8 (gate deny/accept)
+./kenya-usecase-test.sh   # Phases 1-7 (discover/negotiate/pull/aggregate) + Phases 8-10 (gate deny/accept)
 ```

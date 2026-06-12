@@ -157,14 +157,17 @@ login_node() {
     RESULT_TOKEN="${token}"
 }
 
-# Read DID from a container's engine-state.json
+# Read the node's ORGANISATION DID from a container's engine-state.json.
+# Post-#203 (organization identifiers) the org DID — not the node DID — is the
+# trust identity (bootstrap-legacy puts the trust-assertion VM on the org
+# identity and stores it as state.nodeOrganizationId).
 read_did() {
     local container="$1"
     local did
 
-    did=$(docker exec "${container}" cat /app/data/engine-state.json 2>/dev/null | jq -r '.nodeId // empty' 2>/dev/null)
+    did=$(docker exec "${container}" cat /app/data/engine-state.json 2>/dev/null | jq -r '.nodeOrganizationId // empty' 2>/dev/null)
     if [ -z "${did}" ]; then
-        fail "Could not read DID from ${container}. Is it bootstrapped?"
+        fail "Could not read org DID (nodeOrganizationId) from ${container}. Is it bootstrapped post-#203?"
     fi
 
     RESULT_DID="${did}"

@@ -13,8 +13,10 @@ services:
 
   twin-mobius:
     build:
-      context: ../../../../..
-      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
+      # Context is the twin-node repo root — the image consumes only the published npm
+      # packages in twin-node/node_modules, so no cross-submodule paths are needed.
+      context: ../../../..
+      dockerfile: apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-mobius-node
     ports:
       - '3020:3000'
@@ -30,8 +32,10 @@ services:
 
   twin-ashford:
     build:
-      context: ../../../../..
-      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
+      # Context is the twin-node repo root — the image consumes only the published npm
+      # packages in twin-node/node_modules, so no cross-submodule paths are needed.
+      context: ../../../..
+      dockerfile: apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-ashford-node
     ports:
       - '3021:3001'
@@ -47,8 +51,10 @@ services:
 
   twin-suffolk:
     build:
-      context: ../../../../..
-      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
+      # Context is the twin-node repo root — the image consumes only the published npm
+      # packages in twin-node/node_modules, so no cross-submodule paths are needed.
+      context: ../../../..
+      dockerfile: apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-suffolk-node
     ports:
       - '3022:3002'
@@ -64,8 +70,10 @@ services:
 
   twin-mcp:
     build:
-      context: ../../../../..
-      dockerfile: node/apps/node/tests/mobiusSupplyChainDocker/Dockerfile
+      # Context is the twin-node repo root — the image consumes only the published npm
+      # packages in twin-node/node_modules, so no cross-submodule paths are needed.
+      context: ../../../..
+      dockerfile: apps/node/tests/mobiusSupplyChainDocker/Dockerfile
     container_name: twin-mcp-node
     ports:
       - '3023:3003'

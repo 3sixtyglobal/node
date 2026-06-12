@@ -20,17 +20,21 @@
 #   1. Read node DID from container state.
 #   2. For each publisher (KRA, KPA, KENTRADE, AFA): login → trust JWT → seed
 #      ODRL offer (PAP) → register dataset (tenant-context publish to fedcat) →
-#      sanity-check the catalogue tenantId.
-#   3. Login Trader → session + trust JWT; mint Trader's encrypted tenantToken
-#      (consumer callback routing — same scaffold workaround as the base Kenya).
+#      sanity-check the catalogue organizationIdentity.
+#   3. Login Trader → session + trust JWT. (Post-#203 there is no encrypted
+#      tenantToken to mint — callbacks route via ?organization=<org-did>.)
 #   4. Persist tokens/ids.
+#
+# Post-#203 (organization identifiers): non-login routes are tenant-routed by
+# the ?organization=<org-did> query param (the tenant's org DID minted in
+# setup.sh), NOT by x-api-key. x-api-key only routes /login.
 #
 # Outputs (used by kenya-usecase-test.sh):
 #   .session-tokens   — <PUB>_SESSION_JWT for all 5 tenants
 #   .trust-tokens     — <PUB>_TRUST_JWT for all 5 tenants
 #   .publishers       — per publisher: <PUB>_DID, <PUB>_DATASET_ID,
 #                       <PUB>_OFFER_ID, <PUB>_CONSIGNMENT_ID; plus TRADER_DID,
-#                       TRADER_TENANT_TOKEN, PUBLISHERS list
+#                       PUBLISHERS list
 # =============================================================================
 
 set -euo pipefail
@@ -94,6 +98,9 @@ ok "Node DID: ${NODE_DID}"
 # -----------------------------------------------------------------------------
 # Helpers (identical to the base Kenya scaffold).
 # -----------------------------------------------------------------------------
+# URL-encode a value for use in a query string (org DIDs contain ':').
+urlenc() { jq -rn --arg v "$1" '$v|@uri'; }
+
 login_session() {
     local api_key="$1" email="$2" password="$3"
     curl -sS -i -X POST "${HOST}/authentication/login" \
@@ -104,11 +111,12 @@ login_session() {
 }
 
 generate_trust_jwt() {
-    local api_key="$1" session_jwt="$2" did="$3" subject="$4"
+    local session_jwt="$1" did="$2" subject="$3"
+    # Post-#203: non-login routes are tenant-routed by ?organization=<org-did>;
+    # here the tenant's org DID is the same DID the VC is issued for.
     local resp
-    resp=$(curl -sS -X POST "${HOST}/identity/${did}/verifiable-credential/${TRUST_VM_ID}" \
+    resp=$(curl -sS -X POST "${HOST}/identity/${did}/verifiable-credential/${TRUST_VM_ID}?organization=$(urlenc "${did}")" \
         -H "Content-Type: application/json" \
-        -H "x-api-key: ${api_key}" \
         -H "Cookie: access_token=${session_jwt}" \
         -d "$(jq -n --arg s "$subject" '{subject:{id:$s}}')")
     echo "${resp}" | jq -r '.jwt // empty'
@@ -149,11 +157,14 @@ seed_publisher() {
 
     step "[${prefix}] generate trust JWT"
     local trust_jwt
-    trust_jwt=$(generate_trust_jwt "${api_key}" "${session_jwt}" "${did}" "urn:trust:${label}-kenya-node")
+    trust_jwt=$(generate_trust_jwt "${session_jwt}" "${did}" "urn:trust:${label}-kenya-node")
     [ -n "${trust_jwt}" ] || fail "Could not generate ${prefix} trust JWT"
 
-    # ODRL offer targeting this publisher's dataset (pass-through arbiter, read
-    # action — the demo proves aggregation, not per-item enforcement).
+    local org_enc
+    org_enc=$(urlenc "${did}")
+
+    # ODRL offer targeting this publisher's dataset (pass-through negotiator,
+    # read action — the demo proves aggregation, not per-item enforcement).
     step "[${prefix}] seed ODRL offer ${offer_id}"
     local offer_body
     offer_body=$(jq -n \
@@ -171,9 +182,8 @@ seed_publisher() {
             permission: [{ action: "read", target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" } }]
         }')
     local pap_resp pap_status
-    pap_resp=$(curl -sS -i -X POST "${HOST}/rights-management/policy/admin" \
+    pap_resp=$(curl -sS -i -X POST "${HOST}/rights-management/policy/admin?organization=${org_enc}" \
         -H "Content-Type: application/json" \
-        -H "x-api-key: ${api_key}" \
         -H "Authorization: Bearer ${session_jwt}" \
         -d "${offer_body}" || true)
     pap_status=$(echo "${pap_resp}" | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
@@ -183,10 +193,10 @@ seed_publisher() {
     fi
     ok "[${prefix}] offer seeded (HTTP ${pap_status})"
 
-    # Register the dataset in the publisher's tenant context → fedcat.set wraps
-    # it in ContextIdStore.run({Tenant: <publisher>}) so the catalogue captures
-    # tenantId = this publisher and bakes the publisher's tenant token into the
-    # distribution accessService URL.
+    # Register the dataset in the publisher's tenant context → the catalogue
+    # captures ownerId = this publisher's org DID and bakes
+    # ?organization=<org-did> into the distribution accessService URL
+    # (bakeOrganizationIntoDistributions, post-#203).
     step "[${prefix}] register dataset ${dataset_id}"
     local dataset_body
     dataset_body=$(jq -n \
@@ -216,9 +226,8 @@ seed_publisher() {
             }
         }')
     local dataset_resp dataset_status
-    dataset_resp=$(curl -sS -i -X POST "${HOST}/dataspace/app-datasets" \
+    dataset_resp=$(curl -sS -i -X POST "${HOST}/dataspace/app-datasets?organization=${org_enc}" \
         -H "Content-Type: application/json" \
-        -H "x-api-key: ${api_key}" \
         -H "Authorization: Bearer ${session_jwt}" \
         -d "${dataset_body}" || true)
     dataset_status=$(echo "${dataset_resp}" | grep -i '^HTTP/' | tail -1 | awk '{print $2}')
@@ -228,19 +237,26 @@ seed_publisher() {
     fi
     ok "[${prefix}] dataset registered (HTTP ${dataset_status})"
 
-    # Sanity: the catalogue must now own this dataset under the publisher tenant.
+    # Sanity: the stored app-dataset must be owned by the publisher's org
+    # (post-#203 DataspaceAppDataset carries organizationIdentity, not a
+    # bare nodeIdentity; tenant partition fields are storage-internal).
     local recaptured
     recaptured=$(docker exec twin-kenya-defaultarb-node node -e "
 const fs = require('fs');
 const store = JSON.parse(fs.readFileSync('/app/data/dataspace-app-dataset/store.json', 'utf8'));
 const entry = store.find(e => e.id === '${dataset_id}');
-process.stdout.write(entry?.tenantId ?? '');
+process.stdout.write(JSON.stringify({ organizationIdentity: entry?.organizationIdentity ?? '', tenantId: entry?.tenantId ?? '' }));
 " 2>/dev/null || true)
-    if [ "${recaptured}" = "${tenant_id}" ]; then
-        ok "[${prefix}] catalogue dataset.tenantId = ${prefix} (${tenant_id})"
+    local recaptured_org recaptured_tenant
+    recaptured_org=$(echo "${recaptured}" | jq -r '.organizationIdentity // empty')
+    recaptured_tenant=$(echo "${recaptured}" | jq -r '.tenantId // empty')
+    if [ "${recaptured_org}" = "${did}" ]; then
+        ok "[${prefix}] app-dataset organizationIdentity = ${prefix} org (${did})"
+    elif [ "${recaptured_tenant}" = "${tenant_id}" ]; then
+        ok "[${prefix}] app-dataset tenant partition = ${prefix} (${tenant_id}); organizationIdentity=\"${recaptured_org}\""
     else
-        info "Recaptured tenantId: \"${recaptured}\" (expected ${tenant_id})"
-        fail "[${prefix}] partial-publish did not retag dataset.tenantId"
+        info "Recaptured: ${recaptured} (expected org ${did} / tenant ${tenant_id})"
+        fail "[${prefix}] dataset registration not attributed to this publisher"
     fi
 
     printf -v "PUB_SESSION_${prefix}" '%s' "${session_jwt}"
@@ -262,48 +278,21 @@ for pub in "${PUBLISHERS[@]}"; do
 done
 
 # -----------------------------------------------------------------------------
-# Step 3: Consumer (Trader) — login, trust JWT, encrypted tenantToken.
+# Step 3: Consumer (Trader) — login + trust JWT.
+#
+# Post-#203 the old "mint Trader's encrypted tenantToken" scaffold workaround is
+# GONE: callback URLs carry ?organization=<trader-org-did> in cleartext and the
+# TenantProcessor reverse-maps the org DID to the tenant partition.
 # -----------------------------------------------------------------------------
 echo ""
-echo -e "${BOLD}Step 3: Consumer (Trader) login + tenant token${NC}"
+echo -e "${BOLD}Step 3: Consumer (Trader) login + trust JWT${NC}"
 TRADER_DID="${TENANT_TRADER_DID}"
 [ -n "${TRADER_DID}" ] || fail "TENANT_TRADER_DID empty — re-run ./setup.sh --clean"
 TRADER_SESSION_JWT=$(login_session "${TENANT_TRADER_API_KEY}" "${TENANT_TRADER_USER_EMAIL}" "${TENANT_TRADER_USER_PASSWORD}")
 [ -n "${TRADER_SESSION_JWT}" ] || fail "Trader login did not return a JWT"
-TRADER_TRUST_JWT=$(generate_trust_jwt "${TENANT_TRADER_API_KEY}" "${TRADER_SESSION_JWT}" "${TRADER_DID}" "urn:trust:trader-kenya-node")
+TRADER_TRUST_JWT=$(generate_trust_jwt "${TRADER_SESSION_JWT}" "${TRADER_DID}" "urn:trust:trader-kenya-node")
 [ -n "${TRADER_TRUST_JWT}" ] || fail "Could not generate Trader trust JWT"
 ok "Trader session + trust JWT ready"
-
-# Mint Trader's encrypted tenantToken — used in the callbackAddress so each
-# provider's reply routes back into Trader's partition. Same scaffold workaround
-# as the base Kenya (P3): in production the consumer-side PNP builds this via
-# sendRequestToProvider → buildCallbackUrl. The vault key is node-level
-# (NODE_DID/param-encryption).
-step "Mint Trader's encrypted tenantToken (test scaffold workaround)"
-TRADER_TENANT_TOKEN=$(docker exec twin-kenya-defaultarb-node node -e "
-const fs = require('fs');
-const { ChaCha20Poly1305 } = require('@twin.org/crypto');
-const { Converter, RandomHelper } = require('@twin.org/core');
-const store = JSON.parse(fs.readFileSync('/app/data/vault-key/store.json', 'utf8'));
-const fullKeyName = '${NODE_DID}/param-encryption';
-const vaultKey = store.find(e => e.id === fullKeyName);
-if (!vaultKey) { console.error('Vault key not found:', fullKeyName); process.exit(1); }
-const privateKey = Converter.base64ToBytes(vaultKey.privateKey);
-const salt = RandomHelper.generate(8);
-const tenantBytes = Converter.utf8ToBytes('${TENANT_TRADER_TENANT_ID}');
-const plaintext = new Uint8Array(salt.length + tenantBytes.length);
-plaintext.set(salt);
-plaintext.set(tenantBytes, salt.length);
-const nonce = RandomHelper.generate(12);
-const cipher = new ChaCha20Poly1305(privateKey, nonce);
-const payload = cipher.encrypt(plaintext);
-const encrypted = new Uint8Array(nonce.length + payload.length);
-encrypted.set(nonce);
-encrypted.set(payload, nonce.length);
-process.stdout.write(Converter.bytesToBase64Url(encrypted));
-") || fail "Trader tenantToken mint failed"
-[ -n "${TRADER_TENANT_TOKEN}" ] || fail "Empty TRADER_TENANT_TOKEN"
-ok "Minted Trader tenantToken (${#TRADER_TENANT_TOKEN} chars)"
 
 # -----------------------------------------------------------------------------
 # Step 4: Persist tokens + ids for kenya-usecase-test.sh.
@@ -335,9 +324,8 @@ done
     printf 'TRADER_TRUST_JWT=%q\n' "${TRADER_TRUST_JWT}"
 } >> .trust-tokens
 {
-    printf 'TRADER_DID=%q\n'           "${TRADER_DID}"
-    printf 'TRADER_TENANT_TOKEN=%q\n'  "${TRADER_TENANT_TOKEN}"
-    printf 'PUBLISHERS=%q\n'           "${PUBLISHERS[*]}"
+    printf 'TRADER_DID=%q\n' "${TRADER_DID}"
+    printf 'PUBLISHERS=%q\n' "${PUBLISHERS[*]}"
 } >> .publishers
 
 ok ".session-tokens, .trust-tokens, .publishers written"

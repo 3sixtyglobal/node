@@ -115,19 +115,27 @@ source .publishers
 # PUBLISHERS is a space-separated list written by provision-storage.sh.
 read -r -a PUBS <<< "${PUBLISHERS}"
 
+# Post-#203 (organization identifiers): non-login routes are tenant-routed by
+# ?organization=<org-did> (cleartext org DID, reverse-mapped to the tenant via
+# Tenant.organizationId + aliases). Encrypted tenant tokens are gone.
+urlenc()   { jq -rn --arg v "$1" '$v|@uri'; }
+urldecode() { local d="${1//+/ }"; printf '%b' "${d//\%/\\x}"; }
+TRADER_ORG_ENC=$(urlenc "${TRADER_DID}")
+
 # ============================================================================
 phase 1 "Trader discovers all four publisher datasets in the shared catalogue"
 # ============================================================================
-catalog_resp=$(curl -sS -X POST "${HOST}/federated-catalogue/request" \
+catalog_resp=$(curl -sS -X POST "${HOST}/federated-catalogue/request?organization=${TRADER_ORG_ENC}" \
     -H "Content-Type: application/json" \
-    -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
     -H "Cookie: access_token=${TRADER_SESSION_JWT}" \
     -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
     -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
 
-# Per publisher: confirm its dataset is discoverable and capture its TICKET-G
-# baked tenant token from the distribution accessService URL. bash 3.2 has no
-# associative arrays, so tokens are stored as dynamic globals (PUB_TOKEN_<PUB>).
+# Per publisher: confirm its dataset is discoverable and capture the publisher's
+# org DID baked into the distribution accessService URL (post-#203 the catalogue
+# bakes ?organization=<org-did> instead of an encrypted tenant token). bash 3.2
+# has no associative arrays, so values are dynamic globals (PUB_ORG_<PUB> /
+# PUB_ORG_ENC_<PUB>).
 for pub in "${PUBS[@]}"; do
     ds_var="${pub}_DATASET_ID"; dataset_id="${!ds_var}"
     found=$(echo "${catalog_resp}" | jq -r '(.dataset[]?, .catalog[]?.dataset[]?) | .["@id"] // empty' | grep -F "${dataset_id}" || true)
@@ -135,19 +143,26 @@ for pub in "${PUBS[@]}"; do
 
     dist_url=$(echo "${catalog_resp}" | jq -r --arg id "${dataset_id}" \
         '(.dataset[]?, .catalog[]?.dataset[]?) | select(.["@id"] == $id) | (.distribution // .["dcat:distribution"]) | (if type == "array" then .[0] else . end) | .accessService // empty' | head -1)
-    token=$(echo "${dist_url}" | sed -nE 's/.*[?&]x-enc-tenant-token=([^&]+).*/\1/p')
-    [ -n "${token}" ] || { info "Distribution URL: ${dist_url}"; fail "[${pub}] distribution carries no x-enc-tenant-token"; }
-    printf -v "PUB_TOKEN_${pub}" '%s' "${token}"
-    ok "[${pub}] dataset discovered + tenant token captured (${#token} chars: ${token:0:10}…)"
+    org_enc=$(echo "${dist_url}" | sed -nE 's/.*[?&]organization=([^&]+).*/\1/p')
+    [ -n "${org_enc}" ] || { info "Distribution URL: ${dist_url}"; fail "[${pub}] distribution carries no organization param"; }
+    org_did=$(urldecode "${org_enc}")
+    expected_var="${pub}_DID"
+    [ "${org_did}" = "${!expected_var}" ] \
+        || { info "Distribution org: ${org_did} (expected ${!expected_var})"; fail "[${pub}] distribution organization is not the publisher's org DID"; }
+    printf -v "PUB_ORG_${pub}" '%s' "${org_did}"
+    printf -v "PUB_ORG_ENC_${pub}" '%s' "${org_enc}"
+    ok "[${pub}] dataset discovered + org DID captured (${org_did})"
 done
 ok "Trader discovered all ${#PUBS[@]} publisher datasets in the shared [Node] catalogue"
 
 # ============================================================================
 phase 2 "The four datasets carry four DISTINCT publisher attributions"
 # ============================================================================
-# Each dataset's dcterms:publisher is the publisher's composite identifier
-# (nodeDid:hash(tenantId)). Four publishers ⇒ four distinct values. bash 3.2 has
-# no associative arrays, so collect the values and count uniques via sort -u.
+# Post-#203 the composite identifier (nodeDid:hash(tenantId)) is gone — each
+# dataset's publisher attribution is its org DID. Four publishers ⇒ four
+# distinct values. bash 3.2 has no associative arrays, so collect the values
+# and count uniques via sort -u. (Soft assertion: warn-only, since the
+# dcterms:publisher field shape post-refactor is verified empirically here.)
 publisher_list=""
 for pub in "${PUBS[@]}"; do
     ds_var="${pub}_DATASET_ID"; dataset_id="${!ds_var}"
@@ -174,49 +189,49 @@ phase 3 "Per authority: negotiate → FINALIZED → transfer → pull its slice"
 negotiate_and_pull() {
     local pub="$1"
     local did_var="${pub}_DID" offer_var="${pub}_OFFER_ID" ds_var="${pub}_DATASET_ID"
-    local cons_var="${pub}_CONSIGNMENT_ID" trust_var="${pub}_TRUST_JWT" token_var="PUB_TOKEN_${pub}"
+    local cons_var="${pub}_CONSIGNMENT_ID" trust_var="${pub}_TRUST_JWT"
+    local org_var="PUB_ORG_${pub}" org_enc_var="PUB_ORG_ENC_${pub}"
     local pub_did="${!did_var}" offer_id="${!offer_var}" dataset_id="${!ds_var}"
     local consignment_id="${!cons_var}" pub_trust="${!trust_var}"
-    local pub_token="${!token_var}"
+    local pub_org="${!org_var}" pub_org_enc="${!org_enc_var}"
 
     local consumer_pid="urn:contract-negotiation:trader-${pub}-$(date +%s)-${RANDOM}"
     [ "${pub}" = "KRA" ] && info "  consumerPid: ${consumer_pid}"
 
     # Pre-inject Trader's consumer-side negotiation entry (mobius pattern: avoid
-    # the provider-offer-before-consumer-registered race).
+    # the provider-offer-before-consumer-registered race). Post-#203 the record
+    # has NO nodeIdentity/tenantId fields and organizationIdentity is REQUIRED.
     local pnap_body
     pnap_body=$(jq -n \
         --arg id "${consumer_pid}" \
         --arg dateCreated "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
-        --arg nodeIdentity "${TRADER_DID}" \
         --arg organizationIdentity "${TRADER_DID}" \
-        '{ id: $id, correlationId: "", dateCreated: $dateCreated, state: "REQUESTED", nodeIdentity: $nodeIdentity, organizationIdentity: $organizationIdentity }')
+        '{ id: $id, correlationId: "", dateCreated: $dateCreated, state: "REQUESTED", organizationIdentity: $organizationIdentity }')
     local pnap_status
     pnap_status=$(curl -sS -o /dev/null -w "%{http_code}" -X PUT \
-        "${HOST}/rights-management/negotiations/admin/${consumer_pid}" \
+        "${HOST}/rights-management/negotiations/admin/${consumer_pid}?organization=${TRADER_ORG_ENC}" \
         -H "Content-Type: application/json" \
-        -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
         -H "Authorization: Bearer ${TRADER_SESSION_JWT}" \
         -d "${pnap_body}")
     { [ "${pnap_status}" = "204" ] || [ "${pnap_status}" = "200" ]; } \
         || fail "[${pub}] PNAP pre-inject failed (HTTP ${pnap_status})"
 
     # ContractRequestMessage mirroring the publisher's seeded offer. Callback
-    # carries Trader's token (reply routes to Trader); request routed to the
-    # publisher via its tenant token.
+    # carries Trader's org DID (reply routes to Trader); request routed to the
+    # publisher via its org DID.
     local offer_json callback_url negotiate_body
     offer_json=$(jq -n \
         --arg ctx "${ODRL_CONTEXT}" --arg uid "${offer_id}" --arg assigner "${pub_did}" --arg target "${dataset_id}" \
         '{ "@context": $ctx, "@type": "Offer", uid: $uid, assigner: $assigner, target: $target,
            action: "read", permission: [{ action: "read", target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" } }] }')
-    callback_url="${INTERNAL_URL}/rights-management?x-enc-tenant-token=${TRADER_TENANT_TOKEN}"
+    callback_url="${INTERNAL_URL}/rights-management?organization=${TRADER_ORG_ENC}"
     negotiate_body=$(jq -n \
         --arg ctx "${DSP_CONTEXT}" --arg consumerPid "${consumer_pid}" --argjson offer "${offer_json}" --arg callback "${callback_url}" \
         '{ "@context": [$ctx], "@type": "ContractRequestMessage", consumerPid: $consumerPid, offer: $offer, callbackAddress: $callback }')
 
     local nego_resp nego_http nego_body provider_nego_pid
     nego_resp=$(curl -sS -w "\n%{http_code}" -X POST \
-        "${HOST}/rights-management/negotiations/request?x-enc-tenant-token=${pub_token}" \
+        "${HOST}/rights-management/negotiations/request?organization=${pub_org_enc}" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
         -d "${negotiate_body}")
@@ -231,7 +246,7 @@ negotiate_and_pull() {
     local final_state="" current_state="" prev_state=""
     local poll_start=$(date +%s)
     for attempt in $(seq 1 15); do
-        current_state=$(curl -sS "${HOST}/rights-management/negotiations/${provider_nego_pid}?x-enc-tenant-token=${pub_token}" \
+        current_state=$(curl -sS "${HOST}/rights-management/negotiations/${provider_nego_pid}?organization=${pub_org_enc}" \
             -H "Authorization: Bearer ${TRADER_TRUST_JWT}" | jq -r '.state // empty')
         if [ -n "${current_state}" ] && [ "${current_state}" != "${prev_state}" ]; then
             [ "${pub}" = "KRA" ] && info "  state: ${current_state}"
@@ -247,8 +262,7 @@ negotiate_and_pull() {
     [ "${pub}" = "KRA" ] && info "  state machine settled in ${poll_secs}s"
 
     local nego_admin_resp agreement_id
-    nego_admin_resp=$(curl -sS "${HOST}/rights-management/negotiations/admin/${consumer_pid}" \
-        -H "x-api-key: ${TENANT_TRADER_API_KEY}" \
+    nego_admin_resp=$(curl -sS "${HOST}/rights-management/negotiations/admin/${consumer_pid}?organization=${TRADER_ORG_ENC}" \
         -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
     agreement_id=$(echo "${nego_admin_resp}" | jq -r '.agreement["@id"] // .agreement.uid // empty')
     [ -n "${agreement_id}" ] || agreement_id="${offer_id}"
@@ -266,10 +280,10 @@ negotiate_and_pull() {
     dsp_pid="urn:uuid:trader-${pub}-dsp-$(date +%s)-${RANDOM}"
     transfer_msg=$(jq -c -n \
         --arg ctx "${DSP_CONTEXT}" --arg consumerPid "${dsp_pid}" --arg agreementId "${agreement_id}" \
-        --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+        --arg callbackAddress "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
         '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "Http-Pull-Query-Format", callbackAddress: $callbackAddress }')
     tr_resp=$(node scripts/dsp-client.mjs requestTransfer \
-        --host "${HOST}" --tenant-token "${pub_token}" --trust-payload "${TRADER_TRUST_JWT}" --body "${transfer_msg}")
+        --host "${HOST}" --organization "${pub_org}" --trust-payload "${TRADER_TRUST_JWT}" --body "${transfer_msg}")
     [ "$(echo "${tr_resp}" | jq -r '.ok')" = "true" ] \
         || fail "[${pub}] requestTransfer failed: $(echo "${tr_resp}" | jq -r '.errorMessage')"
     tr_body=$(echo "${tr_resp}" | jq -c '.body')
@@ -284,7 +298,7 @@ negotiate_and_pull() {
         --arg ctx "${DSP_CONTEXT}" --arg consumerPid "${dsp_pid}" --arg providerPid "${provider_dsp_pid}" \
         '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
     start_resp=$(node scripts/dsp-client.mjs startTransfer \
-        --host "${HOST}" --tenant-token "${pub_token}" --trust-payload "${pub_trust}" --body "${start_msg}")
+        --host "${HOST}" --organization "${pub_org}" --trust-payload "${pub_trust}" --body "${start_msg}")
     [ "$(echo "${start_resp}" | jq -r '.ok')" = "true" ] \
         || fail "[${pub}] startTransfer failed: $(echo "${start_resp}" | jq -r '.errorMessage')"
     start_body=$(echo "${start_resp}" | jq -c '.body')
@@ -355,23 +369,25 @@ else
 fi
 
 # ============================================================================
-phase 5 "Push setup REJECTS missing tenant token (multi-tenant gate, KRA proof)"
+phase 5 "Push setup REJECTS missing organization id (multi-tenant gate, KRA proof)"
 # ============================================================================
 # Push transfer where dataAddress.endpoint (the consumer's inbox) carries NO
-# x-enc-tenant-token. On a multi-tenant publisher the data plane must refuse
-# setupPushSubscription rather than letting the eventual delivery 401 silently.
-# We exercise the proof against KRA — symmetric for the other three publishers.
+# ?organization=<org-did>. On a multi-tenant publisher the data plane must
+# refuse setupPushSubscription (pushSubscriptionMissingOrganizationId,
+# post-#203 rename of pushSubscriptionMissingTenantToken) rather than letting
+# the eventual delivery 401 silently. Proven against KRA — symmetric for the
+# other three publishers.
 KRA_PUSH_NEG_PID="urn:uuid:trader-KRA-push-neg-$(date +%s)-${RANDOM}"
 push_neg_msg=$(jq -c -n \
     --arg ctx "${DSP_CONTEXT}" \
     --arg consumerPid "${KRA_PUSH_NEG_PID}" \
     --arg agreementId "${AGREEMENT_KRA}" \
-    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
     --arg inbox "${INTERNAL_URL}/dataspace/inbox" \
     '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
 push_neg_resp=$(node scripts/dsp-client.mjs requestTransfer \
     --host "${HOST}" \
-    --tenant-token "${PUB_TOKEN_KRA}" \
+    --organization "${PUB_ORG_KRA}" \
     --trust-payload "${TRADER_TRUST_JWT}" \
     --body "${push_neg_msg}")
 [ "$(echo "${push_neg_resp}" | jq -r '.ok')" = "true" ] \
@@ -388,40 +404,40 @@ start_neg_msg=$(jq -c -n \
     '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
 start_neg_resp=$(node scripts/dsp-client.mjs startTransfer \
     --host "${HOST}" \
-    --tenant-token "${PUB_TOKEN_KRA}" \
+    --organization "${PUB_ORG_KRA}" \
     --trust-payload "${KRA_TRUST_JWT}" \
     --body "${start_neg_msg}")
 start_neg_body=$(echo "${start_neg_resp}" | jq -c '.body')
 start_neg_type=$(echo "${start_neg_body}" | jq -r '.["@type"] // empty')
 start_neg_code=$(echo "${start_neg_body}" | jq -r '.code // empty')
 
-if [ "${start_neg_type}" = "TransferError" ] && echo "${start_neg_code}" | grep -q "pushSubscriptionMissingTenantToken"; then
+if [ "${start_neg_type}" = "TransferError" ] && echo "${start_neg_code}" | grep -q "pushSubscriptionMissingOrganizationId"; then
     ok "[KRA] Push setup rejected as expected — code: ${start_neg_code}"
 elif [ "${start_neg_type}" = "TransferError" ]; then
     info "[KRA] Push setup returned TransferError but with a different code: ${start_neg_code}"
     info "Body: ${start_neg_body}"
-    fail "[KRA] Push setup error code mismatch — expected pushSubscriptionMissingTenantToken"
+    fail "[KRA] Push setup error code mismatch — expected pushSubscriptionMissingOrganizationId"
 else
     info "[KRA] Response type: ${start_neg_type}; body: ${start_neg_body}"
     fail "[KRA] Push setup did NOT reject the bare endpoint — multi-tenant gate is bypassed"
 fi
 
 # ============================================================================
-phase 6 "Push setup ACCEPTS endpoint with baked consumer tenant token (KRA proof)"
+phase 6 "Push setup ACCEPTS endpoint with baked consumer org DID (KRA proof)"
 # ============================================================================
 # Same shape as Phase 5 but dataAddress.endpoint now carries Trader's
-# x-enc-tenant-token, satisfying the data plane's multi-tenant gate.
+# ?organization=<org-did>, satisfying the data plane's multi-tenant gate.
 KRA_PUSH_POS_PID="urn:uuid:trader-KRA-push-pos-$(date +%s)-${RANDOM}"
 push_pos_msg=$(jq -c -n \
     --arg ctx "${DSP_CONTEXT}" \
     --arg consumerPid "${KRA_PUSH_POS_PID}" \
     --arg agreementId "${AGREEMENT_KRA}" \
-    --arg callbackAddress "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-    --arg inbox "${INTERNAL_URL}/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg callbackAddress "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox?organization=${TRADER_ORG_ENC}" \
     '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
 push_pos_resp=$(node scripts/dsp-client.mjs requestTransfer \
     --host "${HOST}" \
-    --tenant-token "${PUB_TOKEN_KRA}" \
+    --organization "${PUB_ORG_KRA}" \
     --trust-payload "${TRADER_TRUST_JWT}" \
     --body "${push_pos_msg}")
 [ "$(echo "${push_pos_resp}" | jq -r '.ok')" = "true" ] \
@@ -436,7 +452,7 @@ start_pos_msg=$(jq -c -n \
     '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $consumerPid, providerPid: $providerPid }')
 start_pos_resp=$(node scripts/dsp-client.mjs startTransfer \
     --host "${HOST}" \
-    --tenant-token "${PUB_TOKEN_KRA}" \
+    --organization "${PUB_ORG_KRA}" \
     --trust-payload "${KRA_TRUST_JWT}" \
     --body "${start_pos_msg}")
 [ "$(echo "${start_pos_resp}" | jq -r '.ok')" = "true" ] \
@@ -448,7 +464,7 @@ if [ "${start_pos_type}" = "TransferError" ]; then
     err_code=$(echo "${start_pos_body}" | jq -r '.code // "unknown"')
     fail "[KRA push-pos] Push setup failed: ${err_code} | body: ${start_pos_body}"
 fi
-ok "[KRA] Push setup accepted with baked consumer tenant token (providerPid: ${push_pos_provider_pid})"
+ok "[KRA] Push setup accepted with baked consumer org DID (providerPid: ${push_pos_provider_pid})"
 
 # ============================================================================
 phase 7 "Negative-path tenant isolation (cross-tenant credential mix rejected)"
@@ -484,7 +500,7 @@ read_activity=$(jq -c -n \
        updated: $ts }')
 read_file=$(mktemp)
 read_http=$(curl -sS -o "${read_file}" -w "%{http_code}" \
-    -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    -X POST "${HOST}/dataspace/inbox?organization=${PUB_ORG_ENC_KRA}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${KRA_TRUST_JWT}" \
     -d "${read_activity}")
@@ -512,7 +528,7 @@ write_activity=$(jq -c -n \
        updated: $ts }')
 write_file=$(mktemp)
 write_http=$(curl -sS -o "${write_file}" -w "%{http_code}" \
-    -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    -X POST "${HOST}/dataspace/inbox?organization=${PUB_ORG_ENC_KRA}" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
     -d "${write_activity}")
@@ -549,34 +565,34 @@ c9_offer=$(jq -n \
                                      operator: "eq", rightOperand: "unece:CountryId#KE" }] }] }')
 
 # Seed the constrained offer in KRA's PAP.
-c9_pap=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/rights-management/policy/admin" \
-    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_KRA_API_KEY}" -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
+c9_pap=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/rights-management/policy/admin?organization=${PUB_ORG_ENC_KRA}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
     -d "${c9_offer}")
 { [ "${c9_pap}" = "201" ] || [ "${c9_pap}" = "204" ]; } || fail "[KRA] 9 constrained offer seed failed (HTTP ${c9_pap})"
 
 # Negotiate it (Trader = consumer); pass-through negotiator copies the offer's rules.
 C9_NEG_PID="urn:contract-negotiation:trader-kra-c9-$(date +%s)-${RANDOM}"
-c9_pnap=$(jq -n --arg id "${C9_NEG_PID}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg ni "${TRADER_DID}" \
-    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", nodeIdentity: $ni, organizationIdentity: $ni }')
-curl -sS -o /dev/null -X PUT "${HOST}/rights-management/negotiations/admin/${C9_NEG_PID}" \
-    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${c9_pnap}"
+c9_pnap=$(jq -n --arg id "${C9_NEG_PID}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg oi "${TRADER_DID}" \
+    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", organizationIdentity: $oi }')
+curl -sS -o /dev/null -X PUT "${HOST}/rights-management/negotiations/admin/${C9_NEG_PID}?organization=${TRADER_ORG_ENC}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${c9_pnap}"
 c9_neg_body=$(jq -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_NEG_PID}" --argjson offer "${c9_offer}" \
-    --arg cb "${INTERNAL_URL}/rights-management?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg cb "${INTERNAL_URL}/rights-management?organization=${TRADER_ORG_ENC}" \
     '{ "@context": [$ctx], "@type": "ContractRequestMessage", consumerPid: $cp, offer: $offer, callbackAddress: $cb }')
-c9_neg=$(curl -sS -X POST "${HOST}/rights-management/negotiations/request?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+c9_neg=$(curl -sS -X POST "${HOST}/rights-management/negotiations/request?organization=${PUB_ORG_ENC_KRA}" \
     -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_TRUST_JWT}" -d "${c9_neg_body}")
 c9_prov_pid=$(echo "${c9_neg}" | jq -r '.providerPid // empty')
 [ -n "${c9_prov_pid}" ] || { info "Nego: ${c9_neg}"; fail "[KRA] 9 negotiation returned no providerPid"; }
 c9_state=""
 for _ in $(seq 1 15); do
-    c9_state=$(curl -sS "${HOST}/rights-management/negotiations/${c9_prov_pid}?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    c9_state=$(curl -sS "${HOST}/rights-management/negotiations/${c9_prov_pid}?organization=${PUB_ORG_ENC_KRA}" \
         -H "Authorization: Bearer ${TRADER_TRUST_JWT}" | jq -r '.state // empty')
     { [ "${c9_state}" = "FINALIZED" ] || [ "${c9_state}" = "VERIFIED" ]; } && break
     sleep 2
 done
 { [ "${c9_state}" = "FINALIZED" ] || [ "${c9_state}" = "VERIFIED" ]; } || fail "[KRA] 9 negotiation not FINALIZED (last: ${c9_state:-none})"
-c9_admin=$(curl -sS "${HOST}/rights-management/negotiations/admin/${C9_NEG_PID}" \
-    -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
+c9_admin=$(curl -sS "${HOST}/rights-management/negotiations/admin/${C9_NEG_PID}?organization=${TRADER_ORG_ENC}" \
+    -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
 C9_AGREEMENT=$(echo "${c9_admin}" | jq -r '.agreement["@id"] // .agreement.uid // empty')
 [ -n "${C9_AGREEMENT}" ] || C9_AGREEMENT="${C9_OFFER_ID}"
 c9_constraints=$(echo "${c9_admin}" | jq -r '[.agreement.permission[]?.constraint // empty] | flatten | length')
@@ -584,16 +600,16 @@ c9_constraints=$(echo "${c9_admin}" | jq -r '[.agreement.permission[]?.constrain
 # Push transfer against the constrained agreement.
 C9_PUSH_PID="urn:uuid:trader-kra-c9-push-$(date +%s)-${RANDOM}"
 c9_req=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_PUSH_PID}" --arg ag "${C9_AGREEMENT}" \
-    --arg cb "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-    --arg inbox "${INTERNAL_URL}/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg cb "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox?organization=${TRADER_ORG_ENC}" \
     '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpProxy-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
-c9_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c9_req}")
+c9_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --organization "${PUB_ORG_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c9_req}")
 [ "$(echo "${c9_req_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 9 requestTransfer failed: $(echo "${c9_req_resp}" | jq -r '.errorMessage')"
 c9_push_prov=$(echo "${c9_req_resp}" | jq -r '.body.providerPid // empty')
 [ -n "${c9_push_prov}" ] || fail "[KRA] 9 requestTransfer returned no providerPid"
 c9_start=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_PUSH_PID}" --arg pp "${c9_push_prov}" \
     '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $cp, providerPid: $pp }')
-c9_start_resp=$(node scripts/dsp-client.mjs startTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${KRA_TRUST_JWT}" --body "${c9_start}")
+c9_start_resp=$(node scripts/dsp-client.mjs startTransfer --host "${HOST}" --organization "${PUB_ORG_KRA}" --trust-payload "${KRA_TRUST_JWT}" --body "${c9_start}")
 [ "$(echo "${c9_start_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 9 startTransfer failed: $(echo "${c9_start_resp}" | jq -r '.errorMessage')"
 
 # Deliver a provider-generated read activity carrying the given destinationCountry.
@@ -606,7 +622,7 @@ deliver_c9() {
         '{ "@context": "https://www.w3.org/ns/activitystreams", type: "Create", generator: $gen,
            object: { "@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld", type: "Consignment", globalId: $cid, destinationCountry: { type: "Country", countryId: $cc } },
            updated: $ts }')
-    curl -sS -o "${bodyfile}" -w "%{http_code}" -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    curl -sS -o "${bodyfile}" -w "%{http_code}" -X POST "${HOST}/dataspace/inbox?organization=${PUB_ORG_ENC_KRA}" \
         -H "Content-Type: application/json" -H "Authorization: Bearer ${KRA_TRUST_JWT}" -d "${act}"
 }
 
@@ -643,49 +659,49 @@ c10_offer=$(jq -n \
     '{ "@context": $ctx, "@type": "Offer", uid: $uid, assigner: $assigner, target: $target, action: "write",
        permission: [{ action: "write", target: { "@type": "twin:jsonPath", "twin:jsonPathExpression": "$" } }] }')
 
-c10_pap=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/rights-management/policy/admin" \
-    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_KRA_API_KEY}" -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
+c10_pap=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/rights-management/policy/admin?organization=${PUB_ORG_ENC_KRA}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${KRA_SESSION_JWT}" \
     -d "${c10_offer}")
 { [ "${c10_pap}" = "201" ] || [ "${c10_pap}" = "204" ]; } || fail "[KRA] 10 write offer seed failed (HTTP ${c10_pap})"
 
 C10_NEG_PID="urn:contract-negotiation:trader-kra-c10-$(date +%s)-${RANDOM}"
-c10_pnap=$(jq -n --arg id "${C10_NEG_PID}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg ni "${TRADER_DID}" \
-    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", nodeIdentity: $ni, organizationIdentity: $ni }')
-curl -sS -o /dev/null -X PUT "${HOST}/rights-management/negotiations/admin/${C10_NEG_PID}" \
-    -H "Content-Type: application/json" -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${c10_pnap}"
+c10_pnap=$(jq -n --arg id "${C10_NEG_PID}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg oi "${TRADER_DID}" \
+    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", organizationIdentity: $oi }')
+curl -sS -o /dev/null -X PUT "${HOST}/rights-management/negotiations/admin/${C10_NEG_PID}?organization=${TRADER_ORG_ENC}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${c10_pnap}"
 c10_neg_body=$(jq -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_NEG_PID}" --argjson offer "${c10_offer}" \
-    --arg cb "${INTERNAL_URL}/rights-management?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg cb "${INTERNAL_URL}/rights-management?organization=${TRADER_ORG_ENC}" \
     '{ "@context": [$ctx], "@type": "ContractRequestMessage", consumerPid: $cp, offer: $offer, callbackAddress: $cb }')
-c10_neg=$(curl -sS -X POST "${HOST}/rights-management/negotiations/request?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+c10_neg=$(curl -sS -X POST "${HOST}/rights-management/negotiations/request?organization=${PUB_ORG_ENC_KRA}" \
     -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_TRUST_JWT}" -d "${c10_neg_body}")
 c10_prov_pid=$(echo "${c10_neg}" | jq -r '.providerPid // empty')
 [ -n "${c10_prov_pid}" ] || { info "Nego: ${c10_neg}"; fail "[KRA] 10 negotiation returned no providerPid"; }
 c10_state=""
 for _ in $(seq 1 15); do
-    c10_state=$(curl -sS "${HOST}/rights-management/negotiations/${c10_prov_pid}?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+    c10_state=$(curl -sS "${HOST}/rights-management/negotiations/${c10_prov_pid}?organization=${PUB_ORG_ENC_KRA}" \
         -H "Authorization: Bearer ${TRADER_TRUST_JWT}" | jq -r '.state // empty')
     { [ "${c10_state}" = "FINALIZED" ] || [ "${c10_state}" = "VERIFIED" ]; } && break
     sleep 2
 done
 { [ "${c10_state}" = "FINALIZED" ] || [ "${c10_state}" = "VERIFIED" ]; } || fail "[KRA] 10 negotiation not FINALIZED (last: ${c10_state:-none})"
-c10_admin=$(curl -sS "${HOST}/rights-management/negotiations/admin/${C10_NEG_PID}" \
-    -H "x-api-key: ${TENANT_TRADER_API_KEY}" -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
+c10_admin=$(curl -sS "${HOST}/rights-management/negotiations/admin/${C10_NEG_PID}?organization=${TRADER_ORG_ENC}" \
+    -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
 C10_AGREEMENT=$(echo "${c10_admin}" | jq -r '.agreement["@id"] // .agreement.uid // empty')
 [ -n "${C10_AGREEMENT}" ] || C10_AGREEMENT="${C10_OFFER_ID}"
 c10_action=$(echo "${c10_admin}" | jq -r '.agreement.permission[0].action // .agreement.action // "unknown"')
 
 C10_PUSH_PID="urn:uuid:trader-kra-c10-push-$(date +%s)-${RANDOM}"
 c10_req=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_PUSH_PID}" --arg ag "${C10_AGREEMENT}" \
-    --arg cb "${INTERNAL_URL}/dataspace?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
-    --arg inbox "${INTERNAL_URL}/dataspace/inbox?x-enc-tenant-token=${TRADER_TENANT_TOKEN}" \
+    --arg cb "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
+    --arg inbox "${INTERNAL_URL}/dataspace/inbox?organization=${TRADER_ORG_ENC}" \
     '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpProxy-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
-c10_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c10_req}")
+c10_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --organization "${PUB_ORG_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c10_req}")
 [ "$(echo "${c10_req_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 10 requestTransfer failed: $(echo "${c10_req_resp}" | jq -r '.errorMessage')"
 c10_push_prov=$(echo "${c10_req_resp}" | jq -r '.body.providerPid // empty')
 [ -n "${c10_push_prov}" ] || fail "[KRA] 10 requestTransfer returned no providerPid"
 c10_start=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_PUSH_PID}" --arg pp "${c10_push_prov}" \
     '{ "@context": [$ctx], "@type": "TransferStartMessage", consumerPid: $cp, providerPid: $pp }')
-c10_start_resp=$(node scripts/dsp-client.mjs startTransfer --host "${HOST}" --tenant-token "${PUB_TOKEN_KRA}" --trust-payload "${KRA_TRUST_JWT}" --body "${c10_start}")
+c10_start_resp=$(node scripts/dsp-client.mjs startTransfer --host "${HOST}" --organization "${PUB_ORG_KRA}" --trust-payload "${KRA_TRUST_JWT}" --body "${c10_start}")
 [ "$(echo "${c10_start_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 10 startTransfer failed: $(echo "${c10_start_resp}" | jq -r '.errorMessage')"
 
 # Consumer (Trader) pushes a WRITE into KRA's inbox. generator=consumerPid → action=write.
@@ -694,7 +710,7 @@ c10_write=$(jq -c -n --arg gen "${C10_PUSH_PID}" --arg cid "${KRA_CONSIGNMENT_ID
        object: { "@context": "https://vocabulary.uncefact.org/unece-context-D23B.jsonld", type: "Consignment", globalId: $cid },
        updated: $ts }')
 c10_file=$(mktemp)
-c10_http=$(curl -sS -o "${c10_file}" -w "%{http_code}" -X POST "${HOST}/dataspace/inbox?x-enc-tenant-token=${PUB_TOKEN_KRA}" \
+c10_http=$(curl -sS -o "${c10_file}" -w "%{http_code}" -X POST "${HOST}/dataspace/inbox?organization=${PUB_ORG_ENC_KRA}" \
     -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_TRUST_JWT}" -d "${c10_write}")
 c10_body=$(cat "${c10_file}"); rm -f "${c10_file}"
 

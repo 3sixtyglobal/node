@@ -1,8 +1,10 @@
 services:
   twin-kenya-defaultarb-node:
     build:
-      context: ../../../../..
-      dockerfile: node/apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile
+      # Context is the twin-node repo root — the image consumes only the published npm
+      # packages in twin-node/node_modules, so no cross-submodule paths are needed.
+      context: ../../../..
+      dockerfile: apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile
     container_name: twin-kenya-defaultarb-node
     ports:
       - '3042:3000'

@@ -10,7 +10,7 @@
 // and Node walks up to .../node/node_modules).
 //
 // CLI shape:
-//   node dsp-client.mjs <command> --host <url> --tenant-token <encrypted>
+//   node dsp-client.mjs <command> --host <url> --organization <org-did>
 //     [--trust-payload <jwt>] [--body <json>] [--pid <consumerPid>] [--id <datasetId>]
 //
 // Output (stdout): a single JSON line.
@@ -35,36 +35,33 @@ function parseArgs(argv) {
 	return { command, opts };
 }
 
-function buildEndpoint(host, tenantToken) {
-	// host arrives like "http://localhost:3040". Embed the tenant token at the
-	// endpoint level so BaseRestClient preserves it as a query param on every
-	// request. This matches what TenantProcessor expects in production —
-	// the catalogue's URL-baked tenantToken is how cross-tenant requests
-	// route on inbound.
-	if (!tenantToken) {
+function buildEndpoint(host, organization) {
+	// host arrives like "http://localhost:3042". Embed the target tenant's org
+	// DID at the endpoint level so BaseRestClient preserves it as a query param
+	// on every request. Post-#203 the TenantProcessor resolves non-login routes
+	// via ?organization=<org-did> (Tenant.organizationId + aliases) — the
+	// catalogue's URL-baked org DID is how cross-tenant requests route inbound.
+	if (!organization) {
 		return host;
 	}
 	const url = new URL(host);
-	url.searchParams.set('x-enc-tenant-token', tenantToken);
+	url.searchParams.set('organization', organization);
 	return url.toString();
 }
 
 function makeClient(opts) {
 	// Two auth modes:
-	//  (1) DSP routes (skipAuth on inbound): tenant token in URL query +
+	//  (1) DSP routes (skipAuth on inbound): target org DID in URL query +
 	//      Bearer trust JWT via the rest client method's trustPayload arg.
-	//  (2) Tenant-admin routes (listAppDatasets, getAppDataset): require
-	//      x-api-key + session JWT cookie. Set them as static headers in
-	//      the config so every request carries them.
+	//  (2) Tenant-admin routes (listAppDatasets, getAppDataset): require the
+	//      org query param (routing) + session JWT cookie (auth). Set the
+	//      cookie as a static header so every request carries it.
 	const headers = {};
-	if (opts['api-key']) {
-		headers['x-api-key'] = opts['api-key'];
-	}
 	if (opts['session-jwt']) {
 		headers.Cookie = `access_token=${opts['session-jwt']}`;
 	}
 	return new DataspaceControlPlaneRestClient({
-		endpoint: buildEndpoint(opts.host, opts['tenant-token']),
+		endpoint: buildEndpoint(opts.host, opts.organization),
 		pathPrefix: 'dataspace',
 		headers: Object.keys(headers).length > 0 ? headers : undefined
 	});
