@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.54](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.53...node-v0.0.3-next.54) (2026-06-12)
+
+
+### Features
+
+* improved cli commands ([#206](https://github.com/iotaledger/twin-node/issues/206)) ([cf00850](https://github.com/iotaledger/twin-node/commit/cf0085023a66e187aaaaf3889128c845c73a1faf))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.53 to 0.0.3-next.54
+
 ## [0.0.3-next.53](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.52...node-v0.0.3-next.53) (2026-06-11)
 
 
