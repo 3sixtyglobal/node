@@ -76,14 +76,15 @@ export function getCommandDefinitionTenantImport(commandDefinitions: {
 }
 
 /**
- * Command for importing a tenant.
+ * Command for importing a tenant with a known tenant ID and API key.
  * @param engineCore The engine core.
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
- * @param params.apiKey The api key to import.
- * @param params.tenantId The tenant ID to import the api key to.
- * @param params.label The label for the api key.
+ * @param params.apiKey The API key to import.
+ * @param params.tenantId The tenant ID to import.
+ * @param params.label The label for the tenant.
  * @param params.publicOrigin The public URL origin for the tenant.
+ * @returns A promise that resolves when the tenant record has been created.
  */
 export async function tenantImport(
 	engineCore: IEngineCore,

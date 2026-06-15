@@ -73,6 +73,7 @@ export function getCommandDefinitionIdentityImport(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.identity The DID of the identity to import.
  * @param params.mnemonic The mnemonic to use for the identity.
+ * @returns A promise that resolves when the identity mnemonic has been stored in the vault.
  */
 export async function identityImport(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,

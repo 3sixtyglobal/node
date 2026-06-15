@@ -101,7 +101,7 @@ export function getCommandDefinitionIdentityVerificationMethodImport(commandDefi
 }
 
 /**
- * Command for creating an identity verification method.
+ * Command for importing an existing key as a verification method on an identity document.
  * @param engineCore The engine core.
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
@@ -110,6 +110,7 @@ export function getCommandDefinitionIdentityVerificationMethodImport(commandDefi
  * @param params.verificationMethodId The ID of the verification method to create.
  * @param params.controller The controller DID for the identity.
  * @param params.privateKeyHex The private key in hex format.
+ * @returns A promise that resolves when the verification method has been imported.
  */
 export async function identityVerificationMethodImport(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,

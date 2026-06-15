@@ -61,6 +61,8 @@ export function getCommandDefinitionSetNodeOrgId(commandDefinitions: {
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
  * @param params.organizationId The organization ID to set.
+ * @returns A promise that resolves when the node organization ID has been persisted.
+ * @throws GeneralError if called while multi-tenant mode is enabled.
  */
 export async function setNodeOrgId(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,

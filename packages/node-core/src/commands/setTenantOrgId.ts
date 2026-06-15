@@ -71,6 +71,7 @@ export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.tenantId The tenant ID to update.
  * @param params.organizationId The organization ID to set.
+ * @returns A promise that resolves when the tenant organization ID has been stored.
  */
 export async function setTenantOrgId(
 	engineCore: IEngineCore,
@@ -99,7 +100,9 @@ export async function setTenantOrgId(
  * Assert that no other tenant already holds the given organization ID.
  * @param tenantAdminComponent The tenant admin component to query.
  * @param newOrganizationId The organization DID to check.
- * @param excludeTenantId When set, the tenant with this ID is excluded from the check (used when updating an existing tenant).
+ * @param excludeTenantId When set, the tenant with this ID is excluded from the uniqueness check.
+ * @returns A promise that resolves when the uniqueness check passes.
+ * @throws GeneralError if another tenant already uses the organization ID.
  */
 export async function assertOrganizationIdUnique(
 	tenantAdminComponent: ITenantAdminComponent,
@@ -140,14 +143,15 @@ export async function assertOrganizationIdUnique(
 }
 
 /**
- * Look up the tenant admin component, apply a new organization ID (moving the existing value to the
- * legacy list), and save. Optionally wraps the operation with a CLI section header and done marker.
+ * Apply a new organization ID to a tenant, moving the current value to the legacy list.
  * @param engineCore The engine core used to look up the tenantAdminComponent.
  * @param tenantId The ID of the tenant to update.
  * @param newOrganizationId The new organization DID to set.
  * @param options Optional display and behaviour overrides.
- * @param options.sectionLabel When set, emits CLIDisplay.break+section before and CLIDisplay.done after.
+ * @param options.sectionLabel When set, emits a CLI section header before and done marker after.
  * @param options.required When false, returns silently when the component is not registered (default true).
+ * @returns A promise that resolves when the tenant record has been updated.
+ * @throws GeneralError if the component is required but not registered, or the organization ID is already in use.
  */
 export async function applyOrganizationIdToTenant(
 	engineCore: IEngineCore,

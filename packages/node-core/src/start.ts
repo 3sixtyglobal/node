@@ -139,13 +139,13 @@ export async function start(
 }
 
 /**
- * Configure the context IDs for the engine.
+ * Populate the engine context IDs from the current engine state.
  * @param engine The engine to configure.
  * @param envVars The environment variables.
  * @param requiresEngineStarted Whether the engine is required to be started.
  * @param requiresNodeIdentity Whether the node identity is required.
  * @param requiresOrgIdentity Whether the organization identity is required.
- * @throws GeneralError Throws if the node identity or tenant is required but not set.
+ * @throws GeneralError if the node identity or organization ID is required but not set.
  */
 function configureContextIds(
 	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
@@ -175,10 +175,9 @@ function configureContextIds(
 }
 
 /**
- * Configure the context IDs for the engine.
+ * Configure the available context ID keys on the engine.
  * @param engine The engine to configure.
  * @param availableContextIdKeys The available context ID keys.
- * @throws GeneralError Throws if the node identity or tenant is required but not set.
  */
 function configureContextIdKeys(
 	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
@@ -206,6 +205,8 @@ function configureContextIdKeys(
  * startup is blocked with an error listing the affected tenant IDs.
  * @param engineCore The engine core.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when all tenants have valid organization IDs.
+ * @throws GeneralError if multiple tenants are missing their organization ID and cannot be auto-recovered.
  */
 async function enforceTenantOrganizationIds(
 	engineCore: IEngineCore<IEngineCoreConfig, INodeEngineState>,

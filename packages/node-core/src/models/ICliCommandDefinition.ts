@@ -6,7 +6,7 @@ import type { ICliCommandDefinitionParam } from "./ICliCommandDefinitionParam.js
 import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
 
 /**
- * Command to execute in the CLI.
+ * Static definition of a CLI command including its name, parameters, and execution action.
  */
 export interface ICliCommandDefinition {
 	/**
@@ -20,7 +20,7 @@ export interface ICliCommandDefinition {
 	description: string;
 
 	/**
-	 * The example.
+	 * An example invocation string shown in help output.
 	 */
 	example: string;
 

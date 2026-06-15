@@ -33,6 +33,7 @@ export function getCommandDefinitionHelp(commandDefinitions: {
  * @param params The command parameters.
  * @param params.command The command to display help for.
  * @param commandDefinitions The registered command definitions.
+ * @returns A promise that resolves when help output has been displayed.
  */
 export async function help(
 	engineCore: IEngineCore,

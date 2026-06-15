@@ -153,6 +153,7 @@ export async function buildEngineConfiguration(
  * Configures the entity storage.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the entity storage configuration has been applied.
  */
 async function configureEntityStorage(
 	coreConfig: IEngineConfig,
@@ -309,6 +310,7 @@ async function configureEntityStorage(
  * Configures the blob storage.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the blob storage configuration has been applied.
  */
 async function configureBlobStorage(
 	coreConfig: IEngineConfig,
@@ -427,6 +429,7 @@ async function configureBlobStorage(
  * Configures the logging.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the logging configuration has been applied.
  */
 async function configureLogging(
 	coreConfig: IEngineConfig,
@@ -493,6 +496,7 @@ async function configureLogging(
  * Configures the vault.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the vault configuration has been applied.
  */
 async function configureVault(
 	coreConfig: IEngineConfig,
@@ -527,6 +531,7 @@ async function configureVault(
  * Configures the background task.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the background task configuration has been applied.
  */
 async function configureBackgroundTask(
 	coreConfig: IEngineConfig,
@@ -542,9 +547,10 @@ async function configureBackgroundTask(
 }
 
 /**
- * Configures the event bud.
+ * Configures the event bus.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the event bus configuration has been applied.
  */
 async function configureEventBus(
 	coreConfig: IEngineConfig,
@@ -568,6 +574,7 @@ async function configureEventBus(
  * Configures the telemetry.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the telemetry configuration has been applied.
  */
 async function configureTelemetry(
 	coreConfig: IEngineConfig,
@@ -611,6 +618,7 @@ async function configureTelemetry(
  * Configures the metrics producers and orchestrator service.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the metrics collector configuration has been applied.
  */
 async function configureMetricsCollector(
 	coreConfig: IEngineConfig,
@@ -646,6 +654,7 @@ async function configureMetricsCollector(
  * Configures the automation.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the automation configuration has been applied.
  */
 async function configureAutomation(
 	coreConfig: IEngineConfig,
@@ -677,6 +686,7 @@ async function configureAutomation(
  * Configures the health.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the health configuration has been applied.
  */
 async function configureHealth(
 	coreConfig: IEngineConfig,
@@ -701,6 +711,7 @@ async function configureHealth(
  * Configures the platform.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the platform configuration has been applied.
  */
 async function configurePlatform(
 	coreConfig: IEngineConfig,
@@ -723,6 +734,7 @@ async function configurePlatform(
  * Configures the tenant.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the tenant configuration has been applied.
  */
 async function configureTenant(
 	coreConfig: IEngineConfig,
@@ -739,9 +751,10 @@ async function configureTenant(
 }
 
 /**
- * Configures the context id handlers.
+ * Configures the context ID handlers.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the context ID handler configuration has been applied.
  */
 async function configureContextIdHandlers(
 	coreConfig: IEngineConfig,
@@ -764,6 +777,7 @@ async function configureContextIdHandlers(
  * Configures the messaging.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the messaging configuration has been applied.
  */
 async function configureMessaging(
 	coreConfig: IEngineConfig,
@@ -822,6 +836,14 @@ async function configureMessaging(
 		} else if (
 			envVars.messagingPushNotificationConnector === MessagingPushNotificationConnectorType.Aws
 		) {
+			let messagingApps;
+			if (Is.stringValue(envVars.awsMessagingPushNotificationApplications)) {
+				try {
+					messagingApps = JSON.parse(envVars.awsMessagingPushNotificationApplications);
+				} catch {}
+			} else if (Is.array(envVars.awsMessagingPushNotificationApplications)) {
+				messagingApps = envVars.awsMessagingPushNotificationApplications;
+			}
 			coreConfig.types.messagingPushNotificationConnector.push({
 				type: MessagingPushNotificationConnectorType.Aws,
 				options: {
@@ -831,9 +853,7 @@ async function configureMessaging(
 						accessKeyId: envVars.awsSesAccessKeyId,
 						secretAccessKey: envVars.awsSesSecretAccessKey,
 						endpoint: envVars.awsSesEndpoint,
-						applicationsSettings: Is.array(envVars.awsMessagingPushNotificationApplications)
-							? JSON.parse(envVars.awsMessagingPushNotificationApplications)
-							: []
+						applicationsSettings: messagingApps ?? []
 					}
 				}
 			});
@@ -853,6 +873,7 @@ async function configureMessaging(
  * Configures the faucet.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the faucet configuration has been applied.
  */
 async function configureFaucet(
 	coreConfig: IEngineConfig,
@@ -887,6 +908,7 @@ async function configureFaucet(
  * Configures the wallet.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the wallet configuration has been applied.
  */
 async function configureWallet(
 	coreConfig: IEngineConfig,
@@ -917,6 +939,7 @@ async function configureWallet(
  * Configures the NFT.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the NFT configuration has been applied.
  */
 async function configureNft(
 	coreConfig: IEngineConfig,
@@ -956,6 +979,7 @@ async function configureNft(
  * Configures the notarization.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the notarization configuration has been applied.
  */
 async function configureNotarization(
 	coreConfig: IEngineConfig,
@@ -991,6 +1015,7 @@ async function configureNotarization(
  * Configures the immutable proof.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the immutable proof configuration has been applied.
  */
 async function configureImmutableProof(
 	coreConfig: IEngineConfig,
@@ -1013,6 +1038,7 @@ async function configureImmutableProof(
  * Configures the identity.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the identity configuration has been applied.
  */
 async function configureIdentity(
 	coreConfig: IEngineConfig,
@@ -1054,6 +1080,7 @@ async function configureIdentity(
  * Configures the identity resolver.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the identity resolver configuration has been applied.
  */
 async function configureIdentityResolver(
 	coreConfig: IEngineConfig,
@@ -1105,6 +1132,7 @@ async function configureIdentityResolver(
  * Configures the identity profile.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the identity profile configuration has been applied.
  */
 async function configureIdentityProfile(
 	coreConfig: IEngineConfig,
@@ -1128,6 +1156,7 @@ async function configureIdentityProfile(
  * Configures the attestation.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the attestation configuration has been applied.
  */
 async function configureAttestation(
 	coreConfig: IEngineConfig,
@@ -1158,6 +1187,7 @@ async function configureAttestation(
  * Configures the auditable item graph.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the auditable item graph configuration has been applied.
  */
 async function configureAuditableItemGraph(
 	coreConfig: IEngineConfig,
@@ -1175,6 +1205,7 @@ async function configureAuditableItemGraph(
  * Configures the auditable item stream.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the auditable item stream configuration has been applied.
  */
 async function configureAuditableItemStream(
 	coreConfig: IEngineConfig,
@@ -1192,6 +1223,7 @@ async function configureAuditableItemStream(
  * Configures the data processing.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the data processing configuration has been applied.
  */
 async function configureDataProcessing(
 	coreConfig: IEngineConfig,
@@ -1224,6 +1256,7 @@ async function configureDataProcessing(
  * Configures the document management.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the document management configuration has been applied.
  */
 async function configureDocumentManagement(
 	coreConfig: IEngineConfig,
@@ -1241,6 +1274,7 @@ async function configureDocumentManagement(
  * Configures the trust components.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the trust configuration has been applied.
  */
 async function configureTrust(
 	coreConfig: IEngineConfig,
@@ -1294,6 +1328,7 @@ async function configureTrust(
  * Configures the rights management.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the rights management configuration has been applied.
  */
 async function configureRightsManagement(
 	coreConfig: IEngineConfig,
@@ -1439,6 +1474,7 @@ async function configureRightsManagement(
  * Configures the task scheduler.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the task scheduler configuration has been applied.
  */
 async function configureTaskScheduler(
 	coreConfig: IEngineConfig,
@@ -1456,6 +1492,7 @@ async function configureTaskScheduler(
  * Configures the federated catalogue.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the federated catalogue configuration has been applied.
  */
 async function configureFederatedCatalogue(
 	coreConfig: IEngineConfig,
@@ -1494,6 +1531,7 @@ async function configureFederatedCatalogue(
  * Configures the dataspace control plane and data plane.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the dataspace configuration has been applied.
  */
 async function configureDataspace(
 	coreConfig: IEngineConfig,
@@ -1537,6 +1575,7 @@ async function configureDataspace(
  * Configures the DLT.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
+ * @returns A promise that resolves when the DLT configuration has been applied.
  */
 async function configureDlt(
 	coreConfig: IEngineConfig,
@@ -1623,10 +1662,10 @@ export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): 
 }
 
 /**
- * Checks if the immutable proof subsystem is required.
- * Returns true when any component that depends on the immutable proof subsystem is enabled.
+ * Checks if the federated catalogue subsystem is required.
+ * Returns true when the catalogue is explicitly enabled, a remote endpoint is configured, filters are set, or dataspace is enabled.
  * @param envVars The environment variables.
- * @returns True if verifiable storage is enabled.
+ * @returns True if the federated catalogue is required.
  */
 export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (

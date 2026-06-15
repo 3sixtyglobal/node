@@ -58,6 +58,7 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
  * @param engineCore The engine core.
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
+ * @returns A promise that resolves when the bootstrap sequence has completed.
  */
 export async function bootstrapLegacy(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,

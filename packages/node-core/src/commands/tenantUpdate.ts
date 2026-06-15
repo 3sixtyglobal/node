@@ -81,9 +81,10 @@ export function getCommandDefinitionTenantUpdate(commandDefinitions: {
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
  * @param params.apiKey The api key to update.
- * @param params.tenantId The tenant ID to update the api key to.
- * @param params.label The label for the api key.
+ * @param params.tenantId The tenant ID to update.
+ * @param params.label The label for the tenant.
  * @param params.publicOrigin The public URL origin for the tenant.
+ * @returns A promise that resolves when the tenant record has been updated.
  */
 export async function tenantUpdate(
 	engineCore: IEngineCore,

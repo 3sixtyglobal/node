@@ -70,6 +70,8 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.tenantId The tenant ID to update.
  * @param params.alias The alias to remove from the legacy list.
+ * @returns A promise that resolves when the alias has been removed.
+ * @throws GeneralError if the tenant admin component is not registered, or the alias is not found.
  */
 export async function removeTenantOrgAlias(
 	engineCore: IEngineCore,

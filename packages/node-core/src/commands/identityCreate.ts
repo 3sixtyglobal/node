@@ -378,8 +378,9 @@ async function mnemonicCreate(
 /**
  * Finalise the mnemonic for the node identity.
  * @param vaultConnector The vault connector to use.
- * @param tempIdentity The identity of the node.
- * @param identity The final identity for the node.
+ * @param tempIdentity The temporary identity used during creation.
+ * @param identity The final resolved identity.
+ * @returns A promise that resolves when the mnemonic has been migrated to the final identity key.
  */
 async function mnemonicFinalise(
 	vaultConnector: IVaultConnector,
@@ -401,10 +402,10 @@ async function mnemonicFinalise(
 }
 
 /**
- * Remove the mnemonic.
+ * Remove the mnemonic and associated account secret for an identity.
  * @param vaultConnector The vault connector.
  * @param identity The working identity.
- * @returns Nothing.
+ * @returns A promise that resolves when all vault secrets for the identity have been removed.
  */
 async function mnemonicRemove(vaultConnector: IVaultConnector, identity: string): Promise<void> {
 	try {
@@ -417,11 +418,11 @@ async function mnemonicRemove(vaultConnector: IVaultConnector, identity: string)
 }
 
 /**
- * Generate an identity.
+ * Resolve or create a DID identity document.
  * @param engineCore The engine core for the node.
- * @param controller The controller for the identity.
- * @param providedIdentity The existing identity if there is one.
- * @returns The addresses for the wallet.
+ * @param controller The controller DID for the new document.
+ * @param providedIdentity An existing DID to resolve; if absent or not found a new one is created.
+ * @returns The DID string for the resolved or newly created identity.
  */
 async function identityGenerate(
 	engineCore: IEngineCore,
@@ -476,11 +477,11 @@ async function identityGenerate(
 }
 
 /**
- * Bootstrap the wallet for the node.
+ * Generate and fund a wallet address for the given identity.
  * @param engineCore The engine core for the node.
  * @param identity The identity to create the wallet for.
  * @param walletAddressIndex The index of the wallet address to use.
- * @returns The addresses for the wallet.
+ * @returns The primary wallet address for the identity.
  */
 async function generateWallet(
 	engineCore: IEngineCore,
@@ -518,10 +519,11 @@ async function generateWallet(
 }
 
 /**
- * Bootstrap the identity for the node.
+ * Correct the identity association on a wallet address after the final DID is known.
  * @param engineCore The engine core for the node.
- * @param identity The identity of the node.
- * @param address The address for the wallet.
+ * @param identity The final resolved identity.
+ * @param address The wallet address to update.
+ * @returns A promise that resolves when the wallet address identity has been updated.
  */
 async function walletFinalise(
 	engineCore: IEngineCore,
