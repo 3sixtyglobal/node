@@ -61,6 +61,7 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
  * @param params.identity The DID to set for the node.
+ * @returns A promise that resolves when the node identity has been persisted.
  */
 export async function nodeSetIdentity(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,

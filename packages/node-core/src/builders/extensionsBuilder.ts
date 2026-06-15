@@ -52,7 +52,7 @@ export async function extensionsConfiguration(
  * Handles the initialisation of the extensions when the engine has been constructed.
  * @param envVars The environment variables for the node.
  * @param engineCore The engine core instance.
- * @returns Nothing.
+ * @returns A promise that resolves when all extension engine initialisation methods have completed.
  */
 export async function extensionsInitialiseEngine(
 	envVars: INodeEnvironmentVariables,
@@ -90,7 +90,7 @@ export async function extensionsInitialiseEngine(
  * @param envVars The environment variables for the node.
  * @param engineCore The engine core instance.
  * @param engineServer The engine server instance.
- * @returns Nothing.
+ * @returns A promise that resolves when all extension engine-server initialisation methods have completed.
  */
 export async function extensionsInitialiseEngineServer(
 	envVars: INodeEnvironmentVariables,
@@ -124,7 +124,7 @@ export async function extensionsInitialiseEngineServer(
  * Handles the shutdown of the extensions.
  * @param envVars The environment variables for the node.
  * @param engineCore The engine core instance.
- * @returns Nothing.
+ * @returns A promise that resolves when all extension shutdown methods have completed.
  */
 export async function shutdownExtensions(
 	envVars: INodeEnvironmentVariables,

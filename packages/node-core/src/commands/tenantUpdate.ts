@@ -4,6 +4,7 @@ import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
+import { Did } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
@@ -48,6 +49,15 @@ export function getCommandDefinitionTenantUpdate(commandDefinitions: {
 				required: false
 			},
 			{
+				key: "organization-id",
+				type: "string",
+				extendedType: "did",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.organization-id.description"
+				),
+				required: false
+			},
+			{
 				key: "label",
 				type: "string",
 				description: I18n.formatMessage("node.cli.commands.tenant-update.params.label.description"),
@@ -81,9 +91,11 @@ export function getCommandDefinitionTenantUpdate(commandDefinitions: {
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
  * @param params.apiKey The api key to update.
- * @param params.tenantId The tenant ID to update the api key to.
- * @param params.label The label for the api key.
+ * @param params.tenantId The tenant ID to update.
+ * @param params.organizationId The organization DID to associate with the tenant.
+ * @param params.label The label for the tenant.
  * @param params.publicOrigin The public URL origin for the tenant.
+ * @returns A promise that resolves when the tenant record has been updated.
  */
 export async function tenantUpdate(
 	engineCore: IEngineCore,
@@ -91,6 +103,7 @@ export async function tenantUpdate(
 	params: {
 		apiKey?: string;
 		tenantId?: string;
+		organizationId?: string;
 		label?: string;
 		publicOrigin?: string;
 	}
@@ -99,6 +112,10 @@ export async function tenantUpdate(
 
 	if (Is.stringValue(params.apiKey)) {
 		Guards.stringHexLength("tenantUpdate", "api-key", params.apiKey, 32);
+	}
+
+	if (Is.stringValue(params.organizationId)) {
+		Did.guard("tenantUpdate", "organization-id", params.organizationId);
 	}
 
 	if (Is.stringValue(params.publicOrigin)) {
@@ -119,11 +136,13 @@ export async function tenantUpdate(
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-update.labels.updating"));
 	CLIDisplay.spinnerStart();
 
+	const tenant = await tenantAdminComponent.get(params.tenantId);
 	await tenantAdminComponent.update({
-		id: params.tenantId,
-		apiKey: params.apiKey,
-		label: params.label,
-		publicOrigin: params.publicOrigin
+		...tenant,
+		...(Is.stringValue(params.apiKey) && { apiKey: params.apiKey }),
+		...(Is.stringValue(params.organizationId) && { organizationId: params.organizationId }),
+		...(Is.stringValue(params.label) && { label: params.label }),
+		...(Is.stringValue(params.publicOrigin) && { publicOrigin: params.publicOrigin })
 	});
 	CLIDisplay.spinnerStop();
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-update.labels.updated"));

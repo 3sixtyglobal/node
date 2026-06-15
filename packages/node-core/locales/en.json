@@ -62,8 +62,7 @@
 			"notAvailableInMultiTenantMode": "The set-node-org-id command is not available in multi-tenant mode, use set-tenant-org-id instead."
 		},
 		"applyOrganizationIdToTenant": {
-			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
-			"organizationIdAlreadyInUse": "The organization ID \"{organizationId}\" is already assigned to tenant \"{conflictingTenantId}\"."
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
 		"removeTenantOrgAlias": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
@@ -401,7 +400,7 @@
 				},
 				"tenant-import": {
 					"description": "Import a tenant with associated api key",
-					"example": "tenant-import --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
+					"example": "tenant-import --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --organization-id=\"did:iota:...\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -411,6 +410,9 @@
 						},
 						"api-key": {
 							"description": "The API key to associate with the tenant id."
+						},
+						"organization-id": {
+							"description": "The organization DID to associate with the tenant."
 						},
 						"label": {
 							"description": "A descriptive label for the tenant."
@@ -439,6 +441,9 @@
 						},
 						"api-key": {
 							"description": "The API key to associate with the tenant id."
+						},
+						"organization-id": {
+							"description": "The organization DID to associate with the tenant."
 						},
 						"label": {
 							"description": "A descriptive label for the tenant."

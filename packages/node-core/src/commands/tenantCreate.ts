@@ -6,7 +6,6 @@ import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did } from "@twin.org/identity-models";
-import { assertOrganizationIdUnique } from "./setTenantOrgId.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
@@ -154,9 +153,7 @@ export async function tenantCreate(
 		Guards.stringHexLength("tenantCreate", "api-key", params.apiKey, 32);
 	}
 
-	if (Is.stringValue(params.organizationId)) {
-		Did.guard("tenantCreate", "organization-id", params.organizationId);
-	}
+	Did.guard("tenantCreate", "organization-id", params.organizationId);
 
 	if (Is.stringValue(params.publicOrigin)) {
 		Url.guard("tenantCreate", "public-origin", params.publicOrigin);
@@ -172,10 +169,6 @@ export async function tenantCreate(
 	const tenantAdminService = ComponentFactory.get<ITenantAdminComponent>(
 		tenantAdminServiceComponentType
 	);
-
-	if (Is.stringValue(params.organizationId)) {
-		await assertOrganizationIdUnique(tenantAdminService, params.organizationId);
-	}
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-create.labels.creating"));
 

@@ -12,6 +12,7 @@ import {
 	SchemaVersionMigrationComponentType
 } from "@twin.org/engine-types";
 import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@twin.org/entity";
+import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
 import {
 	EntityStorageConnectorFactory,
 	SchemaMigrationFactory
@@ -146,21 +147,29 @@ describe("migration", () => {
 		// Reset MigrationTestEntity's schema-version record to v0 so run 2 detects it as
 		// needing migration, then seed three v0-shaped entity records (bypassing schema
 		// validation which would reject the missing newField/tags fields).
-		const svConnector = EntityStorageConnectorFactory.get("schema-version");
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const svStore = (svConnector as any)._store as { schemaName: string; version: number }[];
-		const svRecord = svStore.find(r => r.schemaName === "MigrationTestEntity");
+		const svConnector = EntityStorageConnectorFactory.get<
+			MemoryEntityStorageConnector<{
+				schemaName: string;
+				version: number;
+			}>
+		>("schema-version");
+		const svRecords = await svConnector.getStore();
+		const svRecord = svRecords.find(r => r.schemaName === "MigrationTestEntity");
 		if (svRecord) {
-			svRecord.version = 0;
+			await svConnector.set({ ...svRecord, version: 0 });
 		}
 
-		const entityConnector = EntityStorageConnectorFactory.get("migration-test-entity");
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(entityConnector as any)._store.push(
+		// Seed v0-shaped entities via a connector that uses the v0 schema so that
+		// EntityStorageHelper.prepareEntity does not strip legacyField/score.
+		const seedConnector = new MemoryEntityStorageConnector<MigrationTestEntityV0>({
+			entitySchema: "MigrationTestEntityV0",
+			config: { storageKey: "migration-test-entity" }
+		});
+		await seedConnector.setBatch([
 			{ id: "entity-1", legacyField: "old-value-1", score: 1 },
 			{ id: "entity-2", legacyField: "old-value-2", score: 2 },
 			{ id: "entity-3", legacyField: "old-value-3", score: 3 }
-		);
+		]);
 
 		// Shut down run 1 without clearing factories so the pre-seeded connectors persist.
 		await run1?.shutdown();

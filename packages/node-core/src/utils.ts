@@ -23,6 +23,7 @@ import { ModuleProtocol } from "./models/moduleProtocol.js";
 /**
  * Initialise the locales for the application.
  * @param localesDirectory The directory containing the locales.
+ * @returns A promise that resolves when the locale dictionary has been loaded.
  */
 export async function initialiseLocales(localesDirectory: string): Promise<void> {
 	const localesFile = path.resolve(path.join(localesDirectory, "en.json"));
@@ -46,7 +47,7 @@ export function getExecutionDirectory(): string {
 /**
  * Get the directory where the script is located.
  * @param args The command line arguments.
- * @returns The execution directory.
+ * @returns The directory containing the entry-point script, or the current working directory if not determinable.
  */
 export function getScriptDirectory(args?: string[]): string {
 	if (Is.array<string>(args) && args.length >= 2 && args[1].includes("index.js")) {
@@ -130,7 +131,7 @@ export async function getFiles(directory: string): Promise<string[]> {
 /**
  * Load the text file.
  * @param filename The filename of the text file to load.
- * @returns The contents of the text file if it could not be loaded.
+ * @returns The contents of the text file as a UTF-8 string.
  */
 export async function loadTextFile(filename: string): Promise<string> {
 	return readFile(filename, "utf8");
@@ -139,7 +140,7 @@ export async function loadTextFile(filename: string): Promise<string> {
 /**
  * Load the JSON file.
  * @param filename The filename of the JSON file to load.
- * @returns The contents of the JSON file or null if it could not be loaded.
+ * @returns The parsed JSON content of the file.
  */
 export async function loadJsonFile<T>(filename: string): Promise<T> {
 	const content = await loadTextFile(filename);

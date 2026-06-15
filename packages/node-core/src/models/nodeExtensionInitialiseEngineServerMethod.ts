@@ -7,6 +7,7 @@ import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
  * This is called when the engine server has been constructed but not yet started.
  * @param engineCore The engine core instance.
  * @param engineServer The engine server instance.
+ * @returns A promise that resolves when the extension engine-server initialisation is complete.
  */
 export type NodeExtensionInitialiseEngineServerMethod = (
 	engineCore: IEngineCore,

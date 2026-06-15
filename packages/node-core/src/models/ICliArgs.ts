@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 /**
- * Command to execute in the CLI.
+ * Parsed command line arguments passed to the CLI.
  */
 export interface ICliArgs {
 	/**

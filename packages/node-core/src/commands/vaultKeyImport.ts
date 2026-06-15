@@ -88,10 +88,11 @@ export function getCommandDefinitionVaultKeyImport(commandDefinitions: {
  * @param engineCore The engine core.
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
- * @param params.identity The DID to create the vault key for.
- * @param params.keyId The ID of the key to create.
- * @param params.keyType The type of key to create.
+ * @param params.identity The DID to import the vault key for.
+ * @param params.keyId The ID of the key to import.
+ * @param params.keyType The type of key to import.
  * @param params.privateKeyHex The private key in hexadecimal format.
+ * @returns A promise that resolves when the key has been imported into the vault.
  */
 export async function vaultKeyImport(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,

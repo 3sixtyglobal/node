@@ -157,7 +157,10 @@ export function constructCliCommand(
 			}
 
 			if (foundParamIndex >= 0) {
-				allParamKeys.splice(allParamKeys.indexOf(commandDefParam.key), 1);
+				const paramIndex = allParamKeys.indexOf(commandDefParam.key);
+				if (paramIndex >= 0) {
+					allParamKeys.splice(paramIndex, 1);
+				}
 			}
 		}
 
@@ -229,7 +232,7 @@ export async function executeCommand(
  * Load the env files and process the options.
  * @param processEnv The environment variables from the process.
  * @param options The options.
- * @returns The processed parameters.
+ * @returns The substituted options, mutated in place with env variable values resolved.
  * @throws GeneralError if an env file has errors.
  */
 export function processEnvOptions(
@@ -293,7 +296,7 @@ export function substituteEnvOptions(
 }
 
 /**
- * Register available CLI commands.
+ * Register all built-in CLI command definitions into the shared command map.
  */
 export function registerCommands(): void {
 	getCommandDefinitionHelp(commandDefinitions);

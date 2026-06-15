@@ -7,6 +7,7 @@ import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
  * The type for the initialise method of an extension module.
  * @param envVars The environment variables for the node.
  * @param nodeEngineConfig The node engine config.
+ * @returns A promise that resolves when the extension configuration initialisation is complete.
  */
 export type NodeExtensionInitialiseMethod = (
 	envVars: INodeEnvironmentVariables,

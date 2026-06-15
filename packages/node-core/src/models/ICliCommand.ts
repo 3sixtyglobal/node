@@ -4,7 +4,7 @@ import type { CliCommandParamType } from "./cliCommandParamType.js";
 import type { ICliCommandDefinition } from "./ICliCommandDefinition.js";
 
 /**
- * Command to execute in the CLI.
+ * A resolved CLI command ready for execution, pairing a definition with its populated parameters.
  */
 export interface ICliCommand {
 	/**

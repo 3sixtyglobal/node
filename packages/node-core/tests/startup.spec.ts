@@ -5,7 +5,30 @@ import { ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import { EntityStorageConnectorType } from "@twin.org/engine-types";
+import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@twin.org/entity";
+import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
 import { run } from "../src/node.js";
+
+@entity()
+class LegacyTenant {
+	@property({ type: "string", isPrimary: true })
+	public id!: string;
+
+	@property({ type: "string" })
+	public apiKey!: string;
+
+	@property({ type: "string" })
+	public label!: string;
+
+	@property({ type: "string" })
+	public dateCreated!: string;
+
+	@property({ type: "string" })
+	public dateModified!: string;
+
+	@property({ type: "string", optional: true })
+	public organizationId?: string;
+}
 
 const LOCALES_DIR = "./dist/locales/";
 
@@ -62,7 +85,12 @@ describe("startup - tenant organization ID enforcement", () => {
 		});
 
 		const comp1 = getTenantAdminComponent(run1);
-		await comp1.create({ id: TEST_TENANT_ID_A, apiKey: TEST_API_KEY_A, label: "Legacy Tenant" });
+		await comp1.create({
+			id: TEST_TENANT_ID_A,
+			apiKey: TEST_API_KEY_A,
+			label: "Legacy Tenant",
+			organizationId: TEST_ORG_ID
+		});
 
 		await run1?.shutdown();
 
@@ -99,11 +127,21 @@ describe("startup - tenant organization ID enforcement", () => {
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) }
 		});
 
-		await getTenantAdminComponent(run1).create({
-			id: TEST_TENANT_ID_A,
-			apiKey: TEST_API_KEY_A,
-			label: "Legacy Tenant"
+		EntitySchemaFactory.register("LegacyTenant", () => EntitySchemaHelper.getSchema(LegacyTenant));
+		const seedConnector2 = new MemoryEntityStorageConnector<LegacyTenant>({
+			entitySchema: "LegacyTenant",
+			partitionContextIds: ["node"],
+			config: { storageKey: "tenant" }
 		});
+		await seedConnector2.setBatch([
+			{
+				id: TEST_TENANT_ID_A,
+				apiKey: TEST_API_KEY_A,
+				label: "Legacy Tenant",
+				dateCreated: new Date().toISOString(),
+				dateModified: new Date().toISOString()
+			}
+		]);
 
 		await run1?.shutdown();
 
@@ -133,9 +171,28 @@ describe("startup - tenant organization ID enforcement", () => {
 			envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) }
 		});
 
-		const comp = getTenantAdminComponent(run1);
-		await comp.create({ id: TEST_TENANT_ID_A, apiKey: TEST_API_KEY_A, label: "Tenant A" });
-		await comp.create({ id: TEST_TENANT_ID_B, apiKey: TEST_API_KEY_B, label: "Tenant B" });
+		EntitySchemaFactory.register("LegacyTenant", () => EntitySchemaHelper.getSchema(LegacyTenant));
+		const seedConnector3 = new MemoryEntityStorageConnector<LegacyTenant>({
+			entitySchema: "LegacyTenant",
+			partitionContextIds: ["node"],
+			config: { storageKey: "tenant" }
+		});
+		await seedConnector3.setBatch([
+			{
+				id: TEST_TENANT_ID_A,
+				apiKey: TEST_API_KEY_A,
+				label: "Tenant A",
+				dateCreated: new Date().toISOString(),
+				dateModified: new Date().toISOString()
+			},
+			{
+				id: TEST_TENANT_ID_B,
+				apiKey: TEST_API_KEY_B,
+				label: "Tenant B",
+				dateCreated: new Date().toISOString(),
+				dateModified: new Date().toISOString()
+			}
+		]);
 
 		await run1?.shutdown();
 

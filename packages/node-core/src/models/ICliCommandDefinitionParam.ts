@@ -3,7 +3,7 @@
 import type { CliCommandParamType } from "./cliCommandParamType.js";
 
 /**
- * Command param to execute in the CLI.
+ * Definition of a single parameter accepted by a CLI command.
  */
 export interface ICliCommandDefinitionParam {
 	/**
