@@ -168,7 +168,8 @@ async function configureEntityStorage(
 
 	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Memory)) {
 		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.Memory
+			type: EntityStorageConnectorType.Memory,
+			options: {}
 		});
 	}
 

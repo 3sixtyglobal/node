@@ -112,7 +112,7 @@ export async function removeTenantOrgAlias(
 	CLIDisplay.spinnerStart();
 
 	await tenantAdminComponent.update({
-		id: params.tenantId,
+		...tenant,
 		organizationIdLegacy: legacy
 	});
 

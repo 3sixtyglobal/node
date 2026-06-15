@@ -4,6 +4,7 @@ import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
+import { Did } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
@@ -48,6 +49,15 @@ export function getCommandDefinitionTenantImport(commandDefinitions: {
 				required: true
 			},
 			{
+				key: "organization-id",
+				type: "string",
+				extendedType: "did",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.organization-id.description"
+				),
+				required: true
+			},
+			{
 				key: "label",
 				type: "string",
 				description: I18n.formatMessage("node.cli.commands.tenant-import.params.label.description"),
@@ -82,6 +92,7 @@ export function getCommandDefinitionTenantImport(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.apiKey The API key to import.
  * @param params.tenantId The tenant ID to import.
+ * @param params.organizationId The organization DID to associate with the tenant.
  * @param params.label The label for the tenant.
  * @param params.publicOrigin The public URL origin for the tenant.
  * @returns A promise that resolves when the tenant record has been created.
@@ -92,12 +103,15 @@ export async function tenantImport(
 	params: {
 		apiKey?: string;
 		tenantId?: string;
+		organizationId?: string;
 		label?: string;
 		publicOrigin?: string;
 	}
 ): Promise<void> {
 	Guards.stringHexLength("tenantImport", "tenant-id", params.tenantId, 32);
 	Guards.stringHexLength("tenantImport", "api-key", params.apiKey, 32);
+
+	Did.guard("tenantImport", "organization-id", params.organizationId);
 
 	if (Is.stringValue(params.publicOrigin)) {
 		Url.guard("tenantImport", "public-origin", params.publicOrigin);
@@ -119,11 +133,13 @@ export async function tenantImport(
 
 	const apiKey = params.apiKey;
 	const tenantId = params.tenantId;
+	const organizationId = params.organizationId;
 	const label = params.label ?? "";
 	const publicOrigin = params.publicOrigin ?? "";
 	await tenantAdminService.create({
 		id: tenantId,
 		apiKey,
+		organizationId,
 		label,
 		publicOrigin
 	});

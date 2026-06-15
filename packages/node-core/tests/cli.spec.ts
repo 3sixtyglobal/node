@@ -784,10 +784,12 @@ describe("node-core", () => {
 				"tenant-import",
 				`--tenant-id=${nodeTenantJson?.tenantId}`,
 				`--api-key=${nodeTenantJson?.apiKey}`,
+				`--organization-id=${nodeTenantJson?.organizationId}`,
 				`--label=${nodeTenantJson?.label}`,
 				`--public-origin=${nodeTenantJson?.publicOrigin}`
 			],
-			{ nodeId: nodeIdentityJson?.did }
+			{ nodeId: nodeIdentityJson?.did },
+			{ TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR}import-db` }
 		);
 	});
 
@@ -1416,7 +1418,7 @@ describe("node-core", () => {
 		expect(tenant?.organizationIdLegacy).toBeUndefined();
 	});
 
-	test("set-tenant-org-id moves existing organization ID to legacy on update", async () => {
+	test("set-tenant-org-id updates the organization ID", async () => {
 		await executeCliCommand(
 			[
 				"set-tenant-org-id",
@@ -1429,10 +1431,9 @@ describe("node-core", () => {
 		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
 		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
 		expect(tenant?.organizationId).toEqual(nodeIdentityJson.did);
-		expect(tenant?.organizationIdLegacy).toEqual(`|${organizationIdentityJson.did}|`);
 	});
 
-	test("set-tenant-org-id removes updated ID from legacy if already present", async () => {
+	test("set-tenant-org-id can update the organization ID again", async () => {
 		await executeCliCommand(
 			[
 				"set-tenant-org-id",
@@ -1445,7 +1446,6 @@ describe("node-core", () => {
 		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
 		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
 		expect(tenant?.organizationId).toEqual(organizationIdentityJson.did);
-		expect(tenant?.organizationIdLegacy).toEqual(`|${nodeIdentityJson.did}|`);
 	});
 
 	test("set-tenant-org-id throws when multi-tenant is not enabled", async () => {
@@ -1464,10 +1464,16 @@ describe("node-core", () => {
 	});
 
 	// remove-tenant-org-alias
-	// Prerequisite: after "set-tenant-org-id removes updated ID from legacy if already present",
-	// the tenant has organizationId=organizationIdentityJson.did and organizationIdLegacy=[nodeIdentityJson.did]
+	// Legacy org ID management is now a backend concern; set up organizationIdLegacy manually
+	// so the remove-tenant-org-alias tests have something to operate on.
 
 	test("Can remove an alias from the tenant organization legacy list", async () => {
+		const storePath = `${OUTPUT_TMP_DIR}db/tenant/store.json`;
+		const store = (await CLIUtils.readJsonFile<any[]>(storePath)) ?? [];
+		const idx = store.findIndex(t => t?.id === nodeTenantJson.tenantId);
+		store[idx].organizationIdLegacy = `|${nodeIdentityJson.did}|`;
+		await writeFile(storePath, JSON.stringify(store, undefined, "\t"));
+
 		await executeCliCommand(
 			[
 				"remove-tenant-org-alias",
@@ -1477,7 +1483,7 @@ describe("node-core", () => {
 			{ nodeId: nodeIdentityJson.did }
 		);
 
-		const dbTable = await CLIUtils.readJsonFile<any[]>(`${OUTPUT_TMP_DIR}db/tenant/store.json`);
+		const dbTable = await CLIUtils.readJsonFile<any[]>(storePath);
 		const tenant = dbTable?.find(t => t?.id === nodeTenantJson.tenantId);
 		expect(tenant?.organizationIdLegacy).toBeUndefined();
 		expect(tenant?.organizationId).toEqual(organizationIdentityJson.did);
