@@ -16,3 +16,5 @@ The engine core instance.
 ## Returns
 
 `Promise`\<`void`\>
+
+A promise that resolves when the extension engine initialisation is complete.

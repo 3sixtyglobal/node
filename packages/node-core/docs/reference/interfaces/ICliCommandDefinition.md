@@ -1,6 +1,6 @@
 # Interface: ICliCommandDefinition
 
-Command to execute in the CLI.
+Static definition of a CLI command including its name, parameters, and execution action.
 
 ## Properties
 
@@ -24,7 +24,7 @@ The command description.
 
 > **example**: `string`
 
-The example.
+An example invocation string shown in help output.
 
 ***
 

@@ -16,4 +16,4 @@ The command line arguments.
 
 `string`
 
-The execution directory.
+The directory containing the entry-point script, or the current working directory if not determinable.

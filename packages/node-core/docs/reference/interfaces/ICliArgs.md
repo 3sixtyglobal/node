@@ -1,6 +1,6 @@
 # Interface: ICliArgs
 
-Command to execute in the CLI.
+Parsed command line arguments passed to the CLI.
 
 ## Properties
 

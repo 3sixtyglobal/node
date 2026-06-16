@@ -22,3 +22,5 @@ The engine server instance.
 ## Returns
 
 `Promise`\<`void`\>
+
+A promise that resolves when the extension engine-server initialisation is complete.

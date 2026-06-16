@@ -22,4 +22,4 @@ The engine core instance.
 
 `Promise`\<`void`\>
 
-Nothing.
+A promise that resolves when all extension shutdown methods have completed.

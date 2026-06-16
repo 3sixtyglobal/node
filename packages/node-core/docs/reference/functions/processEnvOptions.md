@@ -20,7 +20,7 @@ The options.
 
 `void`
 
-The processed parameters.
+The substituted options, mutated in place with env variable values resolved.
 
 ## Throws
 

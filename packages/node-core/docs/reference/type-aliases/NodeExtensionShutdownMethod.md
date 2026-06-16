@@ -8,3 +8,5 @@ This is called when the engine is shutting down.
 ## Returns
 
 `Promise`\<`void`\>
+
+A promise that resolves when the extension shutdown is complete.
