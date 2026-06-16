@@ -575,6 +575,7 @@ describe("node-core", () => {
 			"POST     /rights-management/negotiations/offers",
 			"POST     /rights-management/negotiations/:id/offers",
 			"POST     /rights-management/negotiations/:id/agreement",
+			"POST     /rights-management/negotiations/admin",
 			"GET      /rights-management/negotiations/admin/:policyId",
 			"PUT      /rights-management/negotiations/admin/:policyId",
 			"DELETE   /rights-management/negotiations/admin/:policyId",
