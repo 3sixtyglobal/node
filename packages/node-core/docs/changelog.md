@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.56](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.55...node-core-v0.0.3-next.56) (2026-06-16)
+
+
+### Features
+
+* identity profile information source ([dbb53d1](https://github.com/iotaledger/twin-node/commit/dbb53d145f517070d864f37650a6dbc1f3e9c3a8))
+
 ## [0.0.3-next.55](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.54...node-core-v0.0.3-next.55) (2026-06-16)
 
 
