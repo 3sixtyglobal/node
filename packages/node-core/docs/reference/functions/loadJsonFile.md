@@ -22,4 +22,4 @@ The filename of the JSON file to load.
 
 `Promise`\<`T`\>
 
-The contents of the JSON file or null if it could not be loaded.
+The parsed JSON content of the file.

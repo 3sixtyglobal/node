@@ -22,4 +22,4 @@ The engine core instance.
 
 `Promise`\<`void`\>
 
-Nothing.
+A promise that resolves when all extension engine initialisation methods have completed.

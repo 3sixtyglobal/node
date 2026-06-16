@@ -16,4 +16,4 @@ The filename of the text file to load.
 
 `Promise`\<`string`\>
 
-The contents of the text file if it could not be loaded.
+The contents of the text file as a UTF-8 string.

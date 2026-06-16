@@ -1,6 +1,6 @@
 # Interface: ICliCommand
 
-Command to execute in the CLI.
+A resolved CLI command ready for execution, pairing a definition with its populated parameters.
 
 ## Properties
 

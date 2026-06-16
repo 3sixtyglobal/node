@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.3-next.56](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.55...node-core-v0.0.3-next.56) (2026-06-16)
+
+
+### Features
+
+* identity profile information source ([dbb53d1](https://github.com/iotaledger/twin-node/commit/dbb53d145f517070d864f37650a6dbc1f3e9c3a8))
+
+## [0.0.3-next.55](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.54...node-core-v0.0.3-next.55) (2026-06-16)
+
+
+### Bug Fixes
+
+* test endpoints ([2b83ed0](https://github.com/iotaledger/twin-node/commit/2b83ed0d4f1da473a525a95202e01d9680c7d26c))
+* use async getStore in tests ([2189df4](https://github.com/iotaledger/twin-node/commit/2189df49a57637ba8effdee50965473f0a814c6c))
+
 ## [0.0.3-next.54](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.53...node-core-v0.0.3-next.54) (2026-06-12)
 
 

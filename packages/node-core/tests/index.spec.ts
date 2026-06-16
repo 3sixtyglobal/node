@@ -166,7 +166,7 @@ describe("node-core", () => {
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity,identity-profile",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
@@ -225,7 +225,7 @@ describe("node-core", () => {
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
-				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+				TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity,identity-profile",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 				TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
@@ -333,7 +333,7 @@ describe("node-core", () => {
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity,identity-profile",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
@@ -581,6 +581,7 @@ describe("node-core", () => {
 			"POST     /rights-management/negotiations/offers",
 			"POST     /rights-management/negotiations/:id/offers",
 			"POST     /rights-management/negotiations/:id/agreement",
+			"POST     /rights-management/negotiations/admin",
 			"GET      /rights-management/negotiations/admin/:policyId",
 			"PUT      /rights-management/negotiations/admin/:policyId",
 			"DELETE   /rights-management/negotiations/admin/:policyId",
@@ -625,7 +626,8 @@ describe("node-core", () => {
 			expect(PolicyExecutionActionFactory.names()).toEqual(["logging-policy-execution-action"]);
 			expect(PolicyInformationSourceFactory.names()).toEqual([
 				"static-policy-information-source",
-				"identity-policy-information-source"
+				"identity-policy-information-source",
+				"identity-profile-policy-information-source"
 			]);
 			expect(PolicyNegotiatorFactory.names()).toEqual(["pass-through-policy-negotiator"]);
 			expect(PolicyRequesterFactory.names()).toEqual([
@@ -670,7 +672,7 @@ describe("node-core", () => {
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
-			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity",
+			TWIN_RIGHTS_MANAGEMENT_POLICY_INFORMATION_SOURCES: "static,identity,identity-profile",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_NEGOTIATORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",

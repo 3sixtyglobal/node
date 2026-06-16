@@ -21,3 +21,5 @@ The node engine config.
 ## Returns
 
 `Promise`\<`void`\>
+
+A promise that resolves when the extension configuration initialisation is complete.

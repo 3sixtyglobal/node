@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.3-next.56](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.55...node-v0.0.3-next.56) (2026-06-16)
+
+
+### Features
+
+* identity profile information source ([dbb53d1](https://github.com/iotaledger/twin-node/commit/dbb53d145f517070d864f37650a6dbc1f3e9c3a8))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.55 to 0.0.3-next.56
+
+## [0.0.3-next.55](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.54...node-v0.0.3-next.55) (2026-06-16)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.54 to 0.0.3-next.55
+
 ## [0.0.3-next.54](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.53...node-v0.0.3-next.54) (2026-06-12)
 
 

@@ -2,8 +2,8 @@
 
 > **isFederatedCatalogueRequired**(`envVars`): `boolean`
 
-Checks if the immutable proof subsystem is required.
-Returns true when any component that depends on the immutable proof subsystem is enabled.
+Checks if the federated catalogue subsystem is required.
+Returns true when the catalogue is explicitly enabled, a remote endpoint is configured, filters are set, or dataspace is enabled.
 
 ## Parameters
 
@@ -17,4 +17,4 @@ The environment variables.
 
 `boolean`
 
-True if verifiable storage is enabled.
+True if the federated catalogue is required.

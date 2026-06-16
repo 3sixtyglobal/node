@@ -28,4 +28,4 @@ The engine server instance.
 
 `Promise`\<`void`\>
 
-Nothing.
+A promise that resolves when all extension engine-server initialisation methods have completed.
