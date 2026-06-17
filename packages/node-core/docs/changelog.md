@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.57](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.56...node-core-v0.0.3-next.57) (2026-06-17)
+
+
+### Features
+
+* auth fix ([a8e59e9](https://github.com/iotaledger/twin-node/commit/a8e59e947735180c9edee041f87af5e1e125e3c6))
+
 ## [0.0.3-next.56](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.55...node-core-v0.0.3-next.56) (2026-06-16)
 
 
