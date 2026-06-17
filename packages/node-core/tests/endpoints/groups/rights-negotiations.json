@@ -21,7 +21,7 @@
 					"@id": "{{offerPolicyId}}"
 				}
 			},
-			"expectedStatus": 400
+			"expectedStatus": 401
 		},
 		{
 			"description": "POST /rights-management/negotiations/request — 400 missing consumerPid",
