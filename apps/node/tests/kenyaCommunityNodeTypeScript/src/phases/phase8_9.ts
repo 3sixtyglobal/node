@@ -85,7 +85,7 @@ async function pushTransferRoundtrip(
 	};
 
 	const cp = makeControlPlaneClient(traderToKraCredentials(context));
-	const reqResponse = await cp.requestTransfer(request, context.traderTrustJwt);
+	const reqResponse = await cp.requestTransfer(request, "", undefined, context.traderTrustJwt);
 
 	if (
 		(reqResponse as { "@type"?: string })["@type"] ===
@@ -117,7 +117,8 @@ async function pushTransferRoundtrip(
 	// platform observation — should be fixed in dataspaceControlPlaneService.)
 	let startResponse;
 	try {
-		startResponse = await cp.startTransfer(startMessage, context.kraTrustJwt);
+		// publicOrigin is derived server-side by the receiving node; pass empty from the client.
+		startResponse = await cp.startTransfer(startMessage, "", context.kraTrustJwt);
 	} catch (err) {
 		const props = (err as { properties?: { response?: unknown } })?.properties;
 		if (props?.response) {

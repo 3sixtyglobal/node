@@ -89,7 +89,7 @@ async function runPhase6(
 	};
 
 	const cp = makeControlPlaneClient(traderToKraCredentials(context));
-	const response = await cp.requestTransfer(request, context.traderTrustJwt);
+	const response = await cp.requestTransfer(request, "", undefined, context.traderTrustJwt);
 
 	if (
 		(response as { "@type"?: string })["@type"] ===
@@ -140,7 +140,8 @@ async function runPhase7(
 	};
 
 	const cp = makeControlPlaneClient(traderToKraCredentials(context));
-	const response = await cp.startTransfer(startMessage, context.kraTrustJwt);
+	// publicOrigin is derived server-side by the receiving node; pass empty from the client.
+	const response = await cp.startTransfer(startMessage, "", context.kraTrustJwt);
 
 	if (
 		(response as { "@type"?: string })["@type"] ===
