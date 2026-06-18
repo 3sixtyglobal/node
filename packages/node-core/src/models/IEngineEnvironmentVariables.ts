@@ -720,7 +720,7 @@ export interface IEngineEnvironmentVariables {
 
 	/**
 	 * The data plane path for PULL transfers (path only, not full URL).
-	 * Will be combined with public origin from hosting component.
+	 * Will be combined with public origin.
 	 * Required if PULL transfers should be supported.
 	 * Example: "dataspace/entities"
 	 */

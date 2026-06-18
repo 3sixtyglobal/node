@@ -13,8 +13,7 @@
 			"cliCommandMissing": "CLI command \"{command}\" is not recognised",
 			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
-			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
-			"invalidPublicOrigin": "The public origin \"{publicOrigin}\" is not a valid origin URL, it should be in the format \"protocol://host[:port]\"."
+			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist"
 		},
 		"bootstrapLegacy": {
 			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled.",
