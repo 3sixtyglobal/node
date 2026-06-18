@@ -1708,7 +1708,7 @@ The interval for cleaning up the activity logs.
 > `optional` **dataspaceDataPlanePath?**: `string`
 
 The data plane path for PULL transfers (path only, not full URL).
-Will be combined with public origin from hosting component.
+Will be combined with public origin.
 Required if PULL transfers should be supported.
 Example: "dataspace/entities"
 
@@ -1865,14 +1865,6 @@ The id of the key in the vault to use for signing in auth operations.
 > `optional` **authApiKeyHeader?**: `string`
 
 The HTTP header name used to pass the API key on requests, defaults to x-api-key.
-
-***
-
-### hostingParamEncryptionKeyId? {#hostingparamencryptionkeyid}
-
-> `optional` **hostingParamEncryptionKeyId?**: `string`
-
-The id of the key in the vault to use for encrypting hosting parameters in auth operations.
 
 ***
 

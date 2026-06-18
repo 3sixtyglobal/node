@@ -14659,7 +14659,7 @@
 				"parameters": [
 					{
 						"name": "id",
-						"description": "The id of the stream to update the get in.",
+						"description": "The id of the stream to get the entry from.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -14670,7 +14670,7 @@
 					},
 					{
 						"name": "entryId",
-						"description": "The id of the entry to update.",
+						"description": "The id of the entry to get.",
 						"in": "path",
 						"required": true,
 						"schema": {
