@@ -278,8 +278,7 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"platform-service",
 			"did-context-id-handler",
-			"information-service",
-			"hosting-service"
+			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -428,8 +427,7 @@ describe("node-core", () => {
 			"entity-storage-authentication-rate-service",
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
-			"information-service",
-			"hosting-service"
+			"information-service"
 		]);
 
 		expect(DataspaceAppFactory.names()).toEqual(["https://twin.example.org/app1"]);
@@ -791,8 +789,7 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"platform-service",
 			"did-context-id-handler",
-			"information-service",
-			"hosting-service"
+			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -853,8 +850,7 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"platform-service",
 			"did-context-id-handler",
-			"information-service",
-			"hosting-service"
+			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -915,8 +911,7 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"platform-service",
 			"did-context-id-handler",
-			"information-service",
-			"hosting-service"
+			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
@@ -1046,8 +1041,7 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"platform-service",
 			"did-context-id-handler",
-			"information-service",
-			"hosting-service"
+			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
