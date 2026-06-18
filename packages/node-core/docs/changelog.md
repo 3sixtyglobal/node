@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3-next.58](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.57...node-core-v0.0.3-next.58) (2026-06-18)
+
+
+### Features
+
+* bump dependencies ([#216](https://github.com/iotaledger/twin-node/issues/216)) ([a005824](https://github.com/iotaledger/twin-node/commit/a005824fe3e4a734543f613d8a7cc1275fec4572))
+
+
+### Bug Fixes
+
+* optional private key in identity create ([325ebd8](https://github.com/iotaledger/twin-node/commit/325ebd859d95b3078107e76f1806cded078a0ce1))
+
 ## [0.0.3-next.57](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.56...node-core-v0.0.3-next.57) (2026-06-17)
 
 
