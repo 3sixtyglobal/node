@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.59](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.58...node-core-v0.0.3-next.59) (2026-06-18)
+
+
+### Features
+
+* remove hosting component ([#219](https://github.com/iotaledger/twin-node/issues/219)) ([fb2fea4](https://github.com/iotaledger/twin-node/commit/fb2fea46f57aab9252ee1491499e84b8ad46533e))
+
 ## [0.0.3-next.58](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.57...node-core-v0.0.3-next.58) (2026-06-18)
 
 
