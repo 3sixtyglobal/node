@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.0.3-next.58](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.57...node-v0.0.3-next.58) (2026-06-18)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.57 to 0.0.3-next.58
+
+## [0.0.3-next.57](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.56...node-v0.0.3-next.57) (2026-06-17)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.56 to 0.0.3-next.57
+
 ## [0.0.3-next.56](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.55...node-v0.0.3-next.56) (2026-06-16)
 
 

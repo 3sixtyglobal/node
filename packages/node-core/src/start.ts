@@ -55,8 +55,8 @@ export async function start(
 	const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;
 	const requiresOrgIdentity = cliCommand?.definition?.requiresOrgIdentity ?? true;
 
-	// If the blob storage or entity storage is configured with file connectors
-	// then we need to make sure the storageFileRoot is set
+	// File connectors (blob/entity) and the default file-based state storage all
+	// persist to disk under storageFileRoot, so it must be set when any of them is in use.
 	if (
 		(entityStorageConnectorType.includes(EntityStorageConnectorType.File) ||
 			blobStorageConnectorType.includes(BlobStorageConnectorType.File) ||
