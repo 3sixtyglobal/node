@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.60](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.59...node-v0.0.3-next.60) (2026-06-19)
+
+
+### Features
+
+* add mutex settings ([#222](https://github.com/iotaledger/twin-node/issues/222)) ([492c55f](https://github.com/iotaledger/twin-node/commit/492c55f67d5f70c2a4a27dfdb2700a644ee87955))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.59 to 0.0.3-next.60
+
 ## [0.0.3-next.59](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.58...node-v0.0.3-next.59) (2026-06-18)
 
 
