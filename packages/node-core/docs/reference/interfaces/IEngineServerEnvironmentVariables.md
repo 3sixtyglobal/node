@@ -1772,7 +1772,7 @@ values: fetch
 
 > `optional` **mutexTimeoutMsDefault?**: `string`
 
-The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000.
+The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
 
 #### Inherited from
 
