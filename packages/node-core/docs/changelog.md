@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.62](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.61...node-core-v0.0.3-next.62) (2026-06-19)
+
+
+### Features
+
+* component update ([9a3fdab](https://github.com/iotaledger/twin-node/commit/9a3fdab250e0dc8b8aa52479d5c72517de8d6c0f))
+
 ## [0.0.3-next.61](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.60...node-core-v0.0.3-next.61) (2026-06-19)
 
 
