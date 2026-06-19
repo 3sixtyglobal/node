@@ -132,6 +132,20 @@ When you change the prefix, all variables in this document use your custom prefi
 
 REST component paths can also be overridden with `TWIN_REST_PATH_<COMPONENT>`, where `<COMPONENT>` is the upper snake case name of the component without the `Component` suffix. Current examples include `TWIN_REST_PATH_LOGGING`, `TWIN_REST_PATH_DATASPACE_CONTROL_PLANE`, and `TWIN_REST_PATH_DATASPACE_DATA_PLANE`.
 
+## Mutex Timeout Variables
+
+| Variable                                      | Possible Values | Default | Notes                                                                       |
+| --------------------------------------------- | --------------- | ------- | --------------------------------------------------------------------------- |
+| `TWIN_MUTEX_TIMEOUT_MS_DEFAULT`               | Integer ms      | `5000`  | Global default mutex timeout. Used when no component-specific value is set. |
+| `TWIN_AUDITABLE_ITEM_GRAPH_MUTEX_TIMEOUT_MS`  | Integer ms      | None    | Mutex timeout for the auditable item graph component.                       |
+| `TWIN_AUDITABLE_ITEM_STREAM_MUTEX_TIMEOUT_MS` | Integer ms      | None    | Mutex timeout for the auditable item stream component.                      |
+| `TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS`   | Integer ms      | None    | Mutex timeout for the federated catalogue component.                        |
+| `TWIN_DOCUMENT_MANAGEMENT_MUTEX_TIMEOUT_MS`   | Integer ms      | None    | Mutex timeout for the document management component.                        |
+| `TWIN_LOGGING_MUTEX_TIMEOUT_MS`               | Integer ms      | None    | Mutex timeout for the logging component.                                    |
+| `TWIN_ENTITY_STORAGE_MEMORY_MUTEX_TIMEOUT_MS` | Integer ms      | None    | Mutex timeout for the memory entity storage connector.                      |
+| `TWIN_ENTITY_STORAGE_FILE_MUTEX_TIMEOUT_MS`   | Integer ms      | None    | Mutex timeout for the file entity storage connector.                        |
+| `TWIN_RIGHTS_MANAGEMENT_MUTEX_TIMEOUT_MS`     | Integer ms      | None    | Mutex timeout for the rights management component.                          |
+
 ## Extension Module Loading Variables
 
 | Variable                          | Possible Values           | Default | Notes                                       |

@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import { Coerce, Is } from "@twin.org/core";
+import { Coerce, Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import {
 	AttestationComponentType,
@@ -107,6 +107,11 @@ export async function buildEngineConfiguration(
 		types: {}
 	};
 
+	const mutexTimeoutMs = Coerce.integer(envVars.mutexTimeoutMsDefault);
+	if (!Is.empty(mutexTimeoutMs)) {
+		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
+	}
+
 	await configurePlatform(coreConfig, envVars);
 	await configureTenant(coreConfig, envVars);
 	await configureContextIdHandlers(coreConfig, envVars);
@@ -169,7 +174,11 @@ async function configureEntityStorage(
 	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Memory)) {
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.Memory,
-			options: {}
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.entityStorageMemoryMutexTimeoutMs)
+				}
+			}
 		});
 	}
 
@@ -177,7 +186,10 @@ async function configureEntityStorage(
 		coreConfig.types.entityStorageConnector.push({
 			type: EntityStorageConnectorType.File,
 			options: {
-				config: { directory: envVars.storageFileRoot ?? "" },
+				config: {
+					directory: envVars.storageFileRoot ?? "",
+					mutexTimeoutMs: Coerce.integer(envVars.entityStorageFileMutexTimeoutMs)
+				},
 				folderPrefix: envVars.entityStorageTablePrefix
 			}
 		});
@@ -461,7 +473,8 @@ async function configureLogging(
 				options: {
 					config: {
 						batchSize: Coerce.integer(envVars.loggingBatchSize),
-						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushIntervalSeconds) ?? 5) * 1000
+						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushIntervalSeconds) ?? 5) * 1000,
+						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeoutMs)
 					}
 				}
 			});
@@ -1197,7 +1210,12 @@ async function configureAuditableItemGraph(
 	if (Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) {
 		coreConfig.types.auditableItemGraphComponent ??= [];
 		coreConfig.types.auditableItemGraphComponent.push({
-			type: AuditableItemGraphComponentType.Service
+			type: AuditableItemGraphComponentType.Service,
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.auditableItemGraphMutexTimeoutMs)
+				}
+			}
 		});
 	}
 }
@@ -1215,7 +1233,12 @@ async function configureAuditableItemStream(
 	if (Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) {
 		coreConfig.types.auditableItemStreamComponent ??= [];
 		coreConfig.types.auditableItemStreamComponent.push({
-			type: AuditableItemStreamComponentType.Service
+			type: AuditableItemStreamComponentType.Service,
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.auditableItemStreamMutexTimeoutMs)
+				}
+			}
 		});
 	}
 }
@@ -1266,7 +1289,12 @@ async function configureDocumentManagement(
 	if (Coerce.boolean(envVars.documentManagementEnabled) ?? false) {
 		coreConfig.types.documentManagementComponent ??= [];
 		coreConfig.types.documentManagementComponent.push({
-			type: DocumentManagementComponentType.Service
+			type: DocumentManagementComponentType.Service,
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.documentManagementMutexTimeoutMs)
+				}
+			}
 		});
 	}
 }
@@ -1390,7 +1418,8 @@ async function configureRightsManagement(
 			options: {
 				config: {
 					callbackPath: rightsManagementPath,
-					includeErrorDetails: coreConfig.debug ?? false
+					includeErrorDetails: coreConfig.debug ?? false,
+					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeoutMs)
 				}
 			},
 			isDefault: true
@@ -1398,7 +1427,12 @@ async function configureRightsManagement(
 
 		coreConfig.types.rightsManagementPnapComponent ??= [];
 		coreConfig.types.rightsManagementPnapComponent.push({
-			type: RightsManagementPnapComponentType.Service
+			type: RightsManagementPnapComponentType.Service,
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeoutMs)
+				}
+			}
 		});
 
 		coreConfig.types.rightsManagementPolicyArbiterComponent ??= [];
@@ -1512,7 +1546,11 @@ async function configureFederatedCatalogue(
 		} else {
 			coreConfig.types.federatedCatalogueComponent.push({
 				type: FederatedCatalogueComponentType.Service,
-				options: {}
+				options: {
+					config: {
+						mutexTimeoutMs: Coerce.integer(envVars.federatedCatalogueMutexTimeoutMs)
+					}
+				}
 			});
 
 			coreConfig.types.federatedCatalogueFilterComponent ??= [];

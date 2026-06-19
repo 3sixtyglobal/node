@@ -744,6 +744,51 @@ export interface IEngineEnvironmentVariables {
 	automationActionTypes?: string;
 
 	/**
+	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000.
+	 */
+	mutexTimeoutMsDefault?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the auditable item graph component.
+	 */
+	auditableItemGraphMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the auditable item stream component.
+	 */
+	auditableItemStreamMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the federated catalogue component.
+	 */
+	federatedCatalogueMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the document management component.
+	 */
+	documentManagementMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the logging component.
+	 */
+	loggingMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the memory entity storage connector.
+	 */
+	entityStorageMemoryMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the file entity storage connector.
+	 */
+	entityStorageFileMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the rights management component.
+	 */
+	rightsManagementMutexTimeoutMs?: string;
+
+	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
 	 */
 	extensions?: string;
