@@ -1188,6 +1188,78 @@ values: fetch
 
 ***
 
+### mutexTimeoutMsDefault? {#mutextimeoutmsdefault}
+
+> `optional` **mutexTimeoutMsDefault?**: `string`
+
+The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000.
+
+***
+
+### auditableItemGraphMutexTimeoutMs? {#auditableitemgraphmutextimeoutms}
+
+> `optional` **auditableItemGraphMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the auditable item graph component.
+
+***
+
+### auditableItemStreamMutexTimeoutMs? {#auditableitemstreammutextimeoutms}
+
+> `optional` **auditableItemStreamMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the auditable item stream component.
+
+***
+
+### federatedCatalogueMutexTimeoutMs? {#federatedcataloguemutextimeoutms}
+
+> `optional` **federatedCatalogueMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the federated catalogue component.
+
+***
+
+### documentManagementMutexTimeoutMs? {#documentmanagementmutextimeoutms}
+
+> `optional` **documentManagementMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the document management component.
+
+***
+
+### loggingMutexTimeoutMs? {#loggingmutextimeoutms}
+
+> `optional` **loggingMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the logging component.
+
+***
+
+### entityStorageMemoryMutexTimeoutMs? {#entitystoragememorymutextimeoutms}
+
+> `optional` **entityStorageMemoryMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the memory entity storage connector.
+
+***
+
+### entityStorageFileMutexTimeoutMs? {#entitystoragefilemutextimeoutms}
+
+> `optional` **entityStorageFileMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the file entity storage connector.
+
+***
+
+### rightsManagementMutexTimeoutMs? {#rightsmanagementmutextimeoutms}
+
+> `optional` **rightsManagementMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the rights management component.
+
+***
+
 ### extensions? {#extensions}
 
 > `optional` **extensions?**: `string`
