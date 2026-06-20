@@ -170,7 +170,10 @@ async function main() {
 				if (!opts['trust-payload']) {
 					throw new Error('requestTransfer requires --trust-payload <jwt>');
 				}
-				body = await client.requestTransfer(message, opts['trust-payload']);
+				// Signature is requestTransfer(request, options, trustPayload). The middle
+				// `options` arg (e.g. { autoStart }) is omitted here so the provider does NOT
+				// auto-start; this scaffold drives startTransfer explicitly afterwards.
+				body = await client.requestTransfer(message, undefined, opts['trust-payload']);
 				break;
 			}
 			case 'startTransfer': {

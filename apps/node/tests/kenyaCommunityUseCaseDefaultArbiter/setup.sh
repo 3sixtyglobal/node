@@ -219,12 +219,17 @@ else
         echo "${prefix}_DID=${tenant_did}" >> "${IDENTITIES_FILE}"
         ok "${prefix} org DID: ${tenant_did}"
 
+        # NOTE: --public-origin is intentionally omitted. tenant-create now enforces a
+        # uniqueness constraint on publicOrigin (tenantAdminService.publicOriginAlreadyExists),
+        # so 5 tenants on the same node cannot all share one origin. Post-#203 routing is by
+        # ?organization=<org-did>, not by origin, and the scaffold's callbacks use a hardcoded
+        # internal URL, so the per-tenant publicOrigin is unused here. Empty origin is exempt
+        # from the uniqueness check.
         step "Creating tenant ${label} (organization-id=${tenant_did})"
         set +e
         docker compose run --rm -T twin-kenya-defaultarb-node \
             node src/index.js tenant-create \
                 --label="${label}" \
-                --public-origin="${origin}" \
                 --organization-id="${tenant_did}" 2>&1 | tee "${tmp}"
         ec=$?
         set -e

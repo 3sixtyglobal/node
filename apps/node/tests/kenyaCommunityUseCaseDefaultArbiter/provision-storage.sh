@@ -210,6 +210,7 @@ seed_publisher() {
                 "@context": [$datasetCtx, { dcterms: "http://purl.org/dc/terms/" }],
                 "@id": $dsId,
                 "@type": "Dataset",
+                "dcterms:publisher": $assigner,
                 hasPolicy: [{
                     "@id": ("urn:policy:" + ($dsId | sub("https://twin.example.org/"; "")) + "-offer"),
                     "@type": "Offer",
