@@ -4,8 +4,6 @@ import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/contex
 import { ComponentFactory, Guards } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
 import { DataRequestType } from '@twin.org/dataspace-models';
-import { DataspaceProtocolContexts } from '@twin.org/standards-dataspace-protocol';
-import { DublinCoreContexts } from '@twin.org/standards-dublin-core';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
 const entities = [

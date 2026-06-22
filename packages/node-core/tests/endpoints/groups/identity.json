@@ -69,7 +69,7 @@
 				"verifiableCredentials": ["{{vcJwt}}"]
 			},
 			"expectedStatus": 200,
-			"capture": { "vpDocument": "body.verifiablePresentation" }
+			"capture": { "vpJwt": "body.jwt", "vpDocument": "body.verifiablePresentation" }
 		},
 		{
 			"description": "POST /identity/:identity/proof/:vmId",
@@ -127,6 +127,37 @@
 			"expectedStatus": 200
 		},
 		{
+			"description": "GET /identity/verifiable-credential/verify",
+			"method": "GET",
+			"path": "/identity/verifiable-credential/verify?jwt={{vcJwt}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /identity/verifiable-presentation/verify",
+			"method": "GET",
+			"path": "/identity/verifiable-presentation/verify?jwt={{vpJwt}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /identity/profile — remove before recreating",
+			"method": "DELETE",
+			"path": "/identity/profile",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /identity/profile",
+			"method": "POST",
+			"path": "/identity/profile",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Admin User"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
 			"description": "GET /identity/profile",
 			"method": "GET",
 			"path": "/identity/profile",
@@ -165,6 +196,12 @@
 			"description": "DELETE /identity/:identity/service/:serviceId",
 			"method": "DELETE",
 			"path": "/identity/{{testIdentity}}/service/{{serviceId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /identity/:identity/verification-method/:verificationMethodId",
+			"method": "DELETE",
+			"path": "/identity/{{testIdentity}}/verification-method/{{vmFragmentId}}",
 			"expectedStatus": 204
 		}
 	]

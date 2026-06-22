@@ -99,6 +99,12 @@
 			"method": "GET",
 			"path": "/aig",
 			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /aig/:id/proof — remove proof from all changesets",
+			"method": "DELETE",
+			"path": "/aig/{{vertexId}}/proof",
+			"expectedStatus": 204
 		}
 	]
 }

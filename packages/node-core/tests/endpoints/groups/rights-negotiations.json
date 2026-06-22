@@ -116,6 +116,158 @@
 			"expectedStatus": 204
 		},
 		{
+			"description": "POST /rights-management/negotiations/request — second negotiation for full flow",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"consumerPid": "urn:uuid:22222222-2222-2222-2222-222222222222",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "negotiation2ProviderPid": "body.providerPid" }
+		},
+		{
+			"description": "POST /rights-management/negotiations/admin — pre-register consumer side for offers test",
+			"method": "POST",
+			"path": "/rights-management/negotiations/admin",
+			"body": {
+				"id": "urn:uuid:22222222-2222-2222-2222-222222222222"
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/offers — provider sends counter-offer",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/offers",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractOfferMessage",
+				"providerPid": "{{negotiation2ProviderPid}}",
+				"consumerPid": "urn:uuid:22222222-2222-2222-2222-222222222222",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}",
+					"assigner": "urn:provider:node:test"
+				}
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/events — consumer accepts offer",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/events",
+			"delayMs": 150,
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractNegotiationEventMessage",
+				"providerPid": "{{negotiation2ProviderPid}}",
+				"consumerPid": "urn:uuid:22222222-2222-2222-2222-222222222222",
+				"event": "ACCEPTED"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/agreement — provider sends agreement",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/agreement",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractAgreementMessage",
+				"providerPid": "{{negotiation2ProviderPid}}",
+				"consumerPid": "urn:uuid:22222222-2222-2222-2222-222222222222",
+				"agreement": {
+					"@type": "Agreement",
+					"@id": "{{offerPolicyId}}",
+					"assigner": "urn:provider:node:test",
+					"assignee": "urn:consumer:node:test"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/agreement/verification — consumer verifies",
+			"appendOrgParam": true,
+			"delayMs": 150,
+			"method": "POST",
+			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/agreement/verification",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractAgreementVerificationMessage",
+				"providerPid": "{{negotiation2ProviderPid}}",
+				"consumerPid": "urn:uuid:22222222-2222-2222-2222-222222222222"
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /rights-management/negotiations/admin — pre-register consumer side for initial offer test",
+			"method": "POST",
+			"path": "/rights-management/negotiations/admin",
+			"body": {
+				"id": "urn:uuid:33333333-3333-3333-3333-333333333333"
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /rights-management/negotiations/offers — provider-initiated offer",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/offers",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractOfferMessage",
+				"providerPid": "urn:uuid:44444444-4444-4444-4444-444444444444",
+				"consumerPid": "urn:uuid:33333333-3333-3333-3333-333333333333",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{offerPolicyId}}",
+					"assigner": "urn:provider:node:test"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /rights-management/negotiations/admin — pre-register consumer-side negotiation",
+			"method": "POST",
+			"path": "/rights-management/negotiations/admin",
+			"body": {
+				"id": "urn:uuid:55555555-5555-5555-5555-555555555555"
+			},
+			"expectedStatus": 201
+		},
+		{
 			"description": "GET /rights-management/negotiations/admin",
 			"method": "GET",
 			"path": "/rights-management/negotiations/admin",

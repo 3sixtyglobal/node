@@ -171,6 +171,12 @@
 			"expectedStatus": 204
 		},
 		{
+			"description": "DELETE /ais/:id/proof — remove proof from stream",
+			"method": "DELETE",
+			"path": "/ais/{{streamId}}/proof",
+			"expectedStatus": 204
+		},
+		{
 			"description": "PUT /ais/:id/close — close stream",
 			"method": "PUT",
 			"path": "/ais/{{streamId}}/close",

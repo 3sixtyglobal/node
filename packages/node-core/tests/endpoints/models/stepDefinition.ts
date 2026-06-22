@@ -74,6 +74,13 @@ export interface StepDefinition {
 	timeBarrier?: number;
 
 	/**
+	 * Milliseconds to sleep immediately before executing this step.
+	 * Use when an async background task (e.g. a 100ms setTimeout) must complete
+	 * before the step runs. Unlike timeBarrier this is relative to step execution time.
+	 */
+	delayMs?: number;
+
+	/**
 	 * Non-falsy string = skip this step with reason; false/omit = run.
 	 */
 	skip?: string | false;
