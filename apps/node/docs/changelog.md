@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.63](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.62...node-v0.0.3-next.63) (2026-06-22)
+
+
+### Features
+
+* update document management components ([ed2c065](https://github.com/iotaledger/twin-node/commit/ed2c065a5030a7233f3623818d7325d85654ef0d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.62 to 0.0.3-next.63
+
 ## [0.0.3-next.62](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.61...node-v0.0.3-next.62) (2026-06-19)
 
 
