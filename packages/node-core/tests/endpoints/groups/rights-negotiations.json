@@ -2,7 +2,7 @@
 	"group": "Rights Management - Negotiations",
 	"steps": [
 		{
-			"description": "POST /rights-management/negotiations/request — 400 without organization context",
+			"description": "POST /rights-management/negotiations/request — 401 without organization context",
 			"skipIfOrgParamOmitted": true,
 			"appendOrgParam": false,
 			"method": "POST",

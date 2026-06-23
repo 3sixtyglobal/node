@@ -1,0 +1,42 @@
+{
+	"group": "Rights Management - Same-Org Auto Agreement",
+	"steps": [
+		{
+			"description": "POST /rights-management/policy/admin — create offer for same-org auto-agreement test",
+			"method": "POST",
+			"path": "/rights-management/policy/admin",
+			"body": {
+				"@context": "http://www.w3.org/ns/odrl.jsonld",
+				"@type": "Offer",
+				"assigner": "urn:provider:same-org-test",
+				"permission": [{ "target": "http://example.com/asset/same-org", "action": "use" }]
+			},
+			"expectedStatus": 201,
+			"capture": { "sameOrgOfferId": "location-last-segment" }
+		},
+		{
+			"description": "POST /rights-management/negotiations/request — same-org initiates negotiation in REQUESTED state",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"consumerPid": "urn:uuid:same-org-consumer-pid-001",
+				"callbackAddress": "http://127.0.0.1:19999/callback",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{sameOrgOfferId}}"
+				}
+			},
+			"expectedStatus": 201,
+			"assert": {
+				"body.state": "REQUESTED"
+			}
+		}
+	]
+}

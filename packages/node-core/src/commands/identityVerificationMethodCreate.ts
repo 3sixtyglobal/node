@@ -275,21 +275,23 @@ export async function identityVerificationMethodCreate(
 		const keyParts = DocumentHelper.parseId(verificationMethod.id);
 
 		const keyPair = await vaultConnector.getKey(`${params.identity}/${keyParts.fragment}`);
-		const privateKeyBase64Url = Converter.bytesToBase64Url(keyPair.privateKey ?? new Uint8Array());
+		Guards.uint8Array("identityVerificationMethodCreate", "privateKey", keyPair.privateKey);
+
+		const privateKeyBase64Url = Converter.bytesToBase64Url(keyPair.privateKey);
 		const publicKeyBase64Url = Is.uint8Array(keyPair.publicKey)
 			? Converter.bytesToBase64Url(keyPair.publicKey)
 			: "";
-		const privateKeyBase64 = Converter.bytesToBase64(keyPair.privateKey ?? new Uint8Array());
+		const privateKeyBase64 = Converter.bytesToBase64(keyPair.privateKey);
 		const publicKeyBase64 = Is.uint8Array(keyPair.publicKey)
 			? Converter.bytesToBase64(keyPair.publicKey)
 			: "";
 
-		const privateKeyHex = Converter.bytesToHex(keyPair.privateKey ?? new Uint8Array(), true);
+		const privateKeyHex = Converter.bytesToHex(keyPair.privateKey, true);
 		const publicKeyHex = Is.uint8Array(keyPair.publicKey)
 			? Converter.bytesToHex(keyPair.publicKey, true)
 			: "";
 
-		const jwk = await Jwk.fromEd25519Private(keyPair.privateKey ?? new Uint8Array());
+		const jwk = await Jwk.fromEd25519Private(keyPair.privateKey);
 		const kid = await Jwk.generateKid(jwk);
 
 		if (createMethod) {

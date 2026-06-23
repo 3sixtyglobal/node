@@ -5,6 +5,7 @@ import path from "node:path";
 import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
+import { DataspaceAppFactory } from "@twin.org/dataspace-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
 	AuthenticationAdminComponentType,
@@ -34,6 +35,7 @@ import { loadAndRunGroups } from "./endpoints/runner.js";
 
 const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
 const TEST_PORT_ST = TEST_PORT + 1000;
+const TEST_PORT_SO = TEST_PORT + 2000;
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_ADMIN_EMAIL = "admin@node";
@@ -41,6 +43,11 @@ const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
 const OUTPUT_TMP_DIR = "./tests/.tmp/endpoints/";
 const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
+const OUTPUT_TMP_DIR_SO = "./tests/.tmp/endpoints-so/";
+
+const TEST_DATASPACE_APP_ID = "https://twin.example.org/test-app";
+const TEST_TRANSFER_CONSUMER_PID = "urn:uuid:consumer-pid-endpoint-001";
+const TEST_DATASPACE_DATASET_ID = "urn:uuid:dataspace-dataset-endpoint-001";
 
 const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
@@ -85,7 +92,8 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_RIGHTS_MANAGEMENT_POLICY_REQUESTERS: "pass-through",
 	TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
-	TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through"
+	TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
+	TWIN_DATASPACE_DATA_PLANE_PATH: "dataspace/entities"
 };
 
 describe("node-core", () => {
@@ -160,9 +168,25 @@ describe("node-core", () => {
 			subject: {}
 		});
 
+		// Register minimal IDataspaceApp so happy-path app-dataset and transfer tests can succeed.
+		DataspaceAppFactory.register(TEST_DATASPACE_APP_ID, () => ({
+			className: () => "EndpointTestApp",
+			activitiesHandled: () => [],
+			supportedQueryTypes: () => ["https://vocabulary.uncefact.org/Consignment"],
+			handleDataRequest: async () => ({
+				data: {
+					"@context": "https://vocabulary.uncefact.org/",
+					"@type": "Consignment",
+					"@id": "urn:test:consignment-001"
+				}
+			})
+		}));
+
 		const serverStartTime = Date.now();
 
 		// Phase 3: Exercise endpoints as a client, using the test definitions in tests/endpoints.
+		// The rights-negotiations-agreement group runs the full DSP negotiation flow to create
+		// a real ODRL Agreement and captures its ID into dataspaceAgreementId for the transfer tests.
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/index.json"), {
 				baseUrl: `http://localhost:${TEST_PORT}`,
@@ -183,7 +207,11 @@ describe("node-core", () => {
 					aliasId: "did:example:alias001",
 					transferAddress: "0x0000000000000000000000000000000000000000000000000000000000000001",
 					fakeId: "fake:nonexistent-resource-id",
-					fedCatDatasetId: TEST_FEDCAT_DATASET_ID
+					fedCatDatasetId: TEST_FEDCAT_DATASET_ID,
+					dataspaceAppId: TEST_DATASPACE_APP_ID,
+					dataspaceDatasetId: TEST_DATASPACE_DATASET_ID,
+					transferConsumerPid: TEST_TRANSFER_CONSUMER_PID,
+					baseUrl: `http://localhost:${TEST_PORT}`
 				},
 				serverStartTime
 			});
@@ -252,9 +280,24 @@ describe("node-core", () => {
 			{ subject: {} }
 		);
 
+		DataspaceAppFactory.register(TEST_DATASPACE_APP_ID, () => ({
+			className: () => "EndpointTestApp",
+			activitiesHandled: () => [],
+			supportedQueryTypes: () => ["https://vocabulary.uncefact.org/Consignment"],
+			handleDataRequest: async () => ({
+				data: {
+					"@context": "https://vocabulary.uncefact.org/",
+					"@type": "Consignment",
+					"@id": "urn:test:consignment-001"
+				}
+			})
+		}));
+
 		const serverStartTime = Date.now();
 
 		// Phase 3: Exercise endpoints using the single-tenant group index.
+		// The rights-negotiations-agreement group runs the full DSP negotiation flow to create
+		// a real ODRL Agreement and captures its ID into dataspaceAgreementId for the transfer tests.
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/index.json"), {
 				baseUrl: `http://localhost:${TEST_PORT_ST}`,
@@ -275,13 +318,101 @@ describe("node-core", () => {
 					aliasId: "did:example:alias001",
 					transferAddress: "0x0000000000000000000000000000000000000000000000000000000000000001",
 					fakeId: "fake:nonexistent-resource-id",
-					fedCatDatasetId: TEST_FEDCAT_DATASET_ID
+					fedCatDatasetId: TEST_FEDCAT_DATASET_ID,
+					dataspaceAppId: TEST_DATASPACE_APP_ID,
+					dataspaceDatasetId: TEST_DATASPACE_DATASET_ID,
+					transferConsumerPid: TEST_TRANSFER_CONSUMER_PID,
+					baseUrl: `http://localhost:${TEST_PORT_ST}`
 				},
 				serverStartTime
 			});
 		} finally {
 			await serverResult?.shutdown();
 			await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+		}
+	});
+
+	test("Can auto-generate a same-org agreement", async () => {
+		const sameOrgEnvVars: { [id: string]: string } = {
+			...SHARED_ENV_VARS,
+			TWIN_TENANT_ENABLED: "false",
+			TWIN_PORT: TEST_PORT_SO.toString(),
+			TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR_SO}db`
+		};
+
+		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
+		Factory.clearFactories();
+
+		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant, no tenant admin).
+		const bootstrapState: INodeEngineState = {};
+		await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, bootstrapState),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...sameOrgEnvVars,
+					TWIN_FEATURES: "admin-user",
+					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
+					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
+					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
+					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500"
+				}
+			},
+			["node", "index.js", "bootstrap-legacy"]
+		);
+
+		expect(bootstrapState.nodeId).toBeDefined();
+
+		Factory.clearFactories();
+
+		// Phase 2: Start the server with the same-org auto-agreement flag enabled.
+		const serverResult = await run({
+			localesDirectory: "./dist/locales/",
+			openApiSpecFile: path.resolve("./tests/spec.json"),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: bootstrapState.nodeId,
+				nodeOrganizationId: bootstrapState.nodeOrganizationId
+			}),
+			envVars: sameOrgEnvVars
+		});
+
+		expect(serverResult).toBeDefined();
+		expect(serverResult?.engine).toBeDefined();
+
+		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
+		expect(trustComponentType).toBeDefined();
+
+		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
+		// Trust token whose identity is the node org DID — matches the context org, triggering
+		// the same-org short-circuit in requestFromConsumer().
+		const trustBearerToken = await trustComponent.generate(
+			bootstrapState.nodeOrganizationId ?? "",
+			undefined,
+			{ subject: {} }
+		);
+
+		const serverStartTime = Date.now();
+
+		// Phase 3: Login (captures organizationId + authToken), create an offer, then negotiate.
+		// The provider returns FINALIZED immediately with an embedded agreement — no PAP pre-seed.
+		try {
+			await loadAndRunGroups(path.resolve("tests/endpoints/same-org-index.json"), {
+				baseUrl: `http://localhost:${TEST_PORT_SO}`,
+				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
+				authToken: "",
+				isSingleTenant: true,
+				vars: {
+					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
+					adminEmail: TEST_ADMIN_EMAIL,
+					adminPassword: TEST_ADMIN_PASSWORD
+				},
+				serverStartTime
+			});
+		} finally {
+			await serverResult?.shutdown();
+			await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 		}
 	});
 });
