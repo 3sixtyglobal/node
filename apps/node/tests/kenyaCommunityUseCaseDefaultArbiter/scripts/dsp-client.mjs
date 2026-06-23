@@ -170,10 +170,12 @@ async function main() {
 				if (!opts['trust-payload']) {
 					throw new Error('requestTransfer requires --trust-payload <jwt>');
 				}
-				// Signature is requestTransfer(request, options, trustPayload). The middle
-				// `options` arg (e.g. { autoStart }) is omitted here so the provider does NOT
-				// auto-start; this scaffold drives startTransfer explicitly afterwards.
-				body = await client.requestTransfer(message, undefined, opts['trust-payload']);
+				// Signature is requestTransfer(request, trustPayload) (2-arg as of
+				// dataspace-control-plane next.55 — the old `options` arg was removed).
+				// Auto-start is now a provider-side config (autoStartTransfers, default
+				// false), never a consumer request param; this scaffold drives startTransfer
+				// explicitly afterwards.
+				body = await client.requestTransfer(message, opts['trust-payload']);
 				break;
 			}
 			case 'startTransfer': {
