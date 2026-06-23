@@ -16783,15 +16783,6 @@
 				],
 				"parameters": [
 					{
-						"name": "autoStart",
-						"description": "When \"true\", the provider immediately starts the requested transfer once it has been created.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
 						"name": "authorization",
 						"in": "header",
 						"required": true,

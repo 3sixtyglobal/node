@@ -1685,7 +1685,7 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 > `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
-The interval for cleaning up the activity logs.
+The interval in minutes for cleaning up the activity logs.
 
 #### Default
 
@@ -1711,6 +1711,62 @@ Example: "dataspace/entities"
 #### Inherited from
 
 [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceDataPlanePath`](IEngineServerEnvironmentVariables.md#dataspacedataplanepath)
+
+***
+
+### dataspaceAutoStartTransfers? {#dataspaceautostarttransfers}
+
+> `optional` **dataspaceAutoStartTransfers?**: `string`
+
+Whether the provider immediately starts a transfer once it has been requested.
+When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+
+#### Default
+
+```ts
+false
+```
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceAutoStartTransfers`](IEngineServerEnvironmentVariables.md#dataspaceautostarttransfers)
+
+***
+
+### dataspaceStalledNegotiationTimeout? {#dataspacestallednegotiationtimeout}
+
+> `optional` **dataspaceStalledNegotiationTimeout?**: `string`
+
+How long in minutes a negotiation may sit without progress before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceStalledNegotiationTimeout`](IEngineServerEnvironmentVariables.md#dataspacestallednegotiationtimeout)
+
+***
+
+### dataspaceStalledTransferTimeout? {#dataspacestalledtransfertimeout}
+
+> `optional` **dataspaceStalledTransferTimeout?**: `string`
+
+How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+progressing it before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+#### Inherited from
+
+[`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md).[`dataspaceStalledTransferTimeout`](IEngineServerEnvironmentVariables.md#dataspacestalledtransfertimeout)
 
 ***
 
