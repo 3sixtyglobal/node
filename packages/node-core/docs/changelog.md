@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.3-next.64](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.63...node-core-v0.0.3-next.64) (2026-06-23)
+
+
+### Features
+
+* add dataspace endpoint tests for app-datasets, transfers, and data plane ([#213](https://github.com/iotaledger/twin-node/issues/213)) ([5641a78](https://github.com/iotaledger/twin-node/commit/5641a781bf17a1914912f3162116d7c5f5c0dca2))
+* env vars consistency ([1823b7a](https://github.com/iotaledger/twin-node/commit/1823b7aeae5dc7484861534b851080afda64d869))
+* update tests ([f15bc1f](https://github.com/iotaledger/twin-node/commit/f15bc1fb9fc1a7a9b6611ad42591d9c02e078cfb))
+
 ## [0.0.3-next.63](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.62...node-core-v0.0.3-next.63) (2026-06-22)
 
 

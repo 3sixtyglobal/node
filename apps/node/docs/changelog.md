@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.64](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.63...node-v0.0.3-next.64) (2026-06-23)
+
+
+### Features
+
+* env vars consistency ([1823b7a](https://github.com/iotaledger/twin-node/commit/1823b7aeae5dc7484861534b851080afda64d869))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.63 to 0.0.3-next.64
+
 ## [0.0.3-next.63](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.62...node-v0.0.3-next.63) (2026-06-22)
 
 
