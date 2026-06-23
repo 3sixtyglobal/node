@@ -7,7 +7,7 @@
 			"path": "/health",
 			"auth": false,
 			"expectedStatus": 200,
-			"healthBarrier": 5000
+			"timeBarrier": 5000
 		}
 	]
 }

@@ -239,6 +239,49 @@ describe("node-core", () => {
 		await result?.shutdown();
 	});
 
+	test("Can run the node as a standalone federated catalogue", async () => {
+		const result = await run({
+			localesDirectory: "./dist/locales/",
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
+			envVars: {
+				TWIN_DEBUG: "true",
+				TWIN_SILENT: "true",
+				TWIN_PORT: port.toString(),
+				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
+				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
+				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
+				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
+				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
+				TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
+				TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
+				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
+				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
+				TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
+				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
+				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
+				TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS: "30000"
+			}
+		});
+		expect(result).toBeDefined();
+		expect(result?.shutdown).toBeInstanceOf(Function);
+		expect(result?.engine).toBeDefined();
+
+		const names = ComponentFactory.names();
+		expect(names).toContain("federated-catalogue-service");
+		expect(names).not.toContain("dataspace-control-plane-service");
+		expect(names).not.toContain("policy-negotiation-point-service");
+		expect(FederatedCatalogueFilterFactory.names()).toContain("FilterByMetadata");
+
+		await result?.shutdown();
+	});
+
 	test("Can start and bootstrap the server with minimal config in memory", async () => {
 		const envVars: { [id: string]: string } = {
 			TWIN_DEBUG: "true",
