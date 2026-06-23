@@ -85,7 +85,7 @@ async function pushTransferRoundtrip(
 	};
 
 	const cp = makeControlPlaneClient(traderToKraCredentials(context));
-	const reqResponse = await cp.requestTransfer(request, undefined, context.traderTrustJwt);
+	const reqResponse = await cp.requestTransfer(request, context.traderTrustJwt);
 
 	if (
 		(reqResponse as { "@type"?: string })["@type"] ===

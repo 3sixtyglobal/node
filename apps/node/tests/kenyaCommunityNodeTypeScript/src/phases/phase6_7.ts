@@ -89,7 +89,7 @@ async function runPhase6(
 	};
 
 	const cp = makeControlPlaneClient(traderToKraCredentials(context));
-	const response = await cp.requestTransfer(request, undefined, context.traderTrustJwt);
+	const response = await cp.requestTransfer(request, context.traderTrustJwt);
 
 	if (
 		(response as { "@type"?: string })["@type"] ===
