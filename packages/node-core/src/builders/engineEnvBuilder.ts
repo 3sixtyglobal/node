@@ -1587,23 +1587,40 @@ async function configureDataspace(
 			isMultiInstance: true,
 			features: ["remote"]
 		});
+		const stalledNegotiationTimeout = Coerce.integer(envVars.dataspaceStalledNegotiationTimeout);
+		const stalledTransferTimeout = Coerce.integer(envVars.dataspaceStalledTransferTimeout);
 		coreConfig.types.dataspaceControlPlaneComponent.push({
 			type: DataspaceControlPlaneComponentType.Service,
 			options: {
 				config: {
-					dataPlanePath: envVars.dataspaceDataPlanePath
+					dataPlanePath: envVars.dataspaceDataPlanePath,
+					autoStartTransfers: Coerce.boolean(envVars.dataspaceAutoStartTransfers),
+					stalledNegotiationTimeoutMs: !Is.empty(stalledNegotiationTimeout)
+						? stalledNegotiationTimeout * 60000
+						: undefined,
+					stalledTransferTimeoutMs: !Is.empty(stalledTransferTimeout)
+						? stalledTransferTimeout * 60000
+						: undefined
 				}
 			},
 			isDefault: true
 		});
 
+		const retainActivityLogsFor = Coerce.integer(envVars.dataspaceRetainActivityLogsFor);
+		const activityLogsCleanUpInterval = Coerce.integer(
+			envVars.dataspaceActivityLogsCleanupInterval
+		);
 		coreConfig.types.dataspaceDataPlaneComponent ??= [];
 		coreConfig.types.dataspaceDataPlaneComponent.push({
 			type: DataspaceDataPlaneComponentType.Service,
 			options: {
 				config: {
-					retainActivityLogsFor: Coerce.number(envVars.dataspaceRetainActivityLogsFor),
-					activityLogsCleanUpInterval: Coerce.number(envVars.dataspaceActivityLogsCleanupInterval)
+					retainActivityLogsForMs: !Is.empty(retainActivityLogsFor)
+						? retainActivityLogsFor * 60000
+						: undefined,
+					activityLogsCleanUpIntervalMs: !Is.empty(activityLogsCleanUpInterval)
+						? activityLogsCleanUpInterval * 60000
+						: undefined
 				}
 			}
 		});
@@ -1642,7 +1659,7 @@ async function configureDlt(
 						url: envVars.iotaNodeEndpoint ?? ""
 					},
 					network: envVars.iotaNetwork ?? "",
-					coinType: Coerce.number(envVars.iotaCoinType),
+					coinType: Coerce.integer(envVars.iotaCoinType),
 					gasStation: gasStationConfig
 				}
 			}

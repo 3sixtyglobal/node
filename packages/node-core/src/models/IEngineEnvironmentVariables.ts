@@ -708,7 +708,7 @@ export interface IEngineEnvironmentVariables {
 	dataspaceRetainActivityLogsFor?: string;
 
 	/**
-	 * The interval for cleaning up the activity logs.
+	 * The interval in minutes for cleaning up the activity logs.
 	 * @default 60
 	 */
 	dataspaceActivityLogsCleanupInterval?: string;
@@ -720,6 +720,26 @@ export interface IEngineEnvironmentVariables {
 	 * Example: "dataspace/entities"
 	 */
 	dataspaceDataPlanePath?: string;
+
+	/**
+	 * Whether the provider immediately starts a transfer once it has been requested.
+	 * When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+	 * @default false
+	 */
+	dataspaceAutoStartTransfers?: string;
+
+	/**
+	 * How long in minutes a negotiation may sit without progress before it is treated as timed out.
+	 * @default 30
+	 */
+	dataspaceStalledNegotiationTimeout?: string;
+
+	/**
+	 * How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+	 * progressing it before it is treated as timed out.
+	 * @default 30
+	 */
+	dataspaceStalledTransferTimeout?: string;
 
 	/**
 	 * Are the health components enabled, defaults to false.
