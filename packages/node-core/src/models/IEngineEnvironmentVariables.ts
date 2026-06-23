@@ -747,6 +747,13 @@ export interface IEngineEnvironmentVariables {
 	dataspaceStalledTransferTimeout?: string;
 
 	/**
+	 * Path under which the dataspace control plane is mounted (path only, not full URL).
+	 * This must match the control-plane REST mount, as it is combined with the public
+	 * origin to build the consumer's advertised callback address.
+	 */
+	dataspaceCallbackPath?: string;
+
+	/**
 	 * Are the health components enabled, defaults to false.
 	 */
 	healthEnabled?: string;

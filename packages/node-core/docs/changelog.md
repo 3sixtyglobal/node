@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.65](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.64...node-core-v0.0.3-next.65) (2026-06-23)
+
+
+### Bug Fixes
+
+* set dataspace control-plane callbackPath in node env builder ([#237](https://github.com/iotaledger/twin-node/issues/237)) ([2eac214](https://github.com/iotaledger/twin-node/commit/2eac21438e9f4b4a0bf84f30ebc864bd424aac35))
+
 ## [0.0.3-next.64](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.63...node-core-v0.0.3-next.64) (2026-06-23)
 
 

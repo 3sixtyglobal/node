@@ -1774,6 +1774,20 @@ progressing it before it is treated as timed out.
 
 ***
 
+### dataspaceCallbackPath? {#dataspacecallbackpath}
+
+> `optional` **dataspaceCallbackPath?**: `string`
+
+Path under which the dataspace control plane is mounted (path only, not full URL).
+This must match the control-plane REST mount, as it is combined with the public
+origin to build the consumer's advertised callback address.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceCallbackPath`](IEngineEnvironmentVariables.md#dataspacecallbackpath)
+
+***
+
 ### healthEnabled? {#healthenabled}
 
 > `optional` **healthEnabled?**: `string`

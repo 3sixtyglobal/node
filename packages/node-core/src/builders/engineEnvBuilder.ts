@@ -1593,6 +1593,9 @@ async function configureDataspace(
 			type: DataspaceControlPlaneComponentType.Service,
 			options: {
 				config: {
+					// Must match the control-plane REST mount, as it is combined with the public origin
+					// to build the consumer's advertised callback address;
+					callbackPath: envVars.dataspaceCallbackPath ?? "dataspace-control-plane",
 					dataPlanePath: envVars.dataspaceDataPlanePath,
 					autoStartTransfers: Coerce.boolean(envVars.dataspaceAutoStartTransfers),
 					stalledNegotiationTimeoutMs: !Is.empty(stalledNegotiationTimeout)
