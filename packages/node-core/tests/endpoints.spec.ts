@@ -39,8 +39,7 @@ const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_ADMIN_EMAIL = "admin@node";
 const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
-const OUTPUT_TMP_DIR = "./tests/.tmp-endpoints/";
-
+const OUTPUT_TMP_DIR = "./tests/.tmp/endpoints/";
 const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
 
 const SHARED_ENV_VARS: { [id: string]: string } = {
@@ -90,8 +89,17 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 };
 
 describe("node-core", () => {
-	test("Can bootstrap the node and exercise all connected endpoints", async () => {
+	beforeAll(async () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+	});
+
+	afterAll(async () => {
+		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+	});
+
+	test("Can bootstrap the node and exercise all connected endpoints", async () => {
 		Factory.clearFactories();
 
 		// Phase 1: Bootstrap - creates node identity, auth signing key, tenant, admin user.
