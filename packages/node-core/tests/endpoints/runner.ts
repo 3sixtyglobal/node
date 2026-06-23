@@ -143,6 +143,10 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 		}
 	}
 
+	if (step.delayMs && step.delayMs > 0) {
+		await new Promise(resolve => setTimeout(resolve, step.delayMs));
+	}
+
 	const useApiKey = step.apiKey === true;
 
 	let resolvedPath = interpolatePath(step.path, ctx.vars);

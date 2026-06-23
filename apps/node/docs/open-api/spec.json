@@ -10542,16 +10542,20 @@
 							"examples": {
 								"DocumentManagementCreateRequestExample": {
 									"value": {
-										"documentId": "2721000",
-										"documentIdFormat": "bol",
-										"documentCode": "unece:DocumentCodeList#705",
-										"blob": "SGVsbG8gV29ybGQ=",
-										"annotationObject": {
-											"@context": "https://schema.org",
-											"@type": "DigitalDocument",
-											"name": "myfile.pdf"
+										"document": {
+											"documentId": "2721000",
+											"documentIdFormat": "bol",
+											"documentCode": "unece:DocumentCodeList#705",
+											"annotationObject": {
+												"@context": "https://schema.org",
+												"@type": "DigitalDocument",
+												"name": "myfile.pdf"
+											}
 										},
-										"createAttestation": true
+										"blob": "SGVsbG8gV29ybGQ=",
+										"options": {
+											"includeAttestation": true
+										}
 									}
 								}
 							}
@@ -10811,12 +10815,14 @@
 							"examples": {
 								"DocumentManagementUpdatePartialRequestExample": {
 									"value": {
-										"blob": "SGVsbG8gV29ybGQ=",
-										"annotationObject": {
-											"@context": "https://schema.org",
-											"@type": "DigitalDocument",
-											"name": "myfile.pdf"
-										}
+										"document": {
+											"annotationObject": {
+												"@context": "https://schema.org",
+												"@type": "DigitalDocument",
+												"name": "myfile.pdf"
+											}
+										},
+										"blob": "SGVsbG8gV29ybGQ="
 									}
 								}
 							}
@@ -16777,15 +16783,6 @@
 				],
 				"parameters": [
 					{
-						"name": "autoStart",
-						"description": "When \"true\", the provider immediately starts the requested transfer once it has been created.",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
 						"name": "authorization",
 						"in": "header",
 						"required": true,
@@ -21717,23 +21714,12 @@
 			"DocumentManagementCreateRequest": {
 				"type": "object",
 				"properties": {
-					"documentId": {
-						"type": "string",
-						"description": "The document id to create."
-					},
-					"documentIdFormat": {
-						"type": "string",
-						"description": "The format of the document identifier."
-					},
-					"documentCode": {
-						"$ref": "https://schema.twindev.org/unece/UneceDocumentCodeList"
+					"document": {
+						"$ref": "https://schema.twindev.org/documents/DocumentBase"
 					},
 					"blob": {
 						"type": "string",
-						"description": "The data to create the document with, in base64."
-					},
-					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"description": "The data to create the document with, either as base64-encoded content or an existing blob storage entry id."
 					},
 					"auditableItemGraphEdges": {
 						"type": "array",
@@ -21742,22 +21728,26 @@
 						},
 						"description": "The auditable item graph vertices to connect the document to."
 					},
-					"createAttestation": {
-						"type": "boolean",
-						"description": "Flag to create an attestation for the document, defaults to false."
-					},
-					"addAlias": {
-						"type": "boolean",
-						"description": "Flag to add the document id as an alias to the aig vertex, defaults to true."
-					},
-					"aliasAnnotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+					"options": {
+						"type": "object",
+						"properties": {
+							"includeAttestation": {
+								"type": "boolean",
+								"description": "Flag to create an attestation for the document, defaults to false."
+							},
+							"includeAlias": {
+								"type": "boolean",
+								"description": "Flag to add the document id as an alias to the aig vertex, defaults to true."
+							},
+							"aliasAnnotationObject": {
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							}
+						},
+						"description": "Additional options for the create operation."
 					}
 				},
 				"required": [
-					"documentId",
-					"documentIdFormat",
-					"documentCode",
+					"document",
 					"blob"
 				],
 				"description": "The body parameters."
@@ -21765,12 +21755,25 @@
 			"DocumentManagementUpdatePartialRequest": {
 				"type": "object",
 				"properties": {
+					"document": {
+						"description": "The document base properties to update. annotationObject, documentIdFormat and documentCode are applied in-place to the current revision.",
+						"type": "object",
+						"properties": {
+							"documentIdFormat": {
+								"type": "string",
+								"description": "The format of the document id."
+							},
+							"documentCode": {
+								"$ref": "https://schema.twindev.org/unece/UneceDocumentCodeList"
+							},
+							"annotationObject": {
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							}
+						}
+					},
 					"blob": {
 						"type": "string",
-						"description": "The data to update the document with, in base64."
-					},
-					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"description": "The data to update the document with, either as base64-encoded content or an existing blob storage entry id."
 					},
 					"auditableItemGraphEdges": {
 						"type": "object",
@@ -21791,6 +21794,23 @@
 							}
 						},
 						"description": "Explicit edge delta to apply. Use `add` to create new connections and `remove` to\ndisconnect existing ones by their target vertex id."
+					},
+					"options": {
+						"type": "object",
+						"properties": {
+							"includeAttestation": {
+								"type": "boolean",
+								"description": "Set to true to start attesting the document (even if originally created without attestation), or false to remove the existing attestation. Omit to leave attestation state unchanged."
+							},
+							"includeAlias": {
+								"type": "boolean",
+								"description": "Set to true to add the document id as an alias on the aig vertex, or false to remove it. Omit to leave alias state unchanged."
+							},
+							"aliasAnnotationObject": {
+								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							}
+						},
+						"description": "Additional options for the update operation."
 					}
 				},
 				"description": "The body parameters."

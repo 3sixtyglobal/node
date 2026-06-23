@@ -1133,7 +1133,7 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 > `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
-The interval for cleaning up the activity logs.
+The interval in minutes for cleaning up the activity logs.
 
 #### Default
 
@@ -1151,6 +1151,50 @@ The data plane path for PULL transfers (path only, not full URL).
 Will be combined with public origin.
 Required if PULL transfers should be supported.
 Example: "dataspace/entities"
+
+***
+
+### dataspaceAutoStartTransfers? {#dataspaceautostarttransfers}
+
+> `optional` **dataspaceAutoStartTransfers?**: `string`
+
+Whether the provider immediately starts a transfer once it has been requested.
+When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+
+#### Default
+
+```ts
+false
+```
+
+***
+
+### dataspaceStalledNegotiationTimeout? {#dataspacestallednegotiationtimeout}
+
+> `optional` **dataspaceStalledNegotiationTimeout?**: `string`
+
+How long in minutes a negotiation may sit without progress before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
+### dataspaceStalledTransferTimeout? {#dataspacestalledtransfertimeout}
+
+> `optional` **dataspaceStalledTransferTimeout?**: `string`
+
+How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+progressing it before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
 
 ***
 
@@ -1185,6 +1229,78 @@ This allows components that take a long time to initialize to be healthy before 
 
 The type of the automation action to create, comma separate for more than one connector.
 values: fetch
+
+***
+
+### mutexTimeoutMsDefault? {#mutextimeoutmsdefault}
+
+> `optional` **mutexTimeoutMsDefault?**: `string`
+
+The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+
+***
+
+### auditableItemGraphMutexTimeoutMs? {#auditableitemgraphmutextimeoutms}
+
+> `optional` **auditableItemGraphMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the auditable item graph component.
+
+***
+
+### auditableItemStreamMutexTimeoutMs? {#auditableitemstreammutextimeoutms}
+
+> `optional` **auditableItemStreamMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the auditable item stream component.
+
+***
+
+### federatedCatalogueMutexTimeoutMs? {#federatedcataloguemutextimeoutms}
+
+> `optional` **federatedCatalogueMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the federated catalogue component.
+
+***
+
+### documentManagementMutexTimeoutMs? {#documentmanagementmutextimeoutms}
+
+> `optional` **documentManagementMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the document management component.
+
+***
+
+### loggingMutexTimeoutMs? {#loggingmutextimeoutms}
+
+> `optional` **loggingMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the logging component.
+
+***
+
+### entityStorageMemoryMutexTimeoutMs? {#entitystoragememorymutextimeoutms}
+
+> `optional` **entityStorageMemoryMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the memory entity storage connector.
+
+***
+
+### entityStorageFileMutexTimeoutMs? {#entitystoragefilemutextimeoutms}
+
+> `optional` **entityStorageFileMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the file entity storage connector.
+
+***
+
+### rightsManagementMutexTimeoutMs? {#rightsmanagementmutextimeoutms}
+
+> `optional` **rightsManagementMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the rights management component.
 
 ***
 

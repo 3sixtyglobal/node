@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.0.3-next.64](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.63...node-core-v0.0.3-next.64) (2026-06-23)
+
+
+### Features
+
+* add dataspace endpoint tests for app-datasets, transfers, and data plane ([#213](https://github.com/iotaledger/twin-node/issues/213)) ([5641a78](https://github.com/iotaledger/twin-node/commit/5641a781bf17a1914912f3162116d7c5f5c0dca2))
+* env vars consistency ([1823b7a](https://github.com/iotaledger/twin-node/commit/1823b7aeae5dc7484861534b851080afda64d869))
+* update tests ([f15bc1f](https://github.com/iotaledger/twin-node/commit/f15bc1fb9fc1a7a9b6611ad42591d9c02e078cfb))
+
+## [0.0.3-next.63](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.62...node-core-v0.0.3-next.63) (2026-06-22)
+
+
+### Features
+
+* update document management components ([ed2c065](https://github.com/iotaledger/twin-node/commit/ed2c065a5030a7233f3623818d7325d85654ef0d))
+
+## [0.0.3-next.62](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.61...node-core-v0.0.3-next.62) (2026-06-19)
+
+
+### Features
+
+* component update ([9a3fdab](https://github.com/iotaledger/twin-node/commit/9a3fdab250e0dc8b8aa52479d5c72517de8d6c0f))
+
+## [0.0.3-next.61](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.60...node-core-v0.0.3-next.61) (2026-06-19)
+
+
+### Features
+
+* component update ([8bf10da](https://github.com/iotaledger/twin-node/commit/8bf10da2e3e29f22afddd9cb55a26f343555e106))
+
+## [0.0.3-next.60](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.59...node-core-v0.0.3-next.60) (2026-06-19)
+
+
+### Features
+
+* add mutex settings ([#222](https://github.com/iotaledger/twin-node/issues/222)) ([492c55f](https://github.com/iotaledger/twin-node/commit/492c55f67d5f70c2a4a27dfdb2700a644ee87955))
+
 ## [0.0.3-next.59](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.58...node-core-v0.0.3-next.59) (2026-06-18)
 
 

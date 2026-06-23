@@ -88,34 +88,37 @@ When you change the prefix, all variables in this document use your custom prefi
 
 ## Feature Toggle and Behaviour Variables
 
-| Variable                                            | Possible Values       | Default                     | Notes                                                                                      |
-| --------------------------------------------------- | --------------------- | --------------------------- | ------------------------------------------------------------------------------------------ |
-| `TWIN_ATTESTATION_VERIFICATION_METHOD_ID`           | Method id string      | `attestation-assertion`     | Default injected by node defaults.                                                         |
-| `TWIN_AUDITABLE_ITEM_GRAPH_ENABLED`                 | `true`, `false`       | `false`                     | Enables auditable item graph. Also enabled automatically when notarization is configured.  |
-| `TWIN_AUDITABLE_ITEM_STREAM_ENABLED`                | `true`, `false`       | `false`                     | Enables auditable item stream. Also enabled automatically when notarization is configured. |
-| `TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION`               | `true`, `false`       | `false`                     | Enables blob encryption in blob storage component flow.                                    |
-| `TWIN_DATA_PROCESSING_ENABLED`                      | `true`, `false`       | `false`                     | Enables data processing.                                                                   |
-| `TWIN_DATASPACE_ACTIVITY_LOGS_CLEANUP_INTERVAL`     | Integer minutes       | `60`                        | Dataspace clean-up interval.                                                               |
-| `TWIN_DATASPACE_DATA_PLANE_PATH`                    | Path                  | None                        | Dataspace PULL transfer path (path only).                                                  |
-| `TWIN_DATASPACE_ENABLED`                            | `true`, `false`       | `false`                     | Enables dataspace features.                                                                |
-| `TWIN_DATASPACE_RETAIN_ACTIVITY_LOGS_FOR`           | Integer minutes, `-1` | `10`                        | Dataspace activity retention period.                                                       |
-| `TWIN_DOCUMENT_MANAGEMENT_ENABLED`                  | `true`, `false`       | `false`                     | Enables document management.                                                               |
-| `TWIN_FEDERATED_CATALOGUE_ENABLED`                  | `true`, `false`       | `false`                     | Enables federated catalogue features.                                                      |
-| `TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT`          | URL                   | None                        | Uses a remote federated catalogue REST client.                                             |
-| `TWIN_HEALTH_ENABLED`                               | `true`, `false`       | `false`                     | Enables health components.                                                                 |
-| `TWIN_HEALTH_INTERVAL_SECONDS`                      | Integer seconds       | `60`                        | Interval between health checks.                                                            |
-| `TWIN_HEALTH_STARTUP_INTERVAL_SECONDS`              | Integer seconds       | `2`                         | Initial delay before the first health check runs.                                          |
-| `TWIN_IDENTITY_WALLET_ADDRESS_INDEX`                | Integer               | `0`                         | Wallet address index used by identity workflows.                                           |
-| `TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`       | Method id string      | `immutable-proof-assertion` | Default injected by node defaults.                                                         |
-| `TWIN_MESSAGING_ENABLED`                            | `true`, `false`       | `false`                     | Enables messaging components.                                                              |
-| `TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH`              | Path                  | None                        | Callback path used by rights management.                                                   |
-| `TWIN_TASK_SCHEDULER_ENABLED`                       | `true`, `false`       | `false`                     | Forces the task scheduler on regardless of which other features require it.                |
-| `TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS` | Integer seconds       | `60`                        | Polling interval between metrics collection runs.                                          |
-| `TWIN_TELEMETRY_METRICS_PRODUCER_MAX_HISTORY`       | Integer               | `1440`                      | Maximum number of values retained per metric.                                              |
-| `TWIN_TRUST_IDENTITIES_ALLOW`                       | Comma-separated list  | None                        | Allow list for trust identity verification.                                                |
-| `TWIN_TRUST_IDENTITIES_DENY`                        | Comma-separated list  | None                        | Deny list for trust identity verification.                                                 |
-| `TWIN_TRUST_JWT_TTL_SECONDS`                        | Integer seconds       | None                        | Leave unset for non-expiring JWT generation.                                               |
-| `TWIN_TRUST_VERIFICATION_METHOD_ID`                 | Method id string      | `trust-assertion`           | Default injected by node defaults.                                                         |
+| Variable                                            | Possible Values       | Default                     | Notes                                                                                                    |
+| --------------------------------------------------- | --------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `TWIN_ATTESTATION_VERIFICATION_METHOD_ID`           | Method id string      | `attestation-assertion`     | Default injected by node defaults.                                                                       |
+| `TWIN_AUDITABLE_ITEM_GRAPH_ENABLED`                 | `true`, `false`       | `false`                     | Enables auditable item graph. Also enabled automatically when notarization is configured.                |
+| `TWIN_AUDITABLE_ITEM_STREAM_ENABLED`                | `true`, `false`       | `false`                     | Enables auditable item stream. Also enabled automatically when notarization is configured.               |
+| `TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION`               | `true`, `false`       | `false`                     | Enables blob encryption in blob storage component flow.                                                  |
+| `TWIN_DATA_PROCESSING_ENABLED`                      | `true`, `false`       | `false`                     | Enables data processing.                                                                                 |
+| `TWIN_DATASPACE_ACTIVITY_LOGS_CLEANUP_INTERVAL`     | Integer minutes       | `60`                        | Dataspace clean-up interval.                                                                             |
+| `TWIN_DATASPACE_AUTO_START_TRANSFERS`               | `true`, `false`       | `false`                     | Provider auto-starts transfers on request; when false the provider must call transferStarted explicitly. |
+| `TWIN_DATASPACE_DATA_PLANE_PATH`                    | Path                  | None                        | Dataspace PULL transfer path (path only).                                                                |
+| `TWIN_DATASPACE_ENABLED`                            | `true`, `false`       | `false`                     | Enables dataspace features.                                                                              |
+| `TWIN_DATASPACE_RETAIN_ACTIVITY_LOGS_FOR`           | Integer minutes, `-1` | `10`                        | Dataspace activity retention period.                                                                     |
+| `TWIN_DATASPACE_STALLED_NEGOTIATION_TIMEOUT`        | Integer minutes       | `30`                        | Time before a stalled negotiation is timed out.                                                          |
+| `TWIN_DATASPACE_STALLED_TRANSFER_TIMEOUT`           | Integer minutes       | `30`                        | Time before a stalled consumer-initiated transfer is timed out.                                          |
+| `TWIN_DOCUMENT_MANAGEMENT_ENABLED`                  | `true`, `false`       | `false`                     | Enables document management.                                                                             |
+| `TWIN_FEDERATED_CATALOGUE_ENABLED`                  | `true`, `false`       | `false`                     | Enables federated catalogue features.                                                                    |
+| `TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT`          | URL                   | None                        | Uses a remote federated catalogue REST client.                                                           |
+| `TWIN_HEALTH_ENABLED`                               | `true`, `false`       | `false`                     | Enables health components.                                                                               |
+| `TWIN_HEALTH_INTERVAL_SECONDS`                      | Integer seconds       | `60`                        | Interval between health checks.                                                                          |
+| `TWIN_HEALTH_STARTUP_INTERVAL_SECONDS`              | Integer seconds       | `2`                         | Initial delay before the first health check runs.                                                        |
+| `TWIN_IDENTITY_WALLET_ADDRESS_INDEX`                | Integer               | `0`                         | Wallet address index used by identity workflows.                                                         |
+| `TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`       | Method id string      | `immutable-proof-assertion` | Default injected by node defaults.                                                                       |
+| `TWIN_MESSAGING_ENABLED`                            | `true`, `false`       | `false`                     | Enables messaging components.                                                                            |
+| `TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH`              | Path                  | None                        | Callback path used by rights management.                                                                 |
+| `TWIN_TASK_SCHEDULER_ENABLED`                       | `true`, `false`       | `false`                     | Forces the task scheduler on regardless of which other features require it.                              |
+| `TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS` | Integer seconds       | `60`                        | Polling interval between metrics collection runs.                                                        |
+| `TWIN_TELEMETRY_METRICS_PRODUCER_MAX_HISTORY`       | Integer               | `1440`                      | Maximum number of values retained per metric.                                                            |
+| `TWIN_TRUST_IDENTITIES_ALLOW`                       | Comma-separated list  | None                        | Allow list for trust identity verification.                                                              |
+| `TWIN_TRUST_IDENTITIES_DENY`                        | Comma-separated list  | None                        | Deny list for trust identity verification.                                                               |
+| `TWIN_TRUST_JWT_TTL_SECONDS`                        | Integer seconds       | None                        | Leave unset for non-expiring JWT generation.                                                             |
+| `TWIN_TRUST_VERIFICATION_METHOD_ID`                 | Method id string      | `trust-assertion`           | Default injected by node defaults.                                                                       |
 
 ## Hosting Variables
 
@@ -131,6 +134,20 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None             | Properties to obfuscate in route logs.          |
 
 REST component paths can also be overridden with `TWIN_REST_PATH_<COMPONENT>`, where `<COMPONENT>` is the upper snake case name of the component without the `Component` suffix. Current examples include `TWIN_REST_PATH_LOGGING`, `TWIN_REST_PATH_DATASPACE_CONTROL_PLANE`, and `TWIN_REST_PATH_DATASPACE_DATA_PLANE`.
+
+## Mutex Timeout Variables
+
+| Variable                                      | Possible Values | Default | Notes                                                                       |
+| --------------------------------------------- | --------------- | ------- | --------------------------------------------------------------------------- |
+| `TWIN_MUTEX_TIMEOUT_MS_DEFAULT`               | Integer ms      | `5000`  | Global default mutex timeout. Used when no component-specific value is set. |
+| `TWIN_AUDITABLE_ITEM_GRAPH_MUTEX_TIMEOUT_MS`  | Integer ms      | None    | Mutex timeout for the auditable item graph component.                       |
+| `TWIN_AUDITABLE_ITEM_STREAM_MUTEX_TIMEOUT_MS` | Integer ms      | None    | Mutex timeout for the auditable item stream component.                      |
+| `TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS`   | Integer ms      | None    | Mutex timeout for the federated catalogue component.                        |
+| `TWIN_DOCUMENT_MANAGEMENT_MUTEX_TIMEOUT_MS`   | Integer ms      | None    | Mutex timeout for the document management component.                        |
+| `TWIN_LOGGING_MUTEX_TIMEOUT_MS`               | Integer ms      | None    | Mutex timeout for the logging component.                                    |
+| `TWIN_ENTITY_STORAGE_MEMORY_MUTEX_TIMEOUT_MS` | Integer ms      | None    | Mutex timeout for the memory entity storage connector.                      |
+| `TWIN_ENTITY_STORAGE_FILE_MUTEX_TIMEOUT_MS`   | Integer ms      | None    | Mutex timeout for the file entity storage connector.                        |
+| `TWIN_RIGHTS_MANAGEMENT_MUTEX_TIMEOUT_MS`     | Integer ms      | None    | Mutex timeout for the rights management component.                          |
 
 ## Extension Module Loading Variables
 

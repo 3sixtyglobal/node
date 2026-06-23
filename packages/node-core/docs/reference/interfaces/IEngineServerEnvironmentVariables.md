@@ -1689,7 +1689,7 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 > `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
-The interval for cleaning up the activity logs.
+The interval in minutes for cleaning up the activity logs.
 
 #### Default
 
@@ -1715,6 +1715,62 @@ Example: "dataspace/entities"
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceDataPlanePath`](IEngineEnvironmentVariables.md#dataspacedataplanepath)
+
+***
+
+### dataspaceAutoStartTransfers? {#dataspaceautostarttransfers}
+
+> `optional` **dataspaceAutoStartTransfers?**: `string`
+
+Whether the provider immediately starts a transfer once it has been requested.
+When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+
+#### Default
+
+```ts
+false
+```
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceAutoStartTransfers`](IEngineEnvironmentVariables.md#dataspaceautostarttransfers)
+
+***
+
+### dataspaceStalledNegotiationTimeout? {#dataspacestallednegotiationtimeout}
+
+> `optional` **dataspaceStalledNegotiationTimeout?**: `string`
+
+How long in minutes a negotiation may sit without progress before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceStalledNegotiationTimeout`](IEngineEnvironmentVariables.md#dataspacestallednegotiationtimeout)
+
+***
+
+### dataspaceStalledTransferTimeout? {#dataspacestalledtransfertimeout}
+
+> `optional` **dataspaceStalledTransferTimeout?**: `string`
+
+How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+progressing it before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`dataspaceStalledTransferTimeout`](IEngineEnvironmentVariables.md#dataspacestalledtransfertimeout)
 
 ***
 
@@ -1765,6 +1821,114 @@ values: fetch
 #### Inherited from
 
 [`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`automationActionTypes`](IEngineEnvironmentVariables.md#automationactiontypes)
+
+***
+
+### mutexTimeoutMsDefault? {#mutextimeoutmsdefault}
+
+> `optional` **mutexTimeoutMsDefault?**: `string`
+
+The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`mutexTimeoutMsDefault`](IEngineEnvironmentVariables.md#mutextimeoutmsdefault)
+
+***
+
+### auditableItemGraphMutexTimeoutMs? {#auditableitemgraphmutextimeoutms}
+
+> `optional` **auditableItemGraphMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the auditable item graph component.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`auditableItemGraphMutexTimeoutMs`](IEngineEnvironmentVariables.md#auditableitemgraphmutextimeoutms)
+
+***
+
+### auditableItemStreamMutexTimeoutMs? {#auditableitemstreammutextimeoutms}
+
+> `optional` **auditableItemStreamMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the auditable item stream component.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`auditableItemStreamMutexTimeoutMs`](IEngineEnvironmentVariables.md#auditableitemstreammutextimeoutms)
+
+***
+
+### federatedCatalogueMutexTimeoutMs? {#federatedcataloguemutextimeoutms}
+
+> `optional` **federatedCatalogueMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the federated catalogue component.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`federatedCatalogueMutexTimeoutMs`](IEngineEnvironmentVariables.md#federatedcataloguemutextimeoutms)
+
+***
+
+### documentManagementMutexTimeoutMs? {#documentmanagementmutextimeoutms}
+
+> `optional` **documentManagementMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the document management component.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`documentManagementMutexTimeoutMs`](IEngineEnvironmentVariables.md#documentmanagementmutextimeoutms)
+
+***
+
+### loggingMutexTimeoutMs? {#loggingmutextimeoutms}
+
+> `optional` **loggingMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the logging component.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`loggingMutexTimeoutMs`](IEngineEnvironmentVariables.md#loggingmutextimeoutms)
+
+***
+
+### entityStorageMemoryMutexTimeoutMs? {#entitystoragememorymutextimeoutms}
+
+> `optional` **entityStorageMemoryMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the memory entity storage connector.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityStorageMemoryMutexTimeoutMs`](IEngineEnvironmentVariables.md#entitystoragememorymutextimeoutms)
+
+***
+
+### entityStorageFileMutexTimeoutMs? {#entitystoragefilemutextimeoutms}
+
+> `optional` **entityStorageFileMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the file entity storage connector.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`entityStorageFileMutexTimeoutMs`](IEngineEnvironmentVariables.md#entitystoragefilemutextimeoutms)
+
+***
+
+### rightsManagementMutexTimeoutMs? {#rightsmanagementmutextimeoutms}
+
+> `optional` **rightsManagementMutexTimeoutMs?**: `string`
+
+The mutex timeout in milliseconds for the rights management component.
+
+#### Inherited from
+
+[`IEngineEnvironmentVariables`](IEngineEnvironmentVariables.md).[`rightsManagementMutexTimeoutMs`](IEngineEnvironmentVariables.md#rightsmanagementmutextimeoutms)
 
 ***
 

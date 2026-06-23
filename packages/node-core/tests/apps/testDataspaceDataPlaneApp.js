@@ -4,8 +4,6 @@ import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/contex
 import { ComponentFactory, Guards } from '@twin.org/core';
 import { DataTypeHandlerFactory } from '@twin.org/data-core';
 import { DataRequestType } from '@twin.org/dataspace-models';
-import { DataspaceProtocolContexts } from '@twin.org/standards-dataspace-protocol';
-import { DublinCoreContexts } from '@twin.org/standards-dublin-core';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
 const entities = [
@@ -65,48 +63,6 @@ export class TestDataspaceDataPlaneApp {
 	 */
 	className() {
 		return TestDataspaceDataPlaneApp.CLASS_NAME;
-	}
-
-	/**
-	 * Datasets handled by the App.
-	 * @returns Dataspace Protocol compliant datasets
-	 */
-	async datasetsHandled() {
-		const contextIds = await ContextIdStore.getContextIds();
-		const organizationId =
-			contextIds?.[ContextIdKeys.Organization] ?? contextIds?.[ContextIdKeys.Node] ?? '';
-		return [
-			{
-				'@context': [
-					DataspaceProtocolContexts.Context,
-					{
-						dcterms: DublinCoreContexts.NamespaceTerms
-					}
-				],
-				'@id': 'https://twin.example.org/data-service-1',
-				'@type': 'Dataset',
-				'dcterms:publisher': organizationId,
-				hasPolicy: [
-					{
-						'@type': 'Offer',
-						uid: 'urn:uuid:test-policy-offer-1',
-						assigner: organizationId,
-						permission: [
-							{
-								action: 'read'
-							}
-						]
-					}
-				],
-				distribution: {
-					'@id': 'https://twin.example.org/distribution-1',
-					'@type': 'Distribution',
-					accessService: 'https://twin.example.org/data-service-1',
-					format: 'Http-Pull-Query-Format'
-				},
-				'dcterms:type': 'https://vocabulary.uncefact.org/Consignment'
-			}
-		];
 	}
 
 	/**

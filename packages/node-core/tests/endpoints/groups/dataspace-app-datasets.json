@@ -1,0 +1,148 @@
+{
+	"group": "Dataspace - App Datasets",
+	"steps": [
+		{
+			"description": "GET /dataspace/app-datasets — 200 empty list",
+			"method": "GET",
+			"path": "/dataspace/app-datasets",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /dataspace/app-datasets/:id — 404 unknown id",
+			"method": "GET",
+			"path": "/dataspace/app-datasets/{{fakeId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /dataspace/app-datasets — 400 missing appId",
+			"method": "POST",
+			"path": "/dataspace/app-datasets",
+			"body": {
+				"dataset": {
+					"@context": {
+						"dcat": "http://www.w3.org/ns/dcat#",
+						"dcterms": "http://purl.org/dc/terms/"
+					},
+					"@type": "dcat:Dataset",
+					"dcterms:title": "Test Dataset"
+				}
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /dataspace/app-datasets — 400 missing dataset",
+			"method": "POST",
+			"path": "/dataspace/app-datasets",
+			"body": {
+				"appId": "https://twin.example.org/app1"
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "PUT /dataspace/app-datasets/:id — 404 unknown id",
+			"method": "PUT",
+			"path": "/dataspace/app-datasets/{{fakeId}}",
+			"body": {
+				"appId": "https://twin.example.org/app1",
+				"dataset": {
+					"@context": {
+						"dcat": "http://www.w3.org/ns/dcat#",
+						"dcterms": "http://purl.org/dc/terms/"
+					},
+					"@type": "dcat:Dataset",
+					"dcterms:title": "Updated Dataset"
+				}
+			},
+			"expectedStatus": 404
+		},
+		{
+			"description": "DELETE /dataspace/app-datasets/:id — 404 unknown id",
+			"method": "DELETE",
+			"path": "/dataspace/app-datasets/{{fakeId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /dataspace/app-datasets — 201 create",
+			"method": "POST",
+			"path": "/dataspace/app-datasets",
+			"body": {
+				"appId": "{{dataspaceAppId}}",
+				"dataset": {
+					"@context": {
+						"dcat": "http://www.w3.org/ns/dcat#",
+						"dcterms": "http://purl.org/dc/terms/",
+						"odrl": "http://www.w3.org/ns/odrl/2/"
+					},
+					"@id": "{{dataspaceDatasetId}}",
+					"@type": "dcat:Dataset",
+					"dcterms:title": "Endpoint Test App Dataset",
+					"odrl:hasPolicy": [
+						{
+							"@context": "http://www.w3.org/ns/odrl.jsonld",
+							"@type": "Offer",
+							"uid": "{{dataspaceAgreementId}}",
+							"assigner": "https://example.com/assigner",
+							"permission": [{ "action": "use" }]
+						}
+					],
+					"dcat:distribution": [
+						{
+							"@type": "dcat:Distribution",
+							"dcterms:format": "application/json",
+							"dcat:accessService": "https://example.com/data-access"
+						}
+					]
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "dataspaceAppDatasetId": "location-last-segment" }
+		},
+		{
+			"description": "GET /dataspace/app-datasets/:id — 200 known id",
+			"method": "GET",
+			"path": "/dataspace/app-datasets/{{dataspaceAppDatasetId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /dataspace/app-datasets/:id — 204 update",
+			"method": "PUT",
+			"path": "/dataspace/app-datasets/{{dataspaceAppDatasetId}}",
+			"body": {
+				"appId": "{{dataspaceAppId}}",
+				"dataset": {
+					"@context": {
+						"dcat": "http://www.w3.org/ns/dcat#",
+						"dcterms": "http://purl.org/dc/terms/",
+						"odrl": "http://www.w3.org/ns/odrl/2/"
+					},
+					"@id": "{{dataspaceDatasetId}}",
+					"@type": "dcat:Dataset",
+					"dcterms:title": "Updated Endpoint Test App Dataset",
+					"odrl:hasPolicy": [
+						{
+							"@context": "http://www.w3.org/ns/odrl.jsonld",
+							"@type": "Offer",
+							"uid": "{{dataspaceAgreementId}}",
+							"assigner": "https://example.com/assigner",
+							"permission": [{ "action": "use" }]
+						}
+					],
+					"dcat:distribution": [
+						{
+							"@type": "dcat:Distribution",
+							"dcterms:format": "application/json",
+							"dcat:accessService": "https://example.com/data-access"
+						}
+					]
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /dataspace/app-datasets — 200 non-empty list",
+			"method": "GET",
+			"path": "/dataspace/app-datasets",
+			"expectedStatus": 200
+		}
+	]
+}

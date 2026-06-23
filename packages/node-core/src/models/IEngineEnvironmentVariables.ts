@@ -713,7 +713,7 @@ export interface IEngineEnvironmentVariables {
 	dataspaceRetainActivityLogsFor?: string;
 
 	/**
-	 * The interval for cleaning up the activity logs.
+	 * The interval in minutes for cleaning up the activity logs.
 	 * @default 60
 	 */
 	dataspaceActivityLogsCleanupInterval?: string;
@@ -725,6 +725,26 @@ export interface IEngineEnvironmentVariables {
 	 * Example: "dataspace/entities"
 	 */
 	dataspaceDataPlanePath?: string;
+
+	/**
+	 * Whether the provider immediately starts a transfer once it has been requested.
+	 * When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+	 * @default false
+	 */
+	dataspaceAutoStartTransfers?: string;
+
+	/**
+	 * How long in minutes a negotiation may sit without progress before it is treated as timed out.
+	 * @default 30
+	 */
+	dataspaceStalledNegotiationTimeout?: string;
+
+	/**
+	 * How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+	 * progressing it before it is treated as timed out.
+	 * @default 30
+	 */
+	dataspaceStalledTransferTimeout?: string;
 
 	/**
 	 * Are the health components enabled, defaults to false.
@@ -747,6 +767,51 @@ export interface IEngineEnvironmentVariables {
 	 * values: fetch
 	 */
 	automationActionTypes?: string;
+
+	/**
+	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+	 */
+	mutexTimeoutMsDefault?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the auditable item graph component.
+	 */
+	auditableItemGraphMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the auditable item stream component.
+	 */
+	auditableItemStreamMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the federated catalogue component.
+	 */
+	federatedCatalogueMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the document management component.
+	 */
+	documentManagementMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the logging component.
+	 */
+	loggingMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the memory entity storage connector.
+	 */
+	entityStorageMemoryMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the file entity storage connector.
+	 */
+	entityStorageFileMutexTimeoutMs?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the rights management component.
+	 */
+	rightsManagementMutexTimeoutMs?: string;
 
 	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
