@@ -100,11 +100,13 @@ describe("node-core", () => {
 	beforeAll(async () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 	});
 
 	afterAll(async () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 	});
 
 	test("Can bootstrap the node and exercise all connected endpoints", async () => {
