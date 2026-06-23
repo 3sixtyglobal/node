@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.3-next.65](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.64...node-v0.0.3-next.65) (2026-06-23)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.0.3-next.64 to 0.0.3-next.65
+
 ## [0.0.3-next.64](https://github.com/iotaledger/twin-node/compare/node-v0.0.3-next.63...node-v0.0.3-next.64) (2026-06-23)
 
 
