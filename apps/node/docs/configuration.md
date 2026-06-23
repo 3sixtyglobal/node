@@ -1,5 +1,16 @@
 # Node Configuration
 
+## Available Example Configurations
+
+Four ready-to-use example files are provided in `apps/node/`. Copy the relevant file to `.env` as a starting point:
+
+| File                                | Role                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------------- |
+| `.env.example-local-entity-storage` | Full-featured node using local file/entity storage                        |
+| `.env.example-aws-ec2`              | Full-featured node deployed on Amazon AWS EC2 with DynamoDB               |
+| `.env.example-iota-testnet`         | Full-featured node connected to the IOTA testnet                          |
+| `.env.example-federated-catalogue`  | Standalone federated catalogue server (no dataspace or rights management) |
+
 ## Extension Loading
 
 The TWIN Node supports loading extensions dynamically to extend its functionality. Extensions can be loaded from multiple sources using protocol-based syntax.

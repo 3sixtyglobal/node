@@ -99,7 +99,7 @@ cd apps
 npm install
 npm run dist
 cd apps/node
-cp .env.example-entity-storage .env
+cp .env.example-local-entity-storage .env
 ```
 
 The .env file can be modified to suit your own use case. For example to set the location for the storage.

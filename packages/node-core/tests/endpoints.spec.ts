@@ -36,14 +36,17 @@ import { loadAndRunGroups } from "./endpoints/runner.js";
 const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
 const TEST_PORT_ST = TEST_PORT + 1000;
 const TEST_PORT_SO = TEST_PORT + 2000;
+const TEST_PORT_FC = TEST_PORT + 3000;
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_ADMIN_EMAIL = "admin@node";
 const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
+const TEST_FEDCAT_ONLY_DATASET_ID = "urn:uuid:test-fedcat-only-dataset-001";
 const OUTPUT_TMP_DIR = "./tests/.tmp/endpoints/";
 const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
 const OUTPUT_TMP_DIR_SO = "./tests/.tmp/endpoints-so/";
+const OUTPUT_TMP_DIR_FC = "./tests/.tmp/endpoints-fc/";
 
 const TEST_DATASPACE_APP_ID = "https://twin.example.org/test-app";
 const TEST_TRANSFER_CONSUMER_PID = "urn:uuid:consumer-pid-endpoint-001";
@@ -101,12 +104,118 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_FC, { recursive: true, force: true });
 	});
 
 	afterAll(async () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_FC, { recursive: true, force: true });
+	});
+
+	test("Can bootstrap a standalone federated catalogue node and exercise its endpoints", async () => {
+		Factory.clearFactories();
+
+		// Cannot spread from SHARED_ENV_VARS: that block enables TWIN_DATASPACE_ENABLED, RM, NFT,
+		// notarization, attestation, faucet, wallet, and other domain components that must be absent
+		// to prove a catalogue-only deployment. This literal is intentionally minimal.
+		const catalogueEnvVars: { [id: string]: string } = {
+			TWIN_DEBUG: "true",
+			TWIN_SILENT: "true",
+			TWIN_PORT: TEST_PORT_FC.toString(),
+			TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR_FC}db`,
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
+			TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
+			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
+			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
+			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
+			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
+			TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
+			TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
+			TWIN_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
+			TWIN_HEALTH_ENABLED: "true",
+			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
+			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
+			TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
+			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
+			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
+			TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS: "30000"
+		};
+
+		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant).
+		const bootstrapState: INodeEngineState = {};
+		await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, bootstrapState),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...catalogueEnvVars,
+					TWIN_FEATURES: "admin-user",
+					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
+					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
+					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_HEALTH_STARTUP_INTERVAL_SECONDS: "1"
+				}
+			},
+			["node", "index.js", "bootstrap-legacy"]
+		);
+
+		expect(bootstrapState.nodeId).toBeDefined();
+
+		Factory.clearFactories();
+
+		// Phase 2: Start the catalogue-only server.
+		const serverResult = await run({
+			localesDirectory: "./dist/locales/",
+			openApiSpecFile: path.resolve("./tests/spec.json"),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: bootstrapState.nodeId,
+				nodeOrganizationId: bootstrapState.nodeOrganizationId
+			}),
+			envVars: catalogueEnvVars
+		});
+
+		expect(serverResult).toBeDefined();
+		expect(serverResult?.engine).toBeDefined();
+
+		// In single-tenant mode the org DID is in bootstrapState.nodeOrganizationId.
+		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
+		expect(trustComponentType).toBeDefined();
+
+		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
+		const trustBearerToken = await trustComponent.generate(
+			bootstrapState.nodeOrganizationId ?? "",
+			undefined,
+			{ subject: {} }
+		);
+
+		const serverStartTime = Date.now();
+
+		// Phase 3: Exercise catalogue endpoints — no dataspace or RM groups.
+		try {
+			await loadAndRunGroups(path.resolve("tests/endpoints/federated-catalogue-only-index.json"), {
+				baseUrl: `http://localhost:${TEST_PORT_FC}`,
+				apiKeyQuery: "",
+				authToken: "",
+				isSingleTenant: true,
+				vars: {
+					trustAuthorization: `Bearer ${String(trustBearerToken)}`,
+					adminEmail: TEST_ADMIN_EMAIL,
+					adminPassword: TEST_ADMIN_PASSWORD,
+					fedCatDatasetId: TEST_FEDCAT_ONLY_DATASET_ID,
+					fakeId: "fake:nonexistent-resource-id",
+					baseUrl: `http://localhost:${TEST_PORT_FC}`
+				},
+				serverStartTime
+			});
+		} finally {
+			await serverResult?.shutdown();
+		}
 	});
 
 	test("Can bootstrap the node and exercise all connected endpoints", async () => {

@@ -1599,10 +1599,10 @@ async function configureDataspace(
 					dataPlanePath: envVars.dataspaceDataPlanePath,
 					autoStartTransfers: Coerce.boolean(envVars.dataspaceAutoStartTransfers),
 					stalledNegotiationTimeoutMs: !Is.empty(stalledNegotiationTimeout)
-						? stalledNegotiationTimeout * 60000
+						? stalledNegotiationTimeout * 1000
 						: undefined,
 					stalledTransferTimeoutMs: !Is.empty(stalledTransferTimeout)
-						? stalledTransferTimeout * 60000
+						? stalledTransferTimeout * 1000
 						: undefined
 				}
 			},

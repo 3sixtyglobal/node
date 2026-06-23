@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3-next.66](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.65...node-core-v0.0.3-next.66) (2026-06-23)
+
+
+### Features
+
+* add standalone federated catalogue example config and endpoint tests ([#235](https://github.com/iotaledger/twin-node/issues/235)) ([ffb51dd](https://github.com/iotaledger/twin-node/commit/ffb51ddda5188c2f21b8ce65343b39a28f4eee4b))
+
 ## [0.0.3-next.65](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.64...node-core-v0.0.3-next.65) (2026-06-23)
 
 
