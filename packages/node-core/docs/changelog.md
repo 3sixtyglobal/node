@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.3-next.67](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.66...node-core-v0.0.3-next.67) (2026-06-24)
+
+
+### Features
+
+* env var validation ([#243](https://github.com/iotaledger/twin-node/issues/243)) ([569945a](https://github.com/iotaledger/twin-node/commit/569945a751eb52d008a681777a3cba881af1b9a4))
+
+
+### Bug Fixes
+
+* stalled timeout now is provided in seconds ([#241](https://github.com/iotaledger/twin-node/issues/241)) ([ebd827d](https://github.com/iotaledger/twin-node/commit/ebd827d02a9a4f8ad4f4c84d064d02831ef015cb))
+
 ## [0.0.3-next.66](https://github.com/iotaledger/twin-node/compare/node-core-v0.0.3-next.65...node-core-v0.0.3-next.66) (2026-06-23)
 
 
