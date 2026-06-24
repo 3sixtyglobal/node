@@ -2,6 +2,7 @@
 
 ## Interfaces
 
+- [IBootstrapLegacyEnvironmentVariables](interfaces/IBootstrapLegacyEnvironmentVariables.md)
 - [ICacheMetadata](interfaces/ICacheMetadata.md)
 - [ICliArgs](interfaces/ICliArgs.md)
 - [ICliCommand](interfaces/ICliCommand.md)
@@ -18,6 +19,7 @@
 
 ## Type Aliases
 
+- [IEnvironmentVariables](type-aliases/IEnvironmentVariables.md)
 - [CliCommandParamType](type-aliases/CliCommandParamType.md)
 - [ModuleProtocol](type-aliases/ModuleProtocol.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)

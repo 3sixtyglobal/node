@@ -8,7 +8,7 @@ The type for the initialise method of an extension module.
 
 ### envVars
 
-[`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](IEnvironmentVariables.md)
 
 The environment variables for the node.
 

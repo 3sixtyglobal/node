@@ -14,7 +14,7 @@ The engine core.
 
 ### envVars
 
-[`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 The environment variables for the node.
 

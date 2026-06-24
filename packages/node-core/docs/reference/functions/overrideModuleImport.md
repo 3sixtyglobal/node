@@ -14,7 +14,7 @@ The execution directory for resolving local module paths.
 
 ### envVars?
 
-[`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 The environment variables containing extension configuration (optional, uses defaults if not provided).
 

@@ -8,7 +8,7 @@ Handles the configuration of the extensions.
 
 ### envVars
 
-[`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 The environment variables for the node.
 

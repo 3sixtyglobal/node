@@ -50,7 +50,7 @@ The method to execute for the command.
 
 ##### envVars
 
-[`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 ##### params
 

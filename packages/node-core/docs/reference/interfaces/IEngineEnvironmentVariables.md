@@ -2,10 +2,6 @@
 
 The engine core environment variables.
 
-## Extended by
-
-- [`IEngineServerEnvironmentVariables`](IEngineServerEnvironmentVariables.md)
-
 ## Properties
 
 ### debug? {#debug}
@@ -21,6 +17,35 @@ Start the engine in debug mode.
 > `optional` **silent?**: `string`
 
 Start the engine in silent mode.
+
+***
+
+### strictEnv? {#strictenv}
+
+> `optional` **strictEnv?**: `string`
+
+Controls how unrecognised TWIN_* environment variables are handled at startup.
+"error" (default): throws a startup error, allowing CI and production deployments
+to hard-fail on misconfigured or misspelled variable names.
+"warn": logs a warning and continues.
+"ignore": skips validation entirely.
+Any other value is rejected at startup.
+
+#### Default
+
+```ts
+"error"
+```
+
+***
+
+### envAllowList? {#envallowlist}
+
+> `optional` **envAllowList?**: `string`
+
+Comma-separated list of raw environment variable names to exempt from the unknown-key check.
+Use this to allowlist variables introduced by custom extensions that are not part of the
+core interface, e.g. TWIN_MY_EXTENSION_SECRET.
 
 ***
 
@@ -113,11 +138,11 @@ AWS Dynamo DB secret access key.
 
 ***
 
-### awsDynamodbConnectionTimeoutMs? {#awsdynamodbconnectiontimeoutms}
+### awsDynamodbConnectionTimeout? {#awsdynamodbconnectiontimeout}
 
-> `optional` **awsDynamodbConnectionTimeoutMs?**: `string`
+> `optional` **awsDynamodbConnectionTimeout?**: `string`
 
-AWS Dynamo DB connection timeout.
+AWS Dynamo DB connection timeout in milliseconds.
 
 ***
 
@@ -562,9 +587,9 @@ The batch size for the logging task, set to 1 for no batching.
 
 ***
 
-### loggingBatchFlushIntervalSeconds? {#loggingbatchflushintervalseconds}
+### loggingBatchFlushInterval? {#loggingbatchflushinterval}
 
-> `optional` **loggingBatchFlushIntervalSeconds?**: `string`
+> `optional` **loggingBatchFlushInterval?**: `string`
 
 The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
 
@@ -714,9 +739,9 @@ The port to use for the Open Telemetry Prometheus metrics server, only required 
 
 ***
 
-### telemetryMetricsCollectorIntervalSeconds? {#telemetrymetricscollectorintervalseconds}
+### telemetryMetricsCollectorInterval? {#telemetrymetricscollectorinterval}
 
-> `optional` **telemetryMetricsCollectorIntervalSeconds?**: `string`
+> `optional` **telemetryMetricsCollectorInterval?**: `string`
 
 Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
 
@@ -1011,11 +1036,11 @@ Defaults to trust-assertion.
 
 ***
 
-### trustJwtTtlSeconds? {#trustjwtttlseconds}
+### trustJwtTtl? {#trustjwtttl}
 
-> `optional` **trustJwtTtlSeconds?**: `string`
+> `optional` **trustJwtTtl?**: `string`
 
-The trust time to live for generating JWTs.
+The trust time to live for generating JWTs in seconds.
 Defaults to undefined for never expiring.
 
 ***
@@ -1119,12 +1144,12 @@ Is the dataspace enabled, defaults to false.
 
 > `optional` **dataspaceRetainActivityLogsFor?**: `string`
 
-The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
+The length of time to retain the activity logs for in seconds, set to -1 to keep forever.
 
 #### Default
 
 ```ts
-10
+600
 ```
 
 ***
@@ -1133,12 +1158,12 @@ The length of time to retain the activity logs for in minutes, set to -1 to keep
 
 > `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
 
-The interval in minutes for cleaning up the activity logs.
+The interval in seconds for cleaning up the activity logs.
 
 #### Default
 
 ```ts
-60
+3600
 ```
 
 ***
@@ -1173,7 +1198,7 @@ false
 
 > `optional` **dataspaceStalledNegotiationTimeout?**: `string`
 
-How long in minutes a negotiation may sit without progress before it is treated as timed out.
+How long in seconds a negotiation may sit without progress before it is treated as timed out.
 
 #### Default
 
@@ -1187,7 +1212,7 @@ How long in minutes a negotiation may sit without progress before it is treated 
 
 > `optional` **dataspaceStalledTransferTimeout?**: `string`
 
-How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+How long in seconds a consumer-initiated transfer may sit in REQUESTED without the provider
 progressing it before it is treated as timed out.
 
 #### Default
@@ -1206,6 +1231,12 @@ Path under which the dataspace control plane is mounted (path only, not full URL
 This must match the control-plane REST mount, as it is combined with the public
 origin to build the consumer's advertised callback address.
 
+#### Default
+
+```ts
+"dataspace-control-plane"
+```
+
 ***
 
 ### healthEnabled? {#healthenabled}
@@ -1216,17 +1247,17 @@ Are the health components enabled, defaults to false.
 
 ***
 
-### healthIntervalSeconds? {#healthintervalseconds}
+### healthInterval? {#healthinterval}
 
-> `optional` **healthIntervalSeconds?**: `string`
+> `optional` **healthInterval?**: `string`
 
 The interval in seconds for performing health checks, defaults to 60.
 
 ***
 
-### healthStartupIntervalSeconds? {#healthstartupintervalseconds}
+### healthStartupInterval? {#healthstartupinterval}
 
-> `optional` **healthStartupIntervalSeconds?**: `string`
+> `optional` **healthStartupInterval?**: `string`
 
 The interval in seconds for performing health checks at startup, defaults to 2.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
@@ -1250,65 +1281,65 @@ The default mutex timeout in milliseconds, used when no component-specific timeo
 
 ***
 
-### auditableItemGraphMutexTimeoutMs? {#auditableitemgraphmutextimeoutms}
+### auditableItemGraphMutexTimeout? {#auditableitemgraphmutextimeout}
 
-> `optional` **auditableItemGraphMutexTimeoutMs?**: `string`
+> `optional` **auditableItemGraphMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the auditable item graph component.
 
 ***
 
-### auditableItemStreamMutexTimeoutMs? {#auditableitemstreammutextimeoutms}
+### auditableItemStreamMutexTimeout? {#auditableitemstreammutextimeout}
 
-> `optional` **auditableItemStreamMutexTimeoutMs?**: `string`
+> `optional` **auditableItemStreamMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the auditable item stream component.
 
 ***
 
-### federatedCatalogueMutexTimeoutMs? {#federatedcataloguemutextimeoutms}
+### federatedCatalogueMutexTimeout? {#federatedcataloguemutextimeout}
 
-> `optional` **federatedCatalogueMutexTimeoutMs?**: `string`
+> `optional` **federatedCatalogueMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the federated catalogue component.
 
 ***
 
-### documentManagementMutexTimeoutMs? {#documentmanagementmutextimeoutms}
+### documentManagementMutexTimeout? {#documentmanagementmutextimeout}
 
-> `optional` **documentManagementMutexTimeoutMs?**: `string`
+> `optional` **documentManagementMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the document management component.
 
 ***
 
-### loggingMutexTimeoutMs? {#loggingmutextimeoutms}
+### loggingMutexTimeout? {#loggingmutextimeout}
 
-> `optional` **loggingMutexTimeoutMs?**: `string`
+> `optional` **loggingMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the logging component.
 
 ***
 
-### entityStorageMemoryMutexTimeoutMs? {#entitystoragememorymutextimeoutms}
+### entityStorageMemoryMutexTimeout? {#entitystoragememorymutextimeout}
 
-> `optional` **entityStorageMemoryMutexTimeoutMs?**: `string`
+> `optional` **entityStorageMemoryMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the memory entity storage connector.
 
 ***
 
-### entityStorageFileMutexTimeoutMs? {#entitystoragefilemutextimeoutms}
+### entityStorageFileMutexTimeout? {#entitystoragefilemutextimeout}
 
-> `optional` **entityStorageFileMutexTimeoutMs?**: `string`
+> `optional` **entityStorageFileMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the file entity storage connector.
 
 ***
 
-### rightsManagementMutexTimeoutMs? {#rightsmanagementmutextimeoutms}
+### rightsManagementMutexTimeout? {#rightsmanagementmutextimeout}
 
-> `optional` **rightsManagementMutexTimeoutMs?**: `string`
+> `optional` **rightsManagementMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the rights management component.
 

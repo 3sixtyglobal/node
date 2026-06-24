@@ -8,7 +8,7 @@ Handles the configuration of the server.
 
 ### envVars
 
-[`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`
+[`IBootstrapLegacyEnvironmentVariables`](../interfaces/IBootstrapLegacyEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`
 
 The environment variables for the engine server.
 

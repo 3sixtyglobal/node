@@ -20,7 +20,7 @@ The configuration for the engine server.
 
 ### envVars
 
-[`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
+[`IBootstrapLegacyEnvironmentVariables`](../interfaces/IBootstrapLegacyEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md)
 
 The environment variables.
 
