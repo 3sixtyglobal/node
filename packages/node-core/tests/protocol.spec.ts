@@ -55,11 +55,11 @@ describe("Protocol Parsing Utilities", () => {
 		});
 
 		test("should parse local relative path correctly", () => {
-			const result = parseModuleProtocol("./myExtension.js");
+			const result = parseModuleProtocol("./fixtures/myExtension.js");
 
 			expect(result.protocol).toEqual(ModuleProtocol.Local);
-			expect(result.identifier).toEqual("./myExtension.js");
-			expect(result.original).toEqual("./myExtension.js");
+			expect(result.identifier).toEqual("./fixtures/myExtension.js");
+			expect(result.original).toEqual("./fixtures/myExtension.js");
 		});
 
 		test("should parse local absolute path correctly", () => {
