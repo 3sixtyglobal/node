@@ -7,6 +7,7 @@ import { MemoryStateStorage } from "@twin.org/engine-core";
 import { EntityStorageConnectorType } from "@twin.org/engine-types";
 import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@twin.org/entity";
 import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
 @entity()
@@ -43,7 +44,8 @@ const TEST_API_KEY_B = "d0000000000000000000000000000002";
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-	TWIN_TENANT_ENABLED: "true"
+	TWIN_TENANT_ENABLED: "true",
+	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
 
 /**

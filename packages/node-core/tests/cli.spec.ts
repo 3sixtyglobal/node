@@ -15,6 +15,7 @@ import {
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
@@ -62,6 +63,7 @@ async function executeCliCommand(
 			stateStorage,
 			disableProcessExitOnFailure: runOptions?.disableProcessExitOnFailure,
 			envVars: {
+				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS,
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
 				TWIN_TENANT_ENABLED: "true",

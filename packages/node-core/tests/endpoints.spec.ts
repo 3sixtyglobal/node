@@ -29,9 +29,10 @@ import {
 	WalletConnectorType
 } from "@twin.org/engine-types";
 import type { ITrustComponent } from "@twin.org/trust-models";
+import { loadAndRunGroups } from "./endpoints/runner.js";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
-import { loadAndRunGroups } from "./endpoints/runner.js";
 
 const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
 const TEST_PORT_ST = TEST_PORT + 1000;
@@ -96,7 +97,8 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_RIGHTS_MANAGEMENT_POLICY_EXECUTION_ACTIONS: "logging",
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 	TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
-	TWIN_DATASPACE_DATA_PLANE_PATH: "dataspace/entities"
+	TWIN_DATASPACE_DATA_PLANE_PATH: "dataspace/entities",
+	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
 
 describe("node-core", () => {
@@ -143,7 +145,8 @@ describe("node-core", () => {
 			TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
 			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
-			TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT: "30000"
+			TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT: "30000",
+			TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 		};
 
 		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant).
@@ -172,7 +175,7 @@ describe("node-core", () => {
 		// Phase 2: Start the catalogue-only server.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("./tests/spec.json"),
+			openApiSpecFile: path.resolve("./tests/fixtures/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: bootstrapState.nodeId,
 				nodeOrganizationId: bootstrapState.nodeOrganizationId
@@ -249,7 +252,7 @@ describe("node-core", () => {
 		// Phase 2: Start the server using the bootstrapped identity/tenant state.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("./tests/spec.json"),
+			openApiSpecFile: path.resolve("./tests/fixtures/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: bootstrapState.nodeId
 			}),
@@ -370,7 +373,7 @@ describe("node-core", () => {
 		// Phase 2: Start the server using the bootstrapped identity/org state.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("./tests/spec.json"),
+			openApiSpecFile: path.resolve("./tests/fixtures/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: bootstrapState.nodeId,
 				nodeOrganizationId: bootstrapState.nodeOrganizationId
@@ -481,7 +484,7 @@ describe("node-core", () => {
 		// Phase 2: Start the server with the same-org auto-agreement flag enabled.
 		const serverResult = await run({
 			localesDirectory: "./dist/locales/",
-			openApiSpecFile: path.resolve("./tests/spec.json"),
+			openApiSpecFile: path.resolve("./tests/fixtures/spec.json"),
 			stateStorage: new MemoryStateStorage(false, {
 				nodeId: bootstrapState.nodeId,
 				nodeOrganizationId: bootstrapState.nodeOrganizationId

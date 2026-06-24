@@ -17,6 +17,7 @@ import {
 } from "@twin.org/identity-models";
 import type { ITrustComponent } from "@twin.org/trust-models";
 import { VaultConnectorFactory } from "@twin.org/vault-models";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
@@ -58,7 +59,8 @@ const BASE_ENV: { [id: string]: string } = {
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
-	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage
+	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
+	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
 
 // Trust vars shared by both nodes.
