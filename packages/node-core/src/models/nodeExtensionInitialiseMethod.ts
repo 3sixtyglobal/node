@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { IEnvironmentVariables } from "./IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./INodeEngineConfig.js";
-import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
 
 /**
  * The type for the initialise method of an extension module.
@@ -10,6 +10,6 @@ import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
  * @returns A promise that resolves when the extension configuration initialisation is complete.
  */
 export type NodeExtensionInitialiseMethod = (
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	nodeEngineConfig: INodeEngineConfig
 ) => Promise<void>;

@@ -27,7 +27,7 @@ import type { CliCommandParamType } from "./models/cliCommandParamType.js";
 import type { ICliArgs } from "./models/ICliArgs.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
 import type { ICliCommandDefinition } from "./models/ICliCommandDefinition.js";
-import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 
 const commandDefinitions: { [id: string]: ICliCommandDefinition } = {};
 
@@ -194,7 +194,7 @@ export function constructCliCommand(
  */
 export async function executeCommand(
 	engineCore: IEngineCore,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	cliCommand: ICliCommand
 ): Promise<void> {
 	const requiresEngineStarted = cliCommand.definition.requiresEngineStarted ?? true;

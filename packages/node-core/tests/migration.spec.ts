@@ -18,6 +18,7 @@ import {
 	SchemaMigrationFactory
 } from "@twin.org/entity-storage-models";
 import type { ILogEntry } from "@twin.org/logging-models";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
 @entity({ version: 0 })
@@ -50,7 +51,8 @@ const TEST_NODE_ORG_ID = "did:iota:0x456";
 
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
-	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
+	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
 
 describe("migration", () => {
@@ -196,7 +198,7 @@ describe("migration", () => {
 					TWIN_PORT: String(PORT_2),
 					TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 					TWIN_LOGGING_BATCH_SIZE: "1",
-					TWIN_LOGGING_BATCH_FLUSH_INTERVAL_SECONDS: "0"
+					TWIN_LOGGING_BATCH_FLUSH_INTERVAL: "0"
 				},
 				extendConfig: async (unusedEnvVars2, config) => {
 					// Override the engine's internal "engine-logging-service" so that migration

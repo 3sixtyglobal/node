@@ -9,7 +9,7 @@ Returns true when any component that depends on the authentication entity storag
 
 ### envVars
 
-[`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 The environment variables.
 

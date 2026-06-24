@@ -4,6 +4,8 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
+import { CLIDisplay } from "@twin.org/cli-core";
+import { I18n } from "@twin.org/core";
 import { buildConfiguration } from "../src/node.js";
 
 vi.mock("../src/builders/engineEnvBuilder.js", () => ({
@@ -142,12 +144,12 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			const { nodeEnvVars } = await buildConfiguration(
-				{ TWIN_MY_SECRET: "@text:secret.txt" },
+				{ TWIN_VAULT_PREFIX: "@text:secret.txt" },
 				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
 				SERVER_INFO
 			);
 
-			expect(nodeEnvVars.mySecret).toBe("my-secret-value");
+			expect(nodeEnvVars.vaultPrefix).toBe("my-secret-value");
 		});
 
 		test("@json: value is expanded to a parsed JSON object from the referenced file", async () => {
@@ -159,12 +161,15 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			const { nodeEnvVars } = await buildConfiguration(
-				{ TWIN_MY_CONFIG: "@json:config.json" },
+				{ TWIN_VAULT_PREFIX: "@json:config.json" },
 				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
 				SERVER_INFO
 			);
 
-			expect(nodeEnvVars.myConfig).toEqual({ key: "value", count: 42 });
+			expect((nodeEnvVars as { [key: string]: unknown }).vaultPrefix).toEqual({
+				key: "value",
+				count: 42
+			});
 		});
 
 		test("extendEnvVars callback can override values after loading", async () => {
@@ -199,6 +204,200 @@ describe("node", () => {
 
 			expect(nodeEnvVars.port).toBe("3000");
 			expect((nodeEnvVars as { [key: string]: unknown }).otherVar).toBeUndefined();
+		});
+
+		test("throws on an unrecognised TWIN_* variable in strict mode (default)", async () => {
+			const envFile = path.join(tempDir, ".env.strict-throw");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{ TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500" },
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).rejects.toMatchObject({
+				source: "node",
+				message: expect.stringContaining("unknownEnvVars"),
+				properties: { keys: expect.stringContaining("TWIN_HEALTH_CHECK_STARTUP_INTERVAL") }
+			});
+		});
+
+		test("warns but does not throw on an unrecognised TWIN_* variable when TWIN_STRICT_ENV=warn", async () => {
+			const envFile = path.join(tempDir, ".env.strict-warn");
+			await writeFile(envFile, "");
+			const warnSpy = vi.spyOn(CLIDisplay, "warning").mockImplementation(() => {});
+			const formatSpy = vi.spyOn(I18n, "formatMessage");
+
+			try {
+				await buildConfiguration(
+					{ TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500", TWIN_STRICT_ENV: "warn" },
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				);
+				expect(formatSpy).toHaveBeenCalledWith(
+					"warn.node.unknownEnvVars",
+					expect.objectContaining({
+						keys: expect.stringContaining("TWIN_HEALTH_CHECK_STARTUP_INTERVAL")
+					})
+				);
+				expect(warnSpy).toHaveBeenCalled();
+			} finally {
+				warnSpy.mockRestore();
+				formatSpy.mockRestore();
+			}
+		});
+
+		test("does not throw for a variable listed in TWIN_ENV_ALLOW_LIST", async () => {
+			const envFile = path.join(tempDir, ".env.allowlist");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{
+						TWIN_MY_EXTENSION_SECRET: "value",
+						TWIN_ENV_ALLOW_LIST: "TWIN_MY_EXTENSION_SECRET"
+					},
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).resolves.toBeDefined();
+		});
+
+		test("throws on an invalid TWIN_STRICT_ENV value", async () => {
+			const envFile = path.join(tempDir, ".env.strict-invalid");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{ TWIN_STRICT_ENV: "strict" },
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).rejects.toThrow();
+		});
+
+		test("does not flag variables that lack the TWIN_ prefix", async () => {
+			const envFile = path.join(tempDir, ".env.no-prefix");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{ TWIN_PORT: "3000", OTHER_TOOL_SETTING: "any-value" },
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).resolves.toBeDefined();
+		});
+
+		test("does not throw for TWIN_REST_PATH_* variables", async () => {
+			const envFile = path.join(tempDir, ".env.rest-path");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{
+						TWIN_REST_PATH_TENANT_ADMIN: "my-tenants",
+						TWIN_REST_PATH_IDENTITY: "id"
+					},
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).resolves.toBeDefined();
+		});
+
+		test("throws for a TWIN_REST_* variable that does not match the restPath prefix", async () => {
+			const envFile = path.join(tempDir, ".env.rest-route");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{ TWIN_REST_ROUTE_TENANT_ADMIN: "my-tenants" },
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).rejects.toMatchObject({
+				source: "node",
+				message: expect.stringContaining("unknownEnvVars"),
+				properties: { keys: expect.stringContaining("TWIN_REST_ROUTE_TENANT_ADMIN") }
+			});
+		});
+
+		test("wildcard in TWIN_ENV_ALLOW_LIST accepts any matching variable", async () => {
+			const envFile = path.join(tempDir, ".env.allowlist-wildcard");
+			await writeFile(envFile, "");
+
+			await expect(
+				buildConfiguration(
+					{
+						TWIN_MY_EXT_SECRET: "value",
+						TWIN_MY_EXT_API_KEY: "key",
+						TWIN_ENV_ALLOW_LIST: "TWIN_MY_EXT_*"
+					},
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+					SERVER_INFO
+				)
+			).resolves.toBeDefined();
+		});
+
+		describe("with a custom env prefix", () => {
+			const CUSTOM_PREFIX = "MYAPP_";
+
+			test("throws on an unrecognised variable in strict mode", async () => {
+				const envFile = path.join(tempDir, ".env.custom-strict-throw");
+				await writeFile(envFile, "");
+
+				await expect(
+					buildConfiguration(
+						{ MYAPP_UNKNOWN_SETTING: "value" },
+						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir },
+						SERVER_INFO
+					)
+				).rejects.toMatchObject({
+					source: "node",
+					message: expect.stringContaining("unknownEnvVars"),
+					properties: { keys: expect.stringContaining("MYAPP_UNKNOWN_SETTING") }
+				});
+			});
+
+			test("warns but does not throw when MYAPP_STRICT_ENV=warn", async () => {
+				const envFile = path.join(tempDir, ".env.custom-strict-warn");
+				await writeFile(envFile, "");
+				const warnSpy = vi.spyOn(CLIDisplay, "warning").mockImplementation(() => {});
+				const formatSpy = vi.spyOn(I18n, "formatMessage");
+
+				try {
+					await buildConfiguration(
+						{ MYAPP_UNKNOWN_SETTING: "value", MYAPP_STRICT_ENV: "warn" },
+						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir },
+						SERVER_INFO
+					);
+					expect(formatSpy).toHaveBeenCalledWith(
+						"warn.node.unknownEnvVars",
+						expect.objectContaining({ keys: expect.stringContaining("MYAPP_UNKNOWN_SETTING") })
+					);
+					expect(warnSpy).toHaveBeenCalled();
+				} finally {
+					warnSpy.mockRestore();
+					formatSpy.mockRestore();
+				}
+			});
+
+			test("does not throw for a variable listed in MYAPP_ENV_ALLOW_LIST", async () => {
+				const envFile = path.join(tempDir, ".env.custom-allowlist");
+				await writeFile(envFile, "");
+
+				await expect(
+					buildConfiguration(
+						{
+							MYAPP_MY_EXTENSION_SECRET: "value",
+							MYAPP_ENV_ALLOW_LIST: "MYAPP_MY_EXTENSION_SECRET"
+						},
+						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir },
+						SERVER_INFO
+					)
+				).resolves.toBeDefined();
+			});
 		});
 	});
 });

@@ -5,6 +5,7 @@ import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import { EntityStorageConnectorType } from "@twin.org/engine-types";
 import type { ITelemetryComponent } from "@twin.org/telemetry-models";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
 const BASE_PORT = 4500 + Math.floor(Math.random() * 400);
@@ -45,7 +46,8 @@ describe("System metrics E2E", () => {
 					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 					TWIN_TELEMETRY_CONNECTOR: "entity-storage",
 					// Large interval so only the startup tick fires during the test
-					TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS: "3600"
+					TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL: "3600",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 				}
 			},
 			["node", "index.js"]

@@ -3,7 +3,7 @@
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { CliCommandParamType } from "./cliCommandParamType.js";
 import type { ICliCommandDefinitionParam } from "./ICliCommandDefinitionParam.js";
-import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "./IEnvironmentVariables.js";
 
 /**
  * Static definition of a CLI command including its name, parameters, and execution action.
@@ -34,7 +34,7 @@ export interface ICliCommandDefinition {
 	 */
 	action: (
 		engineCore: IEngineCore,
-		envVars: INodeEnvironmentVariables,
+		envVars: IEnvironmentVariables,
 		params: { [id: string]: CliCommandParamType }
 	) => Promise<unknown>;
 

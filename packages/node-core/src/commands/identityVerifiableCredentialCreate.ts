@@ -8,9 +8,9 @@ import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityConnectorFactory } from "@twin.org/identity-models";
 import type { IDidVerifiableCredential } from "@twin.org/standards-w3c-did";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
 const COMMAND_NAME = "identity-verifiable-credential-create";
 
@@ -146,7 +146,7 @@ export function getCommandDefinitionIdentityVerifiableCredentialCreate(commandDe
  */
 export async function identityVerifiableCredentialCreate(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		verificationMethodId?: string;
 		identity?: string;

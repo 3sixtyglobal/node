@@ -16,6 +16,24 @@ export interface IEngineEnvironmentVariables {
 	silent?: string;
 
 	/**
+	 * Controls how unrecognised TWIN_* environment variables are handled at startup.
+	 * "error" (default): throws a startup error, allowing CI and production deployments
+	 * to hard-fail on misconfigured or misspelled variable names.
+	 * "warn": logs a warning and continues.
+	 * "ignore": skips validation entirely.
+	 * Any other value is rejected at startup.
+	 * @default "error"
+	 */
+	strictEnv?: string;
+
+	/**
+	 * Comma-separated list of raw environment variable names to exempt from the unknown-key check.
+	 * Use this to allowlist variables introduced by custom extensions that are not part of the
+	 * core interface, e.g. TWIN_MY_EXTENSION_SECRET.
+	 */
+	envAllowList?: string;
+
+	/**
 	 * The root directory for storing items like state file.
 	 */
 	storageFileRoot?: string;
@@ -72,9 +90,9 @@ export interface IEngineEnvironmentVariables {
 	awsDynamodbSecretAccessKey?: string;
 
 	/**
-	 * AWS Dynamo DB connection timeout.
+	 * AWS Dynamo DB connection timeout in milliseconds.
 	 */
-	awsDynamodbConnectionTimeoutMs?: string;
+	awsDynamodbConnectionTimeout?: string;
 
 	/**
 	 * Azure Cosmos DB key.
@@ -355,7 +373,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
 	 */
-	loggingBatchFlushIntervalSeconds?: string;
+	loggingBatchFlushInterval?: string;
 
 	/**
 	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
@@ -450,7 +468,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
 	 */
-	telemetryMetricsCollectorIntervalSeconds?: string;
+	telemetryMetricsCollectorInterval?: string;
 
 	/**
 	 * The type of telemetry metrics producers, can be a comma separated list: system, process.
@@ -634,10 +652,10 @@ export interface IEngineEnvironmentVariables {
 	trustVerificationMethodId?: string;
 
 	/**
-	 * The trust time to live for generating JWTs.
+	 * The trust time to live for generating JWTs in seconds.
 	 * Defaults to undefined for never expiring.
 	 */
-	trustJwtTtlSeconds?: string;
+	trustJwtTtl?: string;
 
 	/**
 	 * Is the rights management enabled, defaults to false.
@@ -707,14 +725,14 @@ export interface IEngineEnvironmentVariables {
 	dataspaceEnabled?: string;
 
 	/**
-	 * The length of time to retain the activity logs for in minutes, set to -1 to keep forever.
-	 * @default 10
+	 * The length of time to retain the activity logs for in seconds, set to -1 to keep forever.
+	 * @default 600
 	 */
 	dataspaceRetainActivityLogsFor?: string;
 
 	/**
-	 * The interval in minutes for cleaning up the activity logs.
-	 * @default 60
+	 * The interval in seconds for cleaning up the activity logs.
+	 * @default 3600
 	 */
 	dataspaceActivityLogsCleanupInterval?: string;
 
@@ -734,13 +752,13 @@ export interface IEngineEnvironmentVariables {
 	dataspaceAutoStartTransfers?: string;
 
 	/**
-	 * How long in minutes a negotiation may sit without progress before it is treated as timed out.
+	 * How long in seconds a negotiation may sit without progress before it is treated as timed out.
 	 * @default 30
 	 */
 	dataspaceStalledNegotiationTimeout?: string;
 
 	/**
-	 * How long in minutes a consumer-initiated transfer may sit in REQUESTED without the provider
+	 * How long in seconds a consumer-initiated transfer may sit in REQUESTED without the provider
 	 * progressing it before it is treated as timed out.
 	 * @default 30
 	 */
@@ -750,6 +768,7 @@ export interface IEngineEnvironmentVariables {
 	 * Path under which the dataspace control plane is mounted (path only, not full URL).
 	 * This must match the control-plane REST mount, as it is combined with the public
 	 * origin to build the consumer's advertised callback address.
+	 * @default "dataspace-control-plane"
 	 */
 	dataspaceCallbackPath?: string;
 
@@ -761,13 +780,13 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The interval in seconds for performing health checks, defaults to 60.
 	 */
-	healthIntervalSeconds?: string;
+	healthInterval?: string;
 
 	/**
 	 * The interval in seconds for performing health checks at startup, defaults to 2.
 	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
 	 */
-	healthStartupIntervalSeconds?: string;
+	healthStartupInterval?: string;
 
 	/**
 	 * The type of the automation action to create, comma separate for more than one connector.
@@ -783,42 +802,42 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The mutex timeout in milliseconds for the auditable item graph component.
 	 */
-	auditableItemGraphMutexTimeoutMs?: string;
+	auditableItemGraphMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the auditable item stream component.
 	 */
-	auditableItemStreamMutexTimeoutMs?: string;
+	auditableItemStreamMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the federated catalogue component.
 	 */
-	federatedCatalogueMutexTimeoutMs?: string;
+	federatedCatalogueMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the document management component.
 	 */
-	documentManagementMutexTimeoutMs?: string;
+	documentManagementMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the logging component.
 	 */
-	loggingMutexTimeoutMs?: string;
+	loggingMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the memory entity storage connector.
 	 */
-	entityStorageMemoryMutexTimeoutMs?: string;
+	entityStorageMemoryMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the file entity storage connector.
 	 */
-	entityStorageFileMutexTimeoutMs?: string;
+	entityStorageFileMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the rights management component.
 	 */
-	rightsManagementMutexTimeoutMs?: string;
+	rightsManagementMutexTimeout?: string;
 
 	/**
 	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.

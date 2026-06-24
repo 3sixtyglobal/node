@@ -18,7 +18,7 @@ import {
 } from "@twin.org/engine-server-types";
 import type { HttpMethod } from "@twin.org/web";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
-import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
 /**
  * Handles the configuration of the server.
@@ -31,7 +31,7 @@ import type { IEngineServerEnvironmentVariables } from "../models/IEngineServerE
  * @returns The config for the core and the server.
  */
 export async function buildEngineServerConfiguration(
-	envVars: IEngineServerEnvironmentVariables & { [id: string]: string | unknown },
+	envVars: IEnvironmentVariables & { [id: string]: string | unknown },
 	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[],
 	coreEngineConfig: IEngineCoreConfig,
 	serverInfo: IServerInfo,
@@ -270,6 +270,7 @@ export async function buildEngineServerConfiguration(
 	addDefaultSocketPaths(serverConfig);
 
 	// See if any of the rest paths should be overridden by environment variables and update the config accordingly
+	// Should be in the format TWIN_REST_PATH_<COMPONENT_TYPE> e.g. TWIN_REST_PATH_TENANT_ADMIN=my-tenants
 	for (const componentType in serverConfig.types) {
 		const types = serverConfig.types[componentType];
 
@@ -296,7 +297,7 @@ export async function buildEngineServerConfiguration(
  * @param envVars The environment variables.
  * @returns True if authentication entity storage is enabled.
  */
-export function isAuthEntityStorageRequired(envVars: IEngineServerEnvironmentVariables): boolean {
+export function isAuthEntityStorageRequired(envVars: IEnvironmentVariables): boolean {
 	return (
 		envVars.authAdminProcessorType === AuthenticationAdminComponentType.EntityStorage ||
 		envVars.authProcessorType === AuthenticationComponentType.EntityStorage

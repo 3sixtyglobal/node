@@ -6,7 +6,7 @@ import { ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
 const COMMAND_NAME = "remove-tenant-org-alias";
 
@@ -75,7 +75,7 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
  */
 export async function removeTenantOrgAlias(
 	engineCore: IEngineCore,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		tenantId?: string;
 		alias?: string;

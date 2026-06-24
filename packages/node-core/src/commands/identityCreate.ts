@@ -21,9 +21,9 @@ import { WalletConnectorFactory } from "@twin.org/wallet-models";
 import { nodeSetIdentity } from "./nodeSetIdentity.js";
 import { applyOrganizationIdToTenant } from "./setTenantOrgId.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
 const COMMAND_NAME = "identity-create";
 
@@ -168,7 +168,7 @@ export function getCommandDefinitionIdentityCreate(commandDefinitions: {
  */
 export async function identityCreate(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		mnemonic?: string;
 		identity?: string;

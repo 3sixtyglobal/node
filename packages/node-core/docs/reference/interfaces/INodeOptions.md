@@ -123,7 +123,7 @@ Method to extend the engine environment variables with any additional custom con
 
 ##### envVars
 
-[`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 #### Returns
 
@@ -141,7 +141,7 @@ Method to extend the engine configuration with any additional custom configurati
 
 ##### envVars
 
-[`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 ##### config
 

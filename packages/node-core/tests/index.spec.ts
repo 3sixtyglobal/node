@@ -1,6 +1,6 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { rm, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { AutomationActionFactory } from "@twin.org/automation-models";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { DataspaceAppFactory } from "@twin.org/dataspace-models";
@@ -36,6 +36,7 @@ import {
 	PolicyRequesterFactory
 } from "@twin.org/rights-management-models";
 import { TrustGeneratorFactory, TrustVerifierFactory } from "@twin.org/trust-models";
+import { CI_ENV_VARS } from "./setupTestEnv.js";
 import { getEnvDefaults } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
@@ -53,10 +54,16 @@ const basePort = Math.floor(Math.random() * 1000);
 let port = 13000 + basePort;
 
 describe("node-core", () => {
-	beforeEach(() => {
+	beforeEach(async () => {
 		port++;
 
 		Factory.clearFactories();
+
+		await mkdir("./tests/.tmp", { recursive: true });
+	});
+
+	afterEach(async () => {
+		await rm("./tests/.tmp", { recursive: true, force: true });
 	});
 
 	test("Can fail to run the node with no config as default is for file storage and this requires a storageFileRoot", async () => {
@@ -75,7 +82,8 @@ describe("node-core", () => {
 			envVars: {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
-				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
+				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
 		expect(result).toBeDefined();
@@ -118,7 +126,8 @@ describe("node-core", () => {
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-				TWIN_HEALTH_ENABLED: "true"
+				TWIN_HEALTH_ENABLED: "true",
+				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
 		expect(result).toBeDefined();
@@ -162,7 +171,6 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
-				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
@@ -176,7 +184,8 @@ describe("node-core", () => {
 				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-				TWIN_HEALTH_ENABLED: "true"
+				TWIN_HEALTH_ENABLED: "true",
+				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
 		expect(result).toBeDefined();
@@ -221,7 +230,6 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TASK_SCHEDULER_ENABLED: "true",
-				TWIN_BACKGROUND_TASKS_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
@@ -235,7 +243,8 @@ describe("node-core", () => {
 				TWIN_DATASPACE_ENABLED: "true",
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-				TWIN_HEALTH_ENABLED: "true"
+				TWIN_HEALTH_ENABLED: "true",
+				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
 		expect(result).toBeDefined();
@@ -270,7 +279,8 @@ describe("node-core", () => {
 				TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
-				TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS: "30000"
+				TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT: "30000",
+				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
 		expect(result).toBeDefined();
@@ -371,7 +381,6 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
-			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
@@ -386,7 +395,7 @@ describe("node-core", () => {
 			TWIN_MESSAGING_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true",
-			TWIN_EXTENSIONS: "./tests/apps/testApp.js"
+			TWIN_EXTENSIONS: "./tests/fixtures/testApp.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -709,7 +718,6 @@ describe("node-core", () => {
 			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 			TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 			TWIN_TASK_SCHEDULER_ENABLED: "true",
-			TWIN_BACKGROUND_TASKS_ENABLED: "true",
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_RIGHTS_MANAGEMENT_CALLBACK_PATH: "/rights-management",
@@ -873,7 +881,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = {
 			envPrefix: "TWIN_",
-			envFilenames: ["tests/.test-env"],
+			envFilenames: ["tests/fixtures/.test-env"],
 			stateStorage: memoryStateStorage
 		};
 
@@ -984,7 +992,8 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_TEST_EMBEDDED: "@text:tests/embedded.txt"
+			TWIN_TEST_EMBEDDED: "@text:tests/fixtures/embedded.txt",
+			TWIN_ENV_ALLOW_LIST: [CI_ENV_VARS, "TWIN_TEST_EMBEDDED"].filter(Boolean).join(",")
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1018,7 +1027,8 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_TEST_EMBEDDED: "@json:tests/embedded.json"
+			TWIN_TEST_EMBEDDED: "@json:tests/fixtures/embedded.json",
+			TWIN_ENV_ALLOW_LIST: [CI_ENV_VARS, "TWIN_TEST_EMBEDDED"].filter(Boolean).join(",")
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1055,7 +1065,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_EXTENSIONS: "./tests/extensions/myExtension.js"
+			TWIN_EXTENSIONS: "./tests/fixtures//myExtension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1146,7 +1156,7 @@ describe("node-core", () => {
 	test("should load multiple extensions in correct order", async () => {
 		// Write first extension
 		await writeFile(
-			"./tests/extensions/first-extension.js",
+			"./tests/.tmp/first-extension.js",
 			`
 				export async function extensionInitialise() {
 					global.extensionCallOrder = global.extensionCallOrder || [];
@@ -1169,7 +1179,7 @@ describe("node-core", () => {
 
 		// Write second extension
 		await writeFile(
-			"./tests/extensions/second-extension.js",
+			"./tests/.tmp/second-extension.js",
 			`
 				export async function extensionInitialise() {
 					global.extensionCallOrder = global.extensionCallOrder || [];
@@ -1195,8 +1205,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_EXTENSIONS:
-				"./tests/extensions/first-extension.js,./tests/extensions/second-extension.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/first-extension.js,./tests/.tmp/second-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1250,14 +1259,14 @@ describe("node-core", () => {
 		]);
 
 		// Cleanup
-		await rm("./tests/extensions/first-extension.js", { force: true });
-		await rm("./tests/extensions/second-extension.js", { force: true });
+		await rm("./tests/.tmp/first-extension.js", { force: true });
+		await rm("./tests/.tmp/second-extension.js", { force: true });
 	});
 
 	test("should execute all extension lifecycle hooks in correct sequence", async () => {
 		// Write extension that tracks all lifecycle hooks
 		await writeFile(
-			"./tests/extensions/lifecycle-test.js",
+			"./tests/.tmp/lifecycle-test.js",
 			`
 				export async function extensionInitialise(config) {
 					global.lifecycleOrder = global.lifecycleOrder || [];
@@ -1286,7 +1295,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_EXTENSIONS: "./tests/extensions/lifecycle-test.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/lifecycle-test.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1339,13 +1348,13 @@ describe("node-core", () => {
 		expect(server).toBeDefined();
 
 		// Cleanup
-		await rm("./tests/extensions/lifecycle-test.js", { force: true });
+		await rm("./tests/.tmp/lifecycle-test.js", { force: true });
 	});
 
 	test("should handle extension initialization failure gracefully", async () => {
 		// Write extension that throws error
 		await writeFile(
-			"./tests/extensions/failing-extension.js",
+			"./tests/.tmp/failing-extension.js",
 			`
 				export async function extensionInitialise() {
 					throw new Error("Extension initialization failed");
@@ -1358,7 +1367,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_EXTENSIONS: "./tests/extensions/failing-extension.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/failing-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1381,15 +1390,12 @@ describe("node-core", () => {
 			});
 			await start(nodeOptions, nodeEngineConfig, nodeEnvVars);
 		}).rejects.toThrow();
-
-		// Cleanup
-		await rm("./tests/extensions/failing-extension.js", { force: true });
 	});
 
 	test("should use custom cache directory when configured", async () => {
 		// Write test extension
 		await writeFile(
-			"./tests/extensions/cache-test.js",
+			"./tests/.tmp/cache-test.js",
 			`
 	export async function extensionInitialise() {
 		global.cacheTestCalled = true;
@@ -1397,13 +1403,13 @@ describe("node-core", () => {
 	`
 		);
 
-		const customCacheDir = "custom-cache";
+		const customCacheDir = "./tests/.tmp/custom-cache";
 		const envVars = {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_EXTENSIONS: "./tests/extensions/cache-test.js",
+			TWIN_EXTENSIONS: "./tests/.tmp/cache-test.js",
 			TWIN_EXTENSIONS_CACHE_DIRECTORY: customCacheDir
 		};
 
@@ -1452,8 +1458,5 @@ describe("node-core", () => {
 		);
 
 		await startResult?.shutdown();
-
-		// Cleanup
-		await rm("./tests/extensions/cache-test.js", { force: true });
 	});
 });

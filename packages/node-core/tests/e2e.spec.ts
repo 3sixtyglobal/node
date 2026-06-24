@@ -247,7 +247,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should use custom cache directory when configured", async () => {
-		const customCacheDir = "customTestCache";
+		const customCacheDir = ".tmp/custom-test-cache";
 		const packageName = "is-number@7.0.0";
 
 		try {
@@ -267,7 +267,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 			expect(result.resolvedPath).toBeDefined();
 
 			// 4. Verify it was downloaded to the custom cache directory
-			expect(result.resolvedPath).toContain(customCacheDir);
+			expect(result.resolvedPath).toContain(path.normalize(customCacheDir));
 			expect(result.resolvedPath).toContain("extensions");
 			expect(result.resolvedPath).toContain("npm");
 			expect(result.resolvedPath).toContain("node_modules");
@@ -303,7 +303,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should use custom cache directory for HTTPS downloads", async () => {
-		const customCacheDir = "customHttpsCache";
+		const customCacheDir = ".tmp/custom-https-cache";
 		const testUrl = "https://unpkg.com/is-number@7.0.0/index.js";
 		const maxSizeMb = 10;
 
@@ -329,7 +329,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 			expect(result.resolvedPath).toBeDefined();
 
 			// 4. Verify it was downloaded to the custom cache directory
-			expect(result.resolvedPath).toContain(customCacheDir);
+			expect(result.resolvedPath).toContain(path.normalize(customCacheDir));
 			expect(result.resolvedPath).toContain("extensions");
 			expect(result.resolvedPath).toContain("https");
 

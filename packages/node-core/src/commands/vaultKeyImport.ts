@@ -7,9 +7,9 @@ import type { IEngineCore } from "@twin.org/engine-models";
 import { Did } from "@twin.org/identity-models";
 import { VaultConnectorFactory, VaultKeyType } from "@twin.org/vault-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
 const COMMAND_NAME = "vault-key-import";
 
@@ -96,7 +96,7 @@ export function getCommandDefinitionVaultKeyImport(commandDefinitions: {
  */
 export async function vaultKeyImport(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		identity?: string;
 		keyType?: string;

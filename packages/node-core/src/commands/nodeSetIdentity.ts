@@ -5,9 +5,9 @@ import { I18n, Is, NotFoundError } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityResolverConnectorFactory } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
 const COMMAND_NAME = "node-set-identity";
 
@@ -65,7 +65,7 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
  */
 export async function nodeSetIdentity(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		identity?: string;
 	}

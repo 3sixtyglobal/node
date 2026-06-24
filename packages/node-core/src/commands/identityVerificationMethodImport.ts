@@ -13,9 +13,9 @@ import {
 import { DidVerificationMethodType } from "@twin.org/standards-w3c-did";
 import { VaultConnectorFactory, VaultKeyType } from "@twin.org/vault-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
 const COMMAND_NAME = "identity-verification-method-import";
 
@@ -114,7 +114,7 @@ export function getCommandDefinitionIdentityVerificationMethodImport(commandDefi
  */
 export async function identityVerificationMethodImport(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		identity?: string;
 		verificationMethodType?: DidVerificationMethodType;

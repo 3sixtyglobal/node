@@ -7,7 +7,7 @@ import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
 const COMMAND_NAME = "tenant-create";
 
@@ -127,7 +127,7 @@ export function getCommandDefinitionTenantCreate(commandDefinitions: {
  */
 export async function tenantCreate(
 	engineCore: IEngineCore,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		apiKey?: string;
 		tenantId?: string;

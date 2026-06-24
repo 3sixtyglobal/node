@@ -8,7 +8,7 @@ Handles the initialisation of the extensions when the engine server has been con
 
 ### envVars
 
-[`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 The environment variables for the node.
 
