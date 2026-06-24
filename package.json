@@ -63,7 +63,7 @@
 	},
 	"homepage": "https://twindev.org",
 	"dependencies": {
-		"@twin.org/dataspace-test-app": "^0.0.3-next.16",
+		"@twin.org/dataspace-test-app": "next",
 		"@twin.org/entity-storage-models": "next",
 		"@twin.org/entity-storage-service": "next",
 		"@twin.org/verifiable-storage-connector-entity-storage": "next"
