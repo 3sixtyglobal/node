@@ -119,6 +119,28 @@ ok()        { echo -e "${GREEN}  [OK] $1${NC}"; }
 fail()      { echo -e "${RED}  [FAIL] $1${NC}"; exit 1; }
 soft_fail() { echo -e "${RED}  [FAIL] $1${NC}"; }
 warn()      { echo -e "${YELLOW}  [WARN] $1${NC}"; }
+
+# --- Contract-shape helpers (hardening item F) ------------------------------
+# Assert the SHAPE of platform responses, not just HTTP status, so a silent
+# contract drift (tenant claim in a token, a composite identifier) fails the run.
+# JWT payload (base64url) -> JSON via jq @base64d (portable; no `base64` binary).
+jwt_claims() { jq -R 'split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson' <<<"$1" 2>/dev/null; }
+# A bare org DID is exactly did:iota:<network>:0x<hex> — rejects the pre-#203
+# composite nodeDid:hash(tenantId) and any "#fragment".
+is_bare_org_did() { printf '%s' "$1" | grep -qE '^did:iota:[a-z]+:0x[0-9a-f]+$'; }
+# Trust tokens must be IDENTITY-ONLY (post-#203 routing is via ?organization=,
+# never JWT claims): iss == this node's bare org DID, and no tenant/org claim.
+assert_trust_identity_only() {
+    local label="$1" jwt="$2" expected_did="$3" claims iss bad
+    claims=$(jwt_claims "${jwt}")
+    [ -n "${claims}" ] || fail "[${label}] trust JWT payload could not be decoded"
+    iss=$(echo "${claims}" | jq -r '.iss // empty')
+    is_bare_org_did "${iss}" || { echo "    iss=${iss}"; fail "[${label}] trust JWT iss is not a bare org DID"; }
+    [ "${iss}" = "${expected_did}" ] || { echo "    iss=${iss} expected=${expected_did}"; fail "[${label}] trust JWT iss is not this node's org DID"; }
+    bad=$(echo "${claims}" | jq -r '[paths(scalars) | last | strings | ascii_downcase] | map(select(. == "tid" or . == "tenantid" or . == "tenant" or . == "organization" or . == "org")) | unique | join(", ")')
+    [ -z "${bad}" ] || { echo "    claims=${claims}"; fail "[${label}] trust JWT carries tenant/org routing claim(s): ${bad}"; }
+    ok "[${label}] trust JWT is identity-only (iss=org DID, no tenant/org claims)"
+}
 show_json() { echo "$1" | jq '.' 2>/dev/null || echo "$1"; }
 
 # ---------------------------------------------------------------------------
@@ -395,6 +417,22 @@ negotiate_contract() {
         if [ -n "${agreement_id}" ]; then
             RESULT_AGREEMENT_ID="${agreement_id}"
             ok "Agreement ID: ${agreement_id}"
+
+            # Contract-shape (F): the finalized agreement's assigner/assignee must
+            # be BARE org DIDs (assigner = provider, assignee = consumer), not the
+            # pre-#203 composite nodeDid:hash(tenantId).
+            local ag_assigner ag_assignee
+            ag_assigner=$(echo "${pnap_body2}" | jq -r '.agreement.assigner // empty' 2>/dev/null)
+            ag_assignee=$(echo "${pnap_body2}" | jq -r '.agreement.assignee // empty' 2>/dev/null)
+            if [ -n "${ag_assigner}" ] && [ -n "${ag_assignee}" ]; then
+                is_bare_org_did "${ag_assigner}" || { echo "    assigner=${ag_assigner}"; fail "Agreement assigner is not a bare org DID"; }
+                is_bare_org_did "${ag_assignee}" || { echo "    assignee=${ag_assignee}"; fail "Agreement assignee is not a bare org DID"; }
+                [ "${ag_assigner}" = "${provider_did}" ] || { echo "    assigner=${ag_assigner} expected=${provider_did}"; fail "Agreement assigner != provider org DID"; }
+                [ "${ag_assignee}" = "${consumer_did}" ] || { echo "    assignee=${ag_assignee} expected=${consumer_did}"; fail "Agreement assignee != consumer org DID"; }
+                ok "Agreement assigner=provider + assignee=consumer, both bare org DIDs"
+            else
+                warn "Agreement carried no assigner/assignee to shape-check"
+            fi
         else
             local fallback_offer_id
             fallback_offer_id=$(echo "${offer_json}" | jq -r '.uid // empty' 2>/dev/null)
@@ -695,6 +733,13 @@ SUFFOLK_TRUST="${RESULT_TRUST_TOKEN}"; ok "Suffolk trust token (${#SUFFOLK_TRUST
 
 generate_trust "${MCP_HOST}" "${MCP_DID}" "${MCP_TOKEN}"
 MCP_TRUST="${RESULT_TRUST_TOKEN}"; ok "MCP trust token (${#MCP_TRUST} chars)"
+
+# Contract-shape (F): every node's trust token must be identity-only (iss = the
+# node's bare org DID, no tenant/org routing claim).
+assert_trust_identity_only "Mobius"  "${MOBIUS_TRUST}"  "${MOBIUS_DID}"
+assert_trust_identity_only "Ashford" "${ASHFORD_TRUST}" "${ASHFORD_DID}"
+assert_trust_identity_only "Suffolk" "${SUFFOLK_TRUST}" "${SUFFOLK_DID}"
+assert_trust_identity_only "MCP"     "${MCP_TRUST}"     "${MCP_DID}"
 
 PHASE_RESULTS+=("${GREEN}[1]${NC} Authentication (4 nodes)")
 

@@ -50,6 +50,36 @@ phase() {
     echo ""
 }
 
+# --- Contract-shape helpers (hardening item F) ------------------------------
+# These assert the SHAPE of what the platform returns, not just HTTP status, so
+# a silent contract drift in a refactor (tenant claim leaking into a token, a
+# composite identifier coming back, a missing publisher) fails the run.
+
+# JWT payload (base64url) -> JSON. jq @base64d keeps this portable (no `base64`
+# binary, whose flags differ across macOS/Linux). Inspects token CLAIMS.
+jwt_claims() { jq -R 'split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson' <<<"$1" 2>/dev/null; }
+
+# A bare org DID is exactly did:iota:<network>:0x<hex> — no extra ":segment" or
+# "#fragment". The pre-#203 composite (nodeDid:hash(tenantId)) would NOT match,
+# so this rejects a regression to tenant-scoped identifiers.
+is_bare_org_did() { printf '%s' "$1" | grep -qE '^did:iota:[a-z]+:0x[0-9a-f]+$'; }
+
+# Trust tokens must be IDENTITY-ONLY: post-#203 tenant routing is via
+# ?organization=, never JWT claims. Assert iss == this tenant's bare org DID and
+# that NO tenant/org routing claim (tid/tenantId/tenant/organization/org) appears
+# anywhere in the payload.
+assert_trust_identity_only() {
+    local label="$1" jwt="$2" expected_did="$3" claims iss bad
+    claims=$(jwt_claims "${jwt}")
+    [ -n "${claims}" ] || fail "[${label}] trust JWT payload could not be decoded"
+    iss=$(echo "${claims}" | jq -r '.iss // empty')
+    is_bare_org_did "${iss}" || { info "iss=${iss}"; fail "[${label}] trust JWT iss is not a bare org DID"; }
+    [ "${iss}" = "${expected_did}" ] || { info "iss=${iss} expected=${expected_did}"; fail "[${label}] trust JWT iss is not this tenant's org DID"; }
+    bad=$(echo "${claims}" | jq -r '[paths(scalars) | last | strings | ascii_downcase] | map(select(. == "tid" or . == "tenantid" or . == "tenant" or . == "organization" or . == "org")) | unique | join(", ")')
+    [ -z "${bad}" ] || { info "claims: ${claims}"; fail "[${label}] trust JWT carries tenant/org routing claim(s): ${bad}"; }
+    ok "[${label}] trust JWT is identity-only (iss=org DID, no tenant/org claims)"
+}
+
 [ -s .node-password ]     || fail "Missing .node-password — run ./setup.sh first"
 [ -s .tenants ]           || fail "Missing .tenants — run ./setup.sh first"
 [ -s .tenant-users ]      || fail "Missing .tenant-users — run ./setup.sh first"
@@ -122,6 +152,12 @@ urlenc()   { jq -rn --arg v "$1" '$v|@uri'; }
 urldecode() { local d="${1//+/ }"; printf '%b' "${d//\%/\\x}"; }
 TRADER_ORG_ENC=$(urlenc "${TRADER_DID}")
 
+# Contract-shape (F): the trust tokens minted in provision-storage.sh must be
+# identity-only — a tenant/org claim leaking back into the JWT would be a routing
+# regression (post-#203 routing is the ?organization= param, not the token).
+assert_trust_identity_only "Trader" "${TRADER_TRUST_JWT}" "${TRADER_DID}"
+assert_trust_identity_only "KRA"    "${KRA_TRUST_JWT}"    "${KRA_DID}"
+
 # ============================================================================
 phase 1 "Trader discovers all four publisher datasets in the shared catalogue"
 # ============================================================================
@@ -159,27 +195,26 @@ ok "Trader discovered all ${#PUBS[@]} publisher datasets in the shared [Node] ca
 phase 2 "The four datasets carry four DISTINCT publisher attributions"
 # ============================================================================
 # Post-#203 the composite identifier (nodeDid:hash(tenantId)) is gone — each
-# dataset's publisher attribution is its org DID. Four publishers ⇒ four
-# distinct values. bash 3.2 has no associative arrays, so collect the values
-# and count uniques via sort -u. (Soft assertion: warn-only, since the
-# dcterms:publisher field shape post-refactor is verified empirically here.)
+# dataset's publisher attribution is its BARE org DID. (Hardening F: assert the
+# SHAPE, not just the count — every dcterms:publisher must be present, a bare org
+# DID, and equal to that authority's org DID; and the four must be distinct. A
+# regression to a composite/node-scoped identifier fails here instead of warning.)
 publisher_list=""
 for pub in "${PUBS[@]}"; do
     ds_var="${pub}_DATASET_ID"; dataset_id="${!ds_var}"
+    did_var="${pub}_DID"; expected_did="${!did_var}"
     publisher=$(echo "${catalog_resp}" | jq -r --arg id "${dataset_id}" \
         '(.dataset[]?, .catalog[]?.dataset[]?) | select(.["@id"] == $id) | (.["dct:publisher"] // .["dcterms:publisher"]) // empty' | head -1)
-    if [ -n "${publisher}" ]; then
-        info "[${pub}] publisher = ${publisher}"
-        publisher_list="${publisher_list}${publisher}
+    [ -n "${publisher}" ] || { info "entry: $(echo "${catalog_resp}" | jq -c --arg id "${dataset_id}" '(.dataset[]?, .catalog[]?.dataset[]?)|select(.["@id"]==$id)')"; fail "[${pub}] dataset has no dct:/dcterms:publisher"; }
+    is_bare_org_did "${publisher}" || { info "publisher=${publisher}"; fail "[${pub}] publisher attribution is not a bare org DID"; }
+    [ "${publisher}" = "${expected_did}" ] || { info "publisher=${publisher} expected=${expected_did}"; fail "[${pub}] publisher attribution != authority org DID"; }
+    info "[${pub}] publisher = ${publisher}"
+    publisher_list="${publisher_list}${publisher}
 "
-    fi
 done
 distinct_count=$(printf '%s' "${publisher_list}" | sed '/^$/d' | sort -u | wc -l | tr -d ' ')
-if [ "${distinct_count}" -eq "${#PUBS[@]}" ]; then
-    ok "${distinct_count} distinct publisher attributions — one per authority"
-else
-    warn "Expected ${#PUBS[@]} distinct publishers, saw ${distinct_count} (publisher attribution may be node-scoped in this build)"
-fi
+[ "${distinct_count}" -eq "${#PUBS[@]}" ] || fail "Expected ${#PUBS[@]} distinct publisher org DIDs, saw ${distinct_count}"
+ok "${distinct_count} distinct publisher attributions — each a bare org DID matching its authority"
 
 # ============================================================================
 phase 3 "Per authority: negotiate → FINALIZED → transfer → pull its slice"
@@ -269,6 +304,20 @@ negotiate_and_pull() {
     ok "[${pub}] negotiation ${final_state} (agreement ${agreement_id})"
     # Save the agreement id globally for the push phases below.
     printf -v "AGREEMENT_${pub}" '%s' "${agreement_id}"
+
+    # Contract-shape (F): the finalized agreement's assigner/assignee must be
+    # BARE org DIDs (assigner = this authority, assignee = Trader) — not the
+    # pre-#203 composite nodeDid:hash(tenantId).
+    local ag_assigner ag_assignee
+    ag_assigner=$(echo "${nego_admin_resp}" | jq -r '.agreement.assigner // empty')
+    ag_assignee=$(echo "${nego_admin_resp}" | jq -r '.agreement.assignee // empty')
+    { [ -n "${ag_assigner}" ] && [ -n "${ag_assignee}" ]; } \
+        || { info "agreement: $(echo "${nego_admin_resp}" | jq -c '.agreement')"; fail "[${pub}] agreement missing assigner/assignee"; }
+    is_bare_org_did "${ag_assigner}" || { info "assigner=${ag_assigner}"; fail "[${pub}] agreement assigner is not a bare org DID"; }
+    is_bare_org_did "${ag_assignee}" || { info "assignee=${ag_assignee}"; fail "[${pub}] agreement assignee is not a bare org DID"; }
+    [ "${ag_assigner}" = "${pub_did}" ]   || { info "assigner=${ag_assigner} expected=${pub_did}"; fail "[${pub}] agreement assigner != authority org DID"; }
+    [ "${ag_assignee}" = "${TRADER_DID}" ] || { info "assignee=${ag_assignee} expected=${TRADER_DID}"; fail "[${pub}] agreement assignee != Trader org DID"; }
+    ok "[${pub}] agreement assigner=authority + assignee=Trader, both bare org DIDs"
     if [ "${pub}" = "KRA" ]; then
         local ag_action
         ag_action=$(echo "${nego_admin_resp}" | jq -r '.agreement.permission[0].action // .agreement.action // "read"')
