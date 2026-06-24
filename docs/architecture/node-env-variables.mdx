@@ -155,7 +155,30 @@ These variables are only read when running the `bootstrap-legacy` CLI command. T
 | `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`          | Includes full base64 payloads in route logging. |
 | `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None             | Properties to obfuscate in route logs.          |
 
-REST component paths can also be overridden with `TWIN_REST_PATH_<COMPONENT>`, where `<COMPONENT>` is the upper snake case name of the component without the `Component` suffix. Current examples include `TWIN_REST_PATH_LOGGING`, `TWIN_REST_PATH_DATASPACE_CONTROL_PLANE`, and `TWIN_REST_PATH_DATASPACE_DATA_PLANE`.
+### REST Path Overrides
+
+The URL path for any REST component can be overridden at startup using variables in the form:
+
+```
+TWIN_REST_PATH_<COMPONENT>=<path>
+```
+
+`<COMPONENT>` is the UPPER_SNAKE_CASE component type name with the `Component` suffix removed.
+
+| Variable                                 | Example Value | Notes                                       |
+| ---------------------------------------- | ------------- | ------------------------------------------- |
+| `TWIN_REST_PATH_LOGGING`                 | `/my-logs`    | Overrides the logging component REST path.  |
+| `TWIN_REST_PATH_DATASPACE_CONTROL_PLANE` | `/dsp-ctrl`   | Overrides the dataspace control plane path. |
+| `TWIN_REST_PATH_DATASPACE_DATA_PLANE`    | `/dsp-data`   | Overrides the dataspace data plane path.    |
+| `TWIN_REST_PATH_TENANT_ADMIN`            | `/my-tenants` | Overrides the tenant admin component path.  |
+
+The pattern extends to any component that has a default REST path configured. The variable name is derived by taking the component type identifier, removing the `Component` suffix, converting to UPPER*SNAKE_CASE, and prepending `TWIN_REST_PATH*`.
+
+Because the set of components is open-ended, these variables are validated as a prefix group. To allow custom `TWIN_REST_PATH_*` variables when using `TWIN_ENV_ALLOW_LIST`, include the wildcard entry:
+
+```
+TWIN_ENV_ALLOW_LIST=restPath*
+```
 
 ## Mutex Timeout Variables
 
