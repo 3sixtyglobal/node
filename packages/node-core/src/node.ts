@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { Coerce, EnvHelper, GeneralError, Is } from "@twin.org/core";
+import { Coerce, EnvHelper, GeneralError, Guards, I18n, Is, StringHelper } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
@@ -15,11 +15,15 @@ import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilde
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
+import { BOOTSTRAP_LEGACY_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapLegacyEnvironmentVariableKeys.js";
+import { ENGINE_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineEnvironmentVariableKeys.js";
+import { ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineServerEnvironmentVariableKeys.js";
+import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
 import { ModuleProtocol } from "./models/moduleProtocol.js";
+import { NODE_ENVIRONMENT_VARIABLE_KEYS } from "./models/nodeEnvironmentVariableKeys.js";
 import { start } from "./start.js";
 import {
 	createModuleImportUrl,
@@ -204,6 +208,77 @@ export async function run(
 }
 
 /**
+ * Test whether a camelCase key matches an entry in a pattern set.
+ * Entries ending with "*" are treated as prefix patterns; all others require an exact match.
+ * @param camelKey The camelCase key to test.
+ * @param patternSet The set of exact keys and/or wildcard patterns (e.g. "restPath*").
+ * @returns True if the key matches any entry.
+ */
+function matchesPatternSet(
+	camelKey: string,
+	patternSet: ReadonlySet<string> | Set<string>
+): boolean {
+	if (patternSet.has(camelKey)) {
+		return true;
+	}
+	for (const pattern of patternSet) {
+		if (pattern.endsWith("*") && camelKey.startsWith(pattern.slice(0, -1))) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Validate that every key in envVars maps to a recognised property.
+ * All unknown keys are collected, then reported together as a single error or warning.
+ * Raw env var names listed in the allow list (e.g. TWIN_MY_EXTENSION_SECRET, TWIN_REST_PATH_*) are always accepted.
+ * Wildcard patterns ending with * are supported in both allow sets and the allow list.
+ * @param envVars The already-converted camelCase env variables.
+ * @param prefix The prefix used for the environment variables (e.g. "TWIN_").
+ * @param allowSets An array of sets of allowed keys and/or wildcard patterns.
+ * @throws GeneralError If any unknown env var properties are found and strict mode is "error", or if the strict mode value is invalid.
+ */
+function validateEnvVarKeys(
+	envVars: { [id: string]: string | unknown },
+	prefix: string,
+	allowSets: ReadonlySet<string>[]
+): void {
+	const mode = Is.stringValue(envVars.strictEnv) ? envVars.strictEnv : "error";
+	Guards.arrayOneOf("node", `${prefix}STRICT_ENV`, mode, ["error", "warn", "ignore"]);
+
+	if (mode === "ignore") {
+		return;
+	}
+
+	const customSet = new Set(
+		Is.stringValue(envVars.envAllowList)
+			? envVars.envAllowList
+					.split(",")
+					.map(k => envVarKeyToJsonKey(k.trim(), prefix))
+					.filter(Boolean)
+			: []
+	);
+
+	const unknown = Object.keys(envVars)
+		.filter(
+			camelKey =>
+				!allowSets.some(set => matchesPatternSet(camelKey, set)) &&
+				!matchesPatternSet(camelKey, customSet)
+		)
+		.map(camelKey => jsonKeyToEnvVarKey(camelKey, prefix));
+
+	if (unknown.length > 0) {
+		if (mode === "error") {
+			throw new GeneralError("node", "unknownEnvVars", { keys: unknown.join(", "), prefix });
+		}
+		CLIDisplay.warning(
+			I18n.formatMessage("warn.node.unknownEnvVars", { keys: unknown.join(", "), prefix })
+		);
+	}
+}
+
+/**
  * Build the configuration for the TWIN Node.
  * @param processEnv The environment variables from the process.
  * @param options The options for running the server.
@@ -218,7 +293,7 @@ export async function buildConfiguration(
 	options: INodeOptions,
 	serverInfo: IServerInfo
 ): Promise<{
-	nodeEnvVars: INodeEnvironmentVariables & { [id: string]: string | unknown };
+	nodeEnvVars: IEnvironmentVariables & { [id: string]: string | unknown };
 	nodeEngineConfig: INodeEngineConfig;
 	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[];
 }> {
@@ -258,6 +333,13 @@ export async function buildConfiguration(
 		processEnv,
 		options.envPrefix ?? ""
 	);
+
+	validateEnvVarKeys(envVars, options.envPrefix ?? "", [
+		ENGINE_ENVIRONMENT_VARIABLE_KEYS,
+		ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS,
+		NODE_ENVIRONMENT_VARIABLE_KEYS,
+		BOOTSTRAP_LEGACY_ENVIRONMENT_VARIABLE_KEYS
+	]);
 
 	// Expand any environment variables that use the @file: syntax
 	const keys = Object.keys(envVars);
@@ -329,7 +411,7 @@ export async function buildConfiguration(
  */
 export function overrideModuleImport(
 	executionDirectory: string,
-	envVars?: INodeEnvironmentVariables
+	envVars?: IEnvironmentVariables
 ): void {
 	const maxSizeMb = Coerce.number(envVars?.extensionsMaxSizeMb) ?? 10;
 	const cacheDirectory = envVars?.extensionsCacheDirectory;
@@ -447,4 +529,37 @@ export function overrideModuleImport(
 function getNpmRootPath(): string {
 	npmRootCache ??= execSync("npm root").toString().trim().replace(/\\/g, "/");
 	return npmRootCache;
+}
+
+/**
+ * Convert an environment variable key to a JSON key.
+ * A trailing _* or * is preserved as a wildcard suffix (e.g. TWIN_REST_PATH_* → "restPath*").
+ * @param envVarKey The environment variable key.
+ * @param prefix The prefix of the environment variable key, if not provided gets all.
+ * @returns The JSON key.
+ */
+function envVarKeyToJsonKey(envVarKey: string, prefix?: string): string {
+	const isWildcard = envVarKey.endsWith("*");
+	if (isWildcard) {
+		envVarKey = envVarKey.replace(/_?\*$/, "");
+	}
+	if (Is.stringValue(prefix) && envVarKey.startsWith(prefix)) {
+		envVarKey = envVarKey.replace(prefix, "");
+	}
+	const camelKey = StringHelper.camelCase(envVarKey.toLowerCase());
+	return isWildcard ? `${camelKey}*` : camelKey;
+}
+
+/**
+ * Convert a JSON key to an environment variable key.
+ * @param jsonKey The JSON key.
+ * @param prefix The prefix of the environment variable key, if not provided gets all.
+ * @returns The environment variable key.
+ */
+function jsonKeyToEnvVarKey(jsonKey: string, prefix?: string): string {
+	const envVarKey = StringHelper.snakeCase(jsonKey).toUpperCase();
+	if (Is.stringValue(prefix)) {
+		return `${prefix}${envVarKey}`;
+	}
+	return envVarKey;
 }

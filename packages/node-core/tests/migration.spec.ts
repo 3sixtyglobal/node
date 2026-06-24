@@ -196,7 +196,7 @@ describe("migration", () => {
 					TWIN_PORT: String(PORT_2),
 					TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 					TWIN_LOGGING_BATCH_SIZE: "1",
-					TWIN_LOGGING_BATCH_FLUSH_INTERVAL_SECONDS: "0"
+					TWIN_LOGGING_BATCH_FLUSH_INTERVAL: "0"
 				},
 				extendConfig: async (unusedEnvVars2, config) => {
 					// Override the engine's internal "engine-logging-service" so that migration

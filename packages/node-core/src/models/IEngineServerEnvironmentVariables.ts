@@ -1,11 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineEnvironmentVariables } from "./IEngineEnvironmentVariables.js";
 
 /**
  * The engine server environment variables.
  */
-export interface IEngineServerEnvironmentVariables extends IEngineEnvironmentVariables {
+export interface IEngineServerEnvironmentVariables {
 	/**
 	 * The port to serve the API from.
 	 */

@@ -176,7 +176,7 @@ async function configureEntityStorage(
 			type: EntityStorageConnectorType.Memory,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.entityStorageMemoryMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.entityStorageMemoryMutexTimeout)
 				}
 			}
 		});
@@ -188,7 +188,7 @@ async function configureEntityStorage(
 			options: {
 				config: {
 					directory: envVars.storageFileRoot ?? "",
-					mutexTimeoutMs: Coerce.integer(envVars.entityStorageFileMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.entityStorageFileMutexTimeout)
 				},
 				folderPrefix: envVars.entityStorageTablePrefix
 			}
@@ -205,7 +205,7 @@ async function configureEntityStorage(
 					accessKeyId: envVars.awsDynamodbAccessKeyId,
 					secretAccessKey: envVars.awsDynamodbSecretAccessKey,
 					endpoint: envVars.awsDynamodbEndpoint,
-					connectionTimeoutMs: Coerce.integer(envVars.awsDynamodbConnectionTimeoutMs)
+					connectionTimeoutMs: Coerce.integer(envVars.awsDynamodbConnectionTimeout)
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -473,8 +473,8 @@ async function configureLogging(
 				options: {
 					config: {
 						batchSize: Coerce.integer(envVars.loggingBatchSize),
-						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushIntervalSeconds) ?? 5) * 1000,
-						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeoutMs)
+						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushInterval) ?? 5) * 1000,
+						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
 					}
 				}
 			});
@@ -639,7 +639,7 @@ async function configureMetricsCollector(
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
 	if (isTelemetryRequired(envVars)) {
-		const intervalSec = Coerce.integer(envVars.telemetryMetricsCollectorIntervalSeconds) ?? 60;
+		const intervalSec = Coerce.integer(envVars.telemetryMetricsCollectorInterval) ?? 60;
 
 		coreConfig.types.metricsCollectorComponent ??= [];
 		coreConfig.types.metricsCollectorComponent.push({
@@ -713,8 +713,8 @@ async function configureHealth(
 			type: HealthComponentType.Service,
 			options: {
 				config: {
-					healthCheckInterval: (Coerce.integer(envVars.healthIntervalSeconds) ?? 60) * 1000,
-					initialInterval: (Coerce.integer(envVars.healthStartupIntervalSeconds) ?? 2) * 1000
+					healthCheckInterval: (Coerce.integer(envVars.healthInterval) ?? 60) * 1000,
+					initialInterval: (Coerce.integer(envVars.healthStartupInterval) ?? 2) * 1000
 				}
 			}
 		});
@@ -1213,7 +1213,7 @@ async function configureAuditableItemGraph(
 			type: AuditableItemGraphComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.auditableItemGraphMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.auditableItemGraphMutexTimeout)
 				}
 			}
 		});
@@ -1236,7 +1236,7 @@ async function configureAuditableItemStream(
 			type: AuditableItemStreamComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.auditableItemStreamMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.auditableItemStreamMutexTimeout)
 				}
 			}
 		});
@@ -1292,7 +1292,7 @@ async function configureDocumentManagement(
 			type: DocumentManagementComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.documentManagementMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.documentManagementMutexTimeout)
 				}
 			}
 		});
@@ -1323,7 +1323,7 @@ async function configureTrust(
 				options: {
 					config: {
 						verificationMethodId: envVars.trustVerificationMethodId ?? "",
-						tokenTtlInSeconds: Coerce.integer(envVars.trustJwtTtlSeconds)
+						tokenTtlInSeconds: Coerce.integer(envVars.trustJwtTtl)
 					}
 				}
 			});
@@ -1407,6 +1407,8 @@ async function configureRightsManagement(
 		coreConfig.types.rightsManagementPnpComponent.push({
 			type: RightsManagementPnpComponentType.RestClient,
 			options: {
+				// The endpoint is required in config, but as this is multi-instance
+				// the actual endpoint will be provided in the config when it is constructed
 				endpoint: "http://localhost",
 				pathPrefix: rightsManagementPath
 			},
@@ -1419,7 +1421,7 @@ async function configureRightsManagement(
 				config: {
 					callbackPath: rightsManagementPath,
 					includeErrorDetails: coreConfig.debug ?? false,
-					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeout)
 				}
 			},
 			isDefault: true
@@ -1430,7 +1432,7 @@ async function configureRightsManagement(
 			type: RightsManagementPnapComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeoutMs)
+					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeout)
 				}
 			}
 		});
@@ -1548,7 +1550,7 @@ async function configureFederatedCatalogue(
 				type: FederatedCatalogueComponentType.Service,
 				options: {
 					config: {
-						mutexTimeoutMs: Coerce.integer(envVars.federatedCatalogueMutexTimeoutMs)
+						mutexTimeoutMs: Coerce.integer(envVars.federatedCatalogueMutexTimeout)
 					}
 				}
 			});
@@ -1619,10 +1621,10 @@ async function configureDataspace(
 			options: {
 				config: {
 					retainActivityLogsForMs: !Is.empty(retainActivityLogsFor)
-						? retainActivityLogsFor * 60000
+						? retainActivityLogsFor * 1000
 						: undefined,
 					activityLogsCleanUpIntervalMs: !Is.empty(activityLogsCleanUpInterval)
-						? activityLogsCleanUpInterval * 60000
+						? activityLogsCleanUpInterval * 1000
 						: undefined
 				}
 			}

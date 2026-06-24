@@ -20,9 +20,10 @@ import {
 } from "./builders/extensionsBuilder.js";
 import { executeCommand } from "./cli.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
+import type { IEngineEnvironmentVariables } from "./models/IEngineEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "./models/INodeEnvironmentVariables.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
 
 /**
@@ -37,7 +38,7 @@ import type { INodeOptions } from "./models/INodeOptions.js";
 export async function start(
 	nodeOptions: INodeOptions | undefined,
 	nodeEngineConfig: INodeEngineConfig,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables & IEngineEnvironmentVariables,
 	cliCommand?: ICliCommand,
 	availableContextIdKeys?: { key: string; requiredHandlerFeatures: string[] }[]
 ): Promise<
@@ -149,7 +150,7 @@ export async function start(
  */
 function configureContextIds(
 	engine: IEngineCore<IEngineCoreConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEngineEnvironmentVariables,
 	requiresEngineStarted: boolean,
 	requiresNodeIdentity: boolean,
 	requiresOrgIdentity: boolean
@@ -210,7 +211,7 @@ function configureContextIdKeys(
  */
 async function enforceTenantOrganizationIds(
 	engineCore: IEngineCore<IEngineCoreConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables
+	envVars: IEnvironmentVariables
 ): Promise<void> {
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (!tenantEnabled) {

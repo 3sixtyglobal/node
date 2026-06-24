@@ -45,7 +45,7 @@ describe("System metrics E2E", () => {
 					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 					TWIN_TELEMETRY_CONNECTOR: "entity-storage",
 					// Large interval so only the startup tick fires during the test
-					TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL_SECONDS: "3600"
+					TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL: "3600"
 				}
 			},
 			["node", "index.js"]

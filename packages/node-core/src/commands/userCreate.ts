@@ -12,7 +12,7 @@ import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
 import type { Person, WithContext } from "schema-dts";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
 const COMMAND_NAME = "user-create";
 
@@ -164,7 +164,7 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
  */
 export async function userCreate(
 	engineCore: IEngineCore,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: {
 		userIdentity?: string;
 		organizationIdentity?: string;

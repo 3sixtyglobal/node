@@ -4,7 +4,7 @@ import { CLIDisplay } from "@twin.org/cli-core";
 import { I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
 const COMMAND_NAME = "help";
 
@@ -37,7 +37,7 @@ export function getCommandDefinitionHelp(commandDefinitions: {
  */
 export async function help(
 	engineCore: IEngineCore,
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	params: { command?: string },
 	commandDefinitions: { [id: string]: ICliCommandDefinition }
 ): Promise<void> {

@@ -12,9 +12,9 @@ import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 
 const COMMAND_NAME = "bootstrap-legacy";
 
@@ -62,64 +62,7 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
  */
 export async function bootstrapLegacy(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	envVars: INodeEnvironmentVariables & {
-		/**
-		 * The features that are enabled on the node.
-		 * @default []
-		 */
-		features?: string;
-
-		/**
-		 * The identity of the node which, if empty and node-identity feature is enabled it will be generated.
-		 */
-		nodeIdentity?: string;
-
-		/**
-		 * The mnemonic for the node identity, if empty it will be randomly generated.
-		 */
-		nodeMnemonic?: string;
-
-		/**
-		 * A tenant id to use as a default for the node.
-		 */
-		tenantId?: string;
-
-		/**
-		 * A tenant api key to use as a default for the node.
-		 */
-		tenantApiKey?: string;
-
-		/**
-		 * The organisation identity. If not provided it will be generated.
-		 */
-		organizationIdentity?: string;
-
-		/**
-		 * The mnemonic for the organisation identity, if empty it will be randomly generated.
-		 */
-		organizationMnemonic?: string;
-
-		/**
-		 * If the admin-user feature is enabled, this will be the identity of the user. If not provided it will be generated.
-		 */
-		adminUserIdentity?: string;
-
-		/**
-		 * The mnemonic for the admin user, if empty it will be randomly generated.
-		 */
-		adminUserMnemonic?: string;
-
-		/**
-		 * If the admin-user feature is enabled, this will be the name of the user.
-		 * @default admin@node
-		 */
-		adminUserName?: string;
-
-		/**
-		 * If the admin-user feature is enabled, this will be the password of the user. If empty it will be randomly generated.
-		 */
-		adminUserPassword?: string;
-	},
+	envVars: IEnvironmentVariables,
 	params: {}
 ): Promise<void> {
 	const features = (envVars.features ?? "admin-user,wallet")
@@ -320,7 +263,9 @@ export async function bootstrapLegacy(
 					tenantId: tenant?.id,
 					email: envVars.adminUserName ?? `admin@${tenantEnabled ? "tenant" : "node"}`,
 					password: envVars.adminUserPassword,
-					scope: (tenantEnabled ? ["tenant-admin", "user-admin"] : ["user-admin"]).join(","),
+					scope:
+						envVars.adminUserScope ??
+						(tenantEnabled ? ["tenant-admin", "user-admin"] : ["user-admin"]).join(","),
 					givenName: tenantEnabled ? "Tenant" : "Node",
 					familyName: "Admin",
 					overwriteMode: "skip"

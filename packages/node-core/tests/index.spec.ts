@@ -266,7 +266,7 @@ describe("node-core", () => {
 				TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
-				TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS: "30000"
+				TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT: "30000"
 			}
 		});
 		expect(result).toBeDefined();
@@ -976,7 +976,8 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_TEST_EMBEDDED: "@text:tests/embedded.txt"
+			TWIN_TEST_EMBEDDED: "@text:tests/embedded.txt",
+			TWIN_ENV_ALLOW_LIST: "TWIN_TEST_EMBEDDED"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1010,7 +1011,8 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
-			TWIN_TEST_EMBEDDED: "@json:tests/embedded.json"
+			TWIN_TEST_EMBEDDED: "@json:tests/embedded.json",
+			TWIN_ENV_ALLOW_LIST: "TWIN_TEST_EMBEDDED"
 		};
 
 		await initialiseLocales("./dist/locales/");

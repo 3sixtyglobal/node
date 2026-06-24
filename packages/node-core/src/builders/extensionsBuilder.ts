@@ -4,8 +4,8 @@ import { CLIDisplay } from "@twin.org/cli-core";
 import { GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { ModuleHelper } from "@twin.org/modules";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
-import type { INodeEnvironmentVariables } from "../models/INodeEnvironmentVariables.js";
 import type { NodeExtensionInitialiseEngineMethod } from "../models/nodeExtensionInitialiseEngineMethod.js";
 import type { NodeExtensionInitialiseEngineServerMethod } from "../models/nodeExtensionInitialiseEngineServerMethod.js";
 import type { NodeExtensionInitialiseMethod } from "../models/nodeExtensionInitialiseMethod.js";
@@ -20,7 +20,7 @@ const extensionState: { [id: string]: { initialised: boolean } } = {};
  * @returns The config for the core and the server.
  */
 export async function extensionsConfiguration(
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	nodeEngineConfig: INodeEngineConfig
 ): Promise<INodeEngineConfig> {
 	if (Is.stringValue(envVars.extensions)) {
@@ -55,7 +55,7 @@ export async function extensionsConfiguration(
  * @returns A promise that resolves when all extension engine initialisation methods have completed.
  */
 export async function extensionsInitialiseEngine(
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	engineCore: IEngineCore
 ): Promise<void> {
 	if (Is.stringValue(envVars.extensions)) {
@@ -93,7 +93,7 @@ export async function extensionsInitialiseEngine(
  * @returns A promise that resolves when all extension engine-server initialisation methods have completed.
  */
 export async function extensionsInitialiseEngineServer(
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	engineCore: IEngineCore,
 	engineServer: IEngineServer
 ): Promise<void> {
@@ -127,7 +127,7 @@ export async function extensionsInitialiseEngineServer(
  * @returns A promise that resolves when all extension shutdown methods have completed.
  */
 export async function shutdownExtensions(
-	envVars: INodeEnvironmentVariables,
+	envVars: IEnvironmentVariables,
 	engineCore: IEngineCore
 ): Promise<void> {
 	if (Is.stringValue(envVars.extensions)) {

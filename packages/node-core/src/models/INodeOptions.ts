@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IEngineCore, IEngineServer, IEngineStateStorage } from "@twin.org/engine-models";
 import type { IEngineConfig } from "@twin.org/engine-types";
+import type { IEnvironmentVariables } from "./IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./INodeEngineConfig.js";
-import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
 
 /**
  * The options when running the node.
@@ -76,12 +76,12 @@ export interface INodeOptions {
 	/**
 	 * Method to extend the engine environment variables with any additional custom configuration.
 	 */
-	extendEnvVars?: (envVars: INodeEnvironmentVariables) => Promise<void>;
+	extendEnvVars?: (envVars: IEnvironmentVariables) => Promise<void>;
 
 	/**
 	 * Method to extend the engine configuration with any additional custom configuration.
 	 */
-	extendConfig?: (envVars: INodeEnvironmentVariables, config: INodeEngineConfig) => Promise<void>;
+	extendConfig?: (envVars: IEnvironmentVariables, config: INodeEngineConfig) => Promise<void>;
 
 	/**
 	 * Method to extend the engine with any additional options.

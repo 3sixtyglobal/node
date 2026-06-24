@@ -143,7 +143,7 @@ describe("node-core", () => {
 			TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
 			TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
-			TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT_MS: "30000"
+			TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT: "30000"
 		};
 
 		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant).
@@ -159,7 +159,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
-					TWIN_HEALTH_STARTUP_INTERVAL_SECONDS: "1"
+					TWIN_HEALTH_STARTUP_INTERVAL: "1"
 				}
 			},
 			["node", "index.js", "bootstrap-legacy"]
@@ -236,7 +236,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
-					TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500"
+					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
 			["node", "index.js", "bootstrap-legacy"]
@@ -357,7 +357,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
-					TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500"
+					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
 			["node", "index.js", "bootstrap-legacy"]
@@ -468,7 +468,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
-					TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500"
+					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
 			["node", "index.js", "bootstrap-legacy"]
