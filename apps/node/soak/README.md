@@ -1,7 +1,7 @@
 # twin-node soak / load harness
 
-Drives sustained HTTP load against a fully-bootstrapped twin-node, samples the node's
-own resource telemetry, and fails the run when memory-growth / latency / error-rate
+Drives sustained HTTP load against a fully-bootstrapped twin-node, samples the node process's
+OS-level memory usage throughout the run, and fails the run when memory-growth / latency / error-rate
 thresholds are breached.
 
 Plan: `../../../.cursor/tasks/node/feat-215/feat-215-implementation-plan-merged.md`.
@@ -18,7 +18,7 @@ Plan: `../../../.cursor/tasks/node/feat-215/feat-215-implementation-plan-merged.
 > fitted over the settled second half of the run — this strips both GC sawtooth and the warm-up
 > ramp, so it reads "settling" vs "leaking" honestly (a raw slope over-reported 856 MB/hr on a
 > node that was actually flat; tail-floor read 100). It is only a _fatal_ verdict once the window
-> is long enough (`SOAK_MEM_MIN_WINDOW`, default 10m) with ≥3 tail buckets; shorter runs report
+> is long enough (`SOAK_MEM_MIN_WINDOW`, default 10m) with ≥4 tail buckets; shorter runs report
 > it as informational.
 >
 > Note: readiness uses the server-level `/readyz` probe (unauthenticated). The `/health`
@@ -68,7 +68,7 @@ All knobs are `SOAK_*` for the harness; the node still uses `TWIN_*`. Defaults s
 | `SOAK_P95_MS` / `SOAK_P99_MS`              | `500` / `1500`                    | Latency ceilings (k6 thresholds)                                            |
 | `SOAK_ERROR_RATE`                          | `0.01`                            | Max failed-request rate (1%)                                                |
 | `SOAK_K6_BIN`                              | _(auto)_                          | Override k6 binary path (else PATH, then default Windows install)           |
-| `SOAK_SAMPLE_INTERVAL`                     | `15s`                             | Memory sampling cadence                                                     |
+| `SOAK_SAMPLE_INTERVAL`                     | `10s`                             | Memory sampling cadence                                                     |
 | `SOAK_MEM_GROWTH_MB_PER_HR`                | `150`                             | Max tail-floor memory-growth slope (enforced only past the min window)      |
 | `SOAK_WARMUP_DISCARD`                      | `30s`                             | Initial window excluded from the growth slope (warm-up)                     |
 | `SOAK_MEM_MIN_WINDOW`                      | `10m`                             | Settled-window length below which memory growth is informational, not fatal |

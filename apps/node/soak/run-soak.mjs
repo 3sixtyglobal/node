@@ -371,11 +371,22 @@ function num(n, digits = 0) {
 function startSampler(pid) {
 	const series = [];
 	const startedAt = Date.now();
+	let stopped = false;
+	let inFlight = false; // guards against a slow sample overlapping the next interval tick
 
 	const tick = async () => {
-		const rssBytes = await sampleProcessRssBytes(pid);
-		if (typeof rssBytes === 'number') {
-			series.push({ t: Date.now() - startedAt, rssBytes });
+		if (stopped || inFlight) {
+			return;
+		}
+		inFlight = true;
+		try {
+			const rssBytes = await sampleProcessRssBytes(pid);
+			// Re-check `stopped`: the sample may have resolved after stop() was called.
+			if (!stopped && typeof rssBytes === 'number') {
+				series.push({ t: Date.now() - startedAt, rssBytes });
+			}
+		} finally {
+			inFlight = false;
 		}
 	};
 
@@ -386,8 +397,9 @@ function startSampler(pid) {
 
 	return {
 		stop() {
+			stopped = true;
 			clearInterval(timer);
-			return series;
+			return [...series]; // snapshot — a late in-flight tick can't mutate the caller's copy
 		}
 	};
 }
@@ -565,9 +577,11 @@ function reportMemory(mem) {
 		mem.verdict === 'informational'
 			? `INFO (window ${Math.round(mem.windowMs / 1000)}s < ${Math.round(cfg.memMinWindowMs / 1000)}s min — not enforced)`
 			: mem.verdict.toUpperCase();
+	// Label the metric by what the OS actually reports: private bytes on Windows, RSS elsewhere.
+	const metricLabel = process.platform === 'win32' ? 'priv' : 'rss';
 	log(
 		'info',
-		`  mem (priv):  ${num(mem.startMb, 1)} → ${num(mem.endMb, 1)} MB   floor ${num(mem.floorStartMb, 1)} → ${num(mem.floorEndMb, 1)} MB`
+		`  mem (${metricLabel}):  ${num(mem.startMb, 1)} → ${num(mem.endMb, 1)} MB   floor ${num(mem.floorStartMb, 1)} → ${num(mem.floorEndMb, 1)} MB`
 	);
 	log(
 		'info',
@@ -627,8 +641,18 @@ async function teardown() {
 /** SIGTERM then SIGKILL fallback so a hung node never lingers. */
 function stopChild(child) {
 	return new Promise(resolve => {
-		const killTimer = setTimeout(() => child.kill('SIGKILL'), 5000);
-		child.on('exit', () => {
+		// Already terminated (exited or signalled) — nothing to wait for. Guards against ever
+		// awaiting an 'exit' event that has already fired (which would hang).
+		if (child.exitCode !== null || child.signalCode !== null) {
+			resolve();
+			return;
+		}
+		const killTimer = setTimeout(() => {
+			if (child.exitCode === null && child.signalCode === null) {
+				child.kill('SIGKILL');
+			}
+		}, 5000);
+		child.once('exit', () => {
 			clearTimeout(killTimer);
 			resolve();
 		});
