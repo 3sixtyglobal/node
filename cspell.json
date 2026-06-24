@@ -58,7 +58,20 @@
 		"decgbytes",
 		"decmbytes",
 		"timepicker",
-		"timezone"
+		"timezone",
+		"choco",
+		"denom",
+		"grafana",
+		"livez",
+		"priv",
+		"rawurl",
+		"readyz",
+		"reqs",
+		"sawtooth",
+		"teardown",
+		"Theil",
+		"vars",
+		"winget"
 	],
 	"ignoreRegExpList": [
 		"/from\\s+(['\"]).*\\1/",

@@ -21,6 +21,7 @@
 		"test": "vitest --run --config ./vitest.config.ts --no-cache",
 		"test:build": "tspc -p ./tests/tsconfig.json --noEmit",
 		"test:n2n": "vitest --run --config ./vitest.config.ts tests/node-to-node/n2n-synced-storage.spec.ts",
+		"test:soak": "node ./soak/run-soak.mjs",
 		"validate-locales": "validate-locales",
 		"test:coverage": "vitest --run --coverage --config ./vitest.config.ts --no-cache",
 		"docs:clean": "rimraf docs/open-api",
