@@ -1,10 +1,11 @@
 # twin-node soak / load harness
 
+> Created: 2026-06-24
+> Last updated: 2026-06-24
+
 Drives sustained HTTP load against a fully-bootstrapped twin-node, samples the node process's
 OS-level memory usage throughout the run, and fails the run when memory-growth / latency / error-rate
 thresholds are breached.
-
-Plan: `../../../.cursor/tasks/node/feat-215/feat-215-implementation-plan-merged.md`.
 
 > **Status:** Phases 1–4 working. The orchestrator bootstraps a file-backed node, starts it,
 > waits for `GET /readyz`, drives k6 load (per-VU API-key login → JWT cookie → org-scoped

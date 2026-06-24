@@ -14,7 +14,7 @@
  *
  * Still to come: phase 5 (weighted traffic mix) and phase 6 (nightly CI workflow).
  *
- * See ./README.md and ../../../.cursor/tasks/node/feat-215/feat-215-implementation-plan-merged.md
+ * See ./README.md for configuration, profiles, and env-var reference.
  */
 
 /* eslint-disable unicorn/no-process-exit -- this file is a CLI entry point; exit codes are the contract */
@@ -272,11 +272,7 @@ async function runLoad() {
 		'--env',
 		`SOAK_BASE_URL=${baseUrl}`,
 		'--env',
-		`SOAK_TENANT_API_KEY=${cfg.tenantApiKey}`,
-		'--env',
 		`SOAK_ADMIN_EMAIL=${cfg.adminEmail}`,
-		'--env',
-		`SOAK_ADMIN_PASSWORD=${cfg.adminPassword}`,
 		'--env',
 		`SOAK_TENANT_MODE=${cfg.tenantMode}`,
 		'--env',
@@ -294,8 +290,20 @@ async function runLoad() {
 		SCENARIO
 	];
 
+	// Secret-bearing vars are passed via the child environment rather than --env argv
+	// so they are not visible in the host process list (ps -ef) during the run.
+	const k6Env = {
+		...process.env,
+		SOAK_TENANT_API_KEY: cfg.tenantApiKey,
+		SOAK_ADMIN_PASSWORD: cfg.adminPassword
+	};
+
 	return new Promise((resolve, reject) => {
-		const child = spawn(k6, args, { cwd: __dirname, stdio: ['ignore', 'inherit', 'inherit'] });
+		const child = spawn(k6, args, {
+			cwd: __dirname,
+			env: k6Env,
+			stdio: ['ignore', 'inherit', 'inherit']
+		});
 		child.on('error', reject);
 		child.on('exit', code => resolve(code ?? 1));
 	});
