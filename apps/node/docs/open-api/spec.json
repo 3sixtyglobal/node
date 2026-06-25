@@ -11624,7 +11624,7 @@
 					},
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the streams, JSON stringified IComparator[].",
+						"description": "The conditions to filter the streams, JSON stringified EntityCondition<IAuditableItemGraphVertex>.",
 						"in": "query",
 						"required": false,
 						"schema": {
