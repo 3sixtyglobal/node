@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node",
-	"version": "0.9.0-next.1",
+	"version": "0.9.1-next.0",
 	"description": "TWIN Node serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
@@ -21,6 +21,7 @@
 		"test": "vitest --run --config ./vitest.config.ts --no-cache",
 		"test:build": "tspc -p ./tests/tsconfig.json --noEmit",
 		"test:n2n": "vitest --run --config ./vitest.config.ts tests/node-to-node/n2n-synced-storage.spec.ts",
+		"test:soak": "node ./soak/run-soak.mjs",
 		"validate-locales": "validate-locales",
 		"test:coverage": "vitest --run --coverage --config ./vitest.config.ts --no-cache",
 		"docs:clean": "rimraf docs/open-api",
@@ -31,15 +32,15 @@
 		"start": "node src/index.js"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "0.9.0-next.1"
+		"@twin.org/node-core": "0.9.1-next.0"
 	},
 	"devDependencies": {
-		"@twin.org/entity-storage-connector-memory": "0.9.0-next.1",
-		"@twin.org/merge-locales": "0.9.0-next.1",
-		"@twin.org/nameof-transformer": "0.9.0-next.1",
-		"@twin.org/nameof-vitest-plugin": "0.9.0-next.1",
-		"@twin.org/ts-to-openapi": "0.9.0-next.1",
-		"@twin.org/validate-locales": "0.9.0-next.1",
+		"@twin.org/entity-storage-connector-memory": "next",
+		"@twin.org/merge-locales": "next",
+		"@twin.org/nameof-transformer": "next",
+		"@twin.org/nameof-vitest-plugin": "next",
+		"@twin.org/ts-to-openapi": "next",
+		"@twin.org/validate-locales": "next",
 		"@types/node": "26.0.0",
 		"@vitest/coverage-v8": "4.1.9",
 		"concurrently": "10.0.3",
