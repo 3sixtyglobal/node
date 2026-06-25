@@ -1,38 +1,37 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineEnvironmentVariables } from "./IEngineEnvironmentVariables";
-import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironmentVariables";
 
 /**
  * The environment variables for the node.
  */
-export interface INodeEnvironmentVariables
-	extends IEngineEnvironmentVariables,
-		IEngineServerEnvironmentVariables {
+export interface INodeEnvironmentVariables {
 	/**
-	 * The features that are enabled on the node.
-	 * @default [NodeFeatures.NodeIdentity]
+	 * Maximum size in MB for HTTPS extensions downloads.
+	 * @default 10
 	 */
-	features?: string;
+	extensionsMaxSizeMb?: number;
 
 	/**
-	 * The identity of the node which, if empty and node-identity feature is enabled it will be generated.
+	 * Whether to clear the extensions cache on startup.
+	 * @default false
 	 */
-	identity?: string;
+	extensionsClearCache?: boolean;
 
 	/**
-	 * The mnemonic for the identity, if empty and node-identity feature is enabled it will be randomly generated.
+	 * Custom directory for extensions cache storage.
+	 * @default ".tmp"
 	 */
-	mnemonic?: string;
+	extensionsCacheDirectory?: string;
 
 	/**
-	 * If the node-user feature is enabled, this will be the name of the user.
-	 * @default admin@node
+	 * TTL in hours for HTTPS extensions cache.
+	 * @default 24
 	 */
-	username?: string;
+	extensionsCacheTtlHours?: number;
 
 	/**
-	 * If the node-user feature is enabled, this will be the password of the user, if empty it will be randomly generated.
+	 * Force refresh of all cached extensions.
+	 * @default false
 	 */
-	password?: string;
+	extensionsForceRefresh?: boolean;
 }

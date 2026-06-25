@@ -1,5 +1,5 @@
 {
-	"title": "TWIN TWIN Node Server",
+	"title": "TWIN Node",
 	"version": "1.0.0",
 	"description": "REST API for TWIN - API Server.",
 	"licenseName": "Apache 2.0 License",
@@ -22,16 +22,19 @@
 			"package": "@twin.org/telemetry-service"
 		},
 		{
+			"package": "@twin.org/automation-service"
+		},
+		{
 			"package": "@twin.org/logging-service"
 		},
 		{
 			"package": "@twin.org/nft-service"
 		},
 		{
-			"package": "@twin.org/attestation-service"
+			"package": "@twin.org/notarization-service"
 		},
 		{
-			"package": "@twin.org/verifiable-storage-service"
+			"package": "@twin.org/attestation-service"
 		},
 		{
 			"package": "@twin.org/immutable-proof-service"
@@ -65,6 +68,18 @@
 		},
 		{
 			"package": "@twin.org/federated-catalogue-service"
+		},
+		{
+			"package": "@twin.org/dataspace-data-plane-service"
+		},
+		{
+			"package": "@twin.org/dataspace-data-plane-service"
+		},
+		{
+			"package": "@twin.org/dataspace-control-plane-service"
+		},
+		{
+			"package": "@twin.org/rights-management-service"
 		}
 	],
 	"authMethods": ["jwtBearer"],
@@ -74,36 +89,19 @@
 		"AuditableItemStream(.*?)": "https://schema.twindev.org/ais/AuditableItemStream$1",
 		"Attestation(.*?)": "https://schema.twindev.org/attestation/Attestation$1",
 		"BlobStorage(.*?)": "https://schema.twindev.org/blob-storage/BlobStorage$1",
-		"Did(.*?)": "https://schema.twindev.org/did/Did$1",
-		"ProofTypes": "https://schema.twindev.org/did/ProofTypes",
-		"Proof": "https://schema.twindev.org/did/Proof",
-		"DataIntegrityProof": "https://schema.twindev.org/did/DataIntegrityProof",
-		"JsonWebSignature2020Proof": "https://schema.twindev.org/did/JsonWebSignature2020Proof",
+		"Did(.*?)": "https://schema.twindev.org/w3c-did/Did$1",
+		"ProofTypes": "https://schema.twindev.org/w3c-did/ProofTypes",
+		"Proof": "https://schema.twindev.org/w3c-did/Proof",
+		"DataIntegrityProof": "https://schema.twindev.org/w3c-did/DataIntegrityProof",
+		"JsonWebSignature2020Proof": "https://schema.twindev.org/w3c-did/JsonWebSignature2020Proof",
 		"Document(.*?)": "https://schema.twindev.org/documents/Document$1",
 		"ImmutableProof(.*)": "https://schema.twindev.org/immutable-proof/ImmutableProof$1",
-		"FederatedCatalogue(.*)": "https://schema.twindev.org/federated-catalogue/FederatedCatalogue$1",
-		"ServiceOfferingEntry": "https://schema.twindev.org/federated-catalogue/ServiceOfferingEntry",
-		"ServiceOfferingList": "https://schema.twindev.org/federated-catalogue/ServiceOfferingList",
-		"DataResourceEntry": "https://schema.twindev.org/federated-catalogue/DataResourceEntry",
-		"DataResourceList": "https://schema.twindev.org/federated-catalogue/DataResourceList",
-		"DataSpaceConnectorEntry": "https://schema.twindev.org/federated-catalogue/DataSpaceConnectorEntry",
-		"DataSpaceConnectorList": "https://schema.twindev.org/federated-catalogue/DataSpaceConnectorList",
-		"ParticipantEntry": "https://schema.twindev.org/federated-catalogue/ParticipantEntry",
-		"ParticipantList": "https://schema.twindev.org/federated-catalogue/ParticipantList",
-		"Odrl(.*)": "https://schema.twindev.org/odrl/Odrl$1",
-		"ActionType": "https://schema.twindev.org/odrl/ActionType",
-		"ConflictStrategyType": "https://schema.twindev.org/odrl/ConflictStrategyType",
-		"StatusType": "https://schema.twindev.org/odrl/StatusType",
-		"PolicyType": "https://schema.twindev.org/odrl/PolicyType",
-		"OperatorType": "https://schema.twindev.org/odrl/OperatorType",
-		"LeftOperandType": "https://schema.twindev.org/odrl/LeftOperandType",
-		"RightOperandType": "https://schema.twindev.org/odrl/RightOperandType",
-		"IAddress": "https://schema.twindev.org/gaia-x/Address",
-		"IDataResource": "https://schema.twindev.org/gaia-x/DataResource",
-		"IDataExchangeComponent": "https://schema.twindev.org/gaia-x/DataExchangeComponent",
-		"IEndpoint": "https://schema.twindev.org/gaia-x/Endpoint",
-		"IParticipant": "https://schema.twindev.org/gaia-x/Participant",
-		"IRegistrationNumber": "https://schema.twindev.org/gaia-x/RegistrationNumber",
-		"IServiceOffering": "https://schema.twindev.org/gaia-x/ServiceOffering"
+		"Odrl(.*)": "https://schema.twindev.org/w3c-odrl/Odrl$1",
+		"Unece(.*)": "https://schema.twindev.org/unece/Unece$1",
+		"DataspaceProtocol(.*?)": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocol$1",
+		"Dcat(.*?)": "https://schema.twindev.org/dcat/Dcat$1",
+		"DublinCore(.*?)": "https://schema.twindev.org/dublin-core/DublinCore$1",
+		"Foaf(.*?)": "https://schema.twindev.org/foaf/Foaf$1",
+		"ActivityStreams(.*?)": "https://schema.twindev.org/w3c-activity-streams/ActivityStreams$1"
 	}
 }

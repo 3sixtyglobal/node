@@ -1,0 +1,18 @@
+{
+	"group": "Logout",
+	"steps": [
+		{
+			"description": "POST /authentication/refresh",
+			"method": "POST",
+			"path": "/authentication/refresh",
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/logout",
+			"method": "POST",
+			"path": "/authentication/logout",
+			"expectedStatus": 204
+		}
+	]
+}

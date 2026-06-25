@@ -1,0 +1,58 @@
+{
+	"group": "Rights Management - Agreement Creation",
+	"steps": [
+		{
+			"description": "POST /rights-management/policy/admin — create offer for agreement test",
+			"method": "POST",
+			"path": "/rights-management/policy/admin",
+			"body": {
+				"@context": "http://www.w3.org/ns/odrl.jsonld",
+				"@type": "Offer",
+				"target": "{{dataspaceDatasetId}}",
+				"assigner": "{{organizationId}}",
+				"permission": [{ "action": "use" }]
+			},
+			"expectedStatus": 201,
+			"capture": { "agreementOfferId": "location-last-segment" }
+		},
+		{
+			"description": "POST /rights-management/negotiations/admin — pre-register consumer-side negotiation",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/admin",
+			"body": { "id": "urn:uuid:agreement-consumer-pid-001" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /rights-management/negotiations/request — initiate agreement negotiation",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/rights-management/negotiations/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "ContractRequestMessage",
+				"consumerPid": "urn:uuid:agreement-consumer-pid-001",
+				"callbackAddress": "{{baseUrl}}/rights-management?organization={{organizationId}}",
+				"offer": {
+					"@type": "Offer",
+					"@id": "{{agreementOfferId}}"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "agreementProviderPid": "body.providerPid" }
+		},
+		{
+			"description": "GET /rights-management/negotiations/admin/:id — wait for FINALIZED state",
+			"delayMs": 3000,
+			"method": "GET",
+			"path": "/rights-management/negotiations/admin/{{agreementProviderPid}}",
+			"expectedStatus": 200,
+			"assert": { "body.state": "FINALIZED" },
+			"capture": { "dataspaceAgreementId": "body.agreement.@id" }
+		}
+	]
+}

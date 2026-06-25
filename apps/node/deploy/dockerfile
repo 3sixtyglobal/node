@@ -1,5 +1,5 @@
 # Set the base image
-FROM node:20
+FROM node:24
 
 # Create the app directory
 WORKDIR /app
@@ -7,19 +7,25 @@ WORKDIR /app
 # Copy the package.json
 COPY package.json .
 
-# Install only the production dependencies
-RUN npm install --omit=dev --ignore-scripts
+# Install dependencies including dev dependencies needed for merge-locales
+RUN npm install --ignore-scripts
 
 # Copy the rest of the files to the image
 COPY . .
+
+# Compile translation messages
+RUN npm run merge-locales
+
+# Remove dev dependencies to reduce image size
+RUN npm prune --omit=dev
 
 # Expose the port the app runs on
 EXPOSE 3000
 
 # Set the environment variables that will override the .env file in the package
-ENV TWIN_NODE_HOST=0.0.0.0
-ENV TWIN_NODE_PORT=3000
-ENV TWIN_NODE_STORAGE_FILE_ROOT=/twin-node/data
+ENV TWIN_HOST=0.0.0.0
+ENV TWIN_PORT=3000
+ENV TWIN_STORAGE_FILE_ROOT=/twin-node/data
 
 # Start the server
-CMD ["node", "src/index.mjs"]
+CMD ["node", "src/index.js"]

@@ -15,12 +15,13 @@
 			"source.organizeImports": "never"
 		}
 	},
-	"prettier.configPath": ".prettierrc",
+	"prettier.configPath": "prettier.config.mjs",
 	"cSpell.autoFormatConfigFile": true,
 	"vitest.disableWorkspaceWarning": true,
 	"markdownlint.lintWorkspaceGlobs": [
 		"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}",
 		"!**/node_modules",
-		"**/docs/reference/**"
+		"!**/docs/reference/**",
+		"!**/changelog.md"
 	]
 }

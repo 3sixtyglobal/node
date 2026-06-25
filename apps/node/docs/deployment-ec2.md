@@ -1,4 +1,4 @@
-# @twin.org/node - Deployment Amazon AWS EC2
+# Node Deployment Amazon AWS EC2
 
 ## Amazon AWS EC2 Instance
 
@@ -40,7 +40,7 @@ nginx -v
 
 ## Configuring nginx
 
-We need to configure nginx to use the certificate and reverse proxy https traffic to the node server.
+We need to configure nginx to use the certificate and reverse proxy https traffic to the node.
 
 ```shell
 sudo nano /etc/nginx/nginx.conf
@@ -94,18 +94,18 @@ Run `sudo systemctl enable nginx` to auto start the server on instance startup.
 We clone the repo, build it and then make a copy of the relevant .env file.
 
 ```shell
-git clone https://github.com/twinfoundation/node.git
+git clone https://github.com/iotaledger/twin-node.git
 cd apps
 npm install
 npm run dist
 cd apps/node
-cp .env.example-entity-storage .env
+cp .env.example-local-entity-storage .env
 ```
 
 The .env file can be modified to suit your own use case. For example to set the location for the storage.
 
 ```shell
-TWIN_NODE_STORAGE_FILE_ROOT="/home/ec2-user/twin-node/"
+TWIN_STORAGE_FILE_ROOT="/home/ec2-user/twin-node/"
 ```
 
 ## Bootstrapping the server
@@ -130,7 +130,7 @@ You might need to modify the location for the node version, you can find this ou
 
 ```shell
 [Unit]
-Description=TWIN Node Server
+Description=TWIN Node
 After=network.target
 
 [Service]

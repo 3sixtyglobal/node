@@ -1,0 +1,260 @@
+# Node Usage
+
+These commands cover local installation, on demand execution, and a complete bootstrap flow that can be reused in deployment scripts.
+
+## Running
+
+To install and run the CLI locally use the following commands:
+
+```shell
+npm install @twin.org/node -g
+twin-node
+```
+
+or run directly using NPX:
+
+```shell
+npx "@twin.org/node"
+```
+
+## Help
+
+```text
+🌩️  TWIN Node v0.0.3-next.26
+
+Command: help
+
+All the commands available are listed below, for more information use the --help option with a specific command.
+bootstrap-legacy: Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**
+identity-create: Create an identity
+identity-import: Import an identity
+identity-verification-method-create: Create an identity verification method
+identity-verification-method-import: Import an identity verification method
+identity-verifiable-credential-create: Create a verifiable credential
+node-set-identity: Set the node identity
+remove-tenant-org-alias: Remove an alias from the tenant organization ID legacy list
+set-node-org-id: Set the node organization ID
+set-tenant-org-id: Set the organization ID for a tenant
+tenant-create: Create a tenant with associated api key
+tenant-import: Import a tenant with associated api key
+tenant-update: Update a tenant with associated api key
+user-create: Create a user
+user-update: Update a user
+vault-key-create: Create a vault key for an identity
+vault-key-import: Import a vault key for an identity
+```
+
+## Server Configuration
+
+Key environment variables that control how the node server handles authentication. A full reference is in the `.env` example files.
+
+| Variable                   | Default        | Description                                    |
+| -------------------------- | -------------- | ---------------------------------------------- |
+| `TWIN_AUTH_API_KEY_HEADER` | `x-api-key`    | HTTP header name for the API key on requests.  |
+| `TWIN_AUTH_SIGNING_KEY_ID` | `auth-signing` | Vault key ID used to sign authentication JWTs. |
+
+## bootstrap-legacy --help
+
+```text
+bootstrap-legacy: Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: bootstrap-legacy --load-env=".env.bootstrap-legacy"
+```
+
+The command reads the following environment variables (use `load-env` to supply them from a file):
+
+| Variable                     | Default                        | Description                                                                 |
+| ---------------------------- | ------------------------------ | --------------------------------------------------------------------------- |
+| `TWIN_NODE_IDENTITY`         | generated                      | The DID of the node identity.                                               |
+| `TWIN_NODE_MNEMONIC`         | randomly generated             | The Bip39 mnemonic for the node identity seed.                              |
+| `TWIN_FEATURES`              | `admin-user,wallet`            | Comma-separated feature flags: `admin-user`, `wallet`.                      |
+| `TWIN_ORGANIZATION_IDENTITY` | generated                      | The DID to use for the organisation identity.                               |
+| `TWIN_ORGANIZATION_MNEMONIC` | randomly generated             | The Bip39 mnemonic for the organisation identity seed.                      |
+| `TWIN_TENANT_ID`             | generated                      | The tenant ID for the node tenant (multi-tenant only).                      |
+| `TWIN_TENANT_API_KEY`        | generated                      | The API key for the node tenant (multi-tenant only).                        |
+| `TWIN_ADMIN_USER_IDENTITY`   | generated                      | The DID for the admin user identity (`admin-user` feature).                 |
+| `TWIN_ADMIN_USER_MNEMONIC`   | randomly generated             | The Bip39 mnemonic for the admin user identity seed (`admin-user` feature). |
+| `TWIN_ADMIN_USER_NAME`       | `admin@node` or `admin@tenant` | The email/username for the admin user (`admin-user` feature).               |
+| `TWIN_ADMIN_USER_PASSWORD`   | randomly generated             | The password for the admin user (`admin-user` feature).                     |
+
+## identity-create --help
+
+```text
+identity-create: Create an identity
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+mnemonic: (string, 24 words, optional)
+The mnemonic phrase to use for the identity. If not provided, a random mnemonic will be generated.
+
+identity: (string, did, optional)
+The DID of the identity to create. If not provided, a new DID will be generated.
+
+controller: (string, did, optional)
+The controller DID for the identity. If not provided, the identity will be its own controller.
+
+fund-wallet: (boolean, default: 'false', optional)
+Whether to fund the wallet associated with the identity from a faucet.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+output-json: (string, optional)
+Path to a .json file to store the command output.
+
+output-env: (string, optional)
+Path to a .env file to store the command output.
+
+output-env-prefix: (string, optional)
+Prefix to use for variables in the output .env file.
+
+node-id: (boolean, default: 'false', optional)
+If true, set the created identity DID as the node identity.
+
+node-organization-id: (boolean, default: 'false', optional)
+If true, set the created identity DID as the node organization ID (not available in multi-tenant mode).
+
+tenant-organization-id: (string, hex(32), optional)
+The tenant ID to set the created identity DID as the organization ID for (requires multi-tenant mode).
+
+Example: identity-create --mnemonic="..." --fund-wallet=true
+```
+
+## Example
+
+### Bootstrap legacy (single command)
+
+Runs the complete bootstrap sequence in one step using values from `.env.bootstrap-legacy`:
+
+```shell
+twin-node bootstrap-legacy --load-env=".env.bootstrap-legacy"
+```
+
+The sections below show the equivalent step-by-step commands that replicate the bootstrap-legacy process.
+
+---
+
+### Step 1 - Create the node identity and associate it with the node
+
+Supply `--fund-wallet=true` when the `wallet` feature is enabled. `--node-id=true` sets the created identity as the node identity in the same step.
+
+```shell
+twin-node identity-create --node-id=true --fund-wallet=true --output-json="node-identity.json" --output-env="node-identity.env" --output-env-prefix=node
+```
+
+### Step 2 - Create the authentication signing key for the node
+
+```shell
+twin-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID --key-type=Ed25519 --key-id=!TWIN_AUTH_SIGNING_KEY_ID --overwrite-mode=skip --output-json="node-auth-key.json" --output-env="node-auth-key.env"
+```
+
+To import an existing authentication signing key instead:
+
+```shell
+twin-node vault-key-import --load-env="node-identity.env,node-auth-key.json" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
+```
+
+### Step 3 - Create the organisation identity
+
+```shell
+twin-node identity-create --load-env="node-identity.env" --fund-wallet=true --output-json="organization-identity.json" --output-env="organization-identity.env" --output-env-prefix=organization
+```
+
+### Step 4 - Add the trust verification method to the organisation identity
+
+```shell
+twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-trust.json" --output-env="organization-trust.env"
+```
+
+### Step 5 - Set the organisation identity on the node (single-tenant)
+
+```shell
+twin-node set-node-org-id --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
+```
+
+### Step 6 - Create the node tenant and associate the organisation (multi-tenant only)
+
+```shell
+twin-node tenant-create --load-env="node-identity.env" --label="Node" --output-json="node-tenant.json" --output-env="node-tenant.env" --output-env-prefix=node
+```
+
+```shell
+twin-node set-tenant-org-id --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
+```
+
+To import an existing tenant instead:
+
+```shell
+twin-node tenant-import --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --label=!NODE_LABEL --public-origin="https://api.example.com"
+```
+
+To update an existing tenant:
+
+```shell
+twin-node tenant-update --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --label="New Label"
+```
+
+To remove a stale organisation alias from a tenant:
+
+```shell
+twin-node remove-tenant-org-alias --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --alias=!OLD_ORGANIZATION_DID
+```
+
+---
+
+The following steps run when the `admin-user` feature is enabled.
+
+### Step 7 - Add the blob encryption key to the organisation (if blob encryption is enabled)
+
+```shell
+twin-node vault-key-create --load-env="organization-identity.env" --identity=!ORGANIZATION_DID --key-type=ChaCha20Poly1305 --key-id=!TWIN_BLOB_STORAGE_ENCRYPTION_KEY_ID --overwrite-mode=skip --output-json="organization-blob-encryption.json" --output-env="organization-blob-encryption.env"
+```
+
+### Step 8 - Add the attestation verification method to the organisation (if attestation is enabled)
+
+```shell
+twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-attestation.json" --output-env="organization-attestation.env"
+```
+
+To import an existing attestation verification method:
+
+```shell
+twin-node identity-verification-method-import --load-env="node-identity.env,organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-id=!DID_VERIFICATION_METHOD_ID --private-key-hex=!DID_VERIFICATION_METHOD_PRIVATE_KEY_HEX
+```
+
+To create a verifiable credential using the attestation verification method:
+
+```shell
+twin-node identity-verifiable-credential-create --load-env="organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID --subject-json="subject.json" --output-json="organization-attestation-credential.json" --output-env="organization-attestation-credential.env"
+```
+
+### Step 9 - Add the immutable proof verification method to the organisation (if immutable proofs are enabled)
+
+```shell
+twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-immutable-proof.json" --output-env="organization-immutable-proof.env"
+```
+
+### Step 10 - Create the admin user identity
+
+```shell
+twin-node identity-create --load-env="organization-identity.env" --controller=!ORGANIZATION_DID --output-json="admin-user-identity.json" --output-env="admin-user-identity.env" --output-env-prefix=admin_user
+```
+
+### Step 11 - Create the admin user account
+
+```shell
+twin-node user-create --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --email="admin@node" --given-name="Node" --family-name="Admin" --scope="tenant-admin,user-admin" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
+```
+
+To update an existing user:
+
+```shell
+twin-node user-update --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --email="admin@node" --scope="tenant-admin,user-admin,foo"
+```

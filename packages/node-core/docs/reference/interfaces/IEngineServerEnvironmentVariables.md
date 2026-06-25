@@ -2,94 +2,122 @@
 
 The engine server environment variables.
 
-## Extended by
-
-- [`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
-
 ## Properties
 
-### port?
+### port? {#port}
 
-> `optional` **port**: `string`
+> `optional` **port?**: `string`
 
 The port to serve the API from.
 
 ***
 
-### host?
+### host? {#host}
 
-> `optional` **host**: `string`
+> `optional` **host?**: `string`
 
 The host to serve the API from.
 
 ***
 
-### corsOrigins?
+### corsOrigins? {#corsorigins}
 
-> `optional` **corsOrigins**: `string`
+> `optional` **corsOrigins?**: `string`
 
 The CORS origins to allow, defaults to *.
 
 ***
 
-### httpMethods?
+### httpMethods? {#httpmethods}
 
-> `optional` **httpMethods**: `string`
+> `optional` **httpMethods?**: `string`
 
 The CORS methods to allow, defaults to GET, POST, PUT, DELETE, OPTIONS.
 
 ***
 
-### httpAllowedHeaders?
+### httpAllowedHeaders? {#httpallowedheaders}
 
-> `optional` **httpAllowedHeaders**: `string`
+> `optional` **httpAllowedHeaders?**: `string`
 
 The CORS headers to allow.
 
 ***
 
-### httpExposedHeaders?
+### httpExposedHeaders? {#httpexposedheaders}
 
-> `optional` **httpExposedHeaders**: `string`
+> `optional` **httpExposedHeaders?**: `string`
 
 The CORS headers to expose.
 
 ***
 
-### authAdminProcessorType?
+### publicOrigin? {#publicorigin}
 
-> `optional` **authAdminProcessorType**: `string`
+> `optional` **publicOrigin?**: `string`
+
+The public origin URL for the API e.g. https://api.example.com:1234
+
+***
+
+### authAdminProcessorType? {#authadminprocessortype}
+
+> `optional` **authAdminProcessorType?**: `string`
 
 The type of auth admin processor to use on the API: entity-storage.
 
 ***
 
-### authProcessorType?
+### authProcessorType? {#authprocessortype}
 
-> `optional` **authProcessorType**: `string`
+> `optional` **authProcessorType?**: `string`
 
 The type of auth processor to use on the API: entity-storage.
 
 ***
 
-### authSigningKeyId?
+### authSigningKeyId? {#authsigningkeyid}
 
-> `optional` **authSigningKeyId**: `string`
+> `optional` **authSigningKeyId?**: `string`
 
 The id of the key in the vault to use for signing in auth operations.
 
 ***
 
-### mimeTypeProcessors?
+### authApiKeyHeader? {#authapikeyheader}
 
-> `optional` **mimeTypeProcessors**: `string`
+> `optional` **authApiKeyHeader?**: `string`
+
+The HTTP header name used to pass the API key on requests, defaults to x-api-key.
+
+***
+
+### mimeTypeProcessors? {#mimetypeprocessors}
+
+> `optional` **mimeTypeProcessors?**: `string`
 
 Additional MIME type processors to include, comma separated.
 
 ***
 
-### disableNodeIdentity?
+### routeLoggingIncludeBody? {#routeloggingincludebody}
 
-> `optional` **disableNodeIdentity**: `string`
+> `optional` **routeLoggingIncludeBody?**: `string`
 
-Disable Node Identity route processors.
+Include the body in the REST logging output, useful for debugging.
+
+***
+
+### routeLoggingFullBase64? {#routeloggingfullbase64}
+
+> `optional` **routeLoggingFullBase64?**: `string`
+
+Include the full base 64 output in the REST logging output, useful for debugging.
+
+***
+
+### routeLoggingObfuscateProperties? {#routeloggingobfuscateproperties}
+
+> `optional` **routeLoggingObfuscateProperties?**: `string`
+
+List of properties to obfuscate in the REST logging output, comma separated.

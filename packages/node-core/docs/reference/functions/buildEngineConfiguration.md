@@ -1,6 +1,6 @@
 # Function: buildEngineConfiguration()
 
-> **buildEngineConfiguration**(`envVars`): `IEngineConfig`
+> **buildEngineConfiguration**(`envVars`): `Promise`\<`IEngineConfig`\>
 
 Build the engine core configuration from environment variables.
 
@@ -14,6 +14,6 @@ The environment variables.
 
 ## Returns
 
-`IEngineConfig`
+`Promise`\<`IEngineConfig`\>
 
 The config for the core.

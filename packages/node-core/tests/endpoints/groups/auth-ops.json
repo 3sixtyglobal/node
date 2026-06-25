@@ -1,0 +1,41 @@
+{
+	"group": "Authentication Operations",
+	"steps": [
+		{
+			"description": "PUT /authentication/password",
+			"method": "PUT",
+			"path": "/authentication/password",
+			"body": { "currentPassword": "{{adminPassword}}", "newPassword": "NewPassword@123456!" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login — re-login with new password",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "NewPassword@123456!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/audit — 400 missing event",
+			"method": "POST",
+			"path": "/authentication/audit",
+			"body": {},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /authentication/audit — create audit entry",
+			"method": "POST",
+			"path": "/authentication/audit",
+			"body": { "event": "login-success" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/audit",
+			"method": "GET",
+			"path": "/authentication/audit",
+			"expectedStatus": 200
+		}
+	]
+}

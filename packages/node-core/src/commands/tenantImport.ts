@@ -1,0 +1,152 @@
+// Copyright 2026 IOTA Stiftung.
+// SPDX-License-Identifier: Apache-2.0.
+import type { ITenantAdminComponent } from "@twin.org/api-models";
+import { CLIDisplay } from "@twin.org/cli-core";
+import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
+import type { IEngineCore } from "@twin.org/engine-models";
+import { Did } from "@twin.org/identity-models";
+import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+
+const COMMAND_NAME = "tenant-import";
+
+/**
+ * Get the command definition parameters.
+ * @param commandDefinitions The registered command definitions.
+ */
+export function getCommandDefinitionTenantImport(commandDefinitions: {
+	[id: string]: ICliCommandDefinition;
+}): void {
+	commandDefinitions[COMMAND_NAME] = {
+		command: COMMAND_NAME,
+		description: I18n.formatMessage("node.cli.commands.tenant-import.description"),
+		example: I18n.formatMessage("node.cli.commands.tenant-import.example"),
+		params: [
+			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
+				key: "tenant-id",
+				type: "string",
+				extendedType: "hex(32)",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.tenant-id.description"
+				),
+				required: true
+			},
+			{
+				key: "api-key",
+				type: "string",
+				extendedType: "hex(32)",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.api-key.description"
+				),
+				required: true
+			},
+			{
+				key: "organization-id",
+				type: "string",
+				extendedType: "did",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.organization-id.description"
+				),
+				required: true
+			},
+			{
+				key: "label",
+				type: "string",
+				description: I18n.formatMessage("node.cli.commands.tenant-import.params.label.description"),
+				required: false
+			},
+			{
+				key: "public-origin",
+				type: "string",
+				extendedType: "url",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.public-origin.description"
+				),
+				required: false
+			},
+			{
+				key: "load-env",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-import.params.load-env.description"
+				),
+				required: false
+			}
+		],
+		action: async (engineCore, envVars, params) => tenantImport(engineCore, envVars, params)
+	};
+}
+
+/**
+ * Command for importing a tenant with a known tenant ID and API key.
+ * @param engineCore The engine core.
+ * @param envVars The environment variables for the node.
+ * @param params The parameters for the command.
+ * @param params.apiKey The API key to import.
+ * @param params.tenantId The tenant ID to import.
+ * @param params.organizationId The organization DID to associate with the tenant.
+ * @param params.label The label for the tenant.
+ * @param params.publicOrigin The public URL origin for the tenant.
+ * @returns A promise that resolves when the tenant record has been created.
+ */
+export async function tenantImport(
+	engineCore: IEngineCore,
+	envVars: IEnvironmentVariables,
+	params: {
+		apiKey?: string;
+		tenantId?: string;
+		organizationId?: string;
+		label?: string;
+		publicOrigin?: string;
+	}
+): Promise<void> {
+	Guards.stringHexLength("tenantImport", "tenant-id", params.tenantId, 32);
+	Guards.stringHexLength("tenantImport", "api-key", params.apiKey, 32);
+
+	Did.guard("tenantImport", "organization-id", params.organizationId);
+
+	if (Is.stringValue(params.publicOrigin)) {
+		Url.guard("tenantImport", "public-origin", params.publicOrigin);
+	}
+
+	const tenantAdminServiceComponentType =
+		engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
+
+	if (!Is.stringValue(tenantAdminServiceComponentType)) {
+		throw new GeneralError("tenantImport", "tenantAdminComponentNotRegistered");
+	}
+
+	const tenantAdminService = ComponentFactory.get<ITenantAdminComponent>(
+		tenantAdminServiceComponentType
+	);
+
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-import.labels.importing"));
+	CLIDisplay.spinnerStart();
+
+	const apiKey = params.apiKey;
+	const tenantId = params.tenantId;
+	const organizationId = params.organizationId;
+	const label = params.label ?? "";
+	const publicOrigin = params.publicOrigin ?? "";
+	await tenantAdminService.create({
+		id: tenantId,
+		apiKey,
+		organizationId,
+		label,
+		publicOrigin
+	});
+	CLIDisplay.spinnerStop();
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-import.labels.imported"));
+
+	CLIDisplay.break();
+
+	CLIDisplay.done();
+}

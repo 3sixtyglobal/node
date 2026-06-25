@@ -1,8 +1,7 @@
 node_modules
+.eslintcache
 .updatable-packages
 **/dist/es
-**/dist/esm
-**/dist/cjs
 **/dist/types
 **/dist/locales
 coverage
@@ -13,6 +12,11 @@ vitest.config.ts.timestamp*
 **/test-results
 .vercel
 .env
+.env.*
 .env.prod
+.env.local
+.env.local.*
+.env.bootstrap
+.env.bootstrap.*
 .vercel
 working

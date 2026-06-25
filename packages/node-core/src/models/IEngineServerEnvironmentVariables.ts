@@ -36,6 +36,11 @@ export interface IEngineServerEnvironmentVariables {
 	httpExposedHeaders?: string;
 
 	/**
+	 * The public origin URL for the API e.g. https://api.example.com:1234
+	 */
+	publicOrigin?: string;
+
+	/**
 	 * The type of auth admin processor to use on the API: entity-storage.
 	 */
 	authAdminProcessorType?: string;
@@ -51,12 +56,27 @@ export interface IEngineServerEnvironmentVariables {
 	authSigningKeyId?: string;
 
 	/**
+	 * The HTTP header name used to pass the API key on requests, defaults to x-api-key.
+	 */
+	authApiKeyHeader?: string;
+
+	/**
 	 * Additional MIME type processors to include, comma separated.
 	 */
 	mimeTypeProcessors?: string;
 
 	/**
-	 * Disable Node Identity route processors.
+	 * Include the body in the REST logging output, useful for debugging.
 	 */
-	disableNodeIdentity?: string;
+	routeLoggingIncludeBody?: string;
+
+	/**
+	 * Include the full base 64 output in the REST logging output, useful for debugging.
+	 */
+	routeLoggingFullBase64?: string;
+
+	/**
+	 * List of properties to obfuscate in the REST logging output, comma separated.
+	 */
+	routeLoggingObfuscateProperties?: string;
 }

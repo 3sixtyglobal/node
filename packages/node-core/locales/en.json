@@ -1,34 +1,704 @@
 {
 	"error": {
 		"node": {
-			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file"
+			"nodeIdentityNotSet": "The node identity is enabled in config but is not set, please set it using the \"node-set-identity\" CLI command.",
+			"nodeOrganizationIdNotSet": "The node organization is not set, please set it using the \"set-node-org-id\".",
+			"tenantsWithoutOrganizationId": "The following tenants have no organization ID assigned. Use the \"set-tenant-org-id\" command to assign one before starting the node: {tenantIds}",
+			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
+			"extensionLoadingError": "Failed to load extension \"{extension}\"",
+			"insecureProtocol": "Cannot load extension from insecure protocol: {protocol}. Only HTTPS is allowed for remote extensions.",
+			"extensionDownloadFailed": "Failed to download extension from {url}",
+			"extensionNpmInstallFailed": "Failed to install npm extension: {package}",
+			"extensionSizeLimitExceeded": "Extension download size exceeds limit: {size} bytes > {limit} bytes",
+			"cliCommandMissing": "CLI command \"{command}\" is not recognised",
+			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
+			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
+			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
+			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
+		},
+		"bootstrapLegacy": {
+			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled.",
+			"organizationNotSet": "The organisation identity has not been set. Run \"set-node-org-id\"."
+		},
+		"identityCreate": {
+			"invalidMnemonic": "The mnemonic is invalid, it should be 24 words from the standard wordlist.",
+			"onlyOneAssignmentOptionAllowed": "Only one of node-id, node-organization-id, or tenant-organization-id can be set at the same time.",
+			"nodeOrganizationIdNotAvailableInMultiTenantMode": "The node-organization-id option is not available in multi-tenant mode, use tenant-organization-id instead."
+		},
+		"identityImport": {
+			"identityNotFound": "The identity was not found, it must be created on-chain already.",
+			"invalidMnemonic": "The mnemonic is invalid, it should be 24 words from the standard wordlist."
+		},
+		"identityVerificationMethodCreate": {
+			"verificationMethodAlreadyExists": "The verification method with ID already exists and overwriteMode is set to \"error\"."
+		},
+		"identityVerifiableCredentialCreate": {
+			"subjectJsonLoadFailed": "Failed to load subject JSON from file: \"{subjectFilename}\""
+		},
+		"tenantCreate": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"tenantImport": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"tenantUpdate": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"userCreate": {
+			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
+			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\".",
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+		},
+		"userUpdate": {
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+		},
+		"vaultKeyCreate": {
+			"vaultKeyAlreadyExists": "The vault key with ID already exists and overwriteMode is set to \"error\"."
+		},
+		"nodeSetIdentity": {
+			"identityNotFound": "The identity with DID \"{notFoundId}\" was not found in the system."
+		},
+		"setNodeOrgId": {
+			"notAvailableInMultiTenantMode": "The set-node-org-id command is not available in multi-tenant mode, use set-tenant-org-id instead."
+		},
+		"applyOrganizationIdToTenant": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"removeTenantOrgAlias": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
+			"aliasNotFound": "The alias \"{alias}\" was not found in the tenant organization legacy list."
+		}
+	},
+	"warn": {
+		"node": {
+			"unknownEnvVars": "Unknown environment variable properties [{keys}], they will be ignored. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
 		}
 	},
 	"node": {
-		"terminateSignal": "Server terminating",
-		"generatingMnemonic": "Generating mnemonic \"{mnemonic}\"",
-		"storingMnemonic": "Storing mnemonic",
-		"existingMnemonic": "Mnemonic already exists",
-		"fundingWallet": "Funding wallet \"{address}\"",
-		"fundedWallet": "Wallet already funded",
-		"generatingNodeIdentity": "Generating node identity",
-		"existingNodeIdentity": "Node identity already exists \"{identity}\"",
-		"createdNodeIdentity": "Node identity created \"{identity}\"",
-		"identityExplorer": "Identity explorer \"{url}\"",
-		"creatingNodeUser": "Creating node user \"{email}\"",
-		"existingNodeUser": "Node user already exists \"{email}\"",
-		"creatingAuthKey": "Creating authentication key \"{keyName}\"",
-		"existingAuthKey": "Authentication key already exists \"{keyName}\"",
-		"addingAttestation": "Adding attestation verification method \"{methodId}\"",
-		"existingAttestation": "Attestation verification method already exists \"{methodId}\"",
-		"addingImmutableProof": "Adding immutable proof verification method \"{methodId}\"",
-		"existingImmutableProof": "Immutable proof verification method already exists \"{methodId}\"",
-		"creatingBlobEncryptionKey": "Creating blob encryption key \"{keyName}\"",
-		"existingBlobEncryptionKey": "Blob encryption key already exists \"{keyName}\"",
-		"creatingUserProfile": "Creating user profile \"{identity}\"",
-		"existingUserProfile": "User profile already exists \"{identity}\"",
-		"nodeIdentity": "Node identity \"{identity}\"",
-		"nodeAdminUserEmail": "Node Admin User Email \"{email}\"",
-		"nodeAdminUserPassword": "Node Admin User Password \"{password}\""
+		"extensionLoading": "Loading Extension",
+		"extensionInitialisingEngine": "Initialising engine for extension \"{extension}\"",
+		"extensionInitialisingEngineServer": "Initialising engine server for extension \"{extension}\"",
+		"extensionShutdown": "Shutdown extension \"{extension}\"",
+		"extendingEngine": "Extending Engine",
+		"extendingEngineServer": "Extending Engine Server",
+		"extensionSecurityWarning": "SECURITY WARNING: Loading extension from external URL: {url}",
+		"extensionNpmInstalling": "Installing npm extension",
+		"extensionHttpsDownloading": "Downloading HTTPS extension",
+		"extensionCacheExpired": "Cache expired for extension: {url}",
+		"extensionForceRefresh": "Force refresh enabled for extension: {url}",
+		"tenantOrganizationIdAutoAssigned": "Legacy migration: automatically assigned organization ID \"{organizationId}\" to tenant \"{tenantId}\".",
+		"cli": {
+			"commands": {
+				"command": "Command",
+				"help": {
+					"description": "Display help information about CLI commands",
+					"labels": {
+						"commands": "All the commands available are listed below, for more information use the --help option with a specific command.",
+						"example": "Example",
+						"optional": "optional",
+						"required": "required",
+						"default": "default",
+						"options": "options"
+					}
+				},
+				"bootstrap-legacy": {
+					"description": "Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**",
+					"example": "bootstrap-legacy --load-env=\"./.env.bootstrap-legacy\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"nodeIdentityCreate": "Creating node identity",
+						"nodeAuthKeyCreate": "Creating node auth key",
+						"trustVerificationMethodCreate": "Creating trust verification method for organisation identity",
+						"nodeTenantCreate": "Creating node tenant",
+						"organisationCreate": "Creating organisation identity",
+						"blobStorageKeyCreate": "Creating blob storage encryption key for organisation identity",
+						"attestationMethodCreate": "Creating attestation method for organisation identity",
+						"immutableProofMethodCreate": "Creating immutable proof method for organisation identity",
+						"nodeOrganizationIdSet": "Setting node organisation ID",
+						"adminIdentityCreate": "Creating admin user identity",
+						"adminUserCreate": "Creating admin user",
+						"tenantFallback": "No Node-labelled tenant found; using first available tenant"
+					}
+				},
+				"identity-create": {
+					"description": "Create an identity",
+					"example": "identity-create --mnemonic=\"...\" --fund-wallet=true",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"mnemonic": {
+							"description": "The mnemonic phrase to use for the identity. If not provided, a random mnemonic will be generated."
+						},
+						"identity": {
+							"description": "The DID of the identity to create. If not provided, a new DID will be generated."
+						},
+						"controller": {
+							"description": "The controller DID for the identity. If not provided, the identity will be its own controller."
+						},
+						"fund-wallet": {
+							"description": "Whether to fund the wallet associated with the identity from a faucet."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						},
+						"output-env": {
+							"description": "Path to a .env file to store the command output."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						},
+						"node-id": {
+							"description": "If true, set the created identity DID as the node identity."
+						},
+						"node-organization-id": {
+							"description": "If true, set the created identity DID as the node organization ID (not available in multi-tenant mode)."
+						},
+						"tenant-organization-id": {
+							"description": "The tenant ID to set the created identity DID as the organization ID for (requires multi-tenant mode)."
+						}
+					},
+					"labels": {
+						"mnemonic": "Mnemonic",
+						"processingMnemonic": "Processing mnemonic",
+						"readingMnemonic": "Reading mnemonic",
+						"storingMnemonic": "Storing mnemonic",
+						"existingMnemonic": "Mnemonic already exists, skipping creation",
+						"noExistingMnemonic": "No existing mnemonic found",
+						"generatingMnemonic": "Generating mnemonic",
+						"processingIdentity": "Processing identity",
+						"resolvingIdentity": "Resolving identity",
+						"existingIdentity": "Identity already exists, skipping creation",
+						"noIdentityFound": "No identity found",
+						"creatingIdentity": "Creating identity",
+						"createdIdentity": "Created identity",
+						"fundingWallet": "Funding wallet",
+						"addressIndex": "Address Index",
+						"addingTokens": "Adding tokens to address \"{address}\"",
+						"explorer": "Explorer",
+						"walletAddress": "Wallet Address",
+						"did": "DID"
+					}
+				},
+				"identity-import": {
+					"description": "Import an identity",
+					"example": "identity-import --identity=\"did:iota:...\" --mnemonic=\"...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID of the identity to import."
+						},
+						"mnemonic": {
+							"description": "The mnemonic phrase to use for the identity."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"resolvingIdentity": "Resolving identity",
+						"storingMnemonic": "Storing mnemonic"
+					}
+				},
+				"identity-verifiable-credential-create": {
+					"description": "Create a verifiable credential",
+					"example": "identity-verifiable-credential-create --identity=\"did:iota:....\" --verification-method-id=\"my-id\" --subject-json=\"./subject.json\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID of the identity to use to create the credential."
+						},
+						"verification-method-id": {
+							"description": "The ID of the verification method to use to create the credential."
+						},
+						"controller": {
+							"description": "The controller DID for the identity. If not provided, the identity will be its own controller."
+						},
+						"subject-json": {
+							"description": "The subject JSON file to load."
+						},
+						"credential-id": {
+							"description": "The id of the verifiable credential."
+						},
+						"expiration-date": {
+							"description": "The expiration date of the verifiable credential."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						},
+						"output-env": {
+							"description": "Path to a .env file to store the command output."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						}
+					},
+					"labels": {
+						"creating": "Creating verifiable credential",
+						"created": "Created verifiable credential",
+						"jwtToken": "JWT Token"
+					}
+				},
+				"identity-verification-method-import": {
+					"description": "Import an identity verification method",
+					"example": "identity-verification-method-import --identity=\"did:iota:....\" --verification-method-type=\"verificationMethod\" --verification-method-id=\"my-key-1\" ----private-key-hex=\"15...a2\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID of the identity to import the verification method to."
+						},
+						"verification-method-type": {
+							"description": "The type of verification method to import."
+						},
+						"verification-method-id": {
+							"description": "The ID of the verification method to import."
+						},
+						"controller": {
+							"description": "The controller DID for the identity. If not provided, the identity will be its own controller."
+						},
+						"private-key-hex": {
+							"description": "The private key in hex format."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"resolvingIdentity": "Resolving identity",
+						"importing": "Importing verification method",
+						"imported": "Imported verification method"
+					}
+				},
+				"identity-verification-method-create": {
+					"description": "Create an identity verification method",
+					"example": "identity-verification-method-create --identity=\"did:iota:....\" --verification-method-type=\"verificationMethod\" --verification-method-id=\"my-key-1\" --controller=\"did:iota:....\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID of the identity to add the verification method to."
+						},
+						"verification-method-type": {
+							"description": "The type of verification method to add."
+						},
+						"verification-method-id": {
+							"description": "The ID of the verification method to add."
+						},
+						"controller": {
+							"description": "The controller DID for the identity. If not provided, the identity will be its own controller."
+						},
+						"overwrite-mode": {
+							"description": "The mode to use when a verification method with the same ID already exists."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						},
+						"output-env": {
+							"description": "Path to a .env file to store the command output."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						}
+					},
+					"labels": {
+						"resolvingIdentity": "Resolving identity",
+						"skipping": "The verification method with ID already exists, skipping creation",
+						"creatingVerificationMethod": "Creating verification method",
+						"createdVerificationMethod": "Created verification method",
+						"verificationMethodId": "Verification Method ID",
+						"verificationMethodType": "Verification Method Type",
+						"kid": "Key Id",
+						"privateKeyBase64Url": "Private Key Base64Url",
+						"publicKeyBase64Url": "Public Key Base64Url",
+						"privateKeyBase64": "Private Key Base64",
+						"publicKeyBase64": "Public Key Base64",
+						"privateKeyHex": "Private Key Hex",
+						"publicKeyHex": "Public Key Hex"
+					}
+				},
+				"node-set-identity": {
+					"description": "Set the node identity",
+					"example": "node-set-identity --identity=\"did:iota...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The identity to set in the node."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"resolvingIdentity": "Resolving identity",
+						"stored": "The node identity has been stored",
+						"skipping": "The node identity has not changed, skipping"
+					}
+				},
+				"tenant-create": {
+					"description": "Create a tenant with associated api key",
+					"example": "tenant-create --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --organization-id=\"did:iota:...\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to add. If not provided a random tenant id will be generated."
+						},
+						"api-key": {
+							"description": "The API key to associate with the tenant id. If not provided, a random key will be generated."
+						},
+						"organization-id": {
+							"description": "The organization DID to associate with the tenant."
+						},
+						"label": {
+							"description": "A descriptive label for the tenant."
+						},
+						"public-origin": {
+							"description": "The public URL origin for the tenant e.g. https://example.com:1234"
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						},
+						"output-env": {
+							"description": "Path to a .env file to store the command output."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						}
+					},
+					"labels": {
+						"creating": "Creating tenant",
+						"tenantId": "Tenant ID",
+						"apiKey": "API Key",
+						"organizationId": "Organization ID",
+						"label": "Label",
+						"publicOrigin": "Public Origin"
+					}
+				},
+				"tenant-import": {
+					"description": "Import a tenant with associated api key",
+					"example": "tenant-import --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --organization-id=\"did:iota:...\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to import."
+						},
+						"api-key": {
+							"description": "The API key to associate with the tenant id."
+						},
+						"organization-id": {
+							"description": "The organization DID to associate with the tenant."
+						},
+						"label": {
+							"description": "A descriptive label for the tenant."
+						},
+						"public-origin": {
+							"description": "The public URL origin for the tenant e.g. https://example.com:1234"
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"importing": "Importing tenant",
+						"imported": "Imported tenant"
+					}
+				},
+				"tenant-update": {
+					"description": "Update a tenant with associated api key",
+					"example": "tenant-update --tenant-id=\"0011..aabb\" --api-key=\"aabb..0099\" --label=\"My Tenant\" --public-origin=\"https://example.com:1234\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to update."
+						},
+						"api-key": {
+							"description": "The API key to associate with the tenant id."
+						},
+						"organization-id": {
+							"description": "The organization DID to associate with the tenant."
+						},
+						"label": {
+							"description": "A descriptive label for the tenant."
+						},
+						"public-origin": {
+							"description": "The public URL origin for the tenant e.g. https://example.com:1234"
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating tenant",
+						"updated": "Updated tenant"
+					}
+				},
+				"user-create": {
+					"description": "Create a user",
+					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"user-identity": {
+							"description": "The DID to associate the user with."
+						},
+						"organization-identity": {
+							"description": "The organization DID to associate the user with."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to associate the user with."
+						},
+						"email": {
+							"description": "The email address of the user."
+						},
+						"password": {
+							"description": "The password for the user."
+						},
+						"scope": {
+							"description": "List of scopes to associate with the user, comma separated."
+						},
+						"given-name": {
+							"description": "The given name of the user."
+						},
+						"family-name": {
+							"description": "The family name of the user."
+						},
+						"overwrite-mode": {
+							"description": "The mode to use when a user with the same identity already exists."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						},
+						"output-env": {
+							"description": "Path to a .env file to store the command output."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						}
+					},
+					"labels": {
+						"creating": "Creating user",
+						"storingUser": "Storing user",
+						"storingProfile": "Storing profile",
+						"userCreated": "User created",
+						"skipping": "The user with ID already exists, skipping creation",
+						"overwriting": "Overwriting existing user with ID",
+						"email": "Email",
+						"password": "Password"
+					}
+				},
+				"user-update": {
+					"description": "Update a user",
+					"example": "user-update --email=\"bob@examples.com\" --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"user-identity": {
+							"description": "The DID to associate the user with."
+						},
+						"organization-identity": {
+							"description": "The organization DID to associate the user with."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to associate the user with."
+						},
+						"email": {
+							"description": "The email address of the user."
+						},
+						"scope": {
+							"description": "List of scopes to associate with the user, comma separated."
+						},
+						"given-name": {
+							"description": "The given name of the user."
+						},
+						"family-name": {
+							"description": "The family name of the user."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating user",
+						"storingUser": "Storing user",
+						"storingProfile": "Storing profile",
+						"userUpdated": "User updated"
+					}
+				},
+				"vault-key-create": {
+					"description": "Create a vault key for an identity",
+					"example": "vault-key-create --identity=\"did:iota:....\" --key-id=\"my-key\" --key-type=\"Ed25519\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID to associate the key with."
+						},
+						"key-id": {
+							"description": "The ID of the key."
+						},
+						"key-type": {
+							"description": "The type of the key."
+						},
+						"overwrite-mode": {
+							"description": "The mode to use when a key with the same id already exists."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the command output."
+						},
+						"output-env": {
+							"description": "Path to a .env file to store the command output."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						}
+					},
+					"labels": {
+						"creating": "Creating key",
+						"created": "Created key",
+						"skipping": "The key with ID already exists, skipping creation",
+						"overwriting": "Overwriting existing key with ID",
+						"keyId": "Key ID",
+						"keyType": "Key Type",
+						"privateKeyBase64": "Private Key Base64",
+						"publicKeyBase64": "Public Key Base64",
+						"privateKeyHex": "Private Key Hex",
+						"publicKeyHex": "Public Key Hex"
+					}
+				},
+				"set-node-org-id": {
+					"description": "Set the node organization ID",
+					"example": "set-node-org-id --organization-id=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"organization-id": {
+							"description": "The organization DID to set as the node organization ID."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"stored": "The node organization ID has been stored"
+					}
+				},
+				"set-tenant-org-id": {
+					"description": "Set the organization ID for a tenant",
+					"example": "set-tenant-org-id --tenant-id=\"0011..aabb\" --organization-id=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to update."
+						},
+						"organization-id": {
+							"description": "The organization DID to set as the tenant organization ID."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating tenant organization ID",
+						"stored": "The tenant organization ID has been stored"
+					}
+				},
+				"remove-tenant-org-alias": {
+					"description": "Remove an alias from the tenant organization ID legacy list",
+					"example": "remove-tenant-org-alias --tenant-id=\"0011..aabb\" --alias=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to update."
+						},
+						"alias": {
+							"description": "The organization DID alias to remove from the legacy list."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"reading": "Reading tenant",
+						"updating": "Removing alias from tenant organization legacy list",
+						"removed": "The alias has been removed from the tenant organization legacy list"
+					}
+				},
+				"vault-key-import": {
+					"description": "Import a vault key for an identity",
+					"example": "vault-key-import --identity=\"did:iota:....\" --key-id=\"my-key\" --key-type=Ed25519 --private-key-hex=\"15...a2\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID to associate the key with."
+						},
+						"key-id": {
+							"description": "The ID of the key."
+						},
+						"key-type": {
+							"description": "The type of the key."
+						},
+						"private-key-hex": {
+							"description": "The private key in hex format."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"importing": "Importing key",
+						"imported": "Imported key"
+					}
+				}
+			}
+		}
 	}
 }

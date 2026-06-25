@@ -1,0 +1,123 @@
+---
+category: node
+order: 1
+---
+
+import { EnvBuildDiagram, NodeBootstrapDiagram } from './node-diagrams.jsx';
+
+# Node Runtime
+
+The node package is the operational entry point that turns environment variables and optional local configuration files into a fully assembled engine plus engine-server runtime. It provides a consistent bootstrap flow for interactive server operation, command execution, and extension-driven customisation.
+
+## What Node Does
+
+At a high level, node:
+
+1. loads command-line arguments and environment variables,
+2. builds strongly typed engine and server configuration,
+3. creates and starts engine plus server,
+4. applies extension modules,
+5. handles context IDs and tenant or identity requirements,
+6. and exposes controlled shutdown behaviour.
+
+The central functions are `run()`, `buildConfiguration()`, and `start()` in `node-core`.
+
+{NodeBootstrapDiagram()}
+
+## Environment Variable Strategy
+
+Node intentionally centralises direct process environment access in one place. The merge order is:
+
+1. default environment values (`getEnvDefaults`),
+2. process environment,
+3. optional `nodeOptions.envVars` overrides,
+4. optional `.env` files (`dotenv`),
+5. optional dynamic expansion values (`@text:` and `@json:`),
+6. optional custom extension hook (`extendEnvVars`).
+
+This produces one normalised env object that is then passed to both config builders.
+
+`@text:` and `@json:` expansion allows sensitive or large values to be sourced from files while still using environment-variable semantics.
+
+For the complete variable catalogue and defaulted values, see [Node Environment Variables](./node-env-variables.mdx).
+
+## Building Engine Configuration
+
+`buildEngineConfiguration` transforms environment values into `IEngineConfig` by configuring connector and component type arrays across all domains.
+
+Examples include:
+
+- entity storage connector lists and default selection,
+- blob storage connector setup,
+- vault, logging, telemetry, and messaging capabilities,
+- identity, wallet, NFT, attestation, and notarization,
+- higher-level modules such as document management, trust, rights management, and dataspace.
+
+The builder also resolves file-based paths such as `storageFileRoot` and state filename when file storage is active.
+
+## Building Engine Server Configuration
+
+`buildEngineServerConfiguration` layers web-server and route-processor configuration on top of core engine config.
+
+Key outcomes include:
+
+- web host, port, CORS, and header settings,
+- default information and hosting components,
+- context ID route processors for node and tenant scopes,
+- logging route processors,
+- authentication processors and related context key registration,
+- default rest and socket path population.
+
+It also supports environment-driven route path overrides by component category.
+
+{EnvBuildDiagram()}
+
+## Starting Runtime
+
+`start()` in `node-core` assembles and runs the runtime:
+
+1. Validates storage prerequisites (for example file-based connectors require storage root).
+2. Creates engine with config and state storage (file state storage by default).
+3. Injects custom bootstrap logic to configure context IDs from engine state.
+4. Registers available context ID keys and required handler features.
+5. Creates engine-server with the prepared engine.
+6. Applies extension initialisation to engine and server.
+7. Registers engine in `EngineCoreFactory` for clone-based background task scenarios.
+8. Starts server (which starts engine) or executes CLI command path.
+
+On shutdown, node runs extension cleanup then stops server and engine.
+
+## Context IDs, Node Identity, and Tenant
+
+Node context behaviour is state driven and environment gated:
+
+- if node identity is enabled, a node context ID must exist in engine state,
+- if tenant mode is enabled, a tenant context ID must exist in engine state,
+- missing required values throw startup errors rather than allowing ambiguous operation.
+
+This enforces clear operational guarantees for multi-tenant and identity-scoped deployments.
+
+## CLI Mode Versus Server Mode
+
+If command-line arguments resolve to a CLI command, node can run command workflows with optional engine startup requirements. In this mode it can suppress regular server startup and execute command logic directly against the configured runtime.
+
+If no CLI command is selected, node starts the HTTP and socket server stack and installs process
+signal handlers for graceful shutdown.
+
+## Extension and Module Loading
+
+Node supports dynamic extension loading with protocol-aware import resolution and staged lifecycle hooks.
+
+For protocol handling (`npm:`, `https:`, local, cache policy), extension lifecycle methods, and security controls, see [Extensions and Module Loading](./node-extensions.mdx).
+
+## Practical Configuration Pattern
+
+In practice, the recommended node workflow is:
+
+1. define environment profile for infrastructure and capability types,
+2. optionally provide `.env` and JSON config overlays,
+3. run node bootstrap to build config and start runtime,
+4. verify context IDs and identity or tenant state for scoped workloads,
+5. iterate by changing env values rather than code for infrastructure changes.
+
+This keeps deployment changes operational and configuration driven while preserving stable runtime composition through engine.

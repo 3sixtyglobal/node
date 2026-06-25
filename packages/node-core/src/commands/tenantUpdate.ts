@@ -1,0 +1,153 @@
+// Copyright 2026 IOTA Stiftung.
+// SPDX-License-Identifier: Apache-2.0.
+import type { ITenantAdminComponent } from "@twin.org/api-models";
+import { CLIDisplay } from "@twin.org/cli-core";
+import { ComponentFactory, GeneralError, Guards, I18n, Is, Url } from "@twin.org/core";
+import type { IEngineCore } from "@twin.org/engine-models";
+import { Did } from "@twin.org/identity-models";
+import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
+import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+
+const COMMAND_NAME = "tenant-update";
+
+/**
+ * Get the command definition parameters.
+ * @param commandDefinitions The registered command definitions.
+ */
+export function getCommandDefinitionTenantUpdate(commandDefinitions: {
+	[id: string]: ICliCommandDefinition;
+}): void {
+	commandDefinitions[COMMAND_NAME] = {
+		command: COMMAND_NAME,
+		description: I18n.formatMessage("node.cli.commands.tenant-update.description"),
+		example: I18n.formatMessage("node.cli.commands.tenant-update.example"),
+		params: [
+			{
+				key: "env-prefix",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.env-prefix.description"
+				),
+				required: false
+			},
+			{
+				key: "tenant-id",
+				type: "string",
+				extendedType: "hex(32)",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.tenant-id.description"
+				),
+				required: true
+			},
+			{
+				key: "api-key",
+				type: "string",
+				extendedType: "hex(32)",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.api-key.description"
+				),
+				required: false
+			},
+			{
+				key: "organization-id",
+				type: "string",
+				extendedType: "did",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.organization-id.description"
+				),
+				required: false
+			},
+			{
+				key: "label",
+				type: "string",
+				description: I18n.formatMessage("node.cli.commands.tenant-update.params.label.description"),
+				required: false
+			},
+			{
+				key: "public-origin",
+				type: "string",
+				extendedType: "url",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.public-origin.description"
+				),
+				required: false
+			},
+			{
+				key: "load-env",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.tenant-update.params.load-env.description"
+				),
+				required: false
+			}
+		],
+		action: async (engineCore, envVars, params) => tenantUpdate(engineCore, envVars, params)
+	};
+}
+
+/**
+ * Command for updating a tenant.
+ * @param engineCore The engine core.
+ * @param envVars The environment variables for the node.
+ * @param params The parameters for the command.
+ * @param params.apiKey The api key to update.
+ * @param params.tenantId The tenant ID to update.
+ * @param params.organizationId The organization DID to associate with the tenant.
+ * @param params.label The label for the tenant.
+ * @param params.publicOrigin The public URL origin for the tenant.
+ * @returns A promise that resolves when the tenant record has been updated.
+ */
+export async function tenantUpdate(
+	engineCore: IEngineCore,
+	envVars: IEnvironmentVariables,
+	params: {
+		apiKey?: string;
+		tenantId?: string;
+		organizationId?: string;
+		label?: string;
+		publicOrigin?: string;
+	}
+): Promise<void> {
+	Guards.stringHexLength("tenantUpdate", "tenant-id", params.tenantId, 32);
+
+	if (Is.stringValue(params.apiKey)) {
+		Guards.stringHexLength("tenantUpdate", "api-key", params.apiKey, 32);
+	}
+
+	if (Is.stringValue(params.organizationId)) {
+		Did.guard("tenantUpdate", "organization-id", params.organizationId);
+	}
+
+	if (Is.stringValue(params.publicOrigin)) {
+		Url.guard("tenantUpdate", "public-origin", params.publicOrigin);
+	}
+
+	const defaultTenantAdminComponentType =
+		engineCore.getRegisteredInstanceType("tenantAdminComponent");
+
+	if (!Is.stringValue(defaultTenantAdminComponentType)) {
+		throw new GeneralError("tenantUpdate", "tenantAdminComponentNotRegistered");
+	}
+
+	const tenantAdminComponent = ComponentFactory.get<ITenantAdminComponent>(
+		defaultTenantAdminComponentType
+	);
+
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-update.labels.updating"));
+	CLIDisplay.spinnerStart();
+
+	const tenant = await tenantAdminComponent.get(params.tenantId);
+	await tenantAdminComponent.update({
+		...tenant,
+		...(Is.stringValue(params.apiKey) && { apiKey: params.apiKey }),
+		...(Is.stringValue(params.organizationId) && { organizationId: params.organizationId }),
+		...(Is.stringValue(params.label) && { label: params.label }),
+		...(Is.stringValue(params.publicOrigin) && { publicOrigin: params.publicOrigin })
+	});
+	CLIDisplay.spinnerStop();
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-update.labels.updated"));
+
+	CLIDisplay.break();
+
+	CLIDisplay.done();
+}

@@ -1,0 +1,62 @@
+{
+	"group": "Immutable Proof",
+	"steps": [
+		{
+			"description": "POST /immutable-proof — 400 missing document",
+			"method": "POST",
+			"path": "/immutable-proof",
+			"body": {},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /immutable-proof",
+			"method": "POST",
+			"path": "/immutable-proof",
+			"body": {
+				"document": {
+					"@context": "https://schema.org",
+					"@type": "Thing",
+					"name": "Test Immutable Proof"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "immutableProofId": "location-last-segment" }
+		},
+		{
+			"description": "GET /immutable-proof/:id — 404 for unknown id",
+			"method": "GET",
+			"path": "/immutable-proof/immutable-proof:nonexistent",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /immutable-proof/:id",
+			"method": "GET",
+			"path": "/immutable-proof/{{immutableProofId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /immutable-proof/:id/verify",
+			"method": "GET",
+			"path": "/immutable-proof/{{immutableProofId}}/verify",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /immutable-proof/:id/notarization",
+			"method": "DELETE",
+			"path": "/immutable-proof/{{immutableProofId}}/notarization",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /immutable-proof/:id",
+			"method": "DELETE",
+			"path": "/immutable-proof/{{immutableProofId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /immutable-proof/:id — 404 after delete",
+			"method": "GET",
+			"path": "/immutable-proof/{{immutableProofId}}",
+			"expectedStatus": 404
+		}
+	]
+}

@@ -1,0 +1,198 @@
+{
+	"group": "Auditable Item Stream",
+	"steps": [
+		{
+			"description": "POST /ais — 400 missing type",
+			"method": "POST",
+			"path": "/ais",
+			"body": {
+				"@context": [
+					"https://schema.org",
+					"https://schema.twindev.org/ais/",
+					"https://schema.twindev.org/common/"
+				]
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /ais — create stream",
+			"method": "POST",
+			"path": "/ais",
+			"body": {
+				"@context": [
+					"https://schema.org",
+					"https://schema.twindev.org/ais/",
+					"https://schema.twindev.org/common/"
+				],
+				"type": "AuditableItemStream"
+			},
+			"expectedStatus": 201,
+			"capture": { "streamId": "location-last-segment" }
+		},
+		{
+			"description": "GET /ais/:id",
+			"method": "GET",
+			"path": "/ais/{{streamId}}",
+			"expectedStatus": 200,
+			"assert": { "body.id": "isDefined" },
+			"capture": { "streamDateCreated": "body.dateCreated" }
+		},
+		{
+			"description": "PUT /ais/:id — update stream",
+			"method": "PUT",
+			"path": "/ais/{{streamId}}",
+			"body": {
+				"@context": [
+					"https://schema.org",
+					"https://schema.twindev.org/ais/",
+					"https://schema.twindev.org/common/"
+				],
+				"type": "AuditableItemStream",
+				"dateCreated": "{{streamDateCreated}}",
+				"annotationObject": {
+					"@context": "https://schema.org",
+					"@type": "Note",
+					"name": "Updated stream"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /ais — list streams",
+			"method": "GET",
+			"path": "/ais",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /ais/:id/entries — 400 missing entryObject",
+			"method": "POST",
+			"path": "/ais/{{streamId}}/entries",
+			"body": {},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /ais/:id/entries — add entry 1",
+			"method": "POST",
+			"path": "/ais/{{streamId}}/entries",
+			"body": {
+				"@context": [
+					"https://schema.org",
+					"https://schema.twindev.org/ais/",
+					"https://schema.twindev.org/common/"
+				],
+				"type": "AuditableItemStreamEntry",
+				"entryObject": {
+					"@context": "https://schema.org",
+					"@type": "Note",
+					"name": "Entry 1"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "entryId": "location-last-segment" }
+		},
+		{
+			"description": "POST /ais/:id/entries — add entry 2",
+			"method": "POST",
+			"path": "/ais/{{streamId}}/entries",
+			"body": {
+				"@context": [
+					"https://schema.org",
+					"https://schema.twindev.org/ais/",
+					"https://schema.twindev.org/common/"
+				],
+				"type": "AuditableItemStreamEntry",
+				"entryObject": {
+					"@context": "https://schema.org",
+					"@type": "Note",
+					"name": "Entry 2"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /ais/:id/entries/:entryId",
+			"method": "GET",
+			"path": "/ais/{{streamId}}/entries/{{entryId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /ais/:id/entries/:entryId/object",
+			"method": "GET",
+			"path": "/ais/{{streamId}}/entries/{{entryId}}/object",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /ais/:id/entries/:entryId — update entry",
+			"method": "PUT",
+			"path": "/ais/{{streamId}}/entries/{{entryId}}",
+			"body": {
+				"@context": [
+					"https://schema.org",
+					"https://schema.twindev.org/ais/",
+					"https://schema.twindev.org/common/"
+				],
+				"type": "AuditableItemStreamEntry",
+				"entryObject": {
+					"@context": "https://schema.org",
+					"@type": "Note",
+					"name": "Entry 1 Updated"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /ais/:id/entries",
+			"method": "GET",
+			"path": "/ais/{{streamId}}/entries",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /ais/:id/entries/objects",
+			"method": "GET",
+			"path": "/ais/{{streamId}}/entries/objects",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /ais/entries — global entries list",
+			"method": "GET",
+			"path": "/ais/entries",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /ais/entries/objects — global entry objects",
+			"method": "GET",
+			"path": "/ais/entries/objects",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /ais/:id/entries/:entryId",
+			"method": "DELETE",
+			"path": "/ais/{{streamId}}/entries/{{entryId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /ais/:id/proof — remove proof from stream",
+			"method": "DELETE",
+			"path": "/ais/{{streamId}}/proof",
+			"expectedStatus": 204
+		},
+		{
+			"description": "PUT /ais/:id/close — close stream",
+			"method": "PUT",
+			"path": "/ais/{{streamId}}/close",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /ais/:id — delete stream",
+			"method": "DELETE",
+			"path": "/ais/{{streamId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /ais/:id — 404 after delete",
+			"method": "GET",
+			"path": "/ais/{{streamId}}",
+			"expectedStatus": 404
+		}
+	]
+}

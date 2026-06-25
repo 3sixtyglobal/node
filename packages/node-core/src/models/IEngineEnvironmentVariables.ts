@@ -11,6 +11,29 @@ export interface IEngineEnvironmentVariables {
 	debug?: string;
 
 	/**
+	 * Start the engine in silent mode.
+	 */
+	silent?: string;
+
+	/**
+	 * Controls how unrecognised TWIN_* environment variables are handled at startup.
+	 * "error" (default): throws a startup error, allowing CI and production deployments
+	 * to hard-fail on misconfigured or misspelled variable names.
+	 * "warn": logs a warning and continues.
+	 * "ignore": skips validation entirely.
+	 * Any other value is rejected at startup.
+	 * @default "error"
+	 */
+	strictEnv?: string;
+
+	/**
+	 * Comma-separated list of raw environment variable names to exempt from the unknown-key check.
+	 * Use this to allowlist variables introduced by custom extensions that are not part of the
+	 * core interface, e.g. TWIN_MY_EXTENSION_SECRET.
+	 */
+	envAllowList?: string;
+
+	/**
 	 * The root directory for storing items like state file.
 	 */
 	storageFileRoot?: string;
@@ -21,9 +44,20 @@ export interface IEngineEnvironmentVariables {
 	stateFilename?: string;
 
 	/**
-	 * The type of the default entity storage: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql.
+	 * Is multi-tenant support enabled, defaults to false.
+	 */
+	tenantEnabled?: string;
+
+	/**
+	 * The type of the entity storage to create, comma separate for more than one connector.
+	 * values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 	 */
 	entityStorageConnectorType?: string;
+
+	/**
+	 * The default entity storage connector to use, defaults to the first one in the list.
+	 */
+	entityStorageConnectorDefault?: string;
 
 	/**
 	 * A prefix for all the table in entity-storage, can be empty.
@@ -31,14 +65,9 @@ export interface IEngineEnvironmentVariables {
 	entityStorageTablePrefix?: string;
 
 	/**
-	 * Enable the file entity storage connector.
+	 * AWS DynamoDB auth mode, either credentials or pod.
 	 */
-	entityFileEnable?: string;
-
-	/**
-	 * Enable the memory entity storage connector.
-	 */
-	entityMemoryEnable?: string;
+	awsDynamodbAuthMode?: string;
 
 	/**
 	 * AWS Dynamo DB access key id.
@@ -59,6 +88,11 @@ export interface IEngineEnvironmentVariables {
 	 * AWS Dynamo DB secret access key.
 	 */
 	awsDynamodbSecretAccessKey?: string;
+
+	/**
+	 * AWS Dynamo DB connection timeout in milliseconds.
+	 */
+	awsDynamodbConnectionTimeout?: string;
 
 	/**
 	 * Azure Cosmos DB key.
@@ -98,7 +132,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * GCP Firestore endpoint.
 	 */
-	gcpFirestoreApiEndpoint?: string;
+	gcpFirestoreEndpoint?: string;
 
 	/**
 	 * GCP Firestore project id.
@@ -119,6 +153,11 @@ export interface IEngineEnvironmentVariables {
 	 * ScyllaDB local data center.
 	 */
 	scylladbLocalDataCenter?: string;
+
+	/**
+	 * ScyllaDB port.
+	 */
+	scylladbPort?: string;
 
 	/**
 	 * MySQL host.
@@ -206,9 +245,15 @@ export interface IEngineEnvironmentVariables {
 	ipfsApiUrl?: string;
 
 	/**
-	 * The type of the default blob storage: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
+	 * The type of the entity storage to create, comma separate for more than one connector.
+	 * values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
 	 */
 	blobStorageConnectorType?: string;
+
+	/**
+	 * The default blob storage connector to use, defaults to the first one in the list.
+	 */
+	blobStorageConnectorDefault?: string;
 
 	/**
 	 * Enable encryption for the blob storage.
@@ -216,9 +261,9 @@ export interface IEngineEnvironmentVariables {
 	blobStorageEnableEncryption?: string;
 
 	/**
-	 * The encryption key for the blob storage.
+	 * The id of the encryption key for the blob storage.
 	 */
-	blobStorageEncryptionKey?: string;
+	blobStorageEncryptionKeyId?: string;
 
 	/**
 	 * A prefix for all the blobs in blob-storage, can be empty.
@@ -226,19 +271,9 @@ export interface IEngineEnvironmentVariables {
 	blobStoragePrefix?: string;
 
 	/**
-	 * Enable the file blob storage connector.
+	 * AWS S3 region.
 	 */
-	blobFileEnable?: string;
-
-	/**
-	 * Enable the memory blob storage connector.
-	 */
-	blobMemoryEnable?: string;
-
-	/**
-	 * AWS S3 access key id.
-	 */
-	awsS3AccessKeyId?: string;
+	awsS3Region?: string;
 
 	/**
 	 * AWS S3 bucket name.
@@ -246,19 +281,24 @@ export interface IEngineEnvironmentVariables {
 	awsS3BucketName?: string;
 
 	/**
-	 * AWS S3 endpoint.
+	 * AWS S3 auth mode, either credentials or pod, defaults to credentials.
 	 */
-	awsS3Endpoint?: string;
+	awsS3AuthMode?: string;
 
 	/**
-	 * AWS S3 region.
+	 * AWS S3 access key id.
 	 */
-	awsS3Region?: string;
+	awsS3AccessKeyId?: string;
 
 	/**
 	 * AWS S3 secret access key.
 	 */
 	awsS3SecretAccessKey?: string;
+
+	/**
+	 * AWS S3 endpoint.
+	 */
+	awsS3Endpoint?: string;
 
 	/**
 	 * Azure Storage account key.
@@ -306,6 +346,11 @@ export interface IEngineEnvironmentVariables {
 	vaultConnector?: string;
 
 	/**
+	 * Prefix to prepend to entries in the vault.
+	 */
+	vaultPrefix?: string;
+
+	/**
 	 * Hashicorp Vault token.
 	 */
 	hashicorpVaultToken?: string;
@@ -316,14 +361,24 @@ export interface IEngineEnvironmentVariables {
 	hashicorpVaultEndpoint?: string;
 
 	/**
-	 * The type of background task connector, can be a comma separated list: console, entity-storage.
+	 * The type of logging task connector, can be a comma separated list: console, entity-storage.
 	 */
 	loggingConnector?: string;
 
 	/**
-	 * The type of background task connector: entity-storage.
+	 * The batch size for the logging task, set to 1 for no batching.
 	 */
-	backgroundTaskConnector?: string;
+	loggingBatchSize?: string;
+
+	/**
+	 * The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+	 */
+	loggingBatchFlushInterval?: string;
+
+	/**
+	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	loggingSilentComponents?: string;
 
 	/**
 	 * The type of event bus connector: local.
@@ -334,6 +389,41 @@ export interface IEngineEnvironmentVariables {
 	 * The type of event bus component: service.
 	 */
 	eventBusComponent?: string;
+
+	/**
+	 * Are the messaging components enabled, defaults to false.
+	 */
+	messagingEnabled?: string;
+
+	/**
+	 * AWS SES region.
+	 */
+	awsSesRegion?: string;
+
+	/**
+	 * AWS SES auth mode, either credentials or pod, defaults to credentials.
+	 */
+	awsSesAuthMode?: string;
+
+	/**
+	 * AWS SES secret access key.
+	 */
+	awsSesSecretAccessKey?: string;
+
+	/**
+	 * AWS SES access key id.
+	 */
+	awsSesAccessKeyId?: string;
+
+	/**
+	 * AWS SES endpoint.
+	 */
+	awsSesEndpoint?: string;
+
+	/**
+	 * The applications for the push notifications reference a separate json with @json: prefix.
+	 */
+	awsMessagingPushNotificationApplications?: string;
 
 	/**
 	 * The type of messaging email connector: entity-storage, aws.
@@ -351,19 +441,44 @@ export interface IEngineEnvironmentVariables {
 	messagingPushNotificationConnector?: string;
 
 	/**
-	 * The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
-	 */
-	awsMessagingPushNotificationApplications?: string;
-
-	/**
-	 * The type of messaging component: service.
-	 */
-	messagingComponent?: string;
-
-	/**
 	 * The type of telemetry connector: entity-storage.
 	 */
 	telemetryConnector?: string;
+
+	/**
+	 * The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+	 */
+	openTelemetryMeterName?: string;
+
+	/**
+	 * The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+	 */
+	openTelemetryMeterVersion?: string;
+
+	/**
+	 * The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+	 */
+	openTelemetryReader?: string;
+
+	/**
+	 * The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+	 */
+	openTelemetryPrometheusPort?: string;
+
+	/**
+	 * Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+	 */
+	telemetryMetricsCollectorInterval?: string;
+
+	/**
+	 * The type of telemetry metrics producers, can be a comma separated list: system, process.
+	 */
+	telemetryMetricsProducers?: string;
+
+	/**
+	 * Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+	 */
+	telemetryMetricsProducerMaxHistory?: string;
 
 	/**
 	 * The type of faucet connector: entity-storage, iota.
@@ -381,19 +496,29 @@ export interface IEngineEnvironmentVariables {
 	nftConnector?: string;
 
 	/**
+	 * The NFT deployed package id, for custom deployments.
+	 */
+	nftPackageId?: string;
+
+	/**
+	 * The type of notarization connector: entity-storage, iota.
+	 */
+	notarizationConnector?: string;
+
+	/**
 	 * The type of identity connector: entity-storage, iota.
 	 */
 	identityConnector?: string;
 
 	/**
+	 * The index of the wallet address to use, defaults to 0.
+	 */
+	identityWalletAddressIndex?: string;
+
+	/**
 	 * The type of identity resolver connector: entity-storage, iota.
 	 */
 	identityResolverConnector?: string;
-
-	/**
-	 * The type of verifiable storage connector: entity-storage, iota.
-	 */
-	verifiableStorageConnector?: string;
 
 	/**
 	 * IOTA Faucet Endpoint.
@@ -431,6 +556,11 @@ export interface IEngineEnvironmentVariables {
 	iotaGasStationAuthToken?: string;
 
 	/**
+	 * The IOTA Identity deployed package id, for custom deployments.
+	 */
+	iotaIdentityPackageId?: string;
+
+	/**
 	 * Universal Resolver Endpoint.
 	 */
 	universalResolverEndpoint?: string;
@@ -456,6 +586,11 @@ export interface IEngineEnvironmentVariables {
 	attestationVerificationMethodId?: string;
 
 	/**
+	 * Is the data processing enabled, defaults to false.
+	 */
+	dataProcessingEnabled?: string;
+
+	/**
 	 * The type of the default data converters, can be a comma separated list: json, xml.
 	 */
 	dataConverterConnectors?: string;
@@ -466,22 +601,241 @@ export interface IEngineEnvironmentVariables {
 	dataExtractorConnectors?: string;
 
 	/**
-	 * Federated catalog TTL for the cache.
-	 */
-	federatedCatalogueCacheTtlMs?: number;
-
-	/**
-	 * Federated catalog clearing house approver list, stringified array of DIDs.
-	 */
-	federatedCatalogueClearingHouseApproverList?: string;
-
-	/**
-	 * Is the rights management enabled, defaults to false.
-	 */
-	rightsManagementEnabled?: string;
-
-	/**
-	 * Is the task scheduler enabled, defaults to true.
+	 * Enable the task scheduler regardless of which other components are active, defaults to false.
 	 */
 	taskSchedulerEnabled?: string;
+
+	/**
+	 * Is the auditable item graph enabled, defaults to false.
+	 */
+	auditableItemGraphEnabled?: string;
+
+	/**
+	 * Is the auditable item stream enabled, defaults to false.
+	 */
+	auditableItemStreamEnabled?: string;
+
+	/**
+	 * Is the document management enabled, defaults to false.
+	 */
+	documentManagementEnabled?: string;
+
+	/**
+	 * Enable the federated catalogue, defaults to false, automatically enabled if remote endpoint, filters or dataspace is enabled.
+	 */
+	federatedCatalogueEnabled?: string;
+
+	/**
+	 * Federated catalog filters, command separated list of filters to add.
+	 */
+	federatedCatalogueFilters?: string;
+
+	/**
+	 * Federated catalog remote endpoint, if set will use a REST client instead of local service.
+	 */
+	federatedCatalogueRemoteEndpoint?: string;
+
+	/**
+	 * The trust generators to add to the factory, comma separated list.
+	 */
+	trustGenerators?: string;
+
+	/**
+	 * The trust verifiers to add to the factory, comma separated list.
+	 */
+	trustVerifiers?: string;
+
+	/**
+	 * The verification method to use for trust identities.
+	 * Defaults to trust-assertion.
+	 */
+	trustVerificationMethodId?: string;
+
+	/**
+	 * The trust time to live for generating JWTs in seconds.
+	 * Defaults to undefined for never expiring.
+	 */
+	trustJwtTtl?: string;
+
+	/**
+	 * The allow lists for the trust identity verifier, comma separated list of identities.
+	 */
+	trustIdentitiesAllow?: string;
+
+	/**
+	 * The deny lists for the trust identity verifier, comma separated list of identities.
+	 */
+	trustIdentitiesDeny?: string;
+
+	/**
+	 * Path under which the rights management service is mounted (single source
+	 * of truth). The same value drives:
+	 * - the server route mount (via engine config)
+	 * - the PNP service's callback URL builder (`buildCallbackUrl`)
+	 * - the PNP rest-client's pathPrefix (consumer side)
+	 * Defaults to `rights-management`. Set when deploying behind a reverse proxy
+	 * with path rewriting, K8s ingress with path-based routing, or any custom
+	 * mount point.
+	 */
+	rightsManagementCallbackPath?: string;
+
+	/**
+	 * The rights management policy information sources to add to the factory.
+	 */
+	rightsManagementPolicyInformationSources?: string;
+
+	/**
+	 * The rights management policy negotiators sources to add to the factory.
+	 */
+	rightsManagementPolicyNegotiators?: string;
+
+	/**
+	 * The rights management policy requesters to add to the factory.
+	 */
+	rightsManagementPolicyRequesters?: string;
+
+	/**
+	 * The rights management policy execution actions to add to the factory.
+	 */
+	rightsManagementPolicyExecutionActions?: string;
+
+	/**
+	 * The rights management policy enforcement processors to add to the factory.
+	 */
+	rightsManagementPolicyEnforcementProcessors?: string;
+
+	/**
+	 * The rights management policy arbiters to add to the factory.
+	 */
+	rightsManagementPolicyArbiters?: string;
+
+	/**
+	 * The rights management policy obligation enforcers to add to the factory.
+	 */
+	rightsManagementPolicyObligationEnforcers?: string;
+
+	/**
+	 * Is the dataspace enabled, defaults to false.
+	 */
+	dataspaceEnabled?: string;
+
+	/**
+	 * The length of time to retain the activity logs for in seconds, set to -1 to keep forever.
+	 * @default 600
+	 */
+	dataspaceRetainActivityLogsFor?: string;
+
+	/**
+	 * The interval in seconds for cleaning up the activity logs.
+	 * @default 3600
+	 */
+	dataspaceActivityLogsCleanupInterval?: string;
+
+	/**
+	 * The data plane path for PULL transfers (path only, not full URL).
+	 * Will be combined with public origin.
+	 * Required if PULL transfers should be supported.
+	 * Example: "dataspace/entities"
+	 */
+	dataspaceDataPlanePath?: string;
+
+	/**
+	 * Whether the provider immediately starts a transfer once it has been requested.
+	 * When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+	 * @default false
+	 */
+	dataspaceAutoStartTransfers?: string;
+
+	/**
+	 * How long in seconds a negotiation may sit without progress before it is treated as timed out.
+	 * @default 30
+	 */
+	dataspaceStalledNegotiationTimeout?: string;
+
+	/**
+	 * How long in seconds a consumer-initiated transfer may sit in REQUESTED without the provider
+	 * progressing it before it is treated as timed out.
+	 * @default 30
+	 */
+	dataspaceStalledTransferTimeout?: string;
+
+	/**
+	 * Path under which the dataspace control plane is mounted (path only, not full URL).
+	 * This must match the control-plane REST mount, as it is combined with the public
+	 * origin to build the consumer's advertised callback address.
+	 * @default "dataspace-control-plane"
+	 */
+	dataspaceCallbackPath?: string;
+
+	/**
+	 * Are the health components enabled, defaults to false.
+	 */
+	healthEnabled?: string;
+
+	/**
+	 * The interval in seconds for performing health checks, defaults to 60.
+	 */
+	healthInterval?: string;
+
+	/**
+	 * The interval in seconds for performing health checks at startup, defaults to 2.
+	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
+	 */
+	healthStartupInterval?: string;
+
+	/**
+	 * The type of the automation action to create, comma separate for more than one connector.
+	 * values: fetch
+	 */
+	automationActionTypes?: string;
+
+	/**
+	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+	 */
+	mutexTimeoutMsDefault?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the auditable item graph component.
+	 */
+	auditableItemGraphMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the auditable item stream component.
+	 */
+	auditableItemStreamMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the federated catalogue component.
+	 */
+	federatedCatalogueMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the document management component.
+	 */
+	documentManagementMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the logging component.
+	 */
+	loggingMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the memory entity storage connector.
+	 */
+	entityStorageMemoryMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the file entity storage connector.
+	 */
+	entityStorageFileMutexTimeout?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the rights management component.
+	 */
+	rightsManagementMutexTimeout?: string;
+
+	/**
+	 * A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.
+	 */
+	extensions?: string;
 }

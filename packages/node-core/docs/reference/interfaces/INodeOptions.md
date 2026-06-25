@@ -4,47 +4,59 @@ The options when running the node.
 
 ## Properties
 
-### serverName?
+### serverName? {#servername}
 
-> `optional` **serverName**: `string`
+> `optional` **serverName?**: `string`
 
-The name of the server, defaults to "TWIN Node Server".
+The name of the server, defaults to "TWIN Node".
 
 #### Default
 
 ```ts
-"TWIN Node Server"
+"TWIN Node"
 ```
 
 ***
 
-### serverVersion?
+### serverVersion? {#serverversion}
 
-> `optional` **serverVersion**: `string`
+> `optional` **serverVersion?**: `string`
 
 The version of the server, defaults to the current version.
 
 ***
 
-### envFilenames?
+### envVars? {#envvars}
 
-> `optional` **envFilenames**: `string`[]
+> `optional` **envVars?**: `object`
+
+Additional environment variables to set.
+
+#### Index Signature
+
+\[`key`: `string`\]: `string`
+
+***
+
+### envFilenames? {#envfilenames}
+
+> `optional` **envFilenames?**: `string`[]
 
 Additional environment variable filenames to load, defaults to .env.
 
 ***
 
-### envPrefix?
+### envPrefix? {#envprefix}
 
-> `optional` **envPrefix**: `string`
+> `optional` **envPrefix?**: `string`
 
-The prefix for environment variables, defaults to "TWIN_NODE_".
+The prefix for environment variables, defaults to "TWIN_".
 
 ***
 
-### configFilenames?
+### configFilenames? {#configfilenames}
 
-> `optional` **configFilenames**: `string`[]
+> `optional` **configFilenames?**: `string`[]
 
 A list of JSON files to load as configuration files.
 The files will be loaded in the order they are provided, and the last one will
@@ -52,42 +64,58 @@ override any previous values.
 
 ***
 
-### config?
+### config? {#config}
 
-> `optional` **config**: `IEngineConfig`
+> `optional` **config?**: `IEngineConfig`
 
 Provides the ability to have some initial custom configuration for the engine.
 This will be merged with any configuration loaded from the environment variables.
 
 ***
 
-### executionDirectory?
+### scriptDirectory? {#scriptdirectory}
 
-> `optional` **executionDirectory**: `string`
+> `optional` **scriptDirectory?**: `string`
+
+The directory to override the script location, defaults to location of index.js.
+
+***
+
+### executionDirectory? {#executiondirectory}
+
+> `optional` **executionDirectory?**: `string`
 
 The directory to override the execution location, defaults to process directory.
 
 ***
 
-### localesDirectory?
+### localesDirectory? {#localesdirectory}
 
-> `optional` **localesDirectory**: `string`
+> `optional` **localesDirectory?**: `string`
 
 The directory to override the locales directory, defaults to the locales directory.
 
 ***
 
-### openApiSpecFile?
+### openApiSpecFile? {#openapispecfile}
 
-> `optional` **openApiSpecFile**: `string`
+> `optional` **openApiSpecFile?**: `string`
 
 The path to the OpenAPI spec file, defaults to docs/open-api/spec.json.
 
 ***
 
-### extendEnvVars()?
+### favIconFile? {#faviconfile}
 
-> `optional` **extendEnvVars**: (`envVars`) => `Promise`\<`void`\>
+> `optional` **favIconFile?**: `string`
+
+The path to the favicon, defaults to static/favicon.png.
+
+***
+
+### extendEnvVars? {#extendenvvars}
+
+> `optional` **extendEnvVars?**: (`envVars`) => `Promise`\<`void`\>
 
 Method to extend the engine environment variables with any additional custom configuration.
 
@@ -95,7 +123,7 @@ Method to extend the engine environment variables with any additional custom con
 
 ##### envVars
 
-[`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
 
 #### Returns
 
@@ -103,17 +131,21 @@ Method to extend the engine environment variables with any additional custom con
 
 ***
 
-### extendConfig()?
+### extendConfig? {#extendconfig}
 
-> `optional` **extendConfig**: (`config`) => `Promise`\<`void`\>
+> `optional` **extendConfig?**: (`envVars`, `config`) => `Promise`\<`void`\>
 
 Method to extend the engine configuration with any additional custom configuration.
 
 #### Parameters
 
+##### envVars
+
+[`IEnvironmentVariables`](../type-aliases/IEnvironmentVariables.md)
+
 ##### config
 
-`IEngineConfig`
+[`INodeEngineConfig`](INodeEngineConfig.md)
 
 #### Returns
 
@@ -121,9 +153,9 @@ Method to extend the engine configuration with any additional custom configurati
 
 ***
 
-### extendEngine()?
+### extendEngine? {#extendengine}
 
-> `optional` **extendEngine**: (`engine`) => `Promise`\<`void`\>
+> `optional` **extendEngine?**: (`engine`) => `Promise`\<`void`\>
 
 Method to extend the engine with any additional options.
 
@@ -139,9 +171,9 @@ Method to extend the engine with any additional options.
 
 ***
 
-### extendEngineServer()?
+### extendEngineServer? {#extendengineserver}
 
-> `optional` **extendEngineServer**: (`engineServer`) => `Promise`\<`void`\>
+> `optional` **extendEngineServer?**: (`engineServer`) => `Promise`\<`void`\>
 
 Method to extend the engine server with any additional options.
 
@@ -157,9 +189,17 @@ Method to extend the engine server with any additional options.
 
 ***
 
-### stateStorage?
+### stateStorage? {#statestorage}
 
-> `optional` **stateStorage**: `IEngineStateStorage`\<`IEngineState`\>
+> `optional` **stateStorage?**: `IEngineStateStorage`\<`IEngineState`\>
 
 The state storage to use for the engine.
 If not provided, a default file-based state storage will be used.
+
+***
+
+### disableProcessExitOnFailure? {#disableprocessexitonfailure}
+
+> `optional` **disableProcessExitOnFailure?**: `boolean`
+
+Disables process.exit calls on fatal errors and throws instead.

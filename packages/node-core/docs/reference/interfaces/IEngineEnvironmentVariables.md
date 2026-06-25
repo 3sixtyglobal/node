@@ -2,774 +2,1351 @@
 
 The engine core environment variables.
 
-## Extended by
-
-- [`INodeEnvironmentVariables`](INodeEnvironmentVariables.md)
-
 ## Properties
 
-### debug?
+### debug? {#debug}
 
-> `optional` **debug**: `string`
+> `optional` **debug?**: `string`
 
 Start the engine in debug mode.
 
 ***
 
-### storageFileRoot?
+### silent? {#silent}
 
-> `optional` **storageFileRoot**: `string`
+> `optional` **silent?**: `string`
+
+Start the engine in silent mode.
+
+***
+
+### strictEnv? {#strictenv}
+
+> `optional` **strictEnv?**: `string`
+
+Controls how unrecognised TWIN_* environment variables are handled at startup.
+"error" (default): throws a startup error, allowing CI and production deployments
+to hard-fail on misconfigured or misspelled variable names.
+"warn": logs a warning and continues.
+"ignore": skips validation entirely.
+Any other value is rejected at startup.
+
+#### Default
+
+```ts
+"error"
+```
+
+***
+
+### envAllowList? {#envallowlist}
+
+> `optional` **envAllowList?**: `string`
+
+Comma-separated list of raw environment variable names to exempt from the unknown-key check.
+Use this to allowlist variables introduced by custom extensions that are not part of the
+core interface, e.g. TWIN_MY_EXTENSION_SECRET.
+
+***
+
+### storageFileRoot? {#storagefileroot}
+
+> `optional` **storageFileRoot?**: `string`
 
 The root directory for storing items like state file.
 
 ***
 
-### stateFilename?
+### stateFilename? {#statefilename}
 
-> `optional` **stateFilename**: `string`
+> `optional` **stateFilename?**: `string`
 
 The name of the state file.
 
 ***
 
-### entityStorageConnectorType?
+### tenantEnabled? {#tenantenabled}
 
-> `optional` **entityStorageConnectorType**: `string`
+> `optional` **tenantEnabled?**: `string`
 
-The type of the default entity storage: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql.
+Is multi-tenant support enabled, defaults to false.
 
 ***
 
-### entityStorageTablePrefix?
+### entityStorageConnectorType? {#entitystorageconnectortype}
 
-> `optional` **entityStorageTablePrefix**: `string`
+> `optional` **entityStorageConnectorType?**: `string`
+
+The type of the entity storage to create, comma separate for more than one connector.
+values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
+
+***
+
+### entityStorageConnectorDefault? {#entitystorageconnectordefault}
+
+> `optional` **entityStorageConnectorDefault?**: `string`
+
+The default entity storage connector to use, defaults to the first one in the list.
+
+***
+
+### entityStorageTablePrefix? {#entitystoragetableprefix}
+
+> `optional` **entityStorageTablePrefix?**: `string`
 
 A prefix for all the table in entity-storage, can be empty.
 
 ***
 
-### entityFileEnable?
+### awsDynamodbAuthMode? {#awsdynamodbauthmode}
 
-> `optional` **entityFileEnable**: `string`
+> `optional` **awsDynamodbAuthMode?**: `string`
 
-Enable the file entity storage connector.
-
-***
-
-### entityMemoryEnable?
-
-> `optional` **entityMemoryEnable**: `string`
-
-Enable the memory entity storage connector.
+AWS DynamoDB auth mode, either credentials or pod.
 
 ***
 
-### awsDynamodbAccessKeyId?
+### awsDynamodbAccessKeyId? {#awsdynamodbaccesskeyid}
 
-> `optional` **awsDynamodbAccessKeyId**: `string`
+> `optional` **awsDynamodbAccessKeyId?**: `string`
 
 AWS Dynamo DB access key id.
 
 ***
 
-### awsDynamodbEndpoint?
+### awsDynamodbEndpoint? {#awsdynamodbendpoint}
 
-> `optional` **awsDynamodbEndpoint**: `string`
+> `optional` **awsDynamodbEndpoint?**: `string`
 
 AWS Dynamo DB Endpoint if running local instance.
 
 ***
 
-### awsDynamodbRegion?
+### awsDynamodbRegion? {#awsdynamodbregion}
 
-> `optional` **awsDynamodbRegion**: `string`
+> `optional` **awsDynamodbRegion?**: `string`
 
 AWS Dynamo DB region.
 
 ***
 
-### awsDynamodbSecretAccessKey?
+### awsDynamodbSecretAccessKey? {#awsdynamodbsecretaccesskey}
 
-> `optional` **awsDynamodbSecretAccessKey**: `string`
+> `optional` **awsDynamodbSecretAccessKey?**: `string`
 
 AWS Dynamo DB secret access key.
 
 ***
 
-### azureCosmosdbKey?
+### awsDynamodbConnectionTimeout? {#awsdynamodbconnectiontimeout}
 
-> `optional` **azureCosmosdbKey**: `string`
+> `optional` **awsDynamodbConnectionTimeout?**: `string`
+
+AWS Dynamo DB connection timeout in milliseconds.
+
+***
+
+### azureCosmosdbKey? {#azurecosmosdbkey}
+
+> `optional` **azureCosmosdbKey?**: `string`
 
 Azure Cosmos DB key.
 
 ***
 
-### azureCosmosdbContainerId?
+### azureCosmosdbContainerId? {#azurecosmosdbcontainerid}
 
-> `optional` **azureCosmosdbContainerId**: `string`
+> `optional` **azureCosmosdbContainerId?**: `string`
 
 Azure Cosmos DB container id.
 
 ***
 
-### azureCosmosdbDatabaseId?
+### azureCosmosdbDatabaseId? {#azurecosmosdbdatabaseid}
 
-> `optional` **azureCosmosdbDatabaseId**: `string`
+> `optional` **azureCosmosdbDatabaseId?**: `string`
 
 Azure Cosmos DB database id.
 
 ***
 
-### azureCosmosdbEndpoint?
+### azureCosmosdbEndpoint? {#azurecosmosdbendpoint}
 
-> `optional` **azureCosmosdbEndpoint**: `string`
+> `optional` **azureCosmosdbEndpoint?**: `string`
 
 Azure Cosmos DB endpoint.
 
 ***
 
-### gcpFirestoreCollectionName?
+### gcpFirestoreCollectionName? {#gcpfirestorecollectionname}
 
-> `optional` **gcpFirestoreCollectionName**: `string`
+> `optional` **gcpFirestoreCollectionName?**: `string`
 
 GCP Firestore collection name.
 
 ***
 
-### gcpFirestoreCredentials?
+### gcpFirestoreCredentials? {#gcpfirestorecredentials}
 
-> `optional` **gcpFirestoreCredentials**: `string`
+> `optional` **gcpFirestoreCredentials?**: `string`
 
 GCP Firestore credentials.
 
 ***
 
-### gcpFirestoreDatabaseId?
+### gcpFirestoreDatabaseId? {#gcpfirestoredatabaseid}
 
-> `optional` **gcpFirestoreDatabaseId**: `string`
+> `optional` **gcpFirestoreDatabaseId?**: `string`
 
 GCP Firestore database id.
 
 ***
 
-### gcpFirestoreApiEndpoint?
+### gcpFirestoreEndpoint? {#gcpfirestoreendpoint}
 
-> `optional` **gcpFirestoreApiEndpoint**: `string`
+> `optional` **gcpFirestoreEndpoint?**: `string`
 
 GCP Firestore endpoint.
 
 ***
 
-### gcpFirestoreProjectId?
+### gcpFirestoreProjectId? {#gcpfirestoreprojectid}
 
-> `optional` **gcpFirestoreProjectId**: `string`
+> `optional` **gcpFirestoreProjectId?**: `string`
 
 GCP Firestore project id.
 
 ***
 
-### scylladbHosts?
+### scylladbHosts? {#scylladbhosts}
 
-> `optional` **scylladbHosts**: `string`
+> `optional` **scylladbHosts?**: `string`
 
 ScyllaDB hosts as comma separated string.
 
 ***
 
-### scylladbKeyspace?
+### scylladbKeyspace? {#scylladbkeyspace}
 
-> `optional` **scylladbKeyspace**: `string`
+> `optional` **scylladbKeyspace?**: `string`
 
 ScyllaDB keyspace.
 
 ***
 
-### scylladbLocalDataCenter?
+### scylladbLocalDataCenter? {#scylladblocaldatacenter}
 
-> `optional` **scylladbLocalDataCenter**: `string`
+> `optional` **scylladbLocalDataCenter?**: `string`
 
 ScyllaDB local data center.
 
 ***
 
-### mySqlHost?
+### scylladbPort? {#scylladbport}
 
-> `optional` **mySqlHost**: `string`
+> `optional` **scylladbPort?**: `string`
+
+ScyllaDB port.
+
+***
+
+### mySqlHost? {#mysqlhost}
+
+> `optional` **mySqlHost?**: `string`
 
 MySQL host.
 
 ***
 
-### mySqlPort?
+### mySqlPort? {#mysqlport}
 
-> `optional` **mySqlPort**: `number`
+> `optional` **mySqlPort?**: `number`
 
 MySQL port.
 
 ***
 
-### mySqlUser?
+### mySqlUser? {#mysqluser}
 
-> `optional` **mySqlUser**: `string`
+> `optional` **mySqlUser?**: `string`
 
 MySQL username.
 
 ***
 
-### mySqlPassword?
+### mySqlPassword? {#mysqlpassword}
 
-> `optional` **mySqlPassword**: `string`
+> `optional` **mySqlPassword?**: `string`
 
 MySQL password.
 
 ***
 
-### mySqlDatabase?
+### mySqlDatabase? {#mysqldatabase}
 
-> `optional` **mySqlDatabase**: `string`
+> `optional` **mySqlDatabase?**: `string`
 
 MySQL Database.
 
 ***
 
-### mongoDbHost?
+### mongoDbHost? {#mongodbhost}
 
-> `optional` **mongoDbHost**: `string`
+> `optional` **mongoDbHost?**: `string`
 
 MongoDB host.
 
 ***
 
-### mongoDbPort?
+### mongoDbPort? {#mongodbport}
 
-> `optional` **mongoDbPort**: `number`
+> `optional` **mongoDbPort?**: `number`
 
 MongoDB port.
 
 ***
 
-### mongoDbUser?
+### mongoDbUser? {#mongodbuser}
 
-> `optional` **mongoDbUser**: `string`
+> `optional` **mongoDbUser?**: `string`
 
 MongoDB username.
 
 ***
 
-### mongoDbPassword?
+### mongoDbPassword? {#mongodbpassword}
 
-> `optional` **mongoDbPassword**: `string`
+> `optional` **mongoDbPassword?**: `string`
 
 MongoDB password.
 
 ***
 
-### mongoDbDatabase?
+### mongoDbDatabase? {#mongodbdatabase}
 
-> `optional` **mongoDbDatabase**: `string`
+> `optional` **mongoDbDatabase?**: `string`
 
 MongoDB Database.
 
 ***
 
-### postgreSqlHost?
+### postgreSqlHost? {#postgresqlhost}
 
-> `optional` **postgreSqlHost**: `string`
+> `optional` **postgreSqlHost?**: `string`
 
 PostgreSQl host.
 
 ***
 
-### postgreSqlPort?
+### postgreSqlPort? {#postgresqlport}
 
-> `optional` **postgreSqlPort**: `number`
+> `optional` **postgreSqlPort?**: `number`
 
 PostgreSQl port.
 
 ***
 
-### postgreSqlUser?
+### postgreSqlUser? {#postgresqluser}
 
-> `optional` **postgreSqlUser**: `string`
+> `optional` **postgreSqlUser?**: `string`
 
 PostgreSQl username.
 
 ***
 
-### postgreSqlPassword?
+### postgreSqlPassword? {#postgresqlpassword}
 
-> `optional` **postgreSqlPassword**: `string`
+> `optional` **postgreSqlPassword?**: `string`
 
 PostgreSQl password.
 
 ***
 
-### postgreSqlDatabase?
+### postgreSqlDatabase? {#postgresqldatabase}
 
-> `optional` **postgreSqlDatabase**: `string`
+> `optional` **postgreSqlDatabase?**: `string`
 
 PostgreSQl Database.
 
 ***
 
-### ipfsBearerToken?
+### ipfsBearerToken? {#ipfsbearertoken}
 
-> `optional` **ipfsBearerToken**: `string`
+> `optional` **ipfsBearerToken?**: `string`
 
 The security token for accessing IPFS API.
 
 ***
 
-### ipfsApiUrl?
+### ipfsApiUrl? {#ipfsapiurl}
 
-> `optional` **ipfsApiUrl**: `string`
+> `optional` **ipfsApiUrl?**: `string`
 
 The url for accessing IPFS API.
 
 ***
 
-### blobStorageConnectorType?
+### blobStorageConnectorType? {#blobstorageconnectortype}
 
-> `optional` **blobStorageConnectorType**: `string`
+> `optional` **blobStorageConnectorType?**: `string`
 
-The type of the default blob storage: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
+The type of the entity storage to create, comma separate for more than one connector.
+values: memory, file, ipfs, aws-s3, azure-storage, gcp-storage.
 
 ***
 
-### blobStorageEnableEncryption?
+### blobStorageConnectorDefault? {#blobstorageconnectordefault}
 
-> `optional` **blobStorageEnableEncryption**: `string`
+> `optional` **blobStorageConnectorDefault?**: `string`
+
+The default blob storage connector to use, defaults to the first one in the list.
+
+***
+
+### blobStorageEnableEncryption? {#blobstorageenableencryption}
+
+> `optional` **blobStorageEnableEncryption?**: `string`
 
 Enable encryption for the blob storage.
 
 ***
 
-### blobStorageEncryptionKey?
+### blobStorageEncryptionKeyId? {#blobstorageencryptionkeyid}
 
-> `optional` **blobStorageEncryptionKey**: `string`
+> `optional` **blobStorageEncryptionKeyId?**: `string`
 
-The encryption key for the blob storage.
+The id of the encryption key for the blob storage.
 
 ***
 
-### blobStoragePrefix?
+### blobStoragePrefix? {#blobstorageprefix}
 
-> `optional` **blobStoragePrefix**: `string`
+> `optional` **blobStoragePrefix?**: `string`
 
 A prefix for all the blobs in blob-storage, can be empty.
 
 ***
 
-### blobFileEnable?
+### awsS3Region? {#awss3region}
 
-> `optional` **blobFileEnable**: `string`
-
-Enable the file blob storage connector.
-
-***
-
-### blobMemoryEnable?
-
-> `optional` **blobMemoryEnable**: `string`
-
-Enable the memory blob storage connector.
-
-***
-
-### awsS3AccessKeyId?
-
-> `optional` **awsS3AccessKeyId**: `string`
-
-AWS S3 access key id.
-
-***
-
-### awsS3BucketName?
-
-> `optional` **awsS3BucketName**: `string`
-
-AWS S3 bucket name.
-
-***
-
-### awsS3Endpoint?
-
-> `optional` **awsS3Endpoint**: `string`
-
-AWS S3 endpoint.
-
-***
-
-### awsS3Region?
-
-> `optional` **awsS3Region**: `string`
+> `optional` **awsS3Region?**: `string`
 
 AWS S3 region.
 
 ***
 
-### awsS3SecretAccessKey?
+### awsS3BucketName? {#awss3bucketname}
 
-> `optional` **awsS3SecretAccessKey**: `string`
+> `optional` **awsS3BucketName?**: `string`
+
+AWS S3 bucket name.
+
+***
+
+### awsS3AuthMode? {#awss3authmode}
+
+> `optional` **awsS3AuthMode?**: `string`
+
+AWS S3 auth mode, either credentials or pod, defaults to credentials.
+
+***
+
+### awsS3AccessKeyId? {#awss3accesskeyid}
+
+> `optional` **awsS3AccessKeyId?**: `string`
+
+AWS S3 access key id.
+
+***
+
+### awsS3SecretAccessKey? {#awss3secretaccesskey}
+
+> `optional` **awsS3SecretAccessKey?**: `string`
 
 AWS S3 secret access key.
 
 ***
 
-### azureStorageAccountKey?
+### awsS3Endpoint? {#awss3endpoint}
 
-> `optional` **azureStorageAccountKey**: `string`
+> `optional` **awsS3Endpoint?**: `string`
+
+AWS S3 endpoint.
+
+***
+
+### azureStorageAccountKey? {#azurestorageaccountkey}
+
+> `optional` **azureStorageAccountKey?**: `string`
 
 Azure Storage account key.
 
 ***
 
-### azureStorageAccountName?
+### azureStorageAccountName? {#azurestorageaccountname}
 
-> `optional` **azureStorageAccountName**: `string`
+> `optional` **azureStorageAccountName?**: `string`
 
 Azure Storage account name.
 
 ***
 
-### azureStorageContainerName?
+### azureStorageContainerName? {#azurestoragecontainername}
 
-> `optional` **azureStorageContainerName**: `string`
+> `optional` **azureStorageContainerName?**: `string`
 
 Azure Storage container.
 
 ***
 
-### azureStorageEndpoint?
+### azureStorageEndpoint? {#azurestorageendpoint}
 
-> `optional` **azureStorageEndpoint**: `string`
+> `optional` **azureStorageEndpoint?**: `string`
 
 Azure Storage endpoint.
 
 ***
 
-### gcpStorageBucketName?
+### gcpStorageBucketName? {#gcpstoragebucketname}
 
-> `optional` **gcpStorageBucketName**: `string`
+> `optional` **gcpStorageBucketName?**: `string`
 
 GCP Storage bucket.
 
 ***
 
-### gcpStorageCredentials?
+### gcpStorageCredentials? {#gcpstoragecredentials}
 
-> `optional` **gcpStorageCredentials**: `string`
+> `optional` **gcpStorageCredentials?**: `string`
 
 GCP Storage credentials.
 
 ***
 
-### gcpStorageEndpoint?
+### gcpStorageEndpoint? {#gcpstorageendpoint}
 
-> `optional` **gcpStorageEndpoint**: `string`
+> `optional` **gcpStorageEndpoint?**: `string`
 
 GCP Storage endpoint.
 
 ***
 
-### gcpStorageProjectId?
+### gcpStorageProjectId? {#gcpstorageprojectid}
 
-> `optional` **gcpStorageProjectId**: `string`
+> `optional` **gcpStorageProjectId?**: `string`
 
 GCP Storage project id.
 
 ***
 
-### vaultConnector?
+### vaultConnector? {#vaultconnector}
 
-> `optional` **vaultConnector**: `string`
+> `optional` **vaultConnector?**: `string`
 
 The type of the default vault connector: entity-storage, hashicorp.
 
 ***
 
-### hashicorpVaultToken?
+### vaultPrefix? {#vaultprefix}
 
-> `optional` **hashicorpVaultToken**: `string`
+> `optional` **vaultPrefix?**: `string`
+
+Prefix to prepend to entries in the vault.
+
+***
+
+### hashicorpVaultToken? {#hashicorpvaulttoken}
+
+> `optional` **hashicorpVaultToken?**: `string`
 
 Hashicorp Vault token.
 
 ***
 
-### hashicorpVaultEndpoint?
+### hashicorpVaultEndpoint? {#hashicorpvaultendpoint}
 
-> `optional` **hashicorpVaultEndpoint**: `string`
+> `optional` **hashicorpVaultEndpoint?**: `string`
 
 Hashicorp Vault endpoint.
 
 ***
 
-### loggingConnector?
+### loggingConnector? {#loggingconnector}
 
-> `optional` **loggingConnector**: `string`
+> `optional` **loggingConnector?**: `string`
 
-The type of background task connector, can be a comma separated list: console, entity-storage.
-
-***
-
-### backgroundTaskConnector?
-
-> `optional` **backgroundTaskConnector**: `string`
-
-The type of background task connector: entity-storage.
+The type of logging task connector, can be a comma separated list: console, entity-storage.
 
 ***
 
-### eventBusConnector?
+### loggingBatchSize? {#loggingbatchsize}
 
-> `optional` **eventBusConnector**: `string`
+> `optional` **loggingBatchSize?**: `string`
+
+The batch size for the logging task, set to 1 for no batching.
+
+***
+
+### loggingBatchFlushInterval? {#loggingbatchflushinterval}
+
+> `optional` **loggingBatchFlushInterval?**: `string`
+
+The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+
+***
+
+### loggingSilentComponents? {#loggingsilentcomponents}
+
+> `optional` **loggingSilentComponents?**: `string`
+
+A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
+### eventBusConnector? {#eventbusconnector}
+
+> `optional` **eventBusConnector?**: `string`
 
 The type of event bus connector: local.
 
 ***
 
-### eventBusComponent?
+### eventBusComponent? {#eventbuscomponent}
 
-> `optional` **eventBusComponent**: `string`
+> `optional` **eventBusComponent?**: `string`
 
 The type of event bus component: service.
 
 ***
 
-### messagingEmailConnector?
+### messagingEnabled? {#messagingenabled}
 
-> `optional` **messagingEmailConnector**: `string`
+> `optional` **messagingEnabled?**: `string`
+
+Are the messaging components enabled, defaults to false.
+
+***
+
+### awsSesRegion? {#awssesregion}
+
+> `optional` **awsSesRegion?**: `string`
+
+AWS SES region.
+
+***
+
+### awsSesAuthMode? {#awssesauthmode}
+
+> `optional` **awsSesAuthMode?**: `string`
+
+AWS SES auth mode, either credentials or pod, defaults to credentials.
+
+***
+
+### awsSesSecretAccessKey? {#awssessecretaccesskey}
+
+> `optional` **awsSesSecretAccessKey?**: `string`
+
+AWS SES secret access key.
+
+***
+
+### awsSesAccessKeyId? {#awssesaccesskeyid}
+
+> `optional` **awsSesAccessKeyId?**: `string`
+
+AWS SES access key id.
+
+***
+
+### awsSesEndpoint? {#awssesendpoint}
+
+> `optional` **awsSesEndpoint?**: `string`
+
+AWS SES endpoint.
+
+***
+
+### awsMessagingPushNotificationApplications? {#awsmessagingpushnotificationapplications}
+
+> `optional` **awsMessagingPushNotificationApplications?**: `string`
+
+The applications for the push notifications reference a separate json with @json: prefix.
+
+***
+
+### messagingEmailConnector? {#messagingemailconnector}
+
+> `optional` **messagingEmailConnector?**: `string`
 
 The type of messaging email connector: entity-storage, aws.
 
 ***
 
-### messagingSmsConnector?
+### messagingSmsConnector? {#messagingsmsconnector}
 
-> `optional` **messagingSmsConnector**: `string`
+> `optional` **messagingSmsConnector?**: `string`
 
 The type of messaging sms connector: entity-storage, aws.
 
 ***
 
-### messagingPushNotificationConnector?
+### messagingPushNotificationConnector? {#messagingpushnotificationconnector}
 
-> `optional` **messagingPushNotificationConnector**: `string`
+> `optional` **messagingPushNotificationConnector?**: `string`
 
 The type of messaging push notification connector: entity-storage, aws.
 
 ***
 
-### awsMessagingPushNotificationApplications?
+### telemetryConnector? {#telemetryconnector}
 
-> `optional` **awsMessagingPushNotificationApplications**: `string`
-
-The applications for the push notifications JSON stringified array of IAwsApplicationSettings.
-
-***
-
-### messagingComponent?
-
-> `optional` **messagingComponent**: `string`
-
-The type of messaging component: service.
-
-***
-
-### telemetryConnector?
-
-> `optional` **telemetryConnector**: `string`
+> `optional` **telemetryConnector?**: `string`
 
 The type of telemetry connector: entity-storage.
 
 ***
 
-### faucetConnector?
+### openTelemetryMeterName? {#opentelemetrymetername}
 
-> `optional` **faucetConnector**: `string`
+> `optional` **openTelemetryMeterName?**: `string`
+
+The name of the Open Telemetry meter to use, only required if using open-telemetry as telemetry connector, defaults to twin-node.
+
+***
+
+### openTelemetryMeterVersion? {#opentelemetrymeterversion}
+
+> `optional` **openTelemetryMeterVersion?**: `string`
+
+The version of the Open Telemetry metrics specification to use, only required if using open-telemetry as telemetry connector, defaults to 1.0.0.
+
+***
+
+### openTelemetryReader? {#opentelemetryreader}
+
+> `optional` **openTelemetryReader?**: `string`
+
+The type of Open Telemetry metric reader to use, only required if using open-telemetry as telemetry connector, values: prometheus.
+
+***
+
+### openTelemetryPrometheusPort? {#opentelemetryprometheusport}
+
+> `optional` **openTelemetryPrometheusPort?**: `string`
+
+The port to use for the Open Telemetry Prometheus metrics server, only required if using open-telemetry as telemetry connector and prometheus as reader, defaults to 9464.
+
+***
+
+### telemetryMetricsCollectorInterval? {#telemetrymetricscollectorinterval}
+
+> `optional` **telemetryMetricsCollectorInterval?**: `string`
+
+Polling interval in seconds for the telemetry metrics collector. Defaults to 60.
+
+***
+
+### telemetryMetricsProducers? {#telemetrymetricsproducers}
+
+> `optional` **telemetryMetricsProducers?**: `string`
+
+The type of telemetry metrics producers, can be a comma separated list: system, process.
+
+***
+
+### telemetryMetricsProducerMaxHistory? {#telemetrymetricsproducermaxhistory}
+
+> `optional` **telemetryMetricsProducerMaxHistory?**: `string`
+
+Maximum number of values retained per telemetry metric (count-based history cap). Defaults to 1440.
+
+***
+
+### faucetConnector? {#faucetconnector}
+
+> `optional` **faucetConnector?**: `string`
 
 The type of faucet connector: entity-storage, iota.
 
 ***
 
-### walletConnector?
+### walletConnector? {#walletconnector}
 
-> `optional` **walletConnector**: `string`
+> `optional` **walletConnector?**: `string`
 
 The type of wallet connector: entity-storage, iota.
 
 ***
 
-### nftConnector?
+### nftConnector? {#nftconnector}
 
-> `optional` **nftConnector**: `string`
+> `optional` **nftConnector?**: `string`
 
 The type of NFT connector: entity-storage, iota.
 
 ***
 
-### identityConnector?
+### nftPackageId? {#nftpackageid}
 
-> `optional` **identityConnector**: `string`
+> `optional` **nftPackageId?**: `string`
+
+The NFT deployed package id, for custom deployments.
+
+***
+
+### notarizationConnector? {#notarizationconnector}
+
+> `optional` **notarizationConnector?**: `string`
+
+The type of notarization connector: entity-storage, iota.
+
+***
+
+### identityConnector? {#identityconnector}
+
+> `optional` **identityConnector?**: `string`
 
 The type of identity connector: entity-storage, iota.
 
 ***
 
-### identityResolverConnector?
+### identityWalletAddressIndex? {#identitywalletaddressindex}
 
-> `optional` **identityResolverConnector**: `string`
+> `optional` **identityWalletAddressIndex?**: `string`
+
+The index of the wallet address to use, defaults to 0.
+
+***
+
+### identityResolverConnector? {#identityresolverconnector}
+
+> `optional` **identityResolverConnector?**: `string`
 
 The type of identity resolver connector: entity-storage, iota.
 
 ***
 
-### verifiableStorageConnector?
+### iotaFaucetEndpoint? {#iotafaucetendpoint}
 
-> `optional` **verifiableStorageConnector**: `string`
-
-The type of verifiable storage connector: entity-storage, iota.
-
-***
-
-### iotaFaucetEndpoint?
-
-> `optional` **iotaFaucetEndpoint**: `string`
+> `optional` **iotaFaucetEndpoint?**: `string`
 
 IOTA Faucet Endpoint.
 
 ***
 
-### iotaNodeEndpoint?
+### iotaNodeEndpoint? {#iotanodeendpoint}
 
-> `optional` **iotaNodeEndpoint**: `string`
+> `optional` **iotaNodeEndpoint?**: `string`
 
 IOTA Node Endpoint.
 
 ***
 
-### iotaNetwork?
+### iotaNetwork? {#iotanetwork}
 
-> `optional` **iotaNetwork**: `string`
+> `optional` **iotaNetwork?**: `string`
 
 IOTA network.
 
 ***
 
-### iotaCoinType?
+### iotaCoinType? {#iotacointype}
 
-> `optional` **iotaCoinType**: `string`
+> `optional` **iotaCoinType?**: `string`
 
 IOTA coin type.
 
 ***
 
-### iotaExplorerEndpoint?
+### iotaExplorerEndpoint? {#iotaexplorerendpoint}
 
-> `optional` **iotaExplorerEndpoint**: `string`
+> `optional` **iotaExplorerEndpoint?**: `string`
 
 IOTA Explorer Endpoint.
 
 ***
 
-### iotaGasStationEndpoint?
+### iotaGasStationEndpoint? {#iotagasstationendpoint}
 
-> `optional` **iotaGasStationEndpoint**: `string`
+> `optional` **iotaGasStationEndpoint?**: `string`
 
 IOTA Gas Station Endpoint.
 
 ***
 
-### iotaGasStationAuthToken?
+### iotaGasStationAuthToken? {#iotagasstationauthtoken}
 
-> `optional` **iotaGasStationAuthToken**: `string`
+> `optional` **iotaGasStationAuthToken?**: `string`
 
 IOTA Gas Station Authentication Token.
 
 ***
 
-### universalResolverEndpoint?
+### iotaIdentityPackageId? {#iotaidentitypackageid}
 
-> `optional` **universalResolverEndpoint**: `string`
+> `optional` **iotaIdentityPackageId?**: `string`
+
+The IOTA Identity deployed package id, for custom deployments.
+
+***
+
+### universalResolverEndpoint? {#universalresolverendpoint}
+
+> `optional` **universalResolverEndpoint?**: `string`
 
 Universal Resolver Endpoint.
 
 ***
 
-### identityProfileConnector?
+### identityProfileConnector? {#identityprofileconnector}
 
-> `optional` **identityProfileConnector**: `string`
+> `optional` **identityProfileConnector?**: `string`
 
 The type of identity profile connector: entity-storage.
 
 ***
 
-### immutableProofVerificationMethodId?
+### immutableProofVerificationMethodId? {#immutableproofverificationmethodid}
 
-> `optional` **immutableProofVerificationMethodId**: `string`
+> `optional` **immutableProofVerificationMethodId?**: `string`
 
 The identity verification method id to use with immutable proofs.
 
 ***
 
-### attestationConnector?
+### attestationConnector? {#attestationconnector}
 
-> `optional` **attestationConnector**: `string`
+> `optional` **attestationConnector?**: `string`
 
 The type of attestation connector: entity-storage, iota.
 
 ***
 
-### attestationVerificationMethodId?
+### attestationVerificationMethodId? {#attestationverificationmethodid}
 
-> `optional` **attestationVerificationMethodId**: `string`
+> `optional` **attestationVerificationMethodId?**: `string`
 
 The identity verification method id to use with attestation.
 
 ***
 
-### dataConverterConnectors?
+### dataProcessingEnabled? {#dataprocessingenabled}
 
-> `optional` **dataConverterConnectors**: `string`
+> `optional` **dataProcessingEnabled?**: `string`
+
+Is the data processing enabled, defaults to false.
+
+***
+
+### dataConverterConnectors? {#dataconverterconnectors}
+
+> `optional` **dataConverterConnectors?**: `string`
 
 The type of the default data converters, can be a comma separated list: json, xml.
 
 ***
 
-### dataExtractorConnectors?
+### dataExtractorConnectors? {#dataextractorconnectors}
 
-> `optional` **dataExtractorConnectors**: `string`
+> `optional` **dataExtractorConnectors?**: `string`
 
 The type of the default data extractor, can be a comma separated list: json-path.
 
 ***
 
-### federatedCatalogueCacheTtlMs?
+### taskSchedulerEnabled? {#taskschedulerenabled}
 
-> `optional` **federatedCatalogueCacheTtlMs**: `number`
+> `optional` **taskSchedulerEnabled?**: `string`
 
-Federated catalog TTL for the cache.
-
-***
-
-### federatedCatalogueClearingHouseApproverList?
-
-> `optional` **federatedCatalogueClearingHouseApproverList**: `string`
-
-Federated catalog clearing house approver list, stringified array of DIDs.
+Enable the task scheduler regardless of which other components are active, defaults to false.
 
 ***
 
-### rightsManagementEnabled?
+### auditableItemGraphEnabled? {#auditableitemgraphenabled}
 
-> `optional` **rightsManagementEnabled**: `string`
+> `optional` **auditableItemGraphEnabled?**: `string`
 
-Is the rights management enabled, defaults to false.
+Is the auditable item graph enabled, defaults to false.
 
 ***
 
-### taskSchedulerEnabled?
+### auditableItemStreamEnabled? {#auditableitemstreamenabled}
 
-> `optional` **taskSchedulerEnabled**: `string`
+> `optional` **auditableItemStreamEnabled?**: `string`
 
-Is the task scheduler enabled, defaults to true.
+Is the auditable item stream enabled, defaults to false.
+
+***
+
+### documentManagementEnabled? {#documentmanagementenabled}
+
+> `optional` **documentManagementEnabled?**: `string`
+
+Is the document management enabled, defaults to false.
+
+***
+
+### federatedCatalogueEnabled? {#federatedcatalogueenabled}
+
+> `optional` **federatedCatalogueEnabled?**: `string`
+
+Enable the federated catalogue, defaults to false, automatically enabled if remote endpoint, filters or dataspace is enabled.
+
+***
+
+### federatedCatalogueFilters? {#federatedcataloguefilters}
+
+> `optional` **federatedCatalogueFilters?**: `string`
+
+Federated catalog filters, command separated list of filters to add.
+
+***
+
+### federatedCatalogueRemoteEndpoint? {#federatedcatalogueremoteendpoint}
+
+> `optional` **federatedCatalogueRemoteEndpoint?**: `string`
+
+Federated catalog remote endpoint, if set will use a REST client instead of local service.
+
+***
+
+### trustGenerators? {#trustgenerators}
+
+> `optional` **trustGenerators?**: `string`
+
+The trust generators to add to the factory, comma separated list.
+
+***
+
+### trustVerifiers? {#trustverifiers}
+
+> `optional` **trustVerifiers?**: `string`
+
+The trust verifiers to add to the factory, comma separated list.
+
+***
+
+### trustVerificationMethodId? {#trustverificationmethodid}
+
+> `optional` **trustVerificationMethodId?**: `string`
+
+The verification method to use for trust identities.
+Defaults to trust-assertion.
+
+***
+
+### trustJwtTtl? {#trustjwtttl}
+
+> `optional` **trustJwtTtl?**: `string`
+
+The trust time to live for generating JWTs in seconds.
+Defaults to undefined for never expiring.
+
+***
+
+### trustIdentitiesAllow? {#trustidentitiesallow}
+
+> `optional` **trustIdentitiesAllow?**: `string`
+
+The allow lists for the trust identity verifier, comma separated list of identities.
+
+***
+
+### trustIdentitiesDeny? {#trustidentitiesdeny}
+
+> `optional` **trustIdentitiesDeny?**: `string`
+
+The deny lists for the trust identity verifier, comma separated list of identities.
+
+***
+
+### rightsManagementCallbackPath? {#rightsmanagementcallbackpath}
+
+> `optional` **rightsManagementCallbackPath?**: `string`
+
+Path under which the rights management service is mounted (single source
+of truth). The same value drives:
+- the server route mount (via engine config)
+- the PNP service's callback URL builder (`buildCallbackUrl`)
+- the PNP rest-client's pathPrefix (consumer side)
+Defaults to `rights-management`. Set when deploying behind a reverse proxy
+with path rewriting, K8s ingress with path-based routing, or any custom
+mount point.
+
+***
+
+### rightsManagementPolicyInformationSources? {#rightsmanagementpolicyinformationsources}
+
+> `optional` **rightsManagementPolicyInformationSources?**: `string`
+
+The rights management policy information sources to add to the factory.
+
+***
+
+### rightsManagementPolicyNegotiators? {#rightsmanagementpolicynegotiators}
+
+> `optional` **rightsManagementPolicyNegotiators?**: `string`
+
+The rights management policy negotiators sources to add to the factory.
+
+***
+
+### rightsManagementPolicyRequesters? {#rightsmanagementpolicyrequesters}
+
+> `optional` **rightsManagementPolicyRequesters?**: `string`
+
+The rights management policy requesters to add to the factory.
+
+***
+
+### rightsManagementPolicyExecutionActions? {#rightsmanagementpolicyexecutionactions}
+
+> `optional` **rightsManagementPolicyExecutionActions?**: `string`
+
+The rights management policy execution actions to add to the factory.
+
+***
+
+### rightsManagementPolicyEnforcementProcessors? {#rightsmanagementpolicyenforcementprocessors}
+
+> `optional` **rightsManagementPolicyEnforcementProcessors?**: `string`
+
+The rights management policy enforcement processors to add to the factory.
+
+***
+
+### rightsManagementPolicyArbiters? {#rightsmanagementpolicyarbiters}
+
+> `optional` **rightsManagementPolicyArbiters?**: `string`
+
+The rights management policy arbiters to add to the factory.
+
+***
+
+### rightsManagementPolicyObligationEnforcers? {#rightsmanagementpolicyobligationenforcers}
+
+> `optional` **rightsManagementPolicyObligationEnforcers?**: `string`
+
+The rights management policy obligation enforcers to add to the factory.
+
+***
+
+### dataspaceEnabled? {#dataspaceenabled}
+
+> `optional` **dataspaceEnabled?**: `string`
+
+Is the dataspace enabled, defaults to false.
+
+***
+
+### dataspaceRetainActivityLogsFor? {#dataspaceretainactivitylogsfor}
+
+> `optional` **dataspaceRetainActivityLogsFor?**: `string`
+
+The length of time to retain the activity logs for in seconds, set to -1 to keep forever.
+
+#### Default
+
+```ts
+600
+```
+
+***
+
+### dataspaceActivityLogsCleanupInterval? {#dataspaceactivitylogscleanupinterval}
+
+> `optional` **dataspaceActivityLogsCleanupInterval?**: `string`
+
+The interval in seconds for cleaning up the activity logs.
+
+#### Default
+
+```ts
+3600
+```
+
+***
+
+### dataspaceDataPlanePath? {#dataspacedataplanepath}
+
+> `optional` **dataspaceDataPlanePath?**: `string`
+
+The data plane path for PULL transfers (path only, not full URL).
+Will be combined with public origin.
+Required if PULL transfers should be supported.
+Example: "dataspace/entities"
+
+***
+
+### dataspaceAutoStartTransfers? {#dataspaceautostarttransfers}
+
+> `optional` **dataspaceAutoStartTransfers?**: `string`
+
+Whether the provider immediately starts a transfer once it has been requested.
+When false the transfer stays in REQUESTED until the provider explicitly calls transferStarted.
+
+#### Default
+
+```ts
+false
+```
+
+***
+
+### dataspaceStalledNegotiationTimeout? {#dataspacestallednegotiationtimeout}
+
+> `optional` **dataspaceStalledNegotiationTimeout?**: `string`
+
+How long in seconds a negotiation may sit without progress before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
+### dataspaceStalledTransferTimeout? {#dataspacestalledtransfertimeout}
+
+> `optional` **dataspaceStalledTransferTimeout?**: `string`
+
+How long in seconds a consumer-initiated transfer may sit in REQUESTED without the provider
+progressing it before it is treated as timed out.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
+### dataspaceCallbackPath? {#dataspacecallbackpath}
+
+> `optional` **dataspaceCallbackPath?**: `string`
+
+Path under which the dataspace control plane is mounted (path only, not full URL).
+This must match the control-plane REST mount, as it is combined with the public
+origin to build the consumer's advertised callback address.
+
+#### Default
+
+```ts
+"dataspace-control-plane"
+```
+
+***
+
+### healthEnabled? {#healthenabled}
+
+> `optional` **healthEnabled?**: `string`
+
+Are the health components enabled, defaults to false.
+
+***
+
+### healthInterval? {#healthinterval}
+
+> `optional` **healthInterval?**: `string`
+
+The interval in seconds for performing health checks, defaults to 60.
+
+***
+
+### healthStartupInterval? {#healthstartupinterval}
+
+> `optional` **healthStartupInterval?**: `string`
+
+The interval in seconds for performing health checks at startup, defaults to 2.
+This allows components that take a long time to initialize to be healthy before the first health check is performed.
+
+***
+
+### automationActionTypes? {#automationactiontypes}
+
+> `optional` **automationActionTypes?**: `string`
+
+The type of the automation action to create, comma separate for more than one connector.
+values: fetch
+
+***
+
+### mutexTimeoutMsDefault? {#mutextimeoutmsdefault}
+
+> `optional` **mutexTimeoutMsDefault?**: `string`
+
+The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+
+***
+
+### auditableItemGraphMutexTimeout? {#auditableitemgraphmutextimeout}
+
+> `optional` **auditableItemGraphMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the auditable item graph component.
+
+***
+
+### auditableItemStreamMutexTimeout? {#auditableitemstreammutextimeout}
+
+> `optional` **auditableItemStreamMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the auditable item stream component.
+
+***
+
+### federatedCatalogueMutexTimeout? {#federatedcataloguemutextimeout}
+
+> `optional` **federatedCatalogueMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the federated catalogue component.
+
+***
+
+### documentManagementMutexTimeout? {#documentmanagementmutextimeout}
+
+> `optional` **documentManagementMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the document management component.
+
+***
+
+### loggingMutexTimeout? {#loggingmutextimeout}
+
+> `optional` **loggingMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the logging component.
+
+***
+
+### entityStorageMemoryMutexTimeout? {#entitystoragememorymutextimeout}
+
+> `optional` **entityStorageMemoryMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the memory entity storage connector.
+
+***
+
+### entityStorageFileMutexTimeout? {#entitystoragefilemutextimeout}
+
+> `optional` **entityStorageFileMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the file entity storage connector.
+
+***
+
+### rightsManagementMutexTimeout? {#rightsmanagementmutextimeout}
+
+> `optional` **rightsManagementMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the rights management component.
+
+***
+
+### extensions? {#extensions}
+
+> `optional` **extensions?**: `string`
+
+A comma separated list of additional node extensions to load, the initialiseExtension method will be called for each extension.

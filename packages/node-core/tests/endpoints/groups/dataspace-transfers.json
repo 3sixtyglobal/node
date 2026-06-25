@@ -1,0 +1,247 @@
+{
+	"group": "Dataspace - Transfers",
+	"steps": [
+		{
+			"description": "POST /dataspace/transfers/request — 401 without organization context",
+			"skipIfOrgParamOmitted": true,
+			"appendOrgParam": false,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferRequestMessage",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"agreementId": "urn:uuid:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+				"format": "HttpData-PULL",
+				"callbackAddress": "https://example.com/callback"
+			},
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /dataspace/transfers/request — 400 missing @type",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"]
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /dataspace/transfers/request — 400 missing consumerPid",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferRequestMessage",
+				"agreementId": "urn:uuid:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+				"format": "HttpData-PULL",
+				"callbackAddress": "https://example.com/callback"
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /dataspace/transfers/request — 400 missing agreementId",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferRequestMessage",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"format": "HttpData-PULL",
+				"callbackAddress": "https://example.com/callback"
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /dataspace/transfers/request — 400 missing callbackAddress",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferRequestMessage",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"agreementId": "urn:uuid:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+				"format": "HttpData-PULL"
+			},
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /dataspace/transfers/request — 404 unknown agreementId (DSP validation passes, PAP lookup fails)",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferRequestMessage",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"agreementId": "urn:uuid:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+				"format": "HttpData-PULL",
+				"callbackAddress": "https://example.com/callback"
+			},
+			"expectedStatus": 404,
+			"assert": { "body.@type": "TransferError" }
+		},
+		{
+			"description": "GET /dataspace/transfers/:pid — 404 unknown pid",
+			"appendOrgParam": true,
+			"method": "GET",
+			"path": "/dataspace/transfers/{{fakeId}}",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"expectedStatus": 404,
+			"assert": { "body.@type": "TransferError" }
+		},
+		{
+			"description": "POST /dataspace/transfers/:pid/start — 404 unknown pid",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/{{fakeId}}/start",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferStartMessage",
+				"providerPid": "urn:uuid:99999999-9999-9999-9999-999999999999",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111"
+			},
+			"expectedStatus": 404,
+			"assert": { "body.@type": "TransferError" }
+		},
+		{
+			"description": "POST /dataspace/transfers/:pid/suspend — 404 unknown pid",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/{{fakeId}}/suspend",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferSuspensionMessage",
+				"providerPid": "urn:uuid:99999999-9999-9999-9999-999999999999",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"code": "test-suspension"
+			},
+			"expectedStatus": 404,
+			"assert": { "body.@type": "TransferError" }
+		},
+		{
+			"description": "POST /dataspace/transfers/:pid/terminate — 404 unknown pid",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/{{fakeId}}/terminate",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferTerminationMessage",
+				"providerPid": "urn:uuid:99999999-9999-9999-9999-999999999999",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"code": "test-termination"
+			},
+			"expectedStatus": 404,
+			"assert": { "body.@type": "TransferError" }
+		},
+		{
+			"description": "POST /dataspace/transfers/:pid/complete — 404 unknown pid",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/{{fakeId}}/complete",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferCompletionMessage",
+				"providerPid": "urn:uuid:99999999-9999-9999-9999-999999999999",
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111"
+			},
+			"expectedStatus": 404,
+			"assert": { "body.@type": "TransferError" }
+		},
+		{
+			"description": "POST /dataspace/transfers/request — 200 create transfer",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/request",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferRequestMessage",
+				"consumerPid": "{{transferConsumerPid}}",
+				"agreementId": "{{dataspaceAgreementId}}",
+				"format": "HttpData-PULL",
+				"callbackAddress": "https://example.com/callback"
+			},
+			"expectedStatus": 200,
+			"capture": { "transferProviderPid": "body.providerPid" }
+		},
+		{
+			"description": "GET /dataspace/transfers/:pid — 200 REQUESTED state",
+			"appendOrgParam": true,
+			"method": "GET",
+			"path": "/dataspace/transfers/{{transferProviderPid}}",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /dataspace/transfers/:pid/start — 200",
+			"appendOrgParam": true,
+			"method": "POST",
+			"path": "/dataspace/transfers/{{transferProviderPid}}/start",
+			"headers": {
+				"authorization": "{{trustAuthorization}}",
+				"accept": "application/ld+json"
+			},
+			"body": {
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"@type": "TransferStartMessage",
+				"consumerPid": "{{transferConsumerPid}}",
+				"providerPid": "{{transferProviderPid}}"
+			},
+			"expectedStatus": 200
+		}
+	]
+}

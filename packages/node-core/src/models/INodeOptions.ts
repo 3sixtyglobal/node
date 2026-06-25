@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IEngineCore, IEngineServer, IEngineStateStorage } from "@twin.org/engine-models";
 import type { IEngineConfig } from "@twin.org/engine-types";
-import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables";
+import type { IEnvironmentVariables } from "./IEnvironmentVariables.js";
+import type { INodeEngineConfig } from "./INodeEngineConfig.js";
 
 /**
  * The options when running the node.
  */
 export interface INodeOptions {
 	/**
-	 * The name of the server, defaults to "TWIN Node Server".
-	 * @default "TWIN Node Server"
+	 * The name of the server, defaults to "TWIN Node".
+	 * @default "TWIN Node"
 	 */
 	serverName?: string;
 
@@ -20,12 +21,17 @@ export interface INodeOptions {
 	serverVersion?: string;
 
 	/**
+	 * Additional environment variables to set.
+	 */
+	envVars?: { [key: string]: string };
+
+	/**
 	 * Additional environment variable filenames to load, defaults to .env.
 	 */
 	envFilenames?: string[];
 
 	/**
-	 * The prefix for environment variables, defaults to "TWIN_NODE_".
+	 * The prefix for environment variables, defaults to "TWIN_".
 	 */
 	envPrefix?: string;
 
@@ -43,6 +49,11 @@ export interface INodeOptions {
 	config?: IEngineConfig;
 
 	/**
+	 * The directory to override the script location, defaults to location of index.js.
+	 */
+	scriptDirectory?: string;
+
+	/**
 	 * The directory to override the execution location, defaults to process directory.
 	 */
 	executionDirectory?: string;
@@ -58,14 +69,19 @@ export interface INodeOptions {
 	openApiSpecFile?: string;
 
 	/**
+	 * The path to the favicon, defaults to static/favicon.png.
+	 */
+	favIconFile?: string;
+
+	/**
 	 * Method to extend the engine environment variables with any additional custom configuration.
 	 */
-	extendEnvVars?: (envVars: INodeEnvironmentVariables) => Promise<void>;
+	extendEnvVars?: (envVars: IEnvironmentVariables) => Promise<void>;
 
 	/**
 	 * Method to extend the engine configuration with any additional custom configuration.
 	 */
-	extendConfig?: (config: IEngineConfig) => Promise<void>;
+	extendConfig?: (envVars: IEnvironmentVariables, config: INodeEngineConfig) => Promise<void>;
 
 	/**
 	 * Method to extend the engine with any additional options.
@@ -82,4 +98,9 @@ export interface INodeOptions {
 	 * If not provided, a default file-based state storage will be used.
 	 */
 	stateStorage?: IEngineStateStorage;
+
+	/**
+	 * Disables process.exit calls on fatal errors and throws instead.
+	 */
+	disableProcessExitOnFailure?: boolean;
 }
