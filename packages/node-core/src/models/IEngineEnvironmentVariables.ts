@@ -381,6 +381,26 @@ export interface IEngineEnvironmentVariables {
 	loggingSilentComponents?: string;
 
 	/**
+	 * The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
+	 */
+	openTelemetryLoggingLoggerName?: string;
+
+	/**
+	 * The version of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to 1.0.0.
+	 */
+	openTelemetryLoggingLoggerVersion?: string;
+
+	/**
+	 * The OTLP endpoint URL for the OpenTelemetry logging exporter, required when using open-telemetry as logging connector, e.g. http://localhost:4318/v1/logs.
+	 */
+	openTelemetryLoggingPrometheusEndpoint?: string;
+
+	/**
+	 * The log record processor to use for the OpenTelemetry logging exporter, either batch or simple, defaults to batch.
+	 */
+	openTelemetryLoggingProcessor?: string;
+
+	/**
 	 * The type of event bus connector: local.
 	 */
 	eventBusConnector?: string;

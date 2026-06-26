@@ -79,6 +79,11 @@ import {
 	WalletConnectorType
 } from "@twin.org/engine-types";
 import {
+	type IOpenTelemetryLoggingConnectorConfig,
+	type IOpenTelemetryOtlpExporterConfig,
+	OpenTelemetryExporterTypes
+} from "@twin.org/logging-connector-opentelemetry";
+import {
 	type IOpenTelemetryTelemetryConnectorConfig,
 	OpenTelemetryReaderTypes
 } from "@twin.org/telemetry-connector-opentelemetry";
@@ -476,6 +481,29 @@ async function configureLogging(
 						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushInterval) ?? 5) * 1000,
 						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
 					}
+				}
+			});
+			additionalConnectorCount++;
+		} else if (loggingConnector === LoggingConnectorType.Otel) {
+			const otelLoggingConfig: IOpenTelemetryLoggingConnectorConfig = {
+				loggerName: envVars.openTelemetryLoggingLoggerName,
+				loggerVersion: envVars.openTelemetryLoggingLoggerVersion
+			};
+			if (Is.stringValue(envVars.openTelemetryLoggingPrometheusEndpoint)) {
+				otelLoggingConfig.exporters = {
+					otlp: {
+						type: OpenTelemetryExporterTypes.Otlp,
+						endpoint: envVars.openTelemetryLoggingPrometheusEndpoint,
+						processor:
+							(envVars.openTelemetryLoggingProcessor as IOpenTelemetryOtlpExporterConfig["processor"]) ??
+							"batch"
+					}
+				};
+			}
+			coreConfig.types.loggingConnector.push({
+				type: LoggingConnectorType.Otel,
+				options: {
+					config: otelLoggingConfig
 				}
 			});
 			additionalConnectorCount++;

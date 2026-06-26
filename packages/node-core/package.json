@@ -49,6 +49,7 @@
 		"@twin.org/rights-management-rest-client": "next",
 		"@twin.org/standards-w3c-did": "next",
 		"@twin.org/standards-w3c-odrl": "next",
+		"@twin.org/logging-connector-opentelemetry": "next",
 		"@twin.org/telemetry-connector-opentelemetry": "next",
 		"@twin.org/telemetry-models": "next",
 		"@twin.org/trust-models": "next",
