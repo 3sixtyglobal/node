@@ -603,6 +603,38 @@ A list of components to exclude from logging, can be a comma separated list of c
 
 ***
 
+### openTelemetryLoggingLoggerName? {#opentelemetryloggingloggername}
+
+> `optional` **openTelemetryLoggingLoggerName?**: `string`
+
+The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
+
+***
+
+### openTelemetryLoggingLoggerVersion? {#opentelemetryloggingloggerversion}
+
+> `optional` **openTelemetryLoggingLoggerVersion?**: `string`
+
+The version of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to 1.0.0.
+
+***
+
+### openTelemetryLoggingPrometheusEndpoint? {#opentelemetryloggingprometheusendpoint}
+
+> `optional` **openTelemetryLoggingPrometheusEndpoint?**: `string`
+
+The OTLP endpoint URL for the OpenTelemetry logging exporter, required when using open-telemetry as logging connector, e.g. http://localhost:4318/v1/logs.
+
+***
+
+### openTelemetryLoggingProcessor? {#opentelemetryloggingprocessor}
+
+> `optional` **openTelemetryLoggingProcessor?**: `string`
+
+The log record processor to use for the OpenTelemetry logging exporter, either batch or simple, defaults to batch.
+
+***
+
 ### eventBusConnector? {#eventbusconnector}
 
 > `optional` **eventBusConnector?**: `string`

@@ -108,6 +108,10 @@
 			"description": "Tenant-scoped CRUD over the datasets the Control Plane reads at start time to populate the federated catalogue."
 		},
 		{
+			"name": "Version Discovery",
+			"description": "RFC 8615 well-known endpoint for advertising the Dataspace Protocol versions supported by this connector."
+		},
+		{
 			"name": "Policy Administration Point",
 			"description": "Endpoints for managing ODRL policies in the Policy Administration Point"
 		},
@@ -11624,7 +11628,7 @@
 					},
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the streams, JSON stringified EntityCondition<IAuditableItemGraphVertex>.",
+						"description": "The conditions to filter the streams, JSON stringified `EntityCondition<IAuditableItemGraphVertex>`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -16774,6 +16778,91 @@
 				}
 			}
 		},
+		"/.well-known/dspace-version": {
+			"get": {
+				"operationId": "getProtocolVersions",
+				"summary": "Get supported Dataspace Protocol versions (DSP 2025-1)",
+				"tags": [
+					"Version Discovery"
+				],
+				"requestBody": {
+					"description": "A REST request with no input parameters.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NoContentRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "API response for the DSP version discovery endpoint.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DataspaceProtocolVersionResponse"
+								},
+								"examples": {
+									"getProtocolVersionsResponseExample": {
+										"value": {
+											"protocolVersions": [
+												{
+													"version": "2025-1",
+													"path": "/dataspace-control-plane/2025-1",
+													"binding": "HTTPS",
+													"serviceId": "twin-connector"
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/dataspace-control-plane/transfers/request": {
 			"post": {
 				"operationId": "requestTransfer",
@@ -21711,6 +21800,7 @@
 					"dateModified"
 				]
 			},
+			"DataspaceProtocolVersionResponse": {},
 			"DocumentManagementCreateRequest": {
 				"type": "object",
 				"properties": {
@@ -21858,7 +21948,7 @@
 						"description": "The query type."
 					},
 					"q": {
-						"description": "The representation of the query."
+						"description": "The representation of the query, optional depending on the query type."
 					},
 					"jsonLdContext": {
 						"type": "array",
@@ -21869,8 +21959,7 @@
 					}
 				},
 				"required": [
-					"type",
-					"q"
+					"type"
 				]
 			},
 			"GetTransferProcessResponse": {
@@ -22552,6 +22641,10 @@
 					}
 				},
 				"description": "The request body containing update parameters."
+			},
+			"NoContentRequest": {
+				"not": {},
+				"description": "Data to return send as the body."
 			},
 			"NotFoundResponse": {
 				"type": "object",
