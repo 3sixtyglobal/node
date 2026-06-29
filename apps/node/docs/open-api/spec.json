@@ -13391,7 +13391,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the streams, JSON stringified IComparator[].",
+						"description": "The conditions to filter the streams, JSON stringified `EntityCondition<IAuditableItemStream>`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -14419,7 +14419,7 @@
 					},
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified IComparator[].",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -15268,7 +15268,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified IComparator[].",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStream>.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -15529,7 +15529,7 @@
 					},
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified IComparator[].",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -15712,7 +15712,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified IComparator[].",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
 						"in": "query",
 						"required": false,
 						"schema": {
