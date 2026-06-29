@@ -70,8 +70,8 @@ jobs:
             TAGS="$VERSION_TAG,${{ env.TWIN_DOCKER_REPO }}:latest"
             echo "Building from main branch - adding latest tag"
           else
-            TAGS="$VERSION_TAG"
-            echo "Building from $BRANCH branch - version tag only"
+            TAGS="$VERSION_TAG,${{ env.TWIN_DOCKER_REPO }}:next"
+            echo "Building from next branch - adding next tag"
           fi
 
           echo "tags=$TAGS" >> $GITHUB_OUTPUT

@@ -640,6 +640,7 @@ describe("node-core", () => {
 			"GET      /federated-catalogue/datasets/:datasetId",
 			"POST     /federated-catalogue/datasets",
 			"DELETE   /federated-catalogue/datasets/:datasetId",
+			"GET      /.well-known/dspace-version",
 			"POST     /dataspace/transfers/request",
 			"GET      /dataspace/transfers/:pid",
 			"POST     /dataspace/transfers/:pid/start",

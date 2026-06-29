@@ -102,6 +102,11 @@ const engineEnvironmentVariableKeysInternal: {
 	loggingBatchFlushInterval: true,
 	loggingSilentComponents: true,
 	loggingMutexTimeout: true,
+	// open telemetry logging
+	openTelemetryLoggingLoggerName: true,
+	openTelemetryLoggingLoggerVersion: true,
+	openTelemetryLoggingPrometheusEndpoint: true,
+	openTelemetryLoggingProcessor: true,
 	// event bus
 	eventBusConnector: true,
 	eventBusComponent: true,
