@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.1-next.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.1...node-v0.9.1-next.2) (2026-06-29)
+
+
+### Features
+
+* extend to 7-group weighted mix, fix REST paths + JSON-LD contexts ([#257](https://github.com/iotaledger/twin-node/issues/257)) ([d9f8d55](https://github.com/iotaledger/twin-node/commit/d9f8d55d389a82947b7a0297f44f76f7f6b3ba21))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.1-next.1 to 0.9.1-next.2
+
 ## [0.9.1-next.1](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.0...node-v0.9.1-next.1) (2026-06-26)
 
 
