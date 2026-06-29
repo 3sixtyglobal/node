@@ -775,6 +775,74 @@ else
     fail "[KRA] 10 Unexpected response on the write-agreement delivery (HTTP ${c10_http})"
 fi
 
+# ============================================================================
+phase 11 "Proof signing — auditable writes are signed by the tenant's ORG DID (#19)"
+# ============================================================================
+# Hardening G. Enabled in env/node.env: TWIN_AUDITABLE_ITEM_STREAM_ENABLED + an
+# entity-storage notarization connector + TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID=
+# trust-assertion (reuses each tenant's existing assertionMethod VM). The immutable-proof
+# service signs as the request's ORGANIZATION identity, recording the proof's
+# verificationMethod = <orgDID>#trust-assertion. For two tenants we write an Auditable
+# Item Stream and assert: (a) the stream is attributed to that tenant's bare ORG DID (not
+# the node), (b) the immutable proof is signed by that org DID, and (c) the proof
+# cryptographically VERIFIES. On a multi-tenant node each tenant's proof is signed by ITS
+# OWN org — the core promise of the org-identifiers refactor (#19) and proof of per-tenant
+# signing isolation. (No "missing org" negative is asserted: while authenticated the org
+# context is always resolved from the session, so a no-org write is attributed to the
+# caller's org rather than erroring — see hardening-backlog.md item G.)
+AIS_CONTEXT='["https://schema.org","https://schema.twindev.org/ais/","https://schema.twindev.org/common/"]'
+
+assert_tenant_proof_signed() {
+    local pub="$1"
+    local did_var="${pub}_DID" sess_var="${pub}_SESSION_JWT"
+    local org_did="${!did_var}" sess="${!sess_var}"
+    { [ -n "${org_did}" ] && [ -n "${sess}" ]; } || fail "[${pub}] missing org DID / session for the proof-signing test"
+    local org_enc; org_enc=$(urlenc "${org_did}")
+    local body; body=$(jq -cn --argjson ctx "${AIS_CONTEXT}" '{"@context":$ctx,type:"AuditableItemStream"}')
+
+    # Write an Auditable Item Stream as this tenant (org-routed + tenant session). The
+    # Location header carries the already-url-encoded stream id (ais%3A...).
+    local sid
+    sid=$(curl -sS -D - -o /dev/null -X POST "${HOST}/ais?organization=${org_enc}" \
+        -H "Content-Type: application/json" -H "Authorization: Bearer ${sess}" -d "${body}" \
+        | grep -i '^location:' | tr -d '\r' | sed -E 's/^[Ll]ocation:[[:space:]]*//')
+    [ -n "${sid}" ] || fail "[${pub}] AIS stream create returned no Location id"
+
+    # The stream must be attributed to THIS tenant's bare org DID (not the node).
+    local stream org_id proof_id
+    stream=$(curl -sS "${HOST}/ais/${sid}?organization=${org_enc}" -H "Authorization: Bearer ${sess}")
+    org_id=$(echo "${stream}" | jq -r '.organizationIdentity // empty')
+    proof_id=$(echo "${stream}" | jq -r '.proofId // empty')
+    is_bare_org_did "${org_id}" || { info "organizationIdentity=${org_id}"; fail "[${pub}] AIS stream org attribution is not a bare org DID"; }
+    [ "${org_id}" = "${org_did}" ] || { info "org=${org_id} expected=${org_did}"; fail "[${pub}] AIS stream not attributed to this tenant's org"; }
+    [ -n "${proof_id}" ] || fail "[${pub}] AIS stream has no proofId"
+    local proof_enc; proof_enc=$(urlenc "${proof_id}")
+
+    # The proof is notarized by a background task — poll until it cryptographically verifies.
+    local verified="" attempt
+    for attempt in $(seq 1 20); do
+        verified=$(curl -sS "${HOST}/immutable-proof/${proof_enc}/verify?organization=${org_enc}" \
+            -H "Authorization: Bearer ${sess}" | jq -r '.verified // false')
+        [ "${verified}" = "true" ] && break
+        sleep 2
+    done
+    [ "${verified}" = "true" ] || fail "[${pub}] immutable proof did not verify (last: ${verified:-none})"
+
+    # The proof MUST be signed by this tenant's org DID: verificationMethod = <orgDID>#vm.
+    local vm vm_did
+    vm=$(curl -sS "${HOST}/immutable-proof/${proof_enc}?organization=${org_enc}" \
+        -H "Authorization: Bearer ${sess}" | jq -r '.. | objects | .verificationMethod? // empty' | head -1)
+    vm_did="${vm%%#*}"
+    [ "${vm}" = "${org_did}#trust-assertion" ] \
+        || { info "verificationMethod=${vm} expected=${org_did}#trust-assertion"; fail "[${pub}] proof not signed by this tenant's org DID"; }
+    is_bare_org_did "${vm_did}" || { info "signer=${vm_did}"; fail "[${pub}] proof signer is not a bare org DID"; }
+    ok "[${pub}] auditable write org-signed + cryptographically verified (proof signer = ${pub} org DID#trust-assertion)"
+}
+
+assert_tenant_proof_signed "KRA"
+assert_tenant_proof_signed "KPA"
+ok "Per-tenant proof signing verified — each tenant's auditable write is signed by ITS OWN org DID (#19 core)"
+
 echo ""
 echo -e "${BOLD}${GREEN}================================================================${NC}"
 echo -e "${BOLD}${GREEN}  ✓ Multi-publisher use case complete${NC}"
