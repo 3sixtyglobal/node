@@ -29,7 +29,33 @@
 			"method": "POST",
 			"path": "/authentication/audit",
 			"body": { "event": "login-success" },
-			"expectedStatus": 201
+			"expectedStatus": 201,
+			"capture": { "auditId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/audit/:id",
+			"method": "GET",
+			"path": "/authentication/audit/{{auditId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "PUT /authentication/audit/:id",
+			"method": "PUT",
+			"path": "/authentication/audit/{{auditId}}",
+			"body": { "event": "logout-success" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/audit/:id",
+			"method": "DELETE",
+			"path": "/authentication/audit/{{auditId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/audit/:id — 404 after delete",
+			"method": "GET",
+			"path": "/authentication/audit/{{auditId}}",
+			"expectedStatus": 404
 		},
 		{
 			"description": "GET /authentication/audit",
