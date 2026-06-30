@@ -792,23 +792,22 @@ phase 11 "Proof signing — auditable writes are signed by the tenant's ORG DID 
 # caller's org rather than erroring — see hardening-backlog.md item G.)
 AIS_CONTEXT='["https://schema.org","https://schema.twindev.org/ais/","https://schema.twindev.org/common/"]'
 
-assert_tenant_proof_signed() {
+# Write an Auditable Item Stream as a tenant and assert it is immediately attributed to
+# that tenant's bare org DID (not the node). Stashes the proofId in PROOF_ID_<pub> for the
+# deferred signing/verification check below. (bash 3.2 has no associative arrays.)
+ais_write_and_check_org() {
     local pub="$1"
     local did_var="${pub}_DID" sess_var="${pub}_SESSION_JWT"
     local org_did="${!did_var}" sess="${!sess_var}"
     { [ -n "${org_did}" ] && [ -n "${sess}" ]; } || fail "[${pub}] missing org DID / session for the proof-signing test"
     local org_enc; org_enc=$(urlenc "${org_did}")
     local body; body=$(jq -cn --argjson ctx "${AIS_CONTEXT}" '{"@context":$ctx,type:"AuditableItemStream"}')
-
-    # Write an Auditable Item Stream as this tenant (org-routed + tenant session). The
-    # Location header carries the already-url-encoded stream id (ais%3A...).
+    # The Location header carries the already-url-encoded stream id (ais%3A...).
     local sid
     sid=$(curl -sS -D - -o /dev/null -X POST "${HOST}/ais?organization=${org_enc}" \
         -H "Content-Type: application/json" -H "Authorization: Bearer ${sess}" -d "${body}" \
         | grep -i '^location:' | tr -d '\r' | sed -E 's/^[Ll]ocation:[[:space:]]*//')
     [ -n "${sid}" ] || fail "[${pub}] AIS stream create returned no Location id"
-
-    # The stream must be attributed to THIS tenant's bare org DID (not the node).
     local stream org_id proof_id
     stream=$(curl -sS "${HOST}/ais/${sid}?organization=${org_enc}" -H "Authorization: Bearer ${sess}")
     org_id=$(echo "${stream}" | jq -r '.organizationIdentity // empty')
@@ -816,18 +815,28 @@ assert_tenant_proof_signed() {
     is_bare_org_did "${org_id}" || { info "organizationIdentity=${org_id}"; fail "[${pub}] AIS stream org attribution is not a bare org DID"; }
     [ "${org_id}" = "${org_did}" ] || { info "org=${org_id} expected=${org_did}"; fail "[${pub}] AIS stream not attributed to this tenant's org"; }
     [ -n "${proof_id}" ] || fail "[${pub}] AIS stream has no proofId"
-    local proof_enc; proof_enc=$(urlenc "${proof_id}")
+    printf -v "PROOF_ID_${pub}" '%s' "${proof_id}"
+}
 
-    # The proof is notarized by a background task — poll until it cryptographically verifies.
+# Assert a tenant's immutable proof is signed by ITS org DID and cryptographically verifies.
+# The proof is notarized by a background task with variable latency (seconds to ~1 min under
+# load), so poll generously (~120s). Both tenants' streams are created up front, so the
+# proofs notarize concurrently and the second check usually returns immediately. The poll
+# exits as soon as it verifies, so a fast node pays no penalty.
+ais_assert_proof_org_signed() {
+    local pub="$1"
+    local did_var="${pub}_DID" sess_var="${pub}_SESSION_JWT" pid_var="PROOF_ID_${pub}"
+    local org_did="${!did_var}" sess="${!sess_var}" proof_id="${!pid_var}"
+    local org_enc; org_enc=$(urlenc "${org_did}")
+    local proof_enc; proof_enc=$(urlenc "${proof_id}")
     local verified="" attempt
-    for attempt in $(seq 1 20); do
+    for attempt in $(seq 1 60); do
         verified=$(curl -sS "${HOST}/immutable-proof/${proof_enc}/verify?organization=${org_enc}" \
             -H "Authorization: Bearer ${sess}" | jq -r '.verified // false')
         [ "${verified}" = "true" ] && break
         sleep 2
     done
-    [ "${verified}" = "true" ] || fail "[${pub}] immutable proof did not verify (last: ${verified:-none})"
-
+    [ "${verified}" = "true" ] || fail "[${pub}] immutable proof did not verify within ~120s (last: ${verified:-none})"
     # The proof MUST be signed by this tenant's org DID: verificationMethod = <orgDID>#vm.
     local vm vm_did
     vm=$(curl -sS "${HOST}/immutable-proof/${proof_enc}?organization=${org_enc}" \
@@ -839,9 +848,53 @@ assert_tenant_proof_signed() {
     ok "[${pub}] auditable write org-signed + cryptographically verified (proof signer = ${pub} org DID#trust-assertion)"
 }
 
-assert_tenant_proof_signed "KRA"
-assert_tenant_proof_signed "KPA"
+# Create both tenants' streams first (org attribution asserted immediately), then verify
+# both proofs — they notarize concurrently in the background.
+ais_write_and_check_org "KRA"
+ais_write_and_check_org "KPA"
+ais_assert_proof_org_signed "KRA"
+ais_assert_proof_org_signed "KPA"
 ok "Per-tenant proof signing verified — each tenant's auditable write is signed by ITS OWN org DID (#19 core)"
+
+# ============================================================================
+phase 12 "Routing / trust negatives (org-DID isolation + trust gate)"
+# ============================================================================
+# Hardening H. Post-#203 every non-login call is routed by ?organization=<org-did> and
+# trust-gated calls require a valid trust JWT. Assert the two security edges directly —
+# the exact class of the getLocalOriginContext / tenant-routing bugs this scaffold exists
+# to catch: (a) a garbage trust token is rejected on a trust-gated route; (b) a record
+# owned by one tenant's org cannot be read by swapping ?organization= to another tenant
+# (org-scoped isolation, no cross-tenant leak).
+
+# (a) Invalid trust token → rejected on a trust-gated route (catalogue request).
+h_inv=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/federated-catalogue/request?organization=${TRADER_ORG_ENC}" \
+    -H "Content-Type: application/json" -H "Cookie: access_token=${TRADER_SESSION_JWT}" -H "Authorization: Bearer not.a.valid.jwt" \
+    -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
+case "${h_inv}" in
+    400|401|403) ok "Invalid trust token rejected on a trust-gated route (HTTP ${h_inv})" ;;
+    *) info "status ${h_inv}"; fail "[H] invalid trust token was NOT rejected (HTTP ${h_inv})" ;;
+esac
+
+# (b) Cross-org read isolation: a Trader-owned negotiation record must not be readable
+# via another tenant's ?organization=. Create it as Trader, confirm Trader reads it, then
+# read the SAME id via KRA's org — must be isolated (not leaked).
+h_pid="urn:contract-negotiation:hardening-H-$(date +%s)-${RANDOM}"
+h_body=$(jq -n --arg id "${h_pid}" --arg dc "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" --arg oi "${TRADER_DID}" \
+    '{ id: $id, correlationId: "", dateCreated: $dc, state: "REQUESTED", organizationIdentity: $oi }')
+h_put=$(curl -sS -o /dev/null -w "%{http_code}" -X PUT "${HOST}/rights-management/negotiations/admin/${h_pid}?organization=${TRADER_ORG_ENC}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer ${TRADER_SESSION_JWT}" -d "${h_body}")
+{ [ "${h_put}" = "204" ] || [ "${h_put}" = "200" ]; } || fail "[H] could not create Trader negotiation for the isolation test (HTTP ${h_put})"
+h_own=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/rights-management/negotiations/admin/${h_pid}?organization=${TRADER_ORG_ENC}" \
+    -H "Authorization: Bearer ${TRADER_SESSION_JWT}")
+[ "${h_own}" = "200" ] || fail "[H] Trader cannot read its own negotiation (HTTP ${h_own})"
+h_kra_enc=$(urlenc "${KRA_DID}")
+h_other=$(curl -sS -o /dev/null -w "%{http_code}" "${HOST}/rights-management/negotiations/admin/${h_pid}?organization=${h_kra_enc}" \
+    -H "Authorization: Bearer ${KRA_SESSION_JWT}")
+if [ "${h_other}" = "404" ] || [ "${h_other}" = "401" ] || [ "${h_other}" = "403" ]; then
+    ok "Cross-org read isolated — Trader's negotiation is not visible via KRA's org (HTTP ${h_other})"
+else
+    fail "[H] ORG ISOLATION LEAK — Trader's negotiation readable via KRA's ?organization= (HTTP ${h_other})"
+fi
 
 echo ""
 echo -e "${BOLD}${GREEN}================================================================${NC}"
