@@ -90,6 +90,7 @@ jobs:
 
       # Build and push the Docker image
       - name: Build and Push Docker image
+        id: build-push
         uses: docker/build-push-action@v7
         with:
           context: ./apps/node
@@ -97,3 +98,35 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.docker-tags.outputs.tags }}
+
+      # Output publish summary
+      - name: Publish Summary
+        run: |
+          VERSION="${{ steps.package-version.outputs.version }}"
+          BRANCH="${{ steps.set-branch.outputs.branch }}"
+          REPO="${{ env.TWIN_DOCKER_REPO }}"
+          DIGEST="${{ steps.build-push.outputs.digest }}"
+
+          if [[ "$BRANCH" == "main" ]]; then
+            CHANNEL_TAG="latest"
+          else
+            CHANNEL_TAG="next"
+          fi
+
+          echo "## Docker Publish Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | \`$VERSION\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | \`$BRANCH\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Channel tag** | \`$CHANNEL_TAG\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image digest** | \`$DIGEST\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tags published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [\`$REPO:$VERSION\`](https://hub.docker.com/r/$REPO/tags?name=$VERSION)" >> $GITHUB_STEP_SUMMARY
+          echo "- [\`$REPO:$CHANNEL_TAG\`](https://hub.docker.com/r/$REPO/tags?name=$CHANNEL_TAG)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Repository" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [Docker Hub: $REPO](https://hub.docker.com/r/$REPO)" >> $GITHUB_STEP_SUMMARY
