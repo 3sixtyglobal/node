@@ -1952,6 +1952,311 @@
 				}
 			}
 		},
+		"/authentication/audit/{id}": {
+			"get": {
+				"operationId": "authenticationAuditGet",
+				"summary": "Get an authentication audit entry",
+				"tags": [
+					"Authentication Audit"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The audit entry id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "018f0b53d5d5704fa3a06d6ed2478575"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response from getting an authentication audit entry.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthenticationAuditEntry"
+								},
+								"examples": {
+									"authenticationAuditGetResponseExample": {
+										"summary": "The response for getting an authentication audit entry.",
+										"value": {
+											"id": "018f0b53d5d5704fa3a06d6ed2478575",
+											"actorId": "user@example.com",
+											"dateCreated": "2026-01-12T09:05:23.123Z",
+											"event": "login-success",
+											"data": {
+												"organizationIdentity": "did:example:org1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"operationId": "authenticationAuditUpdate",
+				"summary": "Update an authentication audit entry",
+				"tags": [
+					"Authentication Audit"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The audit entry id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "018f0b53d5d5704fa3a06d6ed2478575"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Update an authentication audit entry.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuditUpdateRequest"
+							},
+							"examples": {
+								"authenticationAuditUpdateRequestExample": {
+									"summary": "The request to update an authentication audit entry.",
+									"value": {
+										"data": {
+											"organizationIdentity": "did:example:org1"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "authenticationAuditRemove",
+				"summary": "Remove an authentication audit entry",
+				"tags": [
+					"Authentication Audit"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The audit entry id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "018f0b53d5d5704fa3a06d6ed2478575"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/identity/{identity}": {
 			"get": {
 				"operationId": "identityResolve",
@@ -6767,6 +7072,122 @@
 												}
 											],
 											"cursor": "1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/telemetry/metric/{id}/value/{valueId}": {
+			"get": {
+				"operationId": "telemetryGetMetricValue",
+				"summary": "Get a specific telemetry metric value",
+				"tags": [
+					"Telemetry"
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"description": "The id of the metric.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "my-counter"
+					},
+					{
+						"name": "valueId",
+						"description": "The id of the metric value.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "aabbccdd11223445566"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Get a telemetry metric value response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TelemetryMetricValue"
+								},
+								"examples": {
+									"telemetryGetMetricValueResponseExample": {
+										"value": {
+											"id": "aabbccdd11223445566",
+											"ts": 1715252922273,
+											"value": 10
 										}
 									}
 								}
@@ -20997,6 +21418,57 @@
 					"entries"
 				],
 				"description": "The response body."
+			},
+			"AuditUpdateRequest": {
+				"description": "The body of the request.",
+				"type": "object",
+				"properties": {
+					"event": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/AuthAuditEvent"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"description": "The audit event that occurred."
+					},
+					"actorId": {
+						"type": "string",
+						"description": "The actor identifier, could be e-mail, username, or other unique identifier."
+					},
+					"nodeId": {
+						"type": "string",
+						"description": "The node identifier associated with the audit entry, if applicable."
+					},
+					"organizationId": {
+						"type": "string",
+						"description": "The organization identifier associated with the audit entry, if applicable."
+					},
+					"tenantId": {
+						"type": "string",
+						"description": "The tenant identifier associated with the audit entry, if applicable."
+					},
+					"ipAddressHashes": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The hashed IP addresses of the client."
+					},
+					"userAgent": {
+						"type": "string",
+						"description": "The user agent string of the client."
+					},
+					"correlationId": {
+						"type": "string",
+						"description": "The correlation ID for request tracing."
+					},
+					"data": {
+						"description": "Additional data related to the audit entry, such as IP address, user agent, etc."
+					}
+				}
 			},
 			"AuditableItemGraphCreateRequest": {
 				"description": "The data to be used in the vertex.",
