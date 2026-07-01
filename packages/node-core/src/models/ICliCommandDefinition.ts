@@ -30,6 +30,11 @@ export interface ICliCommandDefinition {
 	params: ICliCommandDefinitionParam[];
 
 	/**
+	 * Deprecated names that resolve to this command with a warning.
+	 */
+	aliases?: string[];
+
+	/**
 	 * The method to execute for the command.
 	 */
 	action: (

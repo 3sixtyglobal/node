@@ -18,8 +18,8 @@ import { nameofKebabCase } from "@twin.org/nameof";
 import { type IVaultConnector, VaultConnectorFactory } from "@twin.org/vault-models";
 import type { WalletAddress } from "@twin.org/wallet-connector-entity-storage";
 import { WalletConnectorFactory } from "@twin.org/wallet-models";
-import { nodeSetIdentity } from "./nodeSetIdentity.js";
-import { applyOrganizationIdToTenant } from "./setTenantOrgId.js";
+import { nodeIdentitySet } from "./nodeIdentitySet.js";
+import { applyOrganizationIdToTenant } from "./tenantOrgIdSet.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -227,7 +227,7 @@ export async function identityCreate(
 		}
 
 		if (params.nodeId) {
-			await nodeSetIdentity(engineCore, envVars, { identity: workingIdentity });
+			await nodeIdentitySet(engineCore, envVars, { identity: workingIdentity });
 		}
 
 		if (params.nodeOrganizationId) {
