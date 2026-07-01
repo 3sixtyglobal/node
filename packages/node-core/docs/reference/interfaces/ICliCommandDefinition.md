@@ -36,6 +36,14 @@ The params available for the command.
 
 ***
 
+### aliases? {#aliases}
+
+> `optional` **aliases?**: `string`[]
+
+Deprecated names that resolve to this command with a warning.
+
+***
+
 ### action {#action}
 
 > **action**: (`engineCore`, `envVars`, `params`) => `Promise`\<`unknown`\>
