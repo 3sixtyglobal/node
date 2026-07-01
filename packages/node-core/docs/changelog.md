@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1-next.4](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.3...node-core-v0.9.1-next.4) (2026-07-01)
+
+
+### Features
+
+* additional cli commands ([#269](https://github.com/iotaledger/twin-node/issues/269)) ([c9e7c93](https://github.com/iotaledger/twin-node/commit/c9e7c939aedfceed9cbe501f2dc936e84289ed62))
+
 ## [0.9.1-next.3](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.2...node-core-v0.9.1-next.3) (2026-06-30)
 
 
