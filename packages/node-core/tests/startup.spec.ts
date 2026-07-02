@@ -63,11 +63,19 @@ function getTenantAdminComponent(result: Awaited<ReturnType<typeof run>>): ITena
 }
 
 describe("startup - tenant organization ID enforcement", () => {
-	beforeAll(() => {
-		ContextIdStore.getContextIds = vi.fn().mockImplementation(() => ({
-			node: "did:iota:testnet:0x1234",
-			tenant: TEST_TENANT_ID_A
-		}));
+	beforeAll(async () => {
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0
+				? { node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }
+				: ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
 	});
 
 	beforeEach(() => {
