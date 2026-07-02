@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.1-next.5](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.4...node-v0.9.1-next.5) (2026-07-02)
+
+
+### Features
+
+* dataspace plane path ([#272](https://github.com/iotaledger/twin-node/issues/272)) ([5998eeb](https://github.com/iotaledger/twin-node/commit/5998eeb6fa1392ae753eb6bafeccefa1fb690573))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.1-next.4 to 0.9.1-next.5
+
 ## [0.9.1-next.4](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.3...node-v0.9.1-next.4) (2026-07-01)
 
 
