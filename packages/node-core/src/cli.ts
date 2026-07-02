@@ -9,17 +9,26 @@ import { getCommandDefinitionBootstrapLegacy } from "./commands/bootstrapLegacy.
 import { getCommandDefinitionHelp } from "./commands/help.js";
 import { getCommandDefinitionIdentityCreate } from "./commands/identityCreate.js";
 import { getCommandDefinitionIdentityImport } from "./commands/identityImports.js";
+import { getCommandDefinitionIdentityList } from "./commands/identityList.js";
+import { getCommandDefinitionIdentityResolve } from "./commands/identityResolve.js";
 import { getCommandDefinitionIdentityVerifiableCredentialCreate } from "./commands/identityVerifiableCredentialCreate.js";
 import { getCommandDefinitionIdentityVerificationMethodCreate } from "./commands/identityVerificationMethodCreate.js";
 import { getCommandDefinitionIdentityVerificationMethodImport } from "./commands/identityVerificationMethodImport.js";
-import { getCommandDefinitionNodeSetIdentity } from "./commands/nodeSetIdentity.js";
+import { getCommandDefinitionNodeIdentityGet } from "./commands/nodeIdentityGet.js";
+import { getCommandDefinitionNodeIdentitySet } from "./commands/nodeIdentitySet.js";
+import { getCommandDefinitionNodeOrgIdGet } from "./commands/nodeOrgIdGet.js";
+import { getCommandDefinitionNodeOrgIdSet } from "./commands/nodeOrgIdSet.js";
+import { getCommandDefinitionOrgUsersList } from "./commands/orgUsersList.js";
 import { getCommandDefinitionRemoveTenantOrgAlias } from "./commands/removeTenantOrgAlias.js";
-import { getCommandDefinitionSetNodeOrgId } from "./commands/setNodeOrgId.js";
-import { getCommandDefinitionSetTenantOrgId } from "./commands/setTenantOrgId.js";
 import { getCommandDefinitionTenantCreate } from "./commands/tenantCreate.js";
+import { getCommandDefinitionTenantGet } from "./commands/tenantGet.js";
 import { getCommandDefinitionTenantImport } from "./commands/tenantImport.js";
+import { getCommandDefinitionTenantList } from "./commands/tenantList.js";
+import { getCommandDefinitionTenantListByOrg } from "./commands/tenantListByOrg.js";
+import { getCommandDefinitionTenantOrgIdSet } from "./commands/tenantOrgIdSet.js";
 import { getCommandDefinitionTenantUpdate } from "./commands/tenantUpdate.js";
 import { getCommandDefinitionUserCreate } from "./commands/userCreate.js";
+import { getCommandDefinitionUserGet } from "./commands/userGet.js";
 import { getCommandDefinitionUserUpdate } from "./commands/userUpdate.js";
 import { getCommandDefinitionVaultKeyCreate } from "./commands/vaultKeyCreate.js";
 import { getCommandDefinitionVaultKeyImport } from "./commands/vaultKeyImport.js";
@@ -108,8 +117,22 @@ export function constructCliCommand(
 			return undefined;
 		}
 
-		if (!commandDefinitions[command.key]) {
-			throw new GeneralError("node", "cliCommandMissing", { command: command.key });
+		let resolvedKey = command.key;
+		if (!commandDefinitions[resolvedKey]) {
+			const aliasEntry = Object.entries(commandDefinitions).find(([, def]) =>
+				def.aliases?.includes(command.key)
+			);
+			if (aliasEntry) {
+				resolvedKey = aliasEntry[0];
+				CLIDisplay.warning(
+					I18n.formatMessage("node.cli.commands.deprecatedAlias", {
+						alias: command.key,
+						command: resolvedKey
+					})
+				);
+			} else {
+				throw new GeneralError("node", "cliCommandMissing", { command: command.key });
+			}
 		}
 
 		// We have a valid command, check for --help for that command
@@ -118,7 +141,7 @@ export function constructCliCommand(
 			return {
 				definition: commandDefinitions.help,
 				params: {
-					command: command.key
+					command: resolvedKey
 				}
 			};
 		}
@@ -130,7 +153,7 @@ export function constructCliCommand(
 			.map(option => option.key)
 			.filter(key => key !== command.key);
 
-		for (const commandDefParam of commandDefinitions[command.key].params) {
+		for (const commandDefParam of commandDefinitions[resolvedKey].params) {
 			const foundParamIndex =
 				cliArgs.options?.findIndex(option => option.key === commandDefParam.key) ?? -1;
 			const foundParam = foundParamIndex >= 0 ? cliArgs.options?.[foundParamIndex] : undefined;
@@ -171,7 +194,7 @@ export function constructCliCommand(
 			});
 		}
 
-		if (commandDefinitions[command.key].params.find(param => param.key === "output-env-prefix")) {
+		if (commandDefinitions[resolvedKey].params.find(param => param.key === "output-env-prefix")) {
 			cliParams.outputEnvPrefix = (Coerce.string(cliParams.outputEnvPrefix) ?? "").toUpperCase();
 			cliParams.outputEnvPrefix =
 				cliParams.outputEnvPrefix.length > 0 && !cliParams.outputEnvPrefix.endsWith("_")
@@ -180,7 +203,7 @@ export function constructCliCommand(
 		}
 
 		return {
-			definition: commandDefinitions[command.key],
+			definition: commandDefinitions[resolvedKey],
 			params: cliParams
 		};
 	}
@@ -303,17 +326,26 @@ export function registerCommands(): void {
 	getCommandDefinitionBootstrapLegacy(commandDefinitions);
 	getCommandDefinitionIdentityCreate(commandDefinitions);
 	getCommandDefinitionIdentityImport(commandDefinitions);
+	getCommandDefinitionIdentityList(commandDefinitions);
+	getCommandDefinitionIdentityResolve(commandDefinitions);
 	getCommandDefinitionIdentityVerificationMethodCreate(commandDefinitions);
 	getCommandDefinitionIdentityVerificationMethodImport(commandDefinitions);
 	getCommandDefinitionIdentityVerifiableCredentialCreate(commandDefinitions);
-	getCommandDefinitionNodeSetIdentity(commandDefinitions);
-	getCommandDefinitionSetNodeOrgId(commandDefinitions);
-	getCommandDefinitionSetTenantOrgId(commandDefinitions);
+	getCommandDefinitionNodeIdentityGet(commandDefinitions);
+	getCommandDefinitionNodeIdentitySet(commandDefinitions);
+	getCommandDefinitionOrgUsersList(commandDefinitions);
 	getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions);
+	getCommandDefinitionNodeOrgIdGet(commandDefinitions);
+	getCommandDefinitionNodeOrgIdSet(commandDefinitions);
+	getCommandDefinitionTenantOrgIdSet(commandDefinitions);
 	getCommandDefinitionTenantCreate(commandDefinitions);
+	getCommandDefinitionTenantGet(commandDefinitions);
 	getCommandDefinitionTenantImport(commandDefinitions);
+	getCommandDefinitionTenantList(commandDefinitions);
+	getCommandDefinitionTenantListByOrg(commandDefinitions);
 	getCommandDefinitionTenantUpdate(commandDefinitions);
 	getCommandDefinitionUserCreate(commandDefinitions);
+	getCommandDefinitionUserGet(commandDefinitions);
 	getCommandDefinitionUserUpdate(commandDefinitions);
 	getCommandDefinitionVaultKeyCreate(commandDefinitions);
 	getCommandDefinitionVaultKeyImport(commandDefinitions);

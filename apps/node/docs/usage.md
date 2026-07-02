@@ -28,17 +28,26 @@ All the commands available are listed below, for more information use the --help
 bootstrap-legacy: Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**
 identity-create: Create an identity
 identity-import: Import an identity
+identity-list: List all identities held in custody by the node
+identity-resolve: Resolve an identity DID to its full document
 identity-verification-method-create: Create an identity verification method
 identity-verification-method-import: Import an identity verification method
 identity-verifiable-credential-create: Create a verifiable credential
-node-set-identity: Set the node identity
+node-identity-get: Get the identity currently assigned to the node
+node-identity-set: Set the node identity
+org-users-list: List all users belonging to an organization DID
 remove-tenant-org-alias: Remove an alias from the tenant organization ID legacy list
-set-node-org-id: Set the node organization ID
-set-tenant-org-id: Set the organization ID for a tenant
+node-org-id-get: Get the organization ID currently assigned to the node
+node-org-id-set: Set the node organization ID
+tenant-org-id-set: Set the organization ID for a tenant
 tenant-create: Create a tenant with associated api key
+tenant-get: Get the full configuration record for a single tenant
 tenant-import: Import a tenant with associated api key
+tenant-list: List all tenants
+tenant-list-by-org: List all tenants associated with a given organization DID
 tenant-update: Update a tenant with associated api key
 user-create: Create a user
+user-get: Get a user by email address
 user-update: Update a user
 vault-key-create: Create a vault key for an identity
 vault-key-import: Import a vault key for an identity
@@ -127,6 +136,150 @@ The tenant ID to set the created identity DID as the organization ID for (requir
 Example: identity-create --mnemonic="..." --fund-wallet=true
 ```
 
+## identity-list --help
+
+```text
+identity-list: List all identities held in custody by the node
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: identity-list
+```
+
+## identity-resolve --help
+
+```text
+identity-resolve: Resolve an identity DID to its full document
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+identity: (string, did, required)
+The DID to resolve.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: identity-resolve --identity="did:iota:..."
+```
+
+## node-identity-get --help
+
+```text
+node-identity-get: Get the identity currently assigned to the node
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: node-identity-get
+```
+
+## node-org-id-get --help
+
+```text
+node-org-id-get: Get the organization ID currently assigned to the node
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: node-org-id-get
+```
+
+## org-users-list --help
+
+```text
+org-users-list: List all users belonging to an organization DID
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+org-did: (string, did, optional)
+The organization DID to list users for. Defaults to the node organization ID in single-tenant mode.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: org-users-list --org-did="did:iota:..."
+```
+
+## user-get --help
+
+```text
+user-get: Get a user by email address
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+email: (string, email, required)
+The email address of the user to retrieve.
+
+tenant-id: (string, hex(32), optional)
+The tenant ID to retrieve the user from (multi-tenant mode only).
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: user-get --email="bob@example.com"
+```
+
+## tenant-get --help
+
+```text
+tenant-get: Get the full configuration record for a single tenant
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+tenant-id: (string, hex(32), required)
+The tenant ID to retrieve.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: tenant-get --tenant-id="0011..aabb"
+```
+
+## tenant-list --help
+
+```text
+tenant-list: List all tenants
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: tenant-list
+```
+
+## tenant-list-by-org --help
+
+```text
+tenant-list-by-org: List all tenants associated with a given organization DID
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+org-id: (string, did, required)
+The organization DID to filter tenants by.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Example: tenant-list-by-org --org-id="did:iota:..."
+```
+
 ## Example
 
 ### Bootstrap legacy (single command)
@@ -176,7 +329,7 @@ twin-node identity-verification-method-create --load-env="node-identity.env,orga
 ### Step 5 - Set the organisation identity on the node (single-tenant)
 
 ```shell
-twin-node set-node-org-id --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
+twin-node node-org-id-set --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
 ```
 
 ### Step 6 - Create the node tenant and associate the organisation (multi-tenant only)
@@ -186,7 +339,7 @@ twin-node tenant-create --load-env="node-identity.env" --label="Node" --output-j
 ```
 
 ```shell
-twin-node set-tenant-org-id --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
+twin-node tenant-org-id-set --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
 ```
 
 To import an existing tenant instead:
@@ -259,6 +412,86 @@ To update an existing user:
 twin-node user-update --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --email="admin@node" --scope="tenant-admin,user-admin,foo"
 ```
 
+````
+
+---
+
+## Inspection commands
+
+The following commands are read-only and can be run at any time to inspect the state of the node.
+
+### Get the node identity
+
+Resolves and displays the DID document currently assigned as the node identity:
+
+```shell
+twin-node node-identity-get
+````
+
+### Get the node organization ID
+
+Displays the organization DID currently assigned to the node (single-tenant only):
+
+```shell
+twin-node node-org-id-get
 ```
 
+### Resolve an identity
+
+Resolve any DID to its full document, including its verification methods:
+
+```shell
+twin-node identity-resolve --identity="did:iota:..."
+```
+
+### List all identities
+
+List every identity held in custody by the node, showing each DID and its controller:
+
+```shell
+twin-node identity-list
+```
+
+### List all tenants (multi-tenant only)
+
+```shell
+twin-node tenant-list
+```
+
+### Get a single tenant (multi-tenant only)
+
+```shell
+twin-node tenant-get --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID
+```
+
+### List tenants for an organization (multi-tenant only)
+
+```shell
+twin-node tenant-list-by-org --load-env="organization-identity.env" --org-id=!ORGANIZATION_DID
+```
+
+### List users for an organization
+
+In single-tenant mode, `--org-did` can be omitted and the node organization ID is used automatically:
+
+```shell
+twin-node org-users-list
+```
+
+To list users for a specific organization:
+
+```shell
+twin-node org-users-list --load-env="organization-identity.env" --org-did=!ORGANIZATION_DID
+```
+
+### Get a single user
+
+```shell
+twin-node user-get --email="admin@node"
+```
+
+In multi-tenant mode supply the tenant ID:
+
+```shell
+twin-node user-get --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@node"
 ```

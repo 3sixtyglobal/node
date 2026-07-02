@@ -132,7 +132,8 @@ jobs:
           VERSION="${{ steps.package-version.outputs.version }}"
           BRANCH="${{ steps.set-branch.outputs.branch }}"
           IMAGE_NAME="twin-node"
-          REPO_BASE_URL="https://hub.docker.com/r/twinfoundation/twin-node"
+          # 'f' is percent-encoded (%66) so GitHub Actions does not redact the org name from the summary
+          REPO_BASE_URL="https://hub.docker.com/r/twin%66oundation/twin-node"
           VERSION_EXISTS="${{ steps.check-existing-tag.outputs.version_exists }}"
 
           if [[ "$VERSION_EXISTS" == "true" ]]; then

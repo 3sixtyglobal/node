@@ -102,6 +102,14 @@ function displayCommandHelp(commandDefinition: ICliCommandDefinition): void {
 		}
 	}
 
+	if (Is.arrayValue(commandDefinition.aliases)) {
+		CLIDisplay.break();
+		CLIDisplay.value(
+			I18n.formatMessage("node.cli.commands.help.labels.aliases"),
+			commandDefinition.aliases.join(", ")
+		);
+	}
+
 	if (Is.stringValue(commandDefinition.example)) {
 		CLIDisplay.break();
 		CLIDisplay.value(
