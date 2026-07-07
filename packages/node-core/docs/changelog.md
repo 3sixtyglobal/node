@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1-next.6](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.5...node-core-v0.9.1-next.6) (2026-07-03)
+
+
+### Features
+
+* use core env helpers ([568fbc5](https://github.com/iotaledger/twin-node/commit/568fbc53906b022bc8465ffb941a160075d88e96))
+
 ## [0.9.1-next.5](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.4...node-core-v0.9.1-next.5) (2026-07-02)
 
 

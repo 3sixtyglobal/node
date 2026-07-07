@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
-import { Coerce, EnvHelper, GeneralError, Guards, I18n, Is, StringHelper } from "@twin.org/core";
+import { Coerce, EnvHelper, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
@@ -67,7 +67,7 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.9.1-next.5" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.9.1-next.6" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
@@ -255,7 +255,7 @@ function validateEnvVarKeys(
 		Is.stringValue(envVars.envAllowList)
 			? envVars.envAllowList
 					.split(",")
-					.map(k => envVarKeyToJsonKey(k.trim(), prefix))
+					.map(k => EnvHelper.envVarKeyToJsonKey(k.trim(), prefix))
 					.filter(Boolean)
 			: []
 	);
@@ -266,7 +266,7 @@ function validateEnvVarKeys(
 				!allowSets.some(set => matchesPatternSet(camelKey, set)) &&
 				!matchesPatternSet(camelKey, customSet)
 		)
-		.map(camelKey => jsonKeyToEnvVarKey(camelKey, prefix));
+		.map(camelKey => EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix));
 
 	if (unknown.length > 0) {
 		if (mode === "error") {
@@ -529,37 +529,4 @@ export function overrideModuleImport(
 function getNpmRootPath(): string {
 	npmRootCache ??= execSync("npm root").toString().trim().replace(/\\/g, "/");
 	return npmRootCache;
-}
-
-/**
- * Convert an environment variable key to a JSON key.
- * A trailing _* or * is preserved as a wildcard suffix (e.g. TWIN_REST_PATH_* → "restPath*").
- * @param envVarKey The environment variable key.
- * @param prefix The prefix of the environment variable key, if not provided gets all.
- * @returns The JSON key.
- */
-function envVarKeyToJsonKey(envVarKey: string, prefix?: string): string {
-	const isWildcard = envVarKey.endsWith("*");
-	if (isWildcard) {
-		envVarKey = envVarKey.replace(/_?\*$/, "");
-	}
-	if (Is.stringValue(prefix) && envVarKey.startsWith(prefix)) {
-		envVarKey = envVarKey.replace(prefix, "");
-	}
-	const camelKey = StringHelper.camelCase(envVarKey.toLowerCase());
-	return isWildcard ? `${camelKey}*` : camelKey;
-}
-
-/**
- * Convert a JSON key to an environment variable key.
- * @param jsonKey The JSON key.
- * @param prefix The prefix of the environment variable key, if not provided gets all.
- * @returns The environment variable key.
- */
-function jsonKeyToEnvVarKey(jsonKey: string, prefix?: string): string {
-	const envVarKey = StringHelper.snakeCase(jsonKey).toUpperCase();
-	if (Is.stringValue(prefix)) {
-		return `${prefix}${envVarKey}`;
-	}
-	return envVarKey;
 }
