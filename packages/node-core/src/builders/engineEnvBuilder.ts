@@ -1626,6 +1626,8 @@ async function configureDataspace(
 					// Must match the control-plane REST mount, as it is combined with the public origin
 					// to build the consumer's advertised callback address;
 					callbackPath: envVars.dataspaceCallbackPath ?? "dataspace-control-plane",
+					// Base mount path of the data plane only; the transfer handlers append the
+					// sub-paths themselves (`/entities` for PULL, `/inbox` for PUSH).
 					dataPlanePath: envVars.dataspaceDataPlanePath,
 					autoStartTransfers: Coerce.boolean(envVars.dataspaceAutoStartTransfers),
 					stalledNegotiationTimeoutMs: !Is.empty(stalledNegotiationTimeout)
