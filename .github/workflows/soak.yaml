@@ -6,4 +6,4 @@ jobs:
   soak:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Soak workflow placeholder"
+      - run: echo "Soak Workflow Placeholder"
