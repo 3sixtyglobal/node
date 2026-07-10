@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1-next.8](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.7...node-core-v0.9.1-next.8) (2026-07-10)
+
+
+### Miscellaneous Chores
+
+* **node-core:** Synchronize repo versions
+
 ## [0.9.1-next.7](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.6...node-core-v0.9.1-next.7) (2026-07-08)
 
 
