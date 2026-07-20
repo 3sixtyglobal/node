@@ -586,6 +586,16 @@ export interface IEngineEnvironmentVariables {
 	iotaCoinType?: string;
 
 	/**
+	 * IOTA gas budget, in nanos.
+	 */
+	iotaGasBudget?: string;
+
+	/**
+	 * IOTA gas reservation duration, in seconds.
+	 */
+	iotaGasReservationDuration?: string;
+
+	/**
 	 * IOTA Explorer Endpoint.
 	 */
 	iotaExplorerEndpoint?: string;

@@ -1711,7 +1711,9 @@ async function configureDlt(
 					},
 					network: envVars.iotaNetwork ?? "",
 					coinType: Coerce.integer(envVars.iotaCoinType),
-					gasStation: gasStationConfig
+					gasStation: gasStationConfig,
+					gasBudget: Coerce.integer(envVars.iotaGasBudget),
+					gasReservationDuration: Coerce.integer(envVars.iotaGasReservationDuration)
 				}
 			}
 		});

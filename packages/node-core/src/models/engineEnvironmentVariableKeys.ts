@@ -152,6 +152,8 @@ const engineEnvironmentVariableKeysInternal: {
 	iotaNodeEndpoint: true,
 	iotaNetwork: true,
 	iotaCoinType: true,
+	iotaGasBudget: true,
+	iotaGasReservationDuration: true,
 	iotaExplorerEndpoint: true,
 	iotaGasStationEndpoint: true,
 	iotaGasStationAuthToken: true,
