@@ -361,7 +361,7 @@ export interface IEngineEnvironmentVariables {
 	hashicorpVaultEndpoint?: string;
 
 	/**
-	 * The type of logging task connector, can be a comma separated list: console, entity-storage.
+	 * The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
 	 */
 	loggingConnector?: string;
 
@@ -379,6 +379,26 @@ export interface IEngineEnvironmentVariables {
 	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
 	 */
 	loggingSilentComponents?: string;
+
+	/**
+	 * The directory to write log files into when using the file logging connector. Required when TWIN_LOGGING_CONNECTOR includes "file".
+	 */
+	loggingFileDirectory?: string;
+
+	/**
+	 * The log filename when using the file logging connector, defaults to "app.log".
+	 */
+	loggingFileFilename?: string;
+
+	/**
+	 * The maximum log file size in bytes before rotation when using the file logging connector, defaults to 10485760 (10 MB). Set to 0 or negative to disable rotation.
+	 */
+	loggingFileMaxFileSizeBytes?: string;
+
+	/**
+	 * The number of rotated log files to retain when using the file logging connector, defaults to 5. Set to 0 or negative to keep all rotated files.
+	 */
+	loggingFileMaxRetainedFiles?: string;
 
 	/**
 	 * The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
@@ -536,6 +556,11 @@ export interface IEngineEnvironmentVariables {
 	identityWalletAddressIndex?: string;
 
 	/**
+	 * The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
+	 */
+	identityDidResolutionCacheTtlMs?: string;
+
+	/**
 	 * The type of identity resolver connector: entity-storage, iota.
 	 */
 	identityResolverConnector?: string;
@@ -654,6 +679,11 @@ export interface IEngineEnvironmentVariables {
 	 * Federated catalog remote endpoint, if set will use a REST client instead of local service.
 	 */
 	federatedCatalogueRemoteEndpoint?: string;
+
+	/**
+	 * The path prefix used by the federated catalogue REST client when forwarding requests to the remote endpoint, defaults to "federated-catalogue".
+	 */
+	federatedCatalogueRestClientPathPrefix?: string;
 
 	/**
 	 * The trust generators to add to the factory, comma separated list.

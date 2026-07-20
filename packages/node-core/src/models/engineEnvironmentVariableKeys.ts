@@ -101,6 +101,10 @@ const engineEnvironmentVariableKeysInternal: {
 	loggingBatchSize: true,
 	loggingBatchFlushInterval: true,
 	loggingSilentComponents: true,
+	loggingFileDirectory: true,
+	loggingFileFilename: true,
+	loggingFileMaxFileSizeBytes: true,
+	loggingFileMaxRetainedFiles: true,
 	loggingMutexTimeout: true,
 	// open telemetry logging
 	openTelemetryLoggingLoggerName: true,
@@ -139,6 +143,7 @@ const engineEnvironmentVariableKeysInternal: {
 	notarizationConnector: true,
 	identityConnector: true,
 	identityWalletAddressIndex: true,
+	identityDidResolutionCacheTtlMs: true,
 	identityResolverConnector: true,
 	identityProfileConnector: true,
 	universalResolverEndpoint: true,
@@ -171,6 +176,7 @@ const engineEnvironmentVariableKeysInternal: {
 	federatedCatalogueEnabled: true,
 	federatedCatalogueFilters: true,
 	federatedCatalogueRemoteEndpoint: true,
+	federatedCatalogueRestClientPathPrefix: true,
 	federatedCatalogueMutexTimeout: true,
 	// trust
 	trustGenerators: true,
