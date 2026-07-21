@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { readFile, rm, writeFile } from "node:fs/promises";
-import { CLIUtils } from "@twin.org/cli-core";
+import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { Converter, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import { AuthenticationAdminComponentType } from "@twin.org/engine-server-types";
@@ -23,11 +23,6 @@ const basePort = Math.floor(Math.random() * 1000);
 let port = 3000 + basePort;
 const OUTPUT_TMP_DIR = "./tests/.tmp/";
 
-/**
- * Get the value from an env line.
- * @param line The env line.
- * @returns The value.
- */
 function valueFromEnv(line?: string): string | undefined {
 	return line?.split("=").slice(1).join("=").replace(/"/g, "");
 }
@@ -121,6 +116,37 @@ describe("node-core", () => {
 
 	test("Can show the help for a command", async () => {
 		await executeCliCommand(["bootstrap-legacy", "--help"], {});
+	});
+
+	test("help listing marks single-tenant-only commands with a label", async () => {
+		const lines: string[] = [];
+		const originalWrite = CLIDisplay.write;
+		CLIDisplay.write = (buf: string | Uint8Array) => {
+			lines.push(buf.toString());
+		};
+		try {
+			await executeCliCommand(["--help"], {});
+		} finally {
+			CLIDisplay.write = originalWrite;
+		}
+		const output = lines.join("");
+		expect(output).toContain("node-org-id-get");
+		expect(output).toContain("single-tenant only");
+	});
+
+	test("per-command help for node-org-id-get includes single-tenant-only label", async () => {
+		const lines: string[] = [];
+		const originalWrite = CLIDisplay.write;
+		CLIDisplay.write = (buf: string | Uint8Array) => {
+			lines.push(buf.toString());
+		};
+		try {
+			await executeCliCommand(["node-org-id-get", "--help"], {});
+		} finally {
+			CLIDisplay.write = originalWrite;
+		}
+		const output = lines.join("");
+		expect(output).toContain("single-tenant only");
 	});
 
 	test("Can bootstrap in legacy mode", async () => {
@@ -1782,6 +1808,16 @@ describe("node-core", () => {
 
 	test("identity-resolve resolves a DID to its document", async () => {
 		await executeCliCommand(["identity-resolve", `--identity=${nodeIdentityJson?.did}`], {});
+	});
+
+	test("identity-resolve saves the full DID document to a json file", async () => {
+		const outputFile = `${OUTPUT_TMP_DIR}identity-resolve.json`;
+		await executeCliCommand(
+			["identity-resolve", `--identity=${nodeIdentityJson?.did}`, `--output-json=${outputFile}`],
+			{}
+		);
+		const document = await CLIUtils.readJsonFile<{ id: string }>(outputFile);
+		expect(document?.id).toBe(nodeIdentityJson?.did);
 	});
 
 	test("identity-resolve throws when identity is not found", async () => {

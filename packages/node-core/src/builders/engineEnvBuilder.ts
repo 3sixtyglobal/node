@@ -507,6 +507,20 @@ async function configureLogging(
 				}
 			});
 			additionalConnectorCount++;
+		} else if (loggingConnector === LoggingConnectorType.File) {
+			coreConfig.types.loggingConnector.push({
+				type: LoggingConnectorType.File,
+				options: {
+					config: {
+						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
+						filename: envVars.loggingFileFilename,
+						maxFileSizeBytes: Coerce.integer(envVars.loggingFileMaxFileSizeBytes),
+						maxRetainedFiles: Coerce.integer(envVars.loggingFileMaxRetainedFiles),
+						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
+					}
+				}
+			});
+			additionalConnectorCount++;
 		}
 	}
 
@@ -1106,7 +1120,8 @@ async function configureIdentity(
 					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
 						? envVars.iotaIdentityPackageId
 						: undefined,
-					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0
+					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0,
+					didResolutionCacheTtlMs: Coerce.integer(envVars.identityDidResolutionCacheTtlMs)
 				}
 			}
 		});
@@ -1570,7 +1585,8 @@ async function configureFederatedCatalogue(
 			coreConfig.types.federatedCatalogueComponent.push({
 				type: FederatedCatalogueComponentType.RestClient,
 				options: {
-					endpoint: envVars.federatedCatalogueRemoteEndpoint
+					endpoint: envVars.federatedCatalogueRemoteEndpoint,
+					pathPrefix: envVars.federatedCatalogueRestClientPathPrefix ?? "federated-catalogue"
 				}
 			});
 		} else {
@@ -1695,7 +1711,9 @@ async function configureDlt(
 					},
 					network: envVars.iotaNetwork ?? "",
 					coinType: Coerce.integer(envVars.iotaCoinType),
-					gasStation: gasStationConfig
+					gasStation: gasStationConfig,
+					gasBudget: Coerce.integer(envVars.iotaGasBudget),
+					gasReservationDuration: Coerce.integer(envVars.iotaGasReservationDuration)
 				}
 			}
 		});

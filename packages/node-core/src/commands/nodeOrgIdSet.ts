@@ -25,6 +25,7 @@ export function getCommandDefinitionNodeOrgIdSet(commandDefinitions: {
 		example: I18n.formatMessage("node.cli.commands.node-org-id-set.example"),
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
+		singleTenantOnly: true,
 		params: [
 			{
 				key: "env-prefix",

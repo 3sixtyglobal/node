@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node",
-	"version": "0.9.1-next.7",
+	"version": "0.9.1-next.10",
 	"description": "TWIN Node serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
@@ -11,7 +11,7 @@
 	"license": "Apache-2.0",
 	"type": "module",
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=24.0.0"
 	},
 	"scripts": {
 		"clean": "rimraf dist coverage",
@@ -32,7 +32,7 @@
 		"start": "node src/index.js"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "0.9.1-next.7"
+		"@twin.org/node-core": "0.9.1-next.10"
 	},
 	"devDependencies": {
 		"@twin.org/entity-storage-connector-memory": "next",

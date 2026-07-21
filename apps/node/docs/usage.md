@@ -37,8 +37,8 @@ node-identity-get: Get the identity currently assigned to the node
 node-identity-set: Set the node identity
 org-users-list: List all users belonging to an organization DID
 remove-tenant-org-alias: Remove an alias from the tenant organization ID legacy list
-node-org-id-get: Get the organization ID currently assigned to the node
-node-org-id-set: Set the node organization ID
+node-org-id-get: Get the organization ID currently assigned to the node (single-tenant only)
+node-org-id-set: Set the node organization ID (single-tenant only)
 tenant-org-id-set: Set the organization ID for a tenant
 tenant-create: Create a tenant with associated api key
 tenant-get: Get the full configuration record for a single tenant
@@ -164,6 +164,9 @@ The DID to resolve.
 load-env: (string, optional)
 Comma separated list of paths to .env files to read input parameters from.
 
+output-json: (string, optional)
+Path to a .json file to store the resolved DID document.
+
 Example: identity-resolve --identity="did:iota:..."
 ```
 
@@ -185,6 +188,7 @@ Example: node-identity-get
 
 ```text
 node-org-id-get: Get the organization ID currently assigned to the node
+  single-tenant only
 
 env-prefix: (string, optional)
 Prefix to use for standard .env files e.g. TWIN_.
@@ -193,6 +197,26 @@ load-env: (string, optional)
 Comma separated list of paths to .env files to read input parameters from.
 
 Example: node-org-id-get
+```
+
+## node-org-id-set --help
+
+```text
+node-org-id-set: Set the node organization ID
+  single-tenant only
+
+env-prefix: (string, optional)
+Prefix to use for standard .env files e.g. TWIN_.
+
+organization-id: (string, did, required)
+The organization DID to set as the node organization ID.
+
+load-env: (string, optional)
+Comma separated list of paths to .env files to read input parameters from.
+
+Deprecated aliases: set-node-org-id
+
+Example: node-org-id-set --organization-id="did:iota:..."
 ```
 
 ## org-users-list --help
@@ -438,10 +462,11 @@ twin-node node-org-id-get
 
 ### Resolve an identity
 
-Resolve any DID to its full document, including its verification methods:
+Resolve any DID to its full document. Pass `--output-json` to save the document to a file:
 
 ```shell
 twin-node identity-resolve --identity="did:iota:..."
+twin-node identity-resolve --identity="did:iota:..." --output-json="did-document.json"
 ```
 
 ### List all identities

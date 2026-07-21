@@ -4,7 +4,7 @@
 /**
  * k6 soak scenario for the twin-node server.
  *
- * Phase 5 + feat-249 round 2: weighted traffic mix across 10 API areas.
+ * Weighted traffic mix across 10 API areas.
  * Each VU authenticates on first iteration and re-authenticates on 401. Per-iteration a
  * single group is chosen by weighted random. Per-group custom metrics are declared so they
  * appear in handleSummary and report.json.

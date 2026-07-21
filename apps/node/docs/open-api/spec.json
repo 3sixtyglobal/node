@@ -15689,7 +15689,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStream>.",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
 						"in": "query",
 						"required": false,
 						"schema": {

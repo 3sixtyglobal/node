@@ -23,6 +23,7 @@ export function getCommandDefinitionNodeOrgIdGet(commandDefinitions: {
 		example: I18n.formatMessage("node.cli.commands.node-org-id-get.example"),
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
+		singleTenantOnly: true,
 		params: [
 			{
 				key: "env-prefix",

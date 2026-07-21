@@ -60,4 +60,9 @@ export interface ICliCommandDefinition {
 	 * @default true
 	 */
 	requiresOrgIdentity?: boolean;
+
+	/**
+	 * Indicates whether this command is only available in single-tenant mode.
+	 */
+	singleTenantOnly?: boolean;
 }

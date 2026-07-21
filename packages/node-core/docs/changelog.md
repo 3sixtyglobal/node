@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.9.1-next.10](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.9...node-core-v0.9.1-next.10) (2026-07-21)
+
+
+### Features
+
+* update dependencies ([64c8ea8](https://github.com/iotaledger/twin-node/commit/64c8ea8c8b5e918f7ad419c4e3b8d08faf5e3fdd))
+
+## [0.9.1-next.9](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.8...node-core-v0.9.1-next.9) (2026-07-21)
+
+
+### Features
+
+* enhanced cli commands ([#288](https://github.com/iotaledger/twin-node/issues/288)) ([479fb34](https://github.com/iotaledger/twin-node/commit/479fb3448c493a134aee35b69ae39458e493a4ad))
+* expose gasBudget and gasReservationDuration as configurable env vars ([#286](https://github.com/iotaledger/twin-node/issues/286)) ([d678b27](https://github.com/iotaledger/twin-node/commit/d678b27d629930a6ce85eeab9caf89d1187c3461))
+* file logging config ([#287](https://github.com/iotaledger/twin-node/issues/287)) ([a567b25](https://github.com/iotaledger/twin-node/commit/a567b253cbb8b9af872bb0e494c013212f4f55a2))
+
+## [0.9.1-next.8](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.7...node-core-v0.9.1-next.8) (2026-07-10)
+
+
+### Miscellaneous Chores
+
+* **node-core:** Synchronize repo versions
+
 ## [0.9.1-next.7](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.6...node-core-v0.9.1-next.7) (2026-07-08)
 
 

@@ -107,3 +107,11 @@ Indicates whether the engine needs the organization identity to be set.
 ```ts
 true
 ```
+
+***
+
+### singleTenantOnly? {#singletenantonly}
+
+> `optional` **singleTenantOnly?**: `boolean`
+
+Indicates whether this command is only available in single-tenant mode.

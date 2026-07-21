@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node-core",
-	"version": "0.9.1-next.7",
+	"version": "0.9.1-next.10",
 	"description": "TWIN Node Core for serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
@@ -11,7 +11,7 @@
 	"license": "Apache-2.0",
 	"type": "module",
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=24.0.0"
 	},
 	"scripts": {
 		"clean": "rimraf dist coverage",
@@ -46,7 +46,6 @@
 		"@twin.org/entity-storage-models": "next",
 		"@twin.org/identity-models": "next",
 		"@twin.org/modules": "next",
-		"@twin.org/rights-management-rest-client": "next",
 		"@twin.org/standards-w3c-did": "next",
 		"@twin.org/standards-w3c-odrl": "next",
 		"@twin.org/logging-connector-opentelemetry": "next",
@@ -60,10 +59,12 @@
 	},
 	"devDependencies": {
 		"@twin.org/automation-models": "next",
+		"@twin.org/dlt-iota": "next",
 		"@twin.org/entity-storage-connector-memory": "next",
 		"@twin.org/merge-locales": "next",
 		"@twin.org/nameof-transformer": "next",
 		"@twin.org/nameof-vitest-plugin": "next",
+		"@twin.org/rights-management-models": "next",
 		"@twin.org/ts-to-openapi": "next",
 		"@twin.org/validate-locales": "next",
 		"@vitest/coverage-v8": "4.1.9",
