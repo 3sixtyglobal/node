@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.9.1-next.9](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.8...node-v0.9.1-next.9) (2026-07-21)
+
+
+### Features
+
+* enhanced cli commands ([#288](https://github.com/iotaledger/twin-node/issues/288)) ([479fb34](https://github.com/iotaledger/twin-node/commit/479fb3448c493a134aee35b69ae39458e493a4ad))
+* expose gasBudget and gasReservationDuration as configurable env vars ([#286](https://github.com/iotaledger/twin-node/issues/286)) ([d678b27](https://github.com/iotaledger/twin-node/commit/d678b27d629930a6ce85eeab9caf89d1187c3461))
+* file logging config ([#287](https://github.com/iotaledger/twin-node/issues/287)) ([a567b25](https://github.com/iotaledger/twin-node/commit/a567b253cbb8b9af872bb0e494c013212f4f55a2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.1-next.8 to 0.9.1-next.9
+
 ## [0.9.1-next.8](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.7...node-v0.9.1-next.8) (2026-07-10)
 
 
