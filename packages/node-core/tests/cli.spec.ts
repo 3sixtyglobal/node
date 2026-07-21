@@ -23,11 +23,6 @@ const basePort = Math.floor(Math.random() * 1000);
 let port = 3000 + basePort;
 const OUTPUT_TMP_DIR = "./tests/.tmp/";
 
-/**
- * Get the value from an env line.
- * @param line The env line.
- * @returns The value.
- */
 function valueFromEnv(line?: string): string | undefined {
 	return line?.split("=").slice(1).join("=").replace(/"/g, "");
 }
