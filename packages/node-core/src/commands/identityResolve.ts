@@ -1,6 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay } from "@twin.org/cli-core";
+import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { IdentityResolverConnectorFactory } from "@twin.org/identity-models";
@@ -48,6 +48,14 @@ export function getCommandDefinitionIdentityResolve(commandDefinitions: {
 					"node.cli.commands.identity-resolve.params.load-env.description"
 				),
 				required: false
+			},
+			{
+				key: "output-json",
+				type: "string",
+				description: I18n.formatMessage(
+					"node.cli.commands.identity-resolve.params.output-json.description"
+				),
+				required: false
 			}
 		],
 		action: async (engineCore, envVars, params) => identityResolve(engineCore, envVars, params)
@@ -60,6 +68,7 @@ export function getCommandDefinitionIdentityResolve(commandDefinitions: {
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
  * @param params.identity The DID to resolve.
+ * @param params.outputJson The output .json file to store the resolved DID document.
  * @returns The resolved DID document.
  */
 export async function identityResolve(
@@ -67,6 +76,7 @@ export async function identityResolve(
 	envVars: IEnvironmentVariables,
 	params: {
 		identity?: string;
+		outputJson?: string;
 	}
 ): Promise<IDidDocument> {
 	Guards.stringValue("identityResolve", "identity", params.identity);
@@ -97,24 +107,13 @@ export async function identityResolve(
 		I18n.formatMessage("node.cli.commands.identity-resolve.labels.did"),
 		identityDocument.id
 	);
-
-	if (Is.arrayValue(identityDocument.verificationMethod)) {
-		CLIDisplay.value(
-			I18n.formatMessage("node.cli.commands.identity-resolve.labels.verificationMethods"),
-			identityDocument.verificationMethod.length.toString(),
-			1
-		);
-		for (const method of identityDocument.verificationMethod) {
-			if (Is.stringValue(method)) {
-				CLIDisplay.value(method, "", 2);
-			} else {
-				const m = method;
-				CLIDisplay.value(Is.stringValue(m.id) ? m.id : "", Is.stringValue(m.type) ? m.type : "", 2);
-			}
-		}
-	}
-
 	CLIDisplay.break();
+	CLIDisplay.json(identityDocument);
+	CLIDisplay.break();
+
+	if (Is.stringValue(params.outputJson)) {
+		await CLIUtils.writeJsonFile(params.outputJson, identityDocument, false);
+	}
 
 	CLIDisplay.done();
 

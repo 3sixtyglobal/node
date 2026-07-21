@@ -125,7 +125,8 @@
 						"optional": "optional",
 						"required": "required",
 						"default": "default",
-						"options": "options"
+						"options": "options",
+						"singleTenantOnly": "single-tenant only"
 					}
 				},
 				"bootstrap-legacy": {
@@ -880,12 +881,14 @@
 						},
 						"load-env": {
 							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the resolved DID document."
 						}
 					},
 					"labels": {
 						"resolving": "Resolving identity",
-						"did": "DID",
-						"verificationMethods": "Verification Methods"
+						"did": "DID"
 					}
 				},
 				"org-users-list": {

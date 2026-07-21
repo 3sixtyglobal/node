@@ -50,12 +50,18 @@ export async function help(
 		CLIDisplay.value("", I18n.formatMessage("node.cli.commands.help.labels.commands"));
 		CLIDisplay.break();
 
+		const singleTenantOnlyLabel = I18n.formatMessage(
+			"node.cli.commands.help.labels.singleTenantOnly"
+		);
 		for (const commandId in commandDefinitions) {
 			const commandDef = commandDefinitions[commandId];
 			if (commandId !== "help") {
+				const description = I18n.formatMessage(
+					`node.cli.commands.${commandDef.command}.description`
+				);
 				CLIDisplay.value(
 					commandDef.command,
-					I18n.formatMessage(`node.cli.commands.${commandDef.command}.description`)
+					commandDef.singleTenantOnly ? `${description} (${singleTenantOnlyLabel})` : description
 				);
 			}
 		}
@@ -68,6 +74,9 @@ export async function help(
  */
 function displayCommandHelp(commandDefinition: ICliCommandDefinition): void {
 	CLIDisplay.value(commandDefinition.command, commandDefinition.description);
+	if (commandDefinition.singleTenantOnly) {
+		CLIDisplay.value("", I18n.formatMessage("node.cli.commands.help.labels.singleTenantOnly"), 1);
+	}
 	CLIDisplay.break();
 
 	const defaultLabel = I18n.formatMessage("node.cli.commands.help.labels.default");
