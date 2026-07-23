@@ -18655,6 +18655,15 @@
 				],
 				"parameters": [
 					{
+						"name": "type",
+						"description": "The type of policy to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "assigner",
 						"description": "The assigner to filter by.",
 						"in": "query",
