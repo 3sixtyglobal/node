@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.1-next.11](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.10...node-v0.9.1-next.11) (2026-07-24)
+
+
+### Features
+
+* migration options ([#293](https://github.com/iotaledger/twin-node/issues/293)) ([91acc88](https://github.com/iotaledger/twin-node/commit/91acc881f665be0177b2e895e2810dd4d6145105))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.1-next.10 to 0.9.1-next.11
+
 ## [0.9.1-next.10](https://github.com/iotaledger/twin-node/compare/node-v0.9.1-next.9...node-v0.9.1-next.10) (2026-07-21)
 
 
