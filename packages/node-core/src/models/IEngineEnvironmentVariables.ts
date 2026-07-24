@@ -49,6 +49,11 @@ export interface IEngineEnvironmentVariables {
 	tenantEnabled?: string;
 
 	/**
+	 * Enable schema migration, defaults to true.
+	 */
+	schemaMigrationEnabled?: string;
+
+	/**
 	 * The type of the entity storage to create, comma separate for more than one connector.
 	 * values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 	 */
@@ -374,6 +379,34 @@ export interface IEngineEnvironmentVariables {
 	 * The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
 	 */
 	loggingBatchFlushInterval?: string;
+
+	/**
+	 * Delete log entries older than this many milliseconds for the entity-storage logging connector.
+	 * Set to 0 to disable age-based retention.
+	 * @default 172800000 (2 days)
+	 */
+	loggingRetainForMs?: string;
+
+	/**
+	 * Keep at most this many log entries for the entity-storage logging connector.
+	 * Set to 0 to disable count-based retention.
+	 * @default 10000
+	 */
+	loggingMaxEntries?: string;
+
+	/**
+	 * How often the retention cleanup task runs in milliseconds for the entity-storage logging connector.
+	 * Set to 0 to disable periodic cleanup.
+	 * @default 300000 (5 minutes)
+	 */
+	loggingRetentionIntervalMs?: string;
+
+	/**
+	 * Maximum number of entries deleted per cleanup batch for the entity-storage logging connector.
+	 * Keeping this value smaller helps avoid spikes in database load.
+	 * @default 1000
+	 */
+	loggingRetentionBatchSize?: string;
 
 	/**
 	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".

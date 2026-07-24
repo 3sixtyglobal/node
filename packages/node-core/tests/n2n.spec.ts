@@ -56,6 +56,7 @@ const BASE_ENV: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
 	TWIN_SILENT: "true",
 	TWIN_TENANT_ENABLED: "false",
+	TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,

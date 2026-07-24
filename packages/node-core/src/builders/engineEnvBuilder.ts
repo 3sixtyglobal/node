@@ -68,6 +68,7 @@ import {
 	type RightsManagementPolicyObligationEnforcerComponentType,
 	type RightsManagementPolicyRequesterComponentType,
 	RightsManagementPxpComponentType,
+	SchemaVersionMigrationComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
@@ -117,6 +118,7 @@ export async function buildEngineConfiguration(
 		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
 	}
 
+	await configureSchemaMigration(coreConfig, envVars);
 	await configurePlatform(coreConfig, envVars);
 	await configureTenant(coreConfig, envVars);
 	await configureContextIdHandlers(coreConfig, envVars);
@@ -479,6 +481,10 @@ async function configureLogging(
 					config: {
 						batchSize: Coerce.integer(envVars.loggingBatchSize),
 						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushInterval) ?? 5) * 1000,
+						retainForMs: Coerce.integer(envVars.loggingRetainForMs),
+						maxEntries: Coerce.integer(envVars.loggingMaxEntries),
+						retentionIntervalMs: Coerce.integer(envVars.loggingRetentionIntervalMs),
+						retentionBatchSize: Coerce.integer(envVars.loggingRetentionBatchSize),
 						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
 					}
 				}
@@ -686,7 +692,8 @@ async function configureMetricsCollector(
 		coreConfig.types.metricsCollectorComponent ??= [];
 		coreConfig.types.metricsCollectorComponent.push({
 			type: MetricsCollectorComponentType.Service,
-			options: { config: { intervalMs: intervalSec * 1000 } }
+			options: { config: { intervalMs: intervalSec * 1000 } },
+			isCloneable: false
 		});
 
 		const maxHistory = Coerce.integer(envVars.telemetryMetricsProducerMaxHistory) ?? 1440;
@@ -700,7 +707,8 @@ async function configureMetricsCollector(
 		for (const producerType of metricsProducers) {
 			coreConfig.types.metricsProducerComponent.push({
 				type: producerType as MetricsProducerComponentType,
-				options: { maxHistory }
+				options: { maxHistory },
+				isCloneable: false
 			});
 		}
 	}
@@ -758,7 +766,29 @@ async function configureHealth(
 					healthCheckInterval: (Coerce.integer(envVars.healthInterval) ?? 60) * 1000,
 					initialInterval: (Coerce.integer(envVars.healthStartupInterval) ?? 2) * 1000
 				}
-			}
+			},
+			isCloneable: false
+		});
+	}
+}
+
+/**
+ * Configures the schema migration.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the schema migration configuration has been applied.
+ */
+async function configureSchemaMigration(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	const isSchemaMigrationEnabled = Coerce.boolean(envVars.schemaMigrationEnabled) ?? true;
+
+	if (isSchemaMigrationEnabled) {
+		coreConfig.types.schemaVersionMigrationComponent ??= [];
+		coreConfig.types.schemaVersionMigrationComponent.push({
+			type: SchemaVersionMigrationComponentType.Service,
+			isCloneable: false
 		});
 	}
 }

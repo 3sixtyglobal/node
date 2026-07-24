@@ -17,6 +17,7 @@ const engineEnvironmentVariableKeysInternal: {
 	storageFileRoot: true,
 	stateFilename: true,
 	tenantEnabled: true,
+	schemaMigrationEnabled: true,
 	extensions: true,
 	// entity storage
 	entityStorageConnectorType: true,
@@ -100,6 +101,10 @@ const engineEnvironmentVariableKeysInternal: {
 	loggingConnector: true,
 	loggingBatchSize: true,
 	loggingBatchFlushInterval: true,
+	loggingRetainForMs: true,
+	loggingMaxEntries: true,
+	loggingRetentionIntervalMs: true,
+	loggingRetentionBatchSize: true,
 	loggingSilentComponents: true,
 	loggingFileDirectory: true,
 	loggingFileFilename: true,

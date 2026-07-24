@@ -83,6 +83,7 @@ describe("node-core", () => {
 				TWIN_DEBUG: "true",
 				TWIN_SILENT: "true",
 				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -127,6 +128,7 @@ describe("node-core", () => {
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
+				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -184,6 +186,7 @@ describe("node-core", () => {
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
+				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -242,6 +245,7 @@ describe("node-core", () => {
 				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
+				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -278,6 +282,7 @@ describe("node-core", () => {
 				TWIN_FEDERATED_CATALOGUE_ENABLED: "true",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 				TWIN_FEDERATED_CATALOGUE_MUTEX_TIMEOUT: "30000",
+				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -299,7 +304,8 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -392,6 +398,7 @@ describe("node-core", () => {
 			TWIN_MESSAGING_ENABLED: "true",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true",
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/fixtures/testApp.js"
 		};
 
@@ -729,7 +736,8 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ENFORCEMENT_PROCESSORS: "pass-through",
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
-			TWIN_HEALTH_ENABLED: "true"
+			TWIN_HEALTH_ENABLED: "true",
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -790,7 +798,8 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -870,7 +879,8 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -931,7 +941,8 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
-			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory
+			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -993,6 +1004,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_TEST_EMBEDDED: "@text:tests/fixtures/embedded.txt",
 			TWIN_ENV_ALLOW_LIST: [CI_ENV_VARS, "TWIN_TEST_EMBEDDED"].filter(Boolean).join(",")
 		};
@@ -1028,6 +1040,7 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_TEST_EMBEDDED: "@json:tests/fixtures/embedded.json",
 			TWIN_ENV_ALLOW_LIST: [CI_ENV_VARS, "TWIN_TEST_EMBEDDED"].filter(Boolean).join(",")
 		};
@@ -1066,6 +1079,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/fixtures//myExtension.js"
 		};
 
@@ -1125,6 +1139,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "http://example.com/insecure-extension.js"
 		};
 
@@ -1206,6 +1221,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/first-extension.js,./tests/.tmp/second-extension.js"
 		};
 
@@ -1296,6 +1312,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/lifecycle-test.js"
 		};
 
@@ -1368,6 +1385,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/failing-extension.js"
 		};
 
@@ -1410,6 +1428,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/cache-test.js",
 			TWIN_EXTENSIONS_CACHE_DIRECTORY: customCacheDir
 		};
