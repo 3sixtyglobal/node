@@ -47,6 +47,7 @@ describe("System metrics E2E", () => {
 					TWIN_TELEMETRY_CONNECTOR: "entity-storage",
 					// Large interval so only the startup tick fires during the test
 					TWIN_TELEMETRY_METRICS_COLLECTOR_INTERVAL: "3600",
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 				}
 			},

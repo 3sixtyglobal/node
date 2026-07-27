@@ -1,8 +1,36 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { DltConfigType } from "@twin.org/engine-types";
+import { DltConfigType, SchemaVersionMigrationComponentType } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
+
+describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
+	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.schemaVersionMigrationComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: SchemaVersionMigrationComponentType.Service })
+			])
+		);
+	});
+
+	test("schema migration service is registered when schemaMigrationEnabled is 'true'", async () => {
+		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "true" });
+
+		expect(config.types.schemaVersionMigrationComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: SchemaVersionMigrationComponentType.Service })
+			])
+		);
+	});
+
+	test("schema migration service is not registered when schemaMigrationEnabled is 'false'", async () => {
+		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "false" });
+
+		expect(config.types.schemaVersionMigrationComponent).toBeUndefined();
+	});
+});
 
 describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 	test("iotaGasBudget and iotaGasReservationDuration env vars are wired through to the resolved config", async () => {

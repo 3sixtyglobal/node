@@ -73,6 +73,14 @@ Is multi-tenant support enabled, defaults to false.
 
 ***
 
+### schemaMigrationEnabled? {#schemamigrationenabled}
+
+> `optional` **schemaMigrationEnabled?**: `string`
+
+Enable schema migration, defaults to true.
+
+***
+
 ### entityStorageConnectorType? {#entitystorageconnectortype}
 
 > `optional` **entityStorageConnectorType?**: `string`
@@ -592,6 +600,66 @@ The batch size for the logging task, set to 1 for no batching.
 > `optional` **loggingBatchFlushInterval?**: `string`
 
 The batch flush interval in seconds for the logging task, how often to flush the logs when using batching, defaults to 5 seconds.
+
+***
+
+### loggingRetainFor? {#loggingretainfor}
+
+> `optional` **loggingRetainFor?**: `string`
+
+Delete log entries older than this many minutes for the entity-storage logging connector.
+Set to 0 to disable age-based retention.
+
+#### Default
+
+```ts
+2880 (2 days)
+```
+
+***
+
+### loggingMaxEntries? {#loggingmaxentries}
+
+> `optional` **loggingMaxEntries?**: `string`
+
+Keep at most this many log entries for the entity-storage logging connector.
+Set to 0 to disable count-based retention.
+
+#### Default
+
+```ts
+10000
+```
+
+***
+
+### loggingRetentionInterval? {#loggingretentioninterval}
+
+> `optional` **loggingRetentionInterval?**: `string`
+
+How often the retention cleanup task runs in minutes for the entity-storage logging connector.
+Set to 0 to disable periodic cleanup.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### loggingRetentionBatchSize? {#loggingretentionbatchsize}
+
+> `optional` **loggingRetentionBatchSize?**: `string`
+
+Maximum number of entries deleted per cleanup batch for the entity-storage logging connector.
+Keeping this value smaller helps avoid spikes in database load.
+
+#### Default
+
+```ts
+1000
+```
 
 ***
 
