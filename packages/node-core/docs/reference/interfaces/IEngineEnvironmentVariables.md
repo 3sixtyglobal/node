@@ -603,7 +603,7 @@ The batch flush interval in seconds for the logging task, how often to flush the
 
 ***
 
-### loggingRetainFor? {#loggingretainformins}
+### loggingRetainFor? {#loggingretainfor}
 
 > `optional` **loggingRetainFor?**: `string`
 
@@ -633,7 +633,7 @@ Set to 0 to disable count-based retention.
 
 ***
 
-### loggingRetentionInterval? {#loggingretentionintervalmins}
+### loggingRetentionInterval? {#loggingretentioninterval}
 
 > `optional` **loggingRetentionInterval?**: `string`
 
