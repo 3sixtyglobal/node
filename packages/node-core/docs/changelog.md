@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1-next.12](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.11...node-core-v0.9.1-next.12) (2026-07-27)
+
+
+### Features
+
+* update logging retention units in config ([0b9bb69](https://github.com/iotaledger/twin-node/commit/0b9bb696db0722f6b33e37e1ebd1f4d6ffbcf7cc))
+
 ## [0.9.1-next.11](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.1-next.10...node-core-v0.9.1-next.11) (2026-07-24)
 
 
