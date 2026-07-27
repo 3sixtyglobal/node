@@ -70,19 +70,45 @@ jobs:
             TAGS="$VERSION_TAG,${{ env.TWIN_DOCKER_REPO }}:latest"
             echo "Building from main branch - adding latest tag"
           else
-            TAGS="$VERSION_TAG"
-            echo "Building from $BRANCH branch - version tag only"
+            TAGS="$VERSION_TAG,${{ env.TWIN_DOCKER_REPO }}:next"
+            echo "Building from next branch - adding next tag"
           fi
 
           echo "tags=$TAGS" >> $GITHUB_OUTPUT
           echo "Docker tags: $TAGS"
 
+      # Check whether the version tag already exists in Docker Hub
+      - name: Check existing Docker Hub version tag
+        id: check-existing-tag
+        run: |
+          REPO="${{ env.TWIN_DOCKER_REPO }}"
+          NAMESPACE="${REPO%%/*}"
+          IMAGE_NAME="${REPO##*/}"
+          VERSION="${{ steps.package-version.outputs.version }}"
+          TAG_URL="https://hub.docker.com/v2/repositories/$NAMESPACE/$IMAGE_NAME/tags/$VERSION"
+
+          HTTP_STATUS=$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "$TAG_URL")
+
+          if [[ "$HTTP_STATUS" == "200" ]]; then
+            echo "version_exists=true" >> $GITHUB_OUTPUT
+            echo "Version tag already exists: $REPO:$VERSION"
+          elif [[ "$HTTP_STATUS" == "404" ]]; then
+            echo "version_exists=false" >> $GITHUB_OUTPUT
+            echo "Version tag does not exist yet: $REPO:$VERSION"
+          else
+            echo "Error: Docker Hub tag check failed with HTTP $HTTP_STATUS"
+            echo "Lookup URL: $TAG_URL"
+            exit 1
+          fi
+
       # Set up Docker Buildx
       - name: Set up Docker Buildx
+        if: steps.check-existing-tag.outputs.version_exists != 'true'
         uses: docker/setup-buildx-action@v4
 
       # Log in to Docker Hub
       - name: Log in to Docker Hub
+        if: steps.check-existing-tag.outputs.version_exists != 'true'
         uses: docker/login-action@v4
         with:
           username: ${{ env.TWIN_DOCKER_USERNAME }}
@@ -90,6 +116,8 @@ jobs:
 
       # Build and push the Docker image
       - name: Build and Push Docker image
+        id: build-push
+        if: steps.check-existing-tag.outputs.version_exists != 'true'
         uses: docker/build-push-action@v7
         with:
           context: ./apps/node
@@ -97,3 +125,46 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.docker-tags.outputs.tags }}
+
+      # Output publish summary
+      - name: Publish Summary
+        run: |
+          VERSION="${{ steps.package-version.outputs.version }}"
+          BRANCH="${{ steps.set-branch.outputs.branch }}"
+          IMAGE_NAME="twin-node"
+          # 'f' is percent-encoded (%66) so GitHub Actions does not redact the org name from the summary
+          REPO_BASE_URL="https://hub.docker.com/r/twin%66oundation/twin-node"
+          VERSION_EXISTS="${{ steps.check-existing-tag.outputs.version_exists }}"
+
+          if [[ "$VERSION_EXISTS" == "true" ]]; then
+            PUBLISH_STATUS="skipped (version already exists)"
+            DIGEST="N/A"
+          else
+            PUBLISH_STATUS="published"
+            DIGEST="${{ steps.build-push.outputs.digest }}"
+          fi
+
+          if [[ "$BRANCH" == "main" ]]; then
+            CHANNEL_TAG="latest"
+          else
+            CHANNEL_TAG="next"
+          fi
+
+          echo "## Docker Publish Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | \`$VERSION\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | \`$BRANCH\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Channel tag** | \`$CHANNEL_TAG\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Publish status** | $PUBLISH_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image digest** | \`$DIGEST\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tags published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [$REPO_BASE_URL?tag=$VERSION]($REPO_BASE_URL?tag=$VERSION)" >> $GITHUB_STEP_SUMMARY
+          echo "- [$REPO_BASE_URL?tag=$CHANNEL_TAG]($REPO_BASE_URL?tag=$CHANNEL_TAG)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Repository" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [Docker Hub: $IMAGE_NAME]($REPO_BASE_URL)" >> $GITHUB_STEP_SUMMARY

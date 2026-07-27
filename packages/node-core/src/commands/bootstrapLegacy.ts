@@ -108,7 +108,7 @@ export async function bootstrapLegacy(
 
 	// Always create the organisation identity first so it can be associated with
 	// the tenant (multi-tenant) or the node (single-tenant) immediately after.
-	// The trust verification method is always added to the organisation identity.
+	// The trust verification method is always added to the organisation identities.
 	await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
 		CLIDisplay.break();
 		CLIDisplay.section(

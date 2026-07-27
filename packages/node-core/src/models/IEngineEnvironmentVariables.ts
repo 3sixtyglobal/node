@@ -49,6 +49,11 @@ export interface IEngineEnvironmentVariables {
 	tenantEnabled?: string;
 
 	/**
+	 * Enable schema migration, defaults to true.
+	 */
+	schemaMigrationEnabled?: string;
+
+	/**
 	 * The type of the entity storage to create, comma separate for more than one connector.
 	 * values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 	 */
@@ -361,7 +366,7 @@ export interface IEngineEnvironmentVariables {
 	hashicorpVaultEndpoint?: string;
 
 	/**
-	 * The type of logging task connector, can be a comma separated list: console, entity-storage.
+	 * The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
 	 */
 	loggingConnector?: string;
 
@@ -376,9 +381,77 @@ export interface IEngineEnvironmentVariables {
 	loggingBatchFlushInterval?: string;
 
 	/**
+	 * Delete log entries older than this many minutes for the entity-storage logging connector.
+	 * Set to 0 to disable age-based retention.
+	 * @default 2880 (2 days)
+	 */
+	loggingRetainFor?: string;
+
+	/**
+	 * Keep at most this many log entries for the entity-storage logging connector.
+	 * Set to 0 to disable count-based retention.
+	 * @default 10000
+	 */
+	loggingMaxEntries?: string;
+
+	/**
+	 * How often the retention cleanup task runs in minutes for the entity-storage logging connector.
+	 * Set to 0 to disable periodic cleanup.
+	 * @default 5
+	 */
+	loggingRetentionInterval?: string;
+
+	/**
+	 * Maximum number of entries deleted per cleanup batch for the entity-storage logging connector.
+	 * Keeping this value smaller helps avoid spikes in database load.
+	 * @default 1000
+	 */
+	loggingRetentionBatchSize?: string;
+
+	/**
 	 * A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
 	 */
 	loggingSilentComponents?: string;
+
+	/**
+	 * The directory to write log files into when using the file logging connector. Required when TWIN_LOGGING_CONNECTOR includes "file".
+	 */
+	loggingFileDirectory?: string;
+
+	/**
+	 * The log filename when using the file logging connector, defaults to "app.log".
+	 */
+	loggingFileFilename?: string;
+
+	/**
+	 * The maximum log file size in bytes before rotation when using the file logging connector, defaults to 10485760 (10 MB). Set to 0 or negative to disable rotation.
+	 */
+	loggingFileMaxFileSizeBytes?: string;
+
+	/**
+	 * The number of rotated log files to retain when using the file logging connector, defaults to 5. Set to 0 or negative to keep all rotated files.
+	 */
+	loggingFileMaxRetainedFiles?: string;
+
+	/**
+	 * The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
+	 */
+	openTelemetryLoggingLoggerName?: string;
+
+	/**
+	 * The version of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to 1.0.0.
+	 */
+	openTelemetryLoggingLoggerVersion?: string;
+
+	/**
+	 * The OTLP endpoint URL for the OpenTelemetry logging exporter, required when using open-telemetry as logging connector, e.g. http://localhost:4318/v1/logs.
+	 */
+	openTelemetryLoggingPrometheusEndpoint?: string;
+
+	/**
+	 * The log record processor to use for the OpenTelemetry logging exporter, either batch or simple, defaults to batch.
+	 */
+	openTelemetryLoggingProcessor?: string;
 
 	/**
 	 * The type of event bus connector: local.
@@ -516,6 +589,11 @@ export interface IEngineEnvironmentVariables {
 	identityWalletAddressIndex?: string;
 
 	/**
+	 * The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
+	 */
+	identityDidResolutionCacheTtlMs?: string;
+
+	/**
 	 * The type of identity resolver connector: entity-storage, iota.
 	 */
 	identityResolverConnector?: string;
@@ -539,6 +617,16 @@ export interface IEngineEnvironmentVariables {
 	 * IOTA coin type.
 	 */
 	iotaCoinType?: string;
+
+	/**
+	 * IOTA gas budget, in nanos.
+	 */
+	iotaGasBudget?: string;
+
+	/**
+	 * IOTA gas reservation duration, in seconds.
+	 */
+	iotaGasReservationDuration?: string;
 
 	/**
 	 * IOTA Explorer Endpoint.
@@ -634,6 +722,11 @@ export interface IEngineEnvironmentVariables {
 	 * Federated catalog remote endpoint, if set will use a REST client instead of local service.
 	 */
 	federatedCatalogueRemoteEndpoint?: string;
+
+	/**
+	 * The path prefix used by the federated catalogue REST client when forwarding requests to the remote endpoint, defaults to "federated-catalogue".
+	 */
+	federatedCatalogueRestClientPathPrefix?: string;
 
 	/**
 	 * The trust generators to add to the factory, comma separated list.
@@ -732,10 +825,18 @@ export interface IEngineEnvironmentVariables {
 	dataspaceActivityLogsCleanupInterval?: string;
 
 	/**
-	 * The data plane path for PULL transfers (path only, not full URL).
-	 * Will be combined with public origin.
-	 * Required if PULL transfers should be supported.
-	 * Example: "dataspace/entities"
+	 * Base route path for the data plane service (path only, not full URL).
+	 * Combined with the public origin to form the `dataAddress.endpoint` sent to PULL consumers
+	 * and the inbox URL sent to PUSH providers.
+	 *
+	 * This must be the mount-point prefix of the data plane routes, NOT a specific route path.
+	 * Do NOT append sub-paths such as `/entities` or `/inbox` — those are appended automatically
+	 * by each transfer handler and by the data plane REST client.
+	 *
+	 * REQUIRED if PULL or PUSH transfers are supported.
+	 * If not specified, PULL and PUSH transfers will not be available.
+	 *
+	 * Example: "dataspace"
 	 */
 	dataspaceDataPlanePath?: string;
 

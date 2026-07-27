@@ -30,6 +30,11 @@ export interface ICliCommandDefinition {
 	params: ICliCommandDefinitionParam[];
 
 	/**
+	 * Deprecated names that resolve to this command with a warning.
+	 */
+	aliases?: string[];
+
+	/**
 	 * The method to execute for the command.
 	 */
 	action: (
@@ -55,4 +60,9 @@ export interface ICliCommandDefinition {
 	 * @default true
 	 */
 	requiresOrgIdentity?: boolean;
+
+	/**
+	 * Indicates whether this command is only available in single-tenant mode.
+	 */
+	singleTenantOnly?: boolean;
 }

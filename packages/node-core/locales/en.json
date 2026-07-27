@@ -1,9 +1,9 @@
 {
 	"error": {
 		"node": {
-			"nodeIdentityNotSet": "The node identity is enabled in config but is not set, please set it using the \"node-set-identity\" CLI command.",
-			"nodeOrganizationIdNotSet": "The node organization is not set, please set it using the \"set-node-org-id\".",
-			"tenantsWithoutOrganizationId": "The following tenants have no organization ID assigned. Use the \"set-tenant-org-id\" command to assign one before starting the node: {tenantIds}",
+			"nodeIdentityNotSet": "The node identity is enabled in config but is not set, please set it using the \"node-identity-set\" CLI command.",
+			"nodeOrganizationIdNotSet": "The node organization is not set, please set it using the \"node-org-id-set\".",
+			"tenantsWithoutOrganizationId": "The following tenants have no organization ID assigned. Use the \"tenant-org-id-set\" command to assign one before starting the node: {tenantIds}",
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
 			"extensionLoadingError": "Failed to load extension \"{extension}\"",
 			"insecureProtocol": "Cannot load extension from insecure protocol: {protocol}. Only HTTPS is allowed for remote extensions.",
@@ -18,7 +18,7 @@
 		},
 		"bootstrapLegacy": {
 			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled.",
-			"organizationNotSet": "The organisation identity has not been set. Run \"set-node-org-id\"."
+			"organizationNotSet": "The organisation identity has not been set. Run \"node-org-id-set\"."
 		},
 		"identityCreate": {
 			"invalidMnemonic": "The mnemonic is invalid, it should be 24 words from the standard wordlist.",
@@ -49,17 +49,27 @@
 			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\".",
 			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
 		},
+		"userGet": {
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+		},
 		"userUpdate": {
 			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+		},
+		"orgUsersList": {
+			"orgDidRequired": "The organization DID is required in multi-tenant mode. Provide --org-did or switch to single-tenant mode."
 		},
 		"vaultKeyCreate": {
 			"vaultKeyAlreadyExists": "The vault key with ID already exists and overwriteMode is set to \"error\"."
 		},
-		"nodeSetIdentity": {
+		"nodeIdentitySet": {
 			"identityNotFound": "The identity with DID \"{notFoundId}\" was not found in the system."
 		},
-		"setNodeOrgId": {
-			"notAvailableInMultiTenantMode": "The set-node-org-id command is not available in multi-tenant mode, use set-tenant-org-id instead."
+		"nodeOrgIdGet": {
+			"notAvailableInMultiTenantMode": "The node-org-id-get command is not available in multi-tenant mode, use tenant-org-id-set instead.",
+			"nodeOrganizationIdNotSet": "The node organization ID is not set. Use \"node-org-id-set\" to set it first."
+		},
+		"nodeOrgIdSet": {
+			"notAvailableInMultiTenantMode": "The node-org-id-set command is not available in multi-tenant mode, use tenant-org-id-set instead."
 		},
 		"applyOrganizationIdToTenant": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
@@ -67,6 +77,21 @@
 		"removeTenantOrgAlias": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
 			"aliasNotFound": "The alias \"{alias}\" was not found in the tenant organization legacy list."
+		},
+		"tenantList": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"tenantGet": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"tenantListByOrg": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"nodeIdentityGet": {
+			"nodeIdentityNotSet": "The node identity is not set. Use \"node-identity-set\" to set it first."
+		},
+		"identityResolve": {
+			"identityNotFound": "The identity \"{identity}\" was not found."
 		}
 	},
 	"warn": {
@@ -90,15 +115,18 @@
 		"cli": {
 			"commands": {
 				"command": "Command",
+				"deprecatedAlias": "\"{alias}\" is a deprecated alias, please use \"{command}\" instead.",
 				"help": {
 					"description": "Display help information about CLI commands",
 					"labels": {
 						"commands": "All the commands available are listed below, for more information use the --help option with a specific command.",
 						"example": "Example",
+						"aliases": "Deprecated aliases",
 						"optional": "optional",
 						"required": "required",
 						"default": "default",
-						"options": "options"
+						"options": "options",
+						"singleTenantOnly": "single-tenant only"
 					}
 				},
 				"bootstrap-legacy": {
@@ -339,9 +367,9 @@
 						"publicKeyHex": "Public Key Hex"
 					}
 				},
-				"node-set-identity": {
+				"node-identity-set": {
 					"description": "Set the node identity",
-					"example": "node-set-identity --identity=\"did:iota...\"",
+					"example": "node-identity-set --identity=\"did:iota...\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -463,6 +491,31 @@
 					"labels": {
 						"updating": "Updating tenant",
 						"updated": "Updated tenant"
+					}
+				},
+				"user-get": {
+					"description": "Get a user by email address",
+					"example": "user-get --email=\"bob@example.com\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"email": {
+							"description": "The email address of the user to retrieve."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to retrieve the user from (multi-tenant mode only)."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"retrieving": "Retrieving user",
+						"email": "Email",
+						"identity": "Identity",
+						"organization": "Organization",
+						"scope": "Scope"
 					}
 				},
 				"user-create": {
@@ -607,9 +660,24 @@
 						"publicKeyHex": "Public Key Hex"
 					}
 				},
-				"set-node-org-id": {
+				"node-org-id-get": {
+					"description": "Get the organization ID currently assigned to the node",
+					"example": "node-org-id-get",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"organizationId": "Organization ID"
+					}
+				},
+				"node-org-id-set": {
 					"description": "Set the node organization ID",
-					"example": "set-node-org-id --organization-id=\"did:iota:...\"",
+					"example": "node-org-id-set --organization-id=\"did:iota:...\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -625,9 +693,9 @@
 						"stored": "The node organization ID has been stored"
 					}
 				},
-				"set-tenant-org-id": {
+				"tenant-org-id-set": {
 					"description": "Set the organization ID for a tenant",
-					"example": "set-tenant-org-id --tenant-id=\"0011..aabb\" --organization-id=\"did:iota:...\"",
+					"example": "tenant-org-id-set --tenant-id=\"0011..aabb\" --organization-id=\"did:iota:...\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -696,6 +764,153 @@
 					"labels": {
 						"importing": "Importing key",
 						"imported": "Imported key"
+					}
+				},
+				"tenant-list": {
+					"description": "List all tenants",
+					"example": "tenant-list",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"listing": "Listing tenants",
+						"tenantId": "Tenant ID",
+						"apiKey": "API Key",
+						"organizationId": "Organization ID",
+						"label": "Label",
+						"count": "Total tenants"
+					}
+				},
+				"tenant-get": {
+					"description": "Get the full configuration record for a single tenant",
+					"example": "tenant-get --tenant-id=\"0011..aabb\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to retrieve."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"retrieving": "Retrieving tenant",
+						"tenantId": "Tenant ID",
+						"apiKey": "API Key",
+						"organizationId": "Organization ID",
+						"label": "Label",
+						"publicOrigin": "Public Origin",
+						"dateCreated": "Date Created",
+						"dateModified": "Date Modified"
+					}
+				},
+				"tenant-list-by-org": {
+					"description": "List all tenants associated with a given organization DID",
+					"example": "tenant-list-by-org --org-id=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"org-id": {
+							"description": "The organization DID to filter tenants by."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"listing": "Listing tenants for organization",
+						"tenantId": "Tenant ID",
+						"apiKey": "API Key",
+						"organizationId": "Organization ID",
+						"label": "Label",
+						"count": "Total tenants"
+					}
+				},
+				"node-identity-get": {
+					"description": "Get the identity currently assigned to the node",
+					"example": "node-identity-get",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"resolving": "Resolving node identity",
+						"did": "DID",
+						"verificationMethods": "Verification Methods"
+					}
+				},
+				"identity-list": {
+					"description": "List all identities held in custody by the node",
+					"example": "identity-list",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"listing": "Listing identities",
+						"did": "DID",
+						"controller": "Controller",
+						"count": "Total identities"
+					}
+				},
+				"identity-resolve": {
+					"description": "Resolve an identity DID to its full document",
+					"example": "identity-resolve --identity=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID to resolve."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Path to a .json file to store the resolved DID document."
+						}
+					},
+					"labels": {
+						"resolving": "Resolving identity",
+						"did": "DID"
+					}
+				},
+				"org-users-list": {
+					"description": "List all users belonging to an organization DID",
+					"example": "org-users-list --org-did=\"did:iota:...\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"org-did": {
+							"description": "The organization DID to list users for. Defaults to the node organization ID in single-tenant mode."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"listing": "Listing organization users",
+						"email": "Email",
+						"identity": "Identity",
+						"scope": "Scope",
+						"count": "Total users"
 					}
 				}
 			}

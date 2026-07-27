@@ -73,6 +73,14 @@ Is multi-tenant support enabled, defaults to false.
 
 ***
 
+### schemaMigrationEnabled? {#schemamigrationenabled}
+
+> `optional` **schemaMigrationEnabled?**: `string`
+
+Enable schema migration, defaults to true.
+
+***
+
 ### entityStorageConnectorType? {#entitystorageconnectortype}
 
 > `optional` **entityStorageConnectorType?**: `string`
@@ -575,7 +583,7 @@ Hashicorp Vault endpoint.
 
 > `optional` **loggingConnector?**: `string`
 
-The type of logging task connector, can be a comma separated list: console, entity-storage.
+The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
 
 ***
 
@@ -595,11 +603,135 @@ The batch flush interval in seconds for the logging task, how often to flush the
 
 ***
 
+### loggingRetainFor? {#loggingretainfor}
+
+> `optional` **loggingRetainFor?**: `string`
+
+Delete log entries older than this many minutes for the entity-storage logging connector.
+Set to 0 to disable age-based retention.
+
+#### Default
+
+```ts
+2880 (2 days)
+```
+
+***
+
+### loggingMaxEntries? {#loggingmaxentries}
+
+> `optional` **loggingMaxEntries?**: `string`
+
+Keep at most this many log entries for the entity-storage logging connector.
+Set to 0 to disable count-based retention.
+
+#### Default
+
+```ts
+10000
+```
+
+***
+
+### loggingRetentionInterval? {#loggingretentioninterval}
+
+> `optional` **loggingRetentionInterval?**: `string`
+
+How often the retention cleanup task runs in minutes for the entity-storage logging connector.
+Set to 0 to disable periodic cleanup.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### loggingRetentionBatchSize? {#loggingretentionbatchsize}
+
+> `optional` **loggingRetentionBatchSize?**: `string`
+
+Maximum number of entries deleted per cleanup batch for the entity-storage logging connector.
+Keeping this value smaller helps avoid spikes in database load.
+
+#### Default
+
+```ts
+1000
+```
+
+***
+
 ### loggingSilentComponents? {#loggingsilentcomponents}
 
 > `optional` **loggingSilentComponents?**: `string`
 
 A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
+### loggingFileDirectory? {#loggingfiledirectory}
+
+> `optional` **loggingFileDirectory?**: `string`
+
+The directory to write log files into when using the file logging connector. Required when TWIN_LOGGING_CONNECTOR includes "file".
+
+***
+
+### loggingFileFilename? {#loggingfilefilename}
+
+> `optional` **loggingFileFilename?**: `string`
+
+The log filename when using the file logging connector, defaults to "app.log".
+
+***
+
+### loggingFileMaxFileSizeBytes? {#loggingfilemaxfilesizebytes}
+
+> `optional` **loggingFileMaxFileSizeBytes?**: `string`
+
+The maximum log file size in bytes before rotation when using the file logging connector, defaults to 10485760 (10 MB). Set to 0 or negative to disable rotation.
+
+***
+
+### loggingFileMaxRetainedFiles? {#loggingfilemaxretainedfiles}
+
+> `optional` **loggingFileMaxRetainedFiles?**: `string`
+
+The number of rotated log files to retain when using the file logging connector, defaults to 5. Set to 0 or negative to keep all rotated files.
+
+***
+
+### openTelemetryLoggingLoggerName? {#opentelemetryloggingloggername}
+
+> `optional` **openTelemetryLoggingLoggerName?**: `string`
+
+The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
+
+***
+
+### openTelemetryLoggingLoggerVersion? {#opentelemetryloggingloggerversion}
+
+> `optional` **openTelemetryLoggingLoggerVersion?**: `string`
+
+The version of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to 1.0.0.
+
+***
+
+### openTelemetryLoggingPrometheusEndpoint? {#opentelemetryloggingprometheusendpoint}
+
+> `optional` **openTelemetryLoggingPrometheusEndpoint?**: `string`
+
+The OTLP endpoint URL for the OpenTelemetry logging exporter, required when using open-telemetry as logging connector, e.g. http://localhost:4318/v1/logs.
+
+***
+
+### openTelemetryLoggingProcessor? {#opentelemetryloggingprocessor}
+
+> `optional` **openTelemetryLoggingProcessor?**: `string`
+
+The log record processor to use for the OpenTelemetry logging exporter, either batch or simple, defaults to batch.
 
 ***
 
@@ -819,6 +951,14 @@ The index of the wallet address to use, defaults to 0.
 
 ***
 
+### identityDidResolutionCacheTtlMs? {#identitydidresolutioncachettlms}
+
+> `optional` **identityDidResolutionCacheTtlMs?**: `string`
+
+The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
+
+***
+
 ### identityResolverConnector? {#identityresolverconnector}
 
 > `optional` **identityResolverConnector?**: `string`
@@ -856,6 +996,22 @@ IOTA network.
 > `optional` **iotaCoinType?**: `string`
 
 IOTA coin type.
+
+***
+
+### iotaGasBudget? {#iotagasbudget}
+
+> `optional` **iotaGasBudget?**: `string`
+
+IOTA gas budget, in nanos.
+
+***
+
+### iotaGasReservationDuration? {#iotagasreservationduration}
+
+> `optional` **iotaGasReservationDuration?**: `string`
+
+IOTA gas reservation duration, in seconds.
 
 ***
 
@@ -1008,6 +1164,14 @@ Federated catalog filters, command separated list of filters to add.
 > `optional` **federatedCatalogueRemoteEndpoint?**: `string`
 
 Federated catalog remote endpoint, if set will use a REST client instead of local service.
+
+***
+
+### federatedCatalogueRestClientPathPrefix? {#federatedcataloguerestclientpathprefix}
+
+> `optional` **federatedCatalogueRestClientPathPrefix?**: `string`
+
+The path prefix used by the federated catalogue REST client when forwarding requests to the remote endpoint, defaults to "federated-catalogue".
 
 ***
 
@@ -1172,10 +1336,18 @@ The interval in seconds for cleaning up the activity logs.
 
 > `optional` **dataspaceDataPlanePath?**: `string`
 
-The data plane path for PULL transfers (path only, not full URL).
-Will be combined with public origin.
-Required if PULL transfers should be supported.
-Example: "dataspace/entities"
+Base route path for the data plane service (path only, not full URL).
+Combined with the public origin to form the `dataAddress.endpoint` sent to PULL consumers
+and the inbox URL sent to PUSH providers.
+
+This must be the mount-point prefix of the data plane routes, NOT a specific route path.
+Do NOT append sub-paths such as `/entities` or `/inbox` — those are appended automatically
+by each transfer handler and by the data plane REST client.
+
+REQUIRED if PULL or PUSH transfers are supported.
+If not specified, PULL and PUSH transfers will not be available.
+
+Example: "dataspace"
 
 ***
 

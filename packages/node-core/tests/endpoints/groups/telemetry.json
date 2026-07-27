@@ -55,7 +55,14 @@
 			"method": "POST",
 			"path": "/telemetry/metric/{{metricId}}/value",
 			"body": { "value": "inc" },
-			"expectedStatus": 201
+			"expectedStatus": 201,
+			"capture": { "metricValueId": "location-last-segment" }
+		},
+		{
+			"description": "GET /telemetry/metric/:id/value/:valueId",
+			"method": "GET",
+			"path": "/telemetry/metric/{{metricId}}/value/{{metricValueId}}",
+			"expectedStatus": 200
 		},
 		{
 			"description": "GET /telemetry/metric/:id/value",

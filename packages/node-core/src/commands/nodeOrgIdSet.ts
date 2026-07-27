@@ -9,27 +9,29 @@ import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
 
-const COMMAND_NAME = "set-node-org-id";
+const COMMAND_NAME = "node-org-id-set";
 
 /**
  * Get the command definition parameters.
  * @param commandDefinitions The registered command definitions.
  */
-export function getCommandDefinitionSetNodeOrgId(commandDefinitions: {
+export function getCommandDefinitionNodeOrgIdSet(commandDefinitions: {
 	[id: string]: ICliCommandDefinition;
 }): void {
 	commandDefinitions[COMMAND_NAME] = {
 		command: COMMAND_NAME,
-		description: I18n.formatMessage("node.cli.commands.set-node-org-id.description"),
-		example: I18n.formatMessage("node.cli.commands.set-node-org-id.example"),
+		aliases: ["set-node-org-id"],
+		description: I18n.formatMessage("node.cli.commands.node-org-id-set.description"),
+		example: I18n.formatMessage("node.cli.commands.node-org-id-set.example"),
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
+		singleTenantOnly: true,
 		params: [
 			{
 				key: "env-prefix",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-node-org-id.params.env-prefix.description"
+					"node.cli.commands.node-org-id-set.params.env-prefix.description"
 				),
 				required: false
 			},
@@ -38,7 +40,7 @@ export function getCommandDefinitionSetNodeOrgId(commandDefinitions: {
 				type: "string",
 				extendedType: "did",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-node-org-id.params.organization-id.description"
+					"node.cli.commands.node-org-id-set.params.organization-id.description"
 				),
 				required: true
 			},
@@ -46,12 +48,12 @@ export function getCommandDefinitionSetNodeOrgId(commandDefinitions: {
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-node-org-id.params.load-env.description"
+					"node.cli.commands.node-org-id-set.params.load-env.description"
 				),
 				required: false
 			}
 		],
-		action: async (engineCore, envVars, params) => setNodeOrgId(engineCore, envVars, params)
+		action: async (engineCore, envVars, params) => nodeOrgIdSet(engineCore, envVars, params)
 	};
 }
 
@@ -64,7 +66,7 @@ export function getCommandDefinitionSetNodeOrgId(commandDefinitions: {
  * @returns A promise that resolves when the node organization ID has been persisted.
  * @throws GeneralError if called while multi-tenant mode is enabled.
  */
-export async function setNodeOrgId(
+export async function nodeOrgIdSet(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
 	envVars: IEnvironmentVariables,
 	params: {
@@ -72,16 +74,16 @@ export async function setNodeOrgId(
 	}
 ): Promise<void> {
 	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
-		throw new GeneralError("setNodeOrgId", "notAvailableInMultiTenantMode");
+		throw new GeneralError("nodeOrgIdSet", "notAvailableInMultiTenantMode");
 	}
 
-	Did.guard("setNodeOrgId", "organizationId", params.organizationId);
+	Did.guard("nodeOrgIdSet", "organizationId", params.organizationId);
 
 	const state = engineCore.getState();
 	state.nodeOrganizationId = params.organizationId;
 	engineCore.setStateDirty();
 
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.set-node-org-id.labels.stored"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-org-id-set.labels.stored"));
 
 	CLIDisplay.done();
 }

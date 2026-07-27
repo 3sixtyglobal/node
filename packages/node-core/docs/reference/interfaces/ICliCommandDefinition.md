@@ -36,6 +36,14 @@ The params available for the command.
 
 ***
 
+### aliases? {#aliases}
+
+> `optional` **aliases?**: `string`[]
+
+Deprecated names that resolve to this command with a warning.
+
+***
+
 ### action {#action}
 
 > **action**: (`engineCore`, `envVars`, `params`) => `Promise`\<`unknown`\>
@@ -99,3 +107,11 @@ Indicates whether the engine needs the organization identity to be set.
 ```ts
 true
 ```
+
+***
+
+### singleTenantOnly? {#singletenantonly}
+
+> `optional` **singleTenantOnly?**: `boolean`
+
+Indicates whether this command is only available in single-tenant mode.

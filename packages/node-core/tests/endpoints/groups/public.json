@@ -2,6 +2,22 @@
 	"group": "Public endpoints",
 	"steps": [
 		{
+			"description": "GET /",
+			"method": "GET",
+			"path": "/",
+			"auth": false,
+			"appendOrgParam": false,
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /favicon.ico",
+			"method": "GET",
+			"path": "/favicon.ico",
+			"auth": false,
+			"appendOrgParam": false,
+			"expectedStatus": 404
+		},
+		{
 			"description": "GET /info",
 			"method": "GET",
 			"path": "/info",

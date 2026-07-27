@@ -56,6 +56,7 @@ const BASE_ENV: { [id: string]: string } = {
 	TWIN_DEBUG: "true",
 	TWIN_SILENT: "true",
 	TWIN_TENANT_ENABLED: "false",
+	TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
@@ -242,7 +243,7 @@ describe("node-core n2n", () => {
 			expect(Array.isArray(requestBody.dataset) && requestBody.dataset.length > 0).toBe(false);
 
 			const getRes = await fetch(
-				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${encodeURIComponent(TEST_FEDCAT_DATASET_ID)}`,
+				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${TEST_FEDCAT_DATASET_ID}`,
 				{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
 			);
 			expect(getRes.status).toBe(200);
@@ -455,7 +456,7 @@ describe("node-core n2n", () => {
 			expect(rootDatasets + nestedDatasets > 0).toBe(true);
 
 			const getRes = await fetch(
-				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${encodeURIComponent(TEST_FEDCAT_DATASET_ID)}`,
+				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${TEST_FEDCAT_DATASET_ID}`,
 				{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
 			);
 			expect(getRes.status).toBe(200);

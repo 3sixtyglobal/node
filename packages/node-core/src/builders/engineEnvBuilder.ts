@@ -68,6 +68,7 @@ import {
 	type RightsManagementPolicyObligationEnforcerComponentType,
 	type RightsManagementPolicyRequesterComponentType,
 	RightsManagementPxpComponentType,
+	SchemaVersionMigrationComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
@@ -78,6 +79,11 @@ import {
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
+import {
+	type IOpenTelemetryLoggingConnectorConfig,
+	type IOpenTelemetryOtlpExporterConfig,
+	OpenTelemetryExporterTypes
+} from "@twin.org/logging-connector-opentelemetry";
 import {
 	type IOpenTelemetryTelemetryConnectorConfig,
 	OpenTelemetryReaderTypes
@@ -112,6 +118,7 @@ export async function buildEngineConfiguration(
 		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
 	}
 
+	await configureSchemaMigration(coreConfig, envVars);
 	await configurePlatform(coreConfig, envVars);
 	await configureTenant(coreConfig, envVars);
 	await configureContextIdHandlers(coreConfig, envVars);
@@ -474,6 +481,48 @@ async function configureLogging(
 					config: {
 						batchSize: Coerce.integer(envVars.loggingBatchSize),
 						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushInterval) ?? 5) * 1000,
+						retainForMs: (Coerce.integer(envVars.loggingRetainFor) ?? 2880) * 60_000,
+						maxEntries: Coerce.integer(envVars.loggingMaxEntries),
+						retentionIntervalMs:
+							(Coerce.integer(envVars.loggingRetentionInterval) ?? 5) * 60_000,
+						retentionBatchSize: Coerce.integer(envVars.loggingRetentionBatchSize),
+						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
+					}
+				}
+			});
+			additionalConnectorCount++;
+		} else if (loggingConnector === LoggingConnectorType.Otel) {
+			const otelLoggingConfig: IOpenTelemetryLoggingConnectorConfig = {
+				loggerName: envVars.openTelemetryLoggingLoggerName,
+				loggerVersion: envVars.openTelemetryLoggingLoggerVersion
+			};
+			if (Is.stringValue(envVars.openTelemetryLoggingPrometheusEndpoint)) {
+				otelLoggingConfig.exporters = {
+					otlp: {
+						type: OpenTelemetryExporterTypes.Otlp,
+						endpoint: envVars.openTelemetryLoggingPrometheusEndpoint,
+						processor:
+							(envVars.openTelemetryLoggingProcessor as IOpenTelemetryOtlpExporterConfig["processor"]) ??
+							"batch"
+					}
+				};
+			}
+			coreConfig.types.loggingConnector.push({
+				type: LoggingConnectorType.Otel,
+				options: {
+					config: otelLoggingConfig
+				}
+			});
+			additionalConnectorCount++;
+		} else if (loggingConnector === LoggingConnectorType.File) {
+			coreConfig.types.loggingConnector.push({
+				type: LoggingConnectorType.File,
+				options: {
+					config: {
+						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
+						filename: envVars.loggingFileFilename,
+						maxFileSizeBytes: Coerce.integer(envVars.loggingFileMaxFileSizeBytes),
+						maxRetainedFiles: Coerce.integer(envVars.loggingFileMaxRetainedFiles),
 						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
 					}
 				}
@@ -644,7 +693,8 @@ async function configureMetricsCollector(
 		coreConfig.types.metricsCollectorComponent ??= [];
 		coreConfig.types.metricsCollectorComponent.push({
 			type: MetricsCollectorComponentType.Service,
-			options: { config: { intervalMs: intervalSec * 1000 } }
+			options: { config: { intervalMs: intervalSec * 1000 } },
+			isCloneable: false
 		});
 
 		const maxHistory = Coerce.integer(envVars.telemetryMetricsProducerMaxHistory) ?? 1440;
@@ -658,7 +708,8 @@ async function configureMetricsCollector(
 		for (const producerType of metricsProducers) {
 			coreConfig.types.metricsProducerComponent.push({
 				type: producerType as MetricsProducerComponentType,
-				options: { maxHistory }
+				options: { maxHistory },
+				isCloneable: false
 			});
 		}
 	}
@@ -716,7 +767,29 @@ async function configureHealth(
 					healthCheckInterval: (Coerce.integer(envVars.healthInterval) ?? 60) * 1000,
 					initialInterval: (Coerce.integer(envVars.healthStartupInterval) ?? 2) * 1000
 				}
-			}
+			},
+			isCloneable: false
+		});
+	}
+}
+
+/**
+ * Configures the schema migration.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the schema migration configuration has been applied.
+ */
+async function configureSchemaMigration(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	const isSchemaMigrationEnabled = Coerce.boolean(envVars.schemaMigrationEnabled) ?? true;
+
+	if (isSchemaMigrationEnabled) {
+		coreConfig.types.schemaVersionMigrationComponent ??= [];
+		coreConfig.types.schemaVersionMigrationComponent.push({
+			type: SchemaVersionMigrationComponentType.Service,
+			isCloneable: false
 		});
 	}
 }
@@ -1078,7 +1151,8 @@ async function configureIdentity(
 					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
 						? envVars.iotaIdentityPackageId
 						: undefined,
-					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0
+					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0,
+					didResolutionCacheTtlMs: Coerce.integer(envVars.identityDidResolutionCacheTtlMs)
 				}
 			}
 		});
@@ -1542,7 +1616,8 @@ async function configureFederatedCatalogue(
 			coreConfig.types.federatedCatalogueComponent.push({
 				type: FederatedCatalogueComponentType.RestClient,
 				options: {
-					endpoint: envVars.federatedCatalogueRemoteEndpoint
+					endpoint: envVars.federatedCatalogueRemoteEndpoint,
+					pathPrefix: envVars.federatedCatalogueRestClientPathPrefix ?? "federated-catalogue"
 				}
 			});
 		} else {
@@ -1598,6 +1673,8 @@ async function configureDataspace(
 					// Must match the control-plane REST mount, as it is combined with the public origin
 					// to build the consumer's advertised callback address;
 					callbackPath: envVars.dataspaceCallbackPath ?? "dataspace-control-plane",
+					// Base mount path of the data plane only; the transfer handlers append the
+					// sub-paths themselves (`/entities` for PULL, `/inbox` for PUSH).
 					dataPlanePath: envVars.dataspaceDataPlanePath,
 					autoStartTransfers: Coerce.boolean(envVars.dataspaceAutoStartTransfers),
 					stalledNegotiationTimeoutMs: !Is.empty(stalledNegotiationTimeout)
@@ -1665,7 +1742,9 @@ async function configureDlt(
 					},
 					network: envVars.iotaNetwork ?? "",
 					coinType: Coerce.integer(envVars.iotaCoinType),
-					gasStation: gasStationConfig
+					gasStation: gasStationConfig,
+					gasBudget: Coerce.integer(envVars.iotaGasBudget),
+					gasReservationDuration: Coerce.integer(envVars.iotaGasReservationDuration)
 				}
 			}
 		});

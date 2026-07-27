@@ -1,0 +1,17 @@
+{
+	"group": "DSP version discovery",
+	"steps": [
+		{
+			"description": "GET /.well-known/dspace-version — public, no auth required",
+			"method": "GET",
+			"path": "/.well-known/dspace-version",
+			"appendOrgParam": false,
+			"expectedStatus": 200,
+			"assert": {
+				"body.protocolVersions": "isDefined",
+				"body.protocolVersions.[0].version": "isDefined",
+				"body.protocolVersions.[0].binding": "isDefined"
+			}
+		}
+	]
+}

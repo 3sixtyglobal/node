@@ -619,7 +619,8 @@ async function writeReport({ k6Code, k6Summary, mem, series }) {
 			exitCode: k6Code,
 			httpReqDuration: k6Summary?.metrics?.http_req_duration?.values,
 			httpReqFailed: k6Summary?.metrics?.http_req_failed?.values,
-			httpReqs: k6Summary?.metrics?.http_reqs?.values
+			httpReqs: k6Summary?.metrics?.http_reqs?.values,
+			groups: k6Summary?.groups
 		},
 		memory: mem,
 		series

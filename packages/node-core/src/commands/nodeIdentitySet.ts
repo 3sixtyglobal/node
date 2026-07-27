@@ -9,19 +9,20 @@ import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
 
-const COMMAND_NAME = "node-set-identity";
+const COMMAND_NAME = "node-identity-set";
 
 /**
  * Get the command definition parameters.
  * @param commandDefinitions The registered command definitions.
  */
-export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
+export function getCommandDefinitionNodeIdentitySet(commandDefinitions: {
 	[id: string]: ICliCommandDefinition;
 }): void {
 	commandDefinitions[COMMAND_NAME] = {
 		command: COMMAND_NAME,
-		description: I18n.formatMessage("node.cli.commands.node-set-identity.description"),
-		example: I18n.formatMessage("node.cli.commands.node-set-identity.example"),
+		aliases: ["node-set-identity"],
+		description: I18n.formatMessage("node.cli.commands.node-identity-set.description"),
+		example: I18n.formatMessage("node.cli.commands.node-identity-set.example"),
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
 		params: [
@@ -29,7 +30,7 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
 				key: "env-prefix",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.node-set-identity.params.env-prefix.description"
+					"node.cli.commands.node-identity-set.params.env-prefix.description"
 				),
 				required: false
 			},
@@ -37,7 +38,7 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
 				key: "identity",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.node-set-identity.params.identity.description"
+					"node.cli.commands.node-identity-set.params.identity.description"
 				),
 				extendedType: "did",
 				required: true
@@ -46,12 +47,12 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.node-set-identity.params.load-env.description"
+					"node.cli.commands.node-identity-set.params.load-env.description"
 				),
 				required: false
 			}
 		],
-		action: async (engineCore, envVars, params) => nodeSetIdentity(engineCore, envVars, params)
+		action: async (engineCore, envVars, params) => nodeIdentitySet(engineCore, envVars, params)
 	};
 }
 
@@ -63,17 +64,17 @@ export function getCommandDefinitionNodeSetIdentity(commandDefinitions: {
  * @param params.identity The DID to set for the node.
  * @returns A promise that resolves when the node identity has been persisted.
  */
-export async function nodeSetIdentity(
+export async function nodeIdentitySet(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
 	envVars: IEnvironmentVariables,
 	params: {
 		identity?: string;
 	}
 ): Promise<void> {
-	Did.guard("nodeSetIdentity", "identity", params.identity);
+	Did.guard("nodeIdentitySet", "identity", params.identity);
 
 	CLIDisplay.task(
-		I18n.formatMessage("node.cli.commands.node-set-identity.labels.resolvingIdentity")
+		I18n.formatMessage("node.cli.commands.node-identity-set.labels.resolvingIdentity")
 	);
 	const defaultIdentityResolverConnectorType = engineCore.getRegisteredInstanceType(
 		"identityResolverConnector"
@@ -85,20 +86,20 @@ export async function nodeSetIdentity(
 
 	const identityDocument = await identityResolverConnector.resolveDocument(params.identity);
 	if (Is.empty(identityDocument)) {
-		throw new NotFoundError("nodeSetIdentity", "identityNotFound", params.identity);
+		throw new NotFoundError("nodeIdentitySet", "identityNotFound", params.identity);
 	}
 
 	const state = engineCore.getState();
 
 	if (state.nodeId === params.identity) {
-		CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-set-identity.labels.skipping"));
+		CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-identity-set.labels.skipping"));
 		return;
 	}
 
 	state.nodeId = params.identity;
 	engineCore.setStateDirty();
 
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-set-identity.labels.stored"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.node-identity-set.labels.stored"));
 
 	CLIDisplay.done();
 }

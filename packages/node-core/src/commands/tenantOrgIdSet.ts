@@ -8,19 +8,20 @@ import { Did } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
-const COMMAND_NAME = "set-tenant-org-id";
+const COMMAND_NAME = "tenant-org-id-set";
 
 /**
  * Get the command definition parameters.
  * @param commandDefinitions The registered command definitions.
  */
-export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
+export function getCommandDefinitionTenantOrgIdSet(commandDefinitions: {
 	[id: string]: ICliCommandDefinition;
 }): void {
 	commandDefinitions[COMMAND_NAME] = {
 		command: COMMAND_NAME,
-		description: I18n.formatMessage("node.cli.commands.set-tenant-org-id.description"),
-		example: I18n.formatMessage("node.cli.commands.set-tenant-org-id.example"),
+		aliases: ["set-tenant-org-id"],
+		description: I18n.formatMessage("node.cli.commands.tenant-org-id-set.description"),
+		example: I18n.formatMessage("node.cli.commands.tenant-org-id-set.example"),
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
 		params: [
@@ -28,7 +29,7 @@ export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
 				key: "env-prefix",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-tenant-org-id.params.env-prefix.description"
+					"node.cli.commands.tenant-org-id-set.params.env-prefix.description"
 				),
 				required: false
 			},
@@ -37,7 +38,7 @@ export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
 				type: "string",
 				extendedType: "hex(32)",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-tenant-org-id.params.tenant-id.description"
+					"node.cli.commands.tenant-org-id-set.params.tenant-id.description"
 				),
 				required: true
 			},
@@ -46,7 +47,7 @@ export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
 				type: "string",
 				extendedType: "did",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-tenant-org-id.params.organization-id.description"
+					"node.cli.commands.tenant-org-id-set.params.organization-id.description"
 				),
 				required: true
 			},
@@ -54,12 +55,12 @@ export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.set-tenant-org-id.params.load-env.description"
+					"node.cli.commands.tenant-org-id-set.params.load-env.description"
 				),
 				required: false
 			}
 		],
-		action: async (engineCore, envVars, params) => setTenantOrgId(engineCore, envVars, params)
+		action: async (engineCore, envVars, params) => tenantOrgIdSet(engineCore, envVars, params)
 	};
 }
 
@@ -72,7 +73,7 @@ export function getCommandDefinitionSetTenantOrgId(commandDefinitions: {
  * @param params.organizationId The organization ID to set.
  * @returns A promise that resolves when the tenant organization ID has been stored.
  */
-export async function setTenantOrgId(
+export async function tenantOrgIdSet(
 	engineCore: IEngineCore,
 	envVars: IEnvironmentVariables,
 	params: {
@@ -80,17 +81,17 @@ export async function setTenantOrgId(
 		organizationId?: string;
 	}
 ): Promise<void> {
-	Guards.stringHexLength("setTenantOrgId", "tenant-id", params.tenantId, 32);
+	Guards.stringHexLength("tenantOrgIdSet", "tenant-id", params.tenantId, 32);
 
-	Did.guard("setTenantOrgId", "organizationId", params.organizationId);
+	Did.guard("tenantOrgIdSet", "organizationId", params.organizationId);
 
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.set-tenant-org-id.labels.updating"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-org-id-set.labels.updating"));
 	CLIDisplay.spinnerStart();
 
 	await applyOrganizationIdToTenant(engineCore, params.tenantId, params.organizationId);
 
 	CLIDisplay.spinnerStop();
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.set-tenant-org-id.labels.stored"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-org-id-set.labels.stored"));
 
 	CLIDisplay.done();
 }
