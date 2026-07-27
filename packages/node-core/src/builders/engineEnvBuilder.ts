@@ -483,8 +483,7 @@ async function configureLogging(
 						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushInterval) ?? 5) * 1000,
 						retainForMs: (Coerce.integer(envVars.loggingRetainFor) ?? 2880) * 60_000,
 						maxEntries: Coerce.integer(envVars.loggingMaxEntries),
-						retentionIntervalMs:
-							(Coerce.integer(envVars.loggingRetentionInterval) ?? 5) * 60_000,
+						retentionIntervalMs: (Coerce.integer(envVars.loggingRetentionInterval) ?? 5) * 60_000,
 						retentionBatchSize: Coerce.integer(envVars.loggingRetentionBatchSize),
 						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
 					}
