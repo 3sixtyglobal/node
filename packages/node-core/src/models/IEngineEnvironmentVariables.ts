@@ -381,11 +381,11 @@ export interface IEngineEnvironmentVariables {
 	loggingBatchFlushInterval?: string;
 
 	/**
-	 * Delete log entries older than this many milliseconds for the entity-storage logging connector.
+	 * Delete log entries older than this many minutes for the entity-storage logging connector.
 	 * Set to 0 to disable age-based retention.
-	 * @default 172800000 (2 days)
+	 * @default 2880 (2 days)
 	 */
-	loggingRetainForMs?: string;
+	loggingRetainFor?: string;
 
 	/**
 	 * Keep at most this many log entries for the entity-storage logging connector.
@@ -395,11 +395,11 @@ export interface IEngineEnvironmentVariables {
 	loggingMaxEntries?: string;
 
 	/**
-	 * How often the retention cleanup task runs in milliseconds for the entity-storage logging connector.
+	 * How often the retention cleanup task runs in minutes for the entity-storage logging connector.
 	 * Set to 0 to disable periodic cleanup.
-	 * @default 300000 (5 minutes)
+	 * @default 5
 	 */
-	loggingRetentionIntervalMs?: string;
+	loggingRetentionInterval?: string;
 
 	/**
 	 * Maximum number of entries deleted per cleanup batch for the entity-storage logging connector.

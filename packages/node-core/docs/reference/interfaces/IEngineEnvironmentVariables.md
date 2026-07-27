@@ -603,17 +603,17 @@ The batch flush interval in seconds for the logging task, how often to flush the
 
 ***
 
-### loggingRetainForMs? {#loggingretainforms}
+### loggingRetainFor? {#loggingretainformins}
 
-> `optional` **loggingRetainForMs?**: `string`
+> `optional` **loggingRetainFor?**: `string`
 
-Delete log entries older than this many milliseconds for the entity-storage logging connector.
+Delete log entries older than this many minutes for the entity-storage logging connector.
 Set to 0 to disable age-based retention.
 
 #### Default
 
 ```ts
-172800000 (2 days)
+2880 (2 days)
 ```
 
 ***
@@ -633,17 +633,17 @@ Set to 0 to disable count-based retention.
 
 ***
 
-### loggingRetentionIntervalMs? {#loggingretentionintervalms}
+### loggingRetentionInterval? {#loggingretentionintervalmins}
 
-> `optional` **loggingRetentionIntervalMs?**: `string`
+> `optional` **loggingRetentionInterval?**: `string`
 
-How often the retention cleanup task runs in milliseconds for the entity-storage logging connector.
+How often the retention cleanup task runs in minutes for the entity-storage logging connector.
 Set to 0 to disable periodic cleanup.
 
 #### Default
 
 ```ts
-300000 (5 minutes)
+5
 ```
 
 ***
