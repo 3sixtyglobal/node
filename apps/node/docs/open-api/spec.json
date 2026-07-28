@@ -21279,6 +21279,10 @@
 					},
 					"dataset": {
 						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+					},
+					"transferIdleTimeoutMs": {
+						"type": "number",
+						"description": "Optional idle window (ms) overriding the node-level idle policy for this\ndataset's PULL transfers; 0 disables it for this dataset."
 					}
 				},
 				"required": [
@@ -21317,6 +21321,10 @@
 					},
 					"dataset": {
 						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+					},
+					"transferIdleTimeoutMs": {
+						"type": "number",
+						"description": "Optional idle window (ms) overriding the node-level idle policy for this\ndataset's PULL transfers; 0 disables it for this dataset."
 					}
 				},
 				"required": [
@@ -22263,6 +22271,10 @@
 					},
 					"dataset": {
 						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+					},
+					"transferIdleTimeoutMs": {
+						"type": "number",
+						"description": "Idle window (ms) for this dataset's PULL transfers, overriding the node-level\nproviderTransferIdleTimeoutMs; 0 disables the idle policy for this dataset."
 					},
 					"dateCreated": {
 						"type": "string",
