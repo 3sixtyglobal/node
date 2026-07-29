@@ -8,6 +8,7 @@ services:
     container_name: twin-kenya-defaultarb-node
     ports:
       - '3042:3000'
+      - '9465:9464'
     env_file:
       - env/node.env
     volumes:
