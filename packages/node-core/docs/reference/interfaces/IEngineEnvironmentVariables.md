@@ -1071,6 +1071,49 @@ The identity verification method id to use with immutable proofs.
 
 ***
 
+### immutableProofTaskRetryCount? {#immutableprooftaskretrycount}
+
+> `optional` **immutableProofTaskRetryCount?**: `number`
+
+The number of times to retry a proof task when it fails, 0 to disable retries.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### immutableProofTaskRetryInterval? {#immutableprooftaskretryinterval}
+
+> `optional` **immutableProofTaskRetryInterval?**: `number`
+
+The interval in seconds to wait between proof task retries.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### immutableProofTaskFailureRetainFor? {#immutableprooftaskfailureretainfor}
+
+> `optional` **immutableProofTaskFailureRetainFor?**: `number`
+
+The time in minutes to retain the record of a failed proof task.
+Set to -1 to retain failures forever.
+
+#### Default
+
+```ts
+10080
+```
+
+***
+
 ### attestationConnector? {#attestationconnector}
 
 > `optional` **attestationConnector?**: `string`
