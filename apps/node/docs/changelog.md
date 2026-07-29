@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.2-next.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.1...node-v0.9.2-next.2) (2026-07-29)
+
+
+### Features
+
+* immutable proof config ([#307](https://github.com/iotaledger/twin-node/issues/307)) ([9257495](https://github.com/iotaledger/twin-node/commit/92574953329647756aa6ab4cca80b1707e14a33f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.1 to 0.9.2-next.2
+
 ## [0.9.2-next.1](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.0...node-v0.9.2-next.1) (2026-07-28)
 
 

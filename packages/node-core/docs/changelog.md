@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.2](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.1...node-core-v0.9.2-next.2) (2026-07-29)
+
+
+### Features
+
+* immutable proof config ([#307](https://github.com/iotaledger/twin-node/issues/307)) ([9257495](https://github.com/iotaledger/twin-node/commit/92574953329647756aa6ab4cca80b1707e14a33f))
+
 ## [0.9.2-next.1](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.0...node-core-v0.9.2-next.1) (2026-07-28)
 
 
