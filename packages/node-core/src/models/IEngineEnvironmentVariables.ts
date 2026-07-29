@@ -664,6 +664,25 @@ export interface IEngineEnvironmentVariables {
 	immutableProofVerificationMethodId?: string;
 
 	/**
+	 * The number of times to retry a proof task when it fails, 0 to disable retries.
+	 * @default 5
+	 */
+	immutableProofTaskRetryCount?: number;
+
+	/**
+	 * The interval in seconds to wait between proof task retries.
+	 * @default 5
+	 */
+	immutableProofTaskRetryInterval?: number;
+
+	/**
+	 * The time in minutes to retain the record of a failed proof task.
+	 * Set to -1 to retain failures forever.
+	 * @default 10080
+	 */
+	immutableProofTaskFailureRetainFor?: number;
+
+	/**
 	 * The type of attestation connector: entity-storage, iota.
 	 */
 	attestationConnector?: string;

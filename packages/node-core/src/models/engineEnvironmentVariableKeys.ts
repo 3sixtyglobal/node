@@ -165,6 +165,9 @@ const engineEnvironmentVariableKeysInternal: {
 	iotaIdentityPackageId: true,
 	// attestation / proofs
 	immutableProofVerificationMethodId: true,
+	immutableProofTaskRetryCount: true,
+	immutableProofTaskRetryInterval: true,
+	immutableProofTaskFailureRetainFor: true,
 	attestationConnector: true,
 	attestationVerificationMethodId: true,
 	// data processing

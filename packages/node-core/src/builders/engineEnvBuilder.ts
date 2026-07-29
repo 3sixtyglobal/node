@@ -1113,7 +1113,11 @@ async function configureImmutableProof(
 			type: ImmutableProofComponentType.Service,
 			options: {
 				config: {
-					verificationMethodId: envVars.immutableProofVerificationMethodId
+					verificationMethodId: envVars.immutableProofVerificationMethodId,
+					taskRetryCount: Coerce.integer(envVars.immutableProofTaskRetryCount),
+					taskRetryInterval: (Coerce.integer(envVars.immutableProofTaskRetryInterval) ?? 5) * 1000,
+					taskFailureRetainFor:
+						(Coerce.integer(envVars.immutableProofTaskFailureRetainFor) ?? 10080) * 60_000
 				}
 			}
 		});
