@@ -34,9 +34,9 @@ When you change the prefix, all variables in this document use your custom prefi
 | `TWIN_SCHEMA_MIGRATION_ENABLED` | `true`, `false`             | `true`                                         | Enables automatic schema migration at startup. Set to `false` to disable schema version migration.                                                |
 | `TWIN_EXTENSIONS`               | Comma-separated module list | None                                           | Extension modules to load. Supports local, `npm:`, and `https:` entries.                                                                          |
 
-## Bootstrap Legacy Variables
+## Bootstrap Dev Variables
 
-These variables are only read when running the `bootstrap-legacy` CLI command. They are not used during normal server startup.
+These variables are only read when running the `bootstrap-dev` CLI command. They are not used during normal server startup.
 
 | Variable                     | Possible Values      | Default                                                                  | Notes                                                                         |
 | ---------------------------- | -------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
@@ -207,6 +207,7 @@ TWIN_ENV_ALLOW_LIST=restPath*
 | `TWIN_ENTITY_STORAGE_MEMORY_MUTEX_TIMEOUT` | Integer ms      | None    | Mutex timeout for the memory entity storage connector.                      |
 | `TWIN_ENTITY_STORAGE_FILE_MUTEX_TIMEOUT`   | Integer ms      | None    | Mutex timeout for the file entity storage connector.                        |
 | `TWIN_RIGHTS_MANAGEMENT_MUTEX_TIMEOUT`     | Integer ms      | None    | Mutex timeout for the rights management component.                          |
+| `TWIN_TELEMETRY_MUTEX_TIMEOUT`             | Integer ms      | None    | Mutex timeout for the telemetry connector.                                  |
 
 ## Extension Module Loading Variables
 

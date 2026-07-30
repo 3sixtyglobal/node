@@ -646,7 +646,12 @@ async function configureTelemetry(
 
 	if (envVars.telemetryConnector === TelemetryConnectorType.EntityStorage) {
 		coreConfig.types.telemetryConnector.push({
-			type: TelemetryConnectorType.EntityStorage
+			type: TelemetryConnectorType.EntityStorage,
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.telemetryMutexTimeout)
+				}
+			}
 		});
 	} else if (envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
 		let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
@@ -662,6 +667,7 @@ async function configureTelemetry(
 			type: TelemetryConnectorType.OpenTelemetry,
 			options: {
 				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.telemetryMutexTimeout),
 					meterName: envVars.openTelemetryMeterName,
 					meterVersion: envVars.openTelemetryMeterVersion,
 					readers

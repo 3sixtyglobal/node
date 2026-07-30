@@ -895,6 +895,14 @@ Maximum number of values retained per telemetry metric (count-based history cap)
 
 ***
 
+### telemetryMutexTimeout? {#telemetrymutextimeout}
+
+> `optional` **telemetryMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the telemetry connector.
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 /**
- * The environment variables for the bootstrap legacy.
+ * The environment variables for the bootstrap development command.
  */
-export interface IBootstrapLegacyEnvironmentVariables {
+export interface IBootstrapDevEnvironmentVariables {
 	/**
 	 * The features that are enabled on the node.
 	 * @default []

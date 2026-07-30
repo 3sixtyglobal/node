@@ -108,7 +108,7 @@ describe("node-core n2n", () => {
 					TWIN_FEATURES: "node-identity"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		const catalogueServer = await run({
@@ -189,7 +189,7 @@ describe("node-core n2n", () => {
 					TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		const proxyServer = await run({
@@ -282,7 +282,7 @@ describe("node-core n2n", () => {
 					TWIN_FEATURES: "node-identity"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		const catalogueServer = await run({
@@ -380,7 +380,7 @@ describe("node-core n2n", () => {
 					TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		const proxyNodeId = proxyState.nodeId;

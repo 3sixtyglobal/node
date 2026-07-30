@@ -115,7 +115,7 @@ describe("node-core", () => {
 	});
 
 	test("Can show the help for a command", async () => {
-		await executeCliCommand(["bootstrap-legacy", "--help"], {});
+		await executeCliCommand(["bootstrap-dev", "--help"], {});
 	});
 
 	test("help listing marks single-tenant-only commands with a label", async () => {
@@ -149,9 +149,9 @@ describe("node-core", () => {
 		expect(output).toContain("single-tenant only");
 	});
 
-	test("Can bootstrap in legacy mode", async () => {
+	test("Can bootstrap in dev mode", async () => {
 		await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_FEATURES: "wallet,admin-user"
@@ -159,13 +159,39 @@ describe("node-core", () => {
 		);
 	});
 
-	test("bootstrap-legacy is idempotent with multi-tenancy when TENANT_ID is not set", async () => {
+	test("bootstrap-legacy alias resolves to bootstrap-dev and emits a deprecation warning", async () => {
+		const aliasDir = `${OUTPUT_TMP_DIR}bootstrap-alias/`;
+		await rm(aliasDir, { recursive: true, force: true });
+
+		const warnings: string[] = [];
+		const originalWarning = CLIDisplay.warning;
+		CLIDisplay.warning = (label: string) => {
+			warnings.push(label);
+		};
+		try {
+			await executeCliCommand(
+				["bootstrap-legacy"],
+				{},
+				{
+					TWIN_FEATURES: "wallet,admin-user",
+					TWIN_STORAGE_FILE_ROOT: `${aliasDir}db`
+				}
+			);
+		} finally {
+			CLIDisplay.warning = originalWarning;
+		}
+		expect(warnings.some(w => w.includes("bootstrap-legacy") && w.includes("bootstrap-dev"))).toBe(
+			true
+		);
+	});
+
+	test("bootstrap-dev is idempotent with multi-tenancy when TENANT_ID is not set", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-idempotent/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		const runBootstrap = async (state: INodeEngineState): Promise<INodeEngineState> =>
-			executeCliCommand(["bootstrap-legacy"], state, {
+			executeCliCommand(["bootstrap-dev"], state, {
 				TWIN_FEATURES: "wallet,admin-user",
 				TWIN_STORAGE_FILE_ROOT: dbDir
 			});
@@ -195,13 +221,13 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfilesAfterFirst);
 	});
 
-	test("bootstrap-legacy is idempotent in single-tenant mode with wallet and admin-user features", async () => {
+	test("bootstrap-dev is idempotent in single-tenant mode with wallet and admin-user features", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-idempotent-single/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		const runBootstrap = async (state: INodeEngineState): Promise<INodeEngineState> =>
-			executeCliCommand(["bootstrap-legacy"], state, {
+			executeCliCommand(["bootstrap-dev"], state, {
 				TWIN_TENANT_ENABLED: "false",
 				TWIN_FEATURES: "wallet,admin-user",
 				TWIN_STORAGE_FILE_ROOT: dbDir
@@ -232,13 +258,13 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfilesAfterFirst);
 	});
 
-	test("bootstrap-legacy is idempotent in single-tenant mode with wallet feature only", async () => {
+	test("bootstrap-dev is idempotent in single-tenant mode with wallet feature only", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-idempotent-single-wallet/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		const runBootstrap = async (state: INodeEngineState): Promise<INodeEngineState> =>
-			executeCliCommand(["bootstrap-legacy"], state, {
+			executeCliCommand(["bootstrap-dev"], state, {
 				TWIN_TENANT_ENABLED: "false",
 				TWIN_FEATURES: "wallet",
 				TWIN_STORAGE_FILE_ROOT: dbDir
@@ -266,14 +292,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocsAfterFirst);
 	});
 
-	test("bootstrap-legacy multi-tenant: explicit tenant config propagates to DB and is retained on re-run without env vars", async () => {
+	test("bootstrap-dev multi-tenant: explicit tenant config propagates to DB and is retained on re-run without env vars", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-propagate-multi/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// First run: configure with explicit tenant ID and API key
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_FEATURES: "wallet,admin-user",
@@ -319,7 +345,7 @@ describe("node-core", () => {
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
 		// Second run: no explicit tenant env vars — lookup by label must find the existing tenant
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
 		});
@@ -332,14 +358,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy single-tenant: admin user config propagates to DB and is retained on re-run without env vars", async () => {
+	test("bootstrap-dev single-tenant: admin user config propagates to DB and is retained on re-run without env vars", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-propagate-single/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// First run: no explicit admin user env vars — defaults apply
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_TENANT_ENABLED: "false",
@@ -382,7 +408,7 @@ describe("node-core", () => {
 		expect(identityProfiles[0].privateProfile.email).toBe("admin@node");
 
 		// Second run: same config, no extra env vars
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
@@ -396,14 +422,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy single-tenant: explicit node and org mnemonics are accepted and retained on re-run without mnemonics", async () => {
+	test("bootstrap-dev single-tenant: explicit node and org mnemonics are accepted and retained on re-run without mnemonics", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-mnemonic-single/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// Run 1: specify mnemonics explicitly
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_TENANT_ENABLED: "false",
@@ -425,7 +451,7 @@ describe("node-core", () => {
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
 		// Run 2: no mnemonics — vault already holds them, identities already exist
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
@@ -437,14 +463,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy multi-tenant: explicit node and org mnemonics are accepted and retained on re-run without mnemonics", async () => {
+	test("bootstrap-dev multi-tenant: explicit node and org mnemonics are accepted and retained on re-run without mnemonics", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-mnemonic-multi/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// Run 1: specify mnemonics explicitly
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_FEATURES: "wallet,admin-user",
@@ -467,7 +493,7 @@ describe("node-core", () => {
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
 		// Run 2: no mnemonics — vault already holds them, tenant and identities already exist
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
 		});
@@ -478,14 +504,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy single-tenant: custom admin user name and password propagate to DB and are retained on re-run without password", async () => {
+	test("bootstrap-dev single-tenant: custom admin user name and password propagate to DB and are retained on re-run without password", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-admin-single/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// Run 1: explicit admin name and password
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_TENANT_ENABLED: "false",
@@ -518,7 +544,7 @@ describe("node-core", () => {
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 
 		// Run 2: same name, no password — overwriteMode:skip must leave the record untouched
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir,
@@ -531,13 +557,13 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy multi-tenant: custom admin user name and password propagate to DB and are retained on re-run without password", async () => {
+	test("bootstrap-dev multi-tenant: custom admin user name and password propagate to DB and are retained on re-run without password", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-admin-multi/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_FEATURES: "wallet,admin-user",
@@ -568,7 +594,7 @@ describe("node-core", () => {
 		const tenantsAfterFirst = await readStoreRecords(dbDir, "tenant");
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir,
 			TWIN_ADMIN_USER_NAME: "admin@acme.com"
@@ -580,14 +606,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy single-tenant: explicit admin user mnemonic is accepted and retained on re-run without mnemonic", async () => {
+	test("bootstrap-dev single-tenant: explicit admin user mnemonic is accepted and retained on re-run without mnemonic", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-admin-mnemonic-single/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// Run 1: specify admin mnemonic explicitly
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_TENANT_ENABLED: "false",
@@ -611,7 +637,7 @@ describe("node-core", () => {
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
 		// Run 2: no mnemonic — admin user found by email, identity creation skipped
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
@@ -623,14 +649,14 @@ describe("node-core", () => {
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
 	});
 
-	test("bootstrap-legacy multi-tenant: explicit admin user mnemonic is accepted and retained on re-run without mnemonic", async () => {
+	test("bootstrap-dev multi-tenant: explicit admin user mnemonic is accepted and retained on re-run without mnemonic", async () => {
 		const bootstrapDir = `${OUTPUT_TMP_DIR}bootstrap-admin-mnemonic-multi/`;
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
 		// Run 1: specify admin mnemonic explicitly
 		const stateAfterFirst = await executeCliCommand(
-			["bootstrap-legacy"],
+			["bootstrap-dev"],
 			{},
 			{
 				TWIN_FEATURES: "wallet,admin-user",
@@ -654,7 +680,7 @@ describe("node-core", () => {
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
 		// Run 2: no mnemonic — admin user found by email, identity creation skipped
-		const stateAfterSecond = await executeCliCommand(["bootstrap-legacy"], stateAfterFirst, {
+		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
 		});

@@ -167,7 +167,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "1"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -244,7 +244,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -365,7 +365,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -476,7 +476,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();

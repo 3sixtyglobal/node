@@ -5,7 +5,7 @@ import { ContextIdStore } from "@twin.org/context";
 import { Coerce, GeneralError, I18n, Is, StringHelper } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import * as dotenv from "dotenv";
-import { getCommandDefinitionBootstrapLegacy } from "./commands/bootstrapLegacy.js";
+import { getCommandDefinitionBootstrapDev } from "./commands/bootstrapDev.js";
 import { getCommandDefinitionHelp } from "./commands/help.js";
 import { getCommandDefinitionIdentityCreate } from "./commands/identityCreate.js";
 import { getCommandDefinitionIdentityImport } from "./commands/identityImports.js";
@@ -323,7 +323,7 @@ export function substituteEnvOptions(
  */
 export function registerCommands(): void {
 	getCommandDefinitionHelp(commandDefinitions);
-	getCommandDefinitionBootstrapLegacy(commandDefinitions);
+	getCommandDefinitionBootstrapDev(commandDefinitions);
 	getCommandDefinitionIdentityCreate(commandDefinitions);
 	getCommandDefinitionIdentityImport(commandDefinitions);
 	getCommandDefinitionIdentityList(commandDefinitions);

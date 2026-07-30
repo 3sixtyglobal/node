@@ -140,6 +140,7 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetryMetricsCollectorInterval: true,
 	telemetryMetricsProducers: true,
 	telemetryMetricsProducerMaxHistory: true,
+	telemetryMutexTimeout: true,
 	// DLT / identity
 	faucetConnector: true,
 	walletConnector: true,

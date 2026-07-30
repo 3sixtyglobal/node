@@ -16,19 +16,20 @@ import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
 
-const COMMAND_NAME = "bootstrap-legacy";
+const COMMAND_NAME = "bootstrap-dev";
 
 /**
  * Get the command definition parameters.
  * @param commandDefinitions The registered command definitions.
  */
-export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
+export function getCommandDefinitionBootstrapDev(commandDefinitions: {
 	[id: string]: ICliCommandDefinition;
 }): void {
 	commandDefinitions[COMMAND_NAME] = {
 		command: COMMAND_NAME,
-		description: I18n.formatMessage("node.cli.commands.bootstrap-legacy.description"),
-		example: I18n.formatMessage("node.cli.commands.bootstrap-legacy.example"),
+		aliases: ["bootstrap-legacy"],
+		description: I18n.formatMessage("node.cli.commands.bootstrap-dev.description"),
+		example: I18n.formatMessage("node.cli.commands.bootstrap-dev.example"),
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
 		params: [
@@ -36,7 +37,7 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
 				key: "env-prefix",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.bootstrap-legacy.params.env-prefix.description"
+					"node.cli.commands.bootstrap-dev.params.env-prefix.description"
 				),
 				required: false
 			},
@@ -44,23 +45,23 @@ export function getCommandDefinitionBootstrapLegacy(commandDefinitions: {
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.bootstrap-legacy.params.load-env.description"
+					"node.cli.commands.bootstrap-dev.params.load-env.description"
 				),
 				required: false
 			}
 		],
-		action: async (engineCore, envVars, params) => bootstrapLegacy(engineCore, envVars, params)
+		action: async (engineCore, envVars, params) => bootstrapDev(engineCore, envVars, params)
 	};
 }
 
 /**
- * Command for legacy bootstrap.
+ * Command for development bootstrap.
  * @param engineCore The engine core.
  * @param envVars The environment variables for the node.
  * @param params The parameters for the command.
  * @returns A promise that resolves when the bootstrap sequence has completed.
  */
-export async function bootstrapLegacy(
+export async function bootstrapDev(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
 	envVars: IEnvironmentVariables,
 	params: {}
@@ -78,12 +79,12 @@ export async function bootstrapLegacy(
 	let tenant: { id: string; organizationId: string } | undefined;
 
 	if (features.length === 0) {
-		throw new GeneralError("bootstrapLegacy", "noFeaturesEnabled");
+		throw new GeneralError("bootstrapDev", "noFeaturesEnabled");
 	}
 
 	CLIDisplay.break();
 	CLIDisplay.section(
-		I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeIdentityCreate")
+		I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.nodeIdentityCreate")
 	);
 
 	const nodeIdentity = await identityCreate(engineCore, envVars, {
@@ -97,7 +98,7 @@ export async function bootstrapLegacy(
 
 	CLIDisplay.break();
 	CLIDisplay.section(
-		I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeAuthKeyCreate")
+		I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.nodeAuthKeyCreate")
 	);
 	await vaultKeyCreate(engineCore, envVars, {
 		identity: nodeId,
@@ -112,7 +113,7 @@ export async function bootstrapLegacy(
 	await ContextIdStore.run({ [ContextIdKeys.Node]: nodeId }, async () => {
 		CLIDisplay.break();
 		CLIDisplay.section(
-			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.organisationCreate")
+			I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.organisationCreate")
 		);
 
 		if (tenantEnabled) {
@@ -131,7 +132,7 @@ export async function bootstrapLegacy(
 
 		CLIDisplay.break();
 		CLIDisplay.section(
-			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.trustVerificationMethodCreate")
+			I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.trustVerificationMethodCreate")
 		);
 		await identityVerificationMethodCreate(engineCore, envVars, {
 			identity: organisation.did,
@@ -143,7 +144,7 @@ export async function bootstrapLegacy(
 		if (Coerce.boolean(envVars.blobStorageEnableEncryption) ?? false) {
 			CLIDisplay.break();
 			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.blobStorageKeyCreate")
+				I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.blobStorageKeyCreate")
 			);
 			await vaultKeyCreate(engineCore, envVars, {
 				identity: organizationId,
@@ -158,7 +159,7 @@ export async function bootstrapLegacy(
 		if (!Is.empty(defaultAttestationConnectorType)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.attestationMethodCreate")
+				I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.attestationMethodCreate")
 			);
 			await identityVerificationMethodCreate(engineCore, envVars, {
 				identity: organizationId,
@@ -174,7 +175,7 @@ export async function bootstrapLegacy(
 		if (!Is.empty(defaultImmutableProofComponentType)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.immutableProofMethodCreate")
+				I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.immutableProofMethodCreate")
 			);
 			await identityVerificationMethodCreate(engineCore, envVars, {
 				identity: organizationId,
@@ -189,7 +190,7 @@ export async function bootstrapLegacy(
 		if (!tenantEnabled && !Is.stringValue(state.nodeOrganizationId)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
-				I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeOrganizationIdSet")
+				I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.nodeOrganizationIdSet")
 			);
 			state.nodeOrganizationId = organisation.did;
 			engineCore.setStateDirty();
@@ -212,7 +213,7 @@ export async function bootstrapLegacy(
 			if (Is.empty(tenant)) {
 				CLIDisplay.break();
 				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.nodeTenantCreate")
+					I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.nodeTenantCreate")
 				);
 				const tenantDetails = await tenantCreate(engineCore, envVars, {
 					tenantId: envVars.tenantId,
@@ -242,7 +243,7 @@ export async function bootstrapLegacy(
 				if (Is.empty(adminUser)) {
 					CLIDisplay.break();
 					CLIDisplay.section(
-						I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.adminIdentityCreate")
+						I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.adminIdentityCreate")
 					);
 					const result = await identityCreate(engineCore, envVars, {
 						identity: envVars.adminUserIdentity,
@@ -255,7 +256,7 @@ export async function bootstrapLegacy(
 
 				CLIDisplay.break();
 				CLIDisplay.section(
-					I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.adminUserCreate")
+					I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.adminUserCreate")
 				);
 				await userCreate(engineCore, envVars, {
 					userIdentity: userDid,
@@ -309,7 +310,7 @@ async function resolveOrganizationDid(
 		}
 	}
 
-	throw new GeneralError("bootstrapLegacy", "organizationNotSet");
+	throw new GeneralError("bootstrapDev", "organizationNotSet");
 }
 
 /**
@@ -361,7 +362,7 @@ async function resolveDefaultTenant(
 
 	if (!Is.empty(firstTenant)) {
 		CLIDisplay.value(
-			I18n.formatMessage("node.cli.commands.bootstrap-legacy.labels.tenantFallback"),
+			I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.tenantFallback"),
 			firstTenant.id
 		);
 	}

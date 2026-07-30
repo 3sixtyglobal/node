@@ -554,6 +554,11 @@ export interface IEngineEnvironmentVariables {
 	telemetryMetricsProducerMaxHistory?: string;
 
 	/**
+	 * The mutex timeout in milliseconds for the telemetry connector.
+	 */
+	telemetryMutexTimeout?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;

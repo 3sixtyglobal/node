@@ -2,7 +2,7 @@
 
 ## Interfaces
 
-- [IBootstrapLegacyEnvironmentVariables](interfaces/IBootstrapLegacyEnvironmentVariables.md)
+- [IBootstrapDevEnvironmentVariables](interfaces/IBootstrapDevEnvironmentVariables.md)
 - [ICacheMetadata](interfaces/ICacheMetadata.md)
 - [ICliArgs](interfaces/ICliArgs.md)
 - [ICliCommand](interfaces/ICliCommand.md)

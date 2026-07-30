@@ -16,8 +16,8 @@
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
 			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
 		},
-		"bootstrapLegacy": {
-			"noFeaturesEnabled": "No features are enabled in legacy bootstrap mode, at least one feature must be enabled.",
+		"bootstrapDev": {
+			"noFeaturesEnabled": "No features are enabled, at least one feature must be enabled.",
 			"organizationNotSet": "The organisation identity has not been set. Run \"node-org-id-set\"."
 		},
 		"identityCreate": {
@@ -129,9 +129,9 @@
 						"singleTenantOnly": "single-tenant only"
 					}
 				},
-				"bootstrap-legacy": {
-					"description": "Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**",
-					"example": "bootstrap-legacy --load-env=\"./.env.bootstrap-legacy\"",
+				"bootstrap-dev": {
+					"description": "Bootstrap the development environment",
+					"example": "bootstrap-dev --load-env=\"./.env.bootstrap-dev\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."

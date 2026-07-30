@@ -15,7 +15,7 @@ import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilde
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
-import { BOOTSTRAP_LEGACY_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapLegacyEnvironmentVariableKeys.js";
+import { BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapDevEnvironmentVariableKeys.js";
 import { ENGINE_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineEnvironmentVariableKeys.js";
 import { ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineServerEnvironmentVariableKeys.js";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
@@ -338,7 +338,7 @@ export async function buildConfiguration(
 		ENGINE_ENVIRONMENT_VARIABLE_KEYS,
 		ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS,
 		NODE_ENVIRONMENT_VARIABLE_KEYS,
-		BOOTSTRAP_LEGACY_ENVIRONMENT_VARIABLE_KEYS
+		BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS
 	]);
 
 	// Expand any environment variables that use the @file: syntax
