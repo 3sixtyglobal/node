@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.2-next.3](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.2...node-v0.9.2-next.3) (2026-07-30)
+
+
+### Features
+
+* bootstrap-legacy rename ([#310](https://github.com/iotaledger/twin-node/issues/310)) ([53af8a2](https://github.com/iotaledger/twin-node/commit/53af8a2e797e90bb601416215247cd8649dd6220))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.2 to 0.9.2-next.3
+
 ## [0.9.2-next.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.1...node-v0.9.2-next.2) (2026-07-29)
 
 
