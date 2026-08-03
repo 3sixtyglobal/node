@@ -1222,7 +1222,7 @@ Federated catalog remote endpoint, if set will use a REST client instead of loca
 
 > `optional` **federatedCatalogueRestClientPathPrefix?**: `string`
 
-The path prefix used by the federated catalogue REST client when forwarding requests to the remote endpoint, defaults to "catalog".
+The path prefix used by the federated catalogue REST client when forwarding requests to the remote endpoint, defaults to "federated-catalogue".
 
 ***
 
