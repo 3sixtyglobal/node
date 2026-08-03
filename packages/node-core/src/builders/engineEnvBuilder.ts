@@ -1626,7 +1626,7 @@ async function configureFederatedCatalogue(
 				type: FederatedCatalogueComponentType.RestClient,
 				options: {
 					endpoint: envVars.federatedCatalogueRemoteEndpoint,
-					pathPrefix: envVars.federatedCatalogueRestClientPathPrefix ?? "federated-catalogue"
+					pathPrefix: envVars.federatedCatalogueRestClientPathPrefix ?? "catalog"
 				}
 			});
 		} else {

@@ -189,20 +189,10 @@ export async function buildEngineServerConfiguration(
 		});
 	}
 	serverConfig.types.restRouteProcessor.push({
-		type: RestRouteProcessorType.RestRoute,
-		options: {
-			config: {
-				includeErrorStack: coreEngineConfig.debug
-			}
-		}
+		type: RestRouteProcessorType.RestRoute
 	});
 	serverConfig.types.socketRouteProcessor.push({
-		type: SocketRouteProcessorType.SocketRoute,
-		options: {
-			config: {
-				includeErrorStack: coreEngineConfig.debug
-			}
-		}
+		type: SocketRouteProcessorType.SocketRoute
 	});
 
 	const authAdminProcessorType = envVars.authAdminProcessorType;

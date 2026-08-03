@@ -88,7 +88,7 @@
 					"dcat:distribution": [
 						{
 							"@type": "dcat:Distribution",
-							"dcterms:format": "application/json",
+							"dcterms:format": "HttpData-PULL",
 							"dcat:accessService": "https://example.com/data-access"
 						}
 					]
@@ -130,7 +130,7 @@
 					"dcat:distribution": [
 						{
 							"@type": "dcat:Distribution",
-							"dcterms:format": "application/json",
+							"dcterms:format": "HttpData-PULL",
 							"dcat:accessService": "https://example.com/data-access"
 						}
 					]

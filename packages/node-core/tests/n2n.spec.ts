@@ -132,7 +132,7 @@ describe("node-core n2n", () => {
 			{ subject: {} }
 		);
 
-		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/federated-catalogue/datasets`, {
+		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
 			method: "POST",
 			headers: {
 				"content-type": "application/json",
@@ -160,7 +160,7 @@ describe("node-core n2n", () => {
 				"dcat:distribution": [
 					{
 						"@type": "dcat:Distribution",
-						"dcterms:format": "application/json",
+						"dcterms:format": "HttpData-PULL",
 						"dcat:accessService": "https://example.com/n2n-data-access"
 					}
 				]
@@ -219,7 +219,7 @@ describe("node-core n2n", () => {
 		);
 
 		try {
-			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/federated-catalogue/request`, {
+			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
 				method: "POST",
 				headers: {
 					"content-type": "application/json",
@@ -243,7 +243,7 @@ describe("node-core n2n", () => {
 			expect(Array.isArray(requestBody.dataset) && requestBody.dataset.length > 0).toBe(false);
 
 			const getRes = await fetch(
-				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${TEST_FEDCAT_DATASET_ID}`,
+				`http://localhost:${PROXY_PORT}/catalog/datasets/${TEST_FEDCAT_DATASET_ID}`,
 				{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
 			);
 			expect(getRes.status).toBe(200);
@@ -312,7 +312,7 @@ describe("node-core n2n", () => {
 		);
 
 		// Seed a dataset into the catalogue node via HTTP.
-		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/federated-catalogue/datasets`, {
+		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
 			method: "POST",
 			headers: {
 				"content-type": "application/json",
@@ -340,7 +340,7 @@ describe("node-core n2n", () => {
 				"dcat:distribution": [
 					{
 						"@type": "dcat:Distribution",
-						"dcterms:format": "application/json",
+						"dcterms:format": "HttpData-PULL",
 						"dcat:accessService": "https://example.com/n2n-data-access"
 					}
 				]
@@ -363,7 +363,7 @@ describe("node-core n2n", () => {
 		// TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT in the bootstrap env makes
 		// isTrustRequired()=true so the proxy's DID gets a trust verification
 		// method key. The endpoint is the base URL - BaseRestClient appends
-		// "/federated-catalogue" automatically.
+		// "/catalog" automatically.
 		const proxyRemoteEndpoint = `http://localhost:${CATALOGUE_PORT}`;
 		const proxyState: INodeEngineState = {};
 		const proxyStorage = new MemoryStateStorage(false, proxyState);
@@ -428,7 +428,7 @@ describe("node-core n2n", () => {
 		// The proxy passes the trust token to the catalogue, which verifies the
 		// proxy's identity using the DID document now present in its entity storage.
 		try {
-			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/federated-catalogue/request`, {
+			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
 				method: "POST",
 				headers: {
 					"content-type": "application/json",
@@ -456,7 +456,7 @@ describe("node-core n2n", () => {
 			expect(rootDatasets + nestedDatasets > 0).toBe(true);
 
 			const getRes = await fetch(
-				`http://localhost:${PROXY_PORT}/federated-catalogue/datasets/${TEST_FEDCAT_DATASET_ID}`,
+				`http://localhost:${PROXY_PORT}/catalog/datasets/${TEST_FEDCAT_DATASET_ID}`,
 				{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
 			);
 			expect(getRes.status).toBe(200);
