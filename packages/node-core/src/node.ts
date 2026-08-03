@@ -44,7 +44,7 @@ const moduleCache: { [id: string]: unknown } = {};
 let npmRootCache: string | undefined;
 
 /**
- * Run the TWIN Node.
+ * Run the node.
  * @param nodeOptions Optional configuration options for running the server.
  * @param args Optional command line arguments.
  * @returns A promise that resolves when the server is started containing a shutdown method.
