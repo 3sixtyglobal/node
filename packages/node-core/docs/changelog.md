@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.4](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.3...node-core-v0.9.2-next.4) (2026-08-03)
+
+
+### Bug Fixes
+
+* wire includeErrorStack debug flag into auth and tenant processor configs ([#313](https://github.com/iotaledger/twin-node/issues/313)) ([3c69c51](https://github.com/iotaledger/twin-node/commit/3c69c51bfdd65305efe2fbe9da508e684a4245d1))
+
 ## [0.9.2-next.3](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.2...node-core-v0.9.2-next.3) (2026-07-30)
 
 
