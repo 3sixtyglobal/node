@@ -1849,7 +1849,8 @@ export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): b
 		(Coerce.boolean(envVars.taskSchedulerEnabled) ?? false) ||
 		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
 		isRightsManagementRequired(envVars) ||
-		isAuthEntityStorageRequired(envVars)
+		isAuthEntityStorageRequired(envVars) ||
+		isImmutableProofRequired(envVars)
 	);
 }
 

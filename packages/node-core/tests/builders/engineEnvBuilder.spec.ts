@@ -1,7 +1,11 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { DltConfigType, SchemaVersionMigrationComponentType } from "@twin.org/engine-types";
+import {
+	DltConfigType,
+	SchemaVersionMigrationComponentType,
+	TaskSchedulerComponentType
+} from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
@@ -29,6 +33,24 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "false" });
 
 		expect(config.types.schemaVersionMigrationComponent).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - task scheduler requirement", () => {
+	test("task scheduler is registered when only auditableItemGraphEnabled is set", async () => {
+		const config = await buildEngineConfiguration({ auditableItemGraphEnabled: "true" });
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
+	test("task scheduler is not registered when no dependent component is enabled", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.taskSchedulerComponent).toBeUndefined();
 	});
 });
 
