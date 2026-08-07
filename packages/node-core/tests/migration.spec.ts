@@ -45,14 +45,69 @@ class MigrationTestEntity {
 	public tags?: string[];
 }
 
+@entity({ version: 0 })
+class MultiTenantMigTestEntityV0 {
+	@property({ type: "string", isPrimary: true })
+	public id!: string;
+
+	@property({ type: "string" })
+	public legacyField!: string;
+
+	@property({ type: "integer" })
+	public score!: number;
+}
+
+@entity({ version: 1 })
+class MultiTenantMigTestEntity {
+	@property({ type: "string", isPrimary: true })
+	public id!: string;
+
+	@property({ type: "string" })
+	public newField!: string;
+
+	@property({ type: "array", itemType: "string", optional: true })
+	public tags?: string[];
+}
+
+@entity({ version: 0 })
+class SparseMigTestEntityV0 {
+	@property({ type: "string", isPrimary: true })
+	public id!: string;
+
+	@property({ type: "string" })
+	public legacyField!: string;
+
+	@property({ type: "integer" })
+	public score!: number;
+}
+
+@entity({ version: 1 })
+class SparseMigTestEntity {
+	@property({ type: "string", isPrimary: true })
+	public id!: string;
+
+	@property({ type: "string" })
+	public newField!: string;
+
+	@property({ type: "array", itemType: "string", optional: true })
+	public tags?: string[];
+}
+
 const LOCALES_DIR = "./dist/locales/";
-const TEST_NODE_ID = "did:iota:0x123";
+const TEST_NODE_ID = "did:iota:0x1234";
 const TEST_NODE_ORG_ID = "did:iota:0x456";
+const TEST_TENANT_ID_A = "a1111111111111111111111111111111";
+const TEST_TENANT_ID_B = "b2222222222222222222222222222222";
 
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+};
+
+const MULTI_TENANT_BASE_ENV: { [id: string]: string } = {
+	...BASE_ENV,
+	TWIN_TENANT_ENABLED: "true"
 };
 
 describe("migration", () => {
@@ -310,5 +365,374 @@ describe("migration", () => {
 				}
 			}
 		});
+	});
+});
+
+describe("migration - multi-tenant", () => {
+	beforeAll(async () => {
+		// Return a context with both node and tenant keys when the store is empty so that
+		// startup paths calling ContextIdStore.run({}, fn) don't leave tenant-partitioned
+		// connectors without their required context IDs.
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0
+				? { node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }
+				: ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		Factory.clearFactories();
+	});
+
+	test("SchemaVersionService writes version records for all registered schemas in multi-tenant mode", async () => {
+		const port = 29000 + Math.floor(Math.random() * 500);
+
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
+			const nodeRun = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+				disableProcessExitOnFailure: true,
+				envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(port) },
+				extendConfig: async (unusedEnvVars, config) => {
+					config.types.schemaVersionMigrationComponent = [
+						{ type: SchemaVersionMigrationComponentType.Service }
+					];
+					config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+				}
+			});
+
+			try {
+				const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+				const { entities } = await versionConnector.query();
+				const rows = entities ?? [];
+
+				expect(rows.some(r => (r as { schemaName: string }).schemaName === "SchemaVersion")).toBe(
+					true
+				);
+				expect(rows.some(r => (r as { schemaName: string }).schemaName === "BackgroundTask")).toBe(
+					true
+				);
+				expect(rows.every(r => (r as { version: number }).version >= 0)).toBe(true);
+			} finally {
+				await nodeRun?.shutdown();
+			}
+		});
+	});
+
+	test("Migrates entity data across two tenant partitions independently", async () => {
+		const MIGRATION_KEY = "MultiTenantMigTestEntity_0_1";
+		const PORT_1 = 29600 + Math.floor(Math.random() * 200);
+		const PORT_2 = PORT_1 + 300;
+
+		EntitySchemaFactory.register("MultiTenantMigTestEntityV0", () =>
+			EntitySchemaHelper.getSchema(MultiTenantMigTestEntityV0)
+		);
+		EntitySchemaFactory.register("MultiTenantMigTestEntity", () =>
+			EntitySchemaHelper.getSchema(MultiTenantMigTestEntity)
+		);
+		SchemaMigrationFactory.register(MIGRATION_KEY, () => ({
+			renames: [
+				{ from: "legacyField", to: "newField" },
+				{ from: "score", to: "tags" }
+			],
+			transformEntityProperty: (fromProp, toProp, value) => [`item:${value as number}`]
+		}));
+
+		// Run 1: initialise schema-version records then back-date the entity to v0.
+		const run1 = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+			disableProcessExitOnFailure: true,
+			envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_1) },
+			extendConfig: async (unusedEnvVars, config) => {
+				config.types.entityStorageComponent ??= [];
+				config.types.entityStorageComponent.push({
+					type: EntityStorageComponentType.Service,
+					options: {
+						entityStorageType: "MultiTenantMigTestEntity",
+						partitionContextIds: ["node", "tenant"]
+					}
+				});
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			}
+		});
+
+		// Back-date the schema-version record to v0 so run 2 detects it as needing migration.
+		const svConnector = EntityStorageConnectorFactory.get<
+			MemoryEntityStorageConnector<{
+				schemaName: string;
+				version: number;
+			}>
+		>("schema-version");
+		const svRecords = await svConnector.getStore();
+		const svRecord = svRecords.find(r => r.schemaName === "MultiTenantMigTestEntity");
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 0 });
+		}
+
+		// Seed 3 v0 entities for tenant A under its partition context.
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
+			const seedConnector = new MemoryEntityStorageConnector<MultiTenantMigTestEntityV0>({
+				entitySchema: "MultiTenantMigTestEntityV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "multi-tenant-mig-test-entity" }
+			});
+			await seedConnector.setBatch([
+				{ id: "entity-a1", legacyField: "a-value-1", score: 10 },
+				{ id: "entity-a2", legacyField: "a-value-2", score: 20 },
+				{ id: "entity-a3", legacyField: "a-value-3", score: 30 }
+			]);
+		});
+
+		// Seed 2 v0 entities for tenant B under its own partition context.
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B }, async () => {
+			const seedConnector = new MemoryEntityStorageConnector<MultiTenantMigTestEntityV0>({
+				entitySchema: "MultiTenantMigTestEntityV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "multi-tenant-mig-test-entity" }
+			});
+			await seedConnector.setBatch([
+				{ id: "entity-b1", legacyField: "b-value-1", score: 100 },
+				{ id: "entity-b2", legacyField: "b-value-2", score: 200 }
+			]);
+		});
+
+		await run1?.shutdown();
+
+		// Run 2: restart. SchemaVersionService detects v0 → v1 migration needed.
+		// getPartitionContextIds() returns [{node,tenant:A},{node,tenant:B}].
+		// Migration runs once per tenant partition independently.
+		let run2;
+		try {
+			run2 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+				disableProcessExitOnFailure: true,
+				envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_2) },
+				extendConfig: async (unusedEnvVars2, config) => {
+					config.types.entityStorageComponent ??= [];
+					config.types.entityStorageComponent.push({
+						type: EntityStorageComponentType.Service,
+						options: {
+							entityStorageType: "MultiTenantMigTestEntity",
+							partitionContextIds: ["node", "tenant"]
+						}
+					});
+					config.types.schemaVersionMigrationComponent = [
+						{ type: SchemaVersionMigrationComponentType.Service }
+					];
+					config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+				}
+			});
+
+			// Schema-version record must show migration reached version 1.
+			const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+			const { entities: versionRecords } = await versionConnector.query();
+			const migrationRecord = (versionRecords ?? []).find(
+				r => (r as { schemaName: string }).schemaName === "MultiTenantMigTestEntity"
+			) as { version: number } | undefined;
+			expect(migrationRecord?.version).toBe(1);
+
+			// Tenant A: all 3 entities migrated, old fields removed.
+			const connector = EntityStorageConnectorFactory.get("multi-tenant-mig-test-entity");
+			const { entities: entitiesA } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A },
+				async () => connector.query()
+			);
+			expect(entitiesA).toHaveLength(3);
+			const sortedA = (
+				[...(entitiesA ?? [])] as (MultiTenantMigTestEntity & MultiTenantMigTestEntityV0)[]
+			).sort((a, b) => a.id.localeCompare(b.id));
+			const scoresA = [10, 20, 30];
+			for (const [i, item] of sortedA.entries()) {
+				const n = i + 1;
+				expect(item.id).toBe(`entity-a${n}`);
+				expect(item.newField).toBe(`a-value-${n}`);
+				expect(item.tags).toEqual([`item:${scoresA[i]}`]);
+				expect((item as unknown as { legacyField: unknown }).legacyField).toBeUndefined();
+				expect((item as unknown as { score: unknown }).score).toBeUndefined();
+			}
+
+			// Tenant B: both 2 entities migrated, and isolated from tenant A's data.
+			const { entities: entitiesB } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B },
+				async () => connector.query()
+			);
+			expect(entitiesB).toHaveLength(2);
+			const sortedB = (
+				[...(entitiesB ?? [])] as (MultiTenantMigTestEntity & MultiTenantMigTestEntityV0)[]
+			).sort((a, b) => a.id.localeCompare(b.id));
+			const scoresB = [100, 200];
+			for (const [i, item] of sortedB.entries()) {
+				const n = i + 1;
+				expect(item.id).toBe(`entity-b${n}`);
+				expect(item.newField).toBe(`b-value-${n}`);
+				expect(item.tags).toEqual([`item:${scoresB[i]}`]);
+				expect((item as unknown as { legacyField: unknown }).legacyField).toBeUndefined();
+				expect((item as unknown as { score: unknown }).score).toBeUndefined();
+			}
+
+			// Migration ran across exactly 2 partitions (one per tenant that has data).
+			// getPartitionContextIds() is called on the post-migration connector registered by
+			// SchemaVersionService - the safest way to assert partition count without touching
+			// the "log-entry" SharedObjectBuffer, which may be contaminated by earlier single-tenant runs.
+			const migratedConnector = EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<MultiTenantMigTestEntity>
+			>("multi-tenant-mig-test-entity");
+			const partitions = await migratedConnector.getPartitionContextIds();
+			expect(partitions, "both tenant partitions discovered").toHaveLength(2);
+		} finally {
+			await run2?.shutdown();
+			try {
+				SchemaMigrationFactory.unregister(MIGRATION_KEY);
+			} catch {
+				// Ignore if already removed.
+			}
+		}
+	});
+
+	test("Migration skips tenant partitions with no entity data", async () => {
+		const MIGRATION_KEY = "SparseMigTestEntity_0_1";
+		const PORT_1 = 30200 + Math.floor(Math.random() * 200);
+		const PORT_2 = PORT_1 + 300;
+
+		EntitySchemaFactory.register("SparseMigTestEntityV0", () =>
+			EntitySchemaHelper.getSchema(SparseMigTestEntityV0)
+		);
+		EntitySchemaFactory.register("SparseMigTestEntity", () =>
+			EntitySchemaHelper.getSchema(SparseMigTestEntity)
+		);
+		SchemaMigrationFactory.register(MIGRATION_KEY, () => ({
+			renames: [
+				{ from: "legacyField", to: "newField" },
+				{ from: "score", to: "tags" }
+			],
+			transformEntityProperty: (fromProp, toProp, value) => [`item:${value as number}`]
+		}));
+
+		// Run 1: initialise schema-version records, then back-date entity to v0.
+		const run1 = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+			disableProcessExitOnFailure: true,
+			envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_1) },
+			extendConfig: async (unusedEnvVars, config) => {
+				config.types.entityStorageComponent ??= [];
+				config.types.entityStorageComponent.push({
+					type: EntityStorageComponentType.Service,
+					options: {
+						entityStorageType: "SparseMigTestEntity",
+						partitionContextIds: ["node", "tenant"]
+					}
+				});
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			}
+		});
+
+		// Back-date to v0.
+		const svConnector = EntityStorageConnectorFactory.get<
+			MemoryEntityStorageConnector<{
+				schemaName: string;
+				version: number;
+			}>
+		>("schema-version");
+		const svRecords = await svConnector.getStore();
+		const svRecord = svRecords.find(r => r.schemaName === "SparseMigTestEntity");
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 0 });
+		}
+
+		// Seed 1 entity ONLY for tenant A. Tenant B has no data for this entity type.
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
+			const seedConnector = new MemoryEntityStorageConnector<SparseMigTestEntityV0>({
+				entitySchema: "SparseMigTestEntityV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "sparse-mig-test-entity" }
+			});
+			await seedConnector.setBatch([{ id: "entity-a1", legacyField: "only-a", score: 42 }]);
+		});
+
+		await run1?.shutdown();
+
+		// Run 2: only tenant A's partition exists - tenant B is skipped entirely.
+		let run2;
+		try {
+			run2 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+				disableProcessExitOnFailure: true,
+				envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_2) },
+				extendConfig: async (unusedEnvVars2, config) => {
+					config.types.entityStorageComponent ??= [];
+					config.types.entityStorageComponent.push({
+						type: EntityStorageComponentType.Service,
+						options: {
+							entityStorageType: "SparseMigTestEntity",
+							partitionContextIds: ["node", "tenant"]
+						}
+					});
+					config.types.schemaVersionMigrationComponent = [
+						{ type: SchemaVersionMigrationComponentType.Service }
+					];
+					config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+				}
+			});
+
+			// Schema-version bumped to 1.
+			const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+			const { entities: versionRecords } = await versionConnector.query();
+			const migrationRecord = (versionRecords ?? []).find(
+				r => (r as { schemaName: string }).schemaName === "SparseMigTestEntity"
+			) as { version: number } | undefined;
+			expect(migrationRecord?.version).toBe(1);
+
+			// Tenant A's single entity migrated correctly.
+			const connector = EntityStorageConnectorFactory.get("sparse-mig-test-entity");
+			const { entities: entitiesA } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A },
+				async () => connector.query()
+			);
+			expect(entitiesA).toHaveLength(1);
+			const item = (entitiesA ?? [])[0] as SparseMigTestEntity & SparseMigTestEntityV0;
+			expect(item.id).toBe("entity-a1");
+			expect(item.newField).toBe("only-a");
+			expect(item.tags).toEqual(["item:42"]);
+			expect((item as unknown as { legacyField: unknown }).legacyField).toBeUndefined();
+
+			// Tenant B has no entities - it was never seeded.
+			const { entities: entitiesB } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B },
+				async () => connector.query()
+			);
+			expect(entitiesB ?? []).toHaveLength(0);
+
+			// Only 1 partition discovered - tenant B has no data and is never touched.
+			const migratedConnector =
+				EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<SparseMigTestEntity>>(
+					"sparse-mig-test-entity"
+				);
+			const partitions = await migratedConnector.getPartitionContextIds();
+			expect(partitions, "only tenant A partition discovered").toHaveLength(1);
+		} finally {
+			await run2?.shutdown();
+			try {
+				SchemaMigrationFactory.unregister(MIGRATION_KEY);
+			} catch {
+				// Ignore if already removed.
+			}
+		}
 	});
 });

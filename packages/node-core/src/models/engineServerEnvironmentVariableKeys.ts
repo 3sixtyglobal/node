@@ -9,7 +9,7 @@ import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironme
 const engineServerEnvironmentVariableKeysInternal: {
 	[K in keyof Required<IEngineServerEnvironmentVariables>]: true;
 } = {
-	// IEngineServerEnvironmentVariables — server
+	// IEngineServerEnvironmentVariables - server
 	port: true,
 	host: true,
 	corsOrigins: true,
@@ -17,12 +17,12 @@ const engineServerEnvironmentVariableKeysInternal: {
 	httpAllowedHeaders: true,
 	httpExposedHeaders: true,
 	publicOrigin: true,
-	// IEngineServerEnvironmentVariables — auth
+	// IEngineServerEnvironmentVariables - auth
 	authAdminProcessorType: true,
 	authProcessorType: true,
 	authSigningKeyId: true,
 	authApiKeyHeader: true,
-	// IEngineServerEnvironmentVariables — routing
+	// IEngineServerEnvironmentVariables - routing
 	mimeTypeProcessors: true,
 	routeLoggingIncludeBody: true,
 	routeLoggingFullBase64: true,

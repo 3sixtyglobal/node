@@ -151,7 +151,7 @@ describe("node-core", () => {
 			TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 		};
 
-		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant).
+		// Phase 1: Bootstrap - creates node identity and admin user (single-tenant).
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -201,7 +201,7 @@ describe("node-core", () => {
 
 		const serverStartTime = Date.now();
 
-		// Phase 3: Exercise catalogue endpoints — no dataspace or RM groups.
+		// Phase 3: Exercise catalogue endpoints - no dataspace or RM groups.
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/federated-catalogue-only-index.json"), {
 				baseUrl: `http://localhost:${TEST_PORT_FC}`,
@@ -267,7 +267,7 @@ describe("node-core", () => {
 		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
 		expect(trustComponentType).toBeDefined();
 
-		// In multi-tenant mode, the org DID is on the tenant, not in node state — look it up.
+		// In multi-tenant mode, the org DID is on the tenant, not in node state - look it up.
 		const tenantAdminType =
 			serverResult?.engine.getRegisteredInstanceTypeOptional("tenantAdminComponent");
 		expect(tenantAdminType).toBeDefined();
@@ -459,7 +459,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant, no tenant admin).
+		// Phase 1: Bootstrap - creates node identity and admin user (single-tenant, no tenant admin).
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -501,7 +501,7 @@ describe("node-core", () => {
 		expect(trustComponentType).toBeDefined();
 
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
-		// Trust token whose identity is the node org DID — matches the context org, triggering
+		// Trust token whose identity is the node org DID - matches the context org, triggering
 		// the same-org short-circuit in requestFromConsumer().
 		const trustBearerToken = await trustComponent.generate(
 			bootstrapState.nodeOrganizationId ?? "",
@@ -512,7 +512,7 @@ describe("node-core", () => {
 		const serverStartTime = Date.now();
 
 		// Phase 3: Login (captures organizationId + authToken), create an offer, then negotiate.
-		// The provider returns FINALIZED immediately with an embedded agreement — no PAP pre-seed.
+		// The provider returns FINALIZED immediately with an embedded agreement - no PAP pre-seed.
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/same-org-index.json"), {
 				baseUrl: `http://localhost:${TEST_PORT_SO}`,

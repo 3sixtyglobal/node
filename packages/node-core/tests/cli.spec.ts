@@ -91,7 +91,7 @@ let nodeTenantJson: {
 	publicOrigin: string;
 };
 
-// Canonical BIP39 24-word test vectors — deterministic key derivation
+// Canonical BIP39 24-word test vectors - deterministic key derivation
 const TEST_NODE_MNEMONIC =
 	"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art";
 const TEST_ORG_MNEMONIC =
@@ -344,14 +344,14 @@ describe("node-core", () => {
 		expect(identityDocs.some(doc => doc.id === stateAfterFirst.nodeId)).toBe(true);
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
-		// Second run: no explicit tenant env vars — lookup by label must find the existing tenant
+		// Second run: no explicit tenant env vars - lookup by label must find the existing tenant
 		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
 		});
 		expect(stateAfterSecond.nodeId).toEqual(stateAfterFirst.nodeId);
 
-		// All DB records must be byte-for-byte identical — nothing recreated or mutated
+		// All DB records must be byte-for-byte identical - nothing recreated or mutated
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenants);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
@@ -363,7 +363,7 @@ describe("node-core", () => {
 		const dbDir = `${bootstrapDir}db`;
 		await rm(bootstrapDir, { recursive: true, force: true });
 
-		// First run: no explicit admin user env vars — defaults apply
+		// First run: no explicit admin user env vars - defaults apply
 		const stateAfterFirst = await executeCliCommand(
 			["bootstrap-dev"],
 			{},
@@ -416,7 +416,7 @@ describe("node-core", () => {
 		expect(stateAfterSecond.nodeId).toEqual(stateAfterFirst.nodeId);
 		expect(stateAfterSecond.nodeOrganizationId).toEqual(stateAfterFirst.nodeOrganizationId);
 
-		// All DB records must be byte-for-byte identical — nothing recreated or mutated
+		// All DB records must be byte-for-byte identical - nothing recreated or mutated
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
 		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
@@ -450,7 +450,7 @@ describe("node-core", () => {
 		const authUsers = await readStoreRecords(dbDir, "authentication-user");
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
-		// Run 2: no mnemonics — vault already holds them, identities already exist
+		// Run 2: no mnemonics - vault already holds them, identities already exist
 		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
@@ -492,7 +492,7 @@ describe("node-core", () => {
 		const authUsers = await readStoreRecords(dbDir, "authentication-user");
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
-		// Run 2: no mnemonics — vault already holds them, tenant and identities already exist
+		// Run 2: no mnemonics - vault already holds them, tenant and identities already exist
 		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir
@@ -543,7 +543,7 @@ describe("node-core", () => {
 
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 
-		// Run 2: same name, no password — overwriteMode:skip must leave the record untouched
+		// Run 2: same name, no password - overwriteMode:skip must leave the record untouched
 		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
@@ -636,7 +636,7 @@ describe("node-core", () => {
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
-		// Run 2: no mnemonic — admin user found by email, identity creation skipped
+		// Run 2: no mnemonic - admin user found by email, identity creation skipped
 		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_TENANT_ENABLED: "false",
 			TWIN_FEATURES: "wallet,admin-user",
@@ -679,7 +679,7 @@ describe("node-core", () => {
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
 
-		// Run 2: no mnemonic — admin user found by email, identity creation skipped
+		// Run 2: no mnemonic - admin user found by email, identity creation skipped
 		const stateAfterSecond = await executeCliCommand(["bootstrap-dev"], stateAfterFirst, {
 			TWIN_FEATURES: "wallet,admin-user",
 			TWIN_STORAGE_FILE_ROOT: dbDir

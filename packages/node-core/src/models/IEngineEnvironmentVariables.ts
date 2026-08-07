@@ -366,7 +366,7 @@ export interface IEngineEnvironmentVariables {
 	hashicorpVaultEndpoint?: string;
 
 	/**
-	 * The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
+	 * The type of logging task connector, can be a comma separated list: console, entity-storage, open-telemetry, file.
 	 */
 	loggingConnector?: string;
 
@@ -854,7 +854,7 @@ export interface IEngineEnvironmentVariables {
 	 * and the inbox URL sent to PUSH providers.
 	 *
 	 * This must be the mount-point prefix of the data plane routes, NOT a specific route path.
-	 * Do NOT append sub-paths such as `/entities` or `/inbox` — those are appended automatically
+	 * Do NOT append sub-paths such as `/entities` or `/inbox` - those are appended automatically
 	 * by each transfer handler and by the data plane REST client.
 	 *
 	 * REQUIRED if PULL or PUSH transfers are supported.
@@ -907,6 +907,11 @@ export interface IEngineEnvironmentVariables {
 	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
 	 */
 	healthStartupInterval?: string;
+
+	/**
+	 * The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
+	 */
+	healthApplicationInterval?: string;
 
 	/**
 	 * The type of the automation action to create, comma separate for more than one connector.

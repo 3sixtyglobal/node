@@ -490,7 +490,7 @@ async function configureLogging(
 				}
 			});
 			additionalConnectorCount++;
-		} else if (loggingConnector === LoggingConnectorType.Otel) {
+		} else if (loggingConnector === LoggingConnectorType.OpenTelemetry) {
 			const otelLoggingConfig: IOpenTelemetryLoggingConnectorConfig = {
 				loggerName: envVars.openTelemetryLoggingLoggerName,
 				loggerVersion: envVars.openTelemetryLoggingLoggerVersion
@@ -507,7 +507,7 @@ async function configureLogging(
 				};
 			}
 			coreConfig.types.loggingConnector.push({
-				type: LoggingConnectorType.Otel,
+				type: LoggingConnectorType.OpenTelemetry,
 				options: {
 					config: otelLoggingConfig
 				}
@@ -770,6 +770,8 @@ async function configureHealth(
 			options: {
 				config: {
 					healthCheckInterval: (Coerce.integer(envVars.healthInterval) ?? 60) * 1000,
+					healthCheckApplicationInterval:
+						(Coerce.integer(envVars.healthApplicationInterval) ?? 300) * 1000,
 					initialInterval: (Coerce.integer(envVars.healthStartupInterval) ?? 2) * 1000
 				}
 			},
@@ -977,7 +979,10 @@ async function configureFaucet(
 		coreConfig.types.faucetConnector.push({
 			type: FaucetConnectorType.EntityStorage
 		});
-	} else if (envVars.faucetConnector === FaucetConnectorType.Iota) {
+	} else if (
+		envVars.faucetConnector === FaucetConnectorType.Iota &&
+		Is.stringValue(envVars.iotaFaucetEndpoint)
+	) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
 			coreConfig,
 			"dltConfig",
@@ -987,7 +992,7 @@ async function configureFaucet(
 			type: FaucetConnectorType.Iota,
 			options: {
 				config: {
-					endpoint: envVars.iotaFaucetEndpoint ?? "",
+					endpoint: envVars.iotaFaucetEndpoint,
 					clientOptions: dltConfig?.options?.config?.clientOptions ?? { url: "" },
 					network: dltConfig?.options?.config?.network ?? ""
 				}

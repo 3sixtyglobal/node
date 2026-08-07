@@ -219,6 +219,7 @@ const engineEnvironmentVariableKeysInternal: {
 	healthEnabled: true,
 	healthInterval: true,
 	healthStartupInterval: true,
+	healthApplicationInterval: true,
 	// automation / mutex
 	automationActionTypes: true,
 	mutexTimeoutMsDefault: true
