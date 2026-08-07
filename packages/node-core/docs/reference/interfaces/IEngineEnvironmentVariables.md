@@ -583,7 +583,7 @@ Hashicorp Vault endpoint.
 
 > `optional` **loggingConnector?**: `string`
 
-The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
+The type of logging task connector, can be a comma separated list: console, entity-storage, open-telemetry, file.
 
 ***
 
@@ -900,6 +900,54 @@ Maximum number of values retained per telemetry metric (count-based history cap)
 > `optional` **telemetryMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the telemetry connector.
+
+***
+
+### tracingConnector? {#tracingconnector}
+
+> `optional` **tracingConnector?**: `string`
+
+The type of tracing connector: entity-storage, open-telemetry.
+
+***
+
+### openTelemetryTracingTracerName? {#opentelemetrytracingtracername}
+
+> `optional` **openTelemetryTracingTracerName?**: `string`
+
+The name of the Open Telemetry tracer to use, only required if using open-telemetry as tracing connector, defaults to twin-node.
+
+***
+
+### openTelemetryTracingTracerVersion? {#opentelemetrytracingtracerversion}
+
+> `optional` **openTelemetryTracingTracerVersion?**: `string`
+
+The version of the Open Telemetry tracing specification to use, only required if using open-telemetry as tracing connector, defaults to 1.0.0.
+
+***
+
+### openTelemetryTracingEndpoint? {#opentelemetrytracingendpoint}
+
+> `optional` **openTelemetryTracingEndpoint?**: `string`
+
+The OTLP HTTP endpoint to push spans to, e.g. http://localhost:4318/v1/traces. Required when using open-telemetry as tracing connector.
+
+***
+
+### openTelemetryTracingProcessor? {#opentelemetrytracingprocessor}
+
+> `optional` **openTelemetryTracingProcessor?**: `string`
+
+The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
+
+***
+
+### tracingMutexTimeout? {#tracingmutextimeout}
+
+> `optional` **tracingMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the tracing connector.
 
 ***
 
@@ -1392,7 +1440,7 @@ Combined with the public origin to form the `dataAddress.endpoint` sent to PULL 
 and the inbox URL sent to PUSH providers.
 
 This must be the mount-point prefix of the data plane routes, NOT a specific route path.
-Do NOT append sub-paths such as `/entities` or `/inbox` — those are appended automatically
+Do NOT append sub-paths such as `/entities` or `/inbox` - those are appended automatically
 by each transfer handler and by the data plane REST client.
 
 REQUIRED if PULL or PUSH transfers are supported.
@@ -1484,6 +1532,14 @@ The interval in seconds for performing health checks, defaults to 60.
 
 The interval in seconds for performing health checks at startup, defaults to 2.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
+
+***
+
+### healthApplicationInterval? {#healthapplicationinterval}
+
+> `optional` **healthApplicationInterval?**: `string`
+
+The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
 
 ***
 

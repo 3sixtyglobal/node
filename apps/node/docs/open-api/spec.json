@@ -2390,6 +2390,15 @@
 						},
 						"style": "simple",
 						"example": "did:iota:tst:0xe3088ba9aa8c28e1d139708a14e8c0fdff11ee8223baac4aa5bcf3321e4bfc6a"
+					},
+					{
+						"name": "removeKeys",
+						"description": "Also remove any associated private keys from the vault.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"security": [
@@ -2730,6 +2739,15 @@
 						},
 						"style": "simple",
 						"example": "my-assertion"
+					},
+					{
+						"name": "removeKeys",
+						"description": "Also remove any associated private key from the vault.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"security": [
@@ -12512,7 +12530,7 @@
 					}
 				],
 				"requestBody": {
-					"description": "Update an auditable item graph vertex (PUT — full replacement of vertex state).",
+					"description": "Update an auditable item graph vertex (PUT - full replacement of vertex state).",
 					"required": true,
 					"content": {
 						"application/json": {
@@ -12694,7 +12712,7 @@
 					}
 				],
 				"requestBody": {
-					"description": "Partially update an auditable item graph vertex (PATCH — explicit list patches).",
+					"description": "Partially update an auditable item graph vertex (PATCH - explicit list patches).",
 					"required": true,
 					"content": {
 						"application/json": {
@@ -18005,7 +18023,7 @@
 					}
 				],
 				"requestBody": {
-					"description": "API request to register an app dataset.\n\nThe owning `tenantId` is captured automatically from the request's tenant\ncontext — callers do not supply it.",
+					"description": "API request to register an app dataset.\n\nThe owning `tenantId` is captured automatically from the request's tenant\ncontext - callers do not supply it.",
 					"required": true,
 					"content": {
 						"application/json": {
@@ -23587,11 +23605,11 @@
 				"properties": {
 					"dateCreated": {
 						"type": "string",
-						"description": "schema.org dateCreated — ISO 8601 date-time set by PAP on create."
+						"description": "schema.org dateCreated - ISO 8601 date-time set by PAP on create."
 					},
 					"dateModified": {
 						"type": "string",
-						"description": "schema.org dateModified — ISO 8601 date-time set by PAP on create and update."
+						"description": "schema.org dateModified - ISO 8601 date-time set by PAP on create and update."
 					}
 				}
 			},
