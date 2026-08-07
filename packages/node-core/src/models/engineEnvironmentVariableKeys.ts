@@ -141,6 +141,13 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetryMetricsProducers: true,
 	telemetryMetricsProducerMaxHistory: true,
 	telemetryMutexTimeout: true,
+	// tracing
+	tracingConnector: true,
+	openTelemetryTracingTracerName: true,
+	openTelemetryTracingTracerVersion: true,
+	openTelemetryTracingEndpoint: true,
+	openTelemetryTracingProcessor: true,
+	tracingMutexTimeout: true,
 	// DLT / identity
 	faucetConnector: true,
 	walletConnector: true,

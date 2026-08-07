@@ -559,6 +559,36 @@ export interface IEngineEnvironmentVariables {
 	telemetryMutexTimeout?: string;
 
 	/**
+	 * The type of tracing connector: entity-storage, open-telemetry.
+	 */
+	tracingConnector?: string;
+
+	/**
+	 * The name of the Open Telemetry tracer to use, only required if using open-telemetry as tracing connector, defaults to twin-node.
+	 */
+	openTelemetryTracingTracerName?: string;
+
+	/**
+	 * The version of the Open Telemetry tracing specification to use, only required if using open-telemetry as tracing connector, defaults to 1.0.0.
+	 */
+	openTelemetryTracingTracerVersion?: string;
+
+	/**
+	 * The OTLP HTTP endpoint to push spans to, e.g. http://localhost:4318/v1/traces. Required when using open-telemetry as tracing connector.
+	 */
+	openTelemetryTracingEndpoint?: string;
+
+	/**
+	 * The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
+	 */
+	openTelemetryTracingProcessor?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the tracing connector.
+	 */
+	tracingMutexTimeout?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;

@@ -73,6 +73,8 @@ import {
 	TelemetryComponentType,
 	TelemetryConnectorType,
 	TenantAdminComponentType,
+	TracingComponentType,
+	TracingConnectorType,
 	TrustComponentType,
 	type TrustGeneratorComponentType,
 	TrustVerifierComponentType,
@@ -88,6 +90,10 @@ import {
 	type IOpenTelemetryTelemetryConnectorConfig,
 	OpenTelemetryReaderTypes
 } from "@twin.org/telemetry-connector-opentelemetry";
+import {
+	type IOpenTelemetryTracingConnectorConfig,
+	OpenTelemetryProcessorTypes
+} from "@twin.org/tracing-connector-opentelemetry";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
@@ -134,6 +140,7 @@ export async function buildEngineConfiguration(
 	await configureEventBus(coreConfig, envVars);
 	await configureTelemetry(coreConfig, envVars);
 	await configureMetricsCollector(coreConfig, envVars);
+	await configureTracing(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
 	await configureHealth(coreConfig, envVars);
@@ -655,7 +662,7 @@ async function configureTelemetry(
 		});
 	} else if (envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
 		let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
-		if (envVars.openTelemetryReader === "prometheus") {
+		if (envVars.openTelemetryReader === OpenTelemetryReaderTypes.Prometheus) {
 			readers = {
 				prometheus: {
 					type: OpenTelemetryReaderTypes.Prometheus,
@@ -717,6 +724,56 @@ async function configureMetricsCollector(
 				isCloneable: false
 			});
 		}
+	}
+}
+
+/**
+ * Configures the tracing.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the tracing configuration has been applied.
+ */
+async function configureTracing(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.tracingConnector ??= [];
+
+	if (envVars.tracingConnector === TracingConnectorType.EntityStorage) {
+		coreConfig.types.tracingConnector.push({
+			type: TracingConnectorType.EntityStorage,
+			options: {
+				config: {
+					mutexTimeoutMs: Coerce.integer(envVars.tracingMutexTimeout)
+				}
+			}
+		});
+	} else if (envVars.tracingConnector === TracingConnectorType.OpenTelemetry) {
+		const otelTracingConfig: IOpenTelemetryTracingConnectorConfig = {
+			tracerName: envVars.openTelemetryTracingTracerName,
+			tracerVersion: envVars.openTelemetryTracingTracerVersion
+		};
+		if (Is.stringValue(envVars.openTelemetryTracingEndpoint)) {
+			otelTracingConfig.exporters = {
+				otlp: {
+					endpoint: envVars.openTelemetryTracingEndpoint,
+					processor:
+						(envVars.openTelemetryTracingProcessor as OpenTelemetryProcessorTypes) ??
+						OpenTelemetryProcessorTypes.Batch
+				}
+			};
+		}
+		coreConfig.types.tracingConnector.push({
+			type: TracingConnectorType.OpenTelemetry,
+			options: {
+				config: otelTracingConfig
+			}
+		});
+	}
+
+	if (coreConfig.types.tracingConnector.length > 0) {
+		coreConfig.types.tracingComponent ??= [];
+		coreConfig.types.tracingComponent.push({ type: TracingComponentType.Service });
 	}
 }
 
