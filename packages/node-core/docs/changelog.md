@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.9.2-next.6](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.5...node-core-v0.9.2-next.6) (2026-08-07)
+
+
+### Features
+
+* add tracing support ([a4986fc](https://github.com/iotaledger/twin-node/commit/a4986fc4af603ee461ec8d18ff502dddbc43edec))
+* register task scheduler when immutable proof is enabled ([#320](https://github.com/iotaledger/twin-node/issues/320)) ([b1d9c81](https://github.com/iotaledger/twin-node/commit/b1d9c81e0ec267292c6eaba8a6228eff1c41a9f0))
+* update docs ([61e5a00](https://github.com/iotaledger/twin-node/commit/61e5a004089a0c11ec03e354b076604ecdeb4817))
+
 ## [0.9.2-next.5](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.4...node-core-v0.9.2-next.5) (2026-08-03)
 
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.9.2-next.6](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.5...node-v0.9.2-next.6) (2026-08-07)
+
+
+### Features
+
+* add tracing support ([a4986fc](https://github.com/iotaledger/twin-node/commit/a4986fc4af603ee461ec8d18ff502dddbc43edec))
+* update docs ([61e5a00](https://github.com/iotaledger/twin-node/commit/61e5a004089a0c11ec03e354b076604ecdeb4817))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.5 to 0.9.2-next.6
+
 ## [0.9.2-next.5](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.4...node-v0.9.2-next.5) (2026-08-03)
 
 
