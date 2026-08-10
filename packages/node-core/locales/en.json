@@ -14,6 +14,7 @@
 			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
+			"invalidEnvVarValue": "Environment variable \"{key}\" has an invalid value \"{value}\", expected {type} type",
 			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
 		},
 		"bootstrapDev": {

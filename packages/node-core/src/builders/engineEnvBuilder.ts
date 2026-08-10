@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import { Coerce, Is, Mutex } from "@twin.org/core";
+import { Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import {
 	AttestationComponentType,
@@ -96,6 +96,18 @@ import {
 } from "@twin.org/tracing-connector-opentelemetry";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
+import {
+	commaSeparatedListToArray,
+	envBoolean,
+	envCount,
+	envDateTime,
+	envInteger,
+	envMinToMs,
+	envMinutes,
+	envMs,
+	envSecToMs,
+	envSeconds
+} from "./helper/envHelpers.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
 /**
@@ -113,13 +125,13 @@ export async function buildEngineConfiguration(
 	}
 
 	const coreConfig: IEngineConfig = {
-		debug: Coerce.boolean(envVars.debug) ?? false,
-		silent: Coerce.boolean(envVars.silent) ?? false,
+		debug: envBoolean(envVars, "debug", false),
+		silent: envBoolean(envVars, "silent", false),
 		silentLoggers: commaSeparatedListToArray(envVars.loggingSilentComponents),
 		types: {}
 	};
 
-	const mutexTimeoutMs = Coerce.integer(envVars.mutexTimeoutMsDefault);
+	const mutexTimeoutMs = envMs(envVars, "mutexTimeoutMsDefault");
 	if (!Is.empty(mutexTimeoutMs)) {
 		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
 	}
@@ -190,7 +202,7 @@ async function configureEntityStorage(
 			type: EntityStorageConnectorType.Memory,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.entityStorageMemoryMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				}
 			}
 		});
@@ -202,7 +214,7 @@ async function configureEntityStorage(
 			options: {
 				config: {
 					directory: envVars.storageFileRoot ?? "",
-					mutexTimeoutMs: Coerce.integer(envVars.entityStorageFileMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				folderPrefix: envVars.entityStorageTablePrefix
 			}
@@ -219,7 +231,7 @@ async function configureEntityStorage(
 					accessKeyId: envVars.awsDynamodbAccessKeyId,
 					secretAccessKey: envVars.awsDynamodbSecretAccessKey,
 					endpoint: envVars.awsDynamodbEndpoint,
-					connectionTimeoutMs: Coerce.integer(envVars.awsDynamodbConnectionTimeout)
+					connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -265,7 +277,7 @@ async function configureEntityStorage(
 					hosts: commaSeparatedListToArray(envVars.scylladbHosts),
 					localDataCenter: envVars.scylladbLocalDataCenter ?? "",
 					keyspace: envVars.scylladbKeyspace ?? "",
-					port: Coerce.integer(envVars.scylladbPort)
+					port: envInteger(envVars, "scylladbPort")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -278,7 +290,7 @@ async function configureEntityStorage(
 			options: {
 				config: {
 					host: envVars.mySqlHost ?? "",
-					port: Coerce.integer(envVars.mySqlPort),
+					port: envInteger(envVars, "mySqlPort"),
 					user: envVars.mySqlUser ?? "",
 					password: envVars.mySqlPassword ?? "",
 					database: envVars.mySqlDatabase ?? ""
@@ -294,7 +306,7 @@ async function configureEntityStorage(
 			options: {
 				config: {
 					host: envVars.mongoDbHost ?? "",
-					port: Coerce.integer(envVars.mongoDbPort),
+					port: envInteger(envVars, "mongoDbPort"),
 					user: envVars.mongoDbUser ?? "",
 					password: envVars.mongoDbPassword ?? "",
 					database: envVars.mongoDbDatabase ?? ""
@@ -310,7 +322,7 @@ async function configureEntityStorage(
 			options: {
 				config: {
 					host: envVars.postgreSqlHost ?? "",
-					port: Coerce.integer(envVars.postgreSqlPort),
+					port: envInteger(envVars, "postgreSqlPort"),
 					user: envVars.postgreSqlUser ?? "",
 					password: envVars.postgreSqlPassword ?? "",
 					database: envVars.postgreSqlDatabase ?? ""
@@ -486,13 +498,13 @@ async function configureLogging(
 				type: LoggingConnectorType.EntityStorage,
 				options: {
 					config: {
-						batchSize: Coerce.integer(envVars.loggingBatchSize),
-						batchIntervalMs: (Coerce.integer(envVars.loggingBatchFlushInterval) ?? 5) * 1000,
-						retainForMs: (Coerce.integer(envVars.loggingRetainFor) ?? 2880) * 60_000,
-						maxEntries: Coerce.integer(envVars.loggingMaxEntries),
-						retentionIntervalMs: (Coerce.integer(envVars.loggingRetentionInterval) ?? 5) * 60_000,
-						retentionBatchSize: Coerce.integer(envVars.loggingRetentionBatchSize),
-						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
+						batchSize: envCount(envVars, "loggingBatchSize"),
+						batchIntervalMs: envSecToMs(envVars, "loggingBatchFlushInterval"),
+						retainForMs: envMinToMs(envVars, "loggingRetainFor"),
+						maxEntries: envCount(envVars, "loggingMaxEntries"),
+						retentionIntervalMs: envMinToMs(envVars, "loggingRetentionInterval"),
+						retentionBatchSize: envCount(envVars, "loggingRetentionBatchSize"),
+						mutexTimeoutMs: envMs(envVars, "loggingMutexTimeout")
 					}
 				}
 			});
@@ -527,9 +539,9 @@ async function configureLogging(
 					config: {
 						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
 						filename: envVars.loggingFileFilename,
-						maxFileSizeBytes: Coerce.integer(envVars.loggingFileMaxFileSizeBytes),
-						maxRetainedFiles: Coerce.integer(envVars.loggingFileMaxRetainedFiles),
-						mutexTimeoutMs: Coerce.integer(envVars.loggingMutexTimeout)
+						maxFileSizeBytes: envCount(envVars, "loggingFileMaxFileSizeBytes"),
+						maxRetainedFiles: envCount(envVars, "loggingFileMaxRetainedFiles"),
+						mutexTimeoutMs: envMs(envVars, "loggingMutexTimeout")
 					}
 				}
 			});
@@ -656,7 +668,7 @@ async function configureTelemetry(
 			type: TelemetryConnectorType.EntityStorage,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.telemetryMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout")
 				}
 			}
 		});
@@ -666,7 +678,7 @@ async function configureTelemetry(
 			readers = {
 				prometheus: {
 					type: OpenTelemetryReaderTypes.Prometheus,
-					port: Coerce.integer(envVars.openTelemetryPrometheusPort)
+					port: envCount(envVars, "openTelemetryPrometheusPort")
 				}
 			};
 		}
@@ -674,7 +686,7 @@ async function configureTelemetry(
 			type: TelemetryConnectorType.OpenTelemetry,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.telemetryMutexTimeout),
+					mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
 					meterName: envVars.openTelemetryMeterName,
 					meterVersion: envVars.openTelemetryMeterVersion,
 					readers
@@ -700,16 +712,17 @@ async function configureMetricsCollector(
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
 	if (isTelemetryRequired(envVars)) {
-		const intervalSec = Coerce.integer(envVars.telemetryMetricsCollectorInterval) ?? 60;
-
 		coreConfig.types.metricsCollectorComponent ??= [];
 		coreConfig.types.metricsCollectorComponent.push({
 			type: MetricsCollectorComponentType.Service,
-			options: { config: { intervalMs: intervalSec * 1000 } },
+			options: {
+				config: {
+					intervalMs: envSecToMs(envVars, "telemetryMetricsCollectorInterval")
+				}
+			},
 			isCloneable: false
 		});
 
-		const maxHistory = Coerce.integer(envVars.telemetryMetricsProducerMaxHistory) ?? 1440;
 		coreConfig.types.metricsProducerComponent ??= [];
 
 		const metricsProducers = commaSeparatedListToArray(
@@ -720,7 +733,7 @@ async function configureMetricsCollector(
 		for (const producerType of metricsProducers) {
 			coreConfig.types.metricsProducerComponent.push({
 				type: producerType as MetricsProducerComponentType,
-				options: { maxHistory },
+				options: { maxHistory: envCount(envVars, "telemetryMetricsProducerMaxHistory") },
 				isCloneable: false
 			});
 		}
@@ -744,7 +757,7 @@ async function configureTracing(
 			type: TracingConnectorType.EntityStorage,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.tracingMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "tracingMutexTimeout")
 				}
 			}
 		});
@@ -821,15 +834,14 @@ async function configureHealth(
 ): Promise<void> {
 	coreConfig.types.healthComponent ??= [];
 
-	if (Coerce.boolean(envVars.healthEnabled) ?? false) {
+	if (envBoolean(envVars, "healthEnabled", false)) {
 		coreConfig.types.healthComponent.push({
 			type: HealthComponentType.Service,
 			options: {
 				config: {
-					healthCheckInterval: (Coerce.integer(envVars.healthInterval) ?? 60) * 1000,
-					healthCheckApplicationInterval:
-						(Coerce.integer(envVars.healthApplicationInterval) ?? 300) * 1000,
-					initialInterval: (Coerce.integer(envVars.healthStartupInterval) ?? 2) * 1000
+					healthCheckInterval: envSecToMs(envVars, "healthInterval"),
+					healthCheckApplicationInterval: envSecToMs(envVars, "healthApplicationInterval"),
+					initialInterval: envSecToMs(envVars, "healthStartupInterval")
 				}
 			},
 			isCloneable: false
@@ -847,7 +859,7 @@ async function configureSchemaMigration(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	const isSchemaMigrationEnabled = Coerce.boolean(envVars.schemaMigrationEnabled) ?? true;
+	const isSchemaMigrationEnabled = envBoolean(envVars, "schemaMigrationEnabled", true);
 
 	if (isSchemaMigrationEnabled) {
 		coreConfig.types.schemaVersionMigrationComponent ??= [];
@@ -868,7 +880,7 @@ async function configurePlatform(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	const isTenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+	const isTenantEnabled = envBoolean(envVars, "tenantEnabled", false);
 
 	coreConfig.types.platformComponent ??= [];
 	coreConfig.types.platformComponent.push({
@@ -891,7 +903,7 @@ async function configureTenant(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	const isTenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
+	const isTenantEnabled = envBoolean(envVars, "tenantEnabled", false);
 
 	if (isTenantEnabled) {
 		coreConfig.types.tenantAdminComponent ??= [];
@@ -916,7 +928,7 @@ async function configureContextIdHandlers(
 		type: ContextIdHandlerComponentType.Did,
 		features: [CONTEXT_ID_HANDLER_FEATURE_DID]
 	});
-	if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	if (envBoolean(envVars, "tenantEnabled", false)) {
 		coreConfig.types.contextIdHandlerComponent.push({
 			type: ContextIdHandlerComponentType.Tenant,
 			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
@@ -934,7 +946,7 @@ async function configureMessaging(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.messagingEnabled) ?? false) {
+	if (envBoolean(envVars, "messagingEnabled", false)) {
 		coreConfig.types.messagingEmailConnector ??= [];
 		coreConfig.types.messagingSmsConnector ??= [];
 		coreConfig.types.messagingPushNotificationConnector ??= [];
@@ -1182,10 +1194,18 @@ async function configureImmutableProof(
 			options: {
 				config: {
 					verificationMethodId: envVars.immutableProofVerificationMethodId,
-					taskRetryCount: Coerce.integer(envVars.immutableProofTaskRetryCount),
-					taskRetryInterval: (Coerce.integer(envVars.immutableProofTaskRetryInterval) ?? 5) * 1000,
-					taskFailureRetainFor:
-						(Coerce.integer(envVars.immutableProofTaskFailureRetainFor) ?? 10080) * 60_000
+					taskRetryCount: envCount(envVars, "immutableProofTaskRetryCount"),
+					taskRetryInterval: envSecToMs(envVars, "immutableProofTaskRetryInterval"),
+					taskFailureRetainFor: envMinToMs(envVars, "immutableProofTaskFailureRetainFor"),
+					sweepIntervalMinutes: envMinutes(envVars, "immutableProofSweepInterval"),
+					sweepStaleThresholdMs: envMinToMs(envVars, "immutableProofSweepStaleThreshold"),
+					sweepMaxAttempts: envCount(envVars, "immutableProofSweepMaxAttempts"),
+					sweepBatchLimit: envCount(envVars, "immutableProofSweepBatchLimit"),
+					sweepBackoffMs: envMinToMs(envVars, "immutableProofSweepBackoff"),
+					sweepAssumeRetryableBefore: envDateTime(
+						envVars,
+						"immutableProofSweepAssumeRetryableBefore"
+					)
 				}
 			}
 		});
@@ -1222,8 +1242,8 @@ async function configureIdentity(
 					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
 						? envVars.iotaIdentityPackageId
 						: undefined,
-					walletAddressIndex: Coerce.integer(envVars.identityWalletAddressIndex) ?? 0,
-					didResolutionCacheTtlMs: Coerce.integer(envVars.identityDidResolutionCacheTtlMs)
+					walletAddressIndex: envCount(envVars, "identityWalletAddressIndex") ?? 0,
+					didResolutionCacheTtlMs: envMs(envVars, "identityDidResolutionCacheTtlMs")
 				}
 			}
 		});
@@ -1352,13 +1372,13 @@ async function configureAuditableItemGraph(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) {
+	if (envBoolean(envVars, "auditableItemGraphEnabled", false)) {
 		coreConfig.types.auditableItemGraphComponent ??= [];
 		coreConfig.types.auditableItemGraphComponent.push({
 			type: AuditableItemGraphComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.auditableItemGraphMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "auditableItemGraphMutexTimeout")
 				}
 			}
 		});
@@ -1375,13 +1395,13 @@ async function configureAuditableItemStream(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) {
+	if (envBoolean(envVars, "auditableItemStreamEnabled", false)) {
 		coreConfig.types.auditableItemStreamComponent ??= [];
 		coreConfig.types.auditableItemStreamComponent.push({
 			type: AuditableItemStreamComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.auditableItemStreamMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "auditableItemStreamMutexTimeout")
 				}
 			}
 		});
@@ -1398,7 +1418,7 @@ async function configureDataProcessing(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.dataProcessingEnabled) ?? false) {
+	if (envBoolean(envVars, "dataProcessingEnabled", false)) {
 		coreConfig.types.dataProcessingComponent ??= [];
 		coreConfig.types.dataProcessingComponent.push({ type: DataProcessingComponentType.Service });
 
@@ -1431,13 +1451,13 @@ async function configureDocumentManagement(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.documentManagementEnabled) ?? false) {
+	if (envBoolean(envVars, "documentManagementEnabled", false)) {
 		coreConfig.types.documentManagementComponent ??= [];
 		coreConfig.types.documentManagementComponent.push({
 			type: DocumentManagementComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.documentManagementMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "documentManagementMutexTimeout")
 				}
 			}
 		});
@@ -1468,7 +1488,7 @@ async function configureTrust(
 				options: {
 					config: {
 						verificationMethodId: envVars.trustVerificationMethodId ?? "",
-						tokenTtlInSeconds: Coerce.integer(envVars.trustJwtTtl)
+						tokenTtlInSeconds: envCount(envVars, "trustJwtTtl")
 					}
 				}
 			});
@@ -1566,7 +1586,7 @@ async function configureRightsManagement(
 				config: {
 					callbackPath: rightsManagementPath,
 					includeErrorDetails: coreConfig.debug ?? false,
-					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "rightsManagementMutexTimeout")
 				}
 			},
 			isDefault: true
@@ -1577,7 +1597,7 @@ async function configureRightsManagement(
 			type: RightsManagementPnapComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: Coerce.integer(envVars.rightsManagementMutexTimeout)
+					mutexTimeoutMs: envMs(envVars, "rightsManagementMutexTimeout")
 				}
 			}
 		});
@@ -1696,7 +1716,7 @@ async function configureFederatedCatalogue(
 				type: FederatedCatalogueComponentType.Service,
 				options: {
 					config: {
-						mutexTimeoutMs: Coerce.integer(envVars.federatedCatalogueMutexTimeout)
+						mutexTimeoutMs: envMs(envVars, "federatedCatalogueMutexTimeout")
 					}
 				}
 			});
@@ -1724,7 +1744,7 @@ async function configureDataspace(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (Coerce.boolean(envVars.dataspaceEnabled) ?? false) {
+	if (envBoolean(envVars, "dataspaceEnabled", false)) {
 		coreConfig.types.dataspaceControlPlaneComponent ??= [];
 		// We add a multi instance REST client for remote/consumer-initiated transfers.
 		coreConfig.types.dataspaceControlPlaneComponent.push({
@@ -1735,8 +1755,6 @@ async function configureDataspace(
 			isMultiInstance: true,
 			features: ["remote"]
 		});
-		const stalledNegotiationTimeout = Coerce.integer(envVars.dataspaceStalledNegotiationTimeout);
-		const stalledTransferTimeout = Coerce.integer(envVars.dataspaceStalledTransferTimeout);
 		coreConfig.types.dataspaceControlPlaneComponent.push({
 			type: DataspaceControlPlaneComponentType.Service,
 			options: {
@@ -1747,33 +1765,29 @@ async function configureDataspace(
 					// Base mount path of the data plane only; the transfer handlers append the
 					// sub-paths themselves (`/entities` for PULL, `/inbox` for PUSH).
 					dataPlanePath: envVars.dataspaceDataPlanePath,
-					autoStartTransfers: Coerce.boolean(envVars.dataspaceAutoStartTransfers),
-					stalledNegotiationTimeoutMs: !Is.empty(stalledNegotiationTimeout)
-						? stalledNegotiationTimeout * 1000
-						: undefined,
-					stalledTransferTimeoutMs: !Is.empty(stalledTransferTimeout)
-						? stalledTransferTimeout * 1000
-						: undefined
+					autoStartTransfers: envBoolean(envVars, "dataspaceAutoStartTransfers", false),
+					stalledNegotiationTimeoutMs: envSecToMs(envVars, "dataspaceStalledNegotiationTimeout"),
+					stalledTransferTimeoutMs: envSecToMs(envVars, "dataspaceStalledTransferTimeout"),
+					providerTransferIdleTimeoutMs: envSecToMs(
+						envVars,
+						"dataspaceProviderTransferIdleTimeout"
+					),
+					providerTransferPolicySweepIntervalMs: envSecToMs(
+						envVars,
+						"dataspaceProviderTransferPolicySweepInterval"
+					)
 				}
 			},
 			isDefault: true
 		});
 
-		const retainActivityLogsFor = Coerce.integer(envVars.dataspaceRetainActivityLogsFor);
-		const activityLogsCleanUpInterval = Coerce.integer(
-			envVars.dataspaceActivityLogsCleanupInterval
-		);
 		coreConfig.types.dataspaceDataPlaneComponent ??= [];
 		coreConfig.types.dataspaceDataPlaneComponent.push({
 			type: DataspaceDataPlaneComponentType.Service,
 			options: {
 				config: {
-					retainActivityLogsForMs: !Is.empty(retainActivityLogsFor)
-						? retainActivityLogsFor * 1000
-						: undefined,
-					activityLogsCleanUpIntervalMs: !Is.empty(activityLogsCleanUpInterval)
-						? activityLogsCleanUpInterval * 1000
-						: undefined
+					retainActivityLogsForMs: envSecToMs(envVars, "dataspaceRetainActivityLogsFor"),
+					activityLogsCleanUpIntervalMs: envSecToMs(envVars, "dataspaceActivityLogsCleanupInterval")
 				}
 			}
 		});
@@ -1812,26 +1826,14 @@ async function configureDlt(
 						url: envVars.iotaNodeEndpoint ?? ""
 					},
 					network: envVars.iotaNetwork ?? "",
-					coinType: Coerce.integer(envVars.iotaCoinType),
+					coinType: envCount(envVars, "iotaCoinType"),
 					gasStation: gasStationConfig,
-					gasBudget: Coerce.integer(envVars.iotaGasBudget),
-					gasReservationDuration: Coerce.integer(envVars.iotaGasReservationDuration)
+					gasBudget: envCount(envVars, "iotaGasBudget"),
+					gasReservationDuration: envSeconds(envVars, "iotaGasReservationDuration")
 				}
 			}
 		});
 	}
-}
-
-/**
- * Converts a comma separated list to an array.
- * @param value The comma separated list.
- * @returns The array.
- */
-function commaSeparatedListToArray<T>(value: string | undefined): T[] {
-	return (value ?? "")
-		.split(",")
-		.map(item => item.trim())
-		.filter(item => item.length > 0) as T[];
 }
 
 /**
@@ -1843,7 +1845,7 @@ function commaSeparatedListToArray<T>(value: string | undefined): T[] {
 export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
 		isRightsManagementRequired(envVars) ||
-		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
+		envBoolean(envVars, "dataspaceEnabled", false) ||
 		isFederatedCatalogueRequired(envVars)
 	);
 }
@@ -1855,7 +1857,7 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
  * @returns True if dataspace or verifiable storage is enabled.
  */
 export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return (Coerce.boolean(envVars.dataspaceEnabled) ?? false) || isImmutableProofRequired(envVars);
+	return envBoolean(envVars, "dataspaceEnabled", false) || isImmutableProofRequired(envVars);
 }
 
 /**
@@ -1866,9 +1868,9 @@ export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables):
  */
 export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		(Coerce.boolean(envVars.auditableItemGraphEnabled) ?? false) ||
-		(Coerce.boolean(envVars.auditableItemStreamEnabled) ?? false) ||
-		(Coerce.boolean(envVars.documentManagementEnabled) ?? false)
+		envBoolean(envVars, "auditableItemGraphEnabled", false) ||
+		envBoolean(envVars, "auditableItemStreamEnabled", false) ||
+		envBoolean(envVars, "documentManagementEnabled", false)
 	);
 }
 
@@ -1880,10 +1882,10 @@ export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): 
  */
 export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		(Coerce.boolean(envVars.federatedCatalogueEnabled) ?? false) ||
+		envBoolean(envVars, "federatedCatalogueEnabled", false) ||
 		Is.stringValue(envVars.federatedCatalogueRemoteEndpoint) ||
 		Is.stringValue(envVars.federatedCatalogueFilters) ||
-		(Coerce.boolean(envVars.dataspaceEnabled) ?? false)
+		envBoolean(envVars, "dataspaceEnabled", false)
 	);
 }
 
@@ -1897,7 +1899,7 @@ export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariable
  * @returns True if rights management is enabled.
  */
 export function isRightsManagementRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return Coerce.boolean(envVars.dataspaceEnabled) ?? false;
+	return envBoolean(envVars, "dataspaceEnabled", false);
 }
 
 /**
@@ -1908,8 +1910,8 @@ export function isRightsManagementRequired(envVars: IEngineEnvironmentVariables)
  */
 export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		(Coerce.boolean(envVars.taskSchedulerEnabled) ?? false) ||
-		(Coerce.boolean(envVars.dataspaceEnabled) ?? false) ||
+		envBoolean(envVars, "taskSchedulerEnabled", false) ||
+		envBoolean(envVars, "dataspaceEnabled", false) ||
 		isRightsManagementRequired(envVars) ||
 		isAuthEntityStorageRequired(envVars) ||
 		isImmutableProofRequired(envVars)

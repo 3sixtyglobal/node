@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import {
+	DataspaceControlPlaneComponentType,
 	DltConfigType,
+	EntityStorageConnectorType,
 	SchemaVersionMigrationComponentType,
 	TaskSchedulerComponentType
 } from "@twin.org/engine-types";
@@ -110,5 +112,94 @@ describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 		});
 		expect(iotaConfig.gasBudget).toBe(123456789);
 		expect(iotaConfig.gasReservationDuration).toBe(45);
+	});
+});
+
+describe("buildEngineConfiguration - dataspace provider idle transfer policy", () => {
+	test("provider idle policy values are wired in seconds and converted to milliseconds", async () => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true",
+			dataspaceProviderTransferIdleTimeout: "120",
+			dataspaceProviderTransferPolicySweepInterval: "15"
+		});
+
+		const dataspaceService = config.types.dataspaceControlPlaneComponent?.find(
+			entry => entry.type === DataspaceControlPlaneComponentType.Service
+		);
+
+		const dataspaceConfig = dataspaceService?.options?.config as {
+			providerTransferIdleTimeoutMs?: number;
+			providerTransferPolicySweepIntervalMs?: number;
+		};
+
+		expect(dataspaceConfig.providerTransferIdleTimeoutMs).toBe(120000);
+		expect(dataspaceConfig.providerTransferPolicySweepIntervalMs).toBe(15000);
+	});
+
+	test("unset provider idle policy values keep existing behaviour unchanged", async () => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true"
+		});
+
+		const dataspaceService = config.types.dataspaceControlPlaneComponent?.find(
+			entry => entry.type === DataspaceControlPlaneComponentType.Service
+		);
+
+		const dataspaceConfig = dataspaceService?.options?.config as {
+			providerTransferIdleTimeoutMs?: number;
+			providerTransferPolicySweepIntervalMs?: number;
+		};
+
+		expect(dataspaceConfig.providerTransferIdleTimeoutMs).toBeUndefined();
+		expect(dataspaceConfig.providerTransferPolicySweepIntervalMs).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - entity storage shared mutex timeout", () => {
+	test("entity storage mutex timeout applies to both memory and file connectors", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "memory,file",
+			entityStorageMutexTimeout: "4321",
+			storageFileRoot: "."
+		});
+
+		const memoryConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.Memory
+		);
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+
+		const memoryMutexTimeoutMs = (
+			memoryConnector?.options as { config?: { mutexTimeoutMs?: number } }
+		)?.config?.mutexTimeoutMs;
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(memoryMutexTimeoutMs).toBe(4321);
+		expect(fileMutexTimeoutMs).toBe(4321);
+	});
+
+	test("entity storage mutex timeout is unset when the env var is empty", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "memory,file",
+			storageFileRoot: "."
+		});
+
+		const memoryConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.Memory
+		);
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+
+		const memoryMutexTimeoutMs = (
+			memoryConnector?.options as { config?: { mutexTimeoutMs?: number } }
+		)?.config?.mutexTimeoutMs;
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(memoryMutexTimeoutMs).toBeUndefined();
+		expect(fileMutexTimeoutMs).toBeUndefined();
 	});
 });

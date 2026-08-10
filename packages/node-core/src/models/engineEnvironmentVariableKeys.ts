@@ -23,8 +23,7 @@ const engineEnvironmentVariableKeysInternal: {
 	entityStorageConnectorType: true,
 	entityStorageConnectorDefault: true,
 	entityStorageTablePrefix: true,
-	entityStorageMemoryMutexTimeout: true,
-	entityStorageFileMutexTimeout: true,
+	entityStorageMutexTimeout: true,
 	// AWS DynamoDB
 	awsDynamodbAuthMode: true,
 	awsDynamodbAccessKeyId: true,
@@ -176,6 +175,12 @@ const engineEnvironmentVariableKeysInternal: {
 	immutableProofTaskRetryCount: true,
 	immutableProofTaskRetryInterval: true,
 	immutableProofTaskFailureRetainFor: true,
+	immutableProofSweepInterval: true,
+	immutableProofSweepStaleThreshold: true,
+	immutableProofSweepMaxAttempts: true,
+	immutableProofSweepBatchLimit: true,
+	immutableProofSweepBackoff: true,
+	immutableProofSweepAssumeRetryableBefore: true,
 	attestationConnector: true,
 	attestationVerificationMethodId: true,
 	// data processing
@@ -221,6 +226,8 @@ const engineEnvironmentVariableKeysInternal: {
 	dataspaceAutoStartTransfers: true,
 	dataspaceStalledNegotiationTimeout: true,
 	dataspaceStalledTransferTimeout: true,
+	dataspaceProviderTransferIdleTimeout: true,
+	dataspaceProviderTransferPolicySweepInterval: true,
 	dataspaceCallbackPath: true,
 	// health
 	healthEnabled: true,

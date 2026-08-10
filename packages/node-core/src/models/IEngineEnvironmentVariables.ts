@@ -172,7 +172,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * MySQL port.
 	 */
-	mySqlPort?: number;
+	mySqlPort?: string;
 
 	/**
 	 * MySQL username.
@@ -197,7 +197,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * MongoDB port.
 	 */
-	mongoDbPort?: number;
+	mongoDbPort?: string;
 
 	/**
 	 * MongoDB username.
@@ -222,7 +222,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * PostgreSQl port.
 	 */
-	postgreSqlPort?: number;
+	postgreSqlPort?: string;
 
 	/**
 	 * PostgreSQl username.
@@ -702,20 +702,55 @@ export interface IEngineEnvironmentVariables {
 	 * The number of times to retry a proof task when it fails, 0 to disable retries.
 	 * @default 5
 	 */
-	immutableProofTaskRetryCount?: number;
+	immutableProofTaskRetryCount?: string;
 
 	/**
 	 * The interval in seconds to wait between proof task retries.
 	 * @default 5
 	 */
-	immutableProofTaskRetryInterval?: number;
+	immutableProofTaskRetryInterval?: string;
 
 	/**
 	 * The time in minutes to retain the record of a failed proof task.
 	 * Set to -1 to retain failures forever.
 	 * @default 10080
 	 */
-	immutableProofTaskFailureRetainFor?: number;
+	immutableProofTaskFailureRetainFor?: string;
+
+	/**
+	 * How often in minutes the immutable proof reconciliation sweep runs.
+	 * @default 30
+	 */
+	immutableProofSweepInterval?: string;
+
+	/**
+	 * The minimum age in minutes before a proof with no notarization is considered stuck.
+	 * @default 180
+	 */
+	immutableProofSweepStaleThreshold?: string;
+
+	/**
+	 * The number of sweep attempts made before a proof is parked.
+	 * @default 5
+	 */
+	immutableProofSweepMaxAttempts?: string;
+
+	/**
+	 * The maximum number of proofs to re-enqueue per tenant per sweep cycle.
+	 * @default 10
+	 */
+	immutableProofSweepBatchLimit?: string;
+
+	/**
+	 * The minimum time in minutes between sweep attempts for the same proof.
+	 * @default 60
+	 */
+	immutableProofSweepBackoff?: string;
+
+	/**
+	 * ISO 8601 date-time used to treat older missing-task proofs as retryable.
+	 */
+	immutableProofSweepAssumeRetryableBefore?: string;
 
 	/**
 	 * The type of attestation connector: entity-storage, iota.
@@ -915,6 +950,16 @@ export interface IEngineEnvironmentVariables {
 	dataspaceStalledTransferTimeout?: string;
 
 	/**
+	 * How long in seconds a provider transfer may stay idle before the idle policy marks it as stalled.
+	 */
+	dataspaceProviderTransferIdleTimeout?: string;
+
+	/**
+	 * How frequently in seconds the provider idle transfer policy sweep runs.
+	 */
+	dataspaceProviderTransferPolicySweepInterval?: string;
+
+	/**
 	 * Path under which the dataspace control plane is mounted (path only, not full URL).
 	 * This must match the control-plane REST mount, as it is combined with the public
 	 * origin to build the consumer's advertised callback address.
@@ -980,14 +1025,9 @@ export interface IEngineEnvironmentVariables {
 	loggingMutexTimeout?: string;
 
 	/**
-	 * The mutex timeout in milliseconds for the memory entity storage connector.
+	 * The mutex timeout in milliseconds for the memory and file entity storage connectors.
 	 */
-	entityStorageMemoryMutexTimeout?: string;
-
-	/**
-	 * The mutex timeout in milliseconds for the file entity storage connector.
-	 */
-	entityStorageFileMutexTimeout?: string;
+	entityStorageMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the rights management component.
