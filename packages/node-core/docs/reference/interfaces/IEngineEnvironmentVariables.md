@@ -268,7 +268,7 @@ MySQL host.
 
 ### mySqlPort? {#mysqlport}
 
-> `optional` **mySqlPort?**: `number`
+> `optional` **mySqlPort?**: `string`
 
 MySQL port.
 
@@ -308,7 +308,7 @@ MongoDB host.
 
 ### mongoDbPort? {#mongodbport}
 
-> `optional` **mongoDbPort?**: `number`
+> `optional` **mongoDbPort?**: `string`
 
 MongoDB port.
 
@@ -348,7 +348,7 @@ PostgreSQl host.
 
 ### postgreSqlPort? {#postgresqlport}
 
-> `optional` **postgreSqlPort?**: `number`
+> `optional` **postgreSqlPort?**: `string`
 
 PostgreSQl port.
 
@@ -1129,7 +1129,7 @@ The identity verification method id to use with immutable proofs.
 
 ### immutableProofTaskRetryCount? {#immutableprooftaskretrycount}
 
-> `optional` **immutableProofTaskRetryCount?**: `number`
+> `optional` **immutableProofTaskRetryCount?**: `string`
 
 The number of times to retry a proof task when it fails, 0 to disable retries.
 
@@ -1143,7 +1143,7 @@ The number of times to retry a proof task when it fails, 0 to disable retries.
 
 ### immutableProofTaskRetryInterval? {#immutableprooftaskretryinterval}
 
-> `optional` **immutableProofTaskRetryInterval?**: `number`
+> `optional` **immutableProofTaskRetryInterval?**: `string`
 
 The interval in seconds to wait between proof task retries.
 
@@ -1157,7 +1157,7 @@ The interval in seconds to wait between proof task retries.
 
 ### immutableProofTaskFailureRetainFor? {#immutableprooftaskfailureretainfor}
 
-> `optional` **immutableProofTaskFailureRetainFor?**: `number`
+> `optional` **immutableProofTaskFailureRetainFor?**: `string`
 
 The time in minutes to retain the record of a failed proof task.
 Set to -1 to retain failures forever.
@@ -1167,6 +1167,84 @@ Set to -1 to retain failures forever.
 ```ts
 10080
 ```
+
+***
+
+### immutableProofSweepInterval? {#immutableproofsweepinterval}
+
+> `optional` **immutableProofSweepInterval?**: `string`
+
+How often in minutes the immutable proof reconciliation sweep runs.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
+### immutableProofSweepStaleThreshold? {#immutableproofsweepstalethreshold}
+
+> `optional` **immutableProofSweepStaleThreshold?**: `string`
+
+The minimum age in minutes before a proof with no notarization is considered stuck.
+
+#### Default
+
+```ts
+180
+```
+
+***
+
+### immutableProofSweepMaxAttempts? {#immutableproofsweepmaxattempts}
+
+> `optional` **immutableProofSweepMaxAttempts?**: `string`
+
+The number of sweep attempts made before a proof is parked.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### immutableProofSweepBatchLimit? {#immutableproofsweepbatchlimit}
+
+> `optional` **immutableProofSweepBatchLimit?**: `string`
+
+The maximum number of proofs to re-enqueue per tenant per sweep cycle.
+
+#### Default
+
+```ts
+10
+```
+
+***
+
+### immutableProofSweepBackoff? {#immutableproofsweepbackoff}
+
+> `optional` **immutableProofSweepBackoff?**: `string`
+
+The minimum time in minutes between sweep attempts for the same proof.
+
+#### Default
+
+```ts
+60
+```
+
+***
+
+### immutableProofSweepAssumeRetryableBefore? {#immutableproofsweepassumeretryablebefore}
+
+> `optional` **immutableProofSweepAssumeRetryableBefore?**: `string`
+
+ISO 8601 date-time used to treat older missing-task proofs as retryable.
 
 ***
 
@@ -1494,6 +1572,22 @@ progressing it before it is treated as timed out.
 
 ***
 
+### dataspaceProviderTransferIdleTimeout? {#dataspaceprovidertransferidletimeout}
+
+> `optional` **dataspaceProviderTransferIdleTimeout?**: `string`
+
+How long in seconds a provider transfer may stay idle before the idle policy marks it as stalled.
+
+***
+
+### dataspaceProviderTransferPolicySweepInterval? {#dataspaceprovidertransferpolicysweepinterval}
+
+> `optional` **dataspaceProviderTransferPolicySweepInterval?**: `string`
+
+How frequently in seconds the provider idle transfer policy sweep runs.
+
+***
+
 ### dataspaceCallbackPath? {#dataspacecallbackpath}
 
 > `optional` **dataspaceCallbackPath?**: `string`
@@ -1600,19 +1694,11 @@ The mutex timeout in milliseconds for the logging component.
 
 ***
 
-### entityStorageMemoryMutexTimeout? {#entitystoragememorymutextimeout}
+### entityStorageMutexTimeout? {#entitystoragemutextimeout}
 
-> `optional` **entityStorageMemoryMutexTimeout?**: `string`
+> `optional` **entityStorageMutexTimeout?**: `string`
 
-The mutex timeout in milliseconds for the memory entity storage connector.
-
-***
-
-### entityStorageFileMutexTimeout? {#entitystoragefilemutextimeout}
-
-> `optional` **entityStorageFileMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the file entity storage connector.
+The mutex timeout in milliseconds for the memory and file entity storage connectors.
 
 ***
 
