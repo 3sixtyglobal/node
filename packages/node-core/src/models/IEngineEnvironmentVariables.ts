@@ -626,7 +626,17 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
 	 */
-	identityDidResolutionCacheTtlMs?: string;
+	identityDidResolutionCacheTtl?: string;
+
+	/**
+	 * The maximum number of DID documents to hold in the resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+	 */
+	identityDidResolutionCacheCapacity?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the DID resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+	 */
+	identityDidResolutionCacheMutexTimeout?: string;
 
 	/**
 	 * The type of identity resolver connector: entity-storage, iota.
@@ -914,6 +924,41 @@ export interface IEngineEnvironmentVariables {
 	dataspaceActivityLogsCleanupInterval?: string;
 
 	/**
+	 * The TTL in milliseconds for the dataspace agreement cache.
+	 */
+	dataspaceAgreementCacheTtl?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the dataspace agreement cache.
+	 */
+	dataspaceAgreementCacheMutexTimeout?: string;
+
+	/**
+	 * The number of times to retry failed data plane tasks.
+	 */
+	dataspaceRetryCount?: string;
+
+	/**
+	 * Maximum HTTP retry attempts per push delivery task execution.
+	 */
+	dataspacePushRetryCount?: string;
+
+	/**
+	 * Base delay in milliseconds for exponential backoff between push HTTP retries.
+	 */
+	dataspacePushRetryBaseDelay?: string;
+
+	/**
+	 * Timeout in milliseconds for each push delivery HTTP POST request.
+	 */
+	dataspacePushTimeout?: string;
+
+	/**
+	 * Interval in milliseconds between orphaned push subscription cleanup scans.
+	 */
+	dataspacePushSubscriptionCleanupInterval?: string;
+
+	/**
 	 * Base route path for the data plane service (path only, not full URL).
 	 * Combined with the public origin to form the `dataAddress.endpoint` sent to PULL consumers
 	 * and the inbox URL sent to PUSH providers.
@@ -997,7 +1042,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
 	 */
-	mutexTimeoutMsDefault?: string;
+	mutexTimeoutDefault?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the auditable item graph component.

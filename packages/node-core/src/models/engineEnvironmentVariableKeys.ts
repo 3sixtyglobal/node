@@ -155,7 +155,9 @@ const engineEnvironmentVariableKeysInternal: {
 	notarizationConnector: true,
 	identityConnector: true,
 	identityWalletAddressIndex: true,
-	identityDidResolutionCacheTtlMs: true,
+	identityDidResolutionCacheTtl: true,
+	identityDidResolutionCacheCapacity: true,
+	identityDidResolutionCacheMutexTimeout: true,
 	identityResolverConnector: true,
 	identityProfileConnector: true,
 	universalResolverEndpoint: true,
@@ -222,6 +224,13 @@ const engineEnvironmentVariableKeysInternal: {
 	dataspaceEnabled: true,
 	dataspaceRetainActivityLogsFor: true,
 	dataspaceActivityLogsCleanupInterval: true,
+	dataspaceAgreementCacheTtl: true,
+	dataspaceAgreementCacheMutexTimeout: true,
+	dataspaceRetryCount: true,
+	dataspacePushRetryCount: true,
+	dataspacePushRetryBaseDelay: true,
+	dataspacePushTimeout: true,
+	dataspacePushSubscriptionCleanupInterval: true,
 	dataspaceDataPlanePath: true,
 	dataspaceAutoStartTransfers: true,
 	dataspaceStalledNegotiationTimeout: true,
@@ -236,7 +245,7 @@ const engineEnvironmentVariableKeysInternal: {
 	healthApplicationInterval: true,
 	// automation / mutex
 	automationActionTypes: true,
-	mutexTimeoutMsDefault: true
+	mutexTimeoutDefault: true
 };
 
 /**

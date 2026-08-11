@@ -131,7 +131,7 @@ export async function buildEngineConfiguration(
 		types: {}
 	};
 
-	const mutexTimeoutMs = envMs(envVars, "mutexTimeoutMsDefault");
+	const mutexTimeoutMs = envMs(envVars, "mutexTimeoutDefault");
 	if (!Is.empty(mutexTimeoutMs)) {
 		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
 	}
@@ -231,7 +231,8 @@ async function configureEntityStorage(
 					accessKeyId: envVars.awsDynamodbAccessKeyId,
 					secretAccessKey: envVars.awsDynamodbSecretAccessKey,
 					endpoint: envVars.awsDynamodbEndpoint,
-					connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout")
+					connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout"),
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -246,7 +247,8 @@ async function configureEntityStorage(
 					endpoint: envVars.azureCosmosdbEndpoint ?? "",
 					key: envVars.azureCosmosdbKey ?? "",
 					databaseId: envVars.azureCosmosdbDatabaseId ?? "",
-					containerId: envVars.azureCosmosdbContainerId ?? ""
+					containerId: envVars.azureCosmosdbContainerId ?? "",
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -262,7 +264,8 @@ async function configureEntityStorage(
 					credentials: envVars.gcpFirestoreCredentials ?? "",
 					databaseId: envVars.gcpFirestoreDatabaseId ?? "",
 					collectionName: envVars.gcpFirestoreCollectionName ?? "",
-					endpoint: envVars.gcpFirestoreEndpoint ?? ""
+					endpoint: envVars.gcpFirestoreEndpoint ?? "",
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -277,7 +280,8 @@ async function configureEntityStorage(
 					hosts: commaSeparatedListToArray(envVars.scylladbHosts),
 					localDataCenter: envVars.scylladbLocalDataCenter ?? "",
 					keyspace: envVars.scylladbKeyspace ?? "",
-					port: envInteger(envVars, "scylladbPort")
+					port: envInteger(envVars, "scylladbPort"),
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -293,7 +297,8 @@ async function configureEntityStorage(
 					port: envInteger(envVars, "mySqlPort"),
 					user: envVars.mySqlUser ?? "",
 					password: envVars.mySqlPassword ?? "",
-					database: envVars.mySqlDatabase ?? ""
+					database: envVars.mySqlDatabase ?? "",
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -309,7 +314,8 @@ async function configureEntityStorage(
 					port: envInteger(envVars, "mongoDbPort"),
 					user: envVars.mongoDbUser ?? "",
 					password: envVars.mongoDbPassword ?? "",
-					database: envVars.mongoDbDatabase ?? ""
+					database: envVars.mongoDbDatabase ?? "",
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -325,7 +331,8 @@ async function configureEntityStorage(
 					port: envInteger(envVars, "postgreSqlPort"),
 					user: envVars.postgreSqlUser ?? "",
 					password: envVars.postgreSqlPassword ?? "",
-					database: envVars.postgreSqlDatabase ?? ""
+					database: envVars.postgreSqlDatabase ?? "",
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -1243,7 +1250,9 @@ async function configureIdentity(
 						? envVars.iotaIdentityPackageId
 						: undefined,
 					walletAddressIndex: envCount(envVars, "identityWalletAddressIndex") ?? 0,
-					didResolutionCacheTtlMs: envMs(envVars, "identityDidResolutionCacheTtlMs")
+					didResolutionCacheTtlMs: envMs(envVars, "identityDidResolutionCacheTtl"),
+					didResolutionCacheCapacity: envCount(envVars, "identityDidResolutionCacheCapacity"),
+					didResolutionCacheMutexTimeoutMs: envMs(envVars, "identityDidResolutionCacheMutexTimeout")
 				}
 			}
 		});
@@ -1787,7 +1796,20 @@ async function configureDataspace(
 			options: {
 				config: {
 					retainActivityLogsForMs: envSecToMs(envVars, "dataspaceRetainActivityLogsFor"),
-					activityLogsCleanUpIntervalMs: envSecToMs(envVars, "dataspaceActivityLogsCleanupInterval")
+					activityLogsCleanUpIntervalMs: envSecToMs(
+						envVars,
+						"dataspaceActivityLogsCleanupInterval"
+					),
+					retryCount: envCount(envVars, "dataspaceRetryCount"),
+					pushRetryCount: envCount(envVars, "dataspacePushRetryCount"),
+					pushRetryBaseDelayMs: envMs(envVars, "dataspacePushRetryBaseDelay"),
+					pushTimeoutMs: envMs(envVars, "dataspacePushTimeout"),
+					pushSubscriptionCleanupIntervalMs: envMs(
+						envVars,
+						"dataspacePushSubscriptionCleanupInterval"
+					),
+					agreementCacheTtlMs: envMs(envVars, "dataspaceAgreementCacheTtl"),
+					agreementCacheMutexTimeoutMs: envMs(envVars, "dataspaceAgreementCacheMutexTimeout")
 				}
 			}
 		});
