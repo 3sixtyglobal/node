@@ -1007,11 +1007,27 @@ The index of the wallet address to use, defaults to 0.
 
 ***
 
-### identityDidResolutionCacheTtlMs? {#identitydidresolutioncachettlms}
+### identityDidResolutionCacheTtl? {#identitydidresolutioncachettl}
 
-> `optional` **identityDidResolutionCacheTtlMs?**: `string`
+> `optional` **identityDidResolutionCacheTtl?**: `string`
 
 The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
+
+***
+
+### identityDidResolutionCacheCapacity? {#identitydidresolutioncachecapacity}
+
+> `optional` **identityDidResolutionCacheCapacity?**: `string`
+
+The maximum number of DID documents to hold in the resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+
+***
+
+### identityDidResolutionCacheMutexTimeout? {#identitydidresolutioncachemutextimeout}
+
+> `optional` **identityDidResolutionCacheMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the DID resolution cache. Only used when using the IOTA identity connector and caching is enabled.
 
 ***
 
@@ -1509,6 +1525,62 @@ The interval in seconds for cleaning up the activity logs.
 
 ***
 
+### dataspaceAgreementCacheTtl? {#dataspaceagreementcachettl}
+
+> `optional` **dataspaceAgreementCacheTtl?**: `string`
+
+The TTL in milliseconds for the dataspace agreement cache.
+
+***
+
+### dataspaceAgreementCacheMutexTimeout? {#dataspaceagreementcachemutextimeout}
+
+> `optional` **dataspaceAgreementCacheMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the dataspace agreement cache.
+
+***
+
+### dataspaceRetryCount? {#dataspaceretrycount}
+
+> `optional` **dataspaceRetryCount?**: `string`
+
+The number of times to retry failed data plane tasks.
+
+***
+
+### dataspacePushRetryCount? {#dataspacepushretrycount}
+
+> `optional` **dataspacePushRetryCount?**: `string`
+
+Maximum HTTP retry attempts per push delivery task execution.
+
+***
+
+### dataspacePushRetryBaseDelay? {#dataspacepushretrybasedelay}
+
+> `optional` **dataspacePushRetryBaseDelay?**: `string`
+
+Base delay in milliseconds for exponential backoff between push HTTP retries.
+
+***
+
+### dataspacePushTimeout? {#dataspacepushtimeout}
+
+> `optional` **dataspacePushTimeout?**: `string`
+
+Timeout in milliseconds for each push delivery HTTP POST request.
+
+***
+
+### dataspacePushSubscriptionCleanupInterval? {#dataspacepushsubscriptioncleanupinterval}
+
+> `optional` **dataspacePushSubscriptionCleanupInterval?**: `string`
+
+Interval in milliseconds between orphaned push subscription cleanup scans.
+
+***
+
 ### dataspaceDataPlanePath? {#dataspacedataplanepath}
 
 > `optional` **dataspaceDataPlanePath?**: `string`
@@ -1646,9 +1718,9 @@ values: fetch
 
 ***
 
-### mutexTimeoutMsDefault? {#mutextimeoutmsdefault}
+### mutexTimeoutDefault? {#mutextimeoutdefault}
 
-> `optional` **mutexTimeoutMsDefault?**: `string`
+> `optional` **mutexTimeoutDefault?**: `string`
 
 The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
 
