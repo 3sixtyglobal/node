@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.2-next.8](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.7...node-v0.9.2-next.8) (2026-08-11)
+
+
+### Features
+
+* add additional env vars ([#328](https://github.com/iotaledger/twin-node/issues/328)) ([6ca8718](https://github.com/iotaledger/twin-node/commit/6ca87184bc4d78829c957ea055d3c281aca6cf9f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.7 to 0.9.2-next.8
+
 ## [0.9.2-next.7](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.6...node-v0.9.2-next.7) (2026-08-10)
 
 
