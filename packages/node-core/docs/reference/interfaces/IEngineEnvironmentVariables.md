@@ -258,6 +258,22 @@ ScyllaDB port.
 
 ***
 
+### scylladbPoolCoreConnectionsPerHost? {#scylladbpoolcoreconnectionsperhost}
+
+> `optional` **scylladbPoolCoreConnectionsPerHost?**: `string`
+
+ScyllaDB connection pool: number of connections per local host.
+
+***
+
+### scylladbPoolMaxRequestsPerConnection? {#scylladbpoolmaxrequestsperconnection}
+
+> `optional` **scylladbPoolMaxRequestsPerConnection?**: `string`
+
+ScyllaDB connection pool: maximum requests per connection.
+
+***
+
 ### mySqlHost? {#mysqlhost}
 
 > `optional` **mySqlHost?**: `string`
@@ -295,6 +311,54 @@ MySQL password.
 > `optional` **mySqlDatabase?**: `string`
 
 MySQL Database.
+
+***
+
+### mySqlPoolConnectionLimit? {#mysqlpoolconnectionlimit}
+
+> `optional` **mySqlPoolConnectionLimit?**: `string`
+
+MySQL connection pool: maximum number of connections.
+
+***
+
+### mySqlPoolMaxIdle? {#mysqlpoolmaxidle}
+
+> `optional` **mySqlPoolMaxIdle?**: `string`
+
+MySQL connection pool: maximum number of idle connections.
+
+***
+
+### mySqlPoolIdleTimeout? {#mysqlpoolidletimeout}
+
+> `optional` **mySqlPoolIdleTimeout?**: `string`
+
+MySQL connection pool: milliseconds before an idle connection is removed.
+
+***
+
+### mySqlPoolEnableKeepAlive? {#mysqlpoolenablekeepalive}
+
+> `optional` **mySqlPoolEnableKeepAlive?**: `string`
+
+MySQL connection pool: enable TCP keep-alive.
+
+***
+
+### mySqlPoolWaitForConnections? {#mysqlpoolwaitforconnections}
+
+> `optional` **mySqlPoolWaitForConnections?**: `string`
+
+MySQL connection pool: wait for a connection when pool is full.
+
+***
+
+### mySqlPoolQueueLimit? {#mysqlpoolqueuelimit}
+
+> `optional` **mySqlPoolQueueLimit?**: `string`
+
+MySQL connection pool: maximum queued requests (0 = unlimited).
 
 ***
 
@@ -338,6 +402,38 @@ MongoDB Database.
 
 ***
 
+### mongoDbPoolMaxPoolSize? {#mongodbpoolmaxpoolsize}
+
+> `optional` **mongoDbPoolMaxPoolSize?**: `string`
+
+MongoDB connection pool: maximum number of connections.
+
+***
+
+### mongoDbPoolMinPoolSize? {#mongodbpoolminpoolsize}
+
+> `optional` **mongoDbPoolMinPoolSize?**: `string`
+
+MongoDB connection pool: minimum number of connections to maintain.
+
+***
+
+### mongoDbPoolMaxIdleTime? {#mongodbpoolmaxidletime}
+
+> `optional` **mongoDbPoolMaxIdleTime?**: `string`
+
+MongoDB connection pool: milliseconds a connection can remain idle before removal.
+
+***
+
+### mongoDbPoolWaitQueueTimeout? {#mongodbpoolwaitqueuetimeout}
+
+> `optional` **mongoDbPoolWaitQueueTimeout?**: `string`
+
+MongoDB connection pool: milliseconds to wait for a connection before throwing.
+
+***
+
 ### postgreSqlHost? {#postgresqlhost}
 
 > `optional` **postgreSqlHost?**: `string`
@@ -375,6 +471,38 @@ PostgreSQl password.
 > `optional` **postgreSqlDatabase?**: `string`
 
 PostgreSQl Database.
+
+***
+
+### postgreSqlPoolMax? {#postgresqlpoolmax}
+
+> `optional` **postgreSqlPoolMax?**: `string`
+
+PostgreSQL connection pool: maximum number of connections.
+
+***
+
+### postgreSqlPoolIdleTimeout? {#postgresqlpoolidletimeout}
+
+> `optional` **postgreSqlPoolIdleTimeout?**: `string`
+
+PostgreSQL connection pool: seconds a connection can remain idle before being closed.
+
+***
+
+### postgreSqlPoolConnectTimeout? {#postgresqlpoolconnecttimeout}
+
+> `optional` **postgreSqlPoolConnectTimeout?**: `string`
+
+PostgreSQL connection pool: seconds to wait when establishing a connection.
+
+***
+
+### postgreSqlPoolMaxLifetime? {#postgresqlpoolmaxlifetime}
+
+> `optional` **postgreSqlPoolMaxLifetime?**: `string`
+
+PostgreSQL connection pool: maximum seconds a connection can remain open.
 
 ***
 
