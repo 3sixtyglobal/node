@@ -19,16 +19,32 @@ describe("envBoolean", () => {
 		expect(envBoolean({}, "debug", true)).toBe(true);
 	});
 
+	test("returns undefined when env var is absent and no default is given", () => {
+		expect(envBoolean({}, "debug")).toBeUndefined();
+	});
+
 	test("returns true for 'true' string", () => {
 		expect(envBoolean({ debug: "true" }, "debug", false)).toBe(true);
+	});
+
+	test("returns true for 'true' string with no default", () => {
+		expect(envBoolean({ debug: "true" }, "debug")).toBe(true);
 	});
 
 	test("returns false for 'false' string", () => {
 		expect(envBoolean({ debug: "false" }, "debug", true)).toBe(false);
 	});
 
+	test("returns false for 'false' string with no default", () => {
+		expect(envBoolean({ debug: "false" }, "debug")).toBe(false);
+	});
+
 	test("throws GeneralError for an invalid boolean string", () => {
 		expect(() => envBoolean({ debug: "notabool" }, "debug", false)).toThrow();
+	});
+
+	test("throws GeneralError for an invalid boolean string with no default", () => {
+		expect(() => envBoolean({ debug: "notabool" }, "debug")).toThrow();
 	});
 });
 

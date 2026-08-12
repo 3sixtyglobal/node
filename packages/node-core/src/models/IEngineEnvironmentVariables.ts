@@ -165,6 +165,16 @@ export interface IEngineEnvironmentVariables {
 	scylladbPort?: string;
 
 	/**
+	 * ScyllaDB connection pool: number of connections per local host.
+	 */
+	scylladbPoolCoreConnectionsPerHost?: string;
+
+	/**
+	 * ScyllaDB connection pool: maximum requests per connection.
+	 */
+	scylladbPoolMaxRequestsPerConnection?: string;
+
+	/**
 	 * MySQL host.
 	 */
 	mySqlHost?: string;
@@ -188,6 +198,36 @@ export interface IEngineEnvironmentVariables {
 	 * MySQL Database.
 	 */
 	mySqlDatabase?: string;
+
+	/**
+	 * MySQL connection pool: maximum number of connections.
+	 */
+	mySqlPoolConnectionLimit?: string;
+
+	/**
+	 * MySQL connection pool: maximum number of idle connections.
+	 */
+	mySqlPoolMaxIdle?: string;
+
+	/**
+	 * MySQL connection pool: milliseconds before an idle connection is removed.
+	 */
+	mySqlPoolIdleTimeout?: string;
+
+	/**
+	 * MySQL connection pool: enable TCP keep-alive.
+	 */
+	mySqlPoolEnableKeepAlive?: string;
+
+	/**
+	 * MySQL connection pool: wait for a connection when pool is full.
+	 */
+	mySqlPoolWaitForConnections?: string;
+
+	/**
+	 * MySQL connection pool: maximum queued requests (0 = unlimited).
+	 */
+	mySqlPoolQueueLimit?: string;
 
 	/**
 	 * MongoDB host.
@@ -215,6 +255,26 @@ export interface IEngineEnvironmentVariables {
 	mongoDbDatabase?: string;
 
 	/**
+	 * MongoDB connection pool: maximum number of connections.
+	 */
+	mongoDbPoolMaxPoolSize?: string;
+
+	/**
+	 * MongoDB connection pool: minimum number of connections to maintain.
+	 */
+	mongoDbPoolMinPoolSize?: string;
+
+	/**
+	 * MongoDB connection pool: milliseconds a connection can remain idle before removal.
+	 */
+	mongoDbPoolMaxIdleTime?: string;
+
+	/**
+	 * MongoDB connection pool: milliseconds to wait for a connection before throwing.
+	 */
+	mongoDbPoolWaitQueueTimeout?: string;
+
+	/**
 	 * PostgreSQl host.
 	 */
 	postgreSqlHost?: string;
@@ -238,6 +298,26 @@ export interface IEngineEnvironmentVariables {
 	 * PostgreSQl Database.
 	 */
 	postgreSqlDatabase?: string;
+
+	/**
+	 * PostgreSQL connection pool: maximum number of connections.
+	 */
+	postgreSqlPoolMax?: string;
+
+	/**
+	 * PostgreSQL connection pool: seconds a connection can remain idle before being closed.
+	 */
+	postgreSqlPoolIdleTimeout?: string;
+
+	/**
+	 * PostgreSQL connection pool: seconds to wait when establishing a connection.
+	 */
+	postgreSqlPoolConnectTimeout?: string;
+
+	/**
+	 * PostgreSQL connection pool: maximum seconds a connection can remain open.
+	 */
+	postgreSqlPoolMaxLifetime?: string;
 
 	/**
 	 * The security token for accessing IPFS API.

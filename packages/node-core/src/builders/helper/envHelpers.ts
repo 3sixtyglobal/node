@@ -7,15 +7,24 @@ import type { IEngineEnvironmentVariables } from "../../models/IEngineEnvironmen
  * Coerces an env var to a boolean, falling back to the supplied default when not set.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @param defaultValue The value to return when the env var is absent.
- * @returns The boolean value or the default.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The boolean value, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to a boolean.
  */
 export function envBoolean(
 	envVars: IEngineEnvironmentVariables,
 	key: keyof IEngineEnvironmentVariables,
 	defaultValue: boolean
-): boolean {
+): boolean;
+export function envBoolean(
+	envVars: IEngineEnvironmentVariables,
+	key: keyof IEngineEnvironmentVariables
+): boolean | undefined;
+export function envBoolean(
+	envVars: IEngineEnvironmentVariables,
+	key: keyof IEngineEnvironmentVariables,
+	defaultValue?: boolean
+): boolean | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
 		return defaultValue;

@@ -203,3 +203,146 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 		expect(fileMutexTimeoutMs).toBeUndefined();
 	});
 });
+
+describe("buildEngineConfiguration - entity storage pool options", () => {
+	function connectorPool(
+		config: { types: { entityStorageConnector?: { type: string; options?: unknown }[] } },
+		type: EntityStorageConnectorType
+	): { [key: string]: unknown } | undefined {
+		const entry = config.types.entityStorageConnector?.find(e => e.type === type);
+		return (entry?.options as { config?: { pool?: { [key: string]: unknown } } } | undefined)
+			?.config?.pool;
+	}
+
+	test("postgresql pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "postgresql",
+			postgreSqlHost: "localhost",
+			postgreSqlUser: "u",
+			postgreSqlPassword: "p",
+			postgreSqlDatabase: "db",
+			postgreSqlPoolMax: "20",
+			postgreSqlPoolIdleTimeout: "60",
+			postgreSqlPoolConnectTimeout: "15",
+			postgreSqlPoolMaxLifetime: "3600"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.PostgreSql);
+		expect(pool).toMatchObject({ max: 20, idleTimeout: 60, connectTimeout: 15, maxLifetime: 3600 });
+	});
+
+	test("postgresql pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "postgresql",
+			postgreSqlHost: "localhost",
+			postgreSqlUser: "u",
+			postgreSqlPassword: "p",
+			postgreSqlDatabase: "db"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.PostgreSql);
+		expect(pool?.max).toBeUndefined();
+		expect(pool?.idleTimeout).toBeUndefined();
+		expect(pool?.connectTimeout).toBeUndefined();
+		expect(pool?.maxLifetime).toBeUndefined();
+	});
+
+	test("mysql pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mysql",
+			mySqlHost: "localhost",
+			mySqlUser: "u",
+			mySqlPassword: "p",
+			mySqlDatabase: "db",
+			mySqlPoolConnectionLimit: "25",
+			mySqlPoolMaxIdle: "5",
+			mySqlPoolIdleTimeout: "30000",
+			mySqlPoolEnableKeepAlive: "false",
+			mySqlPoolWaitForConnections: "true",
+			mySqlPoolQueueLimit: "100"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MySqlDb);
+		expect(pool).toMatchObject({
+			connectionLimit: 25,
+			maxIdle: 5,
+			idleTimeout: 30000,
+			enableKeepAlive: false,
+			waitForConnections: true,
+			queueLimit: 100
+		});
+	});
+
+	test("mysql pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mysql",
+			mySqlHost: "localhost",
+			mySqlUser: "u",
+			mySqlPassword: "p",
+			mySqlDatabase: "db"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MySqlDb);
+		expect(pool?.connectionLimit).toBeUndefined();
+		expect(pool?.enableKeepAlive).toBeUndefined();
+	});
+
+	test("mongodb pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mongodb",
+			mongoDbHost: "localhost",
+			mongoDbDatabase: "db",
+			mongoDbPoolMaxPoolSize: "50",
+			mongoDbPoolMinPoolSize: "2",
+			mongoDbPoolMaxIdleTime: "10000",
+			mongoDbPoolWaitQueueTimeout: "5000"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MongoDb);
+		expect(pool).toMatchObject({
+			maxPoolSize: 50,
+			minPoolSize: 2,
+			maxIdleTimeMs: 10000,
+			waitQueueTimeoutMs: 5000
+		});
+	});
+
+	test("mongodb pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mongodb",
+			mongoDbHost: "localhost",
+			mongoDbDatabase: "db"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MongoDb);
+		expect(pool?.maxPoolSize).toBeUndefined();
+		expect(pool?.minPoolSize).toBeUndefined();
+	});
+
+	test("scylladb pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "scylladb",
+			scylladbHosts: "localhost",
+			scylladbLocalDataCenter: "dc1",
+			scylladbKeyspace: "ks",
+			scylladbPoolCoreConnectionsPerHost: "2",
+			scylladbPoolMaxRequestsPerConnection: "512"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.ScyllaDb);
+		expect(pool).toMatchObject({ coreConnectionsPerHost: 2, maxRequestsPerConnection: 512 });
+	});
+
+	test("scylladb pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "scylladb",
+			scylladbHosts: "localhost",
+			scylladbLocalDataCenter: "dc1",
+			scylladbKeyspace: "ks"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.ScyllaDb);
+		expect(pool?.coreConnectionsPerHost).toBeUndefined();
+		expect(pool?.maxRequestsPerConnection).toBeUndefined();
+	});
+});

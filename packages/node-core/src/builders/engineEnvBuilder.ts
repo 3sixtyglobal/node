@@ -281,7 +281,11 @@ async function configureEntityStorage(
 					localDataCenter: envVars.scylladbLocalDataCenter ?? "",
 					keyspace: envVars.scylladbKeyspace ?? "",
 					port: envInteger(envVars, "scylladbPort"),
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+					pool: {
+						coreConnectionsPerHost: envCount(envVars, "scylladbPoolCoreConnectionsPerHost"),
+						maxRequestsPerConnection: envCount(envVars, "scylladbPoolMaxRequestsPerConnection")
+					}
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -298,7 +302,15 @@ async function configureEntityStorage(
 					user: envVars.mySqlUser ?? "",
 					password: envVars.mySqlPassword ?? "",
 					database: envVars.mySqlDatabase ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+					pool: {
+						connectionLimit: envCount(envVars, "mySqlPoolConnectionLimit"),
+						maxIdle: envCount(envVars, "mySqlPoolMaxIdle"),
+						idleTimeout: envMs(envVars, "mySqlPoolIdleTimeout"),
+						enableKeepAlive: envBoolean(envVars, "mySqlPoolEnableKeepAlive"),
+						waitForConnections: envBoolean(envVars, "mySqlPoolWaitForConnections"),
+						queueLimit: envCount(envVars, "mySqlPoolQueueLimit")
+					}
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -315,7 +327,13 @@ async function configureEntityStorage(
 					user: envVars.mongoDbUser ?? "",
 					password: envVars.mongoDbPassword ?? "",
 					database: envVars.mongoDbDatabase ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+					pool: {
+						maxPoolSize: envCount(envVars, "mongoDbPoolMaxPoolSize"),
+						minPoolSize: envCount(envVars, "mongoDbPoolMinPoolSize"),
+						maxIdleTimeMs: envMs(envVars, "mongoDbPoolMaxIdleTime"),
+						waitQueueTimeoutMs: envMs(envVars, "mongoDbPoolWaitQueueTimeout")
+					}
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
@@ -332,7 +350,13 @@ async function configureEntityStorage(
 					user: envVars.postgreSqlUser ?? "",
 					password: envVars.postgreSqlPassword ?? "",
 					database: envVars.postgreSqlDatabase ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+					pool: {
+						max: envCount(envVars, "postgreSqlPoolMax"),
+						idleTimeout: envSeconds(envVars, "postgreSqlPoolIdleTimeout"),
+						connectTimeout: envSeconds(envVars, "postgreSqlPoolConnectTimeout"),
+						maxLifetime: envSeconds(envVars, "postgreSqlPoolMaxLifetime")
+					}
 				},
 				tablePrefix: envVars.entityStorageTablePrefix
 			}
