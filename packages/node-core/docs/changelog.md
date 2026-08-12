@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.10](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.9...node-core-v0.9.2-next.10) (2026-08-12)
+
+
+### Features
+
+* update dependencies ([34a5d51](https://github.com/iotaledger/twin-node/commit/34a5d5100140f6e642e8aaa1b4da5304b8ce6f0a))
+
 ## [0.9.2-next.9](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.8...node-core-v0.9.2-next.9) (2026-08-12)
 
 
