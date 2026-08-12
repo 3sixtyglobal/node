@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.9](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.8...node-core-v0.9.2-next.9) (2026-08-12)
+
+
+### Features
+
+* pool env vars ([#331](https://github.com/iotaledger/twin-node/issues/331)) ([338ea61](https://github.com/iotaledger/twin-node/commit/338ea612b37aa4d15971c8a09def47bee9395d0c))
+
 ## [0.9.2-next.8](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.7...node-core-v0.9.2-next.8) (2026-08-11)
 
 
