@@ -81,7 +81,7 @@ export function envCount(
 }
 
 /**
- * Coerces an env var that represents an integer to an integer.
+ * Coerces an env var that represents an integer to an actual integer.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
  * @returns The integer, or undefined when not set.
