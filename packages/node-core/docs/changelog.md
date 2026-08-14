@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.11](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.10...node-core-v0.9.2-next.11) (2026-08-14)
+
+
+### Features
+
+* add tenant override ([#337](https://github.com/iotaledger/twin-node/issues/337)) ([b4ea765](https://github.com/iotaledger/twin-node/commit/b4ea7656e2557c19053365dd5d4af14d0d945cd5))
+
 ## [0.9.2-next.10](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.9...node-core-v0.9.2-next.10) (2026-08-12)
 
 
