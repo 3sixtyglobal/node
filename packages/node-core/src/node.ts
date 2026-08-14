@@ -13,6 +13,7 @@ import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
+import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
 import { BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapDevEnvironmentVariableKeys.js";
@@ -252,12 +253,9 @@ function validateEnvVarKeys(
 	}
 
 	const customSet = new Set(
-		Is.stringValue(envVars.envAllowList)
-			? envVars.envAllowList
-					.split(",")
-					.map(k => EnvHelper.envVarKeyToJsonKey(k.trim(), prefix))
-					.filter(Boolean)
-			: []
+		commaSeparatedListToArray<string>(envVars.envAllowList as string).map(k =>
+			EnvHelper.envVarKeyToJsonKey(k.trim(), prefix)
+		)
 	);
 
 	const unknown = Object.keys(envVars)

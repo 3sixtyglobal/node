@@ -4,6 +4,7 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@twin.org/api-auth-entity-storage-models";
+import { ScopeHelper } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
@@ -181,7 +182,7 @@ export async function userUpdate(
 				email: paramsEmail,
 				userIdentity: paramsUserIdentity,
 				organizationIdentity: paramsOrganizationIdentity,
-				scope: params.scope?.split(",").map(s => s.trim())
+				scope: ScopeHelper.toArray(params.scope)
 			};
 
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update.labels.storingUser"));
@@ -218,7 +219,9 @@ export async function userUpdate(
 				did: params.userIdentity ?? existingUser.userIdentity,
 				organizationDid: params.organizationIdentity ?? existingUser.organizationIdentity,
 				email: paramsEmail,
-				scope: params.scope?.split(",").map(s => s.trim()) ?? existingUser.scope,
+				scope: Is.stringValue(params.scope)
+					? ScopeHelper.toArray(params.scope)
+					: existingUser.scope,
 				givenName: params.givenName ?? "",
 				familyName: params.familyName ?? ""
 			};

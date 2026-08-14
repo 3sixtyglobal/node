@@ -31,10 +31,17 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 		);
 	});
 
-	test("schema migration service is not registered when schemaMigrationEnabled is 'false'", async () => {
+	test("schema migration service is registered with enabled:false when schemaMigrationEnabled is 'false'", async () => {
 		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "false" });
 
-		expect(config.types.schemaVersionMigrationComponent).toBeUndefined();
+		expect(config.types.schemaVersionMigrationComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: SchemaVersionMigrationComponentType.Service,
+					options: { config: { enabled: false } }
+				})
+			])
+		);
 	});
 });
 

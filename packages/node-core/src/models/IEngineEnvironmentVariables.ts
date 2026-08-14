@@ -719,6 +719,16 @@ export interface IEngineEnvironmentVariables {
 	identityDidResolutionCacheMutexTimeout?: string;
 
 	/**
+	 * The number of times to retry resolving a DID after a write operation (create, update, or delete) to confirm propagation. Only used when using the IOTA identity connector.
+	 */
+	identityDidResolutionRetries?: string;
+
+	/**
+	 * The delay in milliseconds between DID resolution retries after a write operation. Only used when using the IOTA identity connector.
+	 */
+	identityDidResolutionRetryDelay?: string;
+
+	/**
 	 * The type of identity resolver connector: entity-storage, iota.
 	 */
 	identityResolverConnector?: string;

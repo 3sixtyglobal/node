@@ -215,11 +215,15 @@ export function envMinToMs(
 /**
  * Converts a comma separated list to an array.
  * @param value The comma separated list.
+ * @param defaultValue The default value to return when the list is empty or undefined.
  * @returns The array.
  */
-export function commaSeparatedListToArray<T>(value: string | undefined): T[] {
+export function commaSeparatedListToArray<T>(
+	value: string | undefined,
+	defaultValue: T[] | undefined = []
+): T[] {
 	if (!Is.stringValue(value)) {
-		return [];
+		return defaultValue;
 	}
 	return value
 		.split(",")

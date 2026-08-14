@@ -11,6 +11,7 @@ import { identityVerificationMethodCreate } from "./identityVerificationMethodCr
 import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
+import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -66,10 +67,7 @@ export async function bootstrapDev(
 	envVars: IEnvironmentVariables,
 	params: {}
 ): Promise<void> {
-	const features = (envVars.features ?? "admin-user,wallet")
-		.split(",")
-		.map(f => f.trim())
-		.filter(f => f.length > 0);
+	const features = commaSeparatedListToArray(envVars.features ?? "admin-user,wallet");
 
 	const state = engineCore.getState();
 	const requireWallet = features.includes("wallet");
@@ -266,7 +264,10 @@ export async function bootstrapDev(
 					password: envVars.adminUserPassword,
 					scope:
 						envVars.adminUserScope ??
-						(tenantEnabled ? ["tenant-admin", "user-admin"] : ["user-admin"]).join(","),
+						(tenantEnabled
+							? ["global-admin", "tenant-admin", "user-admin"]
+							: ["global-admin", "user-admin"]
+						).join(","),
 					givenName: tenantEnabled ? "Tenant" : "Node",
 					familyName: "Admin",
 					overwriteMode: "skip"

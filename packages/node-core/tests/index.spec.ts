@@ -337,6 +337,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -447,6 +448,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"logging-service",
 			"background-task-service",
@@ -561,10 +563,14 @@ describe("node-core", () => {
 			"GET      /identity/:identity",
 			"POST     /identity/profile",
 			"GET      /identity/profile",
+			"GET      /identity/profile/:userIdentity",
 			"GET      /identity/profile/:identity/public",
 			"PUT      /identity/profile",
+			"PUT      /identity/profile/:userIdentity",
 			"DELETE   /identity/profile",
+			"DELETE   /identity/profile/:userIdentity",
 			"GET      /identity/profile/query",
+			"GET      /identity/profile/admin/query",
 			"POST     /nft",
 			"GET      /nft/:id",
 			"DELETE   /nft/:id",
@@ -856,6 +862,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -918,6 +925,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -980,6 +988,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -1115,6 +1124,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"

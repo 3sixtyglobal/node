@@ -892,13 +892,12 @@ async function configureSchemaMigration(
 ): Promise<void> {
 	const isSchemaMigrationEnabled = envBoolean(envVars, "schemaMigrationEnabled", true);
 
-	if (isSchemaMigrationEnabled) {
-		coreConfig.types.schemaVersionMigrationComponent ??= [];
-		coreConfig.types.schemaVersionMigrationComponent.push({
-			type: SchemaVersionMigrationComponentType.Service,
-			isCloneable: false
-		});
-	}
+	coreConfig.types.schemaVersionMigrationComponent ??= [];
+	coreConfig.types.schemaVersionMigrationComponent.push({
+		type: SchemaVersionMigrationComponentType.Service,
+		options: { config: { enabled: isSchemaMigrationEnabled } },
+		isCloneable: false
+	});
 }
 
 /**
@@ -1276,7 +1275,12 @@ async function configureIdentity(
 					walletAddressIndex: envCount(envVars, "identityWalletAddressIndex") ?? 0,
 					didResolutionCacheTtlMs: envMs(envVars, "identityDidResolutionCacheTtl"),
 					didResolutionCacheCapacity: envCount(envVars, "identityDidResolutionCacheCapacity"),
-					didResolutionCacheMutexTimeoutMs: envMs(envVars, "identityDidResolutionCacheMutexTimeout")
+					didResolutionCacheMutexTimeoutMs: envMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					),
+					didResolutionRetries: envCount(envVars, "identityDidResolutionRetries"),
+					didResolutionRetryDelayMs: envMs(envVars, "identityDidResolutionRetryDelay")
 				}
 			}
 		});

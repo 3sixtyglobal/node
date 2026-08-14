@@ -4,6 +4,7 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@twin.org/api-auth-entity-storage-models";
+import { ScopeHelper } from "@twin.org/api-models";
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
@@ -261,13 +262,17 @@ export async function userCreate(
 					password: params.password ?? PasswordGenerator.generate(16),
 					userIdentity: paramsUserIdentity,
 					organizationIdentity: paramsOrganizationIdentity,
-					scope: params.scope?.split(",").map(s => s.trim()) ?? []
+					scope: ScopeHelper.toArray(params.scope)
 				};
 
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
 
 				await ContextIdStore.run(
-					{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
+					{
+						...currentContextIds,
+						[ContextIdKeys.Tenant]: params.tenantId,
+						scope: ScopeHelper.toString(user.scope)
+					},
 					async () => {
 						if (existingUser) {
 							await authenticationAdminComponent.update(user);
@@ -313,7 +318,7 @@ export async function userCreate(
 					organizationDid: paramsOrganizationIdentity,
 					email: paramsEmail,
 					password: user.password,
-					scope: params.scope?.split(",").map(s => s.trim()) ?? [],
+					scope: ScopeHelper.toArray(params.scope),
 					givenName: params.givenName ?? "",
 					familyName: params.familyName ?? ""
 				};

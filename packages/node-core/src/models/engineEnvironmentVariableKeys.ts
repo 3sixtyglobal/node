@@ -174,6 +174,8 @@ const engineEnvironmentVariableKeysInternal: {
 	identityDidResolutionCacheTtl: true,
 	identityDidResolutionCacheCapacity: true,
 	identityDidResolutionCacheMutexTimeout: true,
+	identityDidResolutionRetries: true,
+	identityDidResolutionRetryDelay: true,
 	identityResolverConnector: true,
 	identityProfileConnector: true,
 	universalResolverEndpoint: true,

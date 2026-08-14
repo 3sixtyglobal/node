@@ -18,6 +18,7 @@ import {
 	extensionsInitialiseEngineServer,
 	shutdownExtensions
 } from "./builders/extensionsBuilder.js";
+import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { executeCommand } from "./cli.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
 import type { IEngineEnvironmentVariables } from "./models/IEngineEnvironmentVariables.js";
@@ -49,8 +50,8 @@ export async function start(
 	  }
 	| undefined
 > {
-	const entityStorageConnectorType = envVars.entityStorageConnectorType?.split(",") ?? [];
-	const blobStorageConnectorType = envVars.blobStorageConnectorType?.split(",") ?? [];
+	const entityStorageConnectorType = commaSeparatedListToArray(envVars.entityStorageConnectorType);
+	const blobStorageConnectorType = commaSeparatedListToArray(envVars.blobStorageConnectorType);
 
 	const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
 	const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;

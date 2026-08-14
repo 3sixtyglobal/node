@@ -16,9 +16,9 @@ import {
 	RestRouteProcessorType,
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
-import type { HttpMethod } from "@twin.org/web";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { commaSeparatedListToArray } from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -41,16 +41,10 @@ export async function buildEngineServerConfiguration(
 	const webServerOptions: IWebServerOptions = {
 		port: Coerce.number(envVars.port),
 		host: Coerce.string(envVars.host),
-		methods: Is.stringValue(envVars.httpMethods)
-			? (envVars.httpMethods.split(",") as HttpMethod[])
-			: undefined,
-		allowedHeaders: Is.stringValue(envVars.httpAllowedHeaders)
-			? envVars.httpAllowedHeaders.split(",")
-			: undefined,
-		exposedHeaders: Is.stringValue(envVars.httpExposedHeaders)
-			? envVars.httpExposedHeaders.split(",")
-			: undefined,
-		corsOrigins: Is.stringValue(envVars.corsOrigins) ? envVars.corsOrigins.split(",") : undefined,
+		methods: commaSeparatedListToArray(envVars.httpMethods, undefined),
+		allowedHeaders: commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
+		exposedHeaders: commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
+		corsOrigins: commaSeparatedListToArray(envVars.corsOrigins, undefined),
 		publicOrigin: Coerce.string(envVars.publicOrigin)
 	};
 
@@ -84,7 +78,7 @@ export async function buildEngineServerConfiguration(
 	};
 
 	if (Is.stringValue(envVars.mimeTypeProcessors)) {
-		const mimeTypeProcessors = envVars.mimeTypeProcessors.split(",");
+		const mimeTypeProcessors = commaSeparatedListToArray(envVars.mimeTypeProcessors);
 
 		if (Is.arrayValue(mimeTypeProcessors)) {
 			serverConfig.types.mimeTypeProcessor ??= [];
@@ -164,9 +158,10 @@ export async function buildEngineServerConfiguration(
 	if (!coreEngineConfig.silent) {
 		const includeBody = Coerce.boolean(envVars.routeLoggingIncludeBody) ?? coreEngineConfig.debug;
 		const fullBase64 = Coerce.boolean(envVars.routeLoggingFullBase64) ?? false;
-		const obfuscateProperties = Is.stringValue(envVars.routeLoggingObfuscateProperties)
-			? envVars.routeLoggingObfuscateProperties.split(",")
-			: undefined;
+		const obfuscateProperties = commaSeparatedListToArray<string>(
+			envVars.routeLoggingObfuscateProperties,
+			undefined
+		);
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Logging,
 			options: {
@@ -254,6 +249,20 @@ export async function buildEngineServerConfiguration(
 				}
 			}
 		});
+		if (tenantEnabled) {
+			serverConfig.types.restRouteProcessor.push({
+				type: RestRouteProcessorType.TenantOverride,
+				options: {
+					config: {}
+				}
+			});
+			serverConfig.types.socketRouteProcessor.push({
+				type: SocketRouteProcessorType.TenantOverride,
+				options: {
+					config: {}
+				}
+			});
+		}
 	}
 
 	addDefaultRestPaths(serverConfig);

@@ -334,7 +334,7 @@ describe("node-core", () => {
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@tenant");
-		expect(authUsers[0].scope).toBe("tenant-admin,user-admin");
+		expect(authUsers[0].scope).toBe("global-admin,tenant-admin,user-admin");
 
 		// Verify identity documents include the node DID
 		interface IdentityDocRecord {
@@ -384,7 +384,7 @@ describe("node-core", () => {
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@node");
-		expect(authUsers[0].scope).toBe("user-admin");
+		expect(authUsers[0].scope).toBe("global-admin,user-admin");
 
 		// Verify identity documents contain both node and org DIDs stored in state
 		interface IdentityDocRecord {
@@ -531,7 +531,7 @@ describe("node-core", () => {
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
-		expect(authUsers[0].scope).toBe("user-admin");
+		expect(authUsers[0].scope).toBe("global-admin,user-admin");
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };
@@ -581,7 +581,7 @@ describe("node-core", () => {
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
-		expect(authUsers[0].scope).toBe("tenant-admin,user-admin");
+		expect(authUsers[0].scope).toBe("global-admin,tenant-admin,user-admin");
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };
