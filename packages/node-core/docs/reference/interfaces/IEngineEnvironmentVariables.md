@@ -1159,6 +1159,22 @@ The mutex timeout in milliseconds for the DID resolution cache. Only used when u
 
 ***
 
+### identityDidResolutionRetries? {#identitydidresolutionretries}
+
+> `optional` **identityDidResolutionRetries?**: `string`
+
+The number of times to retry resolving a DID after a write operation (create, update, or delete) to confirm propagation. Only used when using the IOTA identity connector.
+
+***
+
+### identityDidResolutionRetryDelay? {#identitydidresolutionretrydelay}
+
+> `optional` **identityDidResolutionRetryDelay?**: `string`
+
+The delay in milliseconds between DID resolution retries after a write operation. Only used when using the IOTA identity connector.
+
+***
+
 ### identityResolverConnector? {#identityresolverconnector}
 
 > `optional` **identityResolverConnector?**: `string`
