@@ -244,6 +244,8 @@ const engineEnvironmentVariableKeysInternal: {
 	dataspaceActivityLogsCleanupInterval: true,
 	dataspaceAgreementCacheTtl: true,
 	dataspaceAgreementCacheMutexTimeout: true,
+	dataspaceAgreementUnusedThreshold: true,
+	dataspaceAgreementSweepInterval: true,
 	dataspaceRetryCount: true,
 	dataspacePushRetryCount: true,
 	dataspacePushRetryBaseDelay: true,

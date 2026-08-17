@@ -1024,6 +1024,16 @@ export interface IEngineEnvironmentVariables {
 	dataspaceAgreementCacheMutexTimeout?: string;
 
 	/**
+	 * The time in milliseconds after which an unused agreement is eligible for removal.
+	 */
+	dataspaceAgreementUnusedThreshold?: string;
+
+	/**
+	 * The interval in milliseconds between agreement sweep runs.
+	 */
+	dataspaceAgreementSweepInterval?: string;
+
+	/**
 	 * The number of times to retry failed data plane tasks.
 	 */
 	dataspaceRetryCount?: string;

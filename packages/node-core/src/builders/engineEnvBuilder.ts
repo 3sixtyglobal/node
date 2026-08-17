@@ -1812,7 +1812,9 @@ async function configureDataspace(
 					providerTransferPolicySweepIntervalMs: envSecToMs(
 						envVars,
 						"dataspaceProviderTransferPolicySweepInterval"
-					)
+					),
+					agreementUnusedThresholdMs: envMs(envVars, "dataspaceAgreementUnusedThreshold"),
+					agreementSweepIntervalMs: envMs(envVars, "dataspaceAgreementSweepInterval")
 				}
 			},
 			isDefault: true
