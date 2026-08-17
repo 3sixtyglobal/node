@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.2-next.12](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.11...node-core-v0.9.2-next.12) (2026-08-17)
+
+
+### Features
+
+* add dsp sweep vars ([#340](https://github.com/iotaledger/twin-node/issues/340)) ([5487c13](https://github.com/iotaledger/twin-node/commit/5487c13197fcd386206ec37f9f342c55ec5b1176))
+* rest metrics ([#341](https://github.com/iotaledger/twin-node/issues/341)) ([ebec573](https://github.com/iotaledger/twin-node/commit/ebec5736bb66adfd97f7d73912bec1ce7392e5f8))
+
 ## [0.9.2-next.11](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.10...node-core-v0.9.2-next.11) (2026-08-14)
 
 
