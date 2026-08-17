@@ -17,6 +17,7 @@ import {
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+import { isTelemetryRequired } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import { commaSeparatedListToArray } from "./helper/envHelpers.js";
 
@@ -263,6 +264,20 @@ export async function buildEngineServerConfiguration(
 				}
 			});
 		}
+	}
+
+	if (isTelemetryRequired(envVars)) {
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.Metrics,
+			options: {
+				config: {
+					excludePaths: commaSeparatedListToArray<string>(
+						envVars.routeMetricsExcludePaths,
+						undefined
+					)
+				}
+			}
+		});
 	}
 
 	addDefaultRestPaths(serverConfig);

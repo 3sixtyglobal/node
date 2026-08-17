@@ -181,16 +181,17 @@ These variables are only read when running the `bootstrap-dev` CLI command. They
 
 ## Hosting Variables
 
-| Variable                                  | Possible Values                 | Default          | Notes                                           |
-| ----------------------------------------- | ------------------------------- | ---------------- | ----------------------------------------------- |
-| `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None             | Authentication admin processor type.            |
-| `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None             | Authentication processor type.                  |
-| `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`   | Key used for auth signing operations.           |
-| `TWIN_AUTH_API_KEY_HEADER`                | Header name string              | `x-api-key`      | HTTP header name for the API key on requests.   |
-| `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None             | Additional MIME processor registrations.        |
-| `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value | Includes body in route logging.                 |
-| `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`          | Includes full base64 payloads in route logging. |
-| `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None             | Properties to obfuscate in route logs.          |
+| Variable                                  | Possible Values                 | Default          | Notes                                                                                                                                               |
+| ----------------------------------------- | ------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TWIN_AUTH_ADMIN_PROCESSOR_TYPE`          | `entity-storage`                | None             | Authentication admin processor type.                                                                                                                |
+| `TWIN_AUTH_PROCESSOR_TYPE`                | `entity-storage`                | None             | Authentication processor type.                                                                                                                      |
+| `TWIN_AUTH_SIGNING_KEY_ID`                | Vault key identifier            | `auth-signing`   | Key used for auth signing operations.                                                                                                               |
+| `TWIN_AUTH_API_KEY_HEADER`                | Header name string              | `x-api-key`      | HTTP header name for the API key on requests.                                                                                                       |
+| `TWIN_MIME_TYPE_PROCESSORS`               | Comma-separated processor types | None             | Additional MIME processor registrations.                                                                                                            |
+| `TWIN_ROUTE_LOGGING_INCLUDE_BODY`         | `true`, `false`                 | Uses debug value | Includes body in route logging.                                                                                                                     |
+| `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`          | Includes full base64 payloads in route logging.                                                                                                     |
+| `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None             | Properties to obfuscate in route logs.                                                                                                              |
+| `TWIN_ROUTE_METRICS_EXCLUDE_PATHS`        | Comma-separated path prefixes   | None             | URL path prefixes excluded from metrics recording. Useful for suppressing health-check or scrape endpoints. Only applies when telemetry is enabled. |
 
 ### REST Path Overrides
 

@@ -79,4 +79,9 @@ export interface IEngineServerEnvironmentVariables {
 	 * List of properties to obfuscate in the REST logging output, comma separated.
 	 */
 	routeLoggingObfuscateProperties?: string;
+
+	/**
+	 * Comma-separated list of URL path prefixes excluded from metrics collection.
+	 */
+	routeMetricsExcludePaths?: string;
 }

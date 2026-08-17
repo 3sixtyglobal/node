@@ -26,7 +26,8 @@ const engineServerEnvironmentVariableKeysInternal: {
 	mimeTypeProcessors: true,
 	routeLoggingIncludeBody: true,
 	routeLoggingFullBase64: true,
-	routeLoggingObfuscateProperties: true
+	routeLoggingObfuscateProperties: true,
+	routeMetricsExcludePaths: true
 };
 
 /**
