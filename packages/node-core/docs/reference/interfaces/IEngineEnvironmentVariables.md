@@ -1685,6 +1685,22 @@ The mutex timeout in milliseconds for the dataspace agreement cache.
 
 ***
 
+### dataspaceAgreementUnusedThreshold? {#dataspaceagreementunusedthreshold}
+
+> `optional` **dataspaceAgreementUnusedThreshold?**: `string`
+
+The time in milliseconds after which an unused agreement is eligible for removal.
+
+***
+
+### dataspaceAgreementSweepInterval? {#dataspaceagreementsweepinterval}
+
+> `optional` **dataspaceAgreementSweepInterval?**: `string`
+
+The interval in milliseconds between agreement sweep runs.
+
+***
+
 ### dataspaceRetryCount? {#dataspaceretrycount}
 
 > `optional` **dataspaceRetryCount?**: `string`

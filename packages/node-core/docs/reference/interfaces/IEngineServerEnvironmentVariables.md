@@ -121,3 +121,11 @@ Include the full base 64 output in the REST logging output, useful for debugging
 > `optional` **routeLoggingObfuscateProperties?**: `string`
 
 List of properties to obfuscate in the REST logging output, comma separated.
+
+***
+
+### routeMetricsExcludePaths? {#routemetricsexcludepaths}
+
+> `optional` **routeMetricsExcludePaths?**: `string`
+
+Comma-separated list of URL path prefixes excluded from metrics collection.

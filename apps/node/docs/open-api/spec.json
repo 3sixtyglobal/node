@@ -19394,7 +19394,7 @@
 					},
 					{
 						"name": "properties",
-						"description": "Comma-separated list of policy property names to include in the response.",
+						"description": "Comma-separated list of policy property names to include in the response, the policy \"@id\" is always included.",
 						"in": "query",
 						"required": false,
 						"schema": {
