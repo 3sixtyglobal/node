@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.13](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.12...node-core-v0.9.2-next.13) (2026-08-18)
+
+
+### Features
+
+* add tracing ([#344](https://github.com/iotaledger/twin-node/issues/344)) ([4fa71cd](https://github.com/iotaledger/twin-node/commit/4fa71cd0eafd7d708df15c8f0a85323fecd05561))
+
 ## [0.9.2-next.12](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.11...node-core-v0.9.2-next.12) (2026-08-17)
 
 
