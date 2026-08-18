@@ -129,3 +129,11 @@ List of properties to obfuscate in the REST logging output, comma separated.
 > `optional` **routeMetricsExcludePaths?**: `string`
 
 Comma-separated list of URL path prefixes excluded from metrics collection.
+
+***
+
+### routeTracingExcludePaths? {#routetracingexcludepaths}
+
+> `optional` **routeTracingExcludePaths?**: `string`
+
+Comma-separated list of URL path prefixes excluded from tracing.
