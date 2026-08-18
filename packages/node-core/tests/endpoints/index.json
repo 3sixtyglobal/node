@@ -3,6 +3,7 @@
 	"login",
 	"logging",
 	"telemetry",
+	"tracing",
 	"blob",
 	"identity",
 	"nft",

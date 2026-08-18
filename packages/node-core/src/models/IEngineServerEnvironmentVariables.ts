@@ -84,4 +84,9 @@ export interface IEngineServerEnvironmentVariables {
 	 * Comma-separated list of URL path prefixes excluded from metrics collection.
 	 */
 	routeMetricsExcludePaths?: string;
+
+	/**
+	 * Comma-separated list of URL path prefixes excluded from tracing.
+	 */
+	routeTracingExcludePaths?: string;
 }

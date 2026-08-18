@@ -188,7 +188,12 @@ describe("migration", () => {
 					{ from: "legacyField", to: "newField" },
 					{ from: "score", to: "tags" }
 				],
-				transformEntityProperty: (fromProp, toProp, value) => [`item:${value as number}`]
+				transformEntityProperty: (
+					migrationEntity: unknown,
+					fromProp: unknown,
+					toProp: unknown,
+					value: unknown
+				) => [`item:${value as number}`]
 			}));
 
 			// Run 1: start the node with schemaVersionMigration to initialise the schema-version
@@ -442,7 +447,12 @@ describe("migration - multi-tenant", () => {
 				{ from: "legacyField", to: "newField" },
 				{ from: "score", to: "tags" }
 			],
-			transformEntityProperty: (fromProp, toProp, value) => [`item:${value as number}`]
+			transformEntityProperty: (
+				migrationEntity: unknown,
+				fromProp: unknown,
+				toProp: unknown,
+				value: unknown
+			) => [`item:${value as number}`]
 		}));
 
 		// Run 1: initialise schema-version records then back-date the entity to v0.
@@ -617,7 +627,12 @@ describe("migration - multi-tenant", () => {
 				{ from: "legacyField", to: "newField" },
 				{ from: "score", to: "tags" }
 			],
-			transformEntityProperty: (fromProp, toProp, value) => [`item:${value as number}`]
+			transformEntityProperty: (
+				migrationEntity: unknown,
+				fromProp: unknown,
+				toProp: unknown,
+				value: unknown
+			) => [`item:${value as number}`]
 		}));
 
 		// Run 1: initialise schema-version records, then back-date entity to v0.

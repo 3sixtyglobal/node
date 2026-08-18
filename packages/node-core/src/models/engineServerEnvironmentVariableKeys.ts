@@ -27,7 +27,8 @@ const engineServerEnvironmentVariableKeysInternal: {
 	routeLoggingIncludeBody: true,
 	routeLoggingFullBase64: true,
 	routeLoggingObfuscateProperties: true,
-	routeMetricsExcludePaths: true
+	routeMetricsExcludePaths: true,
+	routeTracingExcludePaths: true
 };
 
 /**

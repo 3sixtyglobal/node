@@ -16,8 +16,9 @@ import {
 	RestRouteProcessorType,
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
+import { TraceparentHelper } from "@twin.org/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
-import { isTelemetryRequired } from "./engineEnvBuilder.js";
+import { isTelemetryRequired, isTracingRequired } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import { commaSeparatedListToArray } from "./helper/envHelpers.js";
 
@@ -55,6 +56,13 @@ export async function buildEngineServerConfiguration(
 		webServerOptions.allowedHeaders ??= [];
 		if (!webServerOptions.allowedHeaders.includes(apiKeyHeader)) {
 			webServerOptions.allowedHeaders.push(apiKeyHeader);
+		}
+	}
+
+	if (isTracingRequired(envVars)) {
+		webServerOptions.allowedHeaders ??= [];
+		if (!webServerOptions.allowedHeaders.includes(TraceparentHelper.HEADER_NAME)) {
+			webServerOptions.allowedHeaders.push(TraceparentHelper.HEADER_NAME);
 		}
 	}
 
@@ -273,6 +281,20 @@ export async function buildEngineServerConfiguration(
 				config: {
 					excludePaths: commaSeparatedListToArray<string>(
 						envVars.routeMetricsExcludePaths,
+						undefined
+					)
+				}
+			}
+		});
+	}
+
+	if (isTracingRequired(envVars)) {
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.Tracing,
+			options: {
+				config: {
+					excludePaths: commaSeparatedListToArray<string>(
+						envVars.routeTracingExcludePaths,
 						undefined
 					)
 				}

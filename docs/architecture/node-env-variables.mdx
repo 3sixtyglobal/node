@@ -192,6 +192,7 @@ These variables are only read when running the `bootstrap-dev` CLI command. They
 | `TWIN_ROUTE_LOGGING_FULL_BASE64`          | `true`, `false`                 | `false`          | Includes full base64 payloads in route logging.                                                                                                     |
 | `TWIN_ROUTE_LOGGING_OBFUSCATE_PROPERTIES` | Comma-separated property names  | None             | Properties to obfuscate in route logs.                                                                                                              |
 | `TWIN_ROUTE_METRICS_EXCLUDE_PATHS`        | Comma-separated path prefixes   | None             | URL path prefixes excluded from metrics recording. Useful for suppressing health-check or scrape endpoints. Only applies when telemetry is enabled. |
+| `TWIN_ROUTE_TRACING_EXCLUDE_PATHS`        | Comma-separated path prefixes   | None             | URL path prefixes excluded from tracing. Useful for suppressing health-check or scrape endpoints. Only applies when tracing is enabled.             |
 
 ### REST Path Overrides
 

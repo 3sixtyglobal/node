@@ -1992,3 +1992,16 @@ export function isTelemetryRequired(envVars: IEngineEnvironmentVariables): boole
 		envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry
 	);
 }
+
+/**
+ * Checks if the tracing subsystem is required.
+ * Returns true when any component that depends on the tracing subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if tracing is enabled.
+ */
+export function isTracingRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		envVars.tracingConnector === TracingConnectorType.EntityStorage ||
+		envVars.tracingConnector === TracingConnectorType.OpenTelemetry
+	);
+}

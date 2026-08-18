@@ -25,6 +25,7 @@ import {
 	NftConnectorType,
 	NotarizationConnectorType,
 	TelemetryConnectorType,
+	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
@@ -70,6 +71,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 	TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 	TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+	TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,

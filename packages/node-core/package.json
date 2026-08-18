@@ -57,6 +57,7 @@
 		"@twin.org/standards-w3c-odrl": "next",
 		"@twin.org/telemetry-connector-opentelemetry": "next",
 		"@twin.org/tracing-connector-opentelemetry": "next",
+		"@twin.org/tracing-models": "next",
 		"@twin.org/vault-models": "next",
 		"@twin.org/wallet-connector-entity-storage": "next",
 		"@twin.org/wallet-models": "next",
