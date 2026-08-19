@@ -700,6 +700,9 @@ async function configureTelemetry(
 			type: TelemetryConnectorType.EntityStorage,
 			options: {
 				config: {
+					batchSize: envCount(envVars, "telemetryBatchSize"),
+					batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
+					maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
 					mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout")
 				}
 			}
@@ -718,6 +721,9 @@ async function configureTelemetry(
 			type: TelemetryConnectorType.OpenTelemetry,
 			options: {
 				config: {
+					batchSize: envCount(envVars, "telemetryBatchSize"),
+					batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
+					maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
 					mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
 					meterName: envVars.openTelemetryMeterName,
 					meterVersion: envVars.openTelemetryMeterVersion,

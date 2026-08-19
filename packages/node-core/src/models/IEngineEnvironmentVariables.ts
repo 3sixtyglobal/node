@@ -634,6 +634,22 @@ export interface IEngineEnvironmentVariables {
 	telemetryMetricsProducerMaxHistory?: string;
 
 	/**
+	 * The batch size for the telemetry connector, set to 1 to disable size-based flushing.
+	 */
+	telemetryBatchSize?: string;
+
+	/**
+	 * The batch flush interval in seconds for the telemetry connector, how often to flush when using batching, defaults to 5 seconds.
+	 */
+	telemetryBatchFlushInterval?: string;
+
+	/**
+	 * The maximum number of metric values to hold in the write-ahead cache for the telemetry connector. Set to 0 for unlimited.
+	 * @default 1000
+	 */
+	telemetryMaxCacheSize?: string;
+
+	/**
 	 * The mutex timeout in milliseconds for the telemetry connector.
 	 */
 	telemetryMutexTimeout?: string;
