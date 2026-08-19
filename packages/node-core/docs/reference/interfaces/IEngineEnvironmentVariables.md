@@ -1023,6 +1023,36 @@ Maximum number of values retained per telemetry metric (count-based history cap)
 
 ***
 
+### telemetryBatchSize? {#telemetrybatchsize}
+
+> `optional` **telemetryBatchSize?**: `string`
+
+The batch size for the telemetry connector, set to 1 to disable size-based flushing.
+
+***
+
+### telemetryBatchFlushInterval? {#telemetrybatchflushinterval}
+
+> `optional` **telemetryBatchFlushInterval?**: `string`
+
+The batch flush interval in seconds for the telemetry connector, how often to flush when using batching, defaults to 5 seconds.
+
+***
+
+### telemetryMaxCacheSize? {#telemetrymaxcachesize}
+
+> `optional` **telemetryMaxCacheSize?**: `string`
+
+The maximum number of metric values to hold in the write-ahead cache for the telemetry connector. Set to 0 for unlimited.
+
+#### Default
+
+```ts
+1000
+```
+
+***
+
 ### telemetryMutexTimeout? {#telemetrymutextimeout}
 
 > `optional` **telemetryMutexTimeout?**: `string`
