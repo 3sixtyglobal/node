@@ -4,6 +4,7 @@
 	"logging",
 	"telemetry",
 	"tracing",
+	"authorization",
 	"blob",
 	"identity",
 	"nft",

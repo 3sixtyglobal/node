@@ -153,6 +153,7 @@ export async function buildEngineConfiguration(
 	await configureTelemetry(coreConfig, envVars);
 	await configureMetricsCollector(coreConfig, envVars);
 	await configureTracing(coreConfig, envVars);
+	await configureAuthorization(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
 	await configureHealth(coreConfig, envVars);
@@ -818,6 +819,41 @@ async function configureTracing(
 	if (coreConfig.types.tracingConnector.length > 0) {
 		coreConfig.types.tracingComponent ??= [];
 		coreConfig.types.tracingComponent.push({ type: TracingComponentType.Service });
+	}
+}
+
+/**
+ * Configures the authorization.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the authorization configuration has been applied.
+ */
+async function configureAuthorization(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.authorizationConnector ??= [];
+
+	if (envVars.authorizationConnector === "entity-storage") {
+		coreConfig.types.authorizationConnector.push({ type: "entity-storage" });
+	} else if (envVars.authorizationConnector === "casbin") {
+		coreConfig.types.authorizationConnector.push({
+			type: "casbin",
+			options: {
+				config: {
+					endpoint: envVars.casbinEndpoint ?? "",
+					clientId: envVars.casbinClientId ?? "",
+					clientSecret: envVars.casbinClientSecret ?? "",
+					enforcerId: envVars.casbinEnforcerId ?? "",
+					timeoutMs: envMs(envVars, "casbinTimeoutMs")
+				}
+			}
+		});
+	}
+
+	if (coreConfig.types.authorizationConnector.length > 0) {
+		coreConfig.types.authorizationComponent ??= [];
+		coreConfig.types.authorizationComponent.push({ type: "service" });
 	}
 }
 
@@ -2003,5 +2039,18 @@ export function isTracingRequired(envVars: IEngineEnvironmentVariables): boolean
 	return (
 		envVars.tracingConnector === TracingConnectorType.EntityStorage ||
 		envVars.tracingConnector === TracingConnectorType.OpenTelemetry
+	);
+}
+
+/**
+ * Checks if the authorization subsystem is required.
+ * Returns true when any authorization connector is configured.
+ * @param envVars The environment variables.
+ * @returns True if authorization is enabled.
+ */
+export function isAuthorizationRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		envVars.authorizationConnector === "entity-storage" ||
+		envVars.authorizationConnector === "casbin"
 	);
 }

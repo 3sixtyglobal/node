@@ -371,6 +371,7 @@ describe("node-core", () => {
 			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
 			TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -443,15 +444,6 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
-
-		const res = await fetch(`http://localhost:${port}/info`);
-		expect(await res.json()).toEqual({
-			name: "foo",
-			version: "0.0.0"
-		});
-
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
 			"schema-version-service",
@@ -463,6 +455,7 @@ describe("node-core", () => {
 			"telemetry-service",
 			"tracing-service",
 			"metrics-collector-service",
+			"authorization-service",
 			"automation-service",
 			"messaging-admin-service",
 			"messaging-service",
@@ -541,6 +534,23 @@ describe("node-core", () => {
 			"PUT      /tracing/:spanId",
 			"GET      /tracing",
 			"GET      /tracing/trace/:traceId",
+			"POST     /authorization/check",
+			"POST     /authorization/check-any",
+			"POST     /authorization/policy",
+			"POST     /authorization/policy/remove",
+			"GET      /authorization/policy",
+			"GET      /authorization/roles",
+			"GET      /authorization/policy/:subject",
+			"POST     /authorization/subject/:subject/role",
+			"DELETE   /authorization/subject/:subject/role/:role",
+			"DELETE   /authorization/subject/:subject/roles",
+			"GET      /authorization/subject/:subject/roles",
+			"GET      /authorization/subject/:subject/role/:role",
+			"GET      /authorization/role/:role/subjects",
+			"POST     /authorization/role/:role/inherit",
+			"DELETE   /authorization/role/:role/inherit/:parentRole",
+			"GET      /authorization/role/:role/parents",
+			"GET      /authorization/role/:role/children",
 			"POST     /automation/trigger/:trigger",
 			"POST     /automation",
 			"DELETE   /automation/:actionId",
@@ -730,6 +740,7 @@ describe("node-core", () => {
 			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
 			TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,

@@ -163,6 +163,13 @@ const engineEnvironmentVariableKeysInternal: {
 	openTelemetryTracingEndpoint: true,
 	openTelemetryTracingProcessor: true,
 	tracingMutexTimeout: true,
+	// authorization
+	authorizationConnector: true,
+	casbinEndpoint: true,
+	casbinClientId: true,
+	casbinClientSecret: true,
+	casbinEnforcerId: true,
+	casbinTimeoutMs: true,
 	// DLT / identity
 	faucetConnector: true,
 	walletConnector: true,

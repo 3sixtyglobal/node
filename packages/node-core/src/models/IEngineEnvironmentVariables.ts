@@ -669,6 +669,36 @@ export interface IEngineEnvironmentVariables {
 	tracingMutexTimeout?: string;
 
 	/**
+	 * The type of authorization connector: entity-storage, casbin.
+	 */
+	authorizationConnector?: string;
+
+	/**
+	 * The base URL of the Casbin server (e.g. "http://localhost:48000"), required when using the casbin authorization connector.
+	 */
+	casbinEndpoint?: string;
+
+	/**
+	 * The OAuth2 client ID for authenticating with the Casbin server, required when using the casbin authorization connector.
+	 */
+	casbinClientId?: string;
+
+	/**
+	 * The OAuth2 client secret for authenticating with the Casbin server, required when using the casbin authorization connector.
+	 */
+	casbinClientSecret?: string;
+
+	/**
+	 * The enforcer identifier in "owner/name" format (e.g. "built-in/built-in"), required when using the casbin authorization connector.
+	 */
+	casbinEnforcerId?: string;
+
+	/**
+	 * The request timeout in milliseconds for the Casbin authorization connector.
+	 */
+	casbinTimeoutMs?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;

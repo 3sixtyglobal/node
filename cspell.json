@@ -63,6 +63,8 @@
 		"rawurl",
 		"readyz",
 		"reqs",
+		"casbin",
+		"Casbin",
 		"sawtooth",
 		"scylladb",
 		"Stiftung",
