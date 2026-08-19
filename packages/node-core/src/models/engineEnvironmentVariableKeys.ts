@@ -155,6 +155,9 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetryMetricsCollectorInterval: true,
 	telemetryMetricsProducers: true,
 	telemetryMetricsProducerMaxHistory: true,
+	telemetryBatchSize: true,
+	telemetryBatchFlushInterval: true,
+	telemetryMaxCacheSize: true,
 	telemetryMutexTimeout: true,
 	// tracing
 	tracingConnector: true,
