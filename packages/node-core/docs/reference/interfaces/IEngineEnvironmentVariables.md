@@ -831,6 +831,14 @@ The number of rotated log files to retain when using the file logging connector,
 
 ***
 
+### telemetrySilentComponents? {#telemetrysilentcomponents}
+
+> `optional` **telemetrySilentComponents?**: `string`
+
+A list of components to exclude from telemetry, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
 ### openTelemetryLoggingLoggerName? {#opentelemetryloggingloggername}
 
 > `optional` **openTelemetryLoggingLoggerName?**: `string`
@@ -1058,6 +1066,14 @@ The maximum number of metric values to hold in the write-ahead cache for the tel
 > `optional` **telemetryMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the telemetry connector.
+
+***
+
+### tracingSilentComponents? {#tracingsilentcomponents}
+
+> `optional` **tracingSilentComponents?**: `string`
+
+A list of components to exclude from tracing, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
 
 ***
 
