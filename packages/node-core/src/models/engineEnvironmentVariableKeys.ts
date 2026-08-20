@@ -159,6 +159,7 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetryBatchFlushInterval: true,
 	telemetryMaxCacheSize: true,
 	telemetryMutexTimeout: true,
+	telemetrySilentComponents: true,
 	// tracing
 	tracingConnector: true,
 	openTelemetryTracingTracerName: true,
@@ -166,6 +167,7 @@ const engineEnvironmentVariableKeysInternal: {
 	openTelemetryTracingEndpoint: true,
 	openTelemetryTracingProcessor: true,
 	tracingMutexTimeout: true,
+	tracingSilentComponents: true,
 	// DLT / identity
 	faucetConnector: true,
 	walletConnector: true,

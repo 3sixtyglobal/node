@@ -127,7 +127,11 @@ export async function buildEngineConfiguration(
 	const coreConfig: IEngineConfig = {
 		debug: envBoolean(envVars, "debug", false),
 		silent: envBoolean(envVars, "silent", false),
-		silentLoggers: commaSeparatedListToArray(envVars.loggingSilentComponents),
+		silentComponents: {
+			logging: commaSeparatedListToArray(envVars.loggingSilentComponents),
+			telemetry: commaSeparatedListToArray(envVars.telemetrySilentComponents),
+			tracing: commaSeparatedListToArray(envVars.tracingSilentComponents)
+		},
 		types: {}
 	};
 
@@ -1915,7 +1919,11 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
  * @returns True if dataspace or verifiable storage is enabled.
  */
 export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return envBoolean(envVars, "dataspaceEnabled", false) || isImmutableProofRequired(envVars);
+	return (
+		envBoolean(envVars, "dataspaceEnabled", false) ||
+		isImmutableProofRequired(envVars) ||
+		envBoolean(envVars, "healthEnabled", false)
+	);
 }
 
 /**
