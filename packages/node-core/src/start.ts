@@ -1,6 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { ITenantAdminComponent } from "@twin.org/api-models";
+import type { IRestRoute, ITenantAdminComponent } from "@twin.org/api-models";
+import { RulesHelper } from "@twin.org/authorization-models";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
 import { Engine } from "@twin.org/engine";
@@ -122,6 +123,14 @@ export async function start(
 		await executeCommand(engine, envVars, cliCommand);
 	} else {
 		try {
+			const routes = server.getRestRoutes();
+
+			RulesHelper.buildRules(routes.map(route => ({
+				id: route.operationId,
+				permissions: route.defaultPermissions ?? [],
+				roles: route.defaultRoles ?? []
+			})));
+
 			// Start the server, which also starts the engine.
 			await server.start();
 

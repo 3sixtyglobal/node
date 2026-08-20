@@ -174,6 +174,9 @@ const engineEnvironmentVariableKeysInternal: {
 	casbinClientSecret: true,
 	casbinEnforcerId: true,
 	casbinTimeoutMs: true,
+	authorizationCheckCacheCapacity: true,
+	authorizationCheckCacheTtiMs: true,
+	authorizationDefaultRules: true,
 	tracingSilentComponents: true,
 	// DLT / identity
 	faucetConnector: true,

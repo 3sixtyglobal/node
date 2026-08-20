@@ -158,7 +158,7 @@
 			"description": "POST /authorization/role/:role/inherit — add inheritance editor inherits viewer",
 			"method": "POST",
 			"path": "/authorization/role/editor/inherit",
-			"body": { "parentRole": "viewer" },
+			"body": { "inheritsFrom": "viewer" },
 			"expectedStatus": 204
 		},
 		{
@@ -176,7 +176,7 @@
 			"assert": { "body.roles": "isDefined" }
 		},
 		{
-			"description": "DELETE /authorization/role/:role/inherit/:parentRole — remove inheritance",
+			"description": "DELETE /authorization/role/:role/inherit/:inheritsFrom — remove inheritance",
 			"method": "DELETE",
 			"path": "/authorization/role/editor/inherit/viewer",
 			"expectedStatus": 204

@@ -725,6 +725,21 @@ export interface IEngineEnvironmentVariables {
 	casbinTimeoutMs?: string;
 
 	/**
+	 * The maximum number of cached authorisation check results.
+	 */
+	authorizationCheckCacheCapacity?: string;
+
+	/**
+	 * The time-to-idle in milliseconds for cached authorisation check results.
+	 */
+	authorizationCheckCacheTtiMs?: string;
+
+	/**
+	 * Default policy rules to seed the authorisation service, as a JSON array or a path to a JSON file using the @json: prefix.
+	 */
+	authorizationDefaultRules?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;

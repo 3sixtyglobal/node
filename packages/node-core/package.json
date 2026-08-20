@@ -33,6 +33,7 @@
 		"@twin.org/api-auth-entity-storage-service": "next",
 		"@twin.org/api-models": "next",
 		"@twin.org/api-tenant-processor": "next",
+		"@twin.org/authorization-models": "next",
 		"@twin.org/cli-core": "next",
 		"@twin.org/context": "next",
 		"@twin.org/core": "next",

@@ -18,11 +18,7 @@ import {
 } from "@twin.org/engine-server-types";
 import { TraceparentHelper } from "@twin.org/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
-import {
-	isAuthorizationRequired,
-	isTelemetryRequired,
-	isTracingRequired
-} from "./engineEnvBuilder.js";
+import { isTelemetryRequired, isTracingRequired } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import { commaSeparatedListToArray } from "./helper/envHelpers.js";
 

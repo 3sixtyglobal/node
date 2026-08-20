@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import {
 	commaSeparatedListToArray,
+	envArray,
 	envBoolean,
 	envCount,
 	envDateTime,
@@ -9,6 +10,7 @@ import {
 	envMinToMs,
 	envMinutes,
 	envMs,
+	envObject,
 	envSecToMs,
 	envSeconds
 } from "../../../src/builders/helper/envHelpers.js";
@@ -49,12 +51,22 @@ describe("envBoolean", () => {
 });
 
 describe("envMs", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envMs({}, "entityStorageMutexTimeout")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envMs({}, "entityStorageMutexTimeout", 1000)).toBe(1000);
 	});
 
 	test("returns integer value for a valid numeric string", () => {
 		expect(envMs({ entityStorageMutexTimeout: "5000" }, "entityStorageMutexTimeout")).toBe(5000);
+	});
+
+	test("returns integer value for a valid numeric string when default given", () => {
+		expect(envMs({ entityStorageMutexTimeout: "5000" }, "entityStorageMutexTimeout", 1000)).toBe(
+			5000
+		);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {
@@ -65,12 +77,20 @@ describe("envMs", () => {
 });
 
 describe("envCount", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envCount({}, "loggingBatchSize")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envCount({}, "loggingBatchSize", 50)).toBe(50);
 	});
 
 	test("returns integer value for a valid numeric string", () => {
 		expect(envCount({ loggingBatchSize: "100" }, "loggingBatchSize")).toBe(100);
+	});
+
+	test("returns integer value for a valid numeric string when default given", () => {
+		expect(envCount({ loggingBatchSize: "100" }, "loggingBatchSize", 50)).toBe(100);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {
@@ -79,12 +99,20 @@ describe("envCount", () => {
 });
 
 describe("envInteger", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envInteger({}, "mySqlPort")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envInteger({}, "mySqlPort", 5432)).toBe(5432);
 	});
 
 	test("returns integer value for a valid numeric string", () => {
 		expect(envInteger({ mySqlPort: "3306" }, "mySqlPort")).toBe(3306);
+	});
+
+	test("returns integer value for a valid numeric string when default given", () => {
+		expect(envInteger({ mySqlPort: "3306" }, "mySqlPort", 5432)).toBe(3306);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {
@@ -93,12 +121,22 @@ describe("envInteger", () => {
 });
 
 describe("envSeconds", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envSeconds({}, "iotaGasReservationDuration")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envSeconds({}, "iotaGasReservationDuration", 60)).toBe(60);
 	});
 
 	test("returns raw seconds value for a valid numeric string", () => {
 		expect(envSeconds({ iotaGasReservationDuration: "30" }, "iotaGasReservationDuration")).toBe(30);
+	});
+
+	test("returns raw seconds value for a valid numeric string when default given", () => {
+		expect(envSeconds({ iotaGasReservationDuration: "30" }, "iotaGasReservationDuration", 60)).toBe(
+			30
+		);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {
@@ -109,14 +147,24 @@ describe("envSeconds", () => {
 });
 
 describe("envMinutes", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envMinutes({}, "immutableProofSweepInterval")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envMinutes({}, "immutableProofSweepInterval", 5)).toBe(5);
 	});
 
 	test("returns raw minutes value for a valid numeric string", () => {
 		expect(envMinutes({ immutableProofSweepInterval: "15" }, "immutableProofSweepInterval")).toBe(
 			15
 		);
+	});
+
+	test("returns raw minutes value for a valid numeric string when default given", () => {
+		expect(
+			envMinutes({ immutableProofSweepInterval: "15" }, "immutableProofSweepInterval", 5)
+		).toBe(15);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {
@@ -127,8 +175,14 @@ describe("envMinutes", () => {
 });
 
 describe("envDateTime", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envDateTime({}, "immutableProofSweepAssumeRetryableBefore")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(
+			envDateTime({}, "immutableProofSweepAssumeRetryableBefore", "2020-01-01T00:00:00.000Z")
+		).toBe("2020-01-01T00:00:00.000Z");
 	});
 
 	test("returns the ISO string for a valid datetime input", () => {
@@ -160,12 +214,22 @@ describe("envDateTime", () => {
 });
 
 describe("envSecToMs", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envSecToMs({}, "loggingBatchFlushInterval")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envSecToMs({}, "loggingBatchFlushInterval", 3000)).toBe(3000);
 	});
 
 	test("converts seconds to milliseconds", () => {
 		expect(envSecToMs({ loggingBatchFlushInterval: "5" }, "loggingBatchFlushInterval")).toBe(5000);
+	});
+
+	test("converts seconds to milliseconds when default given", () => {
+		expect(envSecToMs({ loggingBatchFlushInterval: "5" }, "loggingBatchFlushInterval", 3000)).toBe(
+			5000
+		);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {
@@ -176,18 +240,123 @@ describe("envSecToMs", () => {
 });
 
 describe("envMinToMs", () => {
-	test("returns undefined when env var is undefined", () => {
+	test("returns undefined when env var is absent and no default given", () => {
 		expect(envMinToMs({}, "loggingRetentionInterval")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envMinToMs({}, "loggingRetentionInterval", 60_000)).toBe(60_000);
 	});
 
 	test("converts minutes to milliseconds", () => {
 		expect(envMinToMs({ loggingRetentionInterval: "2" }, "loggingRetentionInterval")).toBe(120_000);
 	});
 
+	test("converts minutes to milliseconds when default given", () => {
+		expect(envMinToMs({ loggingRetentionInterval: "2" }, "loggingRetentionInterval", 60_000)).toBe(
+			120_000
+		);
+	});
+
 	test("throws GeneralError for a non-numeric string", () => {
 		expect(() =>
 			envMinToMs({ loggingRetentionInterval: "two" }, "loggingRetentionInterval")
 		).toThrow();
+	});
+});
+
+describe("envObject", () => {
+	test("returns undefined when env var is absent and no default given", () => {
+		expect(envObject({}, "authorizationDefaultRules")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		const def = { allow: [] };
+		expect(envObject({}, "authorizationDefaultRules", def)).toBe(def);
+	});
+
+	test("returns the parsed object when the var holds a pre-parsed object", () => {
+		const rules = { allow: ["read"] };
+		expect(
+			envObject(
+				{ authorizationDefaultRules: rules as unknown as string },
+				"authorizationDefaultRules"
+			)
+		).toEqual(rules);
+	});
+
+	test("parses a JSON object string", () => {
+		expect(
+			envObject<{ x: number }>(
+				{ authorizationDefaultRules: '{"x":1}' },
+				"authorizationDefaultRules"
+			)
+		).toEqual({ x: 1 });
+	});
+
+	test("returns undefined for a non-object string when no default given", () => {
+		expect(
+			envObject({ authorizationDefaultRules: "not-json" }, "authorizationDefaultRules")
+		).toBeUndefined();
+	});
+
+	test("returns defaultValue for a non-object string when default given", () => {
+		const def = { allow: [] };
+		expect(
+			envObject({ authorizationDefaultRules: "not-json" }, "authorizationDefaultRules", def)
+		).toBe(def);
+	});
+});
+
+describe("envArray", () => {
+	test("returns undefined when env var is absent and no default given", () => {
+		expect(envArray({}, "awsMessagingPushNotificationApplications")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		const def = [{ name: "default" }];
+		expect(
+			envArray({}, "awsMessagingPushNotificationApplications", def as unknown as never[])
+		).toBe(def);
+	});
+
+	test("returns the parsed array when the var holds a pre-parsed array", () => {
+		const apps = [{ name: "app1" }];
+		expect(
+			envArray(
+				{ awsMessagingPushNotificationApplications: apps as unknown as string },
+				"awsMessagingPushNotificationApplications"
+			)
+		).toEqual(apps);
+	});
+
+	test("parses a JSON array string", () => {
+		expect(
+			envArray<number>(
+				{ awsMessagingPushNotificationApplications: "[1,2,3]" },
+				"awsMessagingPushNotificationApplications"
+			)
+		).toEqual([1, 2, 3]);
+	});
+
+	test("returns undefined for a non-array string when no default given", () => {
+		expect(
+			envArray(
+				{ awsMessagingPushNotificationApplications: "not-an-array" },
+				"awsMessagingPushNotificationApplications"
+			)
+		).toBeUndefined();
+	});
+
+	test("returns defaultValue for a non-array string when default given", () => {
+		const def = [{ name: "fallback" }];
+		expect(
+			envArray(
+				{ awsMessagingPushNotificationApplications: "not-an-array" },
+				"awsMessagingPushNotificationApplications",
+				def as unknown as never[]
+			)
+		).toBe(def);
 	});
 });
 

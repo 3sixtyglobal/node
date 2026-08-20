@@ -1,0 +1,72 @@
+{
+	"policies": [
+		{
+			"subject": "order-viewer",
+			"object": "readOrder",
+			"action": "execute"
+		},
+		{
+			"subject": "user-viewer",
+			"object": "readUser",
+			"action": "execute"
+		},
+		{
+			"subject": "order-admin",
+			"object": "createOrder",
+			"action": "execute"
+		},
+		{
+			"subject": "order-admin",
+			"object": "updateOrder",
+			"action": "execute"
+		},
+		{
+			"subject": "order-admin",
+			"object": "deleteOrder",
+			"action": "execute"
+		},
+		{
+			"subject": "user-admin",
+			"object": "createUser",
+			"action": "execute"
+		},
+		{
+			"subject": "user-admin",
+			"object": "updateUser",
+			"action": "execute"
+		},
+		{
+			"subject": "user-admin",
+			"object": "deleteUser",
+			"action": "execute"
+		}
+	],
+	"roleAssignments": [
+		{
+			"subject": "Admin1234",
+			"role": "order-admin"
+		},
+		{
+			"subject": "Admin1234",
+			"role": "user-admin"
+		},
+		{
+			"subject": "User5678",
+			"role": "user-viewer"
+		},
+		{
+			"subject": "User1357",
+			"role": "order-viewer"
+		}
+	],
+	"roleInheritances": [
+		{
+			"role": "order-admin",
+			"inheritsFrom": "order-viewer"
+		},
+		{
+			"role": "user-admin",
+			"inheritsFrom": "user-viewer"
+		}
+	]
+}

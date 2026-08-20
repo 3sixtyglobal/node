@@ -8,6 +8,7 @@ import {
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
+	AuthorizationComponentType,
 	type AutomationActionConfig,
 	type AutomationActionType,
 	AutomationComponentType,
@@ -98,6 +99,7 @@ import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } fro
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import {
 	commaSeparatedListToArray,
+	envArray,
 	envBoolean,
 	envCount,
 	envDateTime,
@@ -105,6 +107,7 @@ import {
 	envMinToMs,
 	envMinutes,
 	envMs,
+	envObject,
 	envSecToMs,
 	envSeconds
 } from "./helper/envHelpers.js";
@@ -863,7 +866,17 @@ async function configureAuthorization(
 
 	if (coreConfig.types.authorizationConnector.length > 0) {
 		coreConfig.types.authorizationComponent ??= [];
-		coreConfig.types.authorizationComponent.push({ type: "service" });
+
+		coreConfig.types.authorizationComponent.push({
+			type: AuthorizationComponentType.Service,
+			options: {
+				config: {
+					checkCacheCapacity: envInteger(envVars, "authorizationCheckCacheCapacity"),
+					checkCacheTtiMs: envMs(envVars, "authorizationCheckCacheTtiMs"),
+					defaultRules: envObject(envVars, "authorizationDefaultRules")
+				}
+			}
+		});
 	}
 }
 
@@ -1075,14 +1088,6 @@ async function configureMessaging(
 		} else if (
 			envVars.messagingPushNotificationConnector === MessagingPushNotificationConnectorType.Aws
 		) {
-			let messagingApps;
-			if (Is.stringValue(envVars.awsMessagingPushNotificationApplications)) {
-				try {
-					messagingApps = JSON.parse(envVars.awsMessagingPushNotificationApplications);
-				} catch {}
-			} else if (Is.array(envVars.awsMessagingPushNotificationApplications)) {
-				messagingApps = envVars.awsMessagingPushNotificationApplications;
-			}
 			coreConfig.types.messagingPushNotificationConnector.push({
 				type: MessagingPushNotificationConnectorType.Aws,
 				options: {
@@ -1092,7 +1097,7 @@ async function configureMessaging(
 						accessKeyId: envVars.awsSesAccessKeyId,
 						secretAccessKey: envVars.awsSesSecretAccessKey,
 						endpoint: envVars.awsSesEndpoint,
-						applicationsSettings: messagingApps ?? []
+						applicationsSettings: envArray(envVars, "awsMessagingPushNotificationApplications", [])
 					}
 				}
 			});
