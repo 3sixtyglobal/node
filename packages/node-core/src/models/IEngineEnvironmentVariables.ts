@@ -514,6 +514,11 @@ export interface IEngineEnvironmentVariables {
 	loggingFileMaxRetainedFiles?: string;
 
 	/**
+	 * A list of components to exclude from telemetry, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	telemetrySilentComponents?: string;
+
+	/**
 	 * The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
 	 */
 	openTelemetryLoggingLoggerName?: string;
@@ -653,6 +658,11 @@ export interface IEngineEnvironmentVariables {
 	 * The mutex timeout in milliseconds for the telemetry connector.
 	 */
 	telemetryMutexTimeout?: string;
+
+	/**
+	 * A list of components to exclude from tracing, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	tracingSilentComponents?: string;
 
 	/**
 	 * The type of tracing connector: entity-storage, open-telemetry.

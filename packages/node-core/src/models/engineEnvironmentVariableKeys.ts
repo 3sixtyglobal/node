@@ -159,6 +159,7 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetryBatchFlushInterval: true,
 	telemetryMaxCacheSize: true,
 	telemetryMutexTimeout: true,
+	telemetrySilentComponents: true,
 	// tracing
 	tracingConnector: true,
 	openTelemetryTracingTracerName: true,
@@ -173,6 +174,7 @@ const engineEnvironmentVariableKeysInternal: {
 	casbinClientSecret: true,
 	casbinEnforcerId: true,
 	casbinTimeoutMs: true,
+	tracingSilentComponents: true,
 	// DLT / identity
 	faucetConnector: true,
 	walletConnector: true,

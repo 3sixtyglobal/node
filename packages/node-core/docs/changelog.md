@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.15](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.14...node-core-v0.9.2-next.15) (2026-08-20)
+
+
+### Features
+
+* silent telemetry and tracing options ([#351](https://github.com/iotaledger/twin-node/issues/351)) ([3a5752f](https://github.com/iotaledger/twin-node/commit/3a5752fc0bf8a028b3ebfc34878524ac799fb81e))
+
 ## [0.9.2-next.14](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.13...node-core-v0.9.2-next.14) (2026-08-19)
 
 
