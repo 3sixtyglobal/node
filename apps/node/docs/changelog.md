@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.9.2-next.16](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.15...node-v0.9.2-next.16) (2026-08-21)
+
+
+### Features
+
+* configure web server body limits from the environment ([#356](https://github.com/iotaledger/twin-node/issues/356)) ([f196ad3](https://github.com/iotaledger/twin-node/commit/f196ad368559515184e37a99d6876570074ebcd5))
+* telemetry tracing multi ([#357](https://github.com/iotaledger/twin-node/issues/357)) ([b6412ac](https://github.com/iotaledger/twin-node/commit/b6412ac3141a94a0f9f7d1dd391451ac9247e862))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.15 to 0.9.2-next.16
+
 ## [0.9.2-next.15](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.14...node-v0.9.2-next.15) (2026-08-20)
 
 
