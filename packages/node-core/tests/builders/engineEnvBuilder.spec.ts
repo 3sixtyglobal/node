@@ -1,7 +1,18 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { DltConfigType, SchemaVersionMigrationComponentType } from "@twin.org/engine-types";
+import {
+	DataspaceControlPlaneComponentType,
+	DltConfigType,
+	EntityStorageConnectorType,
+	LoggingConnectorType,
+	SchemaVersionMigrationComponentType,
+	TaskSchedulerComponentType,
+	TelemetryComponentType,
+	TelemetryConnectorType,
+	TracingComponentType,
+	TracingConnectorType
+} from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
@@ -25,10 +36,35 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 		);
 	});
 
-	test("schema migration service is not registered when schemaMigrationEnabled is 'false'", async () => {
+	test("schema migration service is registered with enabled:false when schemaMigrationEnabled is 'false'", async () => {
 		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "false" });
 
-		expect(config.types.schemaVersionMigrationComponent).toBeUndefined();
+		expect(config.types.schemaVersionMigrationComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					type: SchemaVersionMigrationComponentType.Service,
+					options: { config: { enabled: false } }
+				})
+			])
+		);
+	});
+});
+
+describe("buildEngineConfiguration - task scheduler requirement", () => {
+	test("task scheduler is registered when only auditableItemGraphEnabled is set", async () => {
+		const config = await buildEngineConfiguration({ auditableItemGraphEnabled: "true" });
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
+	test("task scheduler is not registered when no dependent component is enabled", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.taskSchedulerComponent).toBeUndefined();
 	});
 });
 
@@ -88,5 +124,383 @@ describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 		});
 		expect(iotaConfig.gasBudget).toBe(123456789);
 		expect(iotaConfig.gasReservationDuration).toBe(45);
+	});
+});
+
+describe("buildEngineConfiguration - dataspace provider idle transfer policy", () => {
+	test("provider idle policy values are wired in seconds and converted to milliseconds", async () => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true",
+			dataspaceProviderTransferIdleTimeout: "120",
+			dataspaceProviderTransferPolicySweepInterval: "15"
+		});
+
+		const dataspaceService = config.types.dataspaceControlPlaneComponent?.find(
+			entry => entry.type === DataspaceControlPlaneComponentType.Service
+		);
+
+		const dataspaceConfig = dataspaceService?.options?.config as {
+			providerTransferIdleTimeoutMs?: number;
+			providerTransferPolicySweepIntervalMs?: number;
+		};
+
+		expect(dataspaceConfig.providerTransferIdleTimeoutMs).toBe(120000);
+		expect(dataspaceConfig.providerTransferPolicySweepIntervalMs).toBe(15000);
+	});
+
+	test("unset provider idle policy values keep existing behaviour unchanged", async () => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true"
+		});
+
+		const dataspaceService = config.types.dataspaceControlPlaneComponent?.find(
+			entry => entry.type === DataspaceControlPlaneComponentType.Service
+		);
+
+		const dataspaceConfig = dataspaceService?.options?.config as {
+			providerTransferIdleTimeoutMs?: number;
+			providerTransferPolicySweepIntervalMs?: number;
+		};
+
+		expect(dataspaceConfig.providerTransferIdleTimeoutMs).toBeUndefined();
+		expect(dataspaceConfig.providerTransferPolicySweepIntervalMs).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - entity storage shared mutex timeout", () => {
+	test("entity storage mutex timeout applies to both memory and file connectors", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "memory,file",
+			entityStorageMutexTimeout: "4321",
+			storageFileRoot: "."
+		});
+
+		const memoryConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.Memory
+		);
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+
+		const memoryMutexTimeoutMs = (
+			memoryConnector?.options as { config?: { mutexTimeoutMs?: number } }
+		)?.config?.mutexTimeoutMs;
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(memoryMutexTimeoutMs).toBe(4321);
+		expect(fileMutexTimeoutMs).toBe(4321);
+	});
+
+	test("entity storage mutex timeout is unset when the env var is empty", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "memory,file",
+			storageFileRoot: "."
+		});
+
+		const memoryConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.Memory
+		);
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+
+		const memoryMutexTimeoutMs = (
+			memoryConnector?.options as { config?: { mutexTimeoutMs?: number } }
+		)?.config?.mutexTimeoutMs;
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(memoryMutexTimeoutMs).toBeUndefined();
+		expect(fileMutexTimeoutMs).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - entity storage pool options", () => {
+	function connectorPool(
+		config: { types: { entityStorageConnector?: { type: string; options?: unknown }[] } },
+		type: EntityStorageConnectorType
+	): { [key: string]: unknown } | undefined {
+		const entry = config.types.entityStorageConnector?.find(e => e.type === type);
+		return (entry?.options as { config?: { pool?: { [key: string]: unknown } } } | undefined)
+			?.config?.pool;
+	}
+
+	test("postgresql pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "postgresql",
+			postgreSqlHost: "localhost",
+			postgreSqlUser: "u",
+			postgreSqlPassword: "p",
+			postgreSqlDatabase: "db",
+			postgreSqlPoolMax: "20",
+			postgreSqlPoolIdleTimeout: "60",
+			postgreSqlPoolConnectTimeout: "15",
+			postgreSqlPoolMaxLifetime: "3600"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.PostgreSql);
+		expect(pool).toMatchObject({ max: 20, idleTimeout: 60, connectTimeout: 15, maxLifetime: 3600 });
+	});
+
+	test("postgresql pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "postgresql",
+			postgreSqlHost: "localhost",
+			postgreSqlUser: "u",
+			postgreSqlPassword: "p",
+			postgreSqlDatabase: "db"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.PostgreSql);
+		expect(pool?.max).toBeUndefined();
+		expect(pool?.idleTimeout).toBeUndefined();
+		expect(pool?.connectTimeout).toBeUndefined();
+		expect(pool?.maxLifetime).toBeUndefined();
+	});
+
+	test("mysql pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mysql",
+			mySqlHost: "localhost",
+			mySqlUser: "u",
+			mySqlPassword: "p",
+			mySqlDatabase: "db",
+			mySqlPoolConnectionLimit: "25",
+			mySqlPoolMaxIdle: "5",
+			mySqlPoolIdleTimeout: "30000",
+			mySqlPoolEnableKeepAlive: "false",
+			mySqlPoolWaitForConnections: "true",
+			mySqlPoolQueueLimit: "100"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MySqlDb);
+		expect(pool).toMatchObject({
+			connectionLimit: 25,
+			maxIdle: 5,
+			idleTimeout: 30000,
+			enableKeepAlive: false,
+			waitForConnections: true,
+			queueLimit: 100
+		});
+	});
+
+	test("mysql pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mysql",
+			mySqlHost: "localhost",
+			mySqlUser: "u",
+			mySqlPassword: "p",
+			mySqlDatabase: "db"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MySqlDb);
+		expect(pool?.connectionLimit).toBeUndefined();
+		expect(pool?.enableKeepAlive).toBeUndefined();
+	});
+
+	test("mongodb pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mongodb",
+			mongoDbHost: "localhost",
+			mongoDbDatabase: "db",
+			mongoDbPoolMaxPoolSize: "50",
+			mongoDbPoolMinPoolSize: "2",
+			mongoDbPoolMaxIdleTime: "10000",
+			mongoDbPoolWaitQueueTimeout: "5000"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MongoDb);
+		expect(pool).toMatchObject({
+			maxPoolSize: 50,
+			minPoolSize: 2,
+			maxIdleTimeMs: 10000,
+			waitQueueTimeoutMs: 5000
+		});
+	});
+
+	test("mongodb pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "mongodb",
+			mongoDbHost: "localhost",
+			mongoDbDatabase: "db"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.MongoDb);
+		expect(pool?.maxPoolSize).toBeUndefined();
+		expect(pool?.minPoolSize).toBeUndefined();
+	});
+
+	test("scylladb pool env vars are wired to the connector config", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "scylladb",
+			scylladbHosts: "localhost",
+			scylladbLocalDataCenter: "dc1",
+			scylladbKeyspace: "ks",
+			scylladbPoolCoreConnectionsPerHost: "2",
+			scylladbPoolMaxRequestsPerConnection: "512"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.ScyllaDb);
+		expect(pool).toMatchObject({ coreConnectionsPerHost: 2, maxRequestsPerConnection: 512 });
+	});
+
+	test("scylladb pool fields are undefined when pool env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "scylladb",
+			scylladbHosts: "localhost",
+			scylladbLocalDataCenter: "dc1",
+			scylladbKeyspace: "ks"
+		});
+
+		const pool = connectorPool(config, EntityStorageConnectorType.ScyllaDb);
+		expect(pool?.coreConnectionsPerHost).toBeUndefined();
+		expect(pool?.maxRequestsPerConnection).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - logging multi-connector", () => {
+	test("single logging connector is marked as default", async () => {
+		const config = await buildEngineConfiguration({ loggingConnector: "console" });
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const multi = connectors.find(c => c.type === LoggingConnectorType.Multi);
+
+		expect(consoleConnector).toBeDefined();
+		expect(consoleConnector?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+	});
+
+	test("two logging connectors produce a multi connector set as the default", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage"
+		});
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const entityStorage = connectors.find(c => c.type === LoggingConnectorType.EntityStorage);
+		const multi = connectors.find(c => c.type === LoggingConnectorType.Multi);
+
+		expect(consoleConnector).toBeDefined();
+		expect(consoleConnector?.isDefault).toBeUndefined();
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBeUndefined();
+		expect(multi).toBeDefined();
+		expect(multi?.isDefault).toBe(true);
+	});
+});
+
+describe("buildEngineConfiguration - telemetry multi-connector", () => {
+	test("single telemetry connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.EntityStorage
+		});
+
+		const connectors = config.types.telemetryConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TelemetryConnectorType.EntityStorage);
+		const multi = connectors.find(c => c.type === TelemetryConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.telemetryComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+
+	test("two telemetry connectors produce a multi connector set as the default", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: `${TelemetryConnectorType.EntityStorage},${TelemetryConnectorType.OpenTelemetry}`
+		});
+
+		const connectors = config.types.telemetryConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TelemetryConnectorType.EntityStorage);
+		const openTelemetry = connectors.find(c => c.type === TelemetryConnectorType.OpenTelemetry);
+		const multi = connectors.find(c => c.type === TelemetryConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBeUndefined();
+		expect(openTelemetry).toBeDefined();
+		expect(openTelemetry?.isDefault).toBeUndefined();
+		expect(multi).toBeDefined();
+		expect(multi?.isDefault).toBe(true);
+		expect(config.types.telemetryComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+
+	test("silent telemetry connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.Silent
+		});
+
+		const connectors = config.types.telemetryConnector ?? [];
+		const silent = connectors.find(c => c.type === TelemetryConnectorType.Silent);
+		const multi = connectors.find(c => c.type === TelemetryConnectorType.Multi);
+
+		expect(silent).toBeDefined();
+		expect(silent?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.telemetryComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+});
+
+describe("buildEngineConfiguration - tracing multi-connector", () => {
+	test("single tracing connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			tracingConnector: TracingConnectorType.EntityStorage
+		});
+
+		const connectors = config.types.tracingConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TracingConnectorType.EntityStorage);
+		const multi = connectors.find(c => c.type === TracingConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.tracingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
+		);
+	});
+
+	test("two tracing connectors produce a multi connector set as the default", async () => {
+		const config = await buildEngineConfiguration({
+			tracingConnector: `${TracingConnectorType.EntityStorage},${TracingConnectorType.OpenTelemetry}`
+		});
+
+		const connectors = config.types.tracingConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TracingConnectorType.EntityStorage);
+		const openTelemetry = connectors.find(c => c.type === TracingConnectorType.OpenTelemetry);
+		const multi = connectors.find(c => c.type === TracingConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBeUndefined();
+		expect(openTelemetry).toBeDefined();
+		expect(openTelemetry?.isDefault).toBeUndefined();
+		expect(multi).toBeDefined();
+		expect(multi?.isDefault).toBe(true);
+		expect(config.types.tracingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
+		);
+	});
+
+	test("silent tracing connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			tracingConnector: TracingConnectorType.Silent
+		});
+
+		const connectors = config.types.tracingConnector ?? [];
+		const silent = connectors.find(c => c.type === TracingConnectorType.Silent);
+		const multi = connectors.find(c => c.type === TracingConnectorType.Multi);
+
+		expect(silent).toBeDefined();
+		expect(silent?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.tracingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
+		);
 	});
 });

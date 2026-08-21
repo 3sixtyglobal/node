@@ -258,6 +258,22 @@ ScyllaDB port.
 
 ***
 
+### scylladbPoolCoreConnectionsPerHost? {#scylladbpoolcoreconnectionsperhost}
+
+> `optional` **scylladbPoolCoreConnectionsPerHost?**: `string`
+
+ScyllaDB connection pool: number of connections per local host.
+
+***
+
+### scylladbPoolMaxRequestsPerConnection? {#scylladbpoolmaxrequestsperconnection}
+
+> `optional` **scylladbPoolMaxRequestsPerConnection?**: `string`
+
+ScyllaDB connection pool: maximum requests per connection.
+
+***
+
 ### mySqlHost? {#mysqlhost}
 
 > `optional` **mySqlHost?**: `string`
@@ -268,7 +284,7 @@ MySQL host.
 
 ### mySqlPort? {#mysqlport}
 
-> `optional` **mySqlPort?**: `number`
+> `optional` **mySqlPort?**: `string`
 
 MySQL port.
 
@@ -298,6 +314,54 @@ MySQL Database.
 
 ***
 
+### mySqlPoolConnectionLimit? {#mysqlpoolconnectionlimit}
+
+> `optional` **mySqlPoolConnectionLimit?**: `string`
+
+MySQL connection pool: maximum number of connections.
+
+***
+
+### mySqlPoolMaxIdle? {#mysqlpoolmaxidle}
+
+> `optional` **mySqlPoolMaxIdle?**: `string`
+
+MySQL connection pool: maximum number of idle connections.
+
+***
+
+### mySqlPoolIdleTimeout? {#mysqlpoolidletimeout}
+
+> `optional` **mySqlPoolIdleTimeout?**: `string`
+
+MySQL connection pool: milliseconds before an idle connection is removed.
+
+***
+
+### mySqlPoolEnableKeepAlive? {#mysqlpoolenablekeepalive}
+
+> `optional` **mySqlPoolEnableKeepAlive?**: `string`
+
+MySQL connection pool: enable TCP keep-alive.
+
+***
+
+### mySqlPoolWaitForConnections? {#mysqlpoolwaitforconnections}
+
+> `optional` **mySqlPoolWaitForConnections?**: `string`
+
+MySQL connection pool: wait for a connection when pool is full.
+
+***
+
+### mySqlPoolQueueLimit? {#mysqlpoolqueuelimit}
+
+> `optional` **mySqlPoolQueueLimit?**: `string`
+
+MySQL connection pool: maximum queued requests (0 = unlimited).
+
+***
+
 ### mongoDbHost? {#mongodbhost}
 
 > `optional` **mongoDbHost?**: `string`
@@ -308,7 +372,7 @@ MongoDB host.
 
 ### mongoDbPort? {#mongodbport}
 
-> `optional` **mongoDbPort?**: `number`
+> `optional` **mongoDbPort?**: `string`
 
 MongoDB port.
 
@@ -338,6 +402,38 @@ MongoDB Database.
 
 ***
 
+### mongoDbPoolMaxPoolSize? {#mongodbpoolmaxpoolsize}
+
+> `optional` **mongoDbPoolMaxPoolSize?**: `string`
+
+MongoDB connection pool: maximum number of connections.
+
+***
+
+### mongoDbPoolMinPoolSize? {#mongodbpoolminpoolsize}
+
+> `optional` **mongoDbPoolMinPoolSize?**: `string`
+
+MongoDB connection pool: minimum number of connections to maintain.
+
+***
+
+### mongoDbPoolMaxIdleTime? {#mongodbpoolmaxidletime}
+
+> `optional` **mongoDbPoolMaxIdleTime?**: `string`
+
+MongoDB connection pool: milliseconds a connection can remain idle before removal.
+
+***
+
+### mongoDbPoolWaitQueueTimeout? {#mongodbpoolwaitqueuetimeout}
+
+> `optional` **mongoDbPoolWaitQueueTimeout?**: `string`
+
+MongoDB connection pool: milliseconds to wait for a connection before throwing.
+
+***
+
 ### postgreSqlHost? {#postgresqlhost}
 
 > `optional` **postgreSqlHost?**: `string`
@@ -348,7 +444,7 @@ PostgreSQl host.
 
 ### postgreSqlPort? {#postgresqlport}
 
-> `optional` **postgreSqlPort?**: `number`
+> `optional` **postgreSqlPort?**: `string`
 
 PostgreSQl port.
 
@@ -375,6 +471,38 @@ PostgreSQl password.
 > `optional` **postgreSqlDatabase?**: `string`
 
 PostgreSQl Database.
+
+***
+
+### postgreSqlPoolMax? {#postgresqlpoolmax}
+
+> `optional` **postgreSqlPoolMax?**: `string`
+
+PostgreSQL connection pool: maximum number of connections.
+
+***
+
+### postgreSqlPoolIdleTimeout? {#postgresqlpoolidletimeout}
+
+> `optional` **postgreSqlPoolIdleTimeout?**: `string`
+
+PostgreSQL connection pool: seconds a connection can remain idle before being closed.
+
+***
+
+### postgreSqlPoolConnectTimeout? {#postgresqlpoolconnecttimeout}
+
+> `optional` **postgreSqlPoolConnectTimeout?**: `string`
+
+PostgreSQL connection pool: seconds to wait when establishing a connection.
+
+***
+
+### postgreSqlPoolMaxLifetime? {#postgresqlpoolmaxlifetime}
+
+> `optional` **postgreSqlPoolMaxLifetime?**: `string`
+
+PostgreSQL connection pool: maximum seconds a connection can remain open.
 
 ***
 
@@ -583,7 +711,7 @@ Hashicorp Vault endpoint.
 
 > `optional` **loggingConnector?**: `string`
 
-The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
+The type of logging task connector, can be a comma separated list: console, entity-storage, open-telemetry, file.
 
 ***
 
@@ -700,6 +828,14 @@ The maximum log file size in bytes before rotation when using the file logging c
 > `optional` **loggingFileMaxRetainedFiles?**: `string`
 
 The number of rotated log files to retain when using the file logging connector, defaults to 5. Set to 0 or negative to keep all rotated files.
+
+***
+
+### telemetrySilentComponents? {#telemetrysilentcomponents}
+
+> `optional` **telemetrySilentComponents?**: `string`
+
+A list of components to exclude from telemetry, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
 
 ***
 
@@ -835,7 +971,7 @@ The type of messaging push notification connector: entity-storage, aws.
 
 > `optional` **telemetryConnector?**: `string`
 
-The type of telemetry connector: entity-storage.
+The type of telemetry connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
 
 ***
 
@@ -895,6 +1031,128 @@ Maximum number of values retained per telemetry metric (count-based history cap)
 
 ***
 
+### telemetryBatchSize? {#telemetrybatchsize}
+
+> `optional` **telemetryBatchSize?**: `string`
+
+The batch size for the telemetry connector, set to 1 to disable size-based flushing.
+
+***
+
+### telemetryBatchFlushInterval? {#telemetrybatchflushinterval}
+
+> `optional` **telemetryBatchFlushInterval?**: `string`
+
+The batch flush interval in seconds for the telemetry connector, how often to flush when using batching, defaults to 5 seconds.
+
+***
+
+### telemetryMaxCacheSize? {#telemetrymaxcachesize}
+
+> `optional` **telemetryMaxCacheSize?**: `string`
+
+The maximum number of metric values to hold in the write-ahead cache for the telemetry connector. Set to 0 for unlimited.
+
+#### Default
+
+```ts
+1000
+```
+
+***
+
+### telemetryMutexTimeout? {#telemetrymutextimeout}
+
+> `optional` **telemetryMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the telemetry connector.
+
+***
+
+### telemetryMetricDefinitionCacheCapacity? {#telemetrymetricdefinitioncachecapacity}
+
+> `optional` **telemetryMetricDefinitionCacheCapacity?**: `string`
+
+The maximum number of metric definitions held in the in-memory definition cache for the telemetry connector.
+
+#### Default
+
+```ts
+100
+```
+
+***
+
+### telemetryMetricDefinitionCacheTtiMs? {#telemetrymetricdefinitioncachettims}
+
+> `optional` **telemetryMetricDefinitionCacheTtiMs?**: `string`
+
+The time-to-idle in milliseconds for cached metric definitions in the telemetry connector.
+
+#### Default
+
+```ts
+3600000
+```
+
+***
+
+### tracingSilentComponents? {#tracingsilentcomponents}
+
+> `optional` **tracingSilentComponents?**: `string`
+
+A list of components to exclude from tracing, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
+### tracingConnector? {#tracingconnector}
+
+> `optional` **tracingConnector?**: `string`
+
+The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
+
+***
+
+### openTelemetryTracingTracerName? {#opentelemetrytracingtracername}
+
+> `optional` **openTelemetryTracingTracerName?**: `string`
+
+The name of the Open Telemetry tracer to use, only required if using open-telemetry as tracing connector, defaults to twin-node.
+
+***
+
+### openTelemetryTracingTracerVersion? {#opentelemetrytracingtracerversion}
+
+> `optional` **openTelemetryTracingTracerVersion?**: `string`
+
+The version of the Open Telemetry tracing specification to use, only required if using open-telemetry as tracing connector, defaults to 1.0.0.
+
+***
+
+### openTelemetryTracingEndpoint? {#opentelemetrytracingendpoint}
+
+> `optional` **openTelemetryTracingEndpoint?**: `string`
+
+The OTLP HTTP endpoint to push spans to, e.g. http://localhost:4318/v1/traces. Required when using open-telemetry as tracing connector.
+
+***
+
+### openTelemetryTracingProcessor? {#opentelemetrytracingprocessor}
+
+> `optional` **openTelemetryTracingProcessor?**: `string`
+
+The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
+
+***
+
+### tracingMutexTimeout? {#tracingmutextimeout}
+
+> `optional` **tracingMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the tracing connector.
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`
@@ -951,11 +1209,43 @@ The index of the wallet address to use, defaults to 0.
 
 ***
 
-### identityDidResolutionCacheTtlMs? {#identitydidresolutioncachettlms}
+### identityDidResolutionCacheTtl? {#identitydidresolutioncachettl}
 
-> `optional` **identityDidResolutionCacheTtlMs?**: `string`
+> `optional` **identityDidResolutionCacheTtl?**: `string`
 
 The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
+
+***
+
+### identityDidResolutionCacheCapacity? {#identitydidresolutioncachecapacity}
+
+> `optional` **identityDidResolutionCacheCapacity?**: `string`
+
+The maximum number of DID documents to hold in the resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+
+***
+
+### identityDidResolutionCacheMutexTimeout? {#identitydidresolutioncachemutextimeout}
+
+> `optional` **identityDidResolutionCacheMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the DID resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+
+***
+
+### identityDidResolutionRetries? {#identitydidresolutionretries}
+
+> `optional` **identityDidResolutionRetries?**: `string`
+
+The number of times to retry resolving a DID after a write operation (create, update, or delete) to confirm propagation. Only used when using the IOTA identity connector.
+
+***
+
+### identityDidResolutionRetryDelay? {#identitydidresolutionretrydelay}
+
+> `optional` **identityDidResolutionRetryDelay?**: `string`
+
+The delay in milliseconds between DID resolution retries after a write operation. Only used when using the IOTA identity connector.
 
 ***
 
@@ -1068,6 +1358,127 @@ The type of identity profile connector: entity-storage.
 > `optional` **immutableProofVerificationMethodId?**: `string`
 
 The identity verification method id to use with immutable proofs.
+
+***
+
+### immutableProofTaskRetryCount? {#immutableprooftaskretrycount}
+
+> `optional` **immutableProofTaskRetryCount?**: `string`
+
+The number of times to retry a proof task when it fails, 0 to disable retries.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### immutableProofTaskRetryInterval? {#immutableprooftaskretryinterval}
+
+> `optional` **immutableProofTaskRetryInterval?**: `string`
+
+The interval in seconds to wait between proof task retries.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### immutableProofTaskFailureRetainFor? {#immutableprooftaskfailureretainfor}
+
+> `optional` **immutableProofTaskFailureRetainFor?**: `string`
+
+The time in minutes to retain the record of a failed proof task.
+Set to -1 to retain failures forever.
+
+#### Default
+
+```ts
+10080
+```
+
+***
+
+### immutableProofSweepInterval? {#immutableproofsweepinterval}
+
+> `optional` **immutableProofSweepInterval?**: `string`
+
+How often in minutes the immutable proof reconciliation sweep runs.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
+### immutableProofSweepStaleThreshold? {#immutableproofsweepstalethreshold}
+
+> `optional` **immutableProofSweepStaleThreshold?**: `string`
+
+The minimum age in minutes before a proof with no notarization is considered stuck.
+
+#### Default
+
+```ts
+180
+```
+
+***
+
+### immutableProofSweepMaxAttempts? {#immutableproofsweepmaxattempts}
+
+> `optional` **immutableProofSweepMaxAttempts?**: `string`
+
+The number of sweep attempts made before a proof is parked.
+
+#### Default
+
+```ts
+5
+```
+
+***
+
+### immutableProofSweepBatchLimit? {#immutableproofsweepbatchlimit}
+
+> `optional` **immutableProofSweepBatchLimit?**: `string`
+
+The maximum number of proofs to re-enqueue per tenant per sweep cycle.
+
+#### Default
+
+```ts
+10
+```
+
+***
+
+### immutableProofSweepBackoff? {#immutableproofsweepbackoff}
+
+> `optional` **immutableProofSweepBackoff?**: `string`
+
+The minimum time in minutes between sweep attempts for the same proof.
+
+#### Default
+
+```ts
+60
+```
+
+***
+
+### immutableProofSweepAssumeRetryableBefore? {#immutableproofsweepassumeretryablebefore}
+
+> `optional` **immutableProofSweepAssumeRetryableBefore?**: `string`
+
+ISO 8601 date-time used to treat older missing-task proofs as retryable.
 
 ***
 
@@ -1332,6 +1743,78 @@ The interval in seconds for cleaning up the activity logs.
 
 ***
 
+### dataspaceAgreementCacheTtl? {#dataspaceagreementcachettl}
+
+> `optional` **dataspaceAgreementCacheTtl?**: `string`
+
+The TTL in milliseconds for the dataspace agreement cache.
+
+***
+
+### dataspaceAgreementCacheMutexTimeout? {#dataspaceagreementcachemutextimeout}
+
+> `optional` **dataspaceAgreementCacheMutexTimeout?**: `string`
+
+The mutex timeout in milliseconds for the dataspace agreement cache.
+
+***
+
+### dataspaceAgreementUnusedThreshold? {#dataspaceagreementunusedthreshold}
+
+> `optional` **dataspaceAgreementUnusedThreshold?**: `string`
+
+The time in milliseconds after which an unused agreement is eligible for removal.
+
+***
+
+### dataspaceAgreementSweepInterval? {#dataspaceagreementsweepinterval}
+
+> `optional` **dataspaceAgreementSweepInterval?**: `string`
+
+The interval in milliseconds between agreement sweep runs.
+
+***
+
+### dataspaceRetryCount? {#dataspaceretrycount}
+
+> `optional` **dataspaceRetryCount?**: `string`
+
+The number of times to retry failed data plane tasks.
+
+***
+
+### dataspacePushRetryCount? {#dataspacepushretrycount}
+
+> `optional` **dataspacePushRetryCount?**: `string`
+
+Maximum HTTP retry attempts per push delivery task execution.
+
+***
+
+### dataspacePushRetryBaseDelay? {#dataspacepushretrybasedelay}
+
+> `optional` **dataspacePushRetryBaseDelay?**: `string`
+
+Base delay in milliseconds for exponential backoff between push HTTP retries.
+
+***
+
+### dataspacePushTimeout? {#dataspacepushtimeout}
+
+> `optional` **dataspacePushTimeout?**: `string`
+
+Timeout in milliseconds for each push delivery HTTP POST request.
+
+***
+
+### dataspacePushSubscriptionCleanupInterval? {#dataspacepushsubscriptioncleanupinterval}
+
+> `optional` **dataspacePushSubscriptionCleanupInterval?**: `string`
+
+Interval in milliseconds between orphaned push subscription cleanup scans.
+
+***
+
 ### dataspaceDataPlanePath? {#dataspacedataplanepath}
 
 > `optional` **dataspaceDataPlanePath?**: `string`
@@ -1341,7 +1824,7 @@ Combined with the public origin to form the `dataAddress.endpoint` sent to PULL 
 and the inbox URL sent to PUSH providers.
 
 This must be the mount-point prefix of the data plane routes, NOT a specific route path.
-Do NOT append sub-paths such as `/entities` or `/inbox` — those are appended automatically
+Do NOT append sub-paths such as `/entities` or `/inbox` - those are appended automatically
 by each transfer handler and by the data plane REST client.
 
 REQUIRED if PULL or PUSH transfers are supported.
@@ -1395,6 +1878,22 @@ progressing it before it is treated as timed out.
 
 ***
 
+### dataspaceProviderTransferIdleTimeout? {#dataspaceprovidertransferidletimeout}
+
+> `optional` **dataspaceProviderTransferIdleTimeout?**: `string`
+
+How long in seconds a provider transfer may stay idle before the idle policy marks it as stalled.
+
+***
+
+### dataspaceProviderTransferPolicySweepInterval? {#dataspaceprovidertransferpolicysweepinterval}
+
+> `optional` **dataspaceProviderTransferPolicySweepInterval?**: `string`
+
+How frequently in seconds the provider idle transfer policy sweep runs.
+
+***
+
 ### dataspaceCallbackPath? {#dataspacecallbackpath}
 
 > `optional` **dataspaceCallbackPath?**: `string`
@@ -1436,6 +1935,14 @@ This allows components that take a long time to initialize to be healthy before 
 
 ***
 
+### healthApplicationInterval? {#healthapplicationinterval}
+
+> `optional` **healthApplicationInterval?**: `string`
+
+The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
+
+***
+
 ### automationActionTypes? {#automationactiontypes}
 
 > `optional` **automationActionTypes?**: `string`
@@ -1445,9 +1952,9 @@ values: fetch
 
 ***
 
-### mutexTimeoutMsDefault? {#mutextimeoutmsdefault}
+### mutexTimeoutDefault? {#mutextimeoutdefault}
 
-> `optional` **mutexTimeoutMsDefault?**: `string`
+> `optional` **mutexTimeoutDefault?**: `string`
 
 The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
 
@@ -1493,19 +2000,11 @@ The mutex timeout in milliseconds for the logging component.
 
 ***
 
-### entityStorageMemoryMutexTimeout? {#entitystoragememorymutextimeout}
+### entityStorageMutexTimeout? {#entitystoragemutextimeout}
 
-> `optional` **entityStorageMemoryMutexTimeout?**: `string`
+> `optional` **entityStorageMutexTimeout?**: `string`
 
-The mutex timeout in milliseconds for the memory entity storage connector.
-
-***
-
-### entityStorageFileMutexTimeout? {#entitystoragefilemutextimeout}
-
-> `optional` **entityStorageFileMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the file entity storage connector.
+The mutex timeout in milliseconds for the memory and file entity storage connectors.
 
 ***
 

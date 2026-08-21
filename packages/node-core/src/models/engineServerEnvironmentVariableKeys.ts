@@ -9,24 +9,27 @@ import type { IEngineServerEnvironmentVariables } from "./IEngineServerEnvironme
 const engineServerEnvironmentVariableKeysInternal: {
 	[K in keyof Required<IEngineServerEnvironmentVariables>]: true;
 } = {
-	// IEngineServerEnvironmentVariables — server
+	// IEngineServerEnvironmentVariables - server
 	port: true,
 	host: true,
 	corsOrigins: true,
 	httpMethods: true,
 	httpAllowedHeaders: true,
 	httpExposedHeaders: true,
+	httpBodyLimits: true,
 	publicOrigin: true,
-	// IEngineServerEnvironmentVariables — auth
+	// IEngineServerEnvironmentVariables - auth
 	authAdminProcessorType: true,
 	authProcessorType: true,
 	authSigningKeyId: true,
 	authApiKeyHeader: true,
-	// IEngineServerEnvironmentVariables — routing
+	// IEngineServerEnvironmentVariables - routing
 	mimeTypeProcessors: true,
 	routeLoggingIncludeBody: true,
 	routeLoggingFullBase64: true,
-	routeLoggingObfuscateProperties: true
+	routeLoggingObfuscateProperties: true,
+	routeMetricsExcludePaths: true,
+	routeTracingExcludePaths: true
 };
 
 /**

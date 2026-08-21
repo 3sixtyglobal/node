@@ -25,7 +25,7 @@ npx "@twin.org/node"
 Command: help
 
 All the commands available are listed below, for more information use the --help option with a specific command.
-bootstrap-legacy: Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**
+bootstrap-dev: Bootstrap the development environment
 identity-create: Create an identity
 identity-import: Import an identity
 identity-list: List all identities held in custody by the node
@@ -62,10 +62,10 @@ Key environment variables that control how the node server handles authenticatio
 | `TWIN_AUTH_API_KEY_HEADER` | `x-api-key`    | HTTP header name for the API key on requests.  |
 | `TWIN_AUTH_SIGNING_KEY_ID` | `auth-signing` | Vault key ID used to sign authentication JWTs. |
 
-## bootstrap-legacy --help
+## bootstrap-dev --help
 
 ```text
-bootstrap-legacy: Bootstrap in legacy mode for backwards compatibility, **will be deprecated in future versions**
+bootstrap-dev: Bootstrap the development environment
 
 env-prefix: (string, optional)
 Prefix to use for standard .env files e.g. TWIN_.
@@ -73,7 +73,7 @@ Prefix to use for standard .env files e.g. TWIN_.
 load-env: (string, optional)
 Comma separated list of paths to .env files to read input parameters from.
 
-Example: bootstrap-legacy --load-env=".env.bootstrap-legacy"
+Example: bootstrap-dev --load-env=".env.bootstrap-dev"
 ```
 
 The command reads the following environment variables (use `load-env` to supply them from a file):
@@ -306,15 +306,15 @@ Example: tenant-list-by-org --org-id="did:iota:..."
 
 ## Example
 
-### Bootstrap legacy (single command)
+### Bootstrap dev (single command)
 
-Runs the complete bootstrap sequence in one step using values from `.env.bootstrap-legacy`:
+Runs the complete bootstrap sequence in one step using values from `.env.bootstrap-dev`:
 
 ```shell
-twin-node bootstrap-legacy --load-env=".env.bootstrap-legacy"
+twin-node bootstrap-dev --load-env=".env.bootstrap-dev"
 ```
 
-The sections below show the equivalent step-by-step commands that replicate the bootstrap-legacy process.
+The sections below show the equivalent step-by-step commands that replicate the bootstrap-dev process.
 
 ---
 

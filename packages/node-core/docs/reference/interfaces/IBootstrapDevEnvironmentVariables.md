@@ -1,6 +1,6 @@
-# Interface: IBootstrapLegacyEnvironmentVariables
+# Interface: IBootstrapDevEnvironmentVariables
 
-The environment variables for the bootstrap legacy.
+The environment variables for the bootstrap development command.
 
 ## Properties
 

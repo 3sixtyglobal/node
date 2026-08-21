@@ -174,9 +174,9 @@ async function buildNodeEnv() {
 	return env;
 }
 
-/** Run the one-shot `bootstrap-legacy` command to create node identity + admin user. */
+/** Run the one-shot `bootstrap-dev` command to create node identity + admin user. */
 async function bootstrap(nodeEnv) {
-	log('info', 'Bootstrapping node (bootstrap-legacy)...');
+	log('info', 'Bootstrapping node (bootstrap-dev)...');
 	const bootstrapEnv = {
 		...nodeEnv,
 		TWIN_FEATURES: 'admin-user',
@@ -185,9 +185,9 @@ async function bootstrap(nodeEnv) {
 		TWIN_ADMIN_USER_SCOPE: cfg.adminScope
 	};
 
-	const code = await runToCompletion(['bootstrap-legacy'], bootstrapEnv);
+	const code = await runToCompletion(['bootstrap-dev'], bootstrapEnv);
 	if (code !== 0) {
-		throw new Error(`bootstrap-legacy exited with code ${code} (see ${SERVER_LOG})`);
+		throw new Error(`bootstrap-dev exited with code ${code} (see ${SERVER_LOG})`);
 	}
 	log('info', 'Bootstrap complete.');
 }

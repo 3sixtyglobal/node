@@ -31,7 +31,11 @@
 				"accept": "application/ld+json"
 			},
 			"body": {
-				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"]
+				"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+				"consumerPid": "urn:uuid:11111111-1111-1111-1111-111111111111",
+				"agreementId": "urn:uuid:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+				"format": "HttpData-PULL",
+				"callbackAddress": "https://example.com/callback"
 			},
 			"expectedStatus": 400
 		},

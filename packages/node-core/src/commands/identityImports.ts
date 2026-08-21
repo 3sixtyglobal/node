@@ -3,6 +3,7 @@
 import { CLIDisplay } from "@twin.org/cli-core";
 import { GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import { Bip39 } from "@twin.org/crypto";
+import { AccountHelper } from "@twin.org/dlt-account";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityResolverConnectorFactory } from "@twin.org/identity-models";
 import { VaultConnectorFactory } from "@twin.org/vault-models";
@@ -110,7 +111,7 @@ export async function identityImport(
 	const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.identity-import.labels.storingMnemonic"));
-	const mnemonicKey = `${params.identity}/mnemonic`;
+	const mnemonicKey = AccountHelper.buildMnemonicKey(params.identity);
 	await vaultConnector.setSecret(mnemonicKey, params.mnemonic);
 
 	CLIDisplay.break();

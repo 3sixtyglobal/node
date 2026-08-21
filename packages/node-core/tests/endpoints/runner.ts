@@ -74,7 +74,7 @@ function interpolatePath(template: string, vars: { [key: string]: string }): str
  * @returns The interpolated value with the same shape as the input.
  */
 function interpolateDeep(value: unknown, vars: { [key: string]: string }): unknown {
-	if (typeof value === "string") {
+	if (Is.string(value)) {
 		const singleVar = /^{{([^}]+)}}$/.exec(value);
 		if (singleVar) {
 			const raw = vars[singleVar[1]] ?? "";
@@ -92,9 +92,9 @@ function interpolateDeep(value: unknown, vars: { [key: string]: string }): unkno
 	if (Is.array(value)) {
 		return value.map(item => interpolateDeep(item, vars));
 	}
-	if (value !== null && typeof value === "object") {
+	if (Is.object(value)) {
 		const result: { [key: string]: unknown } = {};
-		for (const [k, v] of Object.entries(value as { [key: string]: unknown })) {
+		for (const [k, v] of Object.entries(value)) {
 			result[k] = interpolateDeep(v, vars);
 		}
 		return result;
@@ -190,8 +190,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 		const interpolated = interpolateDeep(step.body, ctx.vars);
 		// A top-level string body means step.body was "{{varName}}" - the captured value
 		// is already a JSON string (e.g. a serialized object), so send it verbatim.
-		fetchOptions.body =
-			typeof interpolated === "string" ? interpolated : JSON.stringify(interpolated);
+		fetchOptions.body = Is.string(interpolated) ? interpolated : JSON.stringify(interpolated);
 	}
 
 	const res = await fetch(urlStr, fetchOptions);
@@ -220,8 +219,8 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 
 	console.debug(`[${step.description}]`, {
 		status: res.status,
-		...(responseJson !== undefined ? { body: responseJson } : {}),
-		...(responseText !== undefined ? { text: responseText } : {})
+		body: responseJson,
+		text: responseText
 	});
 
 	// Capture - extract values from the response and store them in ctx.vars so they can be
@@ -306,7 +305,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 						`[${step.description}] Assert ${spec} should be defined, got ${JSON.stringify(actual)}`
 					);
 				}
-			} else if (typeof expected === "string" && /^{{[^}]+}}$/.test(expected)) {
+			} else if (Is.string(expected) && /^{{[^}]+}}$/.test(expected)) {
 				// Compare against a previously captured variable rather than a literal.
 				const key = expected.slice(2, -2);
 				if (actual !== ctx.vars[key]) {

@@ -2,9 +2,9 @@
 	"group": "Federated Catalogue",
 	"steps": [
 		{
-			"description": "POST /federated-catalogue/datasets — create dataset",
+			"description": "POST /catalog/datasets — create dataset",
 			"method": "POST",
-			"path": "/federated-catalogue/datasets",
+			"path": "/catalog/datasets",
 			"headers": {
 				"authorization": "{{trustAuthorization}}"
 			},
@@ -30,7 +30,7 @@
 				"dcat:distribution": [
 					{
 						"@type": "dcat:Distribution",
-						"dcterms:format": "application/json",
+						"dcterms:format": "HttpData-PULL",
 						"dcat:accessService": "https://example.com/data-access"
 					}
 				]
@@ -38,9 +38,9 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /federated-catalogue/request — 400 missing @type",
+			"description": "POST /catalog/request — 400 missing @type",
 			"method": "POST",
-			"path": "/federated-catalogue/request",
+			"path": "/catalog/request",
 			"headers": {
 				"authorization": "{{trustAuthorization}}"
 			},
@@ -51,9 +51,9 @@
 			"assert": { "body.@type": "CatalogError" }
 		},
 		{
-			"description": "POST /federated-catalogue/request — 400 filter not an array",
+			"description": "POST /catalog/request — 400 filter not an array",
 			"method": "POST",
-			"path": "/federated-catalogue/request",
+			"path": "/catalog/request",
 			"headers": {
 				"authorization": "{{trustAuthorization}}"
 			},
@@ -66,9 +66,9 @@
 			"assert": { "body.@type": "CatalogError" }
 		},
 		{
-			"description": "GET /federated-catalogue/datasets/:datasetId — 200 known dataset",
+			"description": "GET /catalog/datasets/:datasetId — 200 known dataset",
 			"method": "GET",
-			"path": "/federated-catalogue/datasets/{{fedCatDatasetId}}",
+			"path": "/catalog/datasets/{{fedCatDatasetId}}",
 			"headers": {
 				"authorization": "{{trustAuthorization}}"
 			},
@@ -76,9 +76,9 @@
 			"assert": { "body.@type": "Dataset" }
 		},
 		{
-			"description": "GET /federated-catalogue/datasets/:datasetId — 404 unknown dataset",
+			"description": "GET /catalog/datasets/:datasetId — 404 unknown dataset",
 			"method": "GET",
-			"path": "/federated-catalogue/datasets/{{fakeId}}",
+			"path": "/catalog/datasets/{{fakeId}}",
 			"headers": {
 				"authorization": "{{trustAuthorization}}"
 			},
@@ -86,9 +86,9 @@
 			"assert": { "body.@type": "CatalogError" }
 		},
 		{
-			"description": "DELETE /federated-catalogue/datasets/:datasetId — delete dataset",
+			"description": "DELETE /catalog/datasets/:datasetId — delete dataset",
 			"method": "DELETE",
-			"path": "/federated-catalogue/datasets/{{fedCatDatasetId}}",
+			"path": "/catalog/datasets/{{fedCatDatasetId}}",
 			"headers": {
 				"authorization": "{{trustAuthorization}}"
 			},

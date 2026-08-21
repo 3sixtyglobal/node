@@ -165,6 +165,16 @@ export interface IEngineEnvironmentVariables {
 	scylladbPort?: string;
 
 	/**
+	 * ScyllaDB connection pool: number of connections per local host.
+	 */
+	scylladbPoolCoreConnectionsPerHost?: string;
+
+	/**
+	 * ScyllaDB connection pool: maximum requests per connection.
+	 */
+	scylladbPoolMaxRequestsPerConnection?: string;
+
+	/**
 	 * MySQL host.
 	 */
 	mySqlHost?: string;
@@ -172,7 +182,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * MySQL port.
 	 */
-	mySqlPort?: number;
+	mySqlPort?: string;
 
 	/**
 	 * MySQL username.
@@ -190,6 +200,36 @@ export interface IEngineEnvironmentVariables {
 	mySqlDatabase?: string;
 
 	/**
+	 * MySQL connection pool: maximum number of connections.
+	 */
+	mySqlPoolConnectionLimit?: string;
+
+	/**
+	 * MySQL connection pool: maximum number of idle connections.
+	 */
+	mySqlPoolMaxIdle?: string;
+
+	/**
+	 * MySQL connection pool: milliseconds before an idle connection is removed.
+	 */
+	mySqlPoolIdleTimeout?: string;
+
+	/**
+	 * MySQL connection pool: enable TCP keep-alive.
+	 */
+	mySqlPoolEnableKeepAlive?: string;
+
+	/**
+	 * MySQL connection pool: wait for a connection when pool is full.
+	 */
+	mySqlPoolWaitForConnections?: string;
+
+	/**
+	 * MySQL connection pool: maximum queued requests (0 = unlimited).
+	 */
+	mySqlPoolQueueLimit?: string;
+
+	/**
 	 * MongoDB host.
 	 */
 	mongoDbHost?: string;
@@ -197,7 +237,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * MongoDB port.
 	 */
-	mongoDbPort?: number;
+	mongoDbPort?: string;
 
 	/**
 	 * MongoDB username.
@@ -215,6 +255,26 @@ export interface IEngineEnvironmentVariables {
 	mongoDbDatabase?: string;
 
 	/**
+	 * MongoDB connection pool: maximum number of connections.
+	 */
+	mongoDbPoolMaxPoolSize?: string;
+
+	/**
+	 * MongoDB connection pool: minimum number of connections to maintain.
+	 */
+	mongoDbPoolMinPoolSize?: string;
+
+	/**
+	 * MongoDB connection pool: milliseconds a connection can remain idle before removal.
+	 */
+	mongoDbPoolMaxIdleTime?: string;
+
+	/**
+	 * MongoDB connection pool: milliseconds to wait for a connection before throwing.
+	 */
+	mongoDbPoolWaitQueueTimeout?: string;
+
+	/**
 	 * PostgreSQl host.
 	 */
 	postgreSqlHost?: string;
@@ -222,7 +282,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * PostgreSQl port.
 	 */
-	postgreSqlPort?: number;
+	postgreSqlPort?: string;
 
 	/**
 	 * PostgreSQl username.
@@ -238,6 +298,26 @@ export interface IEngineEnvironmentVariables {
 	 * PostgreSQl Database.
 	 */
 	postgreSqlDatabase?: string;
+
+	/**
+	 * PostgreSQL connection pool: maximum number of connections.
+	 */
+	postgreSqlPoolMax?: string;
+
+	/**
+	 * PostgreSQL connection pool: seconds a connection can remain idle before being closed.
+	 */
+	postgreSqlPoolIdleTimeout?: string;
+
+	/**
+	 * PostgreSQL connection pool: seconds to wait when establishing a connection.
+	 */
+	postgreSqlPoolConnectTimeout?: string;
+
+	/**
+	 * PostgreSQL connection pool: maximum seconds a connection can remain open.
+	 */
+	postgreSqlPoolMaxLifetime?: string;
 
 	/**
 	 * The security token for accessing IPFS API.
@@ -366,7 +446,7 @@ export interface IEngineEnvironmentVariables {
 	hashicorpVaultEndpoint?: string;
 
 	/**
-	 * The type of logging task connector, can be a comma separated list: console, entity-storage, otel, file.
+	 * The type of logging task connector, can be a comma separated list: console, entity-storage, open-telemetry, file.
 	 */
 	loggingConnector?: string;
 
@@ -432,6 +512,11 @@ export interface IEngineEnvironmentVariables {
 	 * The number of rotated log files to retain when using the file logging connector, defaults to 5. Set to 0 or negative to keep all rotated files.
 	 */
 	loggingFileMaxRetainedFiles?: string;
+
+	/**
+	 * A list of components to exclude from telemetry, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	telemetrySilentComponents?: string;
 
 	/**
 	 * The name of the OpenTelemetry logger, only required if using open-telemetry as logging connector, defaults to twin-logging.
@@ -514,7 +599,7 @@ export interface IEngineEnvironmentVariables {
 	messagingPushNotificationConnector?: string;
 
 	/**
-	 * The type of telemetry connector: entity-storage.
+	 * The type of telemetry connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
 	 */
 	telemetryConnector?: string;
 
@@ -554,6 +639,74 @@ export interface IEngineEnvironmentVariables {
 	telemetryMetricsProducerMaxHistory?: string;
 
 	/**
+	 * The batch size for the telemetry connector, set to 1 to disable size-based flushing.
+	 */
+	telemetryBatchSize?: string;
+
+	/**
+	 * The batch flush interval in seconds for the telemetry connector, how often to flush when using batching, defaults to 5 seconds.
+	 */
+	telemetryBatchFlushInterval?: string;
+
+	/**
+	 * The maximum number of metric values to hold in the write-ahead cache for the telemetry connector. Set to 0 for unlimited.
+	 * @default 1000
+	 */
+	telemetryMaxCacheSize?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the telemetry connector.
+	 */
+	telemetryMutexTimeout?: string;
+
+	/**
+	 * The maximum number of metric definitions held in the in-memory definition cache for the telemetry connector.
+	 * @default 100
+	 */
+	telemetryMetricDefinitionCacheCapacity?: string;
+
+	/**
+	 * The time-to-idle in milliseconds for cached metric definitions in the telemetry connector.
+	 * @default 3600000
+	 */
+	telemetryMetricDefinitionCacheTtiMs?: string;
+
+	/**
+	 * A list of components to exclude from tracing, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+	 */
+	tracingSilentComponents?: string;
+
+	/**
+	 * The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
+	 */
+	tracingConnector?: string;
+
+	/**
+	 * The name of the Open Telemetry tracer to use, only required if using open-telemetry as tracing connector, defaults to twin-node.
+	 */
+	openTelemetryTracingTracerName?: string;
+
+	/**
+	 * The version of the Open Telemetry tracing specification to use, only required if using open-telemetry as tracing connector, defaults to 1.0.0.
+	 */
+	openTelemetryTracingTracerVersion?: string;
+
+	/**
+	 * The OTLP HTTP endpoint to push spans to, e.g. http://localhost:4318/v1/traces. Required when using open-telemetry as tracing connector.
+	 */
+	openTelemetryTracingEndpoint?: string;
+
+	/**
+	 * The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
+	 */
+	openTelemetryTracingProcessor?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the tracing connector.
+	 */
+	tracingMutexTimeout?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;
@@ -591,7 +744,27 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The TTL in milliseconds for caching resolved DIDs when using the IOTA identity connector. Omit to use the connector default.
 	 */
-	identityDidResolutionCacheTtlMs?: string;
+	identityDidResolutionCacheTtl?: string;
+
+	/**
+	 * The maximum number of DID documents to hold in the resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+	 */
+	identityDidResolutionCacheCapacity?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the DID resolution cache. Only used when using the IOTA identity connector and caching is enabled.
+	 */
+	identityDidResolutionCacheMutexTimeout?: string;
+
+	/**
+	 * The number of times to retry resolving a DID after a write operation (create, update, or delete) to confirm propagation. Only used when using the IOTA identity connector.
+	 */
+	identityDidResolutionRetries?: string;
+
+	/**
+	 * The delay in milliseconds between DID resolution retries after a write operation. Only used when using the IOTA identity connector.
+	 */
+	identityDidResolutionRetryDelay?: string;
 
 	/**
 	 * The type of identity resolver connector: entity-storage, iota.
@@ -662,6 +835,60 @@ export interface IEngineEnvironmentVariables {
 	 * The identity verification method id to use with immutable proofs.
 	 */
 	immutableProofVerificationMethodId?: string;
+
+	/**
+	 * The number of times to retry a proof task when it fails, 0 to disable retries.
+	 * @default 5
+	 */
+	immutableProofTaskRetryCount?: string;
+
+	/**
+	 * The interval in seconds to wait between proof task retries.
+	 * @default 5
+	 */
+	immutableProofTaskRetryInterval?: string;
+
+	/**
+	 * The time in minutes to retain the record of a failed proof task.
+	 * Set to -1 to retain failures forever.
+	 * @default 10080
+	 */
+	immutableProofTaskFailureRetainFor?: string;
+
+	/**
+	 * How often in minutes the immutable proof reconciliation sweep runs.
+	 * @default 30
+	 */
+	immutableProofSweepInterval?: string;
+
+	/**
+	 * The minimum age in minutes before a proof with no notarization is considered stuck.
+	 * @default 180
+	 */
+	immutableProofSweepStaleThreshold?: string;
+
+	/**
+	 * The number of sweep attempts made before a proof is parked.
+	 * @default 5
+	 */
+	immutableProofSweepMaxAttempts?: string;
+
+	/**
+	 * The maximum number of proofs to re-enqueue per tenant per sweep cycle.
+	 * @default 10
+	 */
+	immutableProofSweepBatchLimit?: string;
+
+	/**
+	 * The minimum time in minutes between sweep attempts for the same proof.
+	 * @default 60
+	 */
+	immutableProofSweepBackoff?: string;
+
+	/**
+	 * ISO 8601 date-time used to treat older missing-task proofs as retryable.
+	 */
+	immutableProofSweepAssumeRetryableBefore?: string;
 
 	/**
 	 * The type of attestation connector: entity-storage, iota.
@@ -830,12 +1057,57 @@ export interface IEngineEnvironmentVariables {
 	dataspaceActivityLogsCleanupInterval?: string;
 
 	/**
+	 * The TTL in milliseconds for the dataspace agreement cache.
+	 */
+	dataspaceAgreementCacheTtl?: string;
+
+	/**
+	 * The mutex timeout in milliseconds for the dataspace agreement cache.
+	 */
+	dataspaceAgreementCacheMutexTimeout?: string;
+
+	/**
+	 * The time in milliseconds after which an unused agreement is eligible for removal.
+	 */
+	dataspaceAgreementUnusedThreshold?: string;
+
+	/**
+	 * The interval in milliseconds between agreement sweep runs.
+	 */
+	dataspaceAgreementSweepInterval?: string;
+
+	/**
+	 * The number of times to retry failed data plane tasks.
+	 */
+	dataspaceRetryCount?: string;
+
+	/**
+	 * Maximum HTTP retry attempts per push delivery task execution.
+	 */
+	dataspacePushRetryCount?: string;
+
+	/**
+	 * Base delay in milliseconds for exponential backoff between push HTTP retries.
+	 */
+	dataspacePushRetryBaseDelay?: string;
+
+	/**
+	 * Timeout in milliseconds for each push delivery HTTP POST request.
+	 */
+	dataspacePushTimeout?: string;
+
+	/**
+	 * Interval in milliseconds between orphaned push subscription cleanup scans.
+	 */
+	dataspacePushSubscriptionCleanupInterval?: string;
+
+	/**
 	 * Base route path for the data plane service (path only, not full URL).
 	 * Combined with the public origin to form the `dataAddress.endpoint` sent to PULL consumers
 	 * and the inbox URL sent to PUSH providers.
 	 *
 	 * This must be the mount-point prefix of the data plane routes, NOT a specific route path.
-	 * Do NOT append sub-paths such as `/entities` or `/inbox` — those are appended automatically
+	 * Do NOT append sub-paths such as `/entities` or `/inbox` - those are appended automatically
 	 * by each transfer handler and by the data plane REST client.
 	 *
 	 * REQUIRED if PULL or PUSH transfers are supported.
@@ -866,6 +1138,16 @@ export interface IEngineEnvironmentVariables {
 	dataspaceStalledTransferTimeout?: string;
 
 	/**
+	 * How long in seconds a provider transfer may stay idle before the idle policy marks it as stalled.
+	 */
+	dataspaceProviderTransferIdleTimeout?: string;
+
+	/**
+	 * How frequently in seconds the provider idle transfer policy sweep runs.
+	 */
+	dataspaceProviderTransferPolicySweepInterval?: string;
+
+	/**
 	 * Path under which the dataspace control plane is mounted (path only, not full URL).
 	 * This must match the control-plane REST mount, as it is combined with the public
 	 * origin to build the consumer's advertised callback address.
@@ -890,6 +1172,11 @@ export interface IEngineEnvironmentVariables {
 	healthStartupInterval?: string;
 
 	/**
+	 * The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
+	 */
+	healthApplicationInterval?: string;
+
+	/**
 	 * The type of the automation action to create, comma separate for more than one connector.
 	 * values: fetch
 	 */
@@ -898,7 +1185,7 @@ export interface IEngineEnvironmentVariables {
 	/**
 	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
 	 */
-	mutexTimeoutMsDefault?: string;
+	mutexTimeoutDefault?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the auditable item graph component.
@@ -926,14 +1213,9 @@ export interface IEngineEnvironmentVariables {
 	loggingMutexTimeout?: string;
 
 	/**
-	 * The mutex timeout in milliseconds for the memory entity storage connector.
+	 * The mutex timeout in milliseconds for the memory and file entity storage connectors.
 	 */
-	entityStorageMemoryMutexTimeout?: string;
-
-	/**
-	 * The mutex timeout in milliseconds for the file entity storage connector.
-	 */
-	entityStorageFileMutexTimeout?: string;
+	entityStorageMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the rights management component.

@@ -23,6 +23,7 @@ import {
 	NftConnectorType,
 	NotarizationConnectorType,
 	TelemetryConnectorType,
+	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
@@ -107,6 +108,7 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+				TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -152,6 +154,7 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+				TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -212,6 +215,7 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+				TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -271,6 +275,7 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 				TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 				TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+				TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -339,6 +344,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -366,6 +372,7 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+			TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -450,12 +457,14 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"logging-service",
 			"background-task-service",
 			"task-scheduler-service",
 			"event-bus-service",
 			"telemetry-service",
+			"tracing-service",
 			"metrics-collector-service",
 			"automation-service",
 			"messaging-admin-service",
@@ -531,6 +540,10 @@ describe("node-core", () => {
 			"GET      /telemetry/metric",
 			"GET      /telemetry/metric/:id/value/:valueId",
 			"GET      /telemetry/metric/:id/value",
+			"POST     /tracing",
+			"PUT      /tracing/:spanId",
+			"GET      /tracing",
+			"GET      /tracing/trace/:traceId",
 			"POST     /automation/trigger/:trigger",
 			"POST     /automation",
 			"DELETE   /automation/:actionId",
@@ -564,10 +577,14 @@ describe("node-core", () => {
 			"GET      /identity/:identity",
 			"POST     /identity/profile",
 			"GET      /identity/profile",
+			"GET      /identity/profile/:userIdentity",
 			"GET      /identity/profile/:identity/public",
 			"PUT      /identity/profile",
+			"PUT      /identity/profile/:userIdentity",
 			"DELETE   /identity/profile",
+			"DELETE   /identity/profile/:userIdentity",
 			"GET      /identity/profile/query",
+			"GET      /identity/profile/admin/query",
 			"POST     /nft",
 			"GET      /nft/:id",
 			"DELETE   /nft/:id",
@@ -647,10 +664,10 @@ describe("node-core", () => {
 			"PUT      /rights-management/negotiations/admin/:policyId",
 			"DELETE   /rights-management/negotiations/admin/:policyId",
 			"GET      /rights-management/negotiations/admin",
-			"POST     /federated-catalogue/request",
-			"GET      /federated-catalogue/datasets/:datasetId",
-			"POST     /federated-catalogue/datasets",
-			"DELETE   /federated-catalogue/datasets/:datasetId",
+			"POST     /catalog/request",
+			"GET      /catalog/datasets/:datasetId",
+			"POST     /catalog/datasets",
+			"DELETE   /catalog/datasets/:datasetId",
 			"GET      /.well-known/dspace-version",
 			"POST     /dataspace/transfers/request",
 			"GET      /dataspace/transfers/:pid",
@@ -715,6 +732,7 @@ describe("node-core", () => {
 			TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 			TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 			TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+			TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 			TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 			TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 			TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -860,6 +878,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -922,6 +941,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -984,6 +1004,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"
@@ -1119,6 +1140,7 @@ describe("node-core", () => {
 
 		expect(ComponentFactory.names()).toEqual([
 			"engine-logging-service",
+			"schema-version-service",
 			"platform-service",
 			"did-context-id-handler",
 			"information-service"

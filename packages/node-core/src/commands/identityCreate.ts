@@ -3,6 +3,7 @@
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { Coerce, GeneralError, I18n, Is, RandomHelper, StringHelper } from "@twin.org/core";
 import { Bip39 } from "@twin.org/crypto";
+import { AccountHelper } from "@twin.org/dlt-account";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { IdentityConnectorType, WalletConnectorType } from "@twin.org/engine-types";
 import {
@@ -299,7 +300,7 @@ export async function identityCreate(
 	} finally {
 		// Always remove temporary identity mnemonic if created
 		if (Is.stringValue(tempIdentity) && mnemonicStored) {
-			await mnemonicRemove(vaultConnector, tempIdentity);
+			await AccountHelper.removeAccountKeys(undefined, vaultConnector, tempIdentity);
 		}
 	}
 }
@@ -329,7 +330,7 @@ async function mnemonicCreate(
 		I18n.formatMessage("node.cli.commands.identity-create.labels.processingMnemonic")
 	);
 
-	const mnemonicKey = `${identity}/mnemonic`;
+	const mnemonicKey = AccountHelper.buildMnemonicKey(identity);
 
 	try {
 		CLIDisplay.task(I18n.formatMessage("node.cli.commands.identity-create.labels.readingMnemonic"));
@@ -390,31 +391,8 @@ async function mnemonicFinalise(
 	// Now that we have an identity we can remove the temporary one
 	// and store the mnemonic with the new identity
 	if (tempIdentity !== identity) {
-		const mnemonic = await vaultConnector.getSecret(`${tempIdentity}/mnemonic`);
-		await vaultConnector.setSecret(`${identity}/mnemonic`, mnemonic);
-
-		try {
-			// not all accounts have account entries in the vault, so wrap this in a try catch
-			const accountChunk = await vaultConnector.getSecret(`${tempIdentity}/account/0/0/0`);
-			await vaultConnector.setSecret(`${identity}/account/0/0/0`, accountChunk);
-		} catch {}
+		await AccountHelper.renameAccountKeys(undefined, vaultConnector, tempIdentity, identity);
 	}
-}
-
-/**
- * Remove the mnemonic and associated account secret for an identity.
- * @param vaultConnector The vault connector.
- * @param identity The working identity.
- * @returns A promise that resolves when all vault secrets for the identity have been removed.
- */
-async function mnemonicRemove(vaultConnector: IVaultConnector, identity: string): Promise<void> {
-	try {
-		await vaultConnector.removeSecret(`${identity}/mnemonic`);
-	} catch {}
-
-	try {
-		await vaultConnector.removeSecret(`${identity}/account/0/0/0`);
-	} catch {}
 }
 
 /**

@@ -187,7 +187,7 @@ export function setup() {
 		{
 			area: 'fedcat',
 			method: 'POST',
-			url: '/federated-catalogue/datasets',
+			url: '/catalog/datasets',
 			body: {
 				'@context': {
 					dcat: 'http://www.w3.org/ns/dcat#',
@@ -201,7 +201,7 @@ export function setup() {
 				'dcat:distribution': {
 					'@type': 'dcat:Distribution',
 					'@id': 'https://soak.example.com/distributions/soak-probe-dist',
-					'dcterms:format': 'application/json',
+					'dcterms:format': 'HttpData-PULL',
 					'dcat:accessService': 'https://soak.example.com/services/soak-node'
 				},
 				'odrl:hasPolicy': {
@@ -295,7 +295,7 @@ function authHeaders() {
 }
 
 // Generate/refresh the org trust token (a JWT-encoded W3C VC). Used as a Bearer token
-// for federated-catalogue requests. Refreshes proactively 60s before expiry so no
+// for catalog requests. Refreshes proactively 60s before expiry so no
 // request ever sends a stale token — this mirrors real client behaviour.
 function ensureTrustToken() {
 	const nowSec = Date.now() / 1000;
@@ -620,7 +620,7 @@ function doFedcat() {
 			'dcat:distribution': {
 				'@type': 'dcat:Distribution',
 				'@id': `https://soak.example.com/distributions/soak-${__VU}-${__ITER}`,
-				'dcterms:format': 'application/json',
+				'dcterms:format': 'HttpData-PULL',
 				'dcat:accessService': 'https://soak.example.com/services/soak-node'
 			},
 			'odrl:hasPolicy': {
@@ -631,7 +631,7 @@ function doFedcat() {
 				permission: [{ action: 'use' }]
 			}
 		});
-		const res = http.post(`${BASE}/federated-catalogue/datasets${orgParam(false)}`, body, {
+		const res = http.post(`${BASE}/catalog/datasets${orgParam(false)}`, body, {
 			headers: { ...authHeaders(), ...trustHeaders(), 'Content-Type': 'application/json' },
 			tags: { name: 'fedcat_create' }
 		});
@@ -647,7 +647,7 @@ function doFedcat() {
 			'@type': 'CatalogRequestMessage',
 			filter: []
 		});
-		const res = http.post(`${BASE}/federated-catalogue/request${orgParam(false)}`, body, {
+		const res = http.post(`${BASE}/catalog/request${orgParam(false)}`, body, {
 			headers: { ...authHeaders(), ...trustHeaders(), 'Content-Type': 'application/json' },
 			tags: { name: 'fedcat_query' }
 		});
@@ -677,7 +677,7 @@ function doDataspace() {
 				'dcat:distribution': {
 					'@type': 'dcat:Distribution',
 					'@id': `https://soak.example.com/distributions/ds-${__VU}-${__ITER}`,
-					'dcterms:format': 'application/json',
+					'dcterms:format': 'HttpData-PULL',
 					'dcat:accessService': 'https://soak.example.com/services/soak-node'
 				},
 				'odrl:hasPolicy': {

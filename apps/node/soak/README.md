@@ -87,18 +87,18 @@ probes for notarization and fedcat) before VUs start, and fails fast with the ar
 unexpected response. The dataspace liveness probe hits `GET /.well-known/dspace-version`
 (unauthenticated, server-level endpoint).
 
-| Group          | Weight | Endpoints exercised                                                                     |
-| -------------- | ------ | --------------------------------------------------------------------------------------- |
-| `logging`      | 15%    | `POST /logging` (write); every 20th iter `GET /logging?limit=20`                        |
-| `blob`         | 12%    | `SOAK_WRITE_RATIO` chance → `POST /blob`; else `GET /blob/:id` + `/content`             |
-| `aig`          | 12%    | write-ratio → `POST /aig`; else `GET /aig/:id`; occasional list `GET /aig?limit=20`     |
-| `ais`          | 12%    | create stream once per VU; then `POST /ais/:id/entries` + `GET /ais/:id/entries`        |
-| `identity`     | 12%    | `GET /identity/:org` (resolve) + `GET /identity/profile/` (own)                         |
-| `telemetry`    | 8%     | `GET /telemetry/metric?limit=20`                                                        |
-| `auth`         | 7%     | `GET /authentication/admin/users/:email`                                                |
-| `notarization` | 8%     | write-ratio → `POST /notarization`; else `GET /notarization/:id`                        |
-| `fedcat`       | 7%     | write-ratio → `POST /federated-catalogue/datasets`; else trust-token `POST .../request` |
-| `dataspace`    | 7%     | write-ratio → `POST /dataspace/app-datasets`; else `GET /dataspace/app-datasets/:id`    |
+| Group          | Weight | Endpoints exercised                                                                  |
+| -------------- | ------ | ------------------------------------------------------------------------------------ |
+| `logging`      | 15%    | `POST /logging` (write); every 20th iter `GET /logging?limit=20`                     |
+| `blob`         | 12%    | `SOAK_WRITE_RATIO` chance → `POST /blob`; else `GET /blob/:id` + `/content`          |
+| `aig`          | 12%    | write-ratio → `POST /aig`; else `GET /aig/:id`; occasional list `GET /aig?limit=20`  |
+| `ais`          | 12%    | create stream once per VU; then `POST /ais/:id/entries` + `GET /ais/:id/entries`     |
+| `identity`     | 12%    | `GET /identity/:org` (resolve) + `GET /identity/profile/` (own)                      |
+| `telemetry`    | 8%     | `GET /telemetry/metric?limit=20`                                                     |
+| `auth`         | 7%     | `GET /authentication/admin/users/:email`                                             |
+| `notarization` | 8%     | write-ratio → `POST /notarization`; else `GET /notarization/:id`                     |
+| `fedcat`       | 7%     | write-ratio → `POST /catalog/datasets`; else trust-token `POST .../request`          |
+| `dataspace`    | 7%     | write-ratio → `POST /dataspace/app-datasets`; else `GET /dataspace/app-datasets/:id` |
 
 Weights sum to 1.0. Traffic is read-heavy (~65% reads) with continuous writes from logging and ais,
 and `SOAK_WRITE_RATIO`-governed writes for blob, aig, notarization, fedcat, and dataspace. This

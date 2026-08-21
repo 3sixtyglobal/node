@@ -1,5 +1,218 @@
 # Changelog
 
+## [0.9.2-next.16](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.15...node-v0.9.2-next.16) (2026-08-21)
+
+
+### Features
+
+* configure web server body limits from the environment ([#356](https://github.com/iotaledger/twin-node/issues/356)) ([f196ad3](https://github.com/iotaledger/twin-node/commit/f196ad368559515184e37a99d6876570074ebcd5))
+* telemetry tracing multi ([#357](https://github.com/iotaledger/twin-node/issues/357)) ([b6412ac](https://github.com/iotaledger/twin-node/commit/b6412ac3141a94a0f9f7d1dd391451ac9247e862))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.15 to 0.9.2-next.16
+
+## [0.9.2-next.15](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.14...node-v0.9.2-next.15) (2026-08-20)
+
+
+### Features
+
+* silent telemetry and tracing options ([#351](https://github.com/iotaledger/twin-node/issues/351)) ([3a5752f](https://github.com/iotaledger/twin-node/commit/3a5752fc0bf8a028b3ebfc34878524ac799fb81e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.14 to 0.9.2-next.15
+
+## [0.9.2-next.14](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.13...node-v0.9.2-next.14) (2026-08-19)
+
+
+### Features
+
+* telemetry batching ([#347](https://github.com/iotaledger/twin-node/issues/347)) ([5d5b0a9](https://github.com/iotaledger/twin-node/commit/5d5b0a91396298fe774ae26193b0595875cd118a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.13 to 0.9.2-next.14
+
+## [0.9.2-next.13](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.12...node-v0.9.2-next.13) (2026-08-18)
+
+
+### Features
+
+* add tracing ([#344](https://github.com/iotaledger/twin-node/issues/344)) ([4fa71cd](https://github.com/iotaledger/twin-node/commit/4fa71cd0eafd7d708df15c8f0a85323fecd05561))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.12 to 0.9.2-next.13
+
+## [0.9.2-next.12](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.11...node-v0.9.2-next.12) (2026-08-17)
+
+
+### Features
+
+* add dsp sweep vars ([#340](https://github.com/iotaledger/twin-node/issues/340)) ([5487c13](https://github.com/iotaledger/twin-node/commit/5487c13197fcd386206ec37f9f342c55ec5b1176))
+* rest metrics ([#341](https://github.com/iotaledger/twin-node/issues/341)) ([ebec573](https://github.com/iotaledger/twin-node/commit/ebec5736bb66adfd97f7d73912bec1ce7392e5f8))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.11 to 0.9.2-next.12
+
+## [0.9.2-next.11](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.10...node-v0.9.2-next.11) (2026-08-14)
+
+
+### Features
+
+* add tenant override ([#337](https://github.com/iotaledger/twin-node/issues/337)) ([b4ea765](https://github.com/iotaledger/twin-node/commit/b4ea7656e2557c19053365dd5d4af14d0d945cd5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.10 to 0.9.2-next.11
+
+## [0.9.2-next.10](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.9...node-v0.9.2-next.10) (2026-08-12)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.9 to 0.9.2-next.10
+
+## [0.9.2-next.9](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.8...node-v0.9.2-next.9) (2026-08-12)
+
+
+### Features
+
+* pool env vars ([#331](https://github.com/iotaledger/twin-node/issues/331)) ([338ea61](https://github.com/iotaledger/twin-node/commit/338ea612b37aa4d15971c8a09def47bee9395d0c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.8 to 0.9.2-next.9
+
+## [0.9.2-next.8](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.7...node-v0.9.2-next.8) (2026-08-11)
+
+
+### Features
+
+* add additional env vars ([#328](https://github.com/iotaledger/twin-node/issues/328)) ([6ca8718](https://github.com/iotaledger/twin-node/commit/6ca87184bc4d78829c957ea055d3c281aca6cf9f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.7 to 0.9.2-next.8
+
+## [0.9.2-next.7](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.6...node-v0.9.2-next.7) (2026-08-10)
+
+
+### Features
+
+* additional env vars and validation ([#324](https://github.com/iotaledger/twin-node/issues/324)) ([6b01e8c](https://github.com/iotaledger/twin-node/commit/6b01e8c10f9aa7181f51f13534d8164db3e7322d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.6 to 0.9.2-next.7
+
+## [0.9.2-next.6](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.5...node-v0.9.2-next.6) (2026-08-07)
+
+
+### Features
+
+* add tracing support ([a4986fc](https://github.com/iotaledger/twin-node/commit/a4986fc4af603ee461ec8d18ff502dddbc43edec))
+* update docs ([61e5a00](https://github.com/iotaledger/twin-node/commit/61e5a004089a0c11ec03e354b076604ecdeb4817))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.5 to 0.9.2-next.6
+
+## [0.9.2-next.5](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.4...node-v0.9.2-next.5) (2026-08-03)
+
+
+### Features
+
+* update dependencies ([#316](https://github.com/iotaledger/twin-node/issues/316)) ([f3fe328](https://github.com/iotaledger/twin-node/commit/f3fe3281a80f34763c923eacca58364273a550b7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.4 to 0.9.2-next.5
+
+## [0.9.2-next.4](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.3...node-v0.9.2-next.4) (2026-08-03)
+
+
+### Bug Fixes
+
+* wire includeErrorStack debug flag into auth and tenant processor configs ([#313](https://github.com/iotaledger/twin-node/issues/313)) ([3c69c51](https://github.com/iotaledger/twin-node/commit/3c69c51bfdd65305efe2fbe9da508e684a4245d1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.3 to 0.9.2-next.4
+
+## [0.9.2-next.3](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.2...node-v0.9.2-next.3) (2026-07-30)
+
+
+### Features
+
+* bootstrap-legacy rename ([#310](https://github.com/iotaledger/twin-node/issues/310)) ([53af8a2](https://github.com/iotaledger/twin-node/commit/53af8a2e797e90bb601416215247cd8649dd6220))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.2 to 0.9.2-next.3
+
+## [0.9.2-next.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.1...node-v0.9.2-next.2) (2026-07-29)
+
+
+### Features
+
+* immutable proof config ([#307](https://github.com/iotaledger/twin-node/issues/307)) ([9257495](https://github.com/iotaledger/twin-node/commit/92574953329647756aa6ab4cca80b1707e14a33f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.2-next.1 to 0.9.2-next.2
+
 ## [0.9.2-next.1](https://github.com/iotaledger/twin-node/compare/node-v0.9.2-next.0...node-v0.9.2-next.1) (2026-07-28)
 
 
