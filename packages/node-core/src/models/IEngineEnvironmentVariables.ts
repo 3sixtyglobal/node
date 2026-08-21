@@ -599,7 +599,7 @@ export interface IEngineEnvironmentVariables {
 	messagingPushNotificationConnector?: string;
 
 	/**
-	 * The type of telemetry connector: entity-storage.
+	 * The type of telemetry connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
 	 */
 	telemetryConnector?: string;
 
@@ -660,12 +660,24 @@ export interface IEngineEnvironmentVariables {
 	telemetryMutexTimeout?: string;
 
 	/**
+	 * The maximum number of metric definitions held in the in-memory definition cache for the telemetry connector.
+	 * @default 100
+	 */
+	telemetryMetricDefinitionCacheCapacity?: string;
+
+	/**
+	 * The time-to-idle in milliseconds for cached metric definitions in the telemetry connector.
+	 * @default 3600000
+	 */
+	telemetryMetricDefinitionCacheTtiMs?: string;
+
+	/**
 	 * A list of components to exclude from tracing, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
 	 */
 	tracingSilentComponents?: string;
 
 	/**
-	 * The type of tracing connector: entity-storage, open-telemetry.
+	 * The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
 	 */
 	tracingConnector?: string;
 

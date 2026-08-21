@@ -1,8 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Coerce, GeneralError, Is } from "@twin.org/core";
-import type { IEngineEnvironmentVariables } from "../../models/IEngineEnvironmentVariables.js";
-import type { IEngineServerEnvironmentVariables } from "../../models/IEngineServerEnvironmentVariables.js";
 
 /**
  * Coerces an env var to a boolean, falling back to the supplied default when not set.
@@ -12,18 +10,11 @@ import type { IEngineServerEnvironmentVariables } from "../../models/IEngineServ
  * @returns The boolean value, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to a boolean.
  */
-export function envBoolean(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables,
-	defaultValue: boolean
-): boolean;
-export function envBoolean(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): boolean | undefined;
-export function envBoolean(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables,
+export function envBoolean<T>(envVars: T, key: keyof T, defaultValue: boolean): boolean;
+export function envBoolean<T>(envVars: T, key: keyof T): boolean | undefined;
+export function envBoolean<T>(
+	envVars: T,
+	key: keyof T,
 	defaultValue?: boolean
 ): boolean | undefined {
 	const value = envVars[key];
@@ -41,16 +32,16 @@ export function envBoolean(
  * Coerces an env var that is already in milliseconds to an integer.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The millisecond value, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The millisecond value, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envMs(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envMs<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envMs<T>(envVars: T, key: keyof T): number | undefined;
+export function envMs<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const result = Coerce.integer(value);
 	if (Is.empty(result)) {
@@ -63,16 +54,16 @@ export function envMs(
  * Coerces an env var that represents an integer count or size to an integer.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The count, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The count, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envCount(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envCount<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envCount<T>(envVars: T, key: keyof T): number | undefined;
+export function envCount<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const result = Coerce.integer(value);
 	if (Is.empty(result)) {
@@ -85,16 +76,16 @@ export function envCount(
  * Coerces an env var that represents an integer to an actual integer.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The integer, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The integer, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envInteger(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envInteger<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envInteger<T>(envVars: T, key: keyof T): number | undefined;
+export function envInteger<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const result = Coerce.integer(value);
 	if (Is.empty(result)) {
@@ -104,19 +95,69 @@ export function envInteger(
 }
 
 /**
+ * Returns an env var as a typed object. Accepts a pre-parsed object, an inline JSON object string,
+ * or a value already expanded from a @json: file reference.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to coerce.
+ * @param defaultValue The value to return when the env var is absent or cannot be parsed.
+ * @returns The parsed object, or the default when absent or the value cannot be parsed.
+ */
+export function envObject<T, U>(envVars: T, key: keyof T, defaultValue: U): U;
+/**
+ * Returns an env var as a typed object. Accepts a pre-parsed object, an inline JSON object string,
+ * or a value already expanded from a @json: file reference.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to coerce.
+ * @returns The parsed object, or undefined when the var is absent or the value cannot be parsed.
+ */
+export function envObject<T, U>(envVars: T, key: keyof T): U | undefined;
+export function envObject<T, U>(envVars: T, key: keyof T, defaultValue?: U): U | undefined {
+	const value: unknown = envVars[key];
+	if (Is.undefined(value)) {
+		return defaultValue;
+	}
+	return Coerce.object<U>(value) ?? defaultValue;
+}
+
+/**
+ * Returns an env var as a typed array. Accepts a pre-parsed array, an inline JSON array string,
+ * or a value already expanded from a @json: file reference.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to coerce.
+ * @param defaultValue The value to return when the env var is absent or cannot be parsed.
+ * @returns The parsed array, or the default when absent or the value cannot be parsed.
+ */
+export function envArray<T, U>(envVars: T, key: keyof T, defaultValue: U[]): U[];
+/**
+ * Returns an env var as a typed array. Accepts a pre-parsed array, an inline JSON array string,
+ * or a value already expanded from a @json: file reference.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to coerce.
+ * @returns The parsed array, or undefined when the var is absent or the value cannot be parsed.
+ */
+export function envArray<T, U>(envVars: T, key: keyof T): U[] | undefined;
+export function envArray<T, U>(envVars: T, key: keyof T, defaultValue?: U[]): U[] | undefined {
+	const value: unknown = envVars[key];
+	if (Is.undefined(value)) {
+		return defaultValue;
+	}
+	return Coerce.array<U>(value) ?? defaultValue;
+}
+
+/**
  * Coerces an env var that is already in seconds to an integer.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The second value, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The second value, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envSeconds(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envSeconds<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envSeconds<T>(envVars: T, key: keyof T): number | undefined;
+export function envSeconds<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const result = Coerce.integer(value);
 	if (Is.empty(result)) {
@@ -129,16 +170,16 @@ export function envSeconds(
  * Coerces an env var that is already in minutes to an integer.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The minute value, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The minute value, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envMinutes(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envMinutes<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envMinutes<T>(envVars: T, key: keyof T): number | undefined;
+export function envMinutes<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const result = Coerce.integer(value);
 	if (Is.empty(result)) {
@@ -151,16 +192,20 @@ export function envMinutes(
  * Coerces an env var that is a datetime string, throwing when the value is set but not a valid datetime.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The datetime string, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The datetime ISO string, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to a datetime.
  */
-export function envDateTime(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
+export function envDateTime<T>(envVars: T, key: keyof T, defaultValue: string): string;
+export function envDateTime<T>(envVars: T, key: keyof T): string | undefined;
+export function envDateTime<T>(
+	envVars: T,
+	key: keyof T,
+	defaultValue?: string
 ): string | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const result = Coerce.dateTime(value) ?? Coerce.date(value);
 	if (Is.empty(result)) {
@@ -173,16 +218,16 @@ export function envDateTime(
  * Coerces an env var to an integer and converts from seconds to milliseconds.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The value in milliseconds, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The value in milliseconds, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envSecToMs(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envSecToMs<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envSecToMs<T>(envVars: T, key: keyof T): number | undefined;
+export function envSecToMs<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const n = Coerce.integer(value);
 	if (Is.empty(n)) {
@@ -195,16 +240,16 @@ export function envSecToMs(
  * Coerces an env var to an integer and converts from minutes to milliseconds.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
- * @returns The value in milliseconds, or undefined when not set.
+ * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
+ * @returns The value in milliseconds, the default, or undefined when absent and no default given.
  * @throws GeneralError if the value is set but cannot be coerced to an integer.
  */
-export function envMinToMs(
-	envVars: IEngineEnvironmentVariables,
-	key: keyof IEngineEnvironmentVariables
-): number | undefined {
+export function envMinToMs<T>(envVars: T, key: keyof T, defaultValue: number): number;
+export function envMinToMs<T>(envVars: T, key: keyof T): number | undefined;
+export function envMinToMs<T>(envVars: T, key: keyof T, defaultValue?: number): number | undefined {
 	const value = envVars[key];
 	if (!Is.stringValue(value)) {
-		return undefined;
+		return defaultValue;
 	}
 	const n = Coerce.integer(value);
 	if (Is.empty(n)) {
@@ -219,49 +264,51 @@ export function envMinToMs(
  * @param defaultValue The default value to return when the list is empty or undefined.
  * @returns The array.
  */
-export function commaSeparatedListToArray<T>(
+export function commaSeparatedListToArray<U>(
 	value: string | undefined,
-	defaultValue: T[] | undefined = []
-): T[] {
+	defaultValue: U[] | undefined = []
+): U[] {
 	if (!Is.stringValue(value)) {
 		return defaultValue;
 	}
 	return value
 		.split(",")
 		.map(item => item.trim())
-		.filter(item => item.length > 0) as T[];
+		.filter(item => item.length > 0) as U[];
 }
 
 /**
- * Gets named byte limits from an env var holding comma separated name=bytes pairs.
+ * Gets named key integer pairs from an env var holding comma separated key=integer pairs.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to read.
- * @returns The named byte limits, or undefined when the env var is absent or empty.
- * @throws GeneralError if an entry is not a unique name=bytes pair with an integer value.
+ * @returns The named key integer pairs, or undefined when the env var is absent or empty.
+ * @throws GeneralError if an entry is not a unique name=value pair with an integer value.
  */
-export function envByteLimits(
-	envVars: IEngineServerEnvironmentVariables,
-	key: keyof IEngineServerEnvironmentVariables
-): { [name: string]: number } | undefined {
-	const entries = commaSeparatedListToArray<string>(envVars[key], undefined);
+export function envKeyIntegerPairs<T>(
+	envVars: T,
+	key: keyof T
+): { [key: string]: number } | undefined {
+	const entries = commaSeparatedListToArray<string>(envVars[key] as string | undefined, undefined);
 	if (!Is.arrayValue(entries)) {
 		return undefined;
 	}
 
-	const byteLimits: { [name: string]: number } = {};
+	const keyValues: { [name: string]: number } = {};
 	for (const entry of entries) {
 		const parts = entry.split("=").map(part => part.trim());
-		const bytes = Coerce.number(parts[1]);
+
+		const keyPart = parts[0];
+		const valuePart = Coerce.integer(parts[1]);
 		if (
 			parts.length !== 2 ||
-			!Is.stringValue(parts[0]) ||
-			!Is.integer(bytes) ||
-			!Is.undefined(byteLimits[parts[0]])
+			!Is.stringValue(keyPart) ||
+			!Is.integer(valuePart) ||
+			!Is.undefined(keyValues[keyPart])
 		) {
-			throw new GeneralError("node", "invalidEnvVarPair", { key, value: entry });
+			throw new GeneralError("node", "invalidEnvVarPair", { key: keyPart, value: entry });
 		}
-		byteLimits[parts[0]] = bytes;
+		keyValues[keyPart] = valuePart;
 	}
 
-	return byteLimits;
+	return keyValues;
 }

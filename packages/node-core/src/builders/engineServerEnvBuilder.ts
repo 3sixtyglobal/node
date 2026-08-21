@@ -18,9 +18,9 @@ import {
 } from "@twin.org/engine-server-types";
 import { TraceparentHelper } from "@twin.org/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
-import { isTelemetryRequired, isTracingRequired } from "./engineEnvBuilder.js";
+import { isTelemetryEnabled, isTracingEnabled } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-import { commaSeparatedListToArray, envByteLimits } from "./helper/envHelpers.js";
+import { commaSeparatedListToArray, envKeyIntegerPairs } from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -47,7 +47,7 @@ export async function buildEngineServerConfiguration(
 		allowedHeaders: commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
 		exposedHeaders: commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
 		corsOrigins: commaSeparatedListToArray(envVars.corsOrigins, undefined),
-		bodyLimits: envByteLimits(envVars, "httpBodyLimits"),
+		bodyLimits: envKeyIntegerPairs(envVars, "httpBodyLimits"),
 		publicOrigin: Coerce.string(envVars.publicOrigin)
 	};
 
@@ -60,7 +60,7 @@ export async function buildEngineServerConfiguration(
 		}
 	}
 
-	if (isTracingRequired(envVars)) {
+	if (isTracingEnabled(envVars)) {
 		webServerOptions.allowedHeaders ??= [];
 		if (!webServerOptions.allowedHeaders.includes(TraceparentHelper.HEADER_NAME)) {
 			webServerOptions.allowedHeaders.push(TraceparentHelper.HEADER_NAME);
@@ -275,7 +275,7 @@ export async function buildEngineServerConfiguration(
 		}
 	}
 
-	if (isTelemetryRequired(envVars)) {
+	if (isTelemetryEnabled(envVars)) {
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Metrics,
 			options: {
@@ -289,7 +289,7 @@ export async function buildEngineServerConfiguration(
 		});
 	}
 
-	if (isTracingRequired(envVars)) {
+	if (isTracingEnabled(envVars)) {
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Tracing,
 			options: {
