@@ -55,15 +55,16 @@ These variables are only read when running the `bootstrap-dev` CLI command. They
 
 ## Server Variables
 
-| Variable                    | Possible Values              | Default                            | Notes                                                         |
-| --------------------------- | ---------------------------- | ---------------------------------- | ------------------------------------------------------------- |
-| `TWIN_PORT`                 | Integer                      | `3000` (web server fallback)       | API server port.                                              |
-| `TWIN_HOST`                 | Host name or IP              | `localhost` (web server fallback)  | API server host.                                              |
-| `TWIN_PUBLIC_ORIGIN`        | URL                          | None                               | Public API origin, for example `https://api.example.com:443`. |
-| `TWIN_CORS_ORIGINS`         | Comma-separated origins      | `*` (if not set by runtime config) | CORS allow list.                                              |
-| `TWIN_HTTP_METHODS`         | Comma-separated HTTP methods | `GET,POST,PUT,DELETE,OPTIONS`      | CORS methods.                                                 |
-| `TWIN_HTTP_ALLOWED_HEADERS` | Comma-separated headers      | Runtime dependent                  | CORS allowed headers.                                         |
-| `TWIN_HTTP_EXPOSED_HEADERS` | Comma-separated headers      | Runtime dependent                  | CORS exposed headers.                                         |
+| Variable                    | Possible Values                    | Default                            | Notes                                                                                                                                            |
+| --------------------------- | ---------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `TWIN_PORT`                 | Integer                            | `3000` (web server fallback)       | API server port.                                                                                                                                 |
+| `TWIN_HOST`                 | Host name or IP                    | `localhost` (web server fallback)  | API server host.                                                                                                                                 |
+| `TWIN_PUBLIC_ORIGIN`        | URL                                | None                               | Public API origin, for example `https://api.example.com:443`.                                                                                    |
+| `TWIN_CORS_ORIGINS`         | Comma-separated origins            | `*` (if not set by runtime config) | CORS allow list.                                                                                                                                 |
+| `TWIN_HTTP_METHODS`         | Comma-separated HTTP methods       | `GET,POST,PUT,DELETE,OPTIONS`      | CORS methods.                                                                                                                                    |
+| `TWIN_HTTP_ALLOWED_HEADERS` | Comma-separated headers            | Runtime dependent                  | CORS allowed headers.                                                                                                                            |
+| `TWIN_HTTP_EXPOSED_HEADERS` | Comma-separated headers            | Runtime dependent                  | CORS exposed headers.                                                                                                                            |
+| `TWIN_HTTP_BODY_LIMITS`     | Comma-separated `name=bytes` pairs | Runtime dependent                  | Named request body limits for REST routes, e.g. `default=2097152,large=26214400`. Unset keeps the 1 MiB default and the 25 MiB `large` built-in. |
 
 ## Connector and Component Selection Variables
 

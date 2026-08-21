@@ -36,6 +36,11 @@ export interface IEngineServerEnvironmentVariables {
 	httpExposedHeaders?: string;
 
 	/**
+	 * Named request body limits in bytes as comma separated name=bytes pairs, e.g. default=2097152,large=26214400.
+	 */
+	httpBodyLimits?: string;
+
+	/**
 	 * The public origin URL for the API e.g. https://api.example.com:1234
 	 */
 	publicOrigin?: string;

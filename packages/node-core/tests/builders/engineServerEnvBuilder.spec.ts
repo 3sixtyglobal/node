@@ -119,3 +119,64 @@ describe("buildEngineServerConfiguration - auth context keys", () => {
 		expect(config.types.authenticationComponent).toBeUndefined();
 	});
 });
+
+describe("buildEngineServerConfiguration - body limits", () => {
+	test("builds bodyLimits from the comma separated name=bytes pairs", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, httpBodyLimits: "default=2048,large=26214400" },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.bodyLimits).toEqual({ default: 2048, large: 26214400 });
+	});
+
+	test("leaves bodyLimits undefined when the env var is not set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.bodyLimits).toBeUndefined();
+	});
+
+	test("trims whitespace and ignores empty entries in the name=bytes pairs", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, httpBodyLimits: " default = 2048 ,, large=26214400 ," },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.bodyLimits).toEqual({ default: 2048, large: 26214400 });
+	});
+
+	test.each([
+		["no separator", "large", "large"],
+		["an empty name", "=2048", "=2048"],
+		["more than one separator", "large=1=2", "large=1=2"],
+		["a non numeric byte value", "large=abc", "large=abc"],
+		["a non integer byte value", "large=1.5", "large=1.5"],
+		["a duplicate name", "large=1,large=2", "large=2"]
+	])(
+		"throws naming the env var and the entry when an entry has %s",
+		async (shape, httpBodyLimits, entry) => {
+			await expect(
+				buildEngineServerConfiguration(
+					{ ...BASE_VARS, httpBodyLimits },
+					[],
+					{ types: {} },
+					SERVER_INFO
+				)
+			).rejects.toMatchObject({
+				name: "GeneralError",
+				source: "node",
+				message: expect.stringContaining("invalidEnvVarPair"),
+				properties: { key: "httpBodyLimits", value: entry }
+			});
+		}
+	);
+});
