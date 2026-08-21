@@ -52,6 +52,14 @@ The CORS headers to expose.
 
 ***
 
+### httpBodyLimits? {#httpbodylimits}
+
+> `optional` **httpBodyLimits?**: `string`
+
+Named request body limits in bytes as comma separated name=bytes pairs, e.g. default=2097152,large=26214400.
+
+***
+
 ### publicOrigin? {#publicorigin}
 
 > `optional` **publicOrigin?**: `string`

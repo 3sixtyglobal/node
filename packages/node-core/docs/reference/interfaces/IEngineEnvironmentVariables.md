@@ -971,7 +971,7 @@ The type of messaging push notification connector: entity-storage, aws.
 
 > `optional` **telemetryConnector?**: `string`
 
-The type of telemetry connector: entity-storage.
+The type of telemetry connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
 
 ***
 
@@ -1069,6 +1069,34 @@ The mutex timeout in milliseconds for the telemetry connector.
 
 ***
 
+### telemetryMetricDefinitionCacheCapacity? {#telemetrymetricdefinitioncachecapacity}
+
+> `optional` **telemetryMetricDefinitionCacheCapacity?**: `string`
+
+The maximum number of metric definitions held in the in-memory definition cache for the telemetry connector.
+
+#### Default
+
+```ts
+100
+```
+
+***
+
+### telemetryMetricDefinitionCacheTtiMs? {#telemetrymetricdefinitioncachettims}
+
+> `optional` **telemetryMetricDefinitionCacheTtiMs?**: `string`
+
+The time-to-idle in milliseconds for cached metric definitions in the telemetry connector.
+
+#### Default
+
+```ts
+3600000
+```
+
+***
+
 ### tracingSilentComponents? {#tracingsilentcomponents}
 
 > `optional` **tracingSilentComponents?**: `string`
@@ -1081,7 +1109,7 @@ A list of components to exclude from tracing, can be a comma separated list of c
 
 > `optional` **tracingConnector?**: `string`
 
-The type of tracing connector: entity-storage, open-telemetry.
+The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
 
 ***
 

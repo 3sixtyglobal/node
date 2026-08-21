@@ -1,8 +1,8 @@
-# Function: isTracingRequired()
+# Function: isTracingEnabled()
 
-> **isTracingRequired**(`envVars`): `boolean`
+> **isTracingEnabled**(`envVars`): `boolean`
 
-Checks if the tracing subsystem is required.
+Checks if the tracing subsystem is enabled.
 Returns true when any component that depends on the tracing subsystem is enabled.
 
 ## Parameters

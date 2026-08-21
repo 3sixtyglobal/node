@@ -1,8 +1,8 @@
-# Function: isTelemetryRequired()
+# Function: isTelemetryEnabled()
 
-> **isTelemetryRequired**(`envVars`): `boolean`
+> **isTelemetryEnabled**(`envVars`): `boolean`
 
-Checks if the telemetry subsystem is required.
+Checks if the telemetry subsystem is enabled.
 Returns true when any component that depends on the telemetry subsystem is enabled.
 
 ## Parameters
