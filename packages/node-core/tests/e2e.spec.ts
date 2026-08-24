@@ -312,7 +312,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		}
 	});
 
-	test("should use custom cache directory for HTTPS downloads", async () => {
+	test("should use custom cache directory for HTTPS downloads", { retry: 2 }, async () => {
 		const customCacheDir = ".tmp/custom-https-cache";
 		const testUrl = "https://unpkg.com/is-number@7.0.0/index.js";
 		const maxSizeMb = 10;
@@ -370,7 +370,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		}
 	});
 
-	test("should respect TTL and re-download expired cache", async () => {
+	test("should respect TTL and re-download expired cache", { retry: 2 }, async () => {
 		const url = "https://unpkg.com/is-number@7.0.0/index.js";
 		const executionDirectory = TEST_EXECUTION_DIR;
 
@@ -393,7 +393,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		expect(result3.resolvedPath).toBe(result1.resolvedPath);
 	});
 
-	test("should force refresh regardless of TTL", async () => {
+	test("should force refresh regardless of TTL", { retry: 2 }, async () => {
 		const url = "https://unpkg.com/is-number@7.0.0/package.json";
 		const executionDirectory = TEST_EXECUTION_DIR;
 
@@ -448,7 +448,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		expect(metadata.size).toBeGreaterThan(0);
 	});
 
-	test("should handle corrupted metadata gracefully", async () => {
+	test("should handle corrupted metadata gracefully", { retry: 2 }, async () => {
 		// Use unique URL to avoid cache conflicts with other tests
 		const url = "https://unpkg.com/lodash@4.17.21/LICENSE";
 		const executionDirectory = TEST_EXECUTION_DIR;

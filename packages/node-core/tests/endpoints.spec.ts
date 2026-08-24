@@ -25,6 +25,7 @@ import {
 	NftConnectorType,
 	NotarizationConnectorType,
 	TelemetryConnectorType,
+	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
@@ -38,8 +39,13 @@ const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
 const TEST_PORT_ST = TEST_PORT + 1000;
 const TEST_PORT_SO = TEST_PORT + 2000;
 const TEST_PORT_FC = TEST_PORT + 3000;
+const TEST_PORT_GA = TEST_PORT + 4000;
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
+const TEST_GA_TENANT_API_KEY = "aabb1122ccdd3344eeff5566aabb7788";
+const TEST_GA_TENANT_ID = "bb2cc3dd4ee5ff6aa7bb8cc9dd0ee1ff";
+const TEST_GA_TENANT2_ID = "cc3dd4ee5ff6aa7bb8cc9dd0ee1ff2aa";
+const TEST_GA_TENANT2_API_KEY = "dd4ee5ff6aa7bb8cc9dd0ee1ff2aa33b";
 const TEST_ADMIN_EMAIL = "admin@node";
 const TEST_ADMIN_PASSWORD = "Admin@Node12345!";
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-dataset-endpoint-001";
@@ -48,6 +54,7 @@ const OUTPUT_TMP_DIR = "./tests/.tmp/endpoints/";
 const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
 const OUTPUT_TMP_DIR_SO = "./tests/.tmp/endpoints-so/";
 const OUTPUT_TMP_DIR_FC = "./tests/.tmp/endpoints-fc/";
+const OUTPUT_TMP_DIR_GA = "./tests/.tmp/endpoints-ga/";
 
 const TEST_DATASPACE_APP_ID = "https://twin.example.org/test-app";
 const TEST_TRANSFER_CONSUMER_PID = "urn:uuid:consumer-pid-endpoint-001";
@@ -64,6 +71,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_BLOB_STORAGE_CONNECTOR_TYPE: BlobStorageConnectorType.Memory,
 	TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 	TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
+	TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
@@ -108,6 +116,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_FC, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
 	});
 
 	afterAll(async () => {
@@ -115,6 +124,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 		await rm(OUTPUT_TMP_DIR_FC, { recursive: true, force: true });
+		await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
 	});
 
 	test("Can bootstrap a standalone federated catalogue node and exercise its endpoints", async () => {
@@ -151,7 +161,7 @@ describe("node-core", () => {
 			TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 		};
 
-		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant).
+		// Phase 1: Bootstrap - creates node identity and admin user (single-tenant).
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -167,7 +177,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "1"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -201,7 +211,7 @@ describe("node-core", () => {
 
 		const serverStartTime = Date.now();
 
-		// Phase 3: Exercise catalogue endpoints — no dataspace or RM groups.
+		// Phase 3: Exercise catalogue endpoints - no dataspace or RM groups.
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/federated-catalogue-only-index.json"), {
 				baseUrl: `http://localhost:${TEST_PORT_FC}`,
@@ -244,7 +254,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -267,7 +277,7 @@ describe("node-core", () => {
 		const trustComponentType = serverResult?.engine.getRegisteredInstanceType("trustComponent");
 		expect(trustComponentType).toBeDefined();
 
-		// In multi-tenant mode, the org DID is on the tenant, not in node state — look it up.
+		// In multi-tenant mode, the org DID is on the tenant, not in node state - look it up.
 		const tenantAdminType =
 			serverResult?.engine.getRegisteredInstanceTypeOptional("tenantAdminComponent");
 		expect(tenantAdminType).toBeDefined();
@@ -365,7 +375,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -448,6 +458,97 @@ describe("node-core", () => {
 		}
 	});
 
+	test("Can bootstrap a global-admin user and exercise cross-tenant override endpoints", async () => {
+		const globalAdminEnvVars: { [id: string]: string } = {
+			...SHARED_ENV_VARS,
+			TWIN_PORT: TEST_PORT_GA.toString(),
+			TWIN_TENANT_ID: TEST_GA_TENANT_ID,
+			TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR_GA}db`
+		};
+
+		await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
+		Factory.clearFactories();
+
+		// Phase 1: Bootstrap — admin user receives global-admin scope so it can use override-tenant.
+		const bootstrapState: INodeEngineState = {};
+		await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, bootstrapState),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...globalAdminEnvVars,
+					TWIN_FEATURES: "admin-user",
+					TWIN_TENANT_API_KEY: TEST_GA_TENANT_API_KEY,
+					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
+					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
+					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin,global-admin",
+					TWIN_HEALTH_STARTUP_INTERVAL: "500"
+				}
+			},
+			["node", "index.js", "bootstrap-dev"]
+		);
+
+		expect(bootstrapState.nodeId).toBeDefined();
+
+		// Phase 1.5: Bootstrap a second tenant for cross-partition override tests.
+		// Reuses the existing node identity and storage root so tenant 2 lives in the same store.
+		Factory.clearFactories();
+		await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: bootstrapState.nodeId
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...globalAdminEnvVars,
+					TWIN_TENANT_ID: TEST_GA_TENANT2_ID,
+					TWIN_TENANT_API_KEY: TEST_GA_TENANT2_API_KEY,
+					TWIN_FEATURES: "tenant",
+					TWIN_HEALTH_STARTUP_INTERVAL: "1"
+				}
+			},
+			["node", "index.js", "bootstrap-dev"]
+		);
+
+		Factory.clearFactories();
+
+		// Phase 2: Start the server using the bootstrapped state.
+		const serverResult = await run({
+			localesDirectory: "./dist/locales/",
+			openApiSpecFile: path.resolve("./tests/fixtures/spec.json"),
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: bootstrapState.nodeId
+			}),
+			envVars: globalAdminEnvVars
+		});
+
+		expect(serverResult).toBeDefined();
+		expect(serverResult?.engine).toBeDefined();
+
+		const serverStartTime = Date.now();
+
+		// Phase 3: Exercise global-admin override-tenant cross-partition endpoints.
+		try {
+			await loadAndRunGroups(path.resolve("tests/endpoints/global-admin-index.json"), {
+				baseUrl: `http://localhost:${TEST_PORT_GA}`,
+				apiKeyQuery: `x-api-key=${TEST_GA_TENANT_API_KEY}`,
+				authToken: "",
+				appendOrgParam: true,
+				vars: {
+					adminEmail: TEST_ADMIN_EMAIL,
+					adminPassword: TEST_ADMIN_PASSWORD,
+					secondTenantId: TEST_GA_TENANT2_ID
+				},
+				serverStartTime
+			});
+		} finally {
+			await serverResult?.shutdown();
+			await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
+		}
+	});
+
 	test("Can auto-generate a same-org agreement", async () => {
 		const sameOrgEnvVars: { [id: string]: string } = {
 			...SHARED_ENV_VARS,
@@ -459,7 +560,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_SO, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — creates node identity and admin user (single-tenant, no tenant admin).
+		// Phase 1: Bootstrap - creates node identity and admin user (single-tenant, no tenant admin).
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -476,7 +577,7 @@ describe("node-core", () => {
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
-			["node", "index.js", "bootstrap-legacy"]
+			["node", "index.js", "bootstrap-dev"]
 		);
 
 		expect(bootstrapState.nodeId).toBeDefined();
@@ -501,7 +602,7 @@ describe("node-core", () => {
 		expect(trustComponentType).toBeDefined();
 
 		const trustComponent = ComponentFactory.get<ITrustComponent>(trustComponentType ?? "");
-		// Trust token whose identity is the node org DID — matches the context org, triggering
+		// Trust token whose identity is the node org DID - matches the context org, triggering
 		// the same-org short-circuit in requestFromConsumer().
 		const trustBearerToken = await trustComponent.generate(
 			bootstrapState.nodeOrganizationId ?? "",
@@ -512,7 +613,7 @@ describe("node-core", () => {
 		const serverStartTime = Date.now();
 
 		// Phase 3: Login (captures organizationId + authToken), create an offer, then negotiate.
-		// The provider returns FINALIZED immediately with an embedded agreement — no PAP pre-seed.
+		// The provider returns FINALIZED immediately with an embedded agreement - no PAP pre-seed.
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/same-org-index.json"), {
 				baseUrl: `http://localhost:${TEST_PORT_SO}`,

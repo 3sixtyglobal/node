@@ -13,9 +13,10 @@ import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
+import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
-import { BOOTSTRAP_LEGACY_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapLegacyEnvironmentVariableKeys.js";
+import { BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapDevEnvironmentVariableKeys.js";
 import { ENGINE_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineEnvironmentVariableKeys.js";
 import { ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineServerEnvironmentVariableKeys.js";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
@@ -44,7 +45,7 @@ const moduleCache: { [id: string]: unknown } = {};
 let npmRootCache: string | undefined;
 
 /**
- * Run the TWIN Node.
+ * Run the node.
  * @param nodeOptions Optional configuration options for running the server.
  * @param args Optional command line arguments.
  * @returns A promise that resolves when the server is started containing a shutdown method.
@@ -67,7 +68,7 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.9.1" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.9.2-next.17" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
@@ -252,12 +253,9 @@ function validateEnvVarKeys(
 	}
 
 	const customSet = new Set(
-		Is.stringValue(envVars.envAllowList)
-			? envVars.envAllowList
-					.split(",")
-					.map(k => EnvHelper.envVarKeyToJsonKey(k.trim(), prefix))
-					.filter(Boolean)
-			: []
+		commaSeparatedListToArray<string>(envVars.envAllowList as string).map(k =>
+			EnvHelper.envVarKeyToJsonKey(k.trim(), prefix)
+		)
 	);
 
 	const unknown = Object.keys(envVars)
@@ -338,7 +336,7 @@ export async function buildConfiguration(
 		ENGINE_ENVIRONMENT_VARIABLE_KEYS,
 		ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS,
 		NODE_ENVIRONMENT_VARIABLE_KEYS,
-		BOOTSTRAP_LEGACY_ENVIRONMENT_VARIABLE_KEYS
+		BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS
 	]);
 
 	// Expand any environment variables that use the @file: syntax

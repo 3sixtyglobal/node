@@ -16,9 +16,11 @@ import {
 	RestRouteProcessorType,
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
-import type { HttpMethod } from "@twin.org/web";
+import { TraceparentHelper } from "@twin.org/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+import { isTelemetryEnabled, isTracingEnabled } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { commaSeparatedListToArray, envKeyIntegerPairs } from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -41,16 +43,11 @@ export async function buildEngineServerConfiguration(
 	const webServerOptions: IWebServerOptions = {
 		port: Coerce.number(envVars.port),
 		host: Coerce.string(envVars.host),
-		methods: Is.stringValue(envVars.httpMethods)
-			? (envVars.httpMethods.split(",") as HttpMethod[])
-			: undefined,
-		allowedHeaders: Is.stringValue(envVars.httpAllowedHeaders)
-			? envVars.httpAllowedHeaders.split(",")
-			: undefined,
-		exposedHeaders: Is.stringValue(envVars.httpExposedHeaders)
-			? envVars.httpExposedHeaders.split(",")
-			: undefined,
-		corsOrigins: Is.stringValue(envVars.corsOrigins) ? envVars.corsOrigins.split(",") : undefined,
+		methods: commaSeparatedListToArray(envVars.httpMethods, undefined),
+		allowedHeaders: commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
+		exposedHeaders: commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
+		corsOrigins: commaSeparatedListToArray(envVars.corsOrigins, undefined),
+		bodyLimits: envKeyIntegerPairs(envVars, "httpBodyLimits"),
 		publicOrigin: Coerce.string(envVars.publicOrigin)
 	};
 
@@ -60,6 +57,13 @@ export async function buildEngineServerConfiguration(
 		webServerOptions.allowedHeaders ??= [];
 		if (!webServerOptions.allowedHeaders.includes(apiKeyHeader)) {
 			webServerOptions.allowedHeaders.push(apiKeyHeader);
+		}
+	}
+
+	if (isTracingEnabled(envVars)) {
+		webServerOptions.allowedHeaders ??= [];
+		if (!webServerOptions.allowedHeaders.includes(TraceparentHelper.HEADER_NAME)) {
+			webServerOptions.allowedHeaders.push(TraceparentHelper.HEADER_NAME);
 		}
 	}
 
@@ -84,7 +88,7 @@ export async function buildEngineServerConfiguration(
 	};
 
 	if (Is.stringValue(envVars.mimeTypeProcessors)) {
-		const mimeTypeProcessors = envVars.mimeTypeProcessors.split(",");
+		const mimeTypeProcessors = commaSeparatedListToArray(envVars.mimeTypeProcessors);
 
 		if (Is.arrayValue(mimeTypeProcessors)) {
 			serverConfig.types.mimeTypeProcessor ??= [];
@@ -164,9 +168,10 @@ export async function buildEngineServerConfiguration(
 	if (!coreEngineConfig.silent) {
 		const includeBody = Coerce.boolean(envVars.routeLoggingIncludeBody) ?? coreEngineConfig.debug;
 		const fullBase64 = Coerce.boolean(envVars.routeLoggingFullBase64) ?? false;
-		const obfuscateProperties = Is.stringValue(envVars.routeLoggingObfuscateProperties)
-			? envVars.routeLoggingObfuscateProperties.split(",")
-			: undefined;
+		const obfuscateProperties = commaSeparatedListToArray<string>(
+			envVars.routeLoggingObfuscateProperties,
+			undefined
+		);
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Logging,
 			options: {
@@ -189,20 +194,10 @@ export async function buildEngineServerConfiguration(
 		});
 	}
 	serverConfig.types.restRouteProcessor.push({
-		type: RestRouteProcessorType.RestRoute,
-		options: {
-			config: {
-				includeErrorStack: coreEngineConfig.debug
-			}
-		}
+		type: RestRouteProcessorType.RestRoute
 	});
 	serverConfig.types.socketRouteProcessor.push({
-		type: SocketRouteProcessorType.SocketRoute,
-		options: {
-			config: {
-				includeErrorStack: coreEngineConfig.debug
-			}
-		}
+		type: SocketRouteProcessorType.SocketRoute
 	});
 
 	const authAdminProcessorType = envVars.authAdminProcessorType;
@@ -261,6 +256,48 @@ export async function buildEngineServerConfiguration(
 			options: {
 				config: {
 					signingKeyName: envVars.authSigningKeyId
+				}
+			}
+		});
+		if (tenantEnabled) {
+			serverConfig.types.restRouteProcessor.push({
+				type: RestRouteProcessorType.TenantOverride,
+				options: {
+					config: {}
+				}
+			});
+			serverConfig.types.socketRouteProcessor.push({
+				type: SocketRouteProcessorType.TenantOverride,
+				options: {
+					config: {}
+				}
+			});
+		}
+	}
+
+	if (isTelemetryEnabled(envVars)) {
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.Metrics,
+			options: {
+				config: {
+					excludePaths: commaSeparatedListToArray<string>(
+						envVars.routeMetricsExcludePaths,
+						undefined
+					)
+				}
+			}
+		});
+	}
+
+	if (isTracingEnabled(envVars)) {
+		serverConfig.types.restRouteProcessor.push({
+			type: RestRouteProcessorType.Tracing,
+			options: {
+				config: {
+					excludePaths: commaSeparatedListToArray<string>(
+						envVars.routeTracingExcludePaths,
+						undefined
+					)
 				}
 			}
 		});

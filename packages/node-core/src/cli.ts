@@ -5,7 +5,8 @@ import { ContextIdStore } from "@twin.org/context";
 import { Coerce, GeneralError, I18n, Is, StringHelper } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import * as dotenv from "dotenv";
-import { getCommandDefinitionBootstrapLegacy } from "./commands/bootstrapLegacy.js";
+import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
+import { getCommandDefinitionBootstrapDev } from "./commands/bootstrapDev.js";
 import { getCommandDefinitionHelp } from "./commands/help.js";
 import { getCommandDefinitionIdentityCreate } from "./commands/identityCreate.js";
 import { getCommandDefinitionIdentityImport } from "./commands/identityImports.js";
@@ -270,7 +271,7 @@ export function processEnvOptions(
 	const inputEnv = options.find(option => option.key === "load-env")?.value;
 
 	if (Is.stringValue(inputEnv)) {
-		const envFiles = inputEnv.split(",").map(f => f.trim());
+		const envFiles = commaSeparatedListToArray<string>(inputEnv);
 		for (const envFile of envFiles) {
 			const output = dotenv.config({
 				path: envFile,
@@ -323,7 +324,7 @@ export function substituteEnvOptions(
  */
 export function registerCommands(): void {
 	getCommandDefinitionHelp(commandDefinitions);
-	getCommandDefinitionBootstrapLegacy(commandDefinitions);
+	getCommandDefinitionBootstrapDev(commandDefinitions);
 	getCommandDefinitionIdentityCreate(commandDefinitions);
 	getCommandDefinitionIdentityImport(commandDefinitions);
 	getCommandDefinitionIdentityList(commandDefinitions);

@@ -2,7 +2,7 @@
 
 ## Interfaces
 
-- [IBootstrapLegacyEnvironmentVariables](interfaces/IBootstrapLegacyEnvironmentVariables.md)
+- [IBootstrapDevEnvironmentVariables](interfaces/IBootstrapDevEnvironmentVariables.md)
 - [ICacheMetadata](interfaces/ICacheMetadata.md)
 - [ICliArgs](interfaces/ICliArgs.md)
 - [ICliCommand](interfaces/ICliCommand.md)
@@ -48,7 +48,8 @@
 - [isRightsManagementRequired](functions/isRightsManagementRequired.md)
 - [isTaskSchedulerRequired](functions/isTaskSchedulerRequired.md)
 - [isAutomationRequired](functions/isAutomationRequired.md)
-- [isTelemetryRequired](functions/isTelemetryRequired.md)
+- [isTelemetryEnabled](functions/isTelemetryEnabled.md)
+- [isTracingEnabled](functions/isTracingEnabled.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)

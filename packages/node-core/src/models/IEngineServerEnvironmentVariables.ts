@@ -36,6 +36,11 @@ export interface IEngineServerEnvironmentVariables {
 	httpExposedHeaders?: string;
 
 	/**
+	 * Named request body limits in bytes as comma separated name=bytes pairs, e.g. default=2097152,large=26214400.
+	 */
+	httpBodyLimits?: string;
+
+	/**
 	 * The public origin URL for the API e.g. https://api.example.com:1234
 	 */
 	publicOrigin?: string;
@@ -79,4 +84,14 @@ export interface IEngineServerEnvironmentVariables {
 	 * List of properties to obfuscate in the REST logging output, comma separated.
 	 */
 	routeLoggingObfuscateProperties?: string;
+
+	/**
+	 * Comma-separated list of URL path prefixes excluded from metrics collection.
+	 */
+	routeMetricsExcludePaths?: string;
+
+	/**
+	 * Comma-separated list of URL path prefixes excluded from tracing.
+	 */
+	routeTracingExcludePaths?: string;
 }

@@ -52,6 +52,14 @@ The CORS headers to expose.
 
 ***
 
+### httpBodyLimits? {#httpbodylimits}
+
+> `optional` **httpBodyLimits?**: `string`
+
+Named request body limits in bytes as comma separated name=bytes pairs, e.g. default=2097152,large=26214400.
+
+***
+
 ### publicOrigin? {#publicorigin}
 
 > `optional` **publicOrigin?**: `string`
@@ -121,3 +129,19 @@ Include the full base 64 output in the REST logging output, useful for debugging
 > `optional` **routeLoggingObfuscateProperties?**: `string`
 
 List of properties to obfuscate in the REST logging output, comma separated.
+
+***
+
+### routeMetricsExcludePaths? {#routemetricsexcludepaths}
+
+> `optional` **routeMetricsExcludePaths?**: `string`
+
+Comma-separated list of URL path prefixes excluded from metrics collection.
+
+***
+
+### routeTracingExcludePaths? {#routetracingexcludepaths}
+
+> `optional` **routeTracingExcludePaths?**: `string`
+
+Comma-separated list of URL path prefixes excluded from tracing.
