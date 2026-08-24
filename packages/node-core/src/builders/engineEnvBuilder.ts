@@ -3,6 +3,7 @@
 import path from "node:path";
 import { Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
+import { EngineCloneMode } from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -793,7 +794,7 @@ async function configureMetricsCollector(
 					intervalMs: envSecToMs(envVars, "telemetryMetricsCollectorInterval")
 				}
 			},
-			isCloneable: false
+			cloneMode: EngineCloneMode.Never
 		});
 
 		coreConfig.types.metricsProducerComponent ??= [];
@@ -807,7 +808,7 @@ async function configureMetricsCollector(
 			coreConfig.types.metricsProducerComponent.push({
 				type: producerType as MetricsProducerComponentType,
 				options: { maxHistory: envCount(envVars, "telemetryMetricsProducerMaxHistory") },
-				isCloneable: false
+				cloneMode: EngineCloneMode.Never
 			});
 		}
 	}
@@ -947,7 +948,7 @@ async function configureHealth(
 					initialInterval: envSecToMs(envVars, "healthStartupInterval")
 				}
 			},
-			isCloneable: false
+			cloneMode: EngineCloneMode.Never
 		});
 	}
 }
@@ -968,7 +969,7 @@ async function configureSchemaMigration(
 	coreConfig.types.schemaVersionMigrationComponent.push({
 		type: SchemaVersionMigrationComponentType.Service,
 		options: { config: { enabled: isSchemaMigrationEnabled } },
-		isCloneable: false
+		cloneMode: EngineCloneMode.Never
 	});
 }
 
@@ -991,7 +992,8 @@ async function configurePlatform(
 			config: {
 				isMultiTenant: isTenantEnabled
 			}
-		}
+		},
+		cloneMode: EngineCloneMode.Always
 	});
 }
 
@@ -1028,12 +1030,14 @@ async function configureContextIdHandlers(
 	coreConfig.types.contextIdHandlerComponent ??= [];
 	coreConfig.types.contextIdHandlerComponent.push({
 		type: ContextIdHandlerComponentType.Did,
-		features: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		features: [CONTEXT_ID_HANDLER_FEATURE_DID],
+		cloneMode: EngineCloneMode.Always
 	});
 	if (envBoolean(envVars, "tenantEnabled", false)) {
 		coreConfig.types.contextIdHandlerComponent.push({
 			type: ContextIdHandlerComponentType.Tenant,
-			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
+			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT],
+			cloneMode: EngineCloneMode.Always
 		});
 	}
 }
