@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2-next.17](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.16...node-core-v0.9.2-next.17) (2026-08-24)
+
+
+### Features
+
+* clone mode ([#360](https://github.com/iotaledger/twin-node/issues/360)) ([8bb56fb](https://github.com/iotaledger/twin-node/commit/8bb56fb6a4b138c2ff0d1267d1be4f8c24f492a6))
+
 ## [0.9.2-next.16](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.2-next.15...node-core-v0.9.2-next.16) (2026-08-21)
 
 
