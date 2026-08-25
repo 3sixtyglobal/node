@@ -4,6 +4,7 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@twin.org/api-auth-entity-storage-models";
+import type { IAuthorizationComponent } from "@twin.org/authorization-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
@@ -87,13 +88,29 @@ export async function userGet(
 	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
 		defaultAuthenticationAdminComponentType
 	);
+	const defaultAuthorizationComponentType =
+		engineCore.getRegisteredInstanceType("authorizationComponent");
+	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
+		defaultAuthorizationComponentType
+	);
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-get.labels.retrieving"));
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
-	const user = await ContextIdStore.run(
+	const { user, roles } = await ContextIdStore.run(
 		{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
-		async () => authenticationAdminComponent.get(params.email ?? "")
+		async () => {
+			const foundUser = await authenticationAdminComponent.get(params.email ?? "");
+			let foundRoles: string[] | undefined;
+
+			if (Is.stringValue(foundUser.userIdentity)) {
+				foundRoles = await authorizationComponent.getRolesForSubject(foundUser.userIdentity);
+			}
+			return {
+				user: foundUser,
+				roles: foundRoles
+			};
+		}
 	);
 
 	CLIDisplay.break();
@@ -109,8 +126,8 @@ export async function userGet(
 		1
 	);
 	CLIDisplay.value(
-		I18n.formatMessage("node.cli.commands.user-get.labels.scope"),
-		(user.scope ?? []).join(", "),
+		I18n.formatMessage("node.cli.commands.user-get.labels.roles"),
+		(roles ?? []).join(", "),
 		1
 	);
 	CLIDisplay.break();

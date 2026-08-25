@@ -2,16 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IAuthenticationAdminComponent } from "@twin.org/api-auth-entity-storage-models";
 import type { ITenantAdminComponent } from "@twin.org/api-models";
+import type { IAuthorizationComponent } from "@twin.org/authorization-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
+import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
+import {
+	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+	DEFAULT_TENANT_ADMIN_ROLE,
+	DEFAULT_USER_ADMIN_ROLE
+} from "../defaults.js";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
 import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
-import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -228,6 +234,13 @@ export async function bootstrapDev(
 		});
 	}
 
+	await ContextIdStore.run(
+		{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenant?.id },
+		async () => {
+			await bootstrapAuthorization(engineCore);
+		}
+	);
+
 	if (features.includes("admin-user")) {
 		await ContextIdStore.run(
 			{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenant?.id },
@@ -262,11 +275,15 @@ export async function bootstrapDev(
 					tenantId: tenant?.id,
 					email: envVars.adminUserName ?? `admin@${tenantEnabled ? "tenant" : "node"}`,
 					password: envVars.adminUserPassword,
-					scope:
-						envVars.adminUserScope ??
+					roles:
+						envVars.adminUserRoles ??
 						(tenantEnabled
-							? ["global-admin", "tenant-admin", "user-admin"]
-							: ["global-admin", "user-admin"]
+							? [
+									DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+									DEFAULT_TENANT_ADMIN_ROLE,
+									DEFAULT_USER_ADMIN_ROLE
+								]
+							: [DEFAULT_ESCALATED_PRIVILEGE_ROLE, DEFAULT_USER_ADMIN_ROLE]
 						).join(","),
 					givenName: tenantEnabled ? "Tenant" : "Node",
 					familyName: "Admin",
@@ -275,6 +292,49 @@ export async function bootstrapDev(
 			}
 		);
 	}
+}
+
+/**
+ * Seed default roles into the authorization system so they can be assigned to users.
+ * @param engineCore The engine core.
+ * @returns A promise that resolves when the default roles have been seeded.
+ * @internal
+ */
+async function bootstrapAuthorization(
+	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>
+): Promise<void> {
+	CLIDisplay.break();
+	CLIDisplay.section(
+		I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.authorizationBootstrap")
+	);
+
+	const defaultAuthorizationComponentType =
+		engineCore.getRegisteredInstanceType("authorizationComponent");
+	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
+		defaultAuthorizationComponentType
+	);
+
+	await authorizationComponent.addPolicy({
+		subject: DEFAULT_TENANT_ADMIN_ROLE,
+		object: "tenantCreate",
+		action: "execute"
+	});
+	await authorizationComponent.addPolicy({
+		subject: DEFAULT_USER_ADMIN_ROLE,
+		object: "authenticationAdminCreateUser",
+		action: "execute"
+	});
+
+	await authorizationComponent.addRoleInheritance(
+		DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+		DEFAULT_TENANT_ADMIN_ROLE
+	);
+	await authorizationComponent.addRoleInheritance(
+		DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+		DEFAULT_USER_ADMIN_ROLE
+	);
+
+	CLIDisplay.done();
 }
 
 /**

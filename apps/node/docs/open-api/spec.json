@@ -22773,6 +22773,10 @@
 					{
 						"const": "duration",
 						"description": "Duration in seconds."
+					},
+					{
+						"const": "array",
+						"description": "Array."
 					}
 				]
 			},
@@ -24523,8 +24527,7 @@
 					}
 				},
 				"required": [
-					"metric",
-					"value"
+					"metric"
 				],
 				"description": "The body parameters."
 			},

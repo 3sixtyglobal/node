@@ -16,6 +16,7 @@ const engineServerEnvironmentVariableKeysInternal: {
 	httpMethods: true,
 	httpAllowedHeaders: true,
 	httpExposedHeaders: true,
+	httpBodyLimits: true,
 	publicOrigin: true,
 	// IEngineServerEnvironmentVariables - auth
 	authAdminProcessorType: true,

@@ -7,6 +7,7 @@ import { Converter, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import { AuthenticationAdminComponentType } from "@twin.org/engine-server-types";
 import {
+	AuthorizationConnectorType,
 	EntityStorageConnectorType,
 	FaucetConnectorType,
 	IdentityConnectorType,
@@ -72,6 +73,7 @@ async function executeCliCommand(
 				TWIN_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
 				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 				...additionalEnvVars
 			}
 		},
@@ -304,6 +306,7 @@ describe("node-core", () => {
 			{
 				TWIN_FEATURES: "wallet,admin-user",
 				TWIN_STORAGE_FILE_ROOT: dbDir,
+				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 				TWIN_TENANT_ID: "019eba0000000000000000000000cafe",
 				TWIN_TENANT_API_KEY: "019eba0000000000000000000000babe"
 			}
@@ -327,14 +330,22 @@ describe("node-core", () => {
 		// Verify admin user record contains expected values for multi-tenant mode
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 			identity: string;
 			organization: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@tenant");
-		expect(authUsers[0].scope).toBe("global-admin,tenant-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"global-admin",
+			"tenant-admin",
+			"user-admin"
+		]);
 
 		// Verify identity documents include the node DID
 		interface IdentityDocRecord {
@@ -370,7 +381,8 @@ describe("node-core", () => {
 			{
 				TWIN_TENANT_ENABLED: "false",
 				TWIN_FEATURES: "wallet,admin-user",
-				TWIN_STORAGE_FILE_ROOT: dbDir
+				TWIN_STORAGE_FILE_ROOT: dbDir,
+				TWIN_AUTHORIZATION_CONNECTOR: "entity-storage"
 			}
 		);
 		expect(stateAfterFirst.nodeId).toBeDefined();
@@ -379,12 +391,16 @@ describe("node-core", () => {
 		// Verify admin user record contains expected values for single-tenant mode
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@node");
-		expect(authUsers[0].scope).toBe("global-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual(["global-admin", "user-admin"]);
 
 		// Verify identity documents contain both node and org DIDs stored in state
 		interface IdentityDocRecord {
@@ -517,6 +533,7 @@ describe("node-core", () => {
 				TWIN_TENANT_ENABLED: "false",
 				TWIN_FEATURES: "wallet,admin-user",
 				TWIN_STORAGE_FILE_ROOT: dbDir,
+				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 				TWIN_ADMIN_USER_NAME: "admin@acme.com",
 				TWIN_ADMIN_USER_PASSWORD: "S3curePass!1Word2"
 			}
@@ -526,12 +543,16 @@ describe("node-core", () => {
 
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
-		expect(authUsers[0].scope).toBe("global-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual(["global-admin", "user-admin"]);
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };
@@ -568,6 +589,7 @@ describe("node-core", () => {
 			{
 				TWIN_FEATURES: "wallet,admin-user",
 				TWIN_STORAGE_FILE_ROOT: dbDir,
+				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 				TWIN_ADMIN_USER_NAME: "admin@acme.com",
 				TWIN_ADMIN_USER_PASSWORD: "S3curePass!1Word2"
 			}
@@ -576,12 +598,20 @@ describe("node-core", () => {
 
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
-		expect(authUsers[0].scope).toBe("global-admin,tenant-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"global-admin",
+			"tenant-admin",
+			"user-admin"
+		]);
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };
@@ -1126,6 +1156,16 @@ describe("node-core", () => {
 		expect(userIdentityJson?.walletAddress).toBeUndefined();
 	});
 
+	test("Can bootstrap the authorization roles", async () => {
+		await executeCliCommand(
+			["bootstrap-dev"],
+			{ nodeId: nodeIdentityJson?.did },
+			{
+				TWIN_FEATURES: "wallet"
+			}
+		);
+	});
+
 	test("Can create the user account", async () => {
 		const envParts = [
 			`${OUTPUT_TMP_DIR}organization-identity.env`,
@@ -1140,7 +1180,7 @@ describe("node-core", () => {
 				"--organization-identity=!ORGANIZATION_DID",
 				"--tenant-id=!NODE_TENANT_ID",
 				"--email=admin@node",
-				"--scope=tenant-admin,doo",
+				"--roles=tenant-admin,user-admin",
 				`--output-json=${OUTPUT_TMP_DIR}user-account-admin.json`,
 				`--output-env=${OUTPUT_TMP_DIR}user-account-admin.env`,
 				"--output-env-prefix=admin"
@@ -1158,7 +1198,7 @@ describe("node-core", () => {
 		expect(userAccountAdminJson?.organizationDid).toEqual(valueFromEnv(userAccountAdminEnv?.[1]));
 		expect(userAccountAdminJson?.email).toEqual(valueFromEnv(userAccountAdminEnv?.[2]));
 		expect(userAccountAdminJson?.password).toEqual(valueFromEnv(userAccountAdminEnv?.[3]));
-		expect(userAccountAdminJson?.scope.join(",")).toEqual(valueFromEnv(userAccountAdminEnv?.[4]));
+		expect(userAccountAdminJson?.roles.join(",")).toEqual(valueFromEnv(userAccountAdminEnv?.[4]));
 		expect(userAccountAdminJson?.givenName).toEqual(valueFromEnv(userAccountAdminEnv?.[5]));
 		expect(userAccountAdminJson?.familyName).toEqual(valueFromEnv(userAccountAdminEnv?.[6]));
 
@@ -1166,7 +1206,6 @@ describe("node-core", () => {
 			`${OUTPUT_TMP_DIR}db/authentication-user/store.json`
 		);
 		expect(dbTable?.[1]?.email).toEqual("admin@node");
-		expect(dbTable?.[1]?.scope).toEqual("tenant-admin,doo");
 
 		const nodeIdParts = nodeIdentityJson?.did.split(":");
 		const nodePartitionId = Converter.bytesToBase64Url(Converter.hexToBytes(nodeIdParts[2]));
@@ -1190,6 +1229,30 @@ describe("node-core", () => {
 					"--user-identity=!USER_DID",
 					"--organization-identity=!ORGANIZATION_DID",
 					"--email=admin-no-tenant@node"
+				],
+				{ nodeId: nodeIdentityJson?.did },
+				undefined,
+				{ disableProcessExitOnFailure: true }
+			)
+		).rejects.toThrow();
+	});
+
+	test("user-create throws when an invalid role is specified", async () => {
+		const envParts = [
+			`${OUTPUT_TMP_DIR}organization-identity.env`,
+			`${OUTPUT_TMP_DIR}user-identity.env`,
+			`${OUTPUT_TMP_DIR}node-tenant.env`
+		];
+		await expect(
+			executeCliCommand(
+				[
+					"user-create",
+					`--load-env=${envParts.join(",")}`,
+					"--user-identity=!USER_DID",
+					"--organization-identity=!ORGANIZATION_DID",
+					"--tenant-id=!NODE_TENANT_ID",
+					"--email=invalid-role@node",
+					"--roles=not-a-real-role"
 				],
 				{ nodeId: nodeIdentityJson?.did },
 				undefined,
@@ -1247,7 +1310,7 @@ describe("node-core", () => {
 				`--load-env=${envParts.join(",")}`,
 				"--tenant-id=!NODE_TENANT_ID",
 				"--email=admin@node",
-				"--scope=tenant-admin,doo",
+				"--roles=tenant-admin,user-admin",
 				"--given-name=Admin",
 				"--family-name=Node"
 			],
@@ -1293,7 +1356,7 @@ describe("node-core", () => {
 				"--organization-identity=!ORGANIZATION_DID",
 				"--tenant-id=!NODE_TENANT_ID",
 				"--email=admin@node",
-				"--scope=tenant-admin",
+				"--roles=tenant-admin",
 				"--overwrite-mode=overwrite",
 				`--output-json=${OUTPUT_TMP_DIR}user-account-overwrite.json`
 			],
@@ -1304,7 +1367,7 @@ describe("node-core", () => {
 			`${OUTPUT_TMP_DIR}user-account-overwrite.json`
 		);
 		expect(userJson?.email).toEqual("admin@node");
-		expect(userJson?.scope).toEqual(["tenant-admin"]);
+		expect(userJson?.roles).toEqual(["tenant-admin"]);
 	});
 
 	test("user-create throws when password is too short", async () => {

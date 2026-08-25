@@ -63,8 +63,8 @@ export interface IBootstrapDevEnvironmentVariables {
 	adminUserPassword?: string;
 
 	/**
-	 * If the admin-user feature is enabled, this is a comma-separated list of scopes for the user.
-	 * @default tenant-admin,user-admin (when tenant enabled) or user-admin (when tenant disabled)
+	 * If the admin-user feature is enabled, this is a comma-separated list of roles for the user.
+	 * @default global-admin,tenant-admin,user-admin (tenant-admin only when tenant enabled)
 	 */
-	adminUserScope?: string;
+	adminUserRoles?: string;
 }

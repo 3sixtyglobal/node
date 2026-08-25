@@ -6,6 +6,7 @@ import {
 	RestRouteProcessorType,
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
+import { AuthorizationConnectorType } from "@twin.org/engine-types";
 import { buildEngineServerConfiguration } from "../../src/builders/engineServerEnvBuilder.js";
 
 const SERVER_INFO = { name: "test", version: "0.0.0" };
@@ -18,7 +19,8 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			contextKeys,
 			{ types: {} },
@@ -38,7 +40,8 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			contextKeys,
 			{ types: {} },

@@ -15,6 +15,7 @@
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
 			"invalidEnvVarValue": "Environment variable \"{key}\" has an invalid value \"{value}\", expected {type} type",
+			"invalidEnvVarPair": "Environment variable \"{key}\" has an invalid entry \"{value}\", expected unique name=integer pairs",
 			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
 		},
 		"bootstrapDev": {
@@ -48,7 +49,8 @@
 		"userCreate": {
 			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
 			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\".",
-			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
+			"rolesNotFound": "The following roles were not found: {roles}"
 		},
 		"userGet": {
 			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
@@ -153,6 +155,7 @@
 						"nodeOrganizationIdSet": "Setting node organisation ID",
 						"adminIdentityCreate": "Creating admin user identity",
 						"adminUserCreate": "Creating admin user",
+						"authorizationBootstrap": "Seeding default authorization roles",
 						"tenantFallback": "No Node-labelled tenant found; using first available tenant"
 					}
 				},
@@ -516,12 +519,12 @@
 						"email": "Email",
 						"identity": "Identity",
 						"organization": "Organization",
-						"scope": "Scope"
+						"roles": "Roles"
 					}
 				},
 				"user-create": {
 					"description": "Create a user",
-					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --roles=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -541,8 +544,8 @@
 						"password": {
 							"description": "The password for the user."
 						},
-						"scope": {
-							"description": "List of scopes to associate with the user, comma separated."
+						"roles": {
+							"description": "List of roles to associate with the user, comma separated."
 						},
 						"given-name": {
 							"description": "The given name of the user."
@@ -579,7 +582,7 @@
 				},
 				"user-update": {
 					"description": "Update a user",
-					"example": "user-update --email=\"bob@examples.com\" --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"example": "user-update --email=\"bob@examples.com\" --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --roles=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -596,8 +599,8 @@
 						"email": {
 							"description": "The email address of the user."
 						},
-						"scope": {
-							"description": "List of scopes to associate with the user, comma separated."
+						"roles": {
+							"description": "List of roles to associate with the user, comma separated."
 						},
 						"given-name": {
 							"description": "The given name of the user."
@@ -910,7 +913,6 @@
 						"listing": "Listing organization users",
 						"email": "Email",
 						"identity": "Identity",
-						"scope": "Scope",
 						"count": "Total users"
 					}
 				}

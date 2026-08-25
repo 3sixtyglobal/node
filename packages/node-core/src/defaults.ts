@@ -37,6 +37,21 @@ export const CONTEXT_ID_HANDLER_FEATURE_DID = "did";
 export const CONTEXT_ID_HANDLER_FEATURE_TENANT = "tenant";
 
 /**
+ * Default role for escalated privileges.
+ */
+export const DEFAULT_ESCALATED_PRIVILEGE_ROLE = "global-admin";
+
+/**
+ * Default role for tenant admins.
+ */
+export const DEFAULT_TENANT_ADMIN_ROLE = "tenant-admin";
+
+/**
+ * Default role for user admins.
+ */
+export const DEFAULT_USER_ADMIN_ROLE = "user-admin";
+
+/**
  * Get the default environment variables for the node.
  * @param envPrefix The environment variable prefix.
  * @returns The default environment variables.

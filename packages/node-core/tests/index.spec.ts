@@ -540,6 +540,7 @@ describe("node-core", () => {
 			"POST     /authorization/policy/remove",
 			"GET      /authorization/policy",
 			"GET      /authorization/roles",
+			"POST     /authorization/roles/has",
 			"GET      /authorization/policy/:subject",
 			"POST     /authorization/subject/:subject/role",
 			"DELETE   /authorization/subject/:subject/role/:role",

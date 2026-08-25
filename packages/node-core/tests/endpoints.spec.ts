@@ -13,6 +13,7 @@ import {
 } from "@twin.org/engine-server-types";
 import {
 	AttestationConnectorType,
+	AuthorizationConnectorType,
 	BlobStorageConnectorType,
 	EntityStorageConnectorType,
 	EventBusComponentType,
@@ -152,6 +153,7 @@ describe("node-core", () => {
 			TWIN_HEALTH_ENABLED: "true",
 			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+			TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 			TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 			TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
@@ -174,7 +176,7 @@ describe("node-core", () => {
 					TWIN_FEATURES: "admin-user",
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
 					TWIN_HEALTH_STARTUP_INTERVAL: "1"
 				}
 			},
@@ -251,7 +253,7 @@ describe("node-core", () => {
 					TWIN_TENANT_ID: TEST_TENANT_ID,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
@@ -372,7 +374,7 @@ describe("node-core", () => {
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
@@ -470,7 +472,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — admin user receives global-admin scope so it can use override-tenant.
+		// Phase 1: Bootstrap — admin user receives global-admin role so it can use override-tenant.
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{
@@ -483,7 +485,7 @@ describe("node-core", () => {
 					TWIN_TENANT_API_KEY: TEST_GA_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin,global-admin",
+					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin,global-admin",
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
@@ -574,7 +576,7 @@ describe("node-core", () => {
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_SCOPE: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},

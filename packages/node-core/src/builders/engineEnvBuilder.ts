@@ -3,12 +3,14 @@
 import path from "node:path";
 import { Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
+import { EngineCloneMode } from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
 	AuthorizationComponentType,
+	AuthorizationConnectorType,
 	type AutomationActionConfig,
 	type AutomationActionType,
 	AutomationComponentType,
@@ -97,6 +99,7 @@ import {
 } from "@twin.org/tracing-connector-opentelemetry";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
+import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 import {
 	commaSeparatedListToArray,
 	envArray,
@@ -108,10 +111,9 @@ import {
 	envMinutes,
 	envMs,
 	envObject,
-	envSecToMs,
-	envSeconds
+	envSeconds,
+	envSecToMs
 } from "./helper/envHelpers.js";
-import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 
 /**
  * Build the engine core configuration from environment variables.
@@ -702,45 +704,76 @@ async function configureTelemetry(
 ): Promise<void> {
 	coreConfig.types.telemetryConnector ??= [];
 
-	if (envVars.telemetryConnector === TelemetryConnectorType.EntityStorage) {
-		coreConfig.types.telemetryConnector.push({
-			type: TelemetryConnectorType.EntityStorage,
-			options: {
-				config: {
-					batchSize: envCount(envVars, "telemetryBatchSize"),
-					batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
-					maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
-					mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout")
+	const telemetryConnectorTypes = commaSeparatedListToArray<TelemetryConnectorType>(
+		envVars.telemetryConnector
+	);
+	let additionalConnectorCount = 0;
+
+	for (const telemetryConnector of telemetryConnectorTypes) {
+		if (telemetryConnector === TelemetryConnectorType.Silent) {
+			coreConfig.types.telemetryConnector.push({
+				type: TelemetryConnectorType.Silent
+			});
+			additionalConnectorCount++;
+		} else if (telemetryConnector === TelemetryConnectorType.EntityStorage) {
+			coreConfig.types.telemetryConnector.push({
+				type: TelemetryConnectorType.EntityStorage,
+				options: {
+					config: {
+						batchSize: envCount(envVars, "telemetryBatchSize"),
+						batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
+						maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
+						mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
+						metricDefinitionCacheCapacity: envCount(
+							envVars,
+							"telemetryMetricDefinitionCacheCapacity"
+						),
+						metricDefinitionCacheTtiMs: envMs(envVars, "telemetryMetricDefinitionCacheTtiMs")
+					}
 				}
+			});
+			additionalConnectorCount++;
+		} else if (telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
+			let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
+			if (envVars.openTelemetryReader === OpenTelemetryReaderTypes.Prometheus) {
+				readers = {
+					prometheus: {
+						type: OpenTelemetryReaderTypes.Prometheus,
+						port: envCount(envVars, "openTelemetryPrometheusPort")
+					}
+				};
 			}
-		});
-	} else if (envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
-		let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
-		if (envVars.openTelemetryReader === OpenTelemetryReaderTypes.Prometheus) {
-			readers = {
-				prometheus: {
-					type: OpenTelemetryReaderTypes.Prometheus,
-					port: envCount(envVars, "openTelemetryPrometheusPort")
+			coreConfig.types.telemetryConnector.push({
+				type: TelemetryConnectorType.OpenTelemetry,
+				options: {
+					config: {
+						meterName: envVars.openTelemetryMeterName,
+						meterVersion: envVars.openTelemetryMeterVersion,
+						readers
+					}
 				}
-			};
+			});
+			additionalConnectorCount++;
 		}
-		coreConfig.types.telemetryConnector.push({
-			type: TelemetryConnectorType.OpenTelemetry,
-			options: {
-				config: {
-					batchSize: envCount(envVars, "telemetryBatchSize"),
-					batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
-					maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
-					mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
-					meterName: envVars.openTelemetryMeterName,
-					meterVersion: envVars.openTelemetryMeterVersion,
-					readers
-				}
-			}
-		});
 	}
 
-	if (coreConfig.types.telemetryConnector.length > 0) {
+	// If more than one telemetry connector, then we need to add a multi connector
+	// and set it as the default one
+	if (additionalConnectorCount > 1) {
+		coreConfig.types.telemetryConnector.push({
+			type: TelemetryConnectorType.Multi,
+			options: {
+				telemetryConnectorTypes
+			},
+			isDefault: true
+		});
+	} else if (additionalConnectorCount > 0) {
+		// If only one connector, then we set it as the default one
+		coreConfig.types.telemetryConnector[coreConfig.types.telemetryConnector.length - 1].isDefault =
+			true;
+	}
+
+	if (additionalConnectorCount > 0) {
 		coreConfig.types.telemetryComponent ??= [];
 		coreConfig.types.telemetryComponent.push({ type: TelemetryComponentType.Service });
 	}
@@ -756,7 +789,7 @@ async function configureMetricsCollector(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (isTelemetryRequired(envVars)) {
+	if (isTelemetryEnabled(envVars)) {
 		coreConfig.types.metricsCollectorComponent ??= [];
 		coreConfig.types.metricsCollectorComponent.push({
 			type: MetricsCollectorComponentType.Service,
@@ -765,7 +798,7 @@ async function configureMetricsCollector(
 					intervalMs: envSecToMs(envVars, "telemetryMetricsCollectorInterval")
 				}
 			},
-			isCloneable: false
+			cloneMode: EngineCloneMode.Never
 		});
 
 		coreConfig.types.metricsProducerComponent ??= [];
@@ -779,7 +812,7 @@ async function configureMetricsCollector(
 			coreConfig.types.metricsProducerComponent.push({
 				type: producerType as MetricsProducerComponentType,
 				options: { maxHistory: envCount(envVars, "telemetryMetricsProducerMaxHistory") },
-				isCloneable: false
+				cloneMode: EngineCloneMode.Never
 			});
 		}
 	}
@@ -797,39 +830,69 @@ async function configureTracing(
 ): Promise<void> {
 	coreConfig.types.tracingConnector ??= [];
 
-	if (envVars.tracingConnector === TracingConnectorType.EntityStorage) {
-		coreConfig.types.tracingConnector.push({
-			type: TracingConnectorType.EntityStorage,
-			options: {
-				config: {
-					mutexTimeoutMs: envMs(envVars, "tracingMutexTimeout")
+	const tracingConnectorTypes = commaSeparatedListToArray<TracingConnectorType>(
+		envVars.tracingConnector
+	);
+	let additionalConnectorCount = 0;
+
+	for (const tracingConnector of tracingConnectorTypes) {
+		if (tracingConnector === TracingConnectorType.Silent) {
+			coreConfig.types.tracingConnector.push({
+				type: TracingConnectorType.Silent
+			});
+			additionalConnectorCount++;
+		} else if (tracingConnector === TracingConnectorType.EntityStorage) {
+			coreConfig.types.tracingConnector.push({
+				type: TracingConnectorType.EntityStorage,
+				options: {
+					config: {
+						mutexTimeoutMs: envMs(envVars, "tracingMutexTimeout")
+					}
 				}
-			}
-		});
-	} else if (envVars.tracingConnector === TracingConnectorType.OpenTelemetry) {
-		const otelTracingConfig: IOpenTelemetryTracingConnectorConfig = {
-			tracerName: envVars.openTelemetryTracingTracerName,
-			tracerVersion: envVars.openTelemetryTracingTracerVersion
-		};
-		if (Is.stringValue(envVars.openTelemetryTracingEndpoint)) {
-			otelTracingConfig.exporters = {
-				otlp: {
-					endpoint: envVars.openTelemetryTracingEndpoint,
-					processor:
-						(envVars.openTelemetryTracingProcessor as OpenTelemetryProcessorTypes) ??
-						OpenTelemetryProcessorTypes.Batch
-				}
+			});
+			additionalConnectorCount++;
+		} else if (tracingConnector === TracingConnectorType.OpenTelemetry) {
+			const otelTracingConfig: IOpenTelemetryTracingConnectorConfig = {
+				tracerName: envVars.openTelemetryTracingTracerName,
+				tracerVersion: envVars.openTelemetryTracingTracerVersion
 			};
-		}
-		coreConfig.types.tracingConnector.push({
-			type: TracingConnectorType.OpenTelemetry,
-			options: {
-				config: otelTracingConfig
+			if (Is.stringValue(envVars.openTelemetryTracingEndpoint)) {
+				otelTracingConfig.exporters = {
+					otlp: {
+						endpoint: envVars.openTelemetryTracingEndpoint,
+						processor:
+							(envVars.openTelemetryTracingProcessor as OpenTelemetryProcessorTypes) ??
+							OpenTelemetryProcessorTypes.Batch
+					}
+				};
 			}
-		});
+			coreConfig.types.tracingConnector.push({
+				type: TracingConnectorType.OpenTelemetry,
+				options: {
+					config: otelTracingConfig
+				}
+			});
+			additionalConnectorCount++;
+		}
 	}
 
-	if (coreConfig.types.tracingConnector.length > 0) {
+	// If more than one tracing connector, then we need to add a multi connector
+	// and set it as the default one
+	if (additionalConnectorCount > 1) {
+		coreConfig.types.tracingConnector.push({
+			type: TracingConnectorType.Multi,
+			options: {
+				tracingConnectorTypes
+			},
+			isDefault: true
+		});
+	} else if (additionalConnectorCount > 0) {
+		// If only one connector, then we set it as the default one
+		coreConfig.types.tracingConnector[coreConfig.types.tracingConnector.length - 1].isDefault =
+			true;
+	}
+
+	if (additionalConnectorCount > 0) {
 		coreConfig.types.tracingComponent ??= [];
 		coreConfig.types.tracingComponent.push({ type: TracingComponentType.Service });
 	}
@@ -847,11 +910,13 @@ async function configureAuthorization(
 ): Promise<void> {
 	coreConfig.types.authorizationConnector ??= [];
 
-	if (envVars.authorizationConnector === "entity-storage") {
-		coreConfig.types.authorizationConnector.push({ type: "entity-storage" });
-	} else if (envVars.authorizationConnector === "casbin") {
+	if (envVars.authorizationConnector === AuthorizationConnectorType.EntityStorage) {
 		coreConfig.types.authorizationConnector.push({
-			type: "casbin",
+			type: AuthorizationConnectorType.EntityStorage
+		});
+	} else if (envVars.authorizationConnector === AuthorizationConnectorType.Casbin) {
+		coreConfig.types.authorizationConnector.push({
+			type: AuthorizationConnectorType.Casbin,
 			options: {
 				config: {
 					endpoint: envVars.casbinEndpoint ?? "",
@@ -934,7 +999,7 @@ async function configureHealth(
 					initialInterval: envSecToMs(envVars, "healthStartupInterval")
 				}
 			},
-			isCloneable: false
+			cloneMode: EngineCloneMode.Never
 		});
 	}
 }
@@ -955,7 +1020,7 @@ async function configureSchemaMigration(
 	coreConfig.types.schemaVersionMigrationComponent.push({
 		type: SchemaVersionMigrationComponentType.Service,
 		options: { config: { enabled: isSchemaMigrationEnabled } },
-		isCloneable: false
+		cloneMode: EngineCloneMode.Never
 	});
 }
 
@@ -978,7 +1043,8 @@ async function configurePlatform(
 			config: {
 				isMultiTenant: isTenantEnabled
 			}
-		}
+		},
+		cloneMode: EngineCloneMode.Always
 	});
 }
 
@@ -1015,12 +1081,14 @@ async function configureContextIdHandlers(
 	coreConfig.types.contextIdHandlerComponent ??= [];
 	coreConfig.types.contextIdHandlerComponent.push({
 		type: ContextIdHandlerComponentType.Did,
-		features: [CONTEXT_ID_HANDLER_FEATURE_DID]
+		features: [CONTEXT_ID_HANDLER_FEATURE_DID],
+		cloneMode: EngineCloneMode.Always
 	});
 	if (envBoolean(envVars, "tenantEnabled", false)) {
 		coreConfig.types.contextIdHandlerComponent.push({
 			type: ContextIdHandlerComponentType.Tenant,
-			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT]
+			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT],
+			cloneMode: EngineCloneMode.Always
 		});
 	}
 }
@@ -2036,28 +2104,26 @@ export function isAutomationRequired(envVars: IEngineEnvironmentVariables): bool
 }
 
 /**
- * Checks if the telemetry subsystem is required.
+ * Checks if the telemetry subsystem is enabled.
  * Returns true when any component that depends on the telemetry subsystem is enabled.
  * @param envVars The environment variables.
  * @returns True if telemetry is enabled.
  */
-export function isTelemetryRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return (
-		envVars.telemetryConnector === TelemetryConnectorType.EntityStorage ||
-		envVars.telemetryConnector === TelemetryConnectorType.OpenTelemetry
+export function isTelemetryEnabled(envVars: IEngineEnvironmentVariables): boolean {
+	return commaSeparatedListToArray<TelemetryConnectorType>(envVars.telemetryConnector).some(
+		t => t === TelemetryConnectorType.EntityStorage || t === TelemetryConnectorType.OpenTelemetry
 	);
 }
 
 /**
- * Checks if the tracing subsystem is required.
+ * Checks if the tracing subsystem is enabled.
  * Returns true when any component that depends on the tracing subsystem is enabled.
  * @param envVars The environment variables.
  * @returns True if tracing is enabled.
  */
-export function isTracingRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return (
-		envVars.tracingConnector === TracingConnectorType.EntityStorage ||
-		envVars.tracingConnector === TracingConnectorType.OpenTelemetry
+export function isTracingEnabled(envVars: IEngineEnvironmentVariables): boolean {
+	return commaSeparatedListToArray<TracingConnectorType>(envVars.tracingConnector).some(
+		t => t === TracingConnectorType.EntityStorage || t === TracingConnectorType.OpenTelemetry
 	);
 }
 
@@ -2069,7 +2135,7 @@ export function isTracingRequired(envVars: IEngineEnvironmentVariables): boolean
  */
 export function isAuthorizationRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envVars.authorizationConnector === "entity-storage" ||
-		envVars.authorizationConnector === "casbin"
+		envVars.authorizationConnector === AuthorizationConnectorType.EntityStorage ||
+		envVars.authorizationConnector === AuthorizationConnectorType.Casbin
 	);
 }

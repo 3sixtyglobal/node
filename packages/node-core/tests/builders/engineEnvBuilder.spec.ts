@@ -5,8 +5,13 @@ import {
 	DataspaceControlPlaneComponentType,
 	DltConfigType,
 	EntityStorageConnectorType,
+	LoggingConnectorType,
 	SchemaVersionMigrationComponentType,
-	TaskSchedulerComponentType
+	TaskSchedulerComponentType,
+	TelemetryComponentType,
+	TelemetryConnectorType,
+	TracingComponentType,
+	TracingConnectorType
 } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 
@@ -351,5 +356,151 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 		const pool = connectorPool(config, EntityStorageConnectorType.ScyllaDb);
 		expect(pool?.coreConnectionsPerHost).toBeUndefined();
 		expect(pool?.maxRequestsPerConnection).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - logging multi-connector", () => {
+	test("single logging connector is marked as default", async () => {
+		const config = await buildEngineConfiguration({ loggingConnector: "console" });
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const multi = connectors.find(c => c.type === LoggingConnectorType.Multi);
+
+		expect(consoleConnector).toBeDefined();
+		expect(consoleConnector?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+	});
+
+	test("two logging connectors produce a multi connector set as the default", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage"
+		});
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const entityStorage = connectors.find(c => c.type === LoggingConnectorType.EntityStorage);
+		const multi = connectors.find(c => c.type === LoggingConnectorType.Multi);
+
+		expect(consoleConnector).toBeDefined();
+		expect(consoleConnector?.isDefault).toBeUndefined();
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBeUndefined();
+		expect(multi).toBeDefined();
+		expect(multi?.isDefault).toBe(true);
+	});
+});
+
+describe("buildEngineConfiguration - telemetry multi-connector", () => {
+	test("single telemetry connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.EntityStorage
+		});
+
+		const connectors = config.types.telemetryConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TelemetryConnectorType.EntityStorage);
+		const multi = connectors.find(c => c.type === TelemetryConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.telemetryComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+
+	test("two telemetry connectors produce a multi connector set as the default", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: `${TelemetryConnectorType.EntityStorage},${TelemetryConnectorType.OpenTelemetry}`
+		});
+
+		const connectors = config.types.telemetryConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TelemetryConnectorType.EntityStorage);
+		const openTelemetry = connectors.find(c => c.type === TelemetryConnectorType.OpenTelemetry);
+		const multi = connectors.find(c => c.type === TelemetryConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBeUndefined();
+		expect(openTelemetry).toBeDefined();
+		expect(openTelemetry?.isDefault).toBeUndefined();
+		expect(multi).toBeDefined();
+		expect(multi?.isDefault).toBe(true);
+		expect(config.types.telemetryComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+
+	test("silent telemetry connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.Silent
+		});
+
+		const connectors = config.types.telemetryConnector ?? [];
+		const silent = connectors.find(c => c.type === TelemetryConnectorType.Silent);
+		const multi = connectors.find(c => c.type === TelemetryConnectorType.Multi);
+
+		expect(silent).toBeDefined();
+		expect(silent?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.telemetryComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+});
+
+describe("buildEngineConfiguration - tracing multi-connector", () => {
+	test("single tracing connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			tracingConnector: TracingConnectorType.EntityStorage
+		});
+
+		const connectors = config.types.tracingConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TracingConnectorType.EntityStorage);
+		const multi = connectors.find(c => c.type === TracingConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.tracingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
+		);
+	});
+
+	test("two tracing connectors produce a multi connector set as the default", async () => {
+		const config = await buildEngineConfiguration({
+			tracingConnector: `${TracingConnectorType.EntityStorage},${TracingConnectorType.OpenTelemetry}`
+		});
+
+		const connectors = config.types.tracingConnector ?? [];
+		const entityStorage = connectors.find(c => c.type === TracingConnectorType.EntityStorage);
+		const openTelemetry = connectors.find(c => c.type === TracingConnectorType.OpenTelemetry);
+		const multi = connectors.find(c => c.type === TracingConnectorType.Multi);
+
+		expect(entityStorage).toBeDefined();
+		expect(entityStorage?.isDefault).toBeUndefined();
+		expect(openTelemetry).toBeDefined();
+		expect(openTelemetry?.isDefault).toBeUndefined();
+		expect(multi).toBeDefined();
+		expect(multi?.isDefault).toBe(true);
+		expect(config.types.tracingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
+		);
+	});
+
+	test("silent tracing connector is marked as default and service component is registered", async () => {
+		const config = await buildEngineConfiguration({
+			tracingConnector: TracingConnectorType.Silent
+		});
+
+		const connectors = config.types.tracingConnector ?? [];
+		const silent = connectors.find(c => c.type === TracingConnectorType.Silent);
+		const multi = connectors.find(c => c.type === TracingConnectorType.Multi);
+
+		expect(silent).toBeDefined();
+		expect(silent?.isDefault).toBe(true);
+		expect(multi).toBeUndefined();
+		expect(config.types.tracingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
+		);
 	});
 });

@@ -5,6 +5,7 @@ import path from "node:path";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
+	AuthorizationConnectorType,
 	EntityStorageConnectorType,
 	IdentityConnectorType,
 	IdentityResolverConnectorType,
@@ -61,6 +62,7 @@ const BASE_ENV: { [id: string]: string } = {
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
+	TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
 

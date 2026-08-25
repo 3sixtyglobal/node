@@ -4,7 +4,7 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@twin.org/api-auth-entity-storage-models";
-import { ScopeHelper } from "@twin.org/api-models";
+import type { IAuthorizationComponent } from "@twin.org/authorization-models";
 import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
@@ -12,6 +12,7 @@ import { PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
 import type { Person, WithContext } from "schema-dts";
+import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -76,9 +77,9 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 				required: false
 			},
 			{
-				key: "scope",
+				key: "roles",
 				type: "string",
-				description: I18n.formatMessage("node.cli.commands.user-create.params.scope.description"),
+				description: I18n.formatMessage("node.cli.commands.user-create.params.roles.description"),
 				required: false
 			},
 			{
@@ -154,7 +155,7 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
  * @param params.tenantId The tenant ID for the user.
  * @param params.email The email for the user.
  * @param params.password The password for the user.
- * @param params.scope The scope for the user.
+ * @param params.roles The roles for the user.
  * @param params.givenName The given name for the user.
  * @param params.familyName The family name for the user.
  * @param params.overwriteMode The mode to use when a user with the same identity already exists.
@@ -172,7 +173,7 @@ export async function userCreate(
 		tenantId?: string;
 		email?: string;
 		password?: string;
-		scope?: string;
+		roles?: string;
 		givenName?: string;
 		familyName?: string;
 		overwriteMode?: "skip" | "overwrite" | "error";
@@ -186,7 +187,7 @@ export async function userCreate(
 			organizationDid: string;
 			email: string;
 			password: string;
-			scope: string[];
+			roles: string[];
 			givenName: string;
 			familyName: string;
 	  }
@@ -221,8 +222,14 @@ export async function userCreate(
 	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
 		defaultAuthenticationAdminComponentType
 	);
+	const defaultAuthorizationComponentType =
+		engineCore.getRegisteredInstanceType("authorizationComponent");
+	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
+		defaultAuthorizationComponentType
+	);
 
 	let createUser = true;
+	const roles = commaSeparatedListToArray<string>(params.roles);
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
 	const returnJson = await ContextIdStore.run(
@@ -261,8 +268,7 @@ export async function userCreate(
 					email: paramsEmail,
 					password: params.password ?? PasswordGenerator.generate(16),
 					userIdentity: paramsUserIdentity,
-					organizationIdentity: paramsOrganizationIdentity,
-					scope: ScopeHelper.toArray(params.scope)
+					organizationIdentity: paramsOrganizationIdentity
 				};
 
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
@@ -270,14 +276,18 @@ export async function userCreate(
 				await ContextIdStore.run(
 					{
 						...currentContextIds,
-						[ContextIdKeys.Tenant]: params.tenantId,
-						scope: ScopeHelper.toString(user.scope)
+						[ContextIdKeys.Tenant]: params.tenantId
 					},
 					async () => {
 						if (existingUser) {
 							await authenticationAdminComponent.update(user);
 						} else {
 							await authenticationAdminComponent.create(user);
+						}
+
+						await verifyRoles(authorizationComponent, roles);
+						for (const role of roles) {
+							await authorizationComponent.addRoleForSubject(paramsUserIdentity, role);
 						}
 					}
 				);
@@ -318,7 +328,7 @@ export async function userCreate(
 					organizationDid: paramsOrganizationIdentity,
 					email: paramsEmail,
 					password: user.password,
-					scope: ScopeHelper.toArray(params.scope),
+					roles: commaSeparatedListToArray<string>(params.roles),
 					givenName: params.givenName ?? "",
 					familyName: params.familyName ?? ""
 				};
@@ -335,7 +345,7 @@ export async function userCreate(
 							`${params.outputEnvPrefix}ORGANIZATION_DID="${params.organizationIdentity}"`,
 							`${params.outputEnvPrefix}EMAIL="${paramsEmail}"`,
 							`${params.outputEnvPrefix}PASSWORD="${user.password}"`,
-							`${params.outputEnvPrefix}SCOPE="${params.scope ?? ""}"`,
+							`${params.outputEnvPrefix}ROLES="${params.roles ?? ""}"`,
 							`${params.outputEnvPrefix}GIVEN_NAME="${params.givenName ?? ""}"`,
 							`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`
 						],
@@ -351,4 +361,24 @@ export async function userCreate(
 	);
 
 	return returnJson;
+}
+
+/**
+ * Verify that the specified roles exist in the system.
+ * @param authorizationComponent The authorization component.
+ * @param roles The roles to verify.
+ * @returns A promise that resolves when all roles have been verified.
+ * @throws GeneralError if any of the specified roles do not exist.
+ */
+export async function verifyRoles(
+	authorizationComponent: IAuthorizationComponent,
+	roles: string[]
+): Promise<void> {
+	const results = await authorizationComponent.hasRoles(roles);
+	const missingRoles = roles.filter((role, i) => !results[i]);
+	if (missingRoles.length > 0) {
+		throw new GeneralError("userCreate", "rolesNotFound", {
+			roles: missingRoles.join(", ")
+		});
+	}
 }
