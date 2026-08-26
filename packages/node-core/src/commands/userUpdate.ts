@@ -11,9 +11,8 @@ import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
 import type { Person, WithContext } from "schema-dts";
-import { verifyRoles } from "./userCreate.js";
 import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
-import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
+import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -205,8 +204,9 @@ export async function userUpdate(
 
 			if (Is.stringValue(params.roles)) {
 				const roles = commaSeparatedListToArray<string>(params.roles);
-
-				await verifyRoles(authorizationComponent, authorizationModelId, roles);
+				if (roles.length === 0) {
+					roles.push(DEFAULT_USER_ROLE);
+				}
 
 				const rolesToAdd = roles.filter(role => !currentRoles.includes(role));
 				const rolesToRemove = currentRoles.filter(role => !roles.includes(role));

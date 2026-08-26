@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IAuthenticationAdminComponent } from "@twin.org/api-auth-entity-storage-models";
 import type { ITenantAdminComponent } from "@twin.org/api-models";
-import type { IAuthorizationComponent } from "@twin.org/authorization-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import {
-	AUTHORIZATION_MODEL_ID,
 	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_TENANT_ADMIN_ROLE,
 	DEFAULT_USER_ADMIN_ROLE
@@ -235,16 +233,6 @@ export async function bootstrapDev(
 		});
 	}
 
-	await ContextIdStore.run(
-		{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenant?.id },
-		async () => {
-			await bootstrapAuthorization(
-				engineCore,
-				envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID
-			);
-		}
-	);
-
 	if (features.includes("admin-user")) {
 		await ContextIdStore.run(
 			{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenant?.id },
@@ -296,55 +284,6 @@ export async function bootstrapDev(
 			}
 		);
 	}
-}
-
-/**
- * Seed default roles into the authorization system so they can be assigned to users.
- * @param engineCore The engine core.
- * @param authorizationModelId The model identifier for authorization.
- * @returns A promise that resolves when the default roles have been seeded.
- * @internal
- */
-async function bootstrapAuthorization(
-	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
-	authorizationModelId: string
-): Promise<void> {
-	CLIDisplay.break();
-	CLIDisplay.section(
-		I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.authorizationBootstrap")
-	);
-
-	const defaultAuthorizationComponentType =
-		engineCore.getRegisteredInstanceType("authorizationComponent");
-	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
-		defaultAuthorizationComponentType
-	);
-
-	await authorizationComponent.addPolicy(
-		authorizationModelId,
-		DEFAULT_TENANT_ADMIN_ROLE,
-		"tenantCreate",
-		"execute"
-	);
-	await authorizationComponent.addPolicy(
-		authorizationModelId,
-		DEFAULT_USER_ADMIN_ROLE,
-		"authenticationAdminCreateUser",
-		"execute"
-	);
-
-	await authorizationComponent.addRoleInheritance(
-		authorizationModelId,
-		DEFAULT_ESCALATED_PRIVILEGE_ROLE,
-		DEFAULT_TENANT_ADMIN_ROLE
-	);
-	await authorizationComponent.addRoleInheritance(
-		authorizationModelId,
-		DEFAULT_ESCALATED_PRIVILEGE_ROLE,
-		DEFAULT_USER_ADMIN_ROLE
-	);
-
-	CLIDisplay.done();
 }
 
 /**

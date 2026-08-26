@@ -178,6 +178,8 @@ const engineEnvironmentVariableKeysInternal: {
 	casbinTimeoutMs: true,
 	authorizationCheckCacheCapacity: true,
 	authorizationCheckCacheTtiMs: true,
+	authorizationModel: true,
+	authorizationModelMode: true,
 	tracingSilentComponents: true,
 	// DLT / identity
 	faucetConnector: true,

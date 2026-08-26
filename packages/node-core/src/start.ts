@@ -19,6 +19,7 @@ import {
 	extensionsInitialiseEngineServer,
 	shutdownExtensions
 } from "./builders/extensionsBuilder.js";
+import { seedAuthorizationDefaults } from "./builders/helper/authorizationSeeder.js";
 import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { executeCommand } from "./cli.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
@@ -125,6 +126,8 @@ export async function start(
 		try {
 			// Start the server, which also starts the engine.
 			await server.start();
+
+			await seedAuthorizationDefaults(engine, envVars, server.getRestRoutes());
 
 			return {
 				engine,

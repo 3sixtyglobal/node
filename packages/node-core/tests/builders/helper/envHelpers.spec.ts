@@ -383,51 +383,40 @@ describe("envArray", () => {
 describe("envObject", () => {
 	test("returns undefined when env var is absent and no default given", () => {
 		expect(
-			envObject<{ authorizationDefaultRules?: string }, {}>({}, "authorizationDefaultRules")
+			envObject<{ authorizationModel?: string }, {}>({}, "authorizationModel")
 		).toBeUndefined();
 	});
 
 	test("returns defaultValue when env var is absent", () => {
 		const def = { allow: [] };
 		expect(
-			envObject<{ authorizationDefaultRules?: string }, { allow: never[] }>(
-				{},
-				"authorizationDefaultRules",
-				def
-			)
+			envObject<{ authorizationModel?: string }, { allow: never[] }>({}, "authorizationModel", def)
 		).toBe(def);
 	});
 
 	test("returns the parsed object when the var holds a pre-parsed object", () => {
 		const rules = { allow: ["read"] };
 		expect(
-			envObject(
-				{ authorizationDefaultRules: rules as unknown as string },
-				"authorizationDefaultRules"
-			)
+			envObject({ authorizationModel: rules as unknown as string }, "authorizationModel")
 		).toEqual(rules);
 	});
 
 	test("parses a JSON object string", () => {
 		expect(
-			envObject<{ authorizationDefaultRules?: string }, { x: number }>(
-				{ authorizationDefaultRules: '{"x":1}' },
-				"authorizationDefaultRules"
+			envObject<{ authorizationModel?: string }, { x: number }>(
+				{ authorizationModel: '{"x":1}' },
+				"authorizationModel"
 			)
 		).toEqual({ x: 1 });
 	});
 
 	test("returns undefined for a non-object string when no default given", () => {
-		expect(
-			envObject({ authorizationDefaultRules: "not-json" }, "authorizationDefaultRules")
-		).toBeUndefined();
+		expect(envObject({ authorizationModel: "not-json" }, "authorizationModel")).toBeUndefined();
 	});
 
 	test("returns defaultValue for a non-object string when default given", () => {
 		const def = { allow: [] };
-		expect(
-			envObject({ authorizationDefaultRules: "not-json" }, "authorizationDefaultRules", def)
-		).toBe(def);
+		expect(envObject({ authorizationModel: "not-json" }, "authorizationModel", def)).toBe(def);
 	});
 });
 

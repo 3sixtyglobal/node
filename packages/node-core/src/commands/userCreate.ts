@@ -12,8 +12,8 @@ import { PasswordGenerator } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
 import type { Person, WithContext } from "schema-dts";
-import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
-import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
+import { commaSeparatedListToArray, envString } from "../builders/helper/envHelpers.js";
+import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -197,7 +197,7 @@ export async function userCreate(
 	const paramsEmail = params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
-	const authorizationModelId = envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID;
+	const authorizationModelId = envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID);
 	Guards.email("userCreate", "email", paramsEmail);
 	Did.guard("userCreate", "user-identity", paramsUserIdentity);
 	Did.guard("userCreate", "organization-identity", paramsOrganizationIdentity);
@@ -232,6 +232,9 @@ export async function userCreate(
 
 	let createUser = true;
 	const roles = commaSeparatedListToArray<string>(params.roles);
+	if (roles.length === 0) {
+		roles.push(DEFAULT_USER_ROLE);
+	}
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
 	const returnJson = await ContextIdStore.run(
@@ -287,7 +290,6 @@ export async function userCreate(
 							await authenticationAdminComponent.create(user);
 						}
 
-						await verifyRoles(authorizationComponent, authorizationModelId, roles);
 						for (const role of roles) {
 							await authorizationComponent.addRoleForSubject(
 								authorizationModelId,
@@ -334,7 +336,7 @@ export async function userCreate(
 					organizationDid: paramsOrganizationIdentity,
 					email: paramsEmail,
 					password: user.password,
-					roles: commaSeparatedListToArray<string>(params.roles),
+					roles,
 					givenName: params.givenName ?? "",
 					familyName: params.familyName ?? ""
 				};
@@ -367,26 +369,4 @@ export async function userCreate(
 	);
 
 	return returnJson;
-}
-
-/**
- * Verify that the specified roles exist in the system.
- * @param authorizationComponent The authorization component.
- * @param authorizationModelId The model identifier for authorization.
- * @param roles The roles to verify.
- * @returns A promise that resolves when all roles have been verified.
- * @throws GeneralError if any of the specified roles do not exist.
- */
-export async function verifyRoles(
-	authorizationComponent: IAuthorizationComponent,
-	authorizationModelId: string,
-	roles: string[]
-): Promise<void> {
-	const results = await authorizationComponent.hasRoles(authorizationModelId, roles);
-	const missingRoles = roles.filter((role, i) => !results[i]);
-	if (missingRoles.length > 0) {
-		throw new GeneralError("userCreate", "rolesNotFound", {
-			roles: missingRoles.join(", ")
-		});
-	}
 }

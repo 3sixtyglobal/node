@@ -49,8 +49,7 @@
 		"userCreate": {
 			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
 			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\".",
-			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
-			"rolesNotFound": "The following roles were not found: {roles}"
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
 		},
 		"userGet": {
 			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
@@ -155,7 +154,6 @@
 						"nodeOrganizationIdSet": "Setting node organisation ID",
 						"adminIdentityCreate": "Creating admin user identity",
 						"adminUserCreate": "Creating admin user",
-						"authorizationBootstrap": "Seeding default authorization roles",
 						"tenantFallback": "No Node-labelled tenant found; using first available tenant"
 					}
 				},

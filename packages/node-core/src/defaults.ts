@@ -57,6 +57,11 @@ export const DEFAULT_TENANT_ADMIN_ROLE = "tenant-admin";
 export const DEFAULT_USER_ADMIN_ROLE = "user-admin";
 
 /**
+ * Default role for users.
+ */
+export const DEFAULT_USER_ROLE = "user";
+
+/**
  * Get the default environment variables for the node.
  * @param envPrefix The environment variable prefix.
  * @returns The default environment variables.

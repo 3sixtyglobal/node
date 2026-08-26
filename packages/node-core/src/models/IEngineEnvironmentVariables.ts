@@ -747,6 +747,22 @@ export interface IEngineEnvironmentVariables {
 	authorizationCheckCacheTtiMs?: string;
 
 	/**
+	 * Path to a JSON file containing the authorization model to seed at startup.
+	 * Use the @json: prefix to load the file, e.g. @json:./authorization-model.json.
+	 * The file must contain an object with policies and roleInheritances arrays.
+	 * Combined with or replaces the route-derived defaults depending on authorizationModelMode.
+	 */
+	authorizationModel?: string;
+
+	/**
+	 * Controls how authorizationModel is combined with route-derived policies at startup.
+	 * "merge" (default): authorizationModel is applied in addition to route-derived rules.
+	 * "replace": authorizationModel replaces route-derived rules entirely.
+	 * @default "merge"
+	 */
+	authorizationModelMode?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;
