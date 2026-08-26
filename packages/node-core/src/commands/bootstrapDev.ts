@@ -9,6 +9,7 @@ import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core
 import type { IEngineCore } from "@twin.org/engine-models";
 import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import {
+	AUTHORIZATION_MODEL_ID,
 	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_TENANT_ADMIN_ROLE,
 	DEFAULT_USER_ADMIN_ROLE
@@ -237,7 +238,10 @@ export async function bootstrapDev(
 	await ContextIdStore.run(
 		{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenant?.id },
 		async () => {
-			await bootstrapAuthorization(engineCore);
+			await bootstrapAuthorization(
+				engineCore,
+				envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID
+			);
 		}
 	);
 
@@ -297,11 +301,13 @@ export async function bootstrapDev(
 /**
  * Seed default roles into the authorization system so they can be assigned to users.
  * @param engineCore The engine core.
+ * @param authorizationModelId The model identifier for authorization.
  * @returns A promise that resolves when the default roles have been seeded.
  * @internal
  */
 async function bootstrapAuthorization(
-	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>
+	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
+	authorizationModelId: string
 ): Promise<void> {
 	CLIDisplay.break();
 	CLIDisplay.section(
@@ -314,22 +320,26 @@ async function bootstrapAuthorization(
 		defaultAuthorizationComponentType
 	);
 
-	await authorizationComponent.addPolicy({
-		subject: DEFAULT_TENANT_ADMIN_ROLE,
-		object: "tenantCreate",
-		action: "execute"
-	});
-	await authorizationComponent.addPolicy({
-		subject: DEFAULT_USER_ADMIN_ROLE,
-		object: "authenticationAdminCreateUser",
-		action: "execute"
-	});
+	await authorizationComponent.addPolicy(
+		authorizationModelId,
+		DEFAULT_TENANT_ADMIN_ROLE,
+		"tenantCreate",
+		"execute"
+	);
+	await authorizationComponent.addPolicy(
+		authorizationModelId,
+		DEFAULT_USER_ADMIN_ROLE,
+		"authenticationAdminCreateUser",
+		"execute"
+	);
 
 	await authorizationComponent.addRoleInheritance(
+		authorizationModelId,
 		DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 		DEFAULT_TENANT_ADMIN_ROLE
 	);
 	await authorizationComponent.addRoleInheritance(
+		authorizationModelId,
 		DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 		DEFAULT_USER_ADMIN_ROLE
 	);

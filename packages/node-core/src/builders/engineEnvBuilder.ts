@@ -97,7 +97,11 @@ import {
 	type IOpenTelemetryTracingConnectorConfig,
 	OpenTelemetryProcessorTypes
 } from "@twin.org/tracing-connector-opentelemetry";
-import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+import {
+	AUTHORIZATION_MODEL_ID,
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT
+} from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 import {
@@ -110,9 +114,9 @@ import {
 	envMinToMs,
 	envMinutes,
 	envMs,
-	envObject,
 	envSeconds,
-	envSecToMs
+	envSecToMs,
+	envString
 } from "./helper/envHelpers.js";
 
 /**
@@ -922,7 +926,6 @@ async function configureAuthorization(
 					endpoint: envVars.casbinEndpoint ?? "",
 					clientId: envVars.casbinClientId ?? "",
 					clientSecret: envVars.casbinClientSecret ?? "",
-					enforcerId: envVars.casbinEnforcerId ?? "",
 					timeoutMs: envMs(envVars, "casbinTimeoutMs")
 				}
 			}
@@ -936,9 +939,9 @@ async function configureAuthorization(
 			type: AuthorizationComponentType.Service,
 			options: {
 				config: {
+					migrationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID),
 					checkCacheCapacity: envInteger(envVars, "authorizationCheckCacheCapacity"),
-					checkCacheTtiMs: envMs(envVars, "authorizationCheckCacheTtiMs"),
-					defaultRules: envObject(envVars, "authorizationDefaultRules")
+					checkCacheTtiMs: envMs(envVars, "authorizationCheckCacheTtiMs")
 				}
 			}
 		});

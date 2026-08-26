@@ -3,7 +3,9 @@
 import { ContextIdStore } from "@twin.org/context";
 import { Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
+import { AuthenticationAdminComponentType } from "@twin.org/engine-server-types";
 import {
+	AuthorizationConnectorType,
 	BackgroundTaskComponentType,
 	EntityStorageComponentType,
 	EntityStorageConnectorType,
@@ -748,6 +750,360 @@ describe("migration - multi-tenant", () => {
 			} catch {
 				// Ignore if already removed.
 			}
+		}
+	});
+});
+
+describe("migration - scope to roles", () => {
+	beforeAll(async () => {
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0 ? { node: TEST_NODE_ID } : ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		Factory.clearFactories();
+	});
+
+	test("Migrates V0 user scope to authorization role assignments on node start", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const PORT_1 = 31000 + Math.floor(Math.random() * 200);
+			const PORT_2 = PORT_1 + 300;
+
+			const AUTH_ENV: { [id: string]: string } = {
+				...BASE_ENV,
+				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage
+			};
+
+			// Run 1: initialise schema-version records. After startup, back-date
+			// AuthenticationUser to v0 and seed V0 users that carry a scope field.
+			const run1 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: { ...AUTH_ENV, TWIN_PORT: String(PORT_1) },
+				extendConfig: async (unusedEnvVars, config) => {
+					config.types.schemaVersionMigrationComponent = [
+						{ type: SchemaVersionMigrationComponentType.Service }
+					];
+					config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+				}
+			});
+
+			// Back-date the AuthenticationUser schema-version record to v0 so run 2
+			// detects it as needing migration.
+			const svConnector =
+				EntityStorageConnectorFactory.get<
+					MemoryEntityStorageConnector<{ schemaName: string; version: number }>
+				>("schema-version");
+			const svRecords = await svConnector.getStore();
+			const svRecord = svRecords.find(r => r.schemaName === "AuthenticationUser");
+			if (svRecord) {
+				await svConnector.set({ ...svRecord, version: 0 });
+			}
+
+			// Seed two V0 users with comma-separated scope fields. The V0 schema is used
+			// so schema validation does not strip the scope property.
+			// partitionContextIds must match the engine-created connector (["node"] in single-tenant).
+			const seedConnector = new MemoryEntityStorageConnector<{
+				email: string;
+				password: string;
+				salt: string;
+				identity: string;
+				organization: string;
+				scope: string;
+			}>({
+				entitySchema: "AuthenticationUserV0",
+				partitionContextIds: ["node"],
+				config: { storageKey: "authentication-user" }
+			});
+			await seedConnector.setBatch([
+				{
+					email: "user1@test.com",
+					password: "hashed1",
+					salt: "salt1",
+					identity: "did:twin:user1",
+					organization: TEST_NODE_ORG_ID,
+					scope: "global-admin,user-admin"
+				},
+				{
+					email: "user2@test.com",
+					password: "hashed2",
+					salt: "salt2",
+					identity: "did:twin:user2",
+					organization: TEST_NODE_ORG_ID,
+					scope: "tenant-admin"
+				},
+				{
+					email: "user3@test.com",
+					password: "hashed3",
+					salt: "salt3",
+					identity: "did:twin:user3",
+					organization: TEST_NODE_ORG_ID,
+					scope: ""
+				}
+			]);
+
+			await run1?.shutdown();
+
+			// Run 2: restart. SchemaVersionService detects AuthenticationUser v0 → v1.
+			// The removeEntityProperty handler splits scope into roles and writes them to
+			// SharedStore["migrationUserRoles"]. AuthorizationService.start() then consumes
+			// that store and calls addRoleForSubject for each entry.
+			let run2;
+			try {
+				run2 = await run({
+					localesDirectory: LOCALES_DIR,
+					stateStorage: new MemoryStateStorage(false, {
+						nodeId: TEST_NODE_ID,
+						nodeOrganizationId: TEST_NODE_ORG_ID
+					}),
+					disableProcessExitOnFailure: true,
+					envVars: { ...AUTH_ENV, TWIN_PORT: String(PORT_2) },
+					extendConfig: async (unusedEnvVars2, config) => {
+						config.types.schemaVersionMigrationComponent = [
+							{ type: SchemaVersionMigrationComponentType.Service }
+						];
+						config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+					}
+				});
+
+				// AuthenticationUser schema version must have advanced to 1.
+				const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+				const { entities: versionRecords } = await versionConnector.query();
+				const migrationRecord = (versionRecords ?? []).find(
+					r => (r as { schemaName: string }).schemaName === "AuthenticationUser"
+				) as { version: number } | undefined;
+				expect(migrationRecord?.version).toBe(1);
+
+				// Migrated users must not carry the scope field.
+				const userConnector = EntityStorageConnectorFactory.get("authentication-user");
+				const { entities: users } = await userConnector.query();
+				expect(users).toHaveLength(3);
+				for (const user of users ?? []) {
+					expect((user as { scope?: unknown }).scope).toBeUndefined();
+				}
+
+				// Authorization role assignments must have been created for every scope entry.
+				// user1: "global-admin,user-admin" → 2 assignments
+				// user2: "tenant-admin" → 1 assignment
+				// user3: "" (empty scope) → falls back to "user" → 1 assignment
+				const roleConnector = EntityStorageConnectorFactory.get("authorization-role-assignment");
+				const { entities: assignments } = await roleConnector.query();
+				const rows = (assignments ?? []) as {
+					id: string;
+					modelId: string;
+					subject: string;
+					role: string;
+				}[];
+
+				const findAssignment = (
+					identity: string,
+					role: string
+				): { id: string; modelId: string; subject: string; role: string } | undefined =>
+					rows.find(r => r.subject === identity && r.role === role);
+
+				expect(rows).toHaveLength(4);
+				expect(findAssignment("did:twin:user1", "global-admin")).toBeDefined();
+				expect(findAssignment("did:twin:user1", "user-admin")).toBeDefined();
+				expect(findAssignment("did:twin:user2", "tenant-admin")).toBeDefined();
+				expect(findAssignment("did:twin:user3", "user")).toBeDefined();
+
+				// All assignments must use the default migration model ID.
+				expect(rows.every(r => r.modelId === "rest")).toBe(true);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+});
+
+describe("migration - scope to roles multi-tenant", () => {
+	beforeAll(async () => {
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0
+				? { node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }
+				: ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		Factory.clearFactories();
+	});
+
+	test("Migrates V0 user scope to role assignments isolated by tenant partition", async () => {
+		const PORT_1 = 31600 + Math.floor(Math.random() * 200);
+		const PORT_2 = PORT_1 + 300;
+
+		const AUTH_MT_ENV: { [id: string]: string } = {
+			...MULTI_TENANT_BASE_ENV,
+			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+			TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage
+		};
+
+		// Run 1: initialise schema-version records then back-date AuthenticationUser to v0.
+		const run1 = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
+			disableProcessExitOnFailure: true,
+			envVars: { ...AUTH_MT_ENV, TWIN_PORT: String(PORT_1) },
+			extendConfig: async (unusedEnvVars, config) => {
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			}
+		});
+
+		const svConnector =
+			EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<{ schemaName: string; version: number }>
+			>("schema-version");
+		const svRecords = await svConnector.getStore();
+		const svRecord = svRecords.find(r => r.schemaName === "AuthenticationUser");
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 0 });
+		}
+
+		// Seed one user per tenant using its own partition context so the migration
+		// handler captures the correct contextIds for each and replays them into the
+		// right authorization partition.
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
+			const seedA = new MemoryEntityStorageConnector<{
+				email: string;
+				password: string;
+				salt: string;
+				identity: string;
+				organization: string;
+				scope: string;
+			}>({
+				entitySchema: "AuthenticationUserV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "authentication-user" }
+			});
+			await seedA.setBatch([
+				{
+					email: "userA@test.com",
+					password: "hashedA",
+					salt: "saltA",
+					identity: "did:twin:userA",
+					organization: TEST_NODE_ORG_ID,
+					scope: "global-admin"
+				}
+			]);
+		});
+
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B }, async () => {
+			const seedB = new MemoryEntityStorageConnector<{
+				email: string;
+				password: string;
+				salt: string;
+				identity: string;
+				organization: string;
+				scope: string;
+			}>({
+				entitySchema: "AuthenticationUserV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "authentication-user" }
+			});
+			await seedB.setBatch([
+				{
+					email: "userB@test.com",
+					password: "hashedB",
+					salt: "saltB",
+					identity: "did:twin:userB",
+					organization: TEST_NODE_ORG_ID,
+					scope: "tenant-admin"
+				}
+			]);
+		});
+
+		await run1?.shutdown();
+
+		// Run 2: restart. Migration runs once per tenant partition. The contextIds captured
+		// during each partition's removeEntityProperty call include the tenant ID, so
+		// AuthorizationService.start() writes each role assignment into the correct partition.
+		let run2;
+		try {
+			run2 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: { ...AUTH_MT_ENV, TWIN_PORT: String(PORT_2) },
+				extendConfig: async (unusedEnvVars2, config) => {
+					config.types.schemaVersionMigrationComponent = [
+						{ type: SchemaVersionMigrationComponentType.Service }
+					];
+					config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+				}
+			});
+
+			// Schema version must have advanced to 1.
+			const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+			const { entities: versionRecords } = await versionConnector.query();
+			const migrationRecord = (versionRecords ?? []).find(
+				r => (r as { schemaName: string }).schemaName === "AuthenticationUser"
+			) as { version: number } | undefined;
+			expect(migrationRecord?.version).toBe(1);
+
+			// Tenant A: user must have global-admin role, isolated to tenant A's partition.
+			const roleConnector = EntityStorageConnectorFactory.get("authorization-role-assignment");
+			const { entities: assignmentsA } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A },
+				async () => roleConnector.query()
+			);
+			const rowsA = (assignmentsA ?? []) as {
+				id: string;
+				modelId: string;
+				subject: string;
+				role: string;
+			}[];
+			expect(rowsA).toHaveLength(1);
+			expect(rowsA[0].subject).toBe("did:twin:userA");
+			expect(rowsA[0].role).toBe("global-admin");
+			expect(rowsA[0].modelId).toBe("rest");
+
+			// Tenant B: user must have tenant-admin role, isolated to tenant B's partition.
+			const { entities: assignmentsB } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B },
+				async () => roleConnector.query()
+			);
+			const rowsB = (assignmentsB ?? []) as {
+				id: string;
+				modelId: string;
+				subject: string;
+				role: string;
+			}[];
+			expect(rowsB).toHaveLength(1);
+			expect(rowsB[0].subject).toBe("did:twin:userB");
+			expect(rowsB[0].role).toBe("tenant-admin");
+			expect(rowsB[0].modelId).toBe("rest");
+		} finally {
+			await run2?.shutdown();
 		}
 	});
 });

@@ -9,6 +9,7 @@ import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
+import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -85,6 +86,7 @@ export async function userGet(
 	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
 		"authenticationAdminComponent"
 	);
+	const authorizationModelId = envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID;
 	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
 		defaultAuthenticationAdminComponentType
 	);
@@ -104,7 +106,10 @@ export async function userGet(
 			let foundRoles: string[] | undefined;
 
 			if (Is.stringValue(foundUser.userIdentity)) {
-				foundRoles = await authorizationComponent.getRolesForSubject(foundUser.userIdentity);
+				foundRoles = await authorizationComponent.getRolesForSubject(
+					authorizationModelId,
+					foundUser.userIdentity
+				);
 			}
 			return {
 				user: foundUser,

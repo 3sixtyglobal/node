@@ -13,6 +13,7 @@ import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models"
 import type { Person, WithContext } from "schema-dts";
 import { verifyRoles } from "./userCreate.js";
 import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
+import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -146,6 +147,7 @@ export async function userUpdate(
 	const paramsEmail = params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
+	const authorizationModelId = envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID;
 
 	Guards.email("userUpdate", "email", paramsEmail);
 	if (Is.stringValue(paramsUserIdentity)) {
@@ -196,21 +198,32 @@ export async function userUpdate(
 			const existingUser = await authenticationAdminComponent.get(paramsEmail);
 			await authenticationAdminComponent.update(user);
 
-			let currentRoles = await authorizationComponent.getRolesForSubject(existingUser.userIdentity);
+			let currentRoles = await authorizationComponent.getRolesForSubject(
+				authorizationModelId,
+				existingUser.userIdentity
+			);
 
 			if (Is.stringValue(params.roles)) {
 				const roles = commaSeparatedListToArray<string>(params.roles);
 
-				await verifyRoles(authorizationComponent, roles);
+				await verifyRoles(authorizationComponent, authorizationModelId, roles);
 
 				const rolesToAdd = roles.filter(role => !currentRoles.includes(role));
 				const rolesToRemove = currentRoles.filter(role => !roles.includes(role));
 
 				for (const role of rolesToAdd) {
-					await authorizationComponent.addRoleForSubject(existingUser.userIdentity, role);
+					await authorizationComponent.addRoleForSubject(
+						authorizationModelId,
+						existingUser.userIdentity,
+						role
+					);
 				}
 				for (const role of rolesToRemove) {
-					await authorizationComponent.removeRoleForSubject(existingUser.userIdentity, role);
+					await authorizationComponent.removeRoleForSubject(
+						authorizationModelId,
+						existingUser.userIdentity,
+						role
+					);
 				}
 
 				currentRoles = roles;

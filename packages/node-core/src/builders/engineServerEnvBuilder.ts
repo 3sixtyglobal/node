@@ -17,14 +17,18 @@ import {
 	SocketRouteProcessorType
 } from "@twin.org/engine-server-types";
 import { TraceparentHelper } from "@twin.org/tracing-models";
-import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+import {
+	AUTHORIZATION_MODEL_ID,
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT
+} from "../defaults.js";
 import {
 	isAuthorizationRequired,
 	isTelemetryEnabled,
 	isTracingEnabled
 } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-import { commaSeparatedListToArray, envKeyIntegerPairs } from "./helper/envHelpers.js";
+import { commaSeparatedListToArray, envKeyIntegerPairs, envString } from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -267,13 +271,17 @@ export async function buildEngineServerConfiguration(
 			serverConfig.types.restRouteProcessor.push({
 				type: RestRouteProcessorType.TenantOverride,
 				options: {
-					config: {}
+					config: {
+						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
+					}
 				}
 			});
 			serverConfig.types.socketRouteProcessor.push({
 				type: SocketRouteProcessorType.TenantOverride,
 				options: {
-					config: {}
+					config: {
+						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
+					}
 				}
 			});
 		}

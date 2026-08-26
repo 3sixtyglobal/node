@@ -3,6 +3,20 @@
 import { Coerce, GeneralError, Is } from "@twin.org/core";
 
 /**
+ * Returns an env var as a string when it holds a non-empty value, falling back to the supplied default.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to read.
+ * @param defaultValue The value to return when the env var is absent or empty. Omit to return undefined when absent.
+ * @returns The string value, the default, or undefined when absent and no default given.
+ */
+export function envString<T>(envVars: T, key: keyof T, defaultValue: string): string;
+export function envString<T>(envVars: T, key: keyof T): string | undefined;
+export function envString<T>(envVars: T, key: keyof T, defaultValue?: string): string | undefined {
+	const value = envVars[key];
+	return Is.stringValue(value) ? value : defaultValue;
+}
+
+/**
  * Coerces an env var to a boolean, falling back to the supplied default when not set.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.

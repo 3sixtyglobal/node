@@ -27,6 +27,11 @@ export const TRUST_VERIFICATION_METHOD_ID = "trust-assertion";
 export const AUTH_SIGNING_KEY_ID = "auth-signing";
 
 /**
+ * Default model identifier for authorization.
+ */
+export const AUTHORIZATION_MODEL_ID = "rest";
+
+/**
  * Feature tag identifying the DID context ID handler.
  */
 export const CONTEXT_ID_HANDLER_FEATURE_DID = "did";
@@ -62,7 +67,8 @@ export function getEnvDefaults(envPrefix: string): { [key: string]: string } {
 		[`${envPrefix}IMMUTABLE_PROOF_VERIFICATION_METHOD_ID`]: IMMUTABLE_PROOF_VERIFICATION_METHOD_ID,
 		[`${envPrefix}BLOB_STORAGE_ENCRYPTION_KEY_ID`]: BLOB_STORAGE_ENCRYPTION_KEY_ID,
 		[`${envPrefix}TRUST_VERIFICATION_METHOD_ID`]: TRUST_VERIFICATION_METHOD_ID,
-		[`${envPrefix}AUTH_SIGNING_KEY_ID`]: AUTH_SIGNING_KEY_ID
+		[`${envPrefix}AUTH_SIGNING_KEY_ID`]: AUTH_SIGNING_KEY_ID,
+		[`${envPrefix}AUTHORIZATION_MODEL_ID`]: AUTHORIZATION_MODEL_ID
 	};
 	return envVars;
 }

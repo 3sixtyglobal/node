@@ -13,7 +13,8 @@ import {
 	envMs,
 	envObject,
 	envSecToMs,
-	envSeconds
+	envSeconds,
+	envString
 } from "../../../src/builders/helper/envHelpers.js";
 
 describe("envBoolean", () => {
@@ -580,5 +581,27 @@ describe("envKeyIntegerPairs", () => {
 		expect(() => envKeyIntegerPairs<{ limits?: string }>({ limits: "=123" }, "limits")).toThrow(
 			expect.objectContaining({ name: "GeneralError", source: "node" })
 		);
+	});
+});
+
+describe("envString", () => {
+	test("returns undefined when env var is absent and no default given", () => {
+		expect(envString<{ modelId?: string }>({}, "modelId")).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envString<{ modelId?: string }>({}, "modelId", "rest")).toBe("rest");
+	});
+
+	test("returns defaultValue when env var is an empty string", () => {
+		expect(envString({ modelId: "" }, "modelId", "rest")).toBe("rest");
+	});
+
+	test("returns the string value when set", () => {
+		expect(envString({ modelId: "custom" }, "modelId", "rest")).toBe("custom");
+	});
+
+	test("returns the string value with no default", () => {
+		expect(envString({ modelId: "custom" }, "modelId")).toBe("custom");
 	});
 });

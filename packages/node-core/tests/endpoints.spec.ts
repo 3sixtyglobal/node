@@ -73,7 +73,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_LOGGING_CONNECTOR: LoggingConnectorType.EntityStorage,
 	TWIN_TELEMETRY_CONNECTOR: TelemetryConnectorType.EntityStorage,
 	TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
-	TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
+	TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,

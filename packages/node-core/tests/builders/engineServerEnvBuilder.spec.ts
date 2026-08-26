@@ -32,6 +32,34 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 
 		expect(restTypes).toContain(RestRouteProcessorType.TenantOverride);
 		expect(socketTypes).toContain(SocketRouteProcessorType.TenantOverride);
+		expect(
+			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.TenantOverride)
+		).toMatchObject({ options: { config: { authorizationModelId: "rest" } } });
+	});
+
+	test("passes the configured authorization model to TenantOverride processors", async () => {
+		const contextKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
+		const config = await buildEngineServerConfiguration(
+			{
+				...BASE_VARS,
+				tenantEnabled: "true",
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage,
+				authorizationModelId: "custom"
+			},
+			contextKeys,
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(
+			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.TenantOverride)
+		).toMatchObject({ options: { config: { authorizationModelId: "custom" } } });
+		expect(
+			config.types.socketRouteProcessor?.find(
+				p => p.type === SocketRouteProcessorType.TenantOverride
+			)
+		).toMatchObject({ options: { config: { authorizationModelId: "custom" } } });
 	});
 
 	test("TenantOverride processor is registered after AuthHeader processor", async () => {

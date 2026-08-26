@@ -712,6 +712,11 @@ export interface IEngineEnvironmentVariables {
 	authorizationConnector?: string;
 
 	/**
+	 * The model identifier to use for authorization.
+	 */
+	authorizationModelId?: string;
+
+	/**
 	 * The base URL of the Casbin server (e.g. "http://localhost:48000"), required when using the casbin authorization connector.
 	 */
 	casbinEndpoint?: string;
@@ -727,11 +732,6 @@ export interface IEngineEnvironmentVariables {
 	casbinClientSecret?: string;
 
 	/**
-	 * The enforcer identifier in "owner/name" format (e.g. "built-in/built-in"), required when using the casbin authorization connector.
-	 */
-	casbinEnforcerId?: string;
-
-	/**
 	 * The request timeout in milliseconds for the Casbin authorization connector.
 	 */
 	casbinTimeoutMs?: string;
@@ -745,11 +745,6 @@ export interface IEngineEnvironmentVariables {
 	 * The time-to-idle in milliseconds for cached authorisation check results.
 	 */
 	authorizationCheckCacheTtiMs?: string;
-
-	/**
-	 * Default policy rules to seed the authorisation service, as a JSON array or a path to a JSON file using the @json: prefix.
-	 */
-	authorizationDefaultRules?: string;
 
 	/**
 	 * The type of faucet connector: entity-storage, iota.
