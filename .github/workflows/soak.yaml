@@ -69,6 +69,10 @@ concurrency:
   group: soak
   cancel-in-progress: false
 
+concurrency:
+  group: kitsune-staging-environment
+  cancel-in-progress: false
+
 jobs:
   soak:
     name: "Soak (${{ inputs.profile || 'cloud' }}, ${{ inputs.duration || 'profile default' }})"
