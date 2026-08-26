@@ -34,6 +34,14 @@ const EMAIL = __ENV.SOAK_ADMIN_EMAIL;
 const PASSWORD = __ENV.SOAK_ADMIN_PASSWORD;
 const MULTI = (__ENV.SOAK_TENANT_MODE || 'multi') === 'multi';
 const WRITE_RATIO = Number(__ENV.SOAK_WRITE_RATIO || 0.3);
+// Comma-separated list of group names to skip entirely (probes + VU traffic).
+// Use when a feature is unavailable on the target node (e.g. SOAK_DISABLED_GROUPS=logging).
+const DISABLED_GROUPS = new Set(
+	(__ENV.SOAK_DISABLED_GROUPS || '')
+		.split(',')
+		.map(s => s.trim())
+		.filter(Boolean)
+);
 
 // ---------------------------------------------------------------------------
 // Group definitions and weighted picker
@@ -43,7 +51,7 @@ const WRITE_RATIO = Number(__ENV.SOAK_WRITE_RATIO || 0.3);
  * Traffic weights. Must sum to 1.0.
  * To tune: change the weight values; the picker recalculates automatically.
  */
-const GROUPS = [
+const ALL_GROUPS = [
 	{ name: 'logging', weight: 0.15 },
 	{ name: 'blob', weight: 0.12 },
 	{ name: 'aig', weight: 0.12 },
@@ -56,6 +64,15 @@ const GROUPS = [
 	{ name: 'dataspace', weight: 0.07 }
 ];
 
+// Re-normalise weights after removing disabled groups so they still sum to 1.
+const ENABLED_GROUPS = ALL_GROUPS.filter(g => !DISABLED_GROUPS.has(g.name));
+if (ENABLED_GROUPS.length === 0) {
+	throw new Error(
+		`SOAK_DISABLED_GROUPS disables all groups; available groups: ${ALL_GROUPS.map(g => g.name).join(', ')}`
+	);
+}
+const enabledTotal = ENABLED_GROUPS.reduce((s, g) => s + g.weight, 0);
+const GROUPS = ENABLED_GROUPS.map(g => ({ name: g.name, weight: g.weight / enabledTotal }));
 const GROUP_NAMES = GROUPS.map(g => g.name);
 
 // Build cumulative probability table once at module init.
@@ -102,6 +119,9 @@ export const options = {
 			duration: __ENV.SOAK_DURATION || '30s'
 		}
 	},
+	// Cloud setup probes 12 endpoints over a remote connection (~500 ms each).
+	// The default 60 s is too tight; 180 s gives a 15× margin per request.
+	setupTimeout: '180s',
 	thresholds: {
 		http_req_duration: [`p(95)<${__ENV.SOAK_P95_MS || 500}`, `p(99)<${__ENV.SOAK_P99_MS || 1500}`],
 		http_req_failed: [`rate<${__ENV.SOAK_ERROR_RATE || 0.01}`]
@@ -117,6 +137,7 @@ export const options = {
 // created resource IDs so subsequent reads/updates go to real stored data.
 const ctx = {
 	token: null,
+	tokenExp: 0,
 	org: null,
 	blobId: null,
 	aigId: null,
@@ -136,7 +157,11 @@ const ctx = {
 export function setup() {
 	const session = login();
 	if (!session.token) {
-		fail('setup: login failed — check SOAK_ADMIN_EMAIL / SOAK_ADMIN_PASSWORD');
+		const detail = String(session.body ?? '').slice(0, 500);
+		fail(
+			`setup: login failed — HTTP ${session.status}: ${detail || '(no response body)'} ` +
+				'— check SOAK_ADMIN_EMAIL / SOAK_ADMIN_PASSWORD / SOAK_TENANT_API_KEY'
+		);
 	}
 	// eslint-disable-next-line no-console
 	console.log('[setup] org =', session.org, '| MULTI =', MULTI);
@@ -217,9 +242,12 @@ export function setup() {
 		{ area: 'dataspace', method: 'GET', url: '/dataspace/app-datasets?limit=1', ok: [200] }
 	];
 
-	for (const probe of probes) {
+	const activeProbes = probes.filter(p => !DISABLED_GROUPS.has(p.area));
+	for (const probe of activeProbes) {
+		// eslint-disable-next-line no-console
+		console.log(`[setup] probing ${probe.area}...`);
 		let url = `${BASE}${probe.url}`;
-		if (MULTI && session.org) {
+		if (session.org) {
 			const sep = probe.url.includes('?') ? '&' : '?';
 			url += `${sep}organization=${encodeURIComponent(session.org)}`;
 		}
@@ -252,11 +280,18 @@ export function setup() {
 // ---------------------------------------------------------------------------
 
 function login() {
+	const loginHeaders = { 'Content-Type': 'application/json' };
+	// Sent whenever a key is configured. Any node running in multi-tenant mode rejects every
+	// request without it (401 tenantProcessor.missingApiKey), including this login — that
+	// applies to cloud targets too, so SOAK_TENANT_API_KEY must be set for those.
+	if (API_KEY) {
+		loginHeaders['x-api-key'] = API_KEY;
+	}
 	const res = http.post(
 		`${BASE}/authentication/login`,
 		JSON.stringify({ email: EMAIL, password: PASSWORD }),
 		{
-			headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
+			headers: loginHeaders,
 			tags: { name: 'login' }
 		}
 	);
@@ -273,6 +308,7 @@ function login() {
 	}
 
 	let org;
+	let exp;
 	if (token) {
 		try {
 			// JWT uses base64url (no padding). Convert to standard base64 before decoding
@@ -282,12 +318,15 @@ function login() {
 				raw.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (raw.length % 4)) % 4);
 			const payload = JSON.parse(encoding.b64decode(b64, 'std', 's'));
 			org = payload.org;
+			exp = payload.exp;
 		} catch (e) {
 			// eslint-disable-next-line no-console
 			console.error('[login] JWT org extraction failed:', String(e));
 		}
 	}
-	return { token, org };
+	// status/body are returned so a failed login can report why (an auth rejection, a tenant
+	// processor rejecting a missing x-api-key, a 5xx) instead of only that it failed.
+	return { token, org, exp, status: res.status, body: res.body };
 }
 
 function authHeaders() {
@@ -327,20 +366,75 @@ function ensureTrustToken() {
 	}
 }
 
+// Refreshes the main session token proactively, before it expires, instead of waiting for a
+// 401 (the old behaviour — see record()'s fallback below). All VUs log in within seconds of
+// each other at the start of a run, so their tokens share almost the same expiry; without
+// staggering, every VU would hit /authentication/login in the same instant the moment that
+// shared expiry arrives. A 5h cloud run hit exactly this: the token expired 1h in, and the
+// resulting thundering herd of simultaneous re-logins appears to have tripped the server's
+// auth rate limiter, locking out the remaining 4h of the run (81.64% failure).
+// The refresh buffer is offset per-VU (60s + 10s * __VU) so VUs refresh a few seconds apart
+// rather than all at once, even though they started together.
+function ensureSessionToken() {
+	const nowSec = Date.now() / 1000;
+	const vuOffsetSec = 10 * __VU; // stagger refreshes by 10s per VU
+	const refreshBufferSec = 60 + vuOffsetSec;
+	if (ctx.token && nowSec < ctx.tokenExp - refreshBufferSec) {
+		return;
+	}
+	const s = login();
+	ctx.token = s.token;
+	ctx.org = s.org;
+	ctx.tokenExp = s.exp ?? nowSec + 3600;
+}
+
 function trustHeaders() {
 	return ctx.trustToken ? { Authorization: `Bearer ${ctx.trustToken}` } : {};
 }
 
 function orgParam(hasExisting) {
-	if (!MULTI || !ctx.org) {
+	if (!ctx.org) {
 		return '';
 	}
 	return `${hasExisting ? '&' : '?'}organization=${encodeURIComponent(ctx.org)}`;
 }
 
+// Extracts the resource id from a create response's Location header. Location is the full
+// absolute URL (e.g. http://host/aig/aig%3Axyz) — only the trailing path segment is the id,
+// so it must be split off before decoding. Decoding the whole URL instead of just the segment
+// produced a mangled, doubled URL on every subsequent request (see bug write-up).
 function locationId(res) {
 	const loc = res.headers?.Location || res.headers?.location || '';
-	return loc ? decodeURIComponent(loc) : null;
+	if (!loc) {
+		return null;
+	}
+	const segment = loc.split('/').pop();
+	return segment ? decodeURIComponent(segment) : null;
+}
+
+const failureLogCount = {};
+const MAX_LOGGED_FAILURES_PER_GROUP = 20;
+
+// Logs enough of the response to diagnose a failure (status, k6-level error, truncated body)
+// without flooding CI logs during a catastrophic run — caps at 20 lines per group, same order
+// of magnitude as a one-off intermittent issue, far below a mass-failure run's request count.
+function logFailure(group, res) {
+	failureLogCount[group] = (failureLogCount[group] ?? 0) + 1;
+	const n = failureLogCount[group];
+	if (n > MAX_LOGGED_FAILURES_PER_GROUP) {
+		if (n === MAX_LOGGED_FAILURES_PER_GROUP + 1) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`[${group}] further failures suppressed after ${MAX_LOGGED_FAILURES_PER_GROUP} logged`
+			);
+		}
+		return;
+	}
+	const body = typeof res.body === 'string' ? res.body.slice(0, 300) : '';
+	// eslint-disable-next-line no-console
+	console.error(
+		`[${group}] status=${res.status} duration=${res.timings.duration.toFixed(0)}ms error=${res.error || ''} body=${body}`
+	);
 }
 
 function record(group, res, successCheck) {
@@ -348,10 +442,12 @@ function record(group, res, successCheck) {
 	grpDuration[group].add(res.timings.duration);
 	if (!successCheck) {
 		grpErrors[group].add(1);
+		logFailure(group, res);
 	}
-	// Clear the token on 401 so the next iteration re-authenticates via the
-	// `if (!ctx.token)` guard in iteration(). Any remaining requests in the
-	// current group call will fire without auth and fail gracefully.
+	// Fallback safety net: ensureSessionToken() should refresh well before expiry, so this
+	// should rarely fire. If a 401 slips through anyway (e.g. clock drift), clear the token
+	// so the next iteration re-authenticates immediately instead of retrying a dead one. Any
+	// remaining requests in the current group call still fire without auth and fail gracefully.
 	if (res.status === 401) {
 		ctx.token = null;
 	}
@@ -479,6 +575,10 @@ function doAis() {
 				'https://schema.twindev.org/common/'
 			],
 			type: 'AuditableItemStream',
+			// Disables gas-consuming immutable-proof checks for this stream (0 = never, per the
+			// model's own docs). Soak traffic doesn't need real on-chain notarization and was
+			// draining the shared testnet wallet — see bug write-up on AIG/AIS gas exhaustion.
+			immutableInterval: 0,
 			annotationObject: {
 				'@context': 'https://schema.org',
 				'@type': 'Note',
@@ -557,7 +657,7 @@ function doTelemetry() {
 function doAuth() {
 	const g = 'auth';
 	let p = `/authentication/admin/users/${encodeURIComponent(EMAIL)}`;
-	if (MULTI && ctx.org) {
+	if (ctx.org) {
 		p += `?organization=${encodeURIComponent(ctx.org)}`;
 	}
 	const res = http.get(`${BASE}${p}`, {
@@ -661,7 +761,12 @@ function doDataspace() {
 	const g = 'dataspace';
 
 	if (!ctx.dataspaceDatasetId || Math.random() < WRITE_RATIO) {
-		const id = `https://soak.example.com/ds-${__VU}-${__ITER}`;
+		// Date.now() suffix guarantees uniqueness across separate runs against the same
+		// long-lived cloud node (VU/ITER alone repeat every run since SOAK_SKIP_BOOTSTRAP=true
+		// means the node and its data persist). Without it, this endpoint's create-only
+		// semantics (unlike fedcat's upsert) throw AlreadyExistsError -> 409 on any (VU, ITER)
+		// pair a past run already used, and that collision rate grows with every run since.
+		const id = `https://soak.example.com/ds-${__VU}-${__ITER}-${Date.now()}`;
 		const body = JSON.stringify({
 			appId: 'https://soak.example.com/app1',
 			dataset: {
@@ -695,8 +800,10 @@ function doDataspace() {
 		});
 		const ok = check(res, { 'dataspace 201': r => r.status === 201 });
 		record(g, res, ok);
-		const loc = locationId(res);
-		ctx.dataspaceDatasetId = loc ?? id;
+		if (ok) {
+			const loc = locationId(res);
+			ctx.dataspaceDatasetId = loc ?? id;
+		}
 	} else {
 		const id = ctx.dataspaceDatasetId;
 		const res = http.get(
@@ -729,13 +836,7 @@ const GROUP_FNS = {
 // ---------------------------------------------------------------------------
 
 export default function iteration() {
-	// Ensure the VU is authenticated. record() clears ctx.token on any 401, so this
-	// also acts as the re-authentication path after a token expiry.
-	if (!ctx.token) {
-		const s = login();
-		ctx.token = s.token;
-		ctx.org = s.org;
-	}
+	ensureSessionToken();
 
 	const group = pickGroup();
 	GROUP_FNS[group]();
