@@ -65,10 +65,8 @@ on:
 
 # Never cancel an in-flight run — killing a 1-hour load run mid-way wastes the data
 # already collected. A second dispatch will queue until the current run finishes.
-concurrency:
-  group: soak
-  cancel-in-progress: false
-
+# Shares the kitsune-staging-environment group with deploy-kitsune-staging.yaml so a
+# soak run and a staging deploy also queue against each other instead of overlapping.
 concurrency:
   group: kitsune-staging-environment
   cancel-in-progress: false
