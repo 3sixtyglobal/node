@@ -1,0 +1,121 @@
+---
+category: node
+order: 10
+---
+
+import { RoleHierarchyDiagram, PermissionNamespacesDiagram, VerbFallbackDiagram } from './authorization-defaults-diagrams.jsx'
+
+# Default Authorization Seeding
+
+On startup, `seedAuthorizationDefaults` derives RBAC policies from the registered REST routes and writes them to the authorization store via the authorization component. This happens once, after the engine server has fully started.
+
+The function processes every route returned by `server.getRestRoutes()` and builds a set of policies and role inheritances. Routes with `skipAuth: true` or `requiresAuthorization: false` are excluded.
+
+## Role Hierarchy
+
+{RoleHierarchyDiagram()}
+
+`global-admin` inherits every role. Every non-`user` role inherits `user`, giving all elevated roles the baseline authenticated-user permissions.
+
+`tenant-admin` is only seeded when the node is running in multi-tenant mode (`TWIN_TENANT_ENABLED=true`).
+
+## Permission Namespaces
+
+Each permission namespace is seeded from the routes that belong to that namespace. Write permissions inherit their read counterpart within the same namespace.
+
+{PermissionNamespacesDiagram()}
+
+### `user` - authenticated user operations
+
+Seeded from the verb-based fallback for routes that do not declare an explicit `defaultAuthorization`.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `user:read` | `user` | GET routes (verb fallback) |
+| `user:write` | `user` | POST / PUT / PATCH / DELETE routes (verb fallback), inherits `user:read` |
+
+### `identity` - identity and credential management
+
+Seeded from the identity service routes.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `identity:write` | `identity-admin` | Create/remove DIDs, verification methods, services, also-known-as entries, VCs, presentations, proofs; revoke/unrevoke VCs |
+
+Verify and resolve operations fall back to verb-based `user:read`. They require authentication but no elevated role.
+
+### `user:read` / `user:write` - user administration
+
+Also used by the user admin and identity profile admin routes. Same permission strings as the verb fallback but bound to the `user-admin` role, giving user admins access to all standard user operations and the admin-scoped routes.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `user:read` | `user-admin` | Admin get user, admin get by identity, profile admin get, audit query |
+| `user:write` | `user-admin` | Admin create/update/remove user, password reset, profile admin update/remove/list, audit create/update/remove; inherits `user:read` |
+
+### `authorization` - authorization policy management
+
+Seeded from the authorization service routes.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `authorization:read` | `user-admin` | Get policies, roles, role assignments, inheritance |
+| `authorization:write` | `user-admin` | Build model, add/remove policies, role assignments, inheritance; inherits `authorization:read` |
+
+### `health` - server health
+
+Seeded from the health route.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `health:read` | `devops` | Server health status |
+
+### `logging` - log entry management
+
+Seeded from the logging service routes.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `logging:read` | `devops` | List log entries |
+| `logging:write` | `devops` | Create log entries; inherits `logging:read` |
+
+### `tracing` - distributed tracing
+
+Seeded from the tracing service routes.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `tracing:read` | `devops` | List spans, get traces |
+| `tracing:write` | `devops` | Start/end spans; inherits `tracing:read` |
+
+### `telemetry` - metrics and telemetry
+
+Seeded from the telemetry service routes.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `telemetry:read` | `devops` | Get metrics, list entries, get values |
+| `telemetry:write` | `devops` | Create/update/remove metrics, add values; inherits `telemetry:read` |
+
+### `tenant` - tenant administration (multi-tenant only)
+
+Seeded from the tenant processor routes when `TWIN_TENANT_ENABLED=true`.
+
+| Permission | Role | Notes |
+|---|---|---|
+| `tenant:read` | `tenant-admin` | List and get tenants |
+| `tenant:write` | `tenant-admin` | Create, update, and remove tenants; inherits `tenant:read` |
+
+## Public Routes
+
+Routes with `skipAuth: true` are excluded from seeding entirely. No token is required to call them. Examples include the information routes (`serverInformation`, `serverSpec`, `serverLivez`, `serverReadyz`) and the public identity profile endpoint (`identityProfileGetPublic`).
+
+## Verb-Based Fallback
+
+Routes that require authentication but declare no `defaultAuthorization` receive authorization rules derived from their HTTP method:
+
+{VerbFallbackDiagram()}
+
+## Custom Model
+
+The seeded defaults can be extended or replaced via the `TWIN_AUTHORIZATION_MODEL` environment variable (a JSON object conforming to `IAuthorizationModel`). Set `TWIN_AUTHORIZATION_MODEL_MODE` to `merge` (default) to add custom rules on top of the defaults, or `replace` to use only the custom rules.
