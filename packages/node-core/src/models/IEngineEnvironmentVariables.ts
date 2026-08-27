@@ -677,7 +677,7 @@ export interface IEngineEnvironmentVariables {
 	tracingSilentComponents?: string;
 
 	/**
-	 * The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
+	 * The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, console, silent.
 	 */
 	tracingConnector?: string;
 
