@@ -12,6 +12,10 @@ on:
           - '🚧 prerelease (next branch)' # For prereleases (e.g., 0.1.0-next.1)
           - '🚀 production (main branch)' # For production releases (e.g., 1.0.0, 1.1.0, 1.1.1)
 
+concurrency:
+  group: twin-node-docker-publish
+  cancel-in-progress: false
+
 env:
   TWIN_DOCKER_USERNAME: ${{ secrets.TWIN_DOCKER_USERNAME }}
   TWIN_DOCKER_REPO: twinfoundation/twin-node
@@ -74,7 +78,7 @@ jobs:
             echo "Building from next branch - adding next tag"
           fi
 
-          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
           echo "Docker tags: $TAGS"
 
       # Check whether the version tag already exists in Docker Hub

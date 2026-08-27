@@ -855,6 +855,11 @@ async function configureTracing(
 				}
 			});
 			additionalConnectorCount++;
+		} else if (tracingConnector === TracingConnectorType.Console) {
+			coreConfig.types.tracingConnector.push({
+				type: TracingConnectorType.Console
+			});
+			additionalConnectorCount++;
 		} else if (tracingConnector === TracingConnectorType.OpenTelemetry) {
 			const otelTracingConfig: IOpenTelemetryTracingConnectorConfig = {
 				tracerName: envVars.openTelemetryTracingTracerName,
@@ -2126,7 +2131,10 @@ export function isTelemetryEnabled(envVars: IEngineEnvironmentVariables): boolea
  */
 export function isTracingEnabled(envVars: IEngineEnvironmentVariables): boolean {
 	return commaSeparatedListToArray<TracingConnectorType>(envVars.tracingConnector).some(
-		t => t === TracingConnectorType.EntityStorage || t === TracingConnectorType.OpenTelemetry
+		t =>
+			t === TracingConnectorType.EntityStorage ||
+			t === TracingConnectorType.OpenTelemetry ||
+			t === TracingConnectorType.Console
 	);
 }
 

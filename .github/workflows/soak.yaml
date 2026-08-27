@@ -1,9 +1,270 @@
 name: Soak
+
+# Runs the soak harness against the cloud-hosted twin-node.
+# Nightly at 02:00 UTC; also manually dispatchable with overridable inputs.
+#
+# Required repo secret (single blob, newline-separated KEY=VALUE):
+#   TWIN_SOAK_ENV_VARS — must contain:
+#     SOAK_BASE_URL           base URL of the cloud twin-node
+#     SOAK_ADMIN_PASSWORD     admin user password
+#     SOAK_SLACK_WEBHOOK_URL  Slack incoming webhook for pass/fail alerts
+#
+# Optional (defaults are correct for the kitsune staging node):
+#   SOAK_ADMIN_EMAIL   admin user email (default: admin@node)
+#
+# Not needed: SOAK_TENANT_API_KEY — cloud admin login uses email+password only.
+
 on:
+  schedule:
+    - cron: '0 2 * * *'
   workflow_dispatch:
+    # All inputs below default to '' (blank) rather than a hardcoded number. The "Run soak"
+    # step only exports the corresponding SOAK_* env var when an input is non-blank, so a
+    # blank value defers entirely to the active profile's own setting (soak.cloud.env etc.)
+    # instead of silently overriding it with a value baked into this workflow. This is
+    # deliberate: a previous version hardcoded '2000' here for p95_ms, and when the profile
+    # was recalibrated to 3000 after observed testnet drift, every dispatch that didn't pass
+    # -f p95_ms=... kept silently reapplying the stale 2000 and failing runs that should have
+    # passed. Only fill these in when you want to override the profile for one specific run.
+    inputs:
+      duration:
+        description: 'k6 run duration, e.g. 1h, 30m (blank = profile default)'
+        required: false
+        type: string
+        default: ''
+      vus:
+        description: 'Number of virtual users (blank = profile default)'
+        required: false
+        type: string
+        default: ''
+      p95_ms:
+        description: 'p95 latency threshold in ms (blank = profile default)'
+        required: false
+        type: string
+        default: ''
+      p99_ms:
+        description: 'p99 latency threshold in ms (blank = profile default)'
+        required: false
+        type: string
+        default: ''
+      mem_growth_mb_per_hr:
+        description: 'Memory growth limit in MB/hr — informational only for cloud runs (blank = profile default)'
+        required: false
+        type: string
+        default: ''
+      disabled_groups:
+        description: 'Comma-separated API groups to skip, e.g. notarization,aig (blank = profile default)'
+        required: false
+        type: string
+        default: ''
+      profile:
+        description: 'Soak profile (cloud, iota-testnet, ...)'
+        required: false
+        type: string
+        default: 'cloud'
+
+# Never cancel an in-flight run — killing a 1-hour load run mid-way wastes the data
+# already collected. A second dispatch will queue until the current run finishes.
+# Shares the kitsune-staging-environment group with deploy-kitsune-staging.yaml so a
+# soak run and a staging deploy also queue against each other instead of overlapping.
+concurrency:
+  group: kitsune-staging-environment
+  cancel-in-progress: false
 
 jobs:
   soak:
-    runs-on: ubuntu-latest
+    name: "Soak (${{ inputs.profile || 'cloud' }}, ${{ inputs.duration || 'profile default' }})"
+    runs-on:
+      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
+      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+    # 6 h ceiling — accommodates the default 1 h run plus setup overhead, and allows
+    # manual dispatches up to ~5 h without adjusting the workflow.
+    timeout-minutes: 360
+    permissions:
+      contents: read
+
     steps:
-      - run: echo "Soak Workflow Placeholder"
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          for i in {1..5}; do
+            npm ci && break || {
+              if [ $i -eq 5 ]; then
+                echo "npm ci failed after 5 attempts"
+                exit 1
+              fi
+              echo "npm ci failed, retrying in 30 seconds (attempt $i/5)..."
+              sleep 30
+            }
+          done
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Load soak environment variables
+        shell: bash
+        # The blob is masked by GitHub as one string, but the individual KEY=VALUE lines it
+        # expands into are not — without ::add-mask:: per value they render in cleartext
+        # wherever a later step echoes its env (e.g. the "Run soak" step below).
+        # Read via env rather than inline ${{ }} for the same reason as the INPUT_* vars below.
+        env:
+          SOAK_ENV_VARS: ${{ secrets.TWIN_SOAK_ENV_VARS }}
+        run: |
+          while IFS= read -r line; do
+            line="${line%$'\r'}"
+            case "$line" in ''|'#'*) continue ;; esac
+            key="${line%%=*}"
+            value="${line#*=}"
+            [ -n "$value" ] && echo "::add-mask::$value"
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done <<< "$SOAK_ENV_VARS"
+
+      - name: Run soak
+        env:
+          # Passed through via intermediate INPUT_* vars (GitHub's recommended pattern for
+          # untrusted expression values) rather than interpolating ${{ }} directly into the
+          # shell script below.
+          INPUT_PROFILE: ${{ inputs.profile }}
+          INPUT_DURATION: ${{ inputs.duration }}
+          INPUT_VUS: ${{ inputs.vus }}
+          INPUT_P95_MS: ${{ inputs.p95_ms }}
+          INPUT_P99_MS: ${{ inputs.p99_ms }}
+          INPUT_MEM_GROWTH_MB_PER_HR: ${{ inputs.mem_growth_mb_per_hr }}
+          INPUT_DISABLED_GROUPS: ${{ inputs.disabled_groups }}
+          # SOAK_BASE_URL, SOAK_TENANT_API_KEY, SOAK_ADMIN_EMAIL, SOAK_ADMIN_PASSWORD,
+          # and SOAK_SLACK_WEBHOOK_URL come from the TWIN_SOAK_ENV_VARS blob loaded above.
+          # Credentials stay in env (not CLI args) so they never appear in the process list.
+        run: |
+          # SOAK_PROFILE always needs a value — it selects which profile file to load, so
+          # there's no "profile default" to defer to. Everything else below is an optional
+          # override: only export the SOAK_* var when the caller explicitly passed a non-blank
+          # input. An unset var lets run-soak.mjs's own precedence rule ("shell env > profile
+          # file > coded default") fall through to the active profile's calibrated value
+          # instead of a hardcoded default in this workflow silently shadowing it — see the
+          # workflow_dispatch.inputs comment above for why this matters.
+          export SOAK_PROFILE="${INPUT_PROFILE:-cloud}"
+          [ -n "$INPUT_DURATION" ] && export SOAK_DURATION="$INPUT_DURATION"
+          [ -n "$INPUT_VUS" ] && export SOAK_VUS="$INPUT_VUS"
+          [ -n "$INPUT_P95_MS" ] && export SOAK_P95_MS="$INPUT_P95_MS"
+          [ -n "$INPUT_P99_MS" ] && export SOAK_P99_MS="$INPUT_P99_MS"
+          [ -n "$INPUT_MEM_GROWTH_MB_PER_HR" ] && export SOAK_MEM_GROWTH_MB_PER_HR="$INPUT_MEM_GROWTH_MB_PER_HR"
+          [ -n "$INPUT_DISABLED_GROUPS" ] && export SOAK_DISABLED_GROUPS="$INPUT_DISABLED_GROUPS"
+          npm run test:soak --prefix apps/node
+
+      - name: Upload soak artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: soak-report-${{ github.run_id }}
+          path: |
+            apps/node/soak/.out/report.json
+            apps/node/soak/.out/summary.json
+            apps/node/soak/.out/k6-dashboard.html
+          retention-days: 30
+          if-no-files-found: warn
+
+      # Pulls the headline numbers out of report.json so both Slack steps below can quote
+      # them. Runs even when "Run soak" failed (threshold breaches exit non-zero) so failure
+      # messages get real stats too — but guards for report.json not existing at all (e.g. a
+      # crash before run-soak.mjs ever wrote it), since that would otherwise fail this step
+      # and mask the actual error.
+      - name: Extract soak result
+        id: soak_result
+        if: always()
+        run: |
+          node - <<'EOF' >> "$GITHUB_OUTPUT"
+          const fs = require('fs');
+          const path = 'apps/node/soak/.out/report.json';
+          if (!fs.existsSync(path)) {
+            console.log('found=false');
+            process.exit(0);
+          }
+          const r = JSON.parse(fs.readFileSync(path, 'utf8'));
+          const pct = n => Math.round(n * 10000) / 100;
+          const ms = n => Math.round(n);
+          console.log('found=true');
+          console.log(`reqs=${r.k6.httpReqs.count}`);
+          console.log(`failed_rate=${pct(r.k6.httpReqFailed.rate)}`);
+          console.log(`p50=${ms(r.k6.httpReqDuration.med)}`);
+          console.log(`p95=${ms(r.k6.httpReqDuration['p(95)'])}`);
+          console.log(`p99=${ms(r.k6.httpReqDuration['p(99)'])}`);
+          console.log(`p95_threshold=${r.config.thresholds.p95Ms}`);
+          console.log(`p99_threshold=${r.config.thresholds.p99Ms}`);
+          EOF
+
+      # Message text is built with JSON.stringify (via node) rather than splicing values into
+      # the curl -d string by hand, so a stray backtick/quote in an extracted value can't break
+      # the payload — same "don't hand-splice dynamic values into shell/JSON" rule as the
+      # INPUT_* pattern in the "Run soak" step above.
+      - name: Notify Slack on success
+        if: success()
+        env:
+          INPUT_PROFILE: ${{ inputs.profile }}
+          INPUT_DURATION: ${{ inputs.duration }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          FOUND: ${{ steps.soak_result.outputs.found }}
+          REQS: ${{ steps.soak_result.outputs.reqs }}
+          FAILED_RATE: ${{ steps.soak_result.outputs.failed_rate }}
+          P50: ${{ steps.soak_result.outputs.p50 }}
+          P95: ${{ steps.soak_result.outputs.p95 }}
+          P99: ${{ steps.soak_result.outputs.p99 }}
+          P95_THRESHOLD: ${{ steps.soak_result.outputs.p95_threshold }}
+          P99_THRESHOLD: ${{ steps.soak_result.outputs.p99_threshold }}
+        run: |
+          PAYLOAD=$(node -e '
+            const env = process.env;
+            const profile = env.INPUT_PROFILE || "cloud";
+            const duration = env.INPUT_DURATION || "profile default";
+            const lines = [
+              ":white_check_mark: *Soak test passed*",
+              `Profile: \`${profile}\` · Duration: \`${duration}\``,
+            ];
+            if (env.FOUND === "true") {
+              lines.push(`Requests: ${env.REQS} · Failed: ${env.FAILED_RATE}% · p50/p95/p99: ${env.P50}/${env.P95}/${env.P99} ms (limits ${env.P95_THRESHOLD}/${env.P99_THRESHOLD})`);
+            } else {
+              lines.push("No report.json found — check artifacts.");
+            }
+            lines.push(`<${env.RUN_URL}|View run · download artifacts>`);
+            console.log(JSON.stringify({ blocks: [{ type: "section", text: { type: "mrkdwn", text: lines.join("\n") } }] }));
+          ')
+          curl -s -X POST "$SOAK_SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' -d "$PAYLOAD"
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          INPUT_PROFILE: ${{ inputs.profile }}
+          INPUT_DURATION: ${{ inputs.duration }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          FOUND: ${{ steps.soak_result.outputs.found }}
+          REQS: ${{ steps.soak_result.outputs.reqs }}
+          FAILED_RATE: ${{ steps.soak_result.outputs.failed_rate }}
+          P50: ${{ steps.soak_result.outputs.p50 }}
+          P95: ${{ steps.soak_result.outputs.p95 }}
+          P99: ${{ steps.soak_result.outputs.p99 }}
+          P95_THRESHOLD: ${{ steps.soak_result.outputs.p95_threshold }}
+          P99_THRESHOLD: ${{ steps.soak_result.outputs.p99_threshold }}
+        run: |
+          PAYLOAD=$(node -e '
+            const env = process.env;
+            const profile = env.INPUT_PROFILE || "cloud";
+            const duration = env.INPUT_DURATION || "profile default";
+            const lines = [
+              ":rotating_light: *Soak test failed*",
+              `Profile: \`${profile}\` · Duration: \`${duration}\``,
+            ];
+            if (env.FOUND === "true") {
+              lines.push(`Requests: ${env.REQS} · Failed: ${env.FAILED_RATE}% · p50/p95/p99: ${env.P50}/${env.P95}/${env.P99} ms (limits ${env.P95_THRESHOLD}/${env.P99_THRESHOLD})`);
+            } else {
+              lines.push("No report.json found — check artifacts.");
+            }
+            lines.push(`<${env.RUN_URL}|View run · download artifacts>`);
+            console.log(JSON.stringify({ blocks: [{ type: "section", text: { type: "mrkdwn", text: lines.join("\n") } }] }));
+          ')
+          curl -s -X POST "$SOAK_SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' -d "$PAYLOAD"

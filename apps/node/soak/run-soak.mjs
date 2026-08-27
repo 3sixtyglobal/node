@@ -41,6 +41,9 @@ const cfg = {
 	tenantMode: process.env.SOAK_TENANT_MODE ?? 'multi',
 	strictEnv: process.env.SOAK_STRICT_ENV ?? 'error', // node throws on unknown TWIN_* by default
 	skipBootstrap: bool(process.env.SOAK_SKIP_BOOTSTRAP, false),
+	// When true, skips spawning a local node process and memory sampling — used when
+	// SOAK_BASE_URL points to an externally-deployed node (e.g. cloud CI runs).
+	skipServer: bool(process.env.SOAK_SKIP_SERVER, false),
 	skipLoad: bool(process.env.SOAK_SKIP_LOAD, false),
 	// Load (k6) parameters.
 	duration: process.env.SOAK_DURATION ?? '2m',
@@ -49,6 +52,8 @@ const cfg = {
 	p99Ms: int(process.env.SOAK_P99_MS, 1500),
 	errorRate: process.env.SOAK_ERROR_RATE ?? '0.01',
 	k6Bin: process.env.SOAK_K6_BIN,
+	k6WebDashboard: bool(process.env.K6_WEB_DASHBOARD, false),
+	k6WebDashboardExport: process.env.K6_WEB_DASHBOARD_EXPORT,
 	// Telemetry sampler (phase 3).
 	sampleIntervalMs: durationMs(process.env.SOAK_SAMPLE_INTERVAL, '10s'),
 	// Default informed by a 30-min baseline: a settled node's tail-floor slope sat near 100 MB/hr
@@ -107,7 +112,11 @@ async function main() {
 		log('info', 'SOAK_SKIP_BOOTSTRAP=true — reusing existing state');
 	}
 
-	await startServer(nodeEnv);
+	if (!cfg.skipServer) {
+		await startServer(nodeEnv);
+	} else {
+		log('info', `SOAK_SKIP_SERVER=true — targeting external node at ${baseUrl}`);
+	}
 	await waitForReady();
 
 	log('info', 'Node is up and ready.');
@@ -119,7 +128,15 @@ async function main() {
 	}
 
 	// Sample the node process's OS-level RSS while k6 drives load.
-	const sampler = startSampler(serverChild.pid);
+	// When targeting an external node there is no local PID to sample — return an empty
+	// series so evaluateMemory reports verdict: 'insufficient' (non-fatal, informational).
+	const sampler = cfg.skipServer
+		? {
+				stop() {
+					return [];
+				}
+			}
+		: startSampler(serverChild.pid);
 
 	const k6Code = await runLoad();
 
@@ -158,6 +175,10 @@ async function buildNodeEnv() {
 	const profilePath = path.join(__dirname, 'config', `soak.${cfg.profile}.env`);
 	const profile = await parseEnvFile(profilePath);
 
+	// Back-fill cfg from the profile for any SOAK_* key not already set in the shell.
+	// Precedence: shell env > profile file > coded default.
+	applyProfileOverrides(profile);
+
 	const env = {
 		...profile,
 		TWIN_PORT: String(cfg.port),
@@ -174,7 +195,49 @@ async function buildNodeEnv() {
 	return env;
 }
 
-/** Run the one-shot `bootstrap-dev` command to create node identity + admin user. */
+/**
+ * Back-fills cfg from the profile env file for any SOAK_* key the shell did not
+ * explicitly set. Makes a profile .env file authoritative for threshold calibration
+ * without requiring every SOAK_* var to be re-declared in the shell or workflow env.
+ */
+function applyProfileOverrides(profile) {
+	const numKeys = [
+		['SOAK_P95_MS', 'p95Ms', 500],
+		['SOAK_P99_MS', 'p99Ms', 1500],
+		['SOAK_MEM_GROWTH_MB_PER_HR', 'memGrowthLimitMbPerHr', 150],
+		['SOAK_VUS', 'vus', 5]
+	];
+	const strKeys = [
+		['SOAK_ERROR_RATE', 'errorRate'],
+		['SOAK_DURATION', 'duration'],
+		['SOAK_TENANT_MODE', 'tenantMode'],
+		['SOAK_DISABLED_GROUPS', 'disabledGroups'],
+		['K6_WEB_DASHBOARD_EXPORT', 'k6WebDashboardExport']
+	];
+	const boolKeys = [
+		['SOAK_SKIP_SERVER', 'skipServer'],
+		['SOAK_SKIP_BOOTSTRAP', 'skipBootstrap'],
+		['SOAK_SKIP_LOAD', 'skipLoad'],
+		['K6_WEB_DASHBOARD', 'k6WebDashboard']
+	];
+	for (const [envKey, cfgKey, fallback] of numKeys) {
+		if (process.env[envKey] === undefined && profile[envKey] !== undefined) {
+			cfg[cfgKey] = int(profile[envKey], fallback);
+		}
+	}
+	for (const [envKey, cfgKey] of strKeys) {
+		if (process.env[envKey] === undefined && profile[envKey] !== undefined) {
+			cfg[cfgKey] = profile[envKey];
+		}
+	}
+	for (const [envKey, cfgKey] of boolKeys) {
+		if (process.env[envKey] === undefined && profile[envKey] !== undefined) {
+			cfg[cfgKey] = bool(profile[envKey], false);
+		}
+	}
+}
+
+/** Run the one-shot `bootstrap-legacy` command to create node identity + admin user. */
 async function bootstrap(nodeEnv) {
 	log('info', 'Bootstrapping node (bootstrap-dev)...');
 	const bootstrapEnv = {
@@ -287,6 +350,7 @@ async function runLoad() {
 		`SOAK_ERROR_RATE=${cfg.errorRate}`,
 		'--env',
 		`SOAK_SUMMARY_PATH=${SUMMARY_PATH}`,
+		...(cfg.disabledGroups ? ['--env', `SOAK_DISABLED_GROUPS=${cfg.disabledGroups}`] : []),
 		SCENARIO
 	];
 
@@ -294,9 +358,18 @@ async function runLoad() {
 	// so they are not visible in the host process list (ps -ef) during the run.
 	const k6Env = {
 		...process.env,
-		SOAK_TENANT_API_KEY: cfg.tenantApiKey,
+		K6_WEB_DASHBOARD: String(cfg.k6WebDashboard),
+		K6_WEB_DASHBOARD_EXPORT: cfg.k6WebDashboardExport ?? '',
 		SOAK_ADMIN_PASSWORD: cfg.adminPassword
 	};
+	// In local server mode the tenant API key must match TWIN_TENANT_API_KEY on the server.
+	// In cloud/skip-server mode only forward it if the caller explicitly provided it — the
+	// hardcoded local fallback would not match the remote node's key. A multi-tenant cloud
+	// node rejects every request without x-api-key, so SOAK_TENANT_API_KEY must be supplied
+	// for those targets.
+	if (!cfg.skipServer || process.env.SOAK_TENANT_API_KEY !== undefined) {
+		k6Env.SOAK_TENANT_API_KEY = cfg.tenantApiKey;
+	}
 
 	return new Promise((resolve, reject) => {
 		const child = spawn(k6, args, {

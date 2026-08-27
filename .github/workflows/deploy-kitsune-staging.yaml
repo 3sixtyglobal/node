@@ -1,0 +1,92 @@
+name: Deploy Kitsune to Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Twin Node image version to deploy; next resolves to the current versioned next image'
+        required: true
+        default: next
+        type: string
+
+concurrency:
+  group: kitsune-staging-environment
+  cancel-in-progress: false
+
+env:
+  TWIN_DOCKER_REPO: twinfoundation/twin-node
+  DOCKER_HUB_REPOSITORY_API_URL: https://hub.docker.com/v2/repositories/twinfoundation/twin-node
+  TFC_API_URL: https://app.terraform.io/api/v2
+
+jobs:
+  deploy:
+    name: Deploy Kitsune to staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Resolve Kitsune image version
+        id: resolve-image
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          SEMVER_PATTERN='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$'
+          RESOLVED_VERSION="$REQUESTED_VERSION"
+
+          if [[ "$REQUESTED_VERSION" == "next" ]]; then
+            TAGS_RESPONSE="$(curl --fail --silent --show-error --retry 3 \
+              "$DOCKER_HUB_REPOSITORY_API_URL/tags?page_size=100&ordering=last_updated")"
+            NEXT_DIGEST="$(echo "$TAGS_RESPONSE" | jq -r \
+              '[.results[] | select(.name == "next") | .digest][0] // ""')"
+
+            if [[ -z "$NEXT_DIGEST" ]]; then
+              echo "ERROR: Docker Hub did not return a digest for $TWIN_DOCKER_REPO:next" >&2
+              exit 1
+            fi
+
+            RESOLVED_VERSION="$(echo "$TAGS_RESPONSE" | jq -r --arg digest "$NEXT_DIGEST" \
+              '[.results[]
+                | select(.digest == $digest)
+                | .name
+                | select(test("^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$"))
+              ][0] // ""')"
+
+            if [[ -z "$RESOLVED_VERSION" ]]; then
+              echo "ERROR: No immutable semantic version tag matches $TWIN_DOCKER_REPO:next ($NEXT_DIGEST)" >&2
+              exit 1
+            fi
+          fi
+
+          if [[ ! "$RESOLVED_VERSION" =~ $SEMVER_PATTERN ]]; then
+            echo "ERROR: version must be 'next' or a semantic version tag. Received '$REQUESTED_VERSION'." >&2
+            exit 1
+          fi
+
+          TAG_URL="$DOCKER_HUB_REPOSITORY_API_URL/tags/$RESOLVED_VERSION"
+          HTTP_STATUS="$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "$TAG_URL")"
+          if [[ "$HTTP_STATUS" != "200" ]]; then
+            echo "ERROR: Docker image $TWIN_DOCKER_REPO:$RESOLVED_VERSION was not found (HTTP $HTTP_STATUS)." >&2
+            exit 1
+          fi
+
+          echo "Requested version: $REQUESTED_VERSION"
+          echo "Resolved image: $TWIN_DOCKER_REPO:$RESOLVED_VERSION"
+          echo "image_reference=$TWIN_DOCKER_REPO:$RESOLVED_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update Kitsune image and auto-apply Terraform run
+        env:
+          TARGET_ENVIRONMENT: staging
+          IMAGE_REFERENCE: ${{ steps.resolve-image.outputs.image_reference }}
+          TFC_WORKSPACE_ID: ${{ secrets.TFC_WORKSPACE_ID_STAGING || vars.TFC_WORKSPACE_ID_STAGING }}
+          TFC_VARIABLE_ID: ${{ secrets.TFC_KITSUNE_TWIN_NODE_IMAGE_VAR_ID_STAGING || vars.TFC_KITSUNE_TWIN_NODE_IMAGE_VAR_ID_STAGING }}
+          TFC_TOKEN: ${{ secrets.TFC_TOKEN }}
+          TFC_API_URL: ${{ env.TFC_API_URL }}
+          DEPLOY_TIMEOUT_SECONDS: 2700
+          DEPLOY_POLL_INTERVAL_SECONDS: 15
+        run: bash ./scripts/deploy-kitsune-via-tfc.sh
