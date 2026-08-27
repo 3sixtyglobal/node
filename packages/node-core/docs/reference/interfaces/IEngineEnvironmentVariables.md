@@ -1109,7 +1109,7 @@ A list of components to exclude from tracing, can be a comma separated list of c
 
 > `optional` **tracingConnector?**: `string`
 
-The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
+The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, console, silent.
 
 ***
 
