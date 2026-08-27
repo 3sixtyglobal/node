@@ -10,9 +10,25 @@ import type {
 import { ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
+import { HttpMethod } from "@twin.org/web";
 import { envObject, envString } from "./envHelpers.js";
-import { AUTHORIZATION_MODEL_ID, DEFAULT_ESCALATED_PRIVILEGE_ROLE } from "../../defaults.js";
+import {
+	AUTHORIZATION_MODEL_ID,
+	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+	DEFAULT_USER_ROLE
+} from "../../defaults.js";
 import type { IEngineEnvironmentVariables } from "../../models/IEngineEnvironmentVariables.js";
+
+const DEFAULT_AUTHORIZATION_READER: IRouteAuthorization = {
+	permission: "user:read",
+	role: DEFAULT_USER_ROLE
+};
+
+const DEFAULT_AUTHORIZATION_WRITER: IRouteAuthorization = {
+	permission: "user:write",
+	role: DEFAULT_USER_ROLE,
+	inherits: [DEFAULT_AUTHORIZATION_READER.permission]
+};
 
 /**
  * Seed default authorization policies and role inheritances after the engine has started.
@@ -62,6 +78,9 @@ export async function seedAuthorizationDefaults(
 		}
 		for (const role of escalatedRoles) {
 			roleInheritances.push({ role: DEFAULT_ESCALATED_PRIVILEGE_ROLE, inheritsFrom: role });
+			if (role !== DEFAULT_USER_ROLE) {
+				roleInheritances.push({ role, inheritsFrom: DEFAULT_USER_ROLE });
+			}
 		}
 	}
 
@@ -71,31 +90,52 @@ export async function seedAuthorizationDefaults(
 		const roles = new Set<string>();
 
 		for (const route of routes) {
-			const auth = route.defaultAuthorization;
-			if (Is.objectValue<IRouteAuthorization>(auth)) {
-				const policyKey = `${auth.permission}|${route.operationId}`;
+			const requiresAuthorization =
+				route.requiresAuthorization !== false && route.skipAuth !== true;
+			let authorization: IRouteAuthorization | undefined = route.defaultAuthorization;
+
+			// If there are no specific default permissions we provide
+			// a fallback based on the HTTP method for the default "user" role.
+			if (!Is.objectValue<IRouteAuthorization>(authorization) && requiresAuthorization) {
+				if (route.method === HttpMethod.GET) {
+					authorization = DEFAULT_AUTHORIZATION_READER;
+				} else if (
+					route.method === HttpMethod.PUT ||
+					route.method === HttpMethod.POST ||
+					route.method === HttpMethod.PATCH ||
+					route.method === HttpMethod.DELETE
+				) {
+					authorization = DEFAULT_AUTHORIZATION_WRITER;
+				}
+			}
+
+			if (Is.objectValue<IRouteAuthorization>(authorization)) {
+				const policyKey = `${authorization.permission}|${route.operationId}`;
 				if (!policyKeys.has(policyKey)) {
 					policyKeys.add(policyKey);
 					policies.push({
-						subject: auth.permission,
+						subject: authorization.permission,
 						object: route.operationId,
 						action: "execute"
 					});
 				}
-				if (Is.stringValue(auth.role)) {
-					const inheritKey = `${auth.role}|${auth.permission}`;
+				if (Is.stringValue(authorization.role)) {
+					const inheritKey = `${authorization.role}|${authorization.permission}`;
 					if (!inheritanceKeys.has(inheritKey)) {
 						inheritanceKeys.add(inheritKey);
-						roleInheritances.push({ role: auth.role, inheritsFrom: auth.permission });
+						roleInheritances.push({
+							role: authorization.role,
+							inheritsFrom: authorization.permission
+						});
 					}
-					roles.add(auth.role);
+					roles.add(authorization.role);
 				}
-				if (Is.arrayValue(auth.inherits)) {
-					for (const inheritsFrom of auth.inherits) {
-						const inheritKey = `${auth.permission}|${inheritsFrom}`;
+				if (Is.arrayValue(authorization.inherits)) {
+					for (const inheritsFrom of authorization.inherits) {
+						const inheritKey = `${authorization.permission}|${inheritsFrom}`;
 						if (!inheritanceKeys.has(inheritKey)) {
 							inheritanceKeys.add(inheritKey);
-							roleInheritances.push({ role: auth.permission, inheritsFrom });
+							roleInheritances.push({ role: authorization.permission, inheritsFrom });
 						}
 					}
 				}
@@ -104,6 +144,9 @@ export async function seedAuthorizationDefaults(
 
 		for (const role of roles) {
 			roleInheritances.push({ role: DEFAULT_ESCALATED_PRIVILEGE_ROLE, inheritsFrom: role });
+			if (role !== DEFAULT_USER_ROLE) {
+				roleInheritances.push({ role, inheritsFrom: DEFAULT_USER_ROLE });
+			}
 		}
 	}
 
