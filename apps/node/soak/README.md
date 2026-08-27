@@ -15,12 +15,23 @@ thresholds are breached.
 >
 > Memory is sampled at the OS level (private bytes via the process PID), not via the node's
 > telemetry API — in a standalone node that API returns only the startup value (see the plan
-> §8.2). The growth verdict is the **tail-floor slope**: the post-GC floor (per-bucket minimum)
-> fitted over the settled second half of the run — this strips both GC sawtooth and the warm-up
-> ramp, so it reads "settling" vs "leaking" honestly (a raw slope over-reported 856 MB/hr on a
-> node that was actually flat; tail-floor read 100). It is only a _fatal_ verdict once the window
-> is long enough (`SOAK_MEM_MIN_WINDOW`, default 10m) with ≥4 tail buckets; shorter runs report
-> it as informational.
+> §8.2). The growth verdict requires **two independent signals to agree**: a whole-window
+> least-squares fit over the raw samples, and a Theil-Sen (median of pairwise slopes) fit over
+> every post-warm-up bucket's post-GC floor (per-bucket minimum, which strips the GC sawtooth). A
+> breach is only reported when both signals independently exceed the limit; disagreement between
+> them reports as informational rather than picking one arbitrarily. An earlier design restricted
+> the floor fit to only the settled second half of the run, which starved it down to 8-9 points
+> and made the verdict flip between -933 and +434 MB/hr on two 30-minute runs of identical code
+> (issue #367) — both signals are now fitted over the whole post-warm-up window instead. It is
+> only a _fatal_ verdict once the window is long enough (`SOAK_MEM_MIN_WINDOW`, default 10m) with
+> ≥4 post-warm-up floor buckets; shorter runs report it as informational.
+>
+> A memory breach on an otherwise-clean k6 run (local runs only — cloud runs never produce a real
+> verdict) gets one automatic extension (`SOAK_MEM_EXTEND_DURATION`, default 30m) before the run
+> is failed: a large, slow-settling warm-up can still dominate a single window's whole-window fit
+> even though it has genuinely plateaued, and running longer resolves that the same way the
+> campaign's manual re-run protocol did. A second breach after the extension is reported as-is —
+> only one extension is attempted.
 >
 > Note: readiness uses the server-level `/readyz` probe (unauthenticated). The `/health`
 > endpoint is tenant-scoped and returns 401 without an `organization` param in multi-tenant
@@ -64,15 +75,16 @@ All knobs are `SOAK_*` for the harness; the node still uses `TWIN_*`. Defaults s
 | `SOAK_TENANT_ID` / `SOAK_TENANT_API_KEY`   | fixed test values                 | Multi-tenant identity                                                       |
 | `SOAK_ADMIN_EMAIL` / `SOAK_ADMIN_PASSWORD` | `admin@node` / `Admin@Node12345!` | Admin login                                                                 |
 | `SOAK_SKIP_LOAD`                           | `false`                           | Readiness only — skip the k6 load phase                                     |
-| `SOAK_DURATION`                            | `2m`                              | k6 run length (e.g. `30s`, `2m`, `30m`)                                     |
+| `SOAK_DURATION`                            | `5m`                              | k6 run length (e.g. `30s`, `2m`, `30m`)                                     |
 | `SOAK_VUS`                                 | `5`                               | Virtual users                                                               |
 | `SOAK_P95_MS` / `SOAK_P99_MS`              | `500` / `1500`                    | Latency ceilings (k6 thresholds)                                            |
 | `SOAK_ERROR_RATE`                          | `0.01`                            | Max failed-request rate (1%)                                                |
 | `SOAK_K6_BIN`                              | _(auto)_                          | Override k6 binary path (else PATH, then default Windows install)           |
 | `SOAK_SAMPLE_INTERVAL`                     | `10s`                             | Memory sampling cadence                                                     |
-| `SOAK_MEM_GROWTH_MB_PER_HR`                | `150`                             | Max tail-floor memory-growth slope (enforced only past the min window)      |
-| `SOAK_WARMUP_DISCARD`                      | `30s`                             | Initial window excluded from the growth slope (warm-up)                     |
+| `SOAK_MEM_GROWTH_MB_PER_HR`                | `150`                             | Max growth slope; both signals must exceed it to breach (past min window)   |
+| `SOAK_WARMUP_DISCARD`                      | `2m`                              | Initial window excluded from the growth slope (warm-up)                     |
 | `SOAK_MEM_MIN_WINDOW`                      | `10m`                             | Settled-window length below which memory growth is informational, not fatal |
+| `SOAK_MEM_EXTEND_DURATION`                 | `30m`                             | One automatic extension on a memory breach before failing (local runs only) |
 | `SOAK_WRITE_RATIO`                         | `0.3`                             | Fraction of blob/aig iterations that create new resources (vs. read)        |
 
 A k6 threshold breach **or** an enforced memory-growth breach makes the run exit non-zero.
