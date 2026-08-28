@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import {
+	AuthorizationConnectorType,
 	DataspaceControlPlaneComponentType,
 	DltConfigType,
 	EntityStorageConnectorType,
@@ -15,9 +16,11 @@ import {
 } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 
+const AUTH = { authorizationConnector: AuthorizationConnectorType.EntityStorage } as const;
+
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
-		const config = await buildEngineConfiguration({});
+		const config = await buildEngineConfiguration({ ...AUTH });
 
 		expect(config.types.schemaVersionMigrationComponent).toEqual(
 			expect.arrayContaining([
@@ -27,7 +30,7 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	});
 
 	test("schema migration service is registered when schemaMigrationEnabled is 'true'", async () => {
-		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "true" });
+		const config = await buildEngineConfiguration({ ...AUTH, schemaMigrationEnabled: "true" });
 
 		expect(config.types.schemaVersionMigrationComponent).toEqual(
 			expect.arrayContaining([
@@ -37,7 +40,7 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	});
 
 	test("schema migration service is registered with enabled:false when schemaMigrationEnabled is 'false'", async () => {
-		const config = await buildEngineConfiguration({ schemaMigrationEnabled: "false" });
+		const config = await buildEngineConfiguration({ ...AUTH, schemaMigrationEnabled: "false" });
 
 		expect(config.types.schemaVersionMigrationComponent).toEqual(
 			expect.arrayContaining([
@@ -52,7 +55,7 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 
 describe("buildEngineConfiguration - task scheduler requirement", () => {
 	test("task scheduler is registered when only auditableItemGraphEnabled is set", async () => {
-		const config = await buildEngineConfiguration({ auditableItemGraphEnabled: "true" });
+		const config = await buildEngineConfiguration({ ...AUTH, auditableItemGraphEnabled: "true" });
 
 		expect(config.types.taskSchedulerComponent).toEqual(
 			expect.arrayContaining([
@@ -62,7 +65,7 @@ describe("buildEngineConfiguration - task scheduler requirement", () => {
 	});
 
 	test("task scheduler is not registered when no dependent component is enabled", async () => {
-		const config = await buildEngineConfiguration({});
+		const config = await buildEngineConfiguration({ ...AUTH });
 
 		expect(config.types.taskSchedulerComponent).toBeUndefined();
 	});
@@ -71,6 +74,7 @@ describe("buildEngineConfiguration - task scheduler requirement", () => {
 describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 	test("iotaGasBudget and iotaGasReservationDuration env vars are wired through to the resolved config", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			iotaNodeEndpoint: "https://api.testnet.iota.cafe",
 			iotaNetwork: "testnet",
 			iotaGasBudget: "123456789",
@@ -88,6 +92,7 @@ describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 
 	test("leaving both env vars unset preserves today's behavior (fields stay undefined)", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			iotaNodeEndpoint: "https://api.testnet.iota.cafe",
 			iotaNetwork: "testnet"
 		});
@@ -103,6 +108,7 @@ describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 
 	test("existing coinType and gasStation fields still resolve correctly alongside the new ones", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			iotaNodeEndpoint: "https://api.testnet.iota.cafe",
 			iotaNetwork: "testnet",
 			iotaCoinType: "4218",
@@ -130,6 +136,7 @@ describe("buildEngineConfiguration - IOTA DLT gas config", () => {
 describe("buildEngineConfiguration - dataspace provider idle transfer policy", () => {
 	test("provider idle policy values are wired in seconds and converted to milliseconds", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			dataspaceEnabled: "true",
 			dataspaceProviderTransferIdleTimeout: "120",
 			dataspaceProviderTransferPolicySweepInterval: "15"
@@ -150,6 +157,7 @@ describe("buildEngineConfiguration - dataspace provider idle transfer policy", (
 
 	test("unset provider idle policy values keep existing behaviour unchanged", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			dataspaceEnabled: "true"
 		});
 
@@ -170,6 +178,7 @@ describe("buildEngineConfiguration - dataspace provider idle transfer policy", (
 describe("buildEngineConfiguration - entity storage shared mutex timeout", () => {
 	test("entity storage mutex timeout applies to both memory and file connectors", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "memory,file",
 			entityStorageMutexTimeout: "4321",
 			storageFileRoot: "."
@@ -194,6 +203,7 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 
 	test("entity storage mutex timeout is unset when the env var is empty", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "memory,file",
 			storageFileRoot: "."
 		});
@@ -228,6 +238,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("postgresql pool env vars are wired to the connector config", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "postgresql",
 			postgreSqlHost: "localhost",
 			postgreSqlUser: "u",
@@ -245,6 +256,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("postgresql pool fields are undefined when pool env vars are not set", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "postgresql",
 			postgreSqlHost: "localhost",
 			postgreSqlUser: "u",
@@ -261,6 +273,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("mysql pool env vars are wired to the connector config", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "mysql",
 			mySqlHost: "localhost",
 			mySqlUser: "u",
@@ -287,6 +300,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("mysql pool fields are undefined when pool env vars are not set", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "mysql",
 			mySqlHost: "localhost",
 			mySqlUser: "u",
@@ -301,6 +315,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("mongodb pool env vars are wired to the connector config", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "mongodb",
 			mongoDbHost: "localhost",
 			mongoDbDatabase: "db",
@@ -321,6 +336,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("mongodb pool fields are undefined when pool env vars are not set", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "mongodb",
 			mongoDbHost: "localhost",
 			mongoDbDatabase: "db"
@@ -333,6 +349,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("scylladb pool env vars are wired to the connector config", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "scylladb",
 			scylladbHosts: "localhost",
 			scylladbLocalDataCenter: "dc1",
@@ -347,6 +364,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 	test("scylladb pool fields are undefined when pool env vars are not set", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			entityStorageConnectorType: "scylladb",
 			scylladbHosts: "localhost",
 			scylladbLocalDataCenter: "dc1",
@@ -361,7 +379,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 
 describe("buildEngineConfiguration - logging multi-connector", () => {
 	test("single logging connector is marked as default", async () => {
-		const config = await buildEngineConfiguration({ loggingConnector: "console" });
+		const config = await buildEngineConfiguration({ ...AUTH, loggingConnector: "console" });
 
 		const connectors = config.types.loggingConnector ?? [];
 		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
@@ -374,6 +392,7 @@ describe("buildEngineConfiguration - logging multi-connector", () => {
 
 	test("two logging connectors produce a multi connector set as the default", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			loggingConnector: "console,entity-storage"
 		});
 
@@ -394,6 +413,7 @@ describe("buildEngineConfiguration - logging multi-connector", () => {
 describe("buildEngineConfiguration - telemetry multi-connector", () => {
 	test("single telemetry connector is marked as default and service component is registered", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			telemetryConnector: TelemetryConnectorType.EntityStorage
 		});
 
@@ -411,6 +431,7 @@ describe("buildEngineConfiguration - telemetry multi-connector", () => {
 
 	test("two telemetry connectors produce a multi connector set as the default", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			telemetryConnector: `${TelemetryConnectorType.EntityStorage},${TelemetryConnectorType.OpenTelemetry}`
 		});
 
@@ -432,6 +453,7 @@ describe("buildEngineConfiguration - telemetry multi-connector", () => {
 
 	test("silent telemetry connector is marked as default and service component is registered", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			telemetryConnector: TelemetryConnectorType.Silent
 		});
 
@@ -451,6 +473,7 @@ describe("buildEngineConfiguration - telemetry multi-connector", () => {
 describe("buildEngineConfiguration - tracing multi-connector", () => {
 	test("single tracing connector is marked as default and service component is registered", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			tracingConnector: TracingConnectorType.EntityStorage
 		});
 
@@ -468,6 +491,7 @@ describe("buildEngineConfiguration - tracing multi-connector", () => {
 
 	test("two tracing connectors produce a multi connector set as the default", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			tracingConnector: `${TracingConnectorType.EntityStorage},${TracingConnectorType.OpenTelemetry}`
 		});
 
@@ -489,6 +513,7 @@ describe("buildEngineConfiguration - tracing multi-connector", () => {
 
 	test("silent tracing connector is marked as default and service component is registered", async () => {
 		const config = await buildEngineConfiguration({
+			...AUTH,
 			tracingConnector: TracingConnectorType.Silent
 		});
 

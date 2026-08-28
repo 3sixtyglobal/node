@@ -57,6 +57,16 @@ export const DEFAULT_TENANT_ADMIN_ROLE = "tenant-admin";
 export const DEFAULT_USER_ADMIN_ROLE = "user-admin";
 
 /**
+ * Default role for identity profile admins.
+ */
+export const DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE = "identity-profile-admin";
+
+/**
+ * Default role for devops.
+ */
+export const DEFAULT_DEVOPS_ROLE = "devops";
+
+/**
  * Default role for users.
  */
 export const DEFAULT_USER_ROLE = "user";

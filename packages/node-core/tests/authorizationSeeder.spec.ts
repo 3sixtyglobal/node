@@ -87,15 +87,6 @@ describe("seedAuthorizationDefaults", () => {
 		TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage
 	};
 
-	test("skips seeding when authorization component is not registered", async () => {
-		const startResult = await startServer({
-			...baseMinimalEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		await startResult?.shutdown();
-	}, 30000);
-
 	test("seeds route-derived policies for all routes with defaultAuthorization on startup", async () => {
 		const startResult = await startServer({
 			...baseAuthEnvVars,

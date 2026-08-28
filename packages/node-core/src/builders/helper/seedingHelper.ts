@@ -1,15 +1,15 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IPlatformComponent, IRestRoute, IRouteAuthorization } from "@twin.org/api-models";
+import type { IPlatformComponent, IRouteAuthorization } from "@twin.org/api-models";
 import type {
 	IAuthorizationComponent,
 	IAuthorizationInheritance,
 	IAuthorizationModel,
 	IAuthorizationPolicy
 } from "@twin.org/authorization-models";
-import { ContextIdStore } from "@twin.org/context";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
+import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { HttpMethod } from "@twin.org/web";
 import { envObject, envString } from "./envHelpers.js";
 import {
@@ -34,26 +34,21 @@ const DEFAULT_AUTHORIZATION_WRITER: IRouteAuthorization = {
  * Seed default authorization policies and role inheritances after the engine has started.
  * Uses the platform component to execute across all tenants in multi-tenant mode.
  * @param engineCore The running engine core.
+ * @param engineServer The running engine server.
  * @param envVars The environment variables.
- * @param routes The REST routes to derive default policies from.
  */
 export async function seedAuthorizationDefaults(
 	engineCore: IEngineCore,
-	envVars: IEngineEnvironmentVariables,
-	routes: IRestRoute[]
+	engineServer: IEngineServer,
+	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
 	const nodeContextIds = engineCore.getContextIds() ?? {};
 	if (!Is.stringValue(nodeContextIds.node)) {
 		return;
 	}
 
-	const authComponentType = engineCore.getRegisteredInstanceTypeOptional("authorizationComponent");
-	const platformComponentType = engineCore.getRegisteredInstanceTypeOptional("platformComponent");
-
-	if (!Is.stringValue(authComponentType) || !Is.stringValue(platformComponentType)) {
-		return;
-	}
-
+	const authComponentType = engineCore.getRegisteredInstanceType("authorizationComponent");
+	const platformComponentType = engineCore.getRegisteredInstanceType("platformComponent");
 	const platformComponent = ComponentFactory.get<IPlatformComponent>(platformComponentType);
 	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(authComponentType);
 
@@ -89,6 +84,7 @@ export async function seedAuthorizationDefaults(
 		const inheritanceKeys = new Set<string>();
 		const roles = new Set<string>();
 
+		const routes = engineServer.getRestRoutes();
 		for (const route of routes) {
 			const requiresAuthorization =
 				route.requiresAuthorization !== false && route.skipAuth !== true;
@@ -157,4 +153,18 @@ export async function seedAuthorizationDefaults(
 			await authorizationComponent.build(modelId, model);
 		});
 	});
+
+	platformComponent.registerTenantEventCallback(
+		"seedAuthorizationDefaults",
+		async (tenantId, eventType) => {
+			if (eventType === "created") {
+				await ContextIdStore.run(
+					{ ...nodeContextIds, [ContextIdKeys.Tenant]: tenantId },
+					async () => {
+						await authorizationComponent.build(modelId, model);
+					}
+				);
+			}
+		}
+	);
 }

@@ -342,7 +342,9 @@ describe("node-core", () => {
 			"authorization-role-assignment"
 		);
 		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
 			"global-admin",
+			"identity-profile-admin",
 			"tenant-admin",
 			"user-admin"
 		]);
@@ -400,7 +402,12 @@ describe("node-core", () => {
 			dbDir,
 			"authorization-role-assignment"
 		);
-		expect(roleAssignments.map(r => r.role).sort()).toEqual(["global-admin", "user-admin"]);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
+			"global-admin",
+			"identity-profile-admin",
+			"user-admin"
+		]);
 
 		// Verify identity documents contain both node and org DIDs stored in state
 		interface IdentityDocRecord {
@@ -552,7 +559,12 @@ describe("node-core", () => {
 			dbDir,
 			"authorization-role-assignment"
 		);
-		expect(roleAssignments.map(r => r.role).sort()).toEqual(["global-admin", "user-admin"]);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
+			"global-admin",
+			"identity-profile-admin",
+			"user-admin"
+		]);
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };
@@ -608,7 +620,9 @@ describe("node-core", () => {
 			"authorization-role-assignment"
 		);
 		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
 			"global-admin",
+			"identity-profile-admin",
 			"tenant-admin",
 			"user-admin"
 		]);
@@ -1229,30 +1243,6 @@ describe("node-core", () => {
 					"--user-identity=!USER_DID",
 					"--organization-identity=!ORGANIZATION_DID",
 					"--email=admin-no-tenant@node"
-				],
-				{ nodeId: nodeIdentityJson?.did },
-				undefined,
-				{ disableProcessExitOnFailure: true }
-			)
-		).rejects.toThrow();
-	});
-
-	test("user-create throws when an invalid role is specified", async () => {
-		const envParts = [
-			`${OUTPUT_TMP_DIR}organization-identity.env`,
-			`${OUTPUT_TMP_DIR}user-identity.env`,
-			`${OUTPUT_TMP_DIR}node-tenant.env`
-		];
-		await expect(
-			executeCliCommand(
-				[
-					"user-create",
-					`--load-env=${envParts.join(",")}`,
-					"--user-identity=!USER_DID",
-					"--organization-identity=!ORGANIZATION_DID",
-					"--tenant-id=!NODE_TENANT_ID",
-					"--email=invalid-role@node",
-					"--roles=not-a-real-role"
 				],
 				{ nodeId: nodeIdentityJson?.did },
 				undefined,

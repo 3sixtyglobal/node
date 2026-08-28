@@ -13,6 +13,9 @@
 			"package": "@twin.org/api-auth-entity-storage-service"
 		},
 		{
+			"package": "@twin.org/api-auth-service"
+		},
+		{
 			"package": "@twin.org/identity-service"
 		},
 		{
@@ -64,13 +67,7 @@
 			]
 		},
 		{
-			"package": "@twin.org/document-management-service"
-		},
-		{
 			"package": "@twin.org/federated-catalogue-service"
-		},
-		{
-			"package": "@twin.org/dataspace-data-plane-service"
 		},
 		{
 			"package": "@twin.org/dataspace-data-plane-service"
@@ -80,6 +77,15 @@
 		},
 		{
 			"package": "@twin.org/rights-management-service"
+		},
+		{
+			"package": "@twin.org/tracing-service"
+		},
+		{
+			"package": "@twin.org/authorization-service"
+		},
+		{
+			"package": "@twin.org/api-tenant-processor"
 		}
 	],
 	"authMethods": ["jwtBearer"],

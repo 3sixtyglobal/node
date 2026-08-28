@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import { Is, Mutex } from "@twin.org/core";
+import { GeneralError, Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import { EngineCloneMode } from "@twin.org/engine-models";
 import {
@@ -97,11 +97,7 @@ import {
 	type IOpenTelemetryTracingConnectorConfig,
 	OpenTelemetryProcessorTypes
 } from "@twin.org/tracing-connector-opentelemetry";
-import {
-	AUTHORIZATION_MODEL_ID,
-	CONTEXT_ID_HANDLER_FEATURE_DID,
-	CONTEXT_ID_HANDLER_FEATURE_TENANT
-} from "../defaults.js";
+import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
 import {
@@ -115,8 +111,7 @@ import {
 	envMinutes,
 	envMs,
 	envSeconds,
-	envSecToMs,
-	envString
+	envSecToMs
 } from "./helper/envHelpers.js";
 
 /**
@@ -935,6 +930,8 @@ async function configureAuthorization(
 				}
 			}
 		});
+	} else {
+		throw new GeneralError("node", "migrationAuthorizationComponent");
 	}
 
 	if (coreConfig.types.authorizationConnector.length > 0) {
@@ -944,7 +941,6 @@ async function configureAuthorization(
 			type: AuthorizationComponentType.Service,
 			options: {
 				config: {
-					migrationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID),
 					checkCacheCapacity: envInteger(envVars, "authorizationCheckCacheCapacity"),
 					checkCacheTtiMs: envMs(envVars, "authorizationCheckCacheTtiMs")
 				}

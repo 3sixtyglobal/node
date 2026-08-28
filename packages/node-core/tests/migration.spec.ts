@@ -104,6 +104,7 @@ const TEST_TENANT_ID_B = "b2222222222222222222222222222222";
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+	TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
 

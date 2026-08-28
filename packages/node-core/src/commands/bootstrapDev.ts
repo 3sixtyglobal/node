@@ -8,9 +8,11 @@ import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core
 import type { IEngineCore } from "@twin.org/engine-models";
 import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import {
+	DEFAULT_DEVOPS_ROLE,
 	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_TENANT_ADMIN_ROLE,
-	DEFAULT_USER_ADMIN_ROLE
+	DEFAULT_USER_ADMIN_ROLE,
+	DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE
 } from "../defaults.js";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
@@ -273,9 +275,16 @@ export async function bootstrapDev(
 							? [
 									DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 									DEFAULT_TENANT_ADMIN_ROLE,
-									DEFAULT_USER_ADMIN_ROLE
+									DEFAULT_USER_ADMIN_ROLE,
+									DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+									DEFAULT_DEVOPS_ROLE
 								]
-							: [DEFAULT_ESCALATED_PRIVILEGE_ROLE, DEFAULT_USER_ADMIN_ROLE]
+							: [
+									DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+									DEFAULT_USER_ADMIN_ROLE,
+									DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+									DEFAULT_DEVOPS_ROLE
+								]
 						).join(","),
 					givenName: tenantEnabled ? "Tenant" : "Node",
 					familyName: "Admin",

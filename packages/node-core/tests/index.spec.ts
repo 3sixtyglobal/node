@@ -85,6 +85,7 @@ describe("node-core", () => {
 				TWIN_SILENT: "true",
 				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+				TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -131,6 +132,7 @@ describe("node-core", () => {
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
 				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+				TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 			}
 		});
@@ -173,6 +175,7 @@ describe("node-core", () => {
 				TWIN_AUDITABLE_ITEM_STREAM_ENABLED: "true",
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+				TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
@@ -233,6 +236,7 @@ describe("node-core", () => {
 				TWIN_AUDITABLE_ITEM_STREAM_ENABLED: "true",
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+				TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
@@ -281,6 +285,7 @@ describe("node-core", () => {
 				TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+				TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 				TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
 				TWIN_TRUST_VERIFICATION_METHOD_ID: "trust-assertion",
@@ -310,6 +315,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
@@ -344,18 +350,37 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"schema-version-service",
 			"platform-service",
+			"authorization-service",
 			"did-context-id-handler",
 			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
-		expect(buildRestRoutes.map(r => r.path)).toEqual([
-			"/",
-			"/favicon.ico",
-			"/info",
-			"/livez",
-			"/readyz",
-			"/spec"
+		expect(buildRestRoutes.map(r => `${r.method.padEnd(8, " ")} ${r.path}`)).toEqual([
+			"GET      /",
+			"GET      /favicon.ico",
+			"GET      /info",
+			"GET      /livez",
+			"GET      /readyz",
+			"GET      /spec",
+			"POST     /authorization/:modelId",
+			"POST     /authorization/:modelId/check",
+			"POST     /authorization/:modelId/policy",
+			"POST     /authorization/:modelId/policy/remove",
+			"GET      /authorization/:modelId/policy",
+			"GET      /authorization/:modelId/roles",
+			"POST     /authorization/:modelId/roles/has",
+			"GET      /authorization/:modelId/policy/:subject",
+			"POST     /authorization/:modelId/subject/:subject/role",
+			"DELETE   /authorization/:modelId/subject/:subject/role/:role",
+			"DELETE   /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/role/:role",
+			"GET      /authorization/:modelId/role/:role/subjects",
+			"POST     /authorization/:modelId/role/:role/inherit",
+			"DELETE   /authorization/:modelId/role/:role/inherit/:inheritsFrom",
+			"GET      /authorization/:modelId/role/:role/parents",
+			"GET      /authorization/:modelId/role/:role/children"
 		]);
 
 		await startResult?.shutdown();
@@ -829,6 +854,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
@@ -888,18 +914,37 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"schema-version-service",
 			"platform-service",
+			"authorization-service",
 			"did-context-id-handler",
 			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
-		expect(buildRestRoutes.map(r => r.path)).toEqual([
-			"/",
-			"/favicon.ico",
-			"/info",
-			"/livez",
-			"/readyz",
-			"/spec"
+		expect(buildRestRoutes.map(r => `${r.method.padEnd(8, " ")} ${r.path}`)).toEqual([
+			"GET      /",
+			"GET      /favicon.ico",
+			"GET      /info",
+			"GET      /livez",
+			"GET      /readyz",
+			"GET      /spec",
+			"POST     /authorization/:modelId",
+			"POST     /authorization/:modelId/check",
+			"POST     /authorization/:modelId/policy",
+			"POST     /authorization/:modelId/policy/remove",
+			"GET      /authorization/:modelId/policy",
+			"GET      /authorization/:modelId/roles",
+			"POST     /authorization/:modelId/roles/has",
+			"GET      /authorization/:modelId/policy/:subject",
+			"POST     /authorization/:modelId/subject/:subject/role",
+			"DELETE   /authorization/:modelId/subject/:subject/role/:role",
+			"DELETE   /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/role/:role",
+			"GET      /authorization/:modelId/role/:role/subjects",
+			"POST     /authorization/:modelId/role/:role/inherit",
+			"DELETE   /authorization/:modelId/role/:role/inherit/:inheritsFrom",
+			"GET      /authorization/:modelId/role/:role/parents",
+			"GET      /authorization/:modelId/role/:role/children"
 		]);
 
 		await startResult?.shutdown();
@@ -911,6 +956,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
@@ -951,18 +997,37 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"schema-version-service",
 			"platform-service",
+			"authorization-service",
 			"did-context-id-handler",
 			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
-		expect(buildRestRoutes.map(r => r.path)).toEqual([
-			"/",
-			"/favicon.ico",
-			"/info",
-			"/livez",
-			"/readyz",
-			"/spec"
+		expect(buildRestRoutes.map(r => `${r.method.padEnd(8, " ")} ${r.path}`)).toEqual([
+			"GET      /",
+			"GET      /favicon.ico",
+			"GET      /info",
+			"GET      /livez",
+			"GET      /readyz",
+			"GET      /spec",
+			"POST     /authorization/:modelId",
+			"POST     /authorization/:modelId/check",
+			"POST     /authorization/:modelId/policy",
+			"POST     /authorization/:modelId/policy/remove",
+			"GET      /authorization/:modelId/policy",
+			"GET      /authorization/:modelId/roles",
+			"POST     /authorization/:modelId/roles/has",
+			"GET      /authorization/:modelId/policy/:subject",
+			"POST     /authorization/:modelId/subject/:subject/role",
+			"DELETE   /authorization/:modelId/subject/:subject/role/:role",
+			"DELETE   /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/role/:role",
+			"GET      /authorization/:modelId/role/:role/subjects",
+			"POST     /authorization/:modelId/role/:role/inherit",
+			"DELETE   /authorization/:modelId/role/:role/inherit/:inheritsFrom",
+			"GET      /authorization/:modelId/role/:role/parents",
+			"GET      /authorization/:modelId/role/:role/children"
 		]);
 
 		await startResult?.shutdown();
@@ -974,6 +1039,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false"
 		};
 
@@ -1014,18 +1080,37 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"schema-version-service",
 			"platform-service",
+			"authorization-service",
 			"did-context-id-handler",
 			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
-		expect(buildRestRoutes.map(r => r.path)).toEqual([
-			"/",
-			"/favicon.ico",
-			"/info",
-			"/livez",
-			"/readyz",
-			"/spec"
+		expect(buildRestRoutes.map(r => `${r.method.padEnd(8, " ")} ${r.path}`)).toEqual([
+			"GET      /",
+			"GET      /favicon.ico",
+			"GET      /info",
+			"GET      /livez",
+			"GET      /readyz",
+			"GET      /spec",
+			"POST     /authorization/:modelId",
+			"POST     /authorization/:modelId/check",
+			"POST     /authorization/:modelId/policy",
+			"POST     /authorization/:modelId/policy/remove",
+			"GET      /authorization/:modelId/policy",
+			"GET      /authorization/:modelId/roles",
+			"POST     /authorization/:modelId/roles/has",
+			"GET      /authorization/:modelId/policy/:subject",
+			"POST     /authorization/:modelId/subject/:subject/role",
+			"DELETE   /authorization/:modelId/subject/:subject/role/:role",
+			"DELETE   /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/role/:role",
+			"GET      /authorization/:modelId/role/:role/subjects",
+			"POST     /authorization/:modelId/role/:role/inherit",
+			"DELETE   /authorization/:modelId/role/:role/inherit/:inheritsFrom",
+			"GET      /authorization/:modelId/role/:role/parents",
+			"GET      /authorization/:modelId/role/:role/children"
 		]);
 
 		await startResult?.shutdown();
@@ -1037,6 +1122,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_TEST_EMBEDDED: "@text:tests/fixtures/embedded.txt",
 			TWIN_ENV_ALLOW_LIST: [CI_ENV_VARS, "TWIN_TEST_EMBEDDED"].filter(Boolean).join(",")
@@ -1073,6 +1159,7 @@ describe("node-core", () => {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_TEST_EMBEDDED: "@json:tests/fixtures/embedded.json",
 			TWIN_ENV_ALLOW_LIST: [CI_ENV_VARS, "TWIN_TEST_EMBEDDED"].filter(Boolean).join(",")
@@ -1112,6 +1199,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/fixtures//myExtension.js"
 		};
@@ -1150,18 +1238,37 @@ describe("node-core", () => {
 			"engine-logging-service",
 			"schema-version-service",
 			"platform-service",
+			"authorization-service",
 			"did-context-id-handler",
 			"information-service"
 		]);
 
 		const buildRestRoutes = startResult?.server?.getRestRoutes() ?? [];
-		expect(buildRestRoutes.map(r => r.path)).toEqual([
-			"/",
-			"/favicon.ico",
-			"/info",
-			"/livez",
-			"/readyz",
-			"/spec"
+		expect(buildRestRoutes.map(r => `${r.method.padEnd(8, " ")} ${r.path}`)).toEqual([
+			"GET      /",
+			"GET      /favicon.ico",
+			"GET      /info",
+			"GET      /livez",
+			"GET      /readyz",
+			"GET      /spec",
+			"POST     /authorization/:modelId",
+			"POST     /authorization/:modelId/check",
+			"POST     /authorization/:modelId/policy",
+			"POST     /authorization/:modelId/policy/remove",
+			"GET      /authorization/:modelId/policy",
+			"GET      /authorization/:modelId/roles",
+			"POST     /authorization/:modelId/roles/has",
+			"GET      /authorization/:modelId/policy/:subject",
+			"POST     /authorization/:modelId/subject/:subject/role",
+			"DELETE   /authorization/:modelId/subject/:subject/role/:role",
+			"DELETE   /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/roles",
+			"GET      /authorization/:modelId/subject/:subject/role/:role",
+			"GET      /authorization/:modelId/role/:role/subjects",
+			"POST     /authorization/:modelId/role/:role/inherit",
+			"DELETE   /authorization/:modelId/role/:role/inherit/:inheritsFrom",
+			"GET      /authorization/:modelId/role/:role/parents",
+			"GET      /authorization/:modelId/role/:role/children"
 		]);
 
 		await startResult?.shutdown();
@@ -1255,6 +1362,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/first-extension.js,./tests/.tmp/second-extension.js"
 		};
@@ -1346,6 +1454,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/lifecycle-test.js"
 		};
@@ -1462,6 +1571,7 @@ describe("node-core", () => {
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/.tmp/cache-test.js",
 			TWIN_EXTENSIONS_CACHE_DIRECTORY: customCacheDir

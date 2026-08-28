@@ -19,8 +19,9 @@ import {
 	extensionsInitialiseEngineServer,
 	shutdownExtensions
 } from "./builders/extensionsBuilder.js";
-import { seedAuthorizationDefaults } from "./builders/helper/authorizationSeeder.js";
 import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
+import { finalizeMigrations, initialiseMigrations } from "./builders/helper/migrationHelper.js";
+import { seedAuthorizationDefaults } from "./builders/helper/seedingHelper.js";
 import { executeCommand } from "./cli.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
 import type { IEngineEnvironmentVariables } from "./models/IEngineEnvironmentVariables.js";
@@ -124,10 +125,13 @@ export async function start(
 		await executeCommand(engine, envVars, cliCommand);
 	} else {
 		try {
+			initialiseMigrations(engine, envVars);
+
 			// Start the server, which also starts the engine.
 			await server.start();
 
-			await seedAuthorizationDefaults(engine, envVars, server.getRestRoutes());
+			await seedAuthorizationDefaults(engine, server, envVars);
+			await finalizeMigrations(engine, envVars);
 
 			return {
 				engine,

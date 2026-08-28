@@ -3,13 +3,17 @@ category: node
 order: 10
 ---
 
-import { RoleHierarchyDiagram, PermissionNamespacesDiagram, VerbFallbackDiagram } from './authorization-defaults-diagrams.jsx'
+import {
+  RoleHierarchyDiagram,
+  PermissionNamespacesDiagram,
+  VerbFallbackDiagram
+} from './authorization-defaults-diagrams.jsx';
 
 # Default Authorization Seeding
 
-On startup, `seedAuthorizationDefaults` derives RBAC policies from the registered REST routes and writes them to the authorization store via the authorization component. This happens once, after the engine server has fully started.
+On every startup, `seedAuthorizationDefaults` derives RBAC policies from the registered REST routes and writes them to the authorization store via the authorization component. Seeding is additive - policies for operations that no longer exist are not removed, so renaming an operation leaves its old policy in the store.
 
-The function processes every route returned by `server.getRestRoutes()` and builds a set of policies and role inheritances. Routes with `skipAuth: true` or `requiresAuthorization: false` are excluded.
+The function processes every route returned by `server.getRestRoutes()`. Routes with an explicit `defaultAuthorization` are always seeded. The verb-based fallback is only applied to routes that both require authentication (`skipAuth` is not `true` and `requiresAuthorization` is not `false`) and declare no `defaultAuthorization`.
 
 ## Role Hierarchy
 
@@ -29,86 +33,95 @@ Each permission namespace is seeded from the routes that belong to that namespac
 
 Seeded from the verb-based fallback for routes that do not declare an explicit `defaultAuthorization`.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `user:read` | `user` | GET routes (verb fallback) |
+| Permission   | Role   | Notes                                                                    |
+| ------------ | ------ | ------------------------------------------------------------------------ |
+| `user:read`  | `user` | GET routes (verb fallback)                                               |
 | `user:write` | `user` | POST / PUT / PATCH / DELETE routes (verb fallback), inherits `user:read` |
 
 ### `identity` - identity and credential management
 
 Seeded from the identity service routes.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `identity:write` | `identity-admin` | Create/remove DIDs, verification methods, services, also-known-as entries, VCs, presentations, proofs; revoke/unrevoke VCs |
+| Permission       | Role             | Notes                                                                                                                           |
+| ---------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `identity:write` | `identity-admin` | Create/remove DIDs, verification methods, services, also-known-as entries, VCs, presentations, proofs; revoke and reinstate VCs |
 
-Verify and resolve operations fall back to verb-based `user:read`. They require authentication but no elevated role.
+The resolve operation falls back to verb-based `user:read`; verify operations (POST) fall back to `user:write`. Neither requires an elevated role beyond authentication.
 
-### `user:read` / `user:write` - user administration
+### `user-admin` - user administration
 
-Also used by the user admin and identity profile admin routes. Same permission strings as the verb fallback but bound to the `user-admin` role, giving user admins access to all standard user operations and the admin-scoped routes.
+Seeded from the authentication admin and audit routes.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `user:read` | `user-admin` | Admin get user, admin get by identity, profile admin get, audit query |
-| `user:write` | `user-admin` | Admin create/update/remove user, password reset, profile admin update/remove/list, audit create/update/remove; inherits `user:read` |
+| Permission         | Role         | Notes                                                                                             |
+| ------------------ | ------------ | ------------------------------------------------------------------------------------------------- |
+| `user-admin:read`  | `user-admin` | Get user, get by identity, get and query audit                                                    |
+| `user-admin:write` | `user-admin` | Create/update/remove user, password reset, create/update/remove audit; inherits `user-admin:read` |
+
+### `identity-profile` - identity profile administration
+
+Seeded from the identity profile admin routes.
+
+| Permission               | Role                     | Notes                                                                 |
+| ------------------------ | ------------------------ | --------------------------------------------------------------------- |
+| `identity-profile:read`  | `identity-profile-admin` | Get and list identity profiles                                        |
+| `identity-profile:write` | `identity-profile-admin` | Update and remove identity profiles; inherits `identity-profile:read` |
 
 ### `authorization` - authorization policy management
 
 Seeded from the authorization service routes.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `authorization:read` | `user-admin` | Get policies, roles, role assignments, inheritance |
+| Permission            | Role         | Notes                                                                                          |
+| --------------------- | ------------ | ---------------------------------------------------------------------------------------------- |
+| `authorization:read`  | `user-admin` | Check authorization, get policies, roles, role assignments, inheritance                        |
 | `authorization:write` | `user-admin` | Build model, add/remove policies, role assignments, inheritance; inherits `authorization:read` |
 
 ### `health` - server health
 
 Seeded from the health route.
 
-| Permission | Role | Notes |
-|---|---|---|
+| Permission    | Role     | Notes                |
+| ------------- | -------- | -------------------- |
 | `health:read` | `devops` | Server health status |
 
 ### `logging` - log entry management
 
 Seeded from the logging service routes.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `logging:read` | `devops` | List log entries |
+| Permission      | Role     | Notes                                       |
+| --------------- | -------- | ------------------------------------------- |
+| `logging:read`  | `devops` | List log entries                            |
 | `logging:write` | `devops` | Create log entries; inherits `logging:read` |
 
 ### `tracing` - distributed tracing
 
 Seeded from the tracing service routes.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `tracing:read` | `devops` | List spans, get traces |
+| Permission      | Role     | Notes                                    |
+| --------------- | -------- | ---------------------------------------- |
+| `tracing:read`  | `devops` | List spans, get traces                   |
 | `tracing:write` | `devops` | Start/end spans; inherits `tracing:read` |
 
 ### `telemetry` - metrics and telemetry
 
 Seeded from the telemetry service routes.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `telemetry:read` | `devops` | Get metrics, list entries, get values |
+| Permission        | Role     | Notes                                                               |
+| ----------------- | -------- | ------------------------------------------------------------------- |
+| `telemetry:read`  | `devops` | Get metrics, list entries, get values                               |
 | `telemetry:write` | `devops` | Create/update/remove metrics, add values; inherits `telemetry:read` |
 
 ### `tenant` - tenant administration (multi-tenant only)
 
 Seeded from the tenant processor routes when `TWIN_TENANT_ENABLED=true`.
 
-| Permission | Role | Notes |
-|---|---|---|
-| `tenant:read` | `tenant-admin` | List and get tenants |
+| Permission     | Role           | Notes                                                      |
+| -------------- | -------------- | ---------------------------------------------------------- |
+| `tenant:read`  | `tenant-admin` | List and get tenants                                       |
 | `tenant:write` | `tenant-admin` | Create, update, and remove tenants; inherits `tenant:read` |
 
 ## Public Routes
 
-Routes with `skipAuth: true` are excluded from seeding entirely. No token is required to call them. Examples include the information routes (`serverInformation`, `serverSpec`, `serverLivez`, `serverReadyz`) and the public identity profile endpoint (`identityProfileGetPublic`).
+Routes with `skipAuth: true` are excluded from the verb-based fallback only. If such a route also declares an explicit `defaultAuthorization`, that policy is still seeded. A route that is purely public - `skipAuth: true` with no `defaultAuthorization` - receives no seeded policy. Examples of purely public routes include the information routes (`serverInformation`, `serverSpec`, `serverLivez`, `serverReadyz`) and the public identity profile endpoint (`identityProfileGetPublic`).
 
 ## Verb-Based Fallback
 
@@ -118,4 +131,6 @@ Routes that require authentication but declare no `defaultAuthorization` receive
 
 ## Custom Model
 
-The seeded defaults can be extended or replaced via the `TWIN_AUTHORIZATION_MODEL` environment variable (a JSON object conforming to `IAuthorizationModel`). Set `TWIN_AUTHORIZATION_MODEL_MODE` to `merge` (default) to add custom rules on top of the defaults, or `replace` to use only the custom rules.
+The seeded defaults can be extended or replaced via the `TWIN_AUTHORIZATION_MODEL` environment variable (a JSON object conforming to `IAuthorizationModel`). Set `TWIN_AUTHORIZATION_MODEL_MODE` to `merge` (default) to add custom rules on top of the defaults, or `replace` to skip the route-derived defaults and use only the custom rules.
+
+Because seeding is additive, `replace` mode only controls what is passed on the current startup - it cannot remove policies already written to the store in a previous run.

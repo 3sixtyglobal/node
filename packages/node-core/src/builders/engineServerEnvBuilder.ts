@@ -267,26 +267,42 @@ export async function buildEngineServerConfiguration(
 				}
 			}
 		});
-		if (tenantEnabled && isAuthorizationRequired(envVars)) {
+		if (isAuthorizationRequired(envVars)) {
 			serverConfig.types.restRouteProcessor.push({
-				type: RestRouteProcessorType.TenantOverride,
-				options: {
-					config: {
-						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
-					}
-				}
+				type: RestRouteProcessorType.Authorization
 			});
 			serverConfig.types.socketRouteProcessor.push({
-				type: SocketRouteProcessorType.TenantOverride,
-				options: {
-					config: {
-						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
-					}
-				}
+				type: SocketRouteProcessorType.Authorization
 			});
+
+			if (tenantEnabled) {
+				serverConfig.types.restRouteProcessor.push({
+					type: RestRouteProcessorType.TenantOverride,
+					options: {
+						config: {
+							authorizationModelId: envString(
+								envVars,
+								"authorizationModelId",
+								AUTHORIZATION_MODEL_ID
+							)
+						}
+					}
+				});
+				serverConfig.types.socketRouteProcessor.push({
+					type: SocketRouteProcessorType.TenantOverride,
+					options: {
+						config: {
+							authorizationModelId: envString(
+								envVars,
+								"authorizationModelId",
+								AUTHORIZATION_MODEL_ID
+							)
+						}
+					}
+				});
+			}
 		}
 	}
-
 	if (isTelemetryEnabled(envVars)) {
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Metrics,
