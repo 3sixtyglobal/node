@@ -33,6 +33,13 @@ import {
 import type { ITrustComponent } from "@twin.org/trust-models";
 import { loadAndRunGroups } from "./endpoints/runner.js";
 import { CI_ENV_VARS } from "./setupTestEnv.js";
+import {
+	DEFAULT_DEVOPS_ROLE,
+	DEFAULT_IDENTITY_ADMIN_ROLE,
+	DEFAULT_TENANT_ADMIN_ROLE,
+	DEFAULT_USER_ADMIN_ROLE,
+	DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE
+} from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
@@ -176,7 +183,13 @@ describe("node-core", () => {
 					TWIN_FEATURES: "admin-user",
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_TENANT_ADMIN_ROLE,
+						DEFAULT_USER_ADMIN_ROLE,
+						DEFAULT_IDENTITY_ADMIN_ROLE,
+						DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+						DEFAULT_DEVOPS_ROLE
+					].join(","),
 					TWIN_HEALTH_STARTUP_INTERVAL: "1"
 				}
 			},
@@ -253,7 +266,13 @@ describe("node-core", () => {
 					TWIN_TENANT_ID: TEST_TENANT_ID,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_TENANT_ADMIN_ROLE,
+						DEFAULT_USER_ADMIN_ROLE,
+						DEFAULT_IDENTITY_ADMIN_ROLE,
+						DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+						DEFAULT_DEVOPS_ROLE
+					].join(","),
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
@@ -374,7 +393,13 @@ describe("node-core", () => {
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_TENANT_ADMIN_ROLE,
+						DEFAULT_USER_ADMIN_ROLE,
+						DEFAULT_IDENTITY_ADMIN_ROLE,
+						DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+						DEFAULT_DEVOPS_ROLE
+					].join(","),
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},
@@ -576,7 +601,13 @@ describe("node-core", () => {
 					TWIN_TENANT_API_KEY: TEST_TENANT_API_KEY,
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
-					TWIN_ADMIN_USER_ROLES: "tenant-admin,user-admin",
+					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_TENANT_ADMIN_ROLE,
+						DEFAULT_USER_ADMIN_ROLE,
+						DEFAULT_IDENTITY_ADMIN_ROLE,
+						DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+						DEFAULT_DEVOPS_ROLE
+					].join(","),
 					TWIN_HEALTH_STARTUP_INTERVAL: "500"
 				}
 			},

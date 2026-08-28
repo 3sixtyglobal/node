@@ -19,7 +19,8 @@ import {
 	DEFAULT_TENANT_ADMIN_ROLE,
 	DEFAULT_USER_ADMIN_ROLE,
 	DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
-	DEFAULT_USER_ROLE
+	DEFAULT_USER_ROLE,
+	DEFAULT_IDENTITY_ADMIN_ROLE
 } from "../../defaults.js";
 import type { IEnvironmentVariables } from "../../models/IEnvironmentVariables.js";
 
@@ -64,6 +65,7 @@ export function initialiseMigrations(
 			// to provide access to everything they had before
 			if (roles.includes(DEFAULT_TENANT_ADMIN_ROLE) && roles.includes(DEFAULT_USER_ADMIN_ROLE)) {
 				roles.push(DEFAULT_DEVOPS_ROLE);
+				roles.push(DEFAULT_IDENTITY_ADMIN_ROLE);
 				roles.push(DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE);
 			}
 

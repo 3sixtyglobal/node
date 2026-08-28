@@ -109,7 +109,12 @@ describe("seedAuthorizationDefaults", () => {
 
 		await ContextIdStore.run(nodeContextIds, async () => {
 			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(AUTHORIZATION_MODEL_ID);
+				const { entities: policies } = await authComponent.getAllPolicies(
+					AUTHORIZATION_MODEL_ID,
+					undefined,
+					undefined,
+					1000
+				);
 				for (const route of protectedRoutes) {
 					const auth = route.defaultAuthorization;
 					const operationId = route.operationId;
@@ -238,7 +243,12 @@ describe("seedAuthorizationDefaults", () => {
 
 		await ContextIdStore.run(nodeContextIds, async () => {
 			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(AUTHORIZATION_MODEL_ID);
+				const { entities: policies } = await authComponent.getAllPolicies(
+					AUTHORIZATION_MODEL_ID,
+					undefined,
+					undefined,
+					1000
+				);
 
 				const hasCustomPolicy = policies.some(
 					p => p.subject === "custom-role" && p.object === "custom-op"
@@ -288,7 +298,9 @@ describe("seedAuthorizationDefaults", () => {
 			await platformComponent.execute(async () => {
 				const { entities: policies } = await authComponent.getAllPolicies(
 					AUTHORIZATION_MODEL_ID,
-					"user:read"
+					"user:read",
+					undefined,
+					1000
 				);
 				for (const route of fallbackGetRoutes) {
 					const hasPolicy = policies.some(
@@ -337,7 +349,9 @@ describe("seedAuthorizationDefaults", () => {
 			await platformComponent.execute(async () => {
 				const { entities: policies } = await authComponent.getAllPolicies(
 					AUTHORIZATION_MODEL_ID,
-					"user:write"
+					"user:write",
+					undefined,
+					1000
 				);
 				for (const route of fallbackWriteRoutes) {
 					const hasPolicy = policies.some(
@@ -375,7 +389,12 @@ describe("seedAuthorizationDefaults", () => {
 
 		await ContextIdStore.run(nodeContextIds, async () => {
 			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(AUTHORIZATION_MODEL_ID);
+				const { entities: policies } = await authComponent.getAllPolicies(
+					AUTHORIZATION_MODEL_ID,
+					undefined,
+					undefined,
+					1000
+				);
 				for (const route of skippedRoutes) {
 					const hasPolicy = policies.some(p => p.object === route.operationId);
 					expect(hasPolicy).toBe(false);
@@ -418,7 +437,12 @@ describe("seedAuthorizationDefaults", () => {
 
 		await ContextIdStore.run(nodeContextIds, async () => {
 			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(AUTHORIZATION_MODEL_ID);
+				const { entities: policies } = await authComponent.getAllPolicies(
+					AUTHORIZATION_MODEL_ID,
+					undefined,
+					undefined,
+					1000
+				);
 
 				const hasCustomPolicy = policies.some(
 					p => p.subject === "custom-role" && p.object === "custom-op"

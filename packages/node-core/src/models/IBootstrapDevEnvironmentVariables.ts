@@ -64,7 +64,7 @@ export interface IBootstrapDevEnvironmentVariables {
 
 	/**
 	 * If the admin-user feature is enabled, this is a comma-separated list of roles for the user.
-	 * @default global-admin,tenant-admin,user-admin (tenant-admin only when tenant enabled)
+	 * @default global-admin,tenant-admin,user-admin,identity-admin,identity-profile-admin,devops (tenant-admin only when tenant enabled)
 	 */
 	adminUserRoles?: string;
 }

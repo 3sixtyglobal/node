@@ -344,6 +344,7 @@ describe("node-core", () => {
 		expect(roleAssignments.map(r => r.role).sort()).toEqual([
 			"devops",
 			"global-admin",
+			"identity-admin",
 			"identity-profile-admin",
 			"tenant-admin",
 			"user-admin"
@@ -405,6 +406,7 @@ describe("node-core", () => {
 		expect(roleAssignments.map(r => r.role).sort()).toEqual([
 			"devops",
 			"global-admin",
+			"identity-admin",
 			"identity-profile-admin",
 			"user-admin"
 		]);
