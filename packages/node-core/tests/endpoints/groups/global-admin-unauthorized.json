@@ -10,20 +10,26 @@
 			"capture": { "regularUserDid": "body.id" }
 		},
 		{
-			"description": "POST /authentication/admin/users — create user without global-admin scope",
+			"description": "POST /authentication/admin/users — create user without global-admin role",
 			"method": "POST",
 			"path": "/authentication/admin/users",
 			"body": {
 				"email": "regular-user@node",
 				"password": "Regular@Node12345!",
 				"userIdentity": "{{regularUserDid}}",
-				"organizationIdentity": "{{adminOrgIdentity}}",
-				"scope": ["tenant-admin"]
+				"organizationIdentity": "{{adminOrgIdentity}}"
 			},
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /authentication/login — login as regular user (no global-admin scope)",
+			"description": "POST /authorization/rest/subject/:subject/role — assign tenant-admin role",
+			"method": "POST",
+			"path": "/authorization/rest/subject/{{regularUserDid}}/role",
+			"body": { "role": "tenant-admin" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login — login as regular user (no global-admin role)",
 			"method": "POST",
 			"path": "/authentication/login",
 			"apiKey": true,
@@ -32,7 +38,7 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "POST /aig?override-tenant — rejected without global-admin scope",
+			"description": "POST /aig?override-tenant — rejected without global-admin role",
 			"method": "POST",
 			"path": "/aig?override-tenant={{secondTenantId}}",
 			"body": {
