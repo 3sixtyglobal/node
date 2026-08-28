@@ -3,7 +3,7 @@
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
-import { EntityStorageConnectorType } from "@twin.org/engine-types";
+import { AuthorizationConnectorType, EntityStorageConnectorType } from "@twin.org/engine-types";
 import type { ITelemetryComponent } from "@twin.org/telemetry-models";
 import { CI_ENV_VARS } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
@@ -43,6 +43,7 @@ describe("System metrics E2E", () => {
 				envVars: {
 					TWIN_SILENT: "true",
 					TWIN_PORT: BASE_PORT.toString(),
+					TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 					TWIN_TELEMETRY_CONNECTOR: "entity-storage",
 					// Large interval so only the startup tick fires during the test
