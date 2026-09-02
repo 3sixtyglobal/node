@@ -38,6 +38,12 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
+			"description": "GET /authentication/admin/users — rejected for user-only role",
+			"method": "GET",
+			"path": "/authentication/admin/users",
+			"expectedStatus": 401
+		},
+		{
 			"description": "POST /aig?override-tenant — rejected without global-admin role",
 			"method": "POST",
 			"path": "/aig?override-tenant={{secondTenantId}}",

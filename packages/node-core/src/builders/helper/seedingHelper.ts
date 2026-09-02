@@ -1,6 +1,11 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IBaseRoute, IPlatformComponent, IRouteAuthorization } from "@twin.org/api-models";
+import {
+	TenantEventType,
+	type IBaseRoute,
+	type IPlatformComponent,
+	type IRouteAuthorization
+} from "@twin.org/api-models";
 import type {
 	IAuthorizationComponent,
 	IAuthorizationInheritance,
@@ -138,7 +143,7 @@ export async function seedAuthorizationDefaults(
 	platformComponent.registerTenantEventCallback(
 		"seedAuthorizationDefaults",
 		async (tenantId, eventType) => {
-			if (eventType === "created") {
+			if (eventType === TenantEventType.Created) {
 				await ContextIdStore.run(
 					{ ...nodeContextIds, [ContextIdKeys.Tenant]: tenantId },
 					async () => {
