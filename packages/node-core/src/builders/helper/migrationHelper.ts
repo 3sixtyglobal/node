@@ -100,9 +100,6 @@ export async function finalizeMigrations(
 	envVars: IEnvironmentVariables
 ): Promise<void> {
 	if (Is.arrayValue(migrateRoles)) {
-		// If a migration of the roles from the old authenticated users has just happened
-		// the old roles will be stored in the SharedStore, if they exist then we need
-		// to populate them in the authorization service.
 		const authComponentType = engineCore.getRegisteredInstanceType("authorizationComponent");
 
 		const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(authComponentType);

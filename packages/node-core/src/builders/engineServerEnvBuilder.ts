@@ -269,10 +269,20 @@ export async function buildEngineServerConfiguration(
 		});
 		if (isAuthorizationRequired(envVars)) {
 			serverConfig.types.restRouteProcessor.push({
-				type: RestRouteProcessorType.Authorization
+				type: RestRouteProcessorType.Authorization,
+				options: {
+					config: {
+						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
+					}
+				}
 			});
 			serverConfig.types.socketRouteProcessor.push({
-				type: SocketRouteProcessorType.Authorization
+				type: SocketRouteProcessorType.Authorization,
+				options: {
+					config: {
+						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
+					}
+				}
 			});
 
 			if (tenantEnabled) {

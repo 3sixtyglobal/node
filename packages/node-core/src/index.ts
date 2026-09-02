@@ -5,6 +5,7 @@ export * from "./builders/engineServerEnvBuilder.js";
 export * from "./builders/extensionsBuilder.js";
 export * from "./cli.js";
 export * from "./defaults.js";
+export * from "./models/authorizationModelMode.js";
 export * from "./models/cliCommandParamType.js";
 export * from "./models/IBootstrapDevEnvironmentVariables.js";
 export * from "./models/ICacheMetadata.js";

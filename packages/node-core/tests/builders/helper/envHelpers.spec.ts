@@ -4,6 +4,7 @@ import {
 	commaSeparatedListToArray,
 	envArray,
 	envBoolean,
+	envChoice,
 	envCount,
 	envDateTime,
 	envInteger,
@@ -579,18 +580,48 @@ describe("envString", () => {
 	});
 
 	test("returns defaultValue when env var is absent", () => {
-		expect(envString<{ modelId?: string }>({}, "modelId", "rest")).toBe("rest");
+		expect(envString<{ modelId?: string }>({}, "modelId", "system")).toBe("system");
 	});
 
 	test("returns defaultValue when env var is an empty string", () => {
-		expect(envString({ modelId: "" }, "modelId", "rest")).toBe("rest");
+		expect(envString({ modelId: "" }, "modelId", "system")).toBe("system");
 	});
 
 	test("returns the string value when set", () => {
-		expect(envString({ modelId: "custom" }, "modelId", "rest")).toBe("custom");
+		expect(envString({ modelId: "custom" }, "modelId", "system")).toBe("custom");
 	});
 
 	test("returns the string value with no default", () => {
 		expect(envString({ modelId: "custom" }, "modelId")).toBe("custom");
+	});
+});
+
+describe("envChoice", () => {
+	const choices = ["merge", "replace"] as const;
+
+	test("returns undefined when env var is absent and no default given", () => {
+		expect(envChoice<{ mode?: string }, "merge" | "replace">({}, "mode", choices)).toBeUndefined();
+	});
+
+	test("returns defaultValue when env var is absent", () => {
+		expect(envChoice<{ mode?: string }, "merge" | "replace">({}, "mode", choices, "merge")).toBe(
+			"merge"
+		);
+	});
+
+	test("returns defaultValue when env var is an empty string", () => {
+		expect(envChoice({ mode: "" }, "mode", choices, "merge")).toBe("merge");
+	});
+
+	test("returns the matching choice when set", () => {
+		expect(envChoice({ mode: "replace" }, "mode", choices, "merge")).toBe("replace");
+	});
+
+	test("returns the matching choice with no default", () => {
+		expect(envChoice({ mode: "replace" }, "mode", choices)).toBe("replace");
+	});
+
+	test("throws GeneralError when the value is not one of the choices", () => {
+		expect(() => envChoice({ mode: "unknown" }, "mode", choices, "merge")).toThrow();
 	});
 });

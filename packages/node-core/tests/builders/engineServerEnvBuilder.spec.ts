@@ -34,7 +34,7 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 		expect(socketTypes).toContain(SocketRouteProcessorType.TenantOverride);
 		expect(
 			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.TenantOverride)
-		).toMatchObject({ options: { config: { authorizationModelId: "rest" } } });
+		).toMatchObject({ options: { config: { authorizationModelId: "system" } } });
 	});
 
 	test("passes the configured authorization model to TenantOverride processors", async () => {

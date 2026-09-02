@@ -1,6 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IPlatformComponent, IRouteAuthorization } from "@twin.org/api-models";
+import type { IBaseRoute, IPlatformComponent, IRouteAuthorization } from "@twin.org/api-models";
 import type {
 	IAuthorizationComponent,
 	IAuthorizationInheritance,
@@ -11,12 +11,13 @@ import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
 import { ComponentFactory, Is } from "@twin.org/core";
 import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { HttpMethod } from "@twin.org/web";
-import { envObject, envString } from "./envHelpers.js";
+import { envChoice, envObject, envString } from "./envHelpers.js";
 import {
 	AUTHORIZATION_MODEL_ID,
 	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_USER_ROLE
 } from "../../defaults.js";
+import { AuthorizationModelMode } from "../../models/authorizationModelMode.js";
 import type { IEngineEnvironmentVariables } from "../../models/IEngineEnvironmentVariables.js";
 
 const DEFAULT_AUTHORIZATION_READER: IRouteAuthorization = {
@@ -53,7 +54,12 @@ export async function seedAuthorizationDefaults(
 	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(authComponentType);
 
 	const modelId = envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID);
-	const rulesMode = envVars.authorizationModelMode ?? "merge";
+	const rulesMode = envChoice(
+		envVars,
+		"authorizationModelMode",
+		Object.values(AuthorizationModelMode),
+		AuthorizationModelMode.Merge
+	);
 
 	const customModel = envObject<IEngineEnvironmentVariables, IAuthorizationModel>(
 		envVars,
@@ -79,63 +85,38 @@ export async function seedAuthorizationDefaults(
 		}
 	}
 
-	if (!Is.objectValue(customModel) || rulesMode === "merge") {
+	if (!Is.objectValue(customModel) || rulesMode === AuthorizationModelMode.Merge) {
 		const policyKeys = new Set<string>();
 		const inheritanceKeys = new Set<string>();
 		const roles = new Set<string>();
 
-		const routes = engineServer.getRestRoutes();
-		for (const route of routes) {
-			const requiresAuthorization =
-				route.requiresAuthorization !== false && route.skipAuth !== true;
-			let authorization: IRouteAuthorization | undefined = route.defaultAuthorization;
-
-			// If there are no specific default permissions we provide
-			// a fallback based on the HTTP method for the default "user" role.
-			if (!Is.objectValue<IRouteAuthorization>(authorization) && requiresAuthorization) {
-				if (route.method === HttpMethod.GET) {
-					authorization = DEFAULT_AUTHORIZATION_READER;
-				} else if (
-					route.method === HttpMethod.PUT ||
-					route.method === HttpMethod.POST ||
-					route.method === HttpMethod.PATCH ||
-					route.method === HttpMethod.DELETE
-				) {
-					authorization = DEFAULT_AUTHORIZATION_WRITER;
-				}
+		for (const route of engineServer.getRestRoutes()) {
+			// Determine verb fallback: GET → reader, mutating methods → writer.
+			let fallback: IRouteAuthorization | undefined;
+			if (route.method === HttpMethod.GET) {
+				fallback = DEFAULT_AUTHORIZATION_READER;
+			} else if (
+				route.method === HttpMethod.PUT ||
+				route.method === HttpMethod.POST ||
+				route.method === HttpMethod.PATCH ||
+				route.method === HttpMethod.DELETE
+			) {
+				fallback = DEFAULT_AUTHORIZATION_WRITER;
 			}
+			seedRoute(route, fallback, policies, roleInheritances, policyKeys, inheritanceKeys, roles);
+		}
 
-			if (Is.objectValue<IRouteAuthorization>(authorization)) {
-				const policyKey = `${authorization.permission}|${route.operationId}`;
-				if (!policyKeys.has(policyKey)) {
-					policyKeys.add(policyKey);
-					policies.push({
-						subject: authorization.permission,
-						object: route.operationId,
-						action: "execute"
-					});
-				}
-				if (Is.stringValue(authorization.role)) {
-					const inheritKey = `${authorization.role}|${authorization.permission}`;
-					if (!inheritanceKeys.has(inheritKey)) {
-						inheritanceKeys.add(inheritKey);
-						roleInheritances.push({
-							role: authorization.role,
-							inheritsFrom: authorization.permission
-						});
-					}
-					roles.add(authorization.role);
-				}
-				if (Is.arrayValue(authorization.inherits)) {
-					for (const inheritsFrom of authorization.inherits) {
-						const inheritKey = `${authorization.permission}|${inheritsFrom}`;
-						if (!inheritanceKeys.has(inheritKey)) {
-							inheritanceKeys.add(inheritKey);
-							roleInheritances.push({ role: authorization.permission, inheritsFrom });
-						}
-					}
-				}
-			}
+		for (const route of engineServer.getSocketRoutes()) {
+			// Socket routes have no HTTP method, so fall back to reader for all authenticated routes.
+			seedRoute(
+				route,
+				DEFAULT_AUTHORIZATION_READER,
+				policies,
+				roleInheritances,
+				policyKeys,
+				inheritanceKeys,
+				roles
+			);
 		}
 
 		for (const role of roles) {
@@ -167,4 +148,63 @@ export async function seedAuthorizationDefaults(
 			}
 		}
 	);
+}
+
+/**
+ * Merges a single route's authorization declaration into the shared accumulator sets.
+ * @param route The route to seed authorization for.
+ * @param fallbackAuthorization Authorization to apply when the route declares none.
+ * @param policies The policy accumulator.
+ * @param roleInheritances The role inheritance accumulator.
+ * @param policyKeys Deduplication set for policies.
+ * @param inheritanceKeys Deduplication set for role inheritances.
+ * @param roles Roles collected for escalation processing.
+ */
+function seedRoute(
+	route: IBaseRoute,
+	fallbackAuthorization: IRouteAuthorization | undefined,
+	policies: IAuthorizationPolicy[],
+	roleInheritances: IAuthorizationInheritance[],
+	policyKeys: Set<string>,
+	inheritanceKeys: Set<string>,
+	roles: Set<string>
+): void {
+	const requiresAuthorization = route.requiresAuthorization !== false && route.skipAuth !== true;
+	let authorization: IRouteAuthorization | undefined = route.defaultAuthorization;
+
+	if (!Is.objectValue<IRouteAuthorization>(authorization) && requiresAuthorization) {
+		authorization = fallbackAuthorization;
+	}
+
+	if (Is.objectValue<IRouteAuthorization>(authorization)) {
+		const policyKey = `${authorization.permission}|${route.operationId}`;
+		if (!policyKeys.has(policyKey)) {
+			policyKeys.add(policyKey);
+			policies.push({
+				subject: authorization.permission,
+				object: route.operationId,
+				action: "execute"
+			});
+		}
+		if (Is.stringValue(authorization.role)) {
+			const inheritKey = `${authorization.role}|${authorization.permission}`;
+			if (!inheritanceKeys.has(inheritKey)) {
+				inheritanceKeys.add(inheritKey);
+				roleInheritances.push({
+					role: authorization.role,
+					inheritsFrom: authorization.permission
+				});
+			}
+			roles.add(authorization.role);
+		}
+		if (Is.arrayValue(authorization.inherits)) {
+			for (const inheritsFrom of authorization.inherits) {
+				const inheritKey = `${authorization.permission}|${inheritsFrom}`;
+				if (!inheritanceKeys.has(inheritKey)) {
+					inheritanceKeys.add(inheritKey);
+					roleInheritances.push({ role: authorization.permission, inheritsFrom });
+				}
+			}
+		}
+	}
 }

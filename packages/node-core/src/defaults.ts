@@ -29,7 +29,7 @@ export const AUTH_SIGNING_KEY_ID = "auth-signing";
 /**
  * Default model identifier for authorization.
  */
-export const AUTHORIZATION_MODEL_ID = "rest";
+export const AUTHORIZATION_MODEL_ID = "system";
 
 /**
  * Feature tag identifying the DID context ID handler.

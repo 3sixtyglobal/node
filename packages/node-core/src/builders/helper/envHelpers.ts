@@ -17,6 +17,46 @@ export function envString<T>(envVars: T, key: keyof T, defaultValue?: string): s
 }
 
 /**
+ * Returns an env var constrained to one of the supplied choices, falling back to the supplied default.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to read.
+ * @param choices The permitted values for the env var.
+ * @param defaultValue The value to return when the env var is absent or empty. Omit to return undefined when absent.
+ * @returns The matching choice, the default, or undefined when absent and no default given.
+ * @throws GeneralError if the value is set but is not one of the choices.
+ */
+export function envChoice<T, U extends string>(
+	envVars: T,
+	key: keyof T,
+	choices: readonly U[],
+	defaultValue: U
+): U;
+export function envChoice<T, U extends string>(
+	envVars: T,
+	key: keyof T,
+	choices: readonly U[]
+): U | undefined;
+export function envChoice<T, U extends string>(
+	envVars: T,
+	key: keyof T,
+	choices: readonly U[],
+	defaultValue?: U
+): U | undefined {
+	const value = envVars[key];
+	if (!Is.stringValue(value)) {
+		return defaultValue;
+	}
+	if (!choices.includes(value as U)) {
+		throw new GeneralError("node", "invalidEnvVarValue", {
+			key,
+			value,
+			type: choices.join(" | ")
+		});
+	}
+	return value as U;
+}
+
+/**
  * Coerces an env var to a boolean, falling back to the supplied default when not set.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.

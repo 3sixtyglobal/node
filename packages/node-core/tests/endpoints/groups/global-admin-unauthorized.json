@@ -24,7 +24,7 @@
 		{
 			"description": "POST /authorization/rest/subject/:subject/role — assign tenant-admin role",
 			"method": "POST",
-			"path": "/authorization/rest/subject/{{regularUserDid}}/role",
+			"path": "/authorization/system/subject/{{regularUserDid}}/role",
 			"body": { "role": "tenant-admin" },
 			"expectedStatus": 204
 		},
