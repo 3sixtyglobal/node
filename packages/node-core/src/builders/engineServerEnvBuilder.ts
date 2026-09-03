@@ -28,7 +28,12 @@ import {
 	isTracingEnabled
 } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-import { commaSeparatedListToArray, envKeyIntegerPairs, envString } from "./helper/envHelpers.js";
+import {
+	commaSeparatedListToArray,
+	envInteger,
+	envKeyIntegerPairs,
+	envString
+} from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -247,7 +252,9 @@ export async function buildEngineServerConfiguration(
 			type: AuthenticationComponentType.EntityStorage,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId,
+					minPasswordLength: envInteger(envVars, "authMinPasswordLength"),
+					maxPasswordLength: envInteger(envVars, "authMaxPasswordLength")
 				}
 			}
 		});

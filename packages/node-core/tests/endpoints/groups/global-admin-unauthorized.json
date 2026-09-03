@@ -22,7 +22,7 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /authorization/rest/subject/:subject/role — assign tenant-admin role",
+			"description": "POST /authorization/system/subject/:subject/role — assign tenant-admin role",
 			"method": "POST",
 			"path": "/authorization/system/subject/{{regularUserDid}}/role",
 			"body": { "role": "tenant-admin" },
@@ -38,9 +38,9 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "GET /authentication/admin/users — rejected for user-only role",
+			"description": "GET /authentication/admin/users/:email — rejected for user-only role",
 			"method": "GET",
-			"path": "/authentication/admin/users",
+			"path": "/authentication/admin/users/{{adminEmail}}",
 			"expectedStatus": 401
 		},
 		{

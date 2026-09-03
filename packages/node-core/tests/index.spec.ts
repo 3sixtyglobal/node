@@ -534,6 +534,7 @@ describe("node-core", () => {
 			"POST     /authentication/logout",
 			"POST     /authentication/refresh",
 			"PUT      /authentication/password",
+			"GET      /authentication/policy",
 			"POST     /authentication/admin/users",
 			"PUT      /authentication/admin/users/:email",
 			"PUT      /authentication/admin/users/:email/password",

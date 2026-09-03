@@ -23,6 +23,8 @@ const engineServerEnvironmentVariableKeysInternal: {
 	authProcessorType: true,
 	authSigningKeyId: true,
 	authApiKeyHeader: true,
+	authMinPasswordLength: true,
+	authMaxPasswordLength: true,
 	// IEngineServerEnvironmentVariables - routing
 	mimeTypeProcessors: true,
 	routeLoggingIncludeBody: true,

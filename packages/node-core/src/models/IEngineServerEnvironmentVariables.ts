@@ -66,6 +66,16 @@ export interface IEngineServerEnvironmentVariables {
 	authApiKeyHeader?: string;
 
 	/**
+	 * The minimum password length for new password validation.
+	 */
+	authMinPasswordLength?: string;
+
+	/**
+	 * The maximum password length for new password validation.
+	 */
+	authMaxPasswordLength?: string;
+
+	/**
 	 * Additional MIME type processors to include, comma separated.
 	 */
 	mimeTypeProcessors?: string;

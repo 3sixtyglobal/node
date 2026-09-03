@@ -4,49 +4,49 @@
 		{
 			"description": "POST /authorization/check — 400 missing subject",
 			"method": "POST",
-			"path": "/authorization/rest/check",
+			"path": "/authorization/system/check",
 			"body": { "object": "/data", "action": "read" },
 			"expectedStatus": 400
 		},
 		{
 			"description": "POST /authorization/policy — 400 missing object",
 			"method": "POST",
-			"path": "/authorization/rest/policy",
+			"path": "/authorization/system/policy",
 			"body": { "subject": "test-subject", "action": "read" },
 			"expectedStatus": 400
 		},
 		{
 			"description": "POST /authorization/policy — add policy",
 			"method": "POST",
-			"path": "/authorization/rest/policy",
+			"path": "/authorization/system/policy",
 			"body": { "subject": "test-subject", "object": "/data", "action": "read" },
 			"expectedStatus": 204
 		},
 		{
 			"description": "POST /authorization/policy — add second policy",
 			"method": "POST",
-			"path": "/authorization/rest/policy",
+			"path": "/authorization/system/policy",
 			"body": { "subject": "test-subject", "object": "/data", "action": "write" },
 			"expectedStatus": 204
 		},
 		{
 			"description": "GET /authorization/policy — list all policies",
 			"method": "GET",
-			"path": "/authorization/rest/policy",
+			"path": "/authorization/system/policy",
 			"expectedStatus": 200,
 			"assert": { "body.entities": "isDefined" }
 		},
 		{
 			"description": "GET /authorization/policy/:subject — get policies for subject",
 			"method": "GET",
-			"path": "/authorization/rest/policy/test-subject",
+			"path": "/authorization/system/policy/test-subject",
 			"expectedStatus": 200,
 			"assert": { "body.entities": "isDefined" }
 		},
 		{
 			"description": "POST /authorization/check — allowed after policy added",
 			"method": "POST",
-			"path": "/authorization/rest/check",
+			"path": "/authorization/system/check",
 			"body": { "subject": "test-subject", "object": "/data", "action": "read" },
 			"expectedStatus": 200,
 			"assert": { "body.allowed": true }
@@ -54,7 +54,7 @@
 		{
 			"description": "POST /authorization/check — not allowed for unknown action",
 			"method": "POST",
-			"path": "/authorization/rest/check",
+			"path": "/authorization/system/check",
 			"body": { "subject": "test-subject", "object": "/data", "action": "delete" },
 			"expectedStatus": 200,
 			"assert": { "body.allowed": false }
@@ -62,116 +62,116 @@
 		{
 			"description": "POST /authorization/policy/remove — remove one policy",
 			"method": "POST",
-			"path": "/authorization/rest/policy/remove",
+			"path": "/authorization/system/policy/remove",
 			"body": { "subject": "test-subject", "object": "/data", "action": "write" },
 			"expectedStatus": 204
 		},
 		{
 			"description": "GET /authorization/roles — list all roles (empty initially)",
 			"method": "GET",
-			"path": "/authorization/rest/roles",
+			"path": "/authorization/system/roles",
 			"expectedStatus": 200,
 			"assert": { "body.roles": "isDefined" }
 		},
 		{
 			"description": "POST /authorization/subject/:subject/role — 400 missing role",
 			"method": "POST",
-			"path": "/authorization/rest/subject/test-subject/role",
+			"path": "/authorization/system/subject/test-subject/role",
 			"body": {},
 			"expectedStatus": 400
 		},
 		{
 			"description": "POST /authorization/subject/:subject/role — add editor role",
 			"method": "POST",
-			"path": "/authorization/rest/subject/test-subject/role",
+			"path": "/authorization/system/subject/test-subject/role",
 			"body": { "role": "editor" },
 			"expectedStatus": 204
 		},
 		{
 			"description": "POST /authorization/subject/:subject/role — add viewer role",
 			"method": "POST",
-			"path": "/authorization/rest/subject/test-subject/role",
+			"path": "/authorization/system/subject/test-subject/role",
 			"body": { "role": "viewer" },
 			"expectedStatus": 204
 		},
 		{
 			"description": "GET /authorization/subject/:subject/roles — get roles for subject",
 			"method": "GET",
-			"path": "/authorization/rest/subject/test-subject/roles",
+			"path": "/authorization/system/subject/test-subject/roles",
 			"expectedStatus": 200,
 			"assert": { "body.roles": "isDefined" }
 		},
 		{
 			"description": "GET /authorization/subject/:subject/role/:role — has editor role",
 			"method": "GET",
-			"path": "/authorization/rest/subject/test-subject/role/editor",
+			"path": "/authorization/system/subject/test-subject/role/editor",
 			"expectedStatus": 200,
 			"assert": { "body.hasRole": true }
 		},
 		{
 			"description": "GET /authorization/subject/:subject/role/:role — does not have admin role",
 			"method": "GET",
-			"path": "/authorization/rest/subject/test-subject/role/admin",
+			"path": "/authorization/system/subject/test-subject/role/admin",
 			"expectedStatus": 200,
 			"assert": { "body.hasRole": false }
 		},
 		{
 			"description": "GET /authorization/role/:role/subjects — get subjects for editor role",
 			"method": "GET",
-			"path": "/authorization/rest/role/editor/subjects",
+			"path": "/authorization/system/role/editor/subjects",
 			"expectedStatus": 200,
 			"assert": { "body.subjects": "isDefined" }
 		},
 		{
 			"description": "DELETE /authorization/subject/:subject/role/:role — remove viewer role",
 			"method": "DELETE",
-			"path": "/authorization/rest/subject/test-subject/role/viewer",
+			"path": "/authorization/system/subject/test-subject/role/viewer",
 			"expectedStatus": 204
 		},
 		{
 			"description": "GET /authorization/subject/:subject/role/:role — no longer has viewer role",
 			"method": "GET",
-			"path": "/authorization/rest/subject/test-subject/role/viewer",
+			"path": "/authorization/system/subject/test-subject/role/viewer",
 			"expectedStatus": 200,
 			"assert": { "body.hasRole": false }
 		},
 		{
 			"description": "POST /authorization/role/:role/inherit — add inheritance editor inherits viewer",
 			"method": "POST",
-			"path": "/authorization/rest/role/editor/inherit",
+			"path": "/authorization/system/role/editor/inherit",
 			"body": { "inheritsFrom": "viewer" },
 			"expectedStatus": 204
 		},
 		{
 			"description": "GET /authorization/role/:role/parents — get parent roles for editor",
 			"method": "GET",
-			"path": "/authorization/rest/role/editor/parents",
+			"path": "/authorization/system/role/editor/parents",
 			"expectedStatus": 200,
 			"assert": { "body.roles": "isDefined" }
 		},
 		{
 			"description": "GET /authorization/role/:role/children — get child roles for viewer",
 			"method": "GET",
-			"path": "/authorization/rest/role/viewer/children",
+			"path": "/authorization/system/role/viewer/children",
 			"expectedStatus": 200,
 			"assert": { "body.roles": "isDefined" }
 		},
 		{
 			"description": "DELETE /authorization/role/:role/inherit/:inheritsFrom — remove inheritance",
 			"method": "DELETE",
-			"path": "/authorization/rest/role/editor/inherit/viewer",
+			"path": "/authorization/system/role/editor/inherit/viewer",
 			"expectedStatus": 204
 		},
 		{
 			"description": "DELETE /authorization/subject/:subject/roles — remove all roles for subject",
 			"method": "DELETE",
-			"path": "/authorization/rest/subject/test-subject/roles",
+			"path": "/authorization/system/subject/test-subject/roles",
 			"expectedStatus": 204
 		},
 		{
 			"description": "GET /authorization/subject/:subject/roles — empty after remove all",
 			"method": "GET",
-			"path": "/authorization/rest/subject/test-subject/roles",
+			"path": "/authorization/system/subject/test-subject/roles",
 			"expectedStatus": 200,
 			"assert": { "body.roles": "isDefined" }
 		}
