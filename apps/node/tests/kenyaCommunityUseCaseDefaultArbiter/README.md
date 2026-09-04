@@ -49,3 +49,49 @@ docker compose up -d
 ./provision-storage.sh    # seed the 4 publisher offers/datasets
 ./kenya-usecase-test.sh   # Phases 1-7 (discover/negotiate/pull/aggregate) + Phases 8-10 (gate deny/accept)
 ```
+
+## Testing a published image
+
+By default the image is built from this checkout's `node_modules`. To run the scaffold
+against a published `twinfoundation/twin-node` image instead (first used to verify the
+0.9.3 hotfix, twin-dataspace #362), vendor the test-app extension the scaffold needs and
+select `Dockerfile.image`:
+
+```bash
+mkdir -p vendor && cd vendor \
+  && npm pack @twin.org/dataspace-test-app@0.9.3 --silent && tar -xzf *.tgz \
+  && mv package dataspace-test-app && rm -f *.tgz && cd ..
+export KENYA_DOCKERFILE=apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile.image
+export TWIN_NODE_IMAGE=twinfoundation/twin-node:0.9.3   # any published tag
+./setup.sh --clean && docker compose up -d && ./provision-storage.sh && ./kenya-usecase-test.sh
+```
+
+`scripts/dsp-client.mjs` runs on the host and needs `@twin.org/dataspace-control-plane-rest-client`
+resolvable from this directory (the repo's `node_modules` on a normal checkout).
+
+## MySQL-backed run (the connector RC/Production use)
+
+`docker-compose.mysql.yml` swaps the node's entity storage from `file` to `mysql` (a `mysql:8.4`
+service with a healthcheck, fresh volume per `./setup.sh --clean`). Opt in with two variables
+before any `docker compose` / script call; everything else runs unchanged, and
+`provision-storage.sh` reads its tenant-attribution proof from the DB when no file store exists:
+
+```bash
+export COMPOSE_FILE=docker-compose.yml:docker-compose.mysql.yml
+export KENYA_START_SERVICES=twin-kenya-mysql   # setup.sh starts the DB before the CLI bootstrap
+./setup.sh --clean && docker compose up -d && ./provision-storage.sh && ./kenya-usecase-test.sh && ./option3-test.sh
+```
+
+Combine with `KENYA_DOCKERFILE`/`TWIN_NODE_IMAGE` above to run a published image on MySQL
+(done for 0.9.3 on 2026-09-04: 13 phases + option 3 green, PAP paging on the SQL connector).
+
+## Option 3: twin-dataspace #362 reproduction
+
+`./option3-test.sh` (after the run above) reproduces both halves of #362 against the live
+node: Phase 13 seeds more than one PAP page of agreements for the KRA/Trader/dataset triple
+and checks that the in-process `negotiateAgreement` reuses the NEWEST one (page 2, then a
+freshly minted real one); Phase 14 seeds a stale newest agreement, runs `prepareTransfer`,
+and checks the provider rejection, the consumer prune (`unknownAtProvider`, PAP 404) and the
+recovery to the real agreement. Both in-process methods are reached through
+`probe/option3-probe.mjs`, loaded as a `TWIN_EXTENSIONS` entry in one-shot `docker compose run`
+node processes that share the scaffold's data volume; each probe writes `.option3-probe-<n>.log`.

@@ -4,7 +4,12 @@ services:
       # Context is the twin-node repo root — the image consumes only the published npm
       # packages in twin-node/node_modules, so no cross-submodule paths are needed.
       context: ../../../..
-      dockerfile: apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile
+      # Default: build from this checkout's node_modules. To test a PUBLISHED image instead
+      # (see README "Testing a published image"), export
+      #   KENYA_DOCKERFILE=apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile.image
+      dockerfile: ${KENYA_DOCKERFILE:-apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile}
+      args:
+        TWIN_NODE_IMAGE: ${TWIN_NODE_IMAGE:-twinfoundation/twin-node:0.9.3}
     container_name: twin-kenya-defaultarb-node
     ports:
       - '3042:3000'

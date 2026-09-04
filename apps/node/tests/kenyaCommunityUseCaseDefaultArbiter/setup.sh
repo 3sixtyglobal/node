@@ -89,6 +89,12 @@ fi
 echo ""
 echo -e "${BOLD}Step 1: Build Docker image${NC}"
 docker compose build || fail "Docker build failed"
+# Opt-in: start backing services (e.g. the MySQL variant, docker-compose.mysql.yml) before the
+# CLI bootstrap below, whose first `docker compose run --no-deps` would otherwise find them down.
+if [ -n "${KENYA_START_SERVICES:-}" ]; then
+    step "Starting backing services: ${KENYA_START_SERVICES}"
+    docker compose up -d --wait ${KENYA_START_SERVICES} || fail "Backing services failed to start"
+fi
 ok "Image built"
 
 # -------------------------------------------------------------------------
@@ -114,7 +120,7 @@ if echo "${existing_state}" | grep -q "nodeId"; then
 else
     set +e
     if [ -n "${TWIN_KENYA_NODE_MNEMONIC}" ]; then
-        # bootstrap-legacy mints THREE identities: node, organization, admin user.
+        # bootstrap-dev mints THREE identities: node, organization, admin user.
         # Each call goes through identityCreate → generateWallet (because
         # node-wallet feature is enabled), which calls ensureBalance against the
         # mnemonic's derived address. With a pre-funded mnemonic, ensureBalance
@@ -127,10 +133,10 @@ else
             -e TWIN_NODE_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC}" \
             -e TWIN_ORGANIZATION_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC}" \
             -e TWIN_ADMIN_USER_MNEMONIC="${TWIN_KENYA_NODE_MNEMONIC}" \
-            twin-kenya-defaultarb-node node src/index.js bootstrap-legacy 2>&1 | tee "${bootstrap_tmp}"
+            twin-kenya-defaultarb-node node src/index.js bootstrap-dev 2>&1 | tee "${bootstrap_tmp}"
     else
         step "No TWIN_KENYA_NODE_MNEMONIC set — minting fresh node DID via faucet"
-        docker compose run --rm -T twin-kenya-defaultarb-node node src/index.js bootstrap-legacy 2>&1 | tee "${bootstrap_tmp}"
+        docker compose run --rm -T twin-kenya-defaultarb-node node src/index.js bootstrap-dev 2>&1 | tee "${bootstrap_tmp}"
     fi
     exit_code=$?
     set -e

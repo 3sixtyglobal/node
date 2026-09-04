@@ -1,0 +1,37 @@
+# MySQL-backed variant of the scaffold (the connector the supply-chain RC/Production nodes use).
+# Opt in by exporting, before ANY docker compose / ./setup.sh call:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.mysql.yml
+#   KENYA_START_SERVICES=twin-kenya-mysql   # setup.sh starts it before the CLI bootstrap
+# Everything else (setup, provision, tests, option3) runs unchanged. Uses a fresh volume per
+# `./setup.sh --clean`, so MYSQL_DATABASE/root init always applies.
+services:
+  twin-kenya-mysql:
+    image: mysql:8.4
+    container_name: twin-kenya-defaultarb-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: twin_kenya
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-uroot', '-ppassword']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - kenya-defaultarb-mysql:/var/lib/mysql
+    networks:
+      - twin-kenya-defaultarb-network
+
+  twin-kenya-defaultarb-node:
+    depends_on:
+      twin-kenya-mysql:
+        condition: service_healthy
+    environment:
+      TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: mysql
+      TWIN_MY_SQL_HOST: twin-kenya-mysql
+      TWIN_MY_SQL_PORT: '3306'
+      TWIN_MY_SQL_USER: root
+      TWIN_MY_SQL_PASSWORD: password
+      TWIN_MY_SQL_DATABASE: twin_kenya
+
+volumes:
+  kenya-defaultarb-mysql:

@@ -255,6 +255,12 @@ const store = JSON.parse(fs.readFileSync('/app/data/dataspace-app-dataset/store.
 const entry = store.find(e => e.id === '${dataset_id}');
 process.stdout.write(JSON.stringify({ organizationIdentity: entry?.organizationIdentity ?? '', tenantId: entry?.tenantId ?? '' }));
 " 2>/dev/null || true)
+    # MySQL-backed run (docker-compose.mysql.yml): no file store, read the same columns from the DB.
+    if [ -z "${recaptured}" ] && docker ps --format '{{.Names}}' | grep -qx "${KENYA_MYSQL_CONTAINER:-twin-kenya-defaultarb-mysql}"; then
+        recaptured=$(docker exec "${KENYA_MYSQL_CONTAINER:-twin-kenya-defaultarb-mysql}" mysql -u"${KENYA_MYSQL_USER:-root}" -p"${KENYA_MYSQL_PASSWORD:-password}" -N -e \
+            "SELECT organizationIdentity, tenantId FROM \`${KENYA_MYSQL_DATABASE:-twin_kenya}\`.\`dataspace-app-dataset\` WHERE id='${dataset_id}';" 2>/dev/null \
+            | head -1 | jq -R 'split("\t") | { organizationIdentity: (.[0] // ""), tenantId: (.[1] // "") }' -c || true)
+    fi
     local recaptured_org recaptured_tenant
     recaptured_org=$(echo "${recaptured}" | jq -r '.organizationIdentity // empty')
     recaptured_tenant=$(echo "${recaptured}" | jq -r '.tenantId // empty')

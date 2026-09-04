@@ -1,0 +1,9 @@
+# Variant of ./Dockerfile that tests a PUBLISHED node image instead of the branch's
+# node_modules: everything comes from twinfoundation/twin-node:<tag> (build arg
+# TWIN_NODE_IMAGE, selected via KENYA_DOCKERFILE in docker-compose.yml), plus the two
+# test-only additions the scaffold needs (consignments + the dataspace-test-app
+# extension, vendored from npm into ./vendor before the build, see README).
+ARG TWIN_NODE_IMAGE=twinfoundation/twin-node:0.9.3
+FROM ${TWIN_NODE_IMAGE}
+COPY apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/consignments.json /app/consignments.json
+COPY apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/vendor/dataspace-test-app /app/node_modules/@twin.org/dataspace-test-app/

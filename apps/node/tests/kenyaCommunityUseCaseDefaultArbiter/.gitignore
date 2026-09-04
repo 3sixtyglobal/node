@@ -8,3 +8,5 @@
 .publishers
 194-trust-mode-findings.md
 findings-from-second-run.md
+vendor/
+.option3-probe-*.log
