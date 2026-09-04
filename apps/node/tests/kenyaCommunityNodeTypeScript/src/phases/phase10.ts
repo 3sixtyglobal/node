@@ -3,7 +3,7 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Converter } from "@twin.org/core";
+import { Converter, Is } from "@twin.org/core";
 import { Blake2b } from "@twin.org/crypto";
 import {
 	DataspaceProtocolCatalogTypes,
@@ -132,7 +132,7 @@ export async function runPhase10(context: IKenyaContext): Promise<void> {
 	const auth = makeAuthenticationClient(context.host, context.kraApiKey);
 	const login = await auth.login(context.kraUserEmail, context.kraUserPassword);
 	assert(
-		typeof login.token === "string" && login.token.length > 0,
+		Is.stringValue(login.token),
 		"KRA re-logged in after restart",
 		"KRA re-login after restart failed"
 	);
@@ -156,8 +156,8 @@ export async function runPhase10(context: IKenyaContext): Promise<void> {
 	}
 	const ds = dataset as unknown as { [key: string]: unknown };
 	const actualPublisher =
-		(typeof ds["dct:publisher"] === "string" && ds["dct:publisher"]) ||
-		(typeof ds["dcterms:publisher"] === "string" && ds["dcterms:publisher"]) ||
+		(Is.string(ds["dct:publisher"]) && ds["dct:publisher"]) ||
+		(Is.string(ds["dcterms:publisher"]) && ds["dcterms:publisher"]) ||
 		"";
 
 	info(`Actual publisher: ${actualPublisher}`);

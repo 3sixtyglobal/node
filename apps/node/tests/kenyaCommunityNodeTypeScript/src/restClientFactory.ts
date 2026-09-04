@@ -5,6 +5,7 @@ import {
 	type IEntityStorageAuthenticationRestClientConstructorOptions
 } from "@twin.org/api-auth-entity-storage-rest-client";
 import type { IBaseRestClientConfig } from "@twin.org/api-models";
+import { Is } from "@twin.org/core";
 import { DataspaceControlPlaneRestClient } from "@twin.org/dataspace-control-plane-rest-client";
 import { FederatedCatalogueRestClient } from "@twin.org/federated-catalogue-rest-client";
 import {
@@ -57,7 +58,7 @@ export interface ITenantCredentials {
  * @returns The endpoint URL.
  */
 function buildEndpoint(host: string, encTenantToken?: string): string {
-	if (typeof encTenantToken !== "string" || encTenantToken.length === 0) {
+	if (!Is.stringValue(encTenantToken)) {
 		return host;
 	}
 	return `${host}?x-enc-tenant-token=${encodeURIComponent(encTenantToken)}`;
@@ -80,15 +81,14 @@ function buildEndpoint(host: string, encTenantToken?: string): string {
  * @returns The headers to send.
  */
 function buildHeaders(credentials: ITenantCredentials): { [key: string]: string } {
-	const isCrossTenant =
-		typeof credentials.encTenantToken === "string" && credentials.encTenantToken.length > 0;
+	const isCrossTenant = Is.stringValue(credentials.encTenantToken);
 	if (isCrossTenant) {
 		return {};
 	}
 	const headers: { [key: string]: string } = {
 		"x-api-key": credentials.apiKey
 	};
-	if (typeof credentials.sessionJwt === "string" && credentials.sessionJwt.length > 0) {
+	if (Is.stringValue(credentials.sessionJwt)) {
 		headers.cookie = `access_token=${credentials.sessionJwt}`;
 	}
 	return headers;

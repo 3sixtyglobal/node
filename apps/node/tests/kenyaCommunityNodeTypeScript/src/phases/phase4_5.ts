@@ -1,5 +1,6 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { Is } from "@twin.org/core";
 import type { IPolicyNegotiation } from "@twin.org/rights-management-models";
 import {
 	DataspaceProtocolContexts,
@@ -56,7 +57,7 @@ function urn(prefix: string): string {
  */
 function traderToKraCredentials(context: IKenyaContext): ITenantCredentials {
 	const encToken = context.kraTenantToken;
-	if (typeof encToken !== "string" || encToken.length === 0) {
+	if (!Is.stringValue(encToken)) {
 		throw new Error("Phase 3 did not populate context.kraTenantToken");
 	}
 	return {
@@ -210,7 +211,7 @@ async function runPhase5(
 	}
 
 	assert(
-		typeof finalState === "string",
+		Is.string(finalState),
 		`Negotiation completed (state: ${finalState ?? "<unknown>"})`,
 		`Negotiation did not reach FINALIZED (last seen: ${lastState ?? "<unknown>"})`
 	);

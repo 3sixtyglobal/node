@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { Is } from "@twin.org/core";
 
 /**
  * The set of KEY=VALUE entries parsed from one of the kenya scaffold's dotfiles.
@@ -81,7 +82,7 @@ export async function readAllDotFiles(scaffoldDir: string): Promise<DotEnv> {
  */
 export function required(env: DotEnv, key: string): string {
 	const value = env[key];
-	if (typeof value !== "string" || value.length === 0) {
+	if (!Is.stringValue(value)) {
 		throw new Error(`Missing required dotfile value: ${key}`);
 	}
 	return value;

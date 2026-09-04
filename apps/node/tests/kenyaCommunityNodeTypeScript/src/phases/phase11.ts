@@ -1,6 +1,6 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { BaseError } from "@twin.org/core";
+import { BaseError, Is } from "@twin.org/core";
 import { assert, assertEquals } from "../assert.js";
 import type { IKenyaContext } from "../context.js";
 import { fail, info, ok, phase, step, warn } from "../logger.js";
@@ -33,11 +33,11 @@ const ERROR_NAME_STATUS: { [key: string]: number } = {
 
 function statusFromError(err: unknown): number {
 	const candidates: unknown[] = [err];
-	if (err && typeof err === "object" && "cause" in err) {
+	if (Is.object(err) && "cause" in err) {
 		candidates.push((err as { cause?: unknown }).cause);
 	}
 	for (const candidate of candidates) {
-		if (candidate && typeof candidate === "object") {
+		if (Is.object(candidate)) {
 			const obj = candidate as {
 				properties?: { httpStatus?: number };
 				httpStatus?: number;
@@ -46,16 +46,16 @@ function statusFromError(err: unknown): number {
 				toJsonObject?: () => { properties?: { httpStatus?: number } };
 			};
 			const direct = obj.properties?.httpStatus ?? obj.httpStatus ?? obj.statusCode;
-			if (typeof direct === "number") {
+			if (Is.number(direct)) {
 				return direct;
 			}
-			if (typeof obj.toJsonObject === "function") {
+			if (Is.function(obj.toJsonObject)) {
 				const dumped = obj.toJsonObject();
-				if (typeof dumped?.properties?.httpStatus === "number") {
+				if (Is.number(dumped?.properties?.httpStatus)) {
 					return dumped.properties.httpStatus;
 				}
 			}
-			if (typeof obj.name === "string" && ERROR_NAME_STATUS[obj.name] !== undefined) {
+			if (Is.string(obj.name) && ERROR_NAME_STATUS[obj.name] !== undefined) {
 				return ERROR_NAME_STATUS[obj.name];
 			}
 		}
@@ -101,7 +101,7 @@ export async function runPhase11(context: IKenyaContext): Promise<void> {
 	const traderAuth = makeAuthenticationClient(context.host, context.traderApiKey);
 	const traderLogin = await traderAuth.login(context.traderUserEmail, context.traderUserPassword);
 	assert(
-		typeof traderLogin.token === "string" && traderLogin.token.length > 0,
+		Is.stringValue(traderLogin.token),
 		"Trader re-logged in after restart",
 		"Trader re-login after restart failed"
 	);

@@ -1,5 +1,6 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { Is } from "@twin.org/core";
 import { fail, ok } from "./logger.js";
 
 /**
@@ -41,9 +42,5 @@ export function assertEquals<T>(actual: T, expected: T, description: string): vo
  * @param description Human-readable description of what is being asserted.
  */
 export function assertNonEmpty(value: string | undefined | null, description: string): void {
-	assert(
-		typeof value === "string" && value.length > 0,
-		description,
-		`${description}: value is empty/undefined`
-	);
+	assert(Is.stringValue(value), description, `${description}: value is empty/undefined`);
 }

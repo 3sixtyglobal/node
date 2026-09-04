@@ -62,7 +62,7 @@ TRUST_JWT=$(echo "${API_BODY}" | jq -r '.verifiableCredentialJwt // .jwt // empt
 [ -n "${TRUST_JWT}" ] && ok "trust VC minted (${API_STATUS})" || warn "trust VC mint failed (${API_STATUS}): $(echo "${API_BODY}" | head -c 120)"
 
 step "Federated catalogue query (fc_queries_executed?)"
-api POST "/federated-catalogue/request" "${TRADER_DID}" "${TRADER_SESS}" \
+api POST "/catalog/request" "${TRADER_DID}" "${TRADER_SESS}" \
     "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}" \
     "Authorization: Bearer ${TRUST_JWT}"
 [ "${API_STATUS}" = "200" ] && ok "catalogue query (${API_STATUS})" || warn "catalogue query (${API_STATUS})"
@@ -164,7 +164,7 @@ st1=${API_STATUS}
 
 step "FC dataset removal (fc_datasets_removed) — removes AFA's offer; rerun provision-storage.sh to restore"
 if [ -n "${AFA_DATASET_ID-}" ]; then
-    api DELETE "/federated-catalogue/datasets/$(urlenc "${AFA_DATASET_ID}")" "${AFA_DID}" \
+    api DELETE "/catalog/datasets/$(urlenc "${AFA_DATASET_ID}")" "${AFA_DID}" \
         "$(login "${TENANT_AFA_API_KEY}" "${TENANT_AFA_USER_EMAIL}" "${TENANT_AFA_USER_PASSWORD}")"
     [ "${API_STATUS}" -lt 400 ] && ok "AFA dataset removed (fc_datasets_removed)" || warn "dataset remove (${API_STATUS}): $(echo "${API_BODY}" | head -c 150)"
 else

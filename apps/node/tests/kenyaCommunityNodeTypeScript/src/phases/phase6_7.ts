@@ -1,5 +1,6 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { Is } from "@twin.org/core";
 import {
 	DataspaceProtocolContexts,
 	DataspaceProtocolTransferProcessTypes,
@@ -32,7 +33,7 @@ function urn(prefix: string): string {
  */
 function traderToKraCredentials(context: IKenyaContext): ITenantCredentials {
 	const encToken = context.kraTenantToken;
-	if (typeof encToken !== "string" || encToken.length === 0) {
+	if (!Is.stringValue(encToken)) {
 		throw new Error("Phase 3 did not populate context.kraTenantToken");
 	}
 	return {
@@ -170,10 +171,7 @@ async function runPhase7(
 	const authEntry = (startResp.dataAddress?.endpointProperties ?? []).find(
 		ep => ep.name === "authorization"
 	);
-	const dataToken =
-		authEntry && typeof authEntry.value === "string" && authEntry.value.length > 0
-			? authEntry.value
-			: context.traderTrustJwt;
+	const dataToken = Is.stringValue(authEntry?.value) ? authEntry.value : context.traderTrustJwt;
 	if (authEntry === undefined) {
 		warn("No data access token in dataAddress; falling back to TRADER_TRUST_JWT");
 	}

@@ -161,7 +161,7 @@ assert_trust_identity_only "KRA"    "${KRA_TRUST_JWT}"    "${KRA_DID}"
 # ============================================================================
 phase 1 "Trader discovers all four publisher datasets in the shared catalogue"
 # ============================================================================
-catalog_resp=$(curl -sS -X POST "${HOST}/federated-catalogue/request?organization=${TRADER_ORG_ENC}" \
+catalog_resp=$(curl -sS -X POST "${HOST}/catalog/request?organization=${TRADER_ORG_ENC}" \
     -H "Content-Type: application/json" \
     -H "Cookie: access_token=${TRADER_SESSION_JWT}" \
     -H "Authorization: Bearer ${TRADER_TRUST_JWT}" \
@@ -330,7 +330,7 @@ negotiate_and_pull() {
     transfer_msg=$(jq -c -n \
         --arg ctx "${DSP_CONTEXT}" --arg consumerPid "${dsp_pid}" --arg agreementId "${agreement_id}" \
         --arg callbackAddress "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
-        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "Http-Pull-Query-Format", callbackAddress: $callbackAddress }')
+        '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpData-PULL", callbackAddress: $callbackAddress }')
     tr_resp=$(node scripts/dsp-client.mjs requestTransfer \
         --host "${HOST}" --organization "${pub_org}" --trust-payload "${TRADER_TRUST_JWT}" --body "${transfer_msg}")
     [ "$(echo "${tr_resp}" | jq -r '.ok')" = "true" ] \
@@ -433,7 +433,7 @@ push_neg_msg=$(jq -c -n \
     --arg agreementId "${AGREEMENT_KRA}" \
     --arg callbackAddress "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
     --arg inbox "${INTERNAL_URL}/dataspace/inbox" \
-    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpData-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
 push_neg_resp=$(node scripts/dsp-client.mjs requestTransfer \
     --host "${HOST}" \
     --organization "${PUB_ORG_KRA}" \
@@ -483,7 +483,7 @@ push_pos_msg=$(jq -c -n \
     --arg agreementId "${AGREEMENT_KRA}" \
     --arg callbackAddress "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
     --arg inbox "${INTERNAL_URL}/dataspace/inbox?organization=${TRADER_ORG_ENC}" \
-    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpProxy-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $consumerPid, agreementId: $agreementId, format: "HttpData-PUSH", callbackAddress: $callbackAddress, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
 push_pos_resp=$(node scripts/dsp-client.mjs requestTransfer \
     --host "${HOST}" \
     --organization "${PUB_ORG_KRA}" \
@@ -651,7 +651,7 @@ C9_PUSH_PID="urn:uuid:trader-kra-c9-push-$(date +%s)-${RANDOM}"
 c9_req=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C9_PUSH_PID}" --arg ag "${C9_AGREEMENT}" \
     --arg cb "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
     --arg inbox "${INTERNAL_URL}/dataspace/inbox?organization=${TRADER_ORG_ENC}" \
-    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpProxy-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpData-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
 c9_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --organization "${PUB_ORG_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c9_req}")
 [ "$(echo "${c9_req_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 9 requestTransfer failed: $(echo "${c9_req_resp}" | jq -r '.errorMessage')"
 c9_push_prov=$(echo "${c9_req_resp}" | jq -r '.body.providerPid // empty')
@@ -743,7 +743,7 @@ C10_PUSH_PID="urn:uuid:trader-kra-c10-push-$(date +%s)-${RANDOM}"
 c10_req=$(jq -c -n --arg ctx "${DSP_CONTEXT}" --arg cp "${C10_PUSH_PID}" --arg ag "${C10_AGREEMENT}" \
     --arg cb "${INTERNAL_URL}/dataspace?organization=${TRADER_ORG_ENC}" \
     --arg inbox "${INTERNAL_URL}/dataspace/inbox?organization=${TRADER_ORG_ENC}" \
-    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpProxy-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
+    '{ "@context": [$ctx], "@type": "TransferRequestMessage", consumerPid: $cp, agreementId: $ag, format: "HttpData-PUSH", callbackAddress: $cb, dataAddress: { "@type": "DataAddress", endpointType: "https", endpoint: $inbox } }')
 c10_req_resp=$(node scripts/dsp-client.mjs requestTransfer --host "${HOST}" --organization "${PUB_ORG_KRA}" --trust-payload "${TRADER_TRUST_JWT}" --body "${c10_req}")
 [ "$(echo "${c10_req_resp}" | jq -r '.ok')" = "true" ] || fail "[KRA] 10 requestTransfer failed: $(echo "${c10_req_resp}" | jq -r '.errorMessage')"
 c10_push_prov=$(echo "${c10_req_resp}" | jq -r '.body.providerPid // empty')
@@ -802,11 +802,14 @@ ais_write_and_check_org() {
     { [ -n "${org_did}" ] && [ -n "${sess}" ]; } || fail "[${pub}] missing org DID / session for the proof-signing test"
     local org_enc; org_enc=$(urlenc "${org_did}")
     local body; body=$(jq -cn --argjson ctx "${AIS_CONTEXT}" '{"@context":$ctx,type:"AuditableItemStream"}')
-    # The Location header carries the already-url-encoded stream id (ais%3A...).
+    # The Location header is an absolute URL when TWIN_PUBLIC_ORIGIN is set; the
+    # last path segment is the url-encoded stream id (ais%3A...), which never
+    # contains a literal "/".
     local sid
     sid=$(curl -sS -D - -o /dev/null -X POST "${HOST}/ais?organization=${org_enc}" \
         -H "Content-Type: application/json" -H "Authorization: Bearer ${sess}" -d "${body}" \
         | grep -i '^location:' | tr -d '\r' | sed -E 's/^[Ll]ocation:[[:space:]]*//')
+    sid="${sid##*/}"
     [ -n "${sid}" ] || fail "[${pub}] AIS stream create returned no Location id"
     local stream org_id proof_id
     stream=$(curl -sS "${HOST}/ais/${sid}?organization=${org_enc}" -H "Authorization: Bearer ${sess}")
@@ -867,7 +870,7 @@ phase 12 "Routing / trust negatives (org-DID isolation + trust gate)"
 # (org-scoped isolation, no cross-tenant leak).
 
 # (a) Invalid trust token → rejected on a trust-gated route (catalogue request).
-h_inv=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/federated-catalogue/request?organization=${TRADER_ORG_ENC}" \
+h_inv=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "${HOST}/catalog/request?organization=${TRADER_ORG_ENC}" \
     -H "Content-Type: application/json" -H "Cookie: access_token=${TRADER_SESSION_JWT}" -H "Authorization: Bearer not.a.valid.jwt" \
     -d "{\"@context\":[\"${DSP_CONTEXT}\"],\"@type\":\"CatalogRequestMessage\",\"filter\":[]}")
 case "${h_inv}" in

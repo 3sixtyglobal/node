@@ -1,5 +1,6 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { Is } from "@twin.org/core";
 import {
 	DataspaceProtocolCatalogTypes,
 	type IDataspaceProtocolCatalog,
@@ -60,16 +61,16 @@ function extractAccessServiceUrl(dataset: IDataspaceProtocolDatasetBase): string
 		return undefined;
 	}
 	const first = Array.isArray(distribution) ? distribution[0] : distribution;
-	if (!first || typeof first !== "object") {
+	if (!Is.object(first)) {
 		return undefined;
 	}
-	const access = (first as { [key: string]: unknown }).accessService;
-	if (typeof access === "string") {
+	const access = first.accessService;
+	if (Is.string(access)) {
 		return access;
 	}
-	if (access && typeof access === "object") {
-		const endpoint = (access as { [key: string]: unknown }).endpointURL;
-		if (typeof endpoint === "string") {
+	if (Is.object(access)) {
+		const endpoint = access.endpointURL;
+		if (Is.string(endpoint)) {
 			return endpoint;
 		}
 	}
@@ -129,7 +130,7 @@ export async function runPhase3(context: IKenyaContext): Promise<void> {
 
 	const encTenantToken = extractEncTenantToken(accessService ?? "");
 	assert(
-		typeof encTenantToken === "string" && encTenantToken.length > 0,
+		Is.stringValue(encTenantToken),
 		`Distribution accessService URL carries encrypted tenantToken (${
 			(encTenantToken ?? "").length
 		} chars)`,

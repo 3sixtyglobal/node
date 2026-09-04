@@ -221,7 +221,12 @@ seed_publisher() {
                     "@id": ($dsId + "/distribution-1"),
                     "@type": "Distribution",
                     accessService: $dsId,
-                    format: "Http-Pull-Query-Format"
+                    format: "HttpData-PULL"
+                }, {
+                    "@id": ($dsId + "/distribution-2"),
+                    "@type": "Distribution",
+                    accessService: $dsId,
+                    format: "HttpData-PUSH"
                 }],
                 "dcterms:type": "https://vocabulary.uncefact.org/Consignment"
             }
