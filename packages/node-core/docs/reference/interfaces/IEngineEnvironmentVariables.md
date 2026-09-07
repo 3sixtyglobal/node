@@ -887,11 +887,11 @@ The type of event bus component: service.
 
 ***
 
-### messagingEnabled? {#messagingenabled}
+### emailProtocolConnector? {#emailprotocolconnector}
 
-> `optional` **messagingEnabled?**: `string`
+> `optional` **emailProtocolConnector?**: `string`
 
-Are the messaging components enabled, defaults to false.
+The email protocol connector types, comma-separated: pop3, imap.
 
 ***
 
@@ -947,7 +947,47 @@ The applications for the push notifications reference a separate json with @json
 
 > `optional` **messagingEmailConnector?**: `string`
 
-The type of messaging email connector: entity-storage, aws.
+The type of messaging email connector: entity-storage, aws, smtp.
+
+***
+
+### smtpHost? {#smtphost}
+
+> `optional` **smtpHost?**: `string`
+
+SMTP server hostname or IP address.
+
+***
+
+### smtpPort? {#smtpport}
+
+> `optional` **smtpPort?**: `string`
+
+SMTP server port, defaults to 587.
+
+***
+
+### smtpSecure? {#smtpsecure}
+
+> `optional` **smtpSecure?**: `string`
+
+Whether the SMTP connector uses TLS.
+
+***
+
+### smtpUsername? {#smtpusername}
+
+> `optional` **smtpUsername?**: `string`
+
+SMTP authentication username.
+
+***
+
+### smtpPassword? {#smtppassword}
+
+> `optional` **smtpPassword?**: `string`
+
+SMTP authentication password.
 
 ***
 
@@ -1495,14 +1535,6 @@ The type of attestation connector: entity-storage, iota.
 > `optional` **attestationVerificationMethodId?**: `string`
 
 The identity verification method id to use with attestation.
-
-***
-
-### dataProcessingEnabled? {#dataprocessingenabled}
-
-> `optional` **dataProcessingEnabled?**: `string`
-
-Is the data processing enabled, defaults to false.
 
 ***
 
