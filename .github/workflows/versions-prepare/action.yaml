@@ -108,6 +108,12 @@ runs:
         cd "$TARGET_DIR"
         git diff --binary origin/next origin/main | git apply --index
 
+    # Set up Node.js environment for running npm commands
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+
     # Hotfix mode: instead of the content alignment, sync only the release
     # artifacts from main: the prod manifest (so the version script continues
     # next's line from the released hotfix version) and the changelogs (they
@@ -127,12 +133,6 @@ runs:
           echo "Synced changelog: $CHANGELOG"
         done
         echo "Synced prod manifest from main: $(node -e "const m=require('./release/release-please-manifest.prod.json');console.log(Object.values(m)[0])") (next currently $ORIGINAL_NEXT_VERSION)"
-
-    # Set up Node.js environment for running npm commands
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: 24
 
     # Timestamp the branch name to avoid collisions when the action is re-run on the same day.
     - name: Create Version Update Branch
