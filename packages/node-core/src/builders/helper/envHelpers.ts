@@ -3,6 +3,60 @@
 import { Coerce, GeneralError, Is } from "@twin.org/core";
 
 /**
+ * Returns an env var as a string when it holds a non-empty value, falling back to the supplied default.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to read.
+ * @param defaultValue The value to return when the env var is absent or empty. Omit to return undefined when absent.
+ * @returns The string value, the default, or undefined when absent and no default given.
+ */
+export function envString<T>(envVars: T, key: keyof T, defaultValue: string): string;
+export function envString<T>(envVars: T, key: keyof T): string | undefined;
+export function envString<T>(envVars: T, key: keyof T, defaultValue?: string): string | undefined {
+	const value = envVars[key];
+	return Is.stringValue(value) ? value : defaultValue;
+}
+
+/**
+ * Returns an env var constrained to one of the supplied choices, falling back to the supplied default.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var to read.
+ * @param choices The permitted values for the env var.
+ * @param defaultValue The value to return when the env var is absent or empty. Omit to return undefined when absent.
+ * @returns The matching choice, the default, or undefined when absent and no default given.
+ * @throws GeneralError if the value is set but is not one of the choices.
+ */
+export function envChoice<T, U extends string>(
+	envVars: T,
+	key: keyof T,
+	choices: readonly U[],
+	defaultValue: U
+): U;
+export function envChoice<T, U extends string>(
+	envVars: T,
+	key: keyof T,
+	choices: readonly U[]
+): U | undefined;
+export function envChoice<T, U extends string>(
+	envVars: T,
+	key: keyof T,
+	choices: readonly U[],
+	defaultValue?: U
+): U | undefined {
+	const value = envVars[key];
+	if (!Is.stringValue(value)) {
+		return defaultValue;
+	}
+	if (!choices.includes(value as U)) {
+		throw new GeneralError("node", "invalidEnvVarValue", {
+			key,
+			value,
+			type: choices.join(" | ")
+		});
+	}
+	return value as U;
+}
+
+/**
  * Coerces an env var to a boolean, falling back to the supplied default when not set.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
@@ -256,6 +310,36 @@ export function envMinToMs<T>(envVars: T, key: keyof T, defaultValue?: number): 
 		throw new GeneralError("node", "invalidEnvVarValue", { key, value, type: "integer" });
 	}
 	return n * 60_000;
+}
+
+/**
+ * Converts a comma separated list to an array.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var.
+ * @param expectedValues An optional array of expected values.
+ * @param defaultValue The default value to return when the list is empty or undefined.
+ * @throws GeneralError if the list contains a value not in the expected values.
+ * @returns The array.
+ */
+export function envListToArray<T, U>(
+	envVars: T,
+	key: keyof T,
+	expectedValues?: U[],
+	defaultValue: U[] | undefined = []
+): U[] {
+	const value = envVars[key];
+
+	const values = commaSeparatedListToArray<U>(value as string, defaultValue);
+
+	if (Is.arrayValue(expectedValues) && !values.every(item => expectedValues.includes(item))) {
+		throw new GeneralError("node", "invalidEnvVarValue", {
+			key,
+			value,
+			type: expectedValues.join(" | ")
+		});
+	}
+
+	return values;
 }
 
 /**

@@ -90,7 +90,7 @@ function displayCommandHelp(commandDefinition: ICliCommandDefinition): void {
 			if (Is.stringValue(param.extendedType)) {
 				typeParts.push(param.extendedType);
 			}
-			if (!Is.empty(param.defaultValue)) {
+			if (Is.notEmpty(param.defaultValue)) {
 				typeParts.push(`${defaultLabel}: '${param.defaultValue}'`);
 			}
 			if (param.required) {

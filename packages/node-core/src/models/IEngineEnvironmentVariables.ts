@@ -549,9 +549,9 @@ export interface IEngineEnvironmentVariables {
 	eventBusComponent?: string;
 
 	/**
-	 * Are the messaging components enabled, defaults to false.
+	 * The email protocol connector types, comma-separated: pop3, imap.
 	 */
-	messagingEnabled?: string;
+	emailProtocolConnector?: string;
 
 	/**
 	 * AWS SES region.
@@ -584,9 +584,34 @@ export interface IEngineEnvironmentVariables {
 	awsMessagingPushNotificationApplications?: string;
 
 	/**
-	 * The type of messaging email connector: entity-storage, aws.
+	 * The type of messaging email connector: entity-storage, aws, smtp.
 	 */
 	messagingEmailConnector?: string;
+
+	/**
+	 * SMTP server hostname or IP address.
+	 */
+	smtpHost?: string;
+
+	/**
+	 * SMTP server port, defaults to 587.
+	 */
+	smtpPort?: string;
+
+	/**
+	 * Whether the SMTP connector uses TLS.
+	 */
+	smtpSecure?: string;
+
+	/**
+	 * SMTP authentication username.
+	 */
+	smtpUsername?: string;
+
+	/**
+	 * SMTP authentication password.
+	 */
+	smtpPassword?: string;
 
 	/**
 	 * The type of messaging sms connector: entity-storage, aws.
@@ -899,11 +924,6 @@ export interface IEngineEnvironmentVariables {
 	 * The identity verification method id to use with attestation.
 	 */
 	attestationVerificationMethodId?: string;
-
-	/**
-	 * Is the data processing enabled, defaults to false.
-	 */
-	dataProcessingEnabled?: string;
 
 	/**
 	 * The type of the default data converters, can be a comma separated list: json, xml.

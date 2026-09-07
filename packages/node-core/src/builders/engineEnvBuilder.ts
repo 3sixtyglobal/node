@@ -10,27 +10,28 @@ import {
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
 	type AutomationActionConfig,
-	type AutomationActionType,
+	AutomationActionType,
 	AutomationComponentType,
 	BackgroundTaskComponentType,
 	BlobStorageComponentType,
 	BlobStorageConnectorType,
 	ContextIdHandlerComponentType,
-	type DataConverterConnectorType,
-	type DataExtractorConnectorType,
+	DataConverterConnectorType,
+	DataExtractorConnectorType,
 	DataProcessingComponentType,
 	DataspaceControlPlaneComponentType,
 	DataspaceDataPlaneComponentType,
 	type DltConfig,
 	DltConfigType,
 	DocumentManagementComponentType,
+	EmailProtocolConnectorType,
 	EngineTypeHelper,
 	EntityStorageConnectorType,
 	EventBusComponentType,
 	EventBusConnectorType,
 	FaucetConnectorType,
 	FederatedCatalogueComponentType,
-	type FederatedCatalogueFilterComponentType,
+	FederatedCatalogueFilterComponentType,
 	HealthComponentType,
 	IdentityComponentType,
 	IdentityConnectorType,
@@ -42,6 +43,8 @@ import {
 	ImmutableProofComponentType,
 	LoggingComponentType,
 	LoggingConnectorType,
+	MailboxComponentType,
+	MailStorageComponentType,
 	MessagingAdminComponentType,
 	MessagingComponentType,
 	MessagingEmailConnectorType,
@@ -61,13 +64,13 @@ import {
 	RightsManagementPmpComponentType,
 	RightsManagementPnapComponentType,
 	RightsManagementPnpComponentType,
-	type RightsManagementPolicyArbiterComponentType,
-	type RightsManagementPolicyEnforcementProcessorComponentType,
-	type RightsManagementPolicyExecutionActionComponentType,
-	type RightsManagementPolicyInformationSourceComponentType,
-	type RightsManagementPolicyNegotiatorComponentType,
-	type RightsManagementPolicyObligationEnforcerComponentType,
-	type RightsManagementPolicyRequesterComponentType,
+	RightsManagementPolicyArbiterComponentType,
+	RightsManagementPolicyEnforcementProcessorComponentType,
+	RightsManagementPolicyExecutionActionComponentType,
+	RightsManagementPolicyInformationSourceComponentType,
+	RightsManagementPolicyNegotiatorComponentType,
+	RightsManagementPolicyObligationEnforcerComponentType,
+	RightsManagementPolicyRequesterComponentType,
 	RightsManagementPxpComponentType,
 	SchemaVersionMigrationComponentType,
 	TaskSchedulerComponentType,
@@ -77,7 +80,7 @@ import {
 	TracingComponentType,
 	TracingConnectorType,
 	TrustComponentType,
-	type TrustGeneratorComponentType,
+	TrustGeneratorComponentType,
 	TrustVerifierComponentType,
 	VaultConnectorType,
 	WalletConnectorType
@@ -101,9 +104,11 @@ import {
 	commaSeparatedListToArray,
 	envArray,
 	envBoolean,
+	envChoice,
 	envCount,
 	envDateTime,
 	envInteger,
+	envListToArray,
 	envMinToMs,
 	envMinutes,
 	envMs,
@@ -138,7 +143,7 @@ export async function buildEngineConfiguration(
 	};
 
 	const mutexTimeoutMs = envMs(envVars, "mutexTimeoutDefault");
-	if (!Is.empty(mutexTimeoutMs)) {
+	if (Is.notEmpty(mutexTimeoutMs)) {
 		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
 	}
 
@@ -160,6 +165,7 @@ export async function buildEngineConfiguration(
 	await configureMetricsCollector(coreConfig, envVars);
 	await configureTracing(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
+	await configureMailbox(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
 	await configureHealth(coreConfig, envVars);
 
@@ -199,174 +205,161 @@ async function configureEntityStorage(
 	coreConfig.types ??= {};
 	coreConfig.types.entityStorageConnector ??= [];
 
-	const entityStorageConnectorTypes = commaSeparatedListToArray<EntityStorageConnectorType>(
-		envVars.entityStorageConnectorType
-	);
+	const entityStorageConnectorTypes = envListToArray<
+		IEngineEnvironmentVariables,
+		EntityStorageConnectorType
+	>(envVars, "entityStorageConnectorType", Object.values(EntityStorageConnectorType));
 
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.Memory)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.Memory,
-			options: {
-				config: {
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+	for (const entityStorageConnectorType of entityStorageConnectorTypes) {
+		if (entityStorageConnectorType === EntityStorageConnectorType.Memory) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.Memory,
+				options: {
+					config: {
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					}
 				}
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.File)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.File,
-			options: {
-				config: {
-					directory: envVars.storageFileRoot ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
-				},
-				folderPrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.AwsDynamoDb)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.AwsDynamoDb,
-			options: {
-				config: {
-					region: envVars.awsDynamodbRegion ?? "",
-					authMode: envVars.awsDynamodbAuthMode as "credentials" | "pod",
-					accessKeyId: envVars.awsDynamodbAccessKeyId,
-					secretAccessKey: envVars.awsDynamodbSecretAccessKey,
-					endpoint: envVars.awsDynamodbEndpoint,
-					connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout"),
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.AzureCosmosDb)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.AzureCosmosDb,
-			options: {
-				config: {
-					endpoint: envVars.azureCosmosdbEndpoint ?? "",
-					key: envVars.azureCosmosdbKey ?? "",
-					databaseId: envVars.azureCosmosdbDatabaseId ?? "",
-					containerId: envVars.azureCosmosdbContainerId ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.GcpFirestoreDb)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.GcpFirestoreDb,
-			options: {
-				config: {
-					projectId: envVars.gcpFirestoreProjectId ?? "",
-					credentials: envVars.gcpFirestoreCredentials ?? "",
-					databaseId: envVars.gcpFirestoreDatabaseId ?? "",
-					collectionName: envVars.gcpFirestoreCollectionName ?? "",
-					endpoint: envVars.gcpFirestoreEndpoint ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.ScyllaDb)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.ScyllaDb,
-			options: {
-				config: {
-					hosts: commaSeparatedListToArray(envVars.scylladbHosts),
-					localDataCenter: envVars.scylladbLocalDataCenter ?? "",
-					keyspace: envVars.scylladbKeyspace ?? "",
-					port: envInteger(envVars, "scylladbPort"),
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
-					pool: {
-						coreConnectionsPerHost: envCount(envVars, "scylladbPoolCoreConnectionsPerHost"),
-						maxRequestsPerConnection: envCount(envVars, "scylladbPoolMaxRequestsPerConnection")
-					}
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.MySqlDb)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.MySqlDb,
-			options: {
-				config: {
-					host: envVars.mySqlHost ?? "",
-					port: envInteger(envVars, "mySqlPort"),
-					user: envVars.mySqlUser ?? "",
-					password: envVars.mySqlPassword ?? "",
-					database: envVars.mySqlDatabase ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
-					pool: {
-						connectionLimit: envCount(envVars, "mySqlPoolConnectionLimit"),
-						maxIdle: envCount(envVars, "mySqlPoolMaxIdle"),
-						idleTimeout: envMs(envVars, "mySqlPoolIdleTimeout"),
-						enableKeepAlive: envBoolean(envVars, "mySqlPoolEnableKeepAlive"),
-						waitForConnections: envBoolean(envVars, "mySqlPoolWaitForConnections"),
-						queueLimit: envCount(envVars, "mySqlPoolQueueLimit")
-					}
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.MongoDb)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.MongoDb,
-			options: {
-				config: {
-					host: envVars.mongoDbHost ?? "",
-					port: envInteger(envVars, "mongoDbPort"),
-					user: envVars.mongoDbUser ?? "",
-					password: envVars.mongoDbPassword ?? "",
-					database: envVars.mongoDbDatabase ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
-					pool: {
-						maxPoolSize: envCount(envVars, "mongoDbPoolMaxPoolSize"),
-						minPoolSize: envCount(envVars, "mongoDbPoolMinPoolSize"),
-						maxIdleTimeMs: envMs(envVars, "mongoDbPoolMaxIdleTime"),
-						waitQueueTimeoutMs: envMs(envVars, "mongoDbPoolWaitQueueTimeout")
-					}
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
-	}
-
-	if (entityStorageConnectorTypes.includes(EntityStorageConnectorType.PostgreSql)) {
-		coreConfig.types.entityStorageConnector.push({
-			type: EntityStorageConnectorType.PostgreSql,
-			options: {
-				config: {
-					host: envVars.postgreSqlHost ?? "",
-					port: envInteger(envVars, "postgreSqlPort"),
-					user: envVars.postgreSqlUser ?? "",
-					password: envVars.postgreSqlPassword ?? "",
-					database: envVars.postgreSqlDatabase ?? "",
-					mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
-					pool: {
-						max: envCount(envVars, "postgreSqlPoolMax"),
-						idleTimeout: envSeconds(envVars, "postgreSqlPoolIdleTimeout"),
-						connectTimeout: envSeconds(envVars, "postgreSqlPoolConnectTimeout"),
-						maxLifetime: envSeconds(envVars, "postgreSqlPoolMaxLifetime")
-					}
-				},
-				tablePrefix: envVars.entityStorageTablePrefix
-			}
-		});
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.File) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.File,
+				options: {
+					config: {
+						directory: envVars.storageFileRoot ?? "",
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					},
+					folderPrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.AwsDynamoDb) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.AwsDynamoDb,
+				options: {
+					config: {
+						region: envVars.awsDynamodbRegion ?? "",
+						authMode: envVars.awsDynamodbAuthMode as "credentials" | "pod",
+						accessKeyId: envVars.awsDynamodbAccessKeyId,
+						secretAccessKey: envVars.awsDynamodbSecretAccessKey,
+						endpoint: envVars.awsDynamodbEndpoint,
+						connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout"),
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.AzureCosmosDb) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.AzureCosmosDb,
+				options: {
+					config: {
+						endpoint: envVars.azureCosmosdbEndpoint ?? "",
+						key: envVars.azureCosmosdbKey ?? "",
+						databaseId: envVars.azureCosmosdbDatabaseId ?? "",
+						containerId: envVars.azureCosmosdbContainerId ?? "",
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.GcpFirestoreDb) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.GcpFirestoreDb,
+				options: {
+					config: {
+						projectId: envVars.gcpFirestoreProjectId ?? "",
+						credentials: envVars.gcpFirestoreCredentials ?? "",
+						databaseId: envVars.gcpFirestoreDatabaseId ?? "",
+						collectionName: envVars.gcpFirestoreCollectionName ?? "",
+						endpoint: envVars.gcpFirestoreEndpoint ?? "",
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.ScyllaDb) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.ScyllaDb,
+				options: {
+					config: {
+						hosts: commaSeparatedListToArray(envVars.scylladbHosts),
+						localDataCenter: envVars.scylladbLocalDataCenter ?? "",
+						keyspace: envVars.scylladbKeyspace ?? "",
+						port: envInteger(envVars, "scylladbPort"),
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						pool: {
+							coreConnectionsPerHost: envCount(envVars, "scylladbPoolCoreConnectionsPerHost"),
+							maxRequestsPerConnection: envCount(envVars, "scylladbPoolMaxRequestsPerConnection")
+						}
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.MySqlDb) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.MySqlDb,
+				options: {
+					config: {
+						host: envVars.mySqlHost ?? "",
+						port: envInteger(envVars, "mySqlPort"),
+						user: envVars.mySqlUser ?? "",
+						password: envVars.mySqlPassword ?? "",
+						database: envVars.mySqlDatabase ?? "",
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						pool: {
+							connectionLimit: envCount(envVars, "mySqlPoolConnectionLimit"),
+							maxIdle: envCount(envVars, "mySqlPoolMaxIdle"),
+							idleTimeout: envMs(envVars, "mySqlPoolIdleTimeout"),
+							enableKeepAlive: envBoolean(envVars, "mySqlPoolEnableKeepAlive"),
+							waitForConnections: envBoolean(envVars, "mySqlPoolWaitForConnections"),
+							queueLimit: envCount(envVars, "mySqlPoolQueueLimit")
+						}
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.MongoDb) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.MongoDb,
+				options: {
+					config: {
+						host: envVars.mongoDbHost ?? "",
+						port: envInteger(envVars, "mongoDbPort"),
+						user: envVars.mongoDbUser ?? "",
+						password: envVars.mongoDbPassword ?? "",
+						database: envVars.mongoDbDatabase ?? "",
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						pool: {
+							maxPoolSize: envCount(envVars, "mongoDbPoolMaxPoolSize"),
+							minPoolSize: envCount(envVars, "mongoDbPoolMinPoolSize"),
+							maxIdleTimeMs: envMs(envVars, "mongoDbPoolMaxIdleTime"),
+							waitQueueTimeoutMs: envMs(envVars, "mongoDbPoolWaitQueueTimeout")
+						}
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		} else if (entityStorageConnectorType === EntityStorageConnectorType.PostgreSql) {
+			coreConfig.types.entityStorageConnector.push({
+				type: EntityStorageConnectorType.PostgreSql,
+				options: {
+					config: {
+						host: envVars.postgreSqlHost ?? "",
+						port: envInteger(envVars, "postgreSqlPort"),
+						user: envVars.postgreSqlUser ?? "",
+						password: envVars.postgreSqlPassword ?? "",
+						database: envVars.postgreSqlDatabase ?? "",
+						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						pool: {
+							max: envCount(envVars, "postgreSqlPoolMax"),
+							idleTimeout: envSeconds(envVars, "postgreSqlPoolIdleTimeout"),
+							connectTimeout: envSeconds(envVars, "postgreSqlPoolConnectTimeout"),
+							maxLifetime: envSeconds(envVars, "postgreSqlPoolMaxLifetime")
+						}
+					},
+					tablePrefix: envVars.entityStorageTablePrefix
+				}
+			});
+		}
 	}
 
 	const defaultEntityStorageConnectorType =
@@ -394,85 +387,80 @@ async function configureBlobStorage(
 ): Promise<void> {
 	coreConfig.types.blobStorageConnector ??= [];
 
-	const blobStorageConnectorTypes = commaSeparatedListToArray(envVars.blobStorageConnectorType);
+	const blobStorageConnectorTypes = envListToArray<
+		IEngineEnvironmentVariables,
+		BlobStorageConnectorType
+	>(envVars, "blobStorageConnectorType", Object.values(BlobStorageConnectorType));
 
-	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.Memory)) {
-		coreConfig.types.blobStorageConnector.push({
-			type: BlobStorageConnectorType.Memory
-		});
-	}
-
-	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.File)) {
-		coreConfig.types.blobStorageConnector.push({
-			type: BlobStorageConnectorType.File,
-			options: {
-				config: {
-					directory: Is.stringValue(envVars.storageFileRoot)
-						? path.join(envVars.storageFileRoot, "blob-storage")
-						: ""
-				},
-				storagePrefix: envVars.blobStoragePrefix
-			}
-		});
-	}
-
-	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.Ipfs)) {
-		coreConfig.types.blobStorageConnector.push({
-			type: BlobStorageConnectorType.Ipfs,
-			options: {
-				config: {
-					apiUrl: envVars.ipfsApiUrl ?? "",
-					bearerToken: envVars.ipfsBearerToken
+	for (const blobStorageConnectorType of blobStorageConnectorTypes) {
+		if (blobStorageConnectorType === BlobStorageConnectorType.Memory) {
+			coreConfig.types.blobStorageConnector.push({
+				type: BlobStorageConnectorType.Memory
+			});
+		} else if (blobStorageConnectorType === BlobStorageConnectorType.File) {
+			coreConfig.types.blobStorageConnector.push({
+				type: BlobStorageConnectorType.File,
+				options: {
+					config: {
+						directory: Is.stringValue(envVars.storageFileRoot)
+							? path.join(envVars.storageFileRoot, "blob-storage")
+							: ""
+					},
+					storagePrefix: envVars.blobStoragePrefix
 				}
-			}
-		});
-	}
-
-	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.AwsS3)) {
-		coreConfig.types.blobStorageConnector.push({
-			type: BlobStorageConnectorType.AwsS3,
-			options: {
-				config: {
-					region: envVars.awsS3Region ?? "",
-					bucketName: envVars.awsS3BucketName ?? "",
-					authMode: envVars.awsS3AuthMode as "credentials" | "pod",
-					accessKeyId: envVars.awsS3AccessKeyId,
-					secretAccessKey: envVars.awsS3SecretAccessKey,
-					endpoint: envVars.awsS3Endpoint
-				},
-				storagePrefix: envVars.blobStoragePrefix
-			}
-		});
-	}
-
-	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.AzureStorage)) {
-		coreConfig.types.blobStorageConnector.push({
-			type: BlobStorageConnectorType.AzureStorage,
-			options: {
-				config: {
-					accountName: envVars.azureStorageAccountName ?? "",
-					accountKey: envVars.azureStorageAccountKey ?? "",
-					containerName: envVars.azureStorageContainerName ?? "",
-					endpoint: envVars.azureStorageEndpoint ?? ""
-				},
-				storagePrefix: envVars.blobStoragePrefix
-			}
-		});
-	}
-
-	if (blobStorageConnectorTypes.includes(BlobStorageConnectorType.GcpStorage)) {
-		coreConfig.types.blobStorageConnector.push({
-			type: BlobStorageConnectorType.GcpStorage,
-			options: {
-				config: {
-					projectId: envVars.gcpStorageProjectId ?? "",
-					credentials: envVars.gcpStorageCredentials ?? "",
-					bucketName: envVars.gcpStorageBucketName ?? "",
-					apiEndpoint: envVars.gcpFirestoreEndpoint
-				},
-				storagePrefix: envVars.blobStoragePrefix
-			}
-		});
+			});
+		} else if (blobStorageConnectorType === BlobStorageConnectorType.Ipfs) {
+			coreConfig.types.blobStorageConnector.push({
+				type: BlobStorageConnectorType.Ipfs,
+				options: {
+					config: {
+						apiUrl: envVars.ipfsApiUrl ?? "",
+						bearerToken: envVars.ipfsBearerToken
+					}
+				}
+			});
+		} else if (blobStorageConnectorType === BlobStorageConnectorType.AwsS3) {
+			coreConfig.types.blobStorageConnector.push({
+				type: BlobStorageConnectorType.AwsS3,
+				options: {
+					config: {
+						region: envVars.awsS3Region ?? "",
+						bucketName: envVars.awsS3BucketName ?? "",
+						authMode: envVars.awsS3AuthMode as "credentials" | "pod",
+						accessKeyId: envVars.awsS3AccessKeyId,
+						secretAccessKey: envVars.awsS3SecretAccessKey,
+						endpoint: envVars.awsS3Endpoint
+					},
+					storagePrefix: envVars.blobStoragePrefix
+				}
+			});
+		} else if (blobStorageConnectorType === BlobStorageConnectorType.AzureStorage) {
+			coreConfig.types.blobStorageConnector.push({
+				type: BlobStorageConnectorType.AzureStorage,
+				options: {
+					config: {
+						accountName: envVars.azureStorageAccountName ?? "",
+						accountKey: envVars.azureStorageAccountKey ?? "",
+						containerName: envVars.azureStorageContainerName ?? "",
+						endpoint: envVars.azureStorageEndpoint ?? ""
+					},
+					storagePrefix: envVars.blobStoragePrefix
+				}
+			});
+		} else if (blobStorageConnectorType === BlobStorageConnectorType.GcpStorage) {
+			coreConfig.types.blobStorageConnector.push({
+				type: BlobStorageConnectorType.GcpStorage,
+				options: {
+					config: {
+						projectId: envVars.gcpStorageProjectId ?? "",
+						credentials: envVars.gcpStorageCredentials ?? "",
+						bucketName: envVars.gcpStorageBucketName ?? "",
+						apiEndpoint: envVars.gcpFirestoreEndpoint
+					},
+					storagePrefix: envVars.blobStoragePrefix
+				}
+			});
+		}
 	}
 
 	if (Is.arrayValue(blobStorageConnectorTypes)) {
@@ -481,6 +469,7 @@ async function configureBlobStorage(
 		for (const config of coreConfig.types.blobStorageConnector) {
 			if (config.type === defaultStorageConnectorType) {
 				config.isDefault = true;
+				break;
 			}
 		}
 	}
@@ -513,8 +502,10 @@ async function configureLogging(
 ): Promise<void> {
 	coreConfig.types.loggingConnector ??= [];
 
-	const loggingConnectorTypes = commaSeparatedListToArray<LoggingConnectorType>(
-		envVars.loggingConnector
+	const loggingConnectorTypes = envListToArray<IEngineEnvironmentVariables, LoggingConnectorType>(
+		envVars,
+		"loggingConnector",
+		Object.values(LoggingConnectorType)
 	);
 	let additionalConnectorCount = 0;
 
@@ -622,7 +613,13 @@ async function configureVault(
 ): Promise<void> {
 	coreConfig.types.vaultConnector ??= [];
 
-	if (envVars.vaultConnector === VaultConnectorType.EntityStorage) {
+	const vaultConnectorType = envChoice<IEngineEnvironmentVariables, VaultConnectorType>(
+		envVars,
+		"vaultConnector",
+		Object.values(VaultConnectorType)
+	);
+
+	if (vaultConnectorType === VaultConnectorType.EntityStorage) {
 		coreConfig.types.vaultConnector.push({
 			type: VaultConnectorType.EntityStorage,
 			options: {
@@ -631,7 +628,7 @@ async function configureVault(
 				}
 			}
 		});
-	} else if (envVars.vaultConnector === VaultConnectorType.Hashicorp) {
+	} else if (vaultConnectorType === VaultConnectorType.Hashicorp) {
 		coreConfig.types.vaultConnector.push({
 			type: VaultConnectorType.Hashicorp,
 			options: {
@@ -676,7 +673,13 @@ async function configureEventBus(
 ): Promise<void> {
 	coreConfig.types.eventBusConnector ??= [];
 
-	if (envVars.eventBusConnector === EventBusConnectorType.Local) {
+	const eventBusConnectorType = envChoice<IEngineEnvironmentVariables, EventBusConnectorType>(
+		envVars,
+		"eventBusConnector",
+		Object.values(EventBusConnectorType)
+	);
+
+	if (eventBusConnectorType === EventBusConnectorType.Local) {
 		coreConfig.types.eventBusConnector.push({
 			type: EventBusConnectorType.Local
 		});
@@ -700,18 +703,19 @@ async function configureTelemetry(
 ): Promise<void> {
 	coreConfig.types.telemetryConnector ??= [];
 
-	const telemetryConnectorTypes = commaSeparatedListToArray<TelemetryConnectorType>(
-		envVars.telemetryConnector
-	);
+	const telemetryConnectorTypes = envListToArray<
+		IEngineEnvironmentVariables,
+		TelemetryConnectorType
+	>(envVars, "telemetryConnector", Object.values(TelemetryConnectorType));
 	let additionalConnectorCount = 0;
 
-	for (const telemetryConnector of telemetryConnectorTypes) {
-		if (telemetryConnector === TelemetryConnectorType.Silent) {
+	for (const telemetryConnectorType of telemetryConnectorTypes) {
+		if (telemetryConnectorType === TelemetryConnectorType.Silent) {
 			coreConfig.types.telemetryConnector.push({
 				type: TelemetryConnectorType.Silent
 			});
 			additionalConnectorCount++;
-		} else if (telemetryConnector === TelemetryConnectorType.EntityStorage) {
+		} else if (telemetryConnectorType === TelemetryConnectorType.EntityStorage) {
 			coreConfig.types.telemetryConnector.push({
 				type: TelemetryConnectorType.EntityStorage,
 				options: {
@@ -729,7 +733,7 @@ async function configureTelemetry(
 				}
 			});
 			additionalConnectorCount++;
-		} else if (telemetryConnector === TelemetryConnectorType.OpenTelemetry) {
+		} else if (telemetryConnectorType === TelemetryConnectorType.OpenTelemetry) {
 			let readers: IOpenTelemetryTelemetryConnectorConfig["readers"];
 			if (envVars.openTelemetryReader === OpenTelemetryReaderTypes.Prometheus) {
 				readers = {
@@ -799,14 +803,17 @@ async function configureMetricsCollector(
 
 		coreConfig.types.metricsProducerComponent ??= [];
 
-		const metricsProducers = commaSeparatedListToArray(
-			envVars.telemetryMetricsProducers ??
-				[MetricsProducerComponentType.System, MetricsProducerComponentType.Process].join(",")
-		);
+		const metricsProducers = envListToArray<
+			IEngineEnvironmentVariables,
+			MetricsProducerComponentType
+		>(envVars, "telemetryMetricsProducers", Object.values(MetricsProducerComponentType), [
+			MetricsProducerComponentType.System,
+			MetricsProducerComponentType.Process
+		]);
 
 		for (const producerType of metricsProducers) {
 			coreConfig.types.metricsProducerComponent.push({
-				type: producerType as MetricsProducerComponentType,
+				type: producerType,
 				options: { maxHistory: envCount(envVars, "telemetryMetricsProducerMaxHistory") },
 				cloneMode: EngineCloneMode.Never
 			});
@@ -826,18 +833,20 @@ async function configureTracing(
 ): Promise<void> {
 	coreConfig.types.tracingConnector ??= [];
 
-	const tracingConnectorTypes = commaSeparatedListToArray<TracingConnectorType>(
-		envVars.tracingConnector
+	const tracingConnectorTypes = envListToArray<IEngineEnvironmentVariables, TracingConnectorType>(
+		envVars,
+		"tracingConnector",
+		Object.values(TracingConnectorType)
 	);
 	let additionalConnectorCount = 0;
 
-	for (const tracingConnector of tracingConnectorTypes) {
-		if (tracingConnector === TracingConnectorType.Silent) {
+	for (const tracingConnectorType of tracingConnectorTypes) {
+		if (tracingConnectorType === TracingConnectorType.Silent) {
 			coreConfig.types.tracingConnector.push({
 				type: TracingConnectorType.Silent
 			});
 			additionalConnectorCount++;
-		} else if (tracingConnector === TracingConnectorType.EntityStorage) {
+		} else if (tracingConnectorType === TracingConnectorType.EntityStorage) {
 			coreConfig.types.tracingConnector.push({
 				type: TracingConnectorType.EntityStorage,
 				options: {
@@ -847,12 +856,12 @@ async function configureTracing(
 				}
 			});
 			additionalConnectorCount++;
-		} else if (tracingConnector === TracingConnectorType.Console) {
+		} else if (tracingConnectorType === TracingConnectorType.Console) {
 			coreConfig.types.tracingConnector.push({
 				type: TracingConnectorType.Console
 			});
 			additionalConnectorCount++;
-		} else if (tracingConnector === TracingConnectorType.OpenTelemetry) {
+		} else if (tracingConnectorType === TracingConnectorType.OpenTelemetry) {
 			const otelTracingConfig: IOpenTelemetryTracingConnectorConfig = {
 				tracerName: envVars.openTelemetryTracingTracerName,
 				tracerVersion: envVars.openTelemetryTracingTracerVersion
@@ -916,17 +925,19 @@ async function configureAutomation(
 			type: AutomationComponentType.Service
 		});
 
-		const automationActionTypes = commaSeparatedListToArray(envVars.automationActionTypes);
+		const automationActionTypes = envListToArray<IEngineEnvironmentVariables, AutomationActionType>(
+			envVars,
+			"automationActionTypes",
+			Object.values(AutomationActionType)
+		);
 
-		if (Is.arrayValue(automationActionTypes)) {
-			coreConfig.types.automationAction ??= [];
+		coreConfig.types.automationAction ??= [];
 
-			for (const actionType of automationActionTypes) {
-				coreConfig.types.automationAction.push({
-					type: actionType as AutomationActionType,
-					isMultiInstance: true
-				} as unknown as AutomationActionConfig);
-			}
+		for (const actionType of automationActionTypes) {
+			coreConfig.types.automationAction.push({
+				type: actionType,
+				isMultiInstance: true
+			} as unknown as AutomationActionConfig);
 		}
 	}
 }
@@ -1057,74 +1068,107 @@ async function configureMessaging(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (envBoolean(envVars, "messagingEnabled", false)) {
-		coreConfig.types.messagingEmailConnector ??= [];
-		coreConfig.types.messagingSmsConnector ??= [];
-		coreConfig.types.messagingPushNotificationConnector ??= [];
+	coreConfig.types.messagingEmailConnector ??= [];
+	coreConfig.types.messagingSmsConnector ??= [];
+	coreConfig.types.messagingPushNotificationConnector ??= [];
 
-		if (envVars.messagingEmailConnector === MessagingEmailConnectorType.EntityStorage) {
-			coreConfig.types.messagingEmailConnector.push({
-				type: MessagingEmailConnectorType.EntityStorage
-			});
-		} else if (envVars.messagingEmailConnector === MessagingEmailConnectorType.Aws) {
-			coreConfig.types.messagingEmailConnector.push({
-				type: MessagingEmailConnectorType.Aws,
-				options: {
-					config: {
-						region: envVars.awsSesRegion ?? "",
-						authMode: envVars.awsSesAuthMode as "credentials" | "pod",
-						accessKeyId: envVars.awsSesAccessKeyId,
-						secretAccessKey: envVars.awsSesSecretAccessKey,
-						endpoint: envVars.awsSesEndpoint
-					}
+	const messagingEmailConnectorType = envChoice<
+		IEngineEnvironmentVariables,
+		MessagingEmailConnectorType
+	>(envVars, "messagingEmailConnector", Object.values(MessagingEmailConnectorType));
+
+	if (messagingEmailConnectorType === MessagingEmailConnectorType.EntityStorage) {
+		coreConfig.types.messagingEmailConnector.push({
+			type: MessagingEmailConnectorType.EntityStorage
+		});
+	} else if (messagingEmailConnectorType === MessagingEmailConnectorType.Aws) {
+		coreConfig.types.messagingEmailConnector.push({
+			type: MessagingEmailConnectorType.Aws,
+			options: {
+				config: {
+					region: envVars.awsSesRegion ?? "",
+					authMode: envVars.awsSesAuthMode as "credentials" | "pod",
+					accessKeyId: envVars.awsSesAccessKeyId,
+					secretAccessKey: envVars.awsSesSecretAccessKey,
+					endpoint: envVars.awsSesEndpoint
 				}
-			});
-		}
-
-		if (envVars.messagingSmsConnector === MessagingSmsConnectorType.EntityStorage) {
-			coreConfig.types.messagingSmsConnector.push({
-				type: MessagingSmsConnectorType.EntityStorage
-			});
-		} else if (envVars.messagingSmsConnector === MessagingSmsConnectorType.Aws) {
-			coreConfig.types.messagingSmsConnector.push({
-				type: MessagingSmsConnectorType.Aws,
-				options: {
-					config: {
-						region: envVars.awsSesRegion ?? "",
-						authMode: envVars.awsSesAuthMode as "credentials" | "pod",
-						accessKeyId: envVars.awsSesAccessKeyId,
-						secretAccessKey: envVars.awsSesSecretAccessKey,
-						endpoint: envVars.awsSesEndpoint
-					}
+			}
+		});
+	} else if (messagingEmailConnectorType === MessagingEmailConnectorType.Smtp) {
+		coreConfig.types.messagingEmailConnector.push({
+			type: MessagingEmailConnectorType.Smtp,
+			options: {
+				config: {
+					host: envVars.smtpHost ?? "",
+					port: envInteger(envVars, "smtpPort"),
+					secure: envBoolean(envVars, "smtpSecure"),
+					username: envVars.smtpUsername,
+					password: envVars.smtpPassword
 				}
-			});
-		}
+			}
+		});
+	}
 
-		if (
-			envVars.messagingPushNotificationConnector ===
-			MessagingPushNotificationConnectorType.EntityStorage
-		) {
-			coreConfig.types.messagingPushNotificationConnector.push({
-				type: MessagingPushNotificationConnectorType.EntityStorage
-			});
-		} else if (
-			envVars.messagingPushNotificationConnector === MessagingPushNotificationConnectorType.Aws
-		) {
-			coreConfig.types.messagingPushNotificationConnector.push({
-				type: MessagingPushNotificationConnectorType.Aws,
-				options: {
-					config: {
-						region: envVars.awsSesRegion ?? "",
-						authMode: envVars.awsSesAuthMode as "credentials" | "pod",
-						accessKeyId: envVars.awsSesAccessKeyId,
-						secretAccessKey: envVars.awsSesSecretAccessKey,
-						endpoint: envVars.awsSesEndpoint,
-						applicationsSettings: envArray(envVars, "awsMessagingPushNotificationApplications", [])
-					}
+	const messagingSmsConnectorType = envChoice<
+		IEngineEnvironmentVariables,
+		MessagingSmsConnectorType
+	>(envVars, "messagingSmsConnector", Object.values(MessagingSmsConnectorType));
+
+	if (messagingSmsConnectorType === MessagingSmsConnectorType.EntityStorage) {
+		coreConfig.types.messagingSmsConnector.push({
+			type: MessagingSmsConnectorType.EntityStorage
+		});
+	} else if (messagingSmsConnectorType === MessagingSmsConnectorType.Aws) {
+		coreConfig.types.messagingSmsConnector.push({
+			type: MessagingSmsConnectorType.Aws,
+			options: {
+				config: {
+					region: envVars.awsSesRegion ?? "",
+					authMode: envVars.awsSesAuthMode as "credentials" | "pod",
+					accessKeyId: envVars.awsSesAccessKeyId,
+					secretAccessKey: envVars.awsSesSecretAccessKey,
+					endpoint: envVars.awsSesEndpoint
 				}
-			});
-		}
+			}
+		});
+	}
 
+	const messagingPushConnectorType = envChoice<
+		IEngineEnvironmentVariables,
+		MessagingPushNotificationConnectorType
+	>(
+		envVars,
+		"messagingPushNotificationConnector",
+		Object.values(MessagingPushNotificationConnectorType)
+	);
+
+	if (messagingPushConnectorType === MessagingPushNotificationConnectorType.EntityStorage) {
+		coreConfig.types.messagingPushNotificationConnector.push({
+			type: MessagingPushNotificationConnectorType.EntityStorage
+		});
+	} else if (messagingPushConnectorType === MessagingPushNotificationConnectorType.Aws) {
+		coreConfig.types.messagingPushNotificationConnector.push({
+			type: MessagingPushNotificationConnectorType.Aws,
+			options: {
+				config: {
+					region: envVars.awsSesRegion ?? "",
+					authMode: envVars.awsSesAuthMode as "credentials" | "pod",
+					accessKeyId: envVars.awsSesAccessKeyId,
+					secretAccessKey: envVars.awsSesSecretAccessKey,
+					endpoint: envVars.awsSesEndpoint,
+					applicationsSettings: envArray(envVars, "awsMessagingPushNotificationApplications", [])
+				}
+			}
+		});
+	}
+
+	// If any messaging connectors are configured, then we should configure the messaging admin and
+	// service components as well since they are required for the messaging connectors to work.
+	if (
+		coreConfig.types.messagingEmailConnector.length > 0 ||
+		coreConfig.types.messagingSmsConnector.length > 0 ||
+		coreConfig.types.messagingPushNotificationConnector.length > 0
+	) {
 		coreConfig.types.messagingAdminComponent ??= [];
 		coreConfig.types.messagingAdminComponent.push({
 			type: MessagingAdminComponentType.Service
@@ -1132,6 +1176,50 @@ async function configureMessaging(
 
 		coreConfig.types.messagingComponent ??= [];
 		coreConfig.types.messagingComponent.push({ type: MessagingComponentType.Service });
+	}
+}
+
+/**
+ * Configures mailbox components, mail storage components, and email protocol connectors.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the mailbox configuration has been applied.
+ */
+async function configureMailbox(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.emailProtocolConnector ??= [];
+
+	const emailProtocolConnectorTypes = envListToArray<
+		IEngineEnvironmentVariables,
+		EmailProtocolConnectorType
+	>(envVars, "emailProtocolConnector", Object.values(EmailProtocolConnectorType));
+	for (const emailProtocolConnectorType of emailProtocolConnectorTypes) {
+		coreConfig.types.emailProtocolConnector.push({
+			type: emailProtocolConnectorType,
+			options: {
+				config: {} as never
+			},
+			cloneMode: EngineCloneMode.Never,
+			isMultiInstance: true
+		});
+	}
+
+	// If email protocol connectors are configured, then we should configure the mailbox and mail store
+	// components as well, since they are required for the email protocol connectors to work.
+	if (coreConfig.types.emailProtocolConnector.length > 0) {
+		coreConfig.types.mailStorageComponent ??= [];
+		coreConfig.types.mailStorageComponent.push({
+			type: MailStorageComponentType.Service,
+			cloneMode: EngineCloneMode.Never
+		});
+
+		coreConfig.types.mailboxComponent ??= [];
+		coreConfig.types.mailboxComponent.push({
+			type: MailboxComponentType.Service,
+			cloneMode: EngineCloneMode.Never
+		});
 	}
 }
 
@@ -1147,12 +1235,18 @@ async function configureFaucet(
 ): Promise<void> {
 	coreConfig.types.faucetConnector ??= [];
 
-	if (envVars.faucetConnector === FaucetConnectorType.EntityStorage) {
+	const faucetConnectorType = envChoice<IEngineEnvironmentVariables, FaucetConnectorType>(
+		envVars,
+		"faucetConnector",
+		Object.values(FaucetConnectorType)
+	);
+
+	if (faucetConnectorType === FaucetConnectorType.EntityStorage) {
 		coreConfig.types.faucetConnector.push({
 			type: FaucetConnectorType.EntityStorage
 		});
 	} else if (
-		envVars.faucetConnector === FaucetConnectorType.Iota &&
+		faucetConnectorType === FaucetConnectorType.Iota &&
 		Is.stringValue(envVars.iotaFaucetEndpoint)
 	) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
@@ -1185,11 +1279,17 @@ async function configureWallet(
 ): Promise<void> {
 	coreConfig.types.walletConnector ??= [];
 
-	if (envVars.walletConnector === WalletConnectorType.EntityStorage) {
+	const walletConnectorType = envChoice<IEngineEnvironmentVariables, WalletConnectorType>(
+		envVars,
+		"walletConnector",
+		Object.values(WalletConnectorType)
+	);
+
+	if (walletConnectorType === WalletConnectorType.EntityStorage) {
 		coreConfig.types.walletConnector.push({
 			type: WalletConnectorType.EntityStorage
 		});
-	} else if (envVars.walletConnector === WalletConnectorType.Iota) {
+	} else if (walletConnectorType === WalletConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
 			coreConfig,
 			"dltConfig",
@@ -1216,11 +1316,17 @@ async function configureNft(
 ): Promise<void> {
 	coreConfig.types.nftConnector ??= [];
 
-	if (envVars.nftConnector === NftConnectorType.EntityStorage) {
+	const nftConnectorType = envChoice<IEngineEnvironmentVariables, NftConnectorType>(
+		envVars,
+		"nftConnector",
+		Object.values(NftConnectorType)
+	);
+
+	if (nftConnectorType === NftConnectorType.EntityStorage) {
 		coreConfig.types.nftConnector.push({
 			type: NftConnectorType.EntityStorage
 		});
-	} else if (envVars.nftConnector === NftConnectorType.Iota) {
+	} else if (nftConnectorType === NftConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
 			coreConfig,
 			"dltConfig",
@@ -1256,11 +1362,16 @@ async function configureNotarization(
 ): Promise<void> {
 	coreConfig.types.notarizationConnector ??= [];
 
-	if (envVars.notarizationConnector === NotarizationConnectorType.EntityStorage) {
+	const notarizationConnectorType = envChoice<
+		IEngineEnvironmentVariables,
+		NotarizationConnectorType
+	>(envVars, "notarizationConnector", Object.values(NotarizationConnectorType));
+
+	if (notarizationConnectorType === NotarizationConnectorType.EntityStorage) {
 		coreConfig.types.notarizationConnector.push({
 			type: NotarizationConnectorType.EntityStorage
 		});
-	} else if (envVars.notarizationConnector === NotarizationConnectorType.Iota) {
+	} else if (notarizationConnectorType === NotarizationConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
 			coreConfig,
 			"dltConfig",
@@ -1327,11 +1438,17 @@ async function configureIdentity(
 ): Promise<void> {
 	coreConfig.types.identityConnector ??= [];
 
-	if (envVars.identityConnector === IdentityConnectorType.EntityStorage) {
+	const identityConnectorType = envChoice<IEngineEnvironmentVariables, IdentityConnectorType>(
+		envVars,
+		"identityConnector",
+		Object.values(IdentityConnectorType)
+	);
+
+	if (identityConnectorType === IdentityConnectorType.EntityStorage) {
 		coreConfig.types.identityConnector.push({
 			type: IdentityConnectorType.EntityStorage
 		});
-	} else if (envVars.identityConnector === IdentityConnectorType.Iota) {
+	} else if (identityConnectorType === IdentityConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
 			coreConfig,
 			"dltConfig",
@@ -1377,11 +1494,16 @@ async function configureIdentityResolver(
 ): Promise<void> {
 	coreConfig.types.identityResolverConnector ??= [];
 
-	if (envVars.identityResolverConnector === IdentityResolverConnectorType.EntityStorage) {
+	const identityResolverConnectorType = envChoice<
+		IEngineEnvironmentVariables,
+		IdentityResolverConnectorType
+	>(envVars, "identityResolverConnector", Object.values(IdentityResolverConnectorType));
+
+	if (identityResolverConnectorType === IdentityResolverConnectorType.EntityStorage) {
 		coreConfig.types.identityResolverConnector.push({
 			type: IdentityResolverConnectorType.EntityStorage
 		});
-	} else if (envVars.identityResolverConnector === IdentityResolverConnectorType.Iota) {
+	} else if (identityResolverConnectorType === IdentityResolverConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
 			coreConfig,
 			"dltConfig",
@@ -1398,7 +1520,7 @@ async function configureIdentityResolver(
 				}
 			}
 		});
-	} else if (envVars.identityResolverConnector === IdentityResolverConnectorType.Universal) {
+	} else if (identityResolverConnectorType === IdentityResolverConnectorType.Universal) {
 		coreConfig.types.identityResolverConnector.push({
 			type: IdentityResolverConnectorType.Universal,
 			options: {
@@ -1429,7 +1551,12 @@ async function configureIdentityProfile(
 ): Promise<void> {
 	coreConfig.types.identityProfileConnector ??= [];
 
-	if (envVars.identityProfileConnector === IdentityConnectorType.EntityStorage) {
+	const identityProfileConnectorType = envChoice<
+		IEngineEnvironmentVariables,
+		IdentityProfileConnectorType
+	>(envVars, "identityProfileConnector", Object.values(IdentityProfileConnectorType));
+
+	if (identityProfileConnectorType === IdentityProfileConnectorType.EntityStorage) {
 		coreConfig.types.identityProfileConnector.push({
 			type: IdentityProfileConnectorType.EntityStorage
 		});
@@ -1453,7 +1580,13 @@ async function configureAttestation(
 ): Promise<void> {
 	coreConfig.types.attestationConnector ??= [];
 
-	if (envVars.attestationConnector === AttestationConnectorType.Nft) {
+	const attestationConnectorType = envChoice<IEngineEnvironmentVariables, AttestationConnectorType>(
+		envVars,
+		"attestationConnector",
+		Object.values(AttestationConnectorType)
+	);
+
+	if (attestationConnectorType === AttestationConnectorType.Nft) {
 		coreConfig.types.attestationConnector.push({
 			type: AttestationConnectorType.Nft
 		});
@@ -1528,26 +1661,35 @@ async function configureDataProcessing(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (envBoolean(envVars, "dataProcessingEnabled", false)) {
+	coreConfig.types.dataConverterConnector ??= [];
+
+	const converterConnectors = envListToArray<
+		IEngineEnvironmentVariables,
+		DataConverterConnectorType
+	>(envVars, "dataConverterConnectors", Object.values(DataConverterConnectorType));
+	for (const converterConnector of converterConnectors) {
+		coreConfig.types.dataConverterConnector.push({
+			type: converterConnector
+		});
+	}
+
+	coreConfig.types.dataExtractorConnector ??= [];
+	const extractorConnectors = envListToArray<
+		IEngineEnvironmentVariables,
+		DataExtractorConnectorType
+	>(envVars, "dataExtractorConnectors", Object.values(DataExtractorConnectorType));
+	for (const extractorConnector of extractorConnectors) {
+		coreConfig.types.dataExtractorConnector.push({
+			type: extractorConnector
+		});
+	}
+
+	if (
+		coreConfig.types.dataConverterConnector.length > 0 ||
+		coreConfig.types.dataExtractorConnector.length > 0
+	) {
 		coreConfig.types.dataProcessingComponent ??= [];
 		coreConfig.types.dataProcessingComponent.push({ type: DataProcessingComponentType.Service });
-
-		coreConfig.types.dataConverterConnector ??= [];
-
-		const converterConnectors = commaSeparatedListToArray(envVars.dataConverterConnectors);
-		for (const converterConnector of converterConnectors) {
-			coreConfig.types.dataConverterConnector.push({
-				type: converterConnector as DataConverterConnectorType
-			});
-		}
-
-		coreConfig.types.dataExtractorConnector ??= [];
-		const extractorConnectors = commaSeparatedListToArray(envVars.dataExtractorConnectors);
-		for (const extractorConnector of extractorConnectors) {
-			coreConfig.types.dataExtractorConnector.push({
-				type: extractorConnector as DataExtractorConnectorType
-			});
-		}
 	}
 }
 
@@ -1591,10 +1733,14 @@ async function configureTrust(
 		});
 
 		coreConfig.types.trustGeneratorComponent ??= [];
-		const trustGeneratorTypes = commaSeparatedListToArray(envVars.trustGenerators);
+		const trustGeneratorTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			TrustGeneratorComponentType
+		>(envVars, "trustGenerators", Object.values(TrustGeneratorComponentType));
+
 		for (const trustGeneratorType of trustGeneratorTypes) {
 			coreConfig.types.trustGeneratorComponent.push({
-				type: trustGeneratorType as TrustGeneratorComponentType,
+				type: trustGeneratorType,
 				options: {
 					config: {
 						verificationMethodId: envVars.trustVerificationMethodId ?? "",
@@ -1605,13 +1751,14 @@ async function configureTrust(
 		}
 
 		coreConfig.types.trustVerifierComponent ??= [];
-		const trustVerifierTypes = commaSeparatedListToArray(envVars.trustVerifiers);
+		const trustVerifierTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			TrustVerifierComponentType
+		>(envVars, "trustVerifiers", Object.values(TrustVerifierComponentType));
 		for (const trustVerifierType of trustVerifierTypes) {
-			const type = trustVerifierType as TrustVerifierComponentType;
-
-			if (type === TrustVerifierComponentType.IdentityAllowDeny) {
+			if (trustVerifierType === TrustVerifierComponentType.IdentityAllowDeny) {
 				coreConfig.types.trustVerifierComponent.push({
-					type,
+					type: TrustVerifierComponentType.IdentityAllowDeny,
 					options: {
 						config: {
 							allowIdentities: commaSeparatedListToArray<string>(envVars.trustIdentitiesAllow),
@@ -1619,9 +1766,9 @@ async function configureTrust(
 						}
 					}
 				});
-			} else {
+			} else if (trustVerifierType === TrustVerifierComponentType.JwtVerifiableCredential) {
 				coreConfig.types.trustVerifierComponent.push({
-					type
+					type: TrustVerifierComponentType.JwtVerifiableCredential
 				});
 			}
 		}
@@ -1713,70 +1860,107 @@ async function configureRightsManagement(
 		});
 
 		coreConfig.types.rightsManagementPolicyArbiterComponent ??= [];
-		const policyArbiterTypes = commaSeparatedListToArray(envVars.rightsManagementPolicyArbiters);
+		const policyArbiterTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyArbiterComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyArbiters",
+			Object.values(RightsManagementPolicyArbiterComponentType)
+		);
 		for (const policyArbiterType of policyArbiterTypes) {
 			coreConfig.types.rightsManagementPolicyArbiterComponent.push({
-				type: policyArbiterType as RightsManagementPolicyArbiterComponentType
+				type: policyArbiterType
 			});
 		}
 
 		coreConfig.types.rightsManagementPolicyObligationEnforcerComponent ??= [];
-		const policyObligationEnforcerTypes = commaSeparatedListToArray(
-			envVars.rightsManagementPolicyObligationEnforcers
+		const policyObligationEnforcerTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyObligationEnforcerComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyObligationEnforcers",
+			Object.values(RightsManagementPolicyObligationEnforcerComponentType)
 		);
 		for (const policyObligationEnforcerType of policyObligationEnforcerTypes) {
 			coreConfig.types.rightsManagementPolicyObligationEnforcerComponent.push({
-				type: policyObligationEnforcerType as RightsManagementPolicyObligationEnforcerComponentType
+				type: policyObligationEnforcerType
 			});
 		}
 
 		coreConfig.types.rightsManagementPolicyEnforcementProcessorComponent ??= [];
-		const policyEnforcementProcessTypes = commaSeparatedListToArray(
-			envVars.rightsManagementPolicyEnforcementProcessors
+		const policyEnforcementProcessTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyEnforcementProcessorComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyEnforcementProcessors",
+			Object.values(RightsManagementPolicyEnforcementProcessorComponentType)
 		);
 		for (const policyEnforcementProcessorType of policyEnforcementProcessTypes) {
 			coreConfig.types.rightsManagementPolicyEnforcementProcessorComponent.push({
-				type: policyEnforcementProcessorType as RightsManagementPolicyEnforcementProcessorComponentType
+				type: policyEnforcementProcessorType
 			});
 		}
 
 		coreConfig.types.rightsManagementPolicyExecutionActionComponent ??= [];
-		const policyExecutionActionTypes = commaSeparatedListToArray(
-			envVars.rightsManagementPolicyExecutionActions
+		const policyExecutionActionTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyExecutionActionComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyExecutionActions",
+			Object.values(RightsManagementPolicyExecutionActionComponentType)
 		);
 		for (const policyExecutionActionType of policyExecutionActionTypes) {
 			coreConfig.types.rightsManagementPolicyExecutionActionComponent.push({
-				type: policyExecutionActionType as RightsManagementPolicyExecutionActionComponentType
+				type: policyExecutionActionType
 			});
 		}
 
 		coreConfig.types.rightsManagementPolicyInformationSourceComponent ??= [];
-		const policyInformationSourceTypes = commaSeparatedListToArray(
-			envVars.rightsManagementPolicyInformationSources
+		const policyInformationSourceTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyInformationSourceComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyInformationSources",
+			Object.values(RightsManagementPolicyInformationSourceComponentType)
 		);
 		for (const policyInformationSourceType of policyInformationSourceTypes) {
 			coreConfig.types.rightsManagementPolicyInformationSourceComponent.push({
-				type: policyInformationSourceType as RightsManagementPolicyInformationSourceComponentType
+				type: policyInformationSourceType
 			});
 		}
 
 		coreConfig.types.rightsManagementPolicyRequesterComponent ??= [];
-		const policyRequesterTypes = commaSeparatedListToArray(
-			envVars.rightsManagementPolicyRequesters
+		const policyRequesterTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyRequesterComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyRequesters",
+			Object.values(RightsManagementPolicyRequesterComponentType)
 		);
 		for (const policyRequesterType of policyRequesterTypes) {
 			coreConfig.types.rightsManagementPolicyRequesterComponent.push({
-				type: policyRequesterType as RightsManagementPolicyRequesterComponentType
+				type: policyRequesterType
 			});
 		}
 
 		coreConfig.types.rightsManagementPolicyNegotiatorComponent ??= [];
-		const policyNegotiatorTypes = commaSeparatedListToArray(
-			envVars.rightsManagementPolicyNegotiators
+		const policyNegotiatorTypes = envListToArray<
+			IEngineEnvironmentVariables,
+			RightsManagementPolicyNegotiatorComponentType
+		>(
+			envVars,
+			"rightsManagementPolicyNegotiators",
+			Object.values(RightsManagementPolicyNegotiatorComponentType)
 		);
 		for (const policyNegotiatorType of policyNegotiatorTypes) {
 			coreConfig.types.rightsManagementPolicyNegotiatorComponent.push({
-				type: policyNegotiatorType as RightsManagementPolicyNegotiatorComponentType
+				type: policyNegotiatorType
 			});
 		}
 	}
@@ -1832,11 +2016,14 @@ async function configureFederatedCatalogue(
 			});
 
 			coreConfig.types.federatedCatalogueFilterComponent ??= [];
-			const filters = commaSeparatedListToArray(envVars.federatedCatalogueFilters);
+			const filters = envListToArray<
+				IEngineEnvironmentVariables,
+				FederatedCatalogueFilterComponentType
+			>(envVars, "federatedCatalogueFilters", Object.values(FederatedCatalogueFilterComponentType));
 
 			for (const filter of filters) {
 				coreConfig.types.federatedCatalogueFilterComponent.push({
-					type: filter as FederatedCatalogueFilterComponentType,
+					type: filter,
 					options: {}
 				});
 			}
@@ -2043,7 +2230,8 @@ export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): b
 		envBoolean(envVars, "dataspaceEnabled", false) ||
 		isRightsManagementRequired(envVars) ||
 		isAuthEntityStorageRequired(envVars) ||
-		isImmutableProofRequired(envVars)
+		isImmutableProofRequired(envVars) ||
+		isMailboxEnabled(envVars)
 	);
 }
 
@@ -2081,5 +2269,17 @@ export function isTracingEnabled(envVars: IEngineEnvironmentVariables): boolean 
 			t === TracingConnectorType.EntityStorage ||
 			t === TracingConnectorType.OpenTelemetry ||
 			t === TracingConnectorType.Console
+	);
+}
+
+/**
+ * Checks if the mailbox subsystem is enabled.
+ * Returns true when any component that depends on the mailbox subsystem is enabled.
+ * @param envVars The environment variables.
+ * @returns True if mailbox is enabled.
+ */
+export function isMailboxEnabled(envVars: IEngineEnvironmentVariables): boolean {
+	return commaSeparatedListToArray<EmailProtocolConnectorType>(envVars.emailProtocolConnector).some(
+		t => t === EmailProtocolConnectorType.Imap || t === EmailProtocolConnectorType.Pop3
 	);
 }

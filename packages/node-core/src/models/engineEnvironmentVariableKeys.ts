@@ -134,11 +134,17 @@ const engineEnvironmentVariableKeysInternal: {
 	// event bus
 	eventBusConnector: true,
 	eventBusComponent: true,
+	// email
+	emailProtocolConnector: true,
 	// messaging
-	messagingEnabled: true,
 	messagingEmailConnector: true,
 	messagingSmsConnector: true,
 	messagingPushNotificationConnector: true,
+	smtpHost: true,
+	smtpPort: true,
+	smtpSecure: true,
+	smtpUsername: true,
+	smtpPassword: true,
 	// AWS SES
 	awsSesRegion: true,
 	awsSesAuthMode: true,
@@ -211,7 +217,6 @@ const engineEnvironmentVariableKeysInternal: {
 	attestationConnector: true,
 	attestationVerificationMethodId: true,
 	// data processing
-	dataProcessingEnabled: true,
 	dataConverterConnectors: true,
 	dataExtractorConnectors: true,
 	taskSchedulerEnabled: true,

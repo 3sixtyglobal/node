@@ -1,9 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
-import { CLIDisplay } from "@twin.org/cli-core";
+import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { Coerce, EnvHelper, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
@@ -42,7 +41,6 @@ import {
 } from "./utils.js";
 
 const moduleCache: { [id: string]: unknown } = {};
-let npmRootCache: string | undefined;
 
 /**
  * Run the node.
@@ -177,7 +175,7 @@ export async function run(
 			availableContextIdKeys
 		);
 
-		if (!Is.empty(startResult)) {
+		if (Is.notEmpty(startResult)) {
 			showErrorDetails = false;
 
 			let isShuttingDown = false;
@@ -470,13 +468,15 @@ export function overrideModuleImport(
 
 			case ModuleProtocol.Default: {
 				try {
-					const packagePath = path.resolve(getNpmRootPath(), moduleName);
-					const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
-					const modulePath = path.resolve(packagePath, mainFile);
-					const exists = await fileExists(modulePath);
-					if (exists) {
-						resolvedPath = modulePath;
-						break;
+					const packagePath = await CLIUtils.findPackageRoot(moduleName, executionDirectory);
+					if (Is.stringValue(packagePath)) {
+						const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
+						const modulePath = path.resolve(packagePath, mainFile);
+						const exists = await fileExists(modulePath);
+						if (exists) {
+							resolvedPath = modulePath;
+							break;
+						}
 					}
 				} catch {
 					// Continue to fallback resolution
@@ -518,13 +518,4 @@ export function overrideModuleImport(
 			useDefault: true
 		};
 	});
-}
-
-/**
- * Get the root path for npm modules by executing "npm root" command and cache it.
- * @returns The root path for npm modules.
- */
-function getNpmRootPath(): string {
-	npmRootCache ??= execSync("npm root").toString().trim().replace(/\\/g, "/");
-	return npmRootCache;
 }

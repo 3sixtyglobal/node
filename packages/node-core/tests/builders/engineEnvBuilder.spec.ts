@@ -1,11 +1,22 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IIotaConfig } from "@twin.org/dlt-iota";
+import { EngineCloneMode } from "@twin.org/engine-models";
 import {
+	DataConverterConnectorType,
+	DataExtractorConnectorType,
+	DataProcessingComponentType,
 	DataspaceControlPlaneComponentType,
 	DltConfigType,
+	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
 	LoggingConnectorType,
+	MailboxComponentType,
+	MetricsProducerComponentType,
+	MailStorageComponentType,
+	MessagingAdminComponentType,
+	MessagingComponentType,
+	MessagingEmailConnectorType,
 	SchemaVersionMigrationComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
@@ -53,6 +64,18 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 describe("buildEngineConfiguration - task scheduler requirement", () => {
 	test("task scheduler is registered when only auditableItemGraphEnabled is set", async () => {
 		const config = await buildEngineConfiguration({ auditableItemGraphEnabled: "true" });
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
+	test("task scheduler is registered when only emailProtocolConnector is set", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Imap
+		});
 
 		expect(config.types.taskSchedulerComponent).toEqual(
 			expect.arrayContaining([
@@ -359,6 +382,170 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 	});
 });
 
+describe("buildEngineConfiguration - messaging connectors", () => {
+	test("configures SMTP connection settings", async () => {
+		const config = await buildEngineConfiguration({
+			messagingEmailConnector: MessagingEmailConnectorType.Smtp,
+			smtpHost: "smtp.example.com",
+			smtpPort: "465",
+			smtpSecure: "true",
+			smtpUsername: "smtp-user",
+			smtpPassword: "smtp-password"
+		});
+
+		expect(config.types.messagingEmailConnector).toEqual([
+			expect.objectContaining({
+				type: MessagingEmailConnectorType.Smtp,
+				options: {
+					config: {
+						host: "smtp.example.com",
+						port: 465,
+						secure: true,
+						username: "smtp-user",
+						password: "smtp-password"
+					}
+				}
+			})
+		]);
+	});
+
+	test("messaging components are registered when an email connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			messagingEmailConnector: MessagingEmailConnectorType.EntityStorage
+		});
+
+		expect(config.types.messagingEmailConnector).toEqual([
+			expect.objectContaining({ type: MessagingEmailConnectorType.EntityStorage })
+		]);
+		expect(config.types.messagingAdminComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: MessagingAdminComponentType.Service })
+			])
+		);
+		expect(config.types.messagingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: MessagingComponentType.Service })])
+		);
+	});
+
+	test("messaging components are not registered when no messaging connector is configured", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.messagingEmailConnector).toEqual([]);
+		expect(config.types.messagingSmsConnector).toEqual([]);
+		expect(config.types.messagingPushNotificationConnector).toEqual([]);
+		expect(config.types.messagingAdminComponent).toBeUndefined();
+		expect(config.types.messagingComponent).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - mailbox", () => {
+	test("no mailbox stack is registered when emailProtocolConnector is unset", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.emailProtocolConnector).toEqual([]);
+		expect(config.types.mailStorageComponent).toBeUndefined();
+		expect(config.types.mailboxComponent).toBeUndefined();
+	});
+
+	test("pop3 connector registers the mail storage and mailbox components", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Pop3
+		});
+
+		expect(config.types.emailProtocolConnector).toEqual([
+			expect.objectContaining({
+				type: EmailProtocolConnectorType.Pop3,
+				isMultiInstance: true
+			})
+		]);
+		expect(config.types.mailStorageComponent).toEqual([
+			expect.objectContaining({
+				type: MailStorageComponentType.Service,
+				cloneMode: EngineCloneMode.Never
+			})
+		]);
+		expect(config.types.mailboxComponent).toEqual([
+			expect.objectContaining({
+				type: MailboxComponentType.Service,
+				cloneMode: EngineCloneMode.Never
+			})
+		]);
+	});
+
+	test("both protocol connectors register a single mail storage and mailbox component", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: `${EmailProtocolConnectorType.Pop3},${EmailProtocolConnectorType.Imap}`
+		});
+
+		expect(config.types.emailProtocolConnector?.map(c => c.type)).toEqual([
+			EmailProtocolConnectorType.Pop3,
+			EmailProtocolConnectorType.Imap
+		]);
+		expect(config.types.mailStorageComponent).toHaveLength(1);
+		expect(config.types.mailboxComponent).toHaveLength(1);
+	});
+
+	test("throws GeneralError naming the env var for an unknown protocol connector", async () => {
+		await expect(buildEngineConfiguration({ emailProtocolConnector: "imap4" })).rejects.toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({ key: "emailProtocolConnector" })
+			})
+		);
+	});
+});
+
+describe("buildEngineConfiguration - data processing", () => {
+	test("data processing component is not registered when no connectors are configured", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.dataConverterConnector).toEqual([]);
+		expect(config.types.dataExtractorConnector).toEqual([]);
+		expect(config.types.dataProcessingComponent).toBeUndefined();
+	});
+
+	test("data processing component is registered when a converter connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			dataConverterConnectors: DataConverterConnectorType.Json
+		});
+
+		expect(config.types.dataConverterConnector).toEqual([
+			expect.objectContaining({ type: DataConverterConnectorType.Json })
+		]);
+		expect(config.types.dataProcessingComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: DataProcessingComponentType.Service })
+			])
+		);
+	});
+
+	test("data processing component is registered when only an extractor connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			dataExtractorConnectors: DataExtractorConnectorType.JsonPath
+		});
+
+		expect(config.types.dataExtractorConnector).toEqual([
+			expect.objectContaining({ type: DataExtractorConnectorType.JsonPath })
+		]);
+		expect(config.types.dataProcessingComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: DataProcessingComponentType.Service })
+			])
+		);
+	});
+
+	test("throws GeneralError naming the env var for an unknown converter connector", async () => {
+		await expect(buildEngineConfiguration({ dataConverterConnectors: "json,xnl" })).rejects.toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({ key: "dataConverterConnectors" })
+			})
+		);
+	});
+});
+
 describe("buildEngineConfiguration - logging multi-connector", () => {
 	test("single logging connector is marked as default", async () => {
 		const config = await buildEngineConfiguration({ loggingConnector: "console" });
@@ -444,6 +631,53 @@ describe("buildEngineConfiguration - telemetry multi-connector", () => {
 		expect(multi).toBeUndefined();
 		expect(config.types.telemetryComponent).toEqual(
 			expect.arrayContaining([expect.objectContaining({ type: TelemetryComponentType.Service })])
+		);
+	});
+});
+
+describe("buildEngineConfiguration - telemetry metrics producers", () => {
+	test("defaults to the system and process producers when the env var is unset", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.EntityStorage
+		});
+
+		expect(config.types.metricsProducerComponent?.map(p => p.type)).toEqual([
+			MetricsProducerComponentType.System,
+			MetricsProducerComponentType.Process
+		]);
+	});
+
+	test("the supplied env vars object is not mutated", async () => {
+		const envVars = { telemetryConnector: TelemetryConnectorType.EntityStorage };
+
+		await buildEngineConfiguration(envVars);
+
+		expect(envVars).toEqual({ telemetryConnector: TelemetryConnectorType.EntityStorage });
+	});
+
+	test("an explicit producer list replaces the defaults", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.EntityStorage,
+			telemetryMetricsProducers: MetricsProducerComponentType.Process
+		});
+
+		expect(config.types.metricsProducerComponent?.map(p => p.type)).toEqual([
+			MetricsProducerComponentType.Process
+		]);
+	});
+
+	test("throws GeneralError naming the env var for an unknown producer", async () => {
+		await expect(
+			buildEngineConfiguration({
+				telemetryConnector: TelemetryConnectorType.EntityStorage,
+				telemetryMetricsProducers: "system,disk"
+			})
+		).rejects.toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({ key: "telemetryMetricsProducers" })
+			})
 		);
 	});
 });

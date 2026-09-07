@@ -154,7 +154,7 @@ export async function bootstrapDev(
 
 		const defaultAttestationConnectorType =
 			engineCore.getRegisteredInstanceTypeOptional("attestationConnector");
-		if (!Is.empty(defaultAttestationConnectorType)) {
+		if (Is.notEmpty(defaultAttestationConnectorType)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
 				I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.attestationMethodCreate")
@@ -170,7 +170,7 @@ export async function bootstrapDev(
 		const defaultImmutableProofComponentType =
 			engineCore.getRegisteredInstanceTypeOptional("immutableProofComponent");
 
-		if (!Is.empty(defaultImmutableProofComponentType)) {
+		if (Is.notEmpty(defaultImmutableProofComponentType)) {
 			CLIDisplay.break();
 			CLIDisplay.section(
 				I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.immutableProofMethodCreate")
@@ -361,7 +361,7 @@ async function resolveDefaultTenant(
 		cursor = result.cursor;
 	} while (Is.stringValue(cursor));
 
-	if (!Is.empty(firstTenant)) {
+	if (Is.notEmpty(firstTenant)) {
 		CLIDisplay.value(
 			I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.tenantFallback"),
 			firstTenant.id
