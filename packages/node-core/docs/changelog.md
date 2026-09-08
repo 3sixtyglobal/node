@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.4-next.2](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.4-next.1...node-core-v0.9.4-next.2) (2026-09-08)
+
+
+### Features
+
+* telemetry and deprecated variables ([198f43f](https://github.com/iotaledger/twin-node/commit/198f43fd2d94e2f6721924365b73c0af3020e31d))
+
 ## [0.9.4-next.1](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.4-next.0...node-core-v0.9.4-next.1) (2026-09-07)
 
 
