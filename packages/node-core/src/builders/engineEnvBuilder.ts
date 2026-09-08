@@ -2172,7 +2172,10 @@ export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables):
 	return (
 		envBoolean(envVars, "dataspaceEnabled", false) ||
 		isImmutableProofRequired(envVars) ||
-		envBoolean(envVars, "healthEnabled", false)
+		envBoolean(envVars, "healthEnabled", false) ||
+		commaSeparatedListToArray<TelemetryConnectorType>(envVars.telemetryConnector).includes(
+			TelemetryConnectorType.EntityStorage
+		)
 	);
 }
 

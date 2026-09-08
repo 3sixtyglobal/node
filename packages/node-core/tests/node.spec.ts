@@ -6,6 +6,7 @@ import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { I18n } from "@twin.org/core";
+import { DEPRECATED_ENVIRONMENT_VARIABLE_KEYS } from "../src/models/deprecatedEnvironmentVariableKeys.js";
 import { buildConfiguration } from "../src/node.js";
 
 vi.mock("../src/builders/engineEnvBuilder.js", () => ({
@@ -243,6 +244,87 @@ describe("node", () => {
 				);
 				expect(warnSpy).toHaveBeenCalled();
 			} finally {
+				warnSpy.mockRestore();
+				formatSpy.mockRestore();
+			}
+		});
+
+		test("warns and does not throw for the deprecated TWIN_MESSAGING_ENABLED", async () => {
+			const envFile = path.join(tempDir, ".env.deprecated-messaging");
+			await writeFile(envFile, "");
+			const warnSpy = vi.spyOn(CLIDisplay, "warning").mockImplementation(() => {});
+			const formatSpy = vi.spyOn(I18n, "formatMessage");
+
+			try {
+				await expect(
+					buildConfiguration(
+						{ TWIN_MESSAGING_ENABLED: "true" },
+						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+						SERVER_INFO
+					)
+				).resolves.toBeDefined();
+
+				expect(formatSpy).toHaveBeenCalledWith("warn.node.deprecatedEnvVar", {
+					key: "TWIN_MESSAGING_ENABLED",
+					replacements:
+						"TWIN_MESSAGING_EMAIL_CONNECTOR, TWIN_MESSAGING_SMS_CONNECTOR, TWIN_MESSAGING_PUSH_NOTIFICATION_CONNECTOR"
+				});
+				expect(warnSpy).toHaveBeenCalled();
+			} finally {
+				warnSpy.mockRestore();
+				formatSpy.mockRestore();
+			}
+		});
+
+		test("warns and does not throw for the deprecated TWIN_DATA_PROCESSING_ENABLED", async () => {
+			const envFile = path.join(tempDir, ".env.deprecated-data-processing");
+			await writeFile(envFile, "");
+			const warnSpy = vi.spyOn(CLIDisplay, "warning").mockImplementation(() => {});
+			const formatSpy = vi.spyOn(I18n, "formatMessage");
+
+			try {
+				await expect(
+					buildConfiguration(
+						{ TWIN_DATA_PROCESSING_ENABLED: "true" },
+						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+						SERVER_INFO
+					)
+				).resolves.toBeDefined();
+
+				expect(formatSpy).toHaveBeenCalledWith("warn.node.deprecatedEnvVar", {
+					key: "TWIN_DATA_PROCESSING_ENABLED",
+					replacements: "TWIN_DATA_CONVERTER_CONNECTORS, TWIN_DATA_EXTRACTOR_CONNECTORS"
+				});
+				expect(warnSpy).toHaveBeenCalled();
+			} finally {
+				warnSpy.mockRestore();
+				formatSpy.mockRestore();
+			}
+		});
+
+		test("warns without a replacement when a deprecated key has none", async () => {
+			const envFile = path.join(tempDir, ".env.deprecated-no-replacement");
+			await writeFile(envFile, "");
+			const warnSpy = vi.spyOn(CLIDisplay, "warning").mockImplementation(() => {});
+			const formatSpy = vi.spyOn(I18n, "formatMessage");
+			const deprecated = DEPRECATED_ENVIRONMENT_VARIABLE_KEYS as Map<string, readonly string[]>;
+			deprecated.set("withdrawnSetting", []);
+
+			try {
+				await expect(
+					buildConfiguration(
+						{ TWIN_WITHDRAWN_SETTING: "true" },
+						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+						SERVER_INFO
+					)
+				).resolves.toBeDefined();
+
+				expect(formatSpy).toHaveBeenCalledWith("warn.node.deprecatedEnvVarNoReplacement", {
+					key: "TWIN_WITHDRAWN_SETTING"
+				});
+				expect(warnSpy).toHaveBeenCalled();
+			} finally {
+				deprecated.delete("withdrawnSetting");
 				warnSpy.mockRestore();
 				formatSpy.mockRestore();
 			}

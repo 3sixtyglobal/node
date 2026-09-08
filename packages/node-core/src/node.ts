@@ -16,6 +16,7 @@ import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
 import { BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapDevEnvironmentVariableKeys.js";
+import { DEPRECATED_ENVIRONMENT_VARIABLE_KEYS } from "./models/deprecatedEnvironmentVariableKeys.js";
 import { ENGINE_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineEnvironmentVariableKeys.js";
 import { ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineServerEnvironmentVariableKeys.js";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
@@ -229,6 +230,37 @@ function matchesPatternSet(
 }
 
 /**
+ * Report any environment variables which are still recognised but no longer used.
+ * Reported whatever the strict env mode is, as a deprecated variable silently has no effect.
+ * @param envVars The already-converted camelCase env variables.
+ * @param prefix The prefix used for the environment variables (e.g. "TWIN_").
+ */
+function warnDeprecatedEnvVarKeys(
+	envVars: { [id: string]: string | unknown },
+	prefix: string
+): void {
+	for (const camelKey of Object.keys(envVars)) {
+		const replacements = DEPRECATED_ENVIRONMENT_VARIABLE_KEYS.get(camelKey);
+		if (!Is.undefined(replacements)) {
+			const key = EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix);
+
+			if (Is.arrayValue(replacements)) {
+				CLIDisplay.warning(
+					I18n.formatMessage("warn.node.deprecatedEnvVar", {
+						key,
+						replacements: replacements
+							.map(replacement => EnvHelper.jsonKeyToEnvVarKey(replacement, prefix))
+							.join(", ")
+					})
+				);
+			} else {
+				CLIDisplay.warning(I18n.formatMessage("warn.node.deprecatedEnvVarNoReplacement", { key }));
+			}
+		}
+	}
+}
+
+/**
  * Validate that every key in envVars maps to a recognised property.
  * All unknown keys are collected, then reported together as a single error or warning.
  * Raw env var names listed in the allow list (e.g. TWIN_MY_EXTENSION_SECRET, TWIN_REST_PATH_*) are always accepted.
@@ -260,7 +292,8 @@ function validateEnvVarKeys(
 		.filter(
 			camelKey =>
 				!allowSets.some(set => matchesPatternSet(camelKey, set)) &&
-				!matchesPatternSet(camelKey, customSet)
+				!matchesPatternSet(camelKey, customSet) &&
+				!DEPRECATED_ENVIRONMENT_VARIABLE_KEYS.has(camelKey)
 		)
 		.map(camelKey => EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix));
 
@@ -329,6 +362,8 @@ export async function buildConfiguration(
 		processEnv,
 		options.envPrefix ?? ""
 	);
+
+	warnDeprecatedEnvVarKeys(envVars, options.envPrefix ?? "");
 
 	validateEnvVarKeys(envVars, options.envPrefix ?? "", [
 		ENGINE_ENVIRONMENT_VARIABLE_KEYS,
