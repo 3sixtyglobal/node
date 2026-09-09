@@ -231,7 +231,6 @@ function matchesPatternSet(
 
 /**
  * Report any environment variables which are still recognised but no longer used.
- * Reported whatever the strict env mode is, as a deprecated variable silently has no effect.
  * @param envVars The already-converted camelCase env variables.
  * @param prefix The prefix used for the environment variables (e.g. "TWIN_").
  */
