@@ -9,6 +9,7 @@ import {
 	envDateTime,
 	envInteger,
 	envKeyIntegerPairs,
+	envListToArray,
 	envMinToMs,
 	envMinutes,
 	envMs,
@@ -17,6 +18,60 @@ import {
 	envSeconds,
 	envString
 } from "../../../src/builders/helper/envHelpers.js";
+
+describe("envString", () => {
+	test("returns undefined when the env var is absent and no default given", () => {
+		expect(envString<{ host?: string }>({}, "host")).toBeUndefined();
+	});
+
+	test("returns defaultValue when the env var is absent", () => {
+		expect(envString<{ host?: string }>({}, "host", "localhost")).toBe("localhost");
+	});
+
+	test("returns defaultValue when the env var is an empty string", () => {
+		expect(envString({ host: "" }, "host", "localhost")).toBe("localhost");
+	});
+
+	test("returns the value when the env var is set", () => {
+		expect(envString({ host: "smtp.example.com" }, "host")).toBe("smtp.example.com");
+	});
+});
+
+describe("envChoice", () => {
+	const choices = ["memory", "file"] as const;
+
+	test("returns undefined when the env var is absent and no default given", () => {
+		expect(envChoice<{ store?: string }, "memory" | "file">({}, "store", choices)).toBeUndefined();
+	});
+
+	test("returns defaultValue when the env var is absent", () => {
+		expect(envChoice<{ store?: string }, "memory" | "file">({}, "store", choices, "memory")).toBe(
+			"memory"
+		);
+	});
+
+	test("returns defaultValue when the env var is an empty string", () => {
+		expect(envChoice({ store: "" }, "store", choices, "file")).toBe("file");
+	});
+
+	test("returns the value when it is one of the choices", () => {
+		expect(envChoice({ store: "file" }, "store", choices)).toBe("file");
+	});
+
+	test("throws GeneralError naming the env var when the value is not a choice", () => {
+		expect(() => envChoice({ store: "dynamodb" }, "store", choices)).toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({
+					key: "store",
+					value: "dynamodb",
+					type: "memory | file"
+				})
+			})
+		);
+	});
+});
 
 describe("envBoolean", () => {
 	test("returns defaultValue when env var is undefined", () => {
@@ -513,6 +568,57 @@ describe("commaSeparatedListToArray", () => {
 
 	test("filters out blank entries from double commas", () => {
 		expect(commaSeparatedListToArray("memory,,file")).toEqual(["memory", "file"]);
+	});
+});
+
+describe("envListToArray", () => {
+	const expected = ["json", "xml"] as const;
+
+	test("returns empty array when the env var is absent", () => {
+		expect(envListToArray<{ converters?: string }, string>({}, "converters")).toEqual([]);
+	});
+
+	test("returns defaultValue when the env var is absent", () => {
+		expect(
+			envListToArray<{ converters?: string }, string>({}, "converters", undefined, ["json"])
+		).toEqual(["json"]);
+	});
+
+	test("returns defaultValue when the env var is an empty string", () => {
+		expect(envListToArray({ converters: "" }, "converters", undefined, ["json"])).toEqual(["json"]);
+	});
+
+	test("splits and trims comma-separated values", () => {
+		expect(
+			envListToArray<{ converters?: string }, string>({ converters: " json , xml " }, "converters")
+		).toEqual(["json", "xml"]);
+	});
+
+	test("returns the values when they are all in expectedValues", () => {
+		expect(envListToArray({ converters: "json,xml" }, "converters", [...expected])).toEqual([
+			"json",
+			"xml"
+		]);
+	});
+
+	test("throws GeneralError naming the env var when a value is not in expectedValues", () => {
+		expect(() => envListToArray({ converters: "json,xnl" }, "converters", [...expected])).toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({
+					key: "converters",
+					value: "json,xnl",
+					type: "json | xml"
+				})
+			})
+		);
+	});
+
+	test("does not validate when expectedValues is omitted", () => {
+		expect(
+			envListToArray<{ converters?: string }, string>({ converters: "xnl" }, "converters")
+		).toEqual(["xnl"]);
 	});
 });
 

@@ -1,12 +1,25 @@
 # Changelog
 
-## [0.9.3-next.1](https://github.com/iotaledger/twin-node/compare/node-v0.9.3-next.0...node-v0.9.3-next.1) (2026-08-27)
+## [0.9.4-next.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.4-next.1...node-v0.9.4-next.2) (2026-09-08)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.4-next.1 to 0.9.4-next.2
+
+## [0.9.4-next.1](https://github.com/iotaledger/twin-node/compare/node-v0.9.4-next.0...node-v0.9.4-next.1) (2026-09-07)
 
 
 ### Features
 
 * add additional env vars ([#328](https://github.com/iotaledger/twin-node/issues/328)) ([6ca8718](https://github.com/iotaledger/twin-node/commit/6ca87184bc4d78829c957ea055d3c281aca6cf9f))
-* add auth admin component ([1661e57](https://github.com/iotaledger/twin-node/commit/1661e57a699d5cf9ebde333e3cbc3aaea89d7c9c))
 * add automation ([cfc63b4](https://github.com/iotaledger/twin-node/commit/cfc63b465c139280f696877df21d54dc6a065a7e))
 * add CLI commands and remove automated bootstrap code ([#69](https://github.com/iotaledger/twin-node/issues/69)) ([6e40933](https://github.com/iotaledger/twin-node/commit/6e40933d8bb820b380e1074fc88feeedca0ef7d9))
 * add cloud soak profile, disabled groups filter, and nightly GHA workflow ([#266](https://github.com/iotaledger/twin-node/issues/266)) ([6e8179c](https://github.com/iotaledger/twin-node/commit/6e8179c2dadbba8a2f0d577b44dc1ed9c8288046))
@@ -14,7 +27,6 @@
 * add data space connector ([157e8b0](https://github.com/iotaledger/twin-node/commit/157e8b0a76e3a8a63c1991924f7f963eb83e27ae))
 * add dsp sweep vars ([#340](https://github.com/iotaledger/twin-node/issues/340)) ([5487c13](https://github.com/iotaledger/twin-node/commit/5487c13197fcd386206ec37f9f342c55ec5b1176))
 * add extensions support ([476d5a8](https://github.com/iotaledger/twin-node/commit/476d5a864026a2f78e5b02bc9eb81359777a4a45))
-* add missing export ([e8eb621](https://github.com/iotaledger/twin-node/commit/e8eb6213937a202520b164a9970a891004122b61))
 * add mutex settings ([#222](https://github.com/iotaledger/twin-node/issues/222)) ([492c55f](https://github.com/iotaledger/twin-node/commit/492c55f67d5f70c2a4a27dfdb2700a644ee87955))
 * add notarization ([#121](https://github.com/iotaledger/twin-node/issues/121)) ([b2a11df](https://github.com/iotaledger/twin-node/commit/b2a11df92c7b5026f73f08a018c0586ebe008e92))
 * add obligation enforcers and multi instance support ([#89](https://github.com/iotaledger/twin-node/issues/89)) ([d81af99](https://github.com/iotaledger/twin-node/commit/d81af99b8c4db6e9a1370b7065bf6d9d222c71ed))
@@ -41,6 +53,7 @@
 * configure web server body limits from the environment ([#356](https://github.com/iotaledger/twin-node/issues/356)) ([f196ad3](https://github.com/iotaledger/twin-node/commit/f196ad368559515184e37a99d6876570074ebcd5))
 * custom REST paths ([#99](https://github.com/iotaledger/twin-node/issues/99)) ([dcab1b2](https://github.com/iotaledger/twin-node/commit/dcab1b2b23c13b4c9f39c3c1c67284f56e732bd1))
 * dataspace plane path ([#272](https://github.com/iotaledger/twin-node/issues/272)) ([5998eeb](https://github.com/iotaledger/twin-node/commit/5998eeb6fa1392ae753eb6bafeccefa1fb690573))
+* email ingestion ([#379](https://github.com/iotaledger/twin-node/issues/379)) ([12da79d](https://github.com/iotaledger/twin-node/commit/12da79dc9b167e288c555d4f1909a61c190eee4d))
 * enable N2N dataspace protocol with synchronized storage ([#98](https://github.com/iotaledger/twin-node/issues/98)) ([f67e366](https://github.com/iotaledger/twin-node/commit/f67e366c5ed3c829955a62b19c420361f035a578))
 * enhanced cli commands ([#288](https://github.com/iotaledger/twin-node/issues/288)) ([479fb34](https://github.com/iotaledger/twin-node/commit/479fb3448c493a134aee35b69ae39458e493a4ad))
 * env var simplification ([460b0f2](https://github.com/iotaledger/twin-node/commit/460b0f20a73cb482f7443af502f261d5f9d01759))
@@ -70,6 +83,7 @@
 * remove dap and darp ([36c3ffb](https://github.com/iotaledger/twin-node/commit/36c3ffb31af65a0e3025859dab675efeee043155))
 * remove set-tenant ([#186](https://github.com/iotaledger/twin-node/issues/186)) ([1fc1909](https://github.com/iotaledger/twin-node/commit/1fc1909e6335dea51dfec3bb91fba4badaa9790a))
 * rest metrics ([#341](https://github.com/iotaledger/twin-node/issues/341)) ([ebec573](https://github.com/iotaledger/twin-node/commit/ebec5736bb66adfd97f7d73912bec1ce7392e5f8))
+* rework soak memory-growth verdict to stop flip-flopping on identical code ([#372](https://github.com/iotaledger/twin-node/issues/372)) ([2afa74d](https://github.com/iotaledger/twin-node/commit/2afa74dd4c638cd9542638e2ea4fb34ab7dc1379))
 * separate script directory from exec directory ([f6bb4db](https://github.com/iotaledger/twin-node/commit/f6bb4dbea1f1e200e0640fa154c6997ef99c99b4))
 * silent telemetry and tracing options ([#351](https://github.com/iotaledger/twin-node/issues/351)) ([3a5752f](https://github.com/iotaledger/twin-node/commit/3a5752fc0bf8a028b3ebfc34878524ac799fb81e))
 * support multiple entity and blob storage connectors ([a489f79](https://github.com/iotaledger/twin-node/commit/a489f7907544aef5708d5111e9f72985e1377bae))
@@ -95,7 +109,6 @@
 * update rights management ([5c992c6](https://github.com/iotaledger/twin-node/commit/5c992c6b0d72f3eeaa39ee267e096d9a3f477f4e))
 * update rights management components ([176a0d6](https://github.com/iotaledger/twin-node/commit/176a0d611f88360fc845ae233b26ee0b43d7cb23))
 * update to latest engine ([00d4974](https://github.com/iotaledger/twin-node/commit/00d4974f9cfb02bf48505cfb4af4a7aba1df4b3d))
-* update twindev schemas ([b7bb6ba](https://github.com/iotaledger/twin-node/commit/b7bb6ba308eaf10b66d349ada8f3880f15b31e0f))
 * updated context id features ([ef7be07](https://github.com/iotaledger/twin-node/commit/ef7be07d44dccdeacf10f90cb4ffde0303faa6fa))
 
 
@@ -111,7 +124,38 @@
 
 * The following workspace dependencies were updated
   * dependencies
-    * @twin.org/node-core bumped from 0.9.3-next.0 to 0.9.3-next.1
+    * @twin.org/node-core bumped from 0.9.4-next.0 to 0.9.4-next.1
+
+## [0.9.3](https://github.com/iotaledger/twin-node/compare/node-v0.9.3...node-v0.9.3) (2026-09-04)
+
+
+### Features
+
+* add auth admin component ([1661e57](https://github.com/iotaledger/twin-node/commit/1661e57a699d5cf9ebde333e3cbc3aaea89d7c9c))
+* add extend engine and server methods ([ec09c7e](https://github.com/iotaledger/twin-node/commit/ec09c7eb882d9f5797f2fd372e96cad1a3716f59))
+* add extend engine and server methods ([0136a6f](https://github.com/iotaledger/twin-node/commit/0136a6f3f4e1a82b1427ee9618b8a17c79bc7fda))
+* add fedcat to openapi ([eac69bd](https://github.com/iotaledger/twin-node/commit/eac69bdf94a22c35fe58e7523d9cf78bdc72eb7b))
+* add updated config vars ([ebe8178](https://github.com/iotaledger/twin-node/commit/ebe81788ce53ddf3d6925a5f2f6dac381f84f06c))
+* improve default options and spec ([b538721](https://github.com/iotaledger/twin-node/commit/b538721902e7f65021d2715148ba59409ccce035))
+* initial commit ([522f1e5](https://github.com/iotaledger/twin-node/commit/522f1e515348f9b1dd1eeb3170b1249e2b0b5371))
+* migrate env config from engine to node ([5da29b8](https://github.com/iotaledger/twin-node/commit/5da29b8d714495308320d237a68e84355bba2b47))
+* node app use JavaScript ([14fe08c](https://github.com/iotaledger/twin-node/commit/14fe08cb760dd885a5dac9056a4d5dbc3d61df64))
+* release to production ([6319a38](https://github.com/iotaledger/twin-node/commit/6319a38490a2c2809622f8acd170cb92bfa06942))
+* release to production ([4f44403](https://github.com/iotaledger/twin-node/commit/4f444039832edce8fae562baa7c900ccdc2181da))
+* release to production ([2d96e37](https://github.com/iotaledger/twin-node/commit/2d96e3737bd9663bc0d1171c2ff2c7f8b2ab01bb))
+* release to production ([#253](https://github.com/iotaledger/twin-node/issues/253)) ([230efd0](https://github.com/iotaledger/twin-node/commit/230efd0f99af6114e707999b4c1a83a391cc1741))
+* release to production ([#300](https://github.com/iotaledger/twin-node/issues/300)) ([4d2b09f](https://github.com/iotaledger/twin-node/commit/4d2b09f92c7815ad3fe48d54eca0972fefc782f7))
+* release to production ([#364](https://github.com/iotaledger/twin-node/issues/364)) ([dbba3db](https://github.com/iotaledger/twin-node/commit/dbba3dbf3d9efb858b0ea28aaf88378964fcf08e))
+* release to production ([#383](https://github.com/iotaledger/twin-node/issues/383)) ([5d29105](https://github.com/iotaledger/twin-node/commit/5d29105355f85011f9a338ba5069162a0b008849))
+* update dependencies ([9d25f16](https://github.com/iotaledger/twin-node/commit/9d25f16f1d554cd38f3bec28fdf7f8fff892ceaf))
+* update spec generation config ([cff633a](https://github.com/iotaledger/twin-node/commit/cff633a0ffb73ad652d5f1bae653fa91e82dc8ab))
+
+
+### Bug Fixes
+
+* adding a condition to verify if the password exists when bootstrapping ([6030a42](https://github.com/iotaledger/twin-node/commit/6030a42bdaf581678d96932fd0b809396bf7b8b0))
+* adding a condition to verify if the password exists when bootstrapping ([c66f396](https://github.com/iotaledger/twin-node/commit/c66f396717394161a7647d1f08b3d87729d96e96))
+* broken docs ([61479fd](https://github.com/iotaledger/twin-node/commit/61479fd618f766d22c5aafec5277e1a89e22b453))
 
 ## [0.9.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.2...node-v0.9.2) (2026-08-24)
 

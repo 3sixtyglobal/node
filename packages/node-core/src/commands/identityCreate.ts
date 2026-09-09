@@ -339,7 +339,7 @@ async function mnemonicCreate(
 			CLIDisplay.task(
 				I18n.formatMessage("node.cli.commands.identity-create.labels.existingMnemonic")
 			);
-			storeMnemonic = storedMnemonic !== mnemonic && !Is.empty(mnemonic);
+			storeMnemonic = storedMnemonic !== mnemonic && Is.notEmpty(mnemonic);
 			mnemonic = storedMnemonic;
 		} else {
 			CLIDisplay.task(
@@ -519,7 +519,7 @@ async function walletFinalise(
 					nameofKebabCase<WalletAddress>()
 				);
 			const addr = await walletAddress.get(address);
-			if (!Is.empty(addr)) {
+			if (Is.notEmpty(addr)) {
 				addr.identity = identity;
 				await walletAddress.set(addr);
 			}

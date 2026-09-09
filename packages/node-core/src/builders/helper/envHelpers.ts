@@ -314,6 +314,36 @@ export function envMinToMs<T>(envVars: T, key: keyof T, defaultValue?: number): 
 
 /**
  * Converts a comma separated list to an array.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var.
+ * @param expectedValues An optional array of expected values.
+ * @param defaultValue The default value to return when the list is empty or undefined.
+ * @throws GeneralError if the list contains a value not in the expected values.
+ * @returns The array.
+ */
+export function envListToArray<T, U>(
+	envVars: T,
+	key: keyof T,
+	expectedValues?: U[],
+	defaultValue: U[] | undefined = []
+): U[] {
+	const value = envVars[key];
+
+	const values = commaSeparatedListToArray<U>(value as string, defaultValue);
+
+	if (Is.arrayValue(expectedValues) && !values.every(item => expectedValues.includes(item))) {
+		throw new GeneralError("node", "invalidEnvVarValue", {
+			key,
+			value,
+			type: expectedValues.join(" | ")
+		});
+	}
+
+	return values;
+}
+
+/**
+ * Converts a comma separated list to an array.
  * @param value The comma separated list.
  * @param defaultValue The default value to return when the list is empty or undefined.
  * @returns The array.

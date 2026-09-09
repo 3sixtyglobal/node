@@ -50,6 +50,7 @@
 - [isAutomationRequired](functions/isAutomationRequired.md)
 - [isTelemetryEnabled](functions/isTelemetryEnabled.md)
 - [isTracingEnabled](functions/isTracingEnabled.md)
+- [isMailboxEnabled](functions/isMailboxEnabled.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)
