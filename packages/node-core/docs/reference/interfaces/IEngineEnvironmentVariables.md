@@ -891,7 +891,7 @@ The type of event bus component: service.
 
 > `optional` **emailProtocolConnector?**: `string`
 
-The email protocol connector types, comma-separated: pop3, imap, gmail.
+The email protocol connector types, comma-separated: pop3, imap, gmail, outlook.
 
 ***
 

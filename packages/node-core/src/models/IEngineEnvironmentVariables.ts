@@ -549,7 +549,7 @@ export interface IEngineEnvironmentVariables {
 	eventBusComponent?: string;
 
 	/**
-	 * The email protocol connector types, comma-separated: pop3, imap, gmail.
+	 * The email protocol connector types, comma-separated: pop3, imap, gmail, outlook.
 	 */
 	emailProtocolConnector?: string;
 

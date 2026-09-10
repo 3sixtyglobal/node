@@ -513,6 +513,33 @@ describe("buildEngineConfiguration - mailbox", () => {
 		);
 	});
 
+	test("outlook connector registers the mail storage and mailbox components", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Outlook
+		});
+
+		expect(config.types.emailProtocolConnector).toEqual([
+			expect.objectContaining({
+				type: EmailProtocolConnectorType.Outlook,
+				isMultiInstance: true
+			})
+		]);
+		expect(config.types.mailStorageComponent).toHaveLength(1);
+		expect(config.types.mailboxComponent).toHaveLength(1);
+	});
+
+	test("outlook connector requires the task scheduler for its polling intervals", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Outlook
+		});
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
 	test("throws GeneralError naming the env var for an unknown protocol connector", async () => {
 		await expect(buildEngineConfiguration({ emailProtocolConnector: "imap4" })).rejects.toThrow(
 			expect.objectContaining({

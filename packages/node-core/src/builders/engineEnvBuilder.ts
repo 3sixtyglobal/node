@@ -2300,6 +2300,7 @@ export function isMailboxEnabled(envVars: IEngineEnvironmentVariables): boolean 
 		t =>
 			t === EmailProtocolConnectorType.Imap ||
 			t === EmailProtocolConnectorType.Pop3 ||
-			t === EmailProtocolConnectorType.Gmail
+			t === EmailProtocolConnectorType.Gmail ||
+			t === EmailProtocolConnectorType.Outlook
 	);
 }
