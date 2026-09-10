@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.4-next.4](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.4-next.3...node-core-v0.9.4-next.4) (2026-09-10)
+
+
+### Features
+
+* custom plugin timeout ([#395](https://github.com/iotaledger/twin-node/issues/395)) ([d4a33ba](https://github.com/iotaledger/twin-node/commit/d4a33ba10a54c6dfab0b845b386201ac326df88a))
+
 ## [0.9.4-next.3](https://github.com/iotaledger/twin-node/compare/node-core-v0.9.4-next.2...node-core-v0.9.4-next.3) (2026-09-09)
 
 
