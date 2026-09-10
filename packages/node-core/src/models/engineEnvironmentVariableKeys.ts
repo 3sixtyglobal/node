@@ -275,6 +275,12 @@ const engineEnvironmentVariableKeysInternal: {
 	healthInterval: true,
 	healthStartupInterval: true,
 	healthApplicationInterval: true,
+	// background task
+	backgroundTaskMaxSystemWorkerCount: true,
+	backgroundTaskInterval: true,
+	backgroundTaskRetryInterval: true,
+	backgroundTaskCleanupInterval: true,
+	backgroundTaskWorkerShutdownTimeout: true,
 	// automation / mutex
 	automationActionTypes: true,
 	mutexTimeoutDefault: true

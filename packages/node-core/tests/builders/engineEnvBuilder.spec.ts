@@ -1,5 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { cpus } from "node:os";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import { EngineCloneMode } from "@twin.org/engine-models";
 import {
@@ -485,6 +486,33 @@ describe("buildEngineConfiguration - mailbox", () => {
 		expect(config.types.mailboxComponent).toHaveLength(1);
 	});
 
+	test("gmail connector registers the mail storage and mailbox components", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Gmail
+		});
+
+		expect(config.types.emailProtocolConnector).toEqual([
+			expect.objectContaining({
+				type: EmailProtocolConnectorType.Gmail,
+				isMultiInstance: true
+			})
+		]);
+		expect(config.types.mailStorageComponent).toHaveLength(1);
+		expect(config.types.mailboxComponent).toHaveLength(1);
+	});
+
+	test("gmail connector requires the task scheduler for its polling intervals", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Gmail
+		});
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
 	test("throws GeneralError naming the env var for an unknown protocol connector", async () => {
 		await expect(buildEngineConfiguration({ emailProtocolConnector: "imap4" })).rejects.toThrow(
 			expect.objectContaining({
@@ -736,5 +764,68 @@ describe("buildEngineConfiguration - tracing multi-connector", () => {
 		expect(config.types.tracingComponent).toEqual(
 			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
 		);
+	});
+});
+
+describe("buildEngineConfiguration - background task service config", () => {
+	test("defaults the max system worker count to twice the CPU count when the env var is not set", async () => {
+		const config = await buildEngineConfiguration({ healthEnabled: "true" });
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toEqual({
+			maxSystemWorkerCount: cpus().length * 2,
+			taskInterval: undefined,
+			retryInterval: undefined,
+			cleanupInterval: undefined,
+			workerShutdownTimeout: undefined
+		});
+	});
+
+	test("uses the max system worker count from the env var when set", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskMaxSystemWorkerCount: "3"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			maxSystemWorkerCount: 3
+		});
+	});
+
+	test("throws when the max system worker count is not an integer", async () => {
+		await expect(
+			buildEngineConfiguration({
+				healthEnabled: "true",
+				backgroundTaskMaxSystemWorkerCount: "lots"
+			})
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+
+	test("wires the interval and timeout env vars through to the service config", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskInterval: "250",
+			backgroundTaskRetryInterval: "7500",
+			backgroundTaskCleanupInterval: "240000",
+			backgroundTaskWorkerShutdownTimeout: "9000"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			taskInterval: 250,
+			retryInterval: 7500,
+			cleanupInterval: 240000,
+			workerShutdownTimeout: 9000
+		});
+	});
+
+	test("throws when an interval env var is not an integer", async () => {
+		await expect(
+			buildEngineConfiguration({ healthEnabled: "true", backgroundTaskInterval: "soon" })
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+
+	test("does not register the background task component when no dependent feature is enabled", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.backgroundTaskComponent).toEqual([]);
 	});
 });

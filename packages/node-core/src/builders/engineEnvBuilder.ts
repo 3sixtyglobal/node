@@ -1,5 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { cpus } from "node:os";
 import path from "node:path";
 import { Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
@@ -656,7 +657,20 @@ async function configureBackgroundTask(
 
 	if (isBackgroundTasksRequired(envVars)) {
 		coreConfig.types.backgroundTaskComponent.push({
-			type: BackgroundTaskComponentType.Service
+			type: BackgroundTaskComponentType.Service,
+			options: {
+				config: {
+					maxSystemWorkerCount: envCount(
+						envVars,
+						"backgroundTaskMaxSystemWorkerCount",
+						cpus().length * 2
+					),
+					taskInterval: envMs(envVars, "backgroundTaskInterval"),
+					retryInterval: envMs(envVars, "backgroundTaskRetryInterval"),
+					cleanupInterval: envMs(envVars, "backgroundTaskCleanupInterval"),
+					workerShutdownTimeout: envMs(envVars, "backgroundTaskWorkerShutdownTimeout")
+				}
+			}
 		});
 	}
 }
@@ -2283,6 +2297,9 @@ export function isTracingEnabled(envVars: IEngineEnvironmentVariables): boolean 
  */
 export function isMailboxEnabled(envVars: IEngineEnvironmentVariables): boolean {
 	return commaSeparatedListToArray<EmailProtocolConnectorType>(envVars.emailProtocolConnector).some(
-		t => t === EmailProtocolConnectorType.Imap || t === EmailProtocolConnectorType.Pop3
+		t =>
+			t === EmailProtocolConnectorType.Imap ||
+			t === EmailProtocolConnectorType.Pop3 ||
+			t === EmailProtocolConnectorType.Gmail
 	);
 }

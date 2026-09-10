@@ -549,7 +549,7 @@ export interface IEngineEnvironmentVariables {
 	eventBusComponent?: string;
 
 	/**
-	 * The email protocol connector types, comma-separated: pop3, imap.
+	 * The email protocol connector types, comma-separated: pop3, imap, gmail.
 	 */
 	emailProtocolConnector?: string;
 
@@ -1190,6 +1190,31 @@ export interface IEngineEnvironmentVariables {
 	 * The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
 	 */
 	healthApplicationInterval?: string;
+
+	/**
+	 * The maximum number of workers to use for processing background tasks, defaults to twice the number of CPU cores.
+	 */
+	backgroundTaskMaxSystemWorkerCount?: string;
+
+	/**
+	 * The interval in milliseconds to leave between background tasks, defaults to 100.
+	 */
+	backgroundTaskInterval?: string;
+
+	/**
+	 * The interval in milliseconds to leave between background task retries, defaults to 5000.
+	 */
+	backgroundTaskRetryInterval?: string;
+
+	/**
+	 * The interval in milliseconds between sweeps removing retained background tasks, defaults to 120000.
+	 */
+	backgroundTaskCleanupInterval?: string;
+
+	/**
+	 * The time in milliseconds to wait for each handler's workers to shut down before terminating them, defaults to 5000.
+	 */
+	backgroundTaskWorkerShutdownTimeout?: string;
 
 	/**
 	 * The type of the automation action to create, comma separate for more than one connector.

@@ -41,6 +41,7 @@
 		"dialogs",
 		"docman",
 		"dspace",
+		"fastify",
 		"faucet",
 		"fedcat",
 		"firestore",
