@@ -891,7 +891,7 @@ The type of event bus component: service.
 
 > `optional` **emailProtocolConnector?**: `string`
 
-The email protocol connector types, comma-separated: pop3, imap.
+The email protocol connector types, comma-separated: pop3, imap, gmail.
 
 ***
 
@@ -1972,6 +1972,46 @@ This allows components that take a long time to initialize to be healthy before 
 > `optional` **healthApplicationInterval?**: `string`
 
 The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
+
+***
+
+### backgroundTaskMaxSystemWorkerCount? {#backgroundtaskmaxsystemworkercount}
+
+> `optional` **backgroundTaskMaxSystemWorkerCount?**: `string`
+
+The maximum number of workers to use for processing background tasks, defaults to twice the number of CPU cores.
+
+***
+
+### backgroundTaskInterval? {#backgroundtaskinterval}
+
+> `optional` **backgroundTaskInterval?**: `string`
+
+The interval in milliseconds to leave between background tasks, defaults to 100.
+
+***
+
+### backgroundTaskRetryInterval? {#backgroundtaskretryinterval}
+
+> `optional` **backgroundTaskRetryInterval?**: `string`
+
+The interval in milliseconds to leave between background task retries, defaults to 5000.
+
+***
+
+### backgroundTaskCleanupInterval? {#backgroundtaskcleanupinterval}
+
+> `optional` **backgroundTaskCleanupInterval?**: `string`
+
+The interval in milliseconds between sweeps removing retained background tasks, defaults to 120000.
+
+***
+
+### backgroundTaskWorkerShutdownTimeout? {#backgroundtaskworkershutdowntimeout}
+
+> `optional` **backgroundTaskWorkerShutdownTimeout?**: `string`
+
+The time in milliseconds to wait for each handler's workers to shut down before terminating them, defaults to 5000.
 
 ***
 
