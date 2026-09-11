@@ -2072,14 +2072,6 @@ The mutex timeout in milliseconds for the document management component.
 
 ***
 
-### loggingMutexTimeout? {#loggingmutextimeout}
-
-> `optional` **loggingMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the logging component.
-
-***
-
 ### entityStorageMutexTimeout? {#entitystoragemutextimeout}
 
 > `optional` **entityStorageMutexTimeout?**: `string`
