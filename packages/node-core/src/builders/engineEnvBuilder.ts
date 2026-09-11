@@ -532,8 +532,7 @@ async function configureLogging(
 						retainForMs: envMinToMs(envVars, "loggingRetainFor"),
 						maxEntries: envCount(envVars, "loggingMaxEntries"),
 						retentionIntervalMs: envMinToMs(envVars, "loggingRetentionInterval"),
-						retentionBatchSize: envCount(envVars, "loggingRetentionBatchSize"),
-						mutexTimeoutMs: envMs(envVars, "loggingMutexTimeout")
+						retentionBatchSize: envCount(envVars, "loggingRetentionBatchSize")
 					}
 				}
 			});
@@ -569,8 +568,7 @@ async function configureLogging(
 						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
 						filename: envVars.loggingFileFilename,
 						maxFileSizeBytes: envCount(envVars, "loggingFileMaxFileSizeBytes"),
-						maxRetainedFiles: envCount(envVars, "loggingFileMaxRetainedFiles"),
-						mutexTimeoutMs: envMs(envVars, "loggingMutexTimeout")
+						maxRetainedFiles: envCount(envVars, "loggingFileMaxRetainedFiles")
 					}
 				}
 			});

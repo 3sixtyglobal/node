@@ -125,7 +125,6 @@ const engineEnvironmentVariableKeysInternal: {
 	loggingFileFilename: true,
 	loggingFileMaxFileSizeBytes: true,
 	loggingFileMaxRetainedFiles: true,
-	loggingMutexTimeout: true,
 	// open telemetry logging
 	openTelemetryLoggingLoggerName: true,
 	openTelemetryLoggingLoggerVersion: true,

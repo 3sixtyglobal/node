@@ -1253,11 +1253,6 @@ export interface IEngineEnvironmentVariables {
 	documentManagementMutexTimeout?: string;
 
 	/**
-	 * The mutex timeout in milliseconds for the logging component.
-	 */
-	loggingMutexTimeout?: string;
-
-	/**
 	 * The mutex timeout in milliseconds for the memory and file entity storage connectors.
 	 */
 	entityStorageMutexTimeout?: string;
