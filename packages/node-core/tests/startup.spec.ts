@@ -7,7 +7,7 @@ import { MemoryStateStorage } from "@twin.org/engine-core";
 import { EntityStorageConnectorType } from "@twin.org/engine-types";
 import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@twin.org/entity";
 import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
 @entity()
@@ -83,8 +83,8 @@ describe("startup - tenant organization ID enforcement", () => {
 	});
 
 	test("auto-assigns nodeOrganizationId to the sole tenant missing an org ID when state has nodeOrganizationId", async () => {
-		const PORT_1 = 26000 + Math.floor(Math.random() * 200);
-		const PORT_2 = PORT_1 + 300;
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
 
 		// Run 1: start with an empty tenant table, then create a tenant without an org ID.
 		const run1 = await run({
@@ -126,8 +126,8 @@ describe("startup - tenant organization ID enforcement", () => {
 	});
 
 	test("blocks startup when the sole tenant missing an org ID has no nodeOrganizationId to recover from", async () => {
-		const PORT_1 = 26500 + Math.floor(Math.random() * 200);
-		const PORT_2 = PORT_1 + 300;
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
 
 		// Run 1: seed a tenant without an org ID.
 		const run1 = await run({
@@ -167,8 +167,8 @@ describe("startup - tenant organization ID enforcement", () => {
 	});
 
 	test("blocks startup and lists all tenant IDs when multiple tenants are missing an org ID", async () => {
-		const PORT_1 = 26700 + Math.floor(Math.random() * 200);
-		const PORT_2 = PORT_1 + 300;
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
 
 		// Run 1: seed two tenants, neither with an org ID.
 		const run1 = await run({

@@ -31,15 +31,15 @@ import {
 } from "@twin.org/engine-types";
 import type { ITrustComponent } from "@twin.org/trust-models";
 import { loadAndRunGroups } from "./endpoints/runner.js";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
-const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
-const TEST_PORT_ST = TEST_PORT + 1000;
-const TEST_PORT_SO = TEST_PORT + 2000;
-const TEST_PORT_FC = TEST_PORT + 3000;
-const TEST_PORT_GA = TEST_PORT + 4000;
+const TEST_PORT = await getFreePort();
+const TEST_PORT_ST = await getFreePort();
+const TEST_PORT_SO = await getFreePort();
+const TEST_PORT_FC = await getFreePort();
+const TEST_PORT_GA = await getFreePort();
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_GA_TENANT_API_KEY = "aabb1122ccdd3344eeff5566aabb7788";
