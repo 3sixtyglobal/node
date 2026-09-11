@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.9.4-next.5](https://github.com/iotaledger/twin-node/compare/node-v0.9.4-next.4...node-v0.9.4-next.5) (2026-09-11)
+
+
+### Features
+
+* add background task max dispatch count ([f0965a0](https://github.com/iotaledger/twin-node/commit/f0965a004dc0e0a856fc0fe1e58330f84e09aa3b))
+* add outlook connector ([cf7ee0b](https://github.com/iotaledger/twin-node/commit/cf7ee0b73042cb33e693f3677386ca94567bb6e4))
+* remove mutex timeout from logger ([e5a5407](https://github.com/iotaledger/twin-node/commit/e5a540725fa97b523f88589f582501f41b982d5b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.4-next.4 to 0.9.4-next.5
+
 ## [0.9.4-next.4](https://github.com/iotaledger/twin-node/compare/node-v0.9.4-next.3...node-v0.9.4-next.4) (2026-09-10)
 
 
