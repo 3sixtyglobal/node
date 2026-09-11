@@ -2015,6 +2015,14 @@ The time in milliseconds to wait for each handler's workers to shut down before 
 
 ***
 
+### backgroundTaskMaxDispatchCount? {#backgroundtaskmaxdispatchcount}
+
+> `optional` **backgroundTaskMaxDispatchCount?**: `string`
+
+The maximum dispatches of a background task attempt before it is failed as interrupted, defaults to 3, set to -1 for no limit.
+
+***
+
 ### automationActionTypes? {#automationactiontypes}
 
 > `optional` **automationActionTypes?**: `string`

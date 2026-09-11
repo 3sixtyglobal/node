@@ -803,7 +803,8 @@ describe("buildEngineConfiguration - background task service config", () => {
 			taskInterval: undefined,
 			retryInterval: undefined,
 			cleanupInterval: undefined,
-			workerShutdownTimeout: undefined
+			workerShutdownTimeout: undefined,
+			maxDispatchCount: undefined
 		});
 	});
 
@@ -842,6 +843,37 @@ describe("buildEngineConfiguration - background task service config", () => {
 			cleanupInterval: 240000,
 			workerShutdownTimeout: 9000
 		});
+	});
+
+	test("uses the max dispatch count from the env var when set", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskMaxDispatchCount: "5"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			maxDispatchCount: 5
+		});
+	});
+
+	test("allows the max dispatch count to be set to -1 for no limit", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskMaxDispatchCount: "-1"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			maxDispatchCount: -1
+		});
+	});
+
+	test("throws when the max dispatch count is not an integer", async () => {
+		await expect(
+			buildEngineConfiguration({
+				healthEnabled: "true",
+				backgroundTaskMaxDispatchCount: "many"
+			})
+		).rejects.toThrow("invalidEnvVarValue");
 	});
 
 	test("throws when an interval env var is not an integer", async () => {

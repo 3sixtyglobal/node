@@ -1217,6 +1217,11 @@ export interface IEngineEnvironmentVariables {
 	backgroundTaskWorkerShutdownTimeout?: string;
 
 	/**
+	 * The maximum dispatches of a background task attempt before it is failed as interrupted, defaults to 3, set to -1 for no limit.
+	 */
+	backgroundTaskMaxDispatchCount?: string;
+
+	/**
 	 * The type of the automation action to create, comma separate for more than one connector.
 	 * values: fetch
 	 */

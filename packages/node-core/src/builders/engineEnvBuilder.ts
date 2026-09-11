@@ -668,7 +668,8 @@ async function configureBackgroundTask(
 					taskInterval: envMs(envVars, "backgroundTaskInterval"),
 					retryInterval: envMs(envVars, "backgroundTaskRetryInterval"),
 					cleanupInterval: envMs(envVars, "backgroundTaskCleanupInterval"),
-					workerShutdownTimeout: envMs(envVars, "backgroundTaskWorkerShutdownTimeout")
+					workerShutdownTimeout: envMs(envVars, "backgroundTaskWorkerShutdownTimeout"),
+					maxDispatchCount: envCount(envVars, "backgroundTaskMaxDispatchCount")
 				}
 			}
 		});
