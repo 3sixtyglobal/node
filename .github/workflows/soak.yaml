@@ -12,7 +12,12 @@ name: Soak
 # Optional (defaults are correct for the kitsune staging node):
 #   SOAK_ADMIN_EMAIL   admin user email (default: admin@node)
 #
-# Not needed: SOAK_TENANT_API_KEY — cloud admin login uses email+password only.
+# Required: SOAK_TENANT_API_KEY — kitsune runs multi-tenant and rejects every request,
+# including /authentication/login itself, with 401 tenantProcessor.missingApiKey without it
+# (verified live 2026-08-27). Included in the TWIN_SOAK_ENV_VARS blob above.
+#
+# After every run (including failed soaks), generates a static HTML report and publishes it to the
+# soak-reports branch + Vercel (soaktest.twindev.org) — see apps/node/soak/README.md.
 
 on:
   schedule:
@@ -81,7 +86,9 @@ jobs:
     # manual dispatches up to ~5 h without adjusting the workflow.
     timeout-minutes: 360
     permissions:
-      contents: read
+      # write is only for the signed bot push to soak-reports (a data-only branch, never
+      # merged into next/main) — the checkout of this workflow's own code stays read-only.
+      contents: write
 
     steps:
       - name: Checkout
@@ -199,6 +206,86 @@ jobs:
           console.log(`p99_threshold=${r.config.thresholds.p99Ms}`);
           EOF
 
+      # Checked out beside (not on top of) the main checkout so generate-report.mjs can read
+      # report.json/summary.json from apps/node/soak/.out while writing into this directory.
+      # Skipped when report.json never existed (soak_result.outputs.found guards this the same
+      # way the Slack steps below do) — nothing to publish, and the site shell copy step after
+      # this would otherwise stage a no-op commit.
+      - name: Checkout soak-reports
+        if: always() && steps.soak_result.outputs.found == 'true'
+        uses: actions/checkout@v6
+        with:
+          ref: soak-reports
+          path: .soak-reports
+
+      # The site shell (index.html/style.css/images) lives on next, not on soak-reports, so
+      # every publish refreshes it from the current checkout — a shell change here reaches the
+      # live site on the very next run, with no separate deploy step of its own.
+      - name: Generate soak report
+        if: always() && steps.soak_result.outputs.found == 'true'
+        run: |
+          cp -r apps/node/soak/web/. .soak-reports/
+          node apps/node/soak/generate-report.mjs \
+            --report apps/node/soak/.out/report.json \
+            --summary apps/node/soak/.out/summary.json \
+            --site .soak-reports \
+            --run-id "${{ github.run_id }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      # Same bot identity/signing as twin-schema's update-schemas.yaml, minus its PR+approve
+      # ceremony: soak-reports is generated data on its own branch, never merged into
+      # next/main, so a nightly PR would only add review noise with nothing to review.
+      - name: Import GPG key
+        if: always() && steps.soak_result.outputs.found == 'true'
+        env:
+          TWIN_GPG_PRIVATE_KEY: ${{ secrets.TWIN_GPG_PRIVATE_KEY }}
+          TWIN_GPG_KEY_ID: ${{ secrets.TWIN_GPG_KEY_ID }}
+        run: |
+          echo "$TWIN_GPG_PRIVATE_KEY" | base64 --decode | gpg --import
+          echo "TWIN_GPG_KEY_ID=$TWIN_GPG_KEY_ID" >> $GITHUB_ENV
+
+      # Config is scoped to the soak-reports checkout only (git -C), not --global, since this
+      # job's earlier steps also run git as the default Actions identity.
+      - name: Commit and push soak-reports
+        if: always() && steps.soak_result.outputs.found == 'true'
+        run: |
+          git -C .soak-reports config user.email "github@twindev.org"
+          git -C .soak-reports config user.name "TWIN GitHub Bot"
+          git -C .soak-reports config user.signingkey "$TWIN_GPG_KEY_ID"
+          git -C .soak-reports config commit.gpgsign true
+          git -C .soak-reports add .
+          # [skip ci] — this is a data-only push and must never trigger another workflow run.
+          git -C .soak-reports commit -S -m "chore: soak report ${{ github.run_id }} [skip ci]"
+          git -C .soak-reports push origin soak-reports
+
+      - name: Cleanup GPG key
+        if: always() && steps.soak_result.outputs.found == 'true'
+        run: |
+          FINGERPRINT=$(gpg --list-secret-keys --with-colons "$TWIN_GPG_KEY_ID" | awk -F: '/fpr:/ {print $10}' | head -1)
+          if [ -n "$FINGERPRINT" ]; then
+            gpg --batch --yes --delete-secret-keys "$FINGERPRINT" || true
+            gpg --batch --yes --delete-keys "$FINGERPRINT" || true
+          fi
+
+      - name: Install Vercel CLI
+        if: always() && steps.soak_result.outputs.found == 'true'
+        run: npm install -g vercel
+
+      # No `vercel alias set` step: the domain (soaktest.twindev.org) is already bound to the
+      # project, confirmed when the site skeleton (d0f652f) reached it without one. If a
+      # production deploy ever stops landing on the domain automatically, add an alias step
+      # here modeled on publish-schemas.yaml — the domain itself is not a secret.
+      - name: Deploy soak dashboard
+        if: always() && steps.soak_result.outputs.found == 'true'
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SOAKTEST }}
+          VERCEL_ORG_ID: ${{ secrets.TWIN_VERCEL_ORG_ID }}
+          VERCEL_TOKEN: ${{ secrets.TWIN_VERCEL_TOKEN }}
+          VERCEL_SCOPE: ${{ secrets.TWIN_VERCEL_SCOPE }}
+        run: |
+          vercel deploy --cwd .soak-reports --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE" \
+            --target=production --yes --force
+
       # Message text is built with JSON.stringify (via node) rather than splicing values into
       # the curl -d string by hand, so a stray backtick/quote in an extracted value can't break
       # the payload — same "don't hand-splice dynamic values into shell/JSON" rule as the
@@ -209,6 +296,7 @@ jobs:
           INPUT_PROFILE: ${{ inputs.profile }}
           INPUT_DURATION: ${{ inputs.duration }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_ID: ${{ github.run_id }}
           FOUND: ${{ steps.soak_result.outputs.found }}
           REQS: ${{ steps.soak_result.outputs.reqs }}
           FAILED_RATE: ${{ steps.soak_result.outputs.failed_rate }}
@@ -228,6 +316,7 @@ jobs:
             ];
             if (env.FOUND === "true") {
               lines.push(`Requests: ${env.REQS} · Failed: ${env.FAILED_RATE}% · p50/p95/p99: ${env.P50}/${env.P95}/${env.P99} ms (limits ${env.P95_THRESHOLD}/${env.P99_THRESHOLD})`);
+              lines.push(`<https://soaktest.twindev.org/reports/${env.RUN_ID}/report.html|View soak dashboard>`);
             } else {
               lines.push("No report.json found — check artifacts.");
             }
@@ -242,6 +331,7 @@ jobs:
           INPUT_PROFILE: ${{ inputs.profile }}
           INPUT_DURATION: ${{ inputs.duration }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_ID: ${{ github.run_id }}
           FOUND: ${{ steps.soak_result.outputs.found }}
           REQS: ${{ steps.soak_result.outputs.reqs }}
           FAILED_RATE: ${{ steps.soak_result.outputs.failed_rate }}
@@ -261,6 +351,7 @@ jobs:
             ];
             if (env.FOUND === "true") {
               lines.push(`Requests: ${env.REQS} · Failed: ${env.FAILED_RATE}% · p50/p95/p99: ${env.P50}/${env.P95}/${env.P99} ms (limits ${env.P95_THRESHOLD}/${env.P99_THRESHOLD})`);
+              lines.push(`<https://soaktest.twindev.org/reports/${env.RUN_ID}/report.html|View soak dashboard>`);
             } else {
               lines.push("No report.json found — check artifacts.");
             }

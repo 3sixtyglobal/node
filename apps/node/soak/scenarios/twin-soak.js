@@ -83,14 +83,33 @@ for (const g of GROUPS) {
 	CDF.push({ name: g.name, p: cumulative });
 }
 
-function pickGroup() {
+function buildCdf(groups) {
+	const total = groups.reduce((s, g) => s + g.weight, 0);
+	const cdf = [];
+	let acc = 0;
+	for (const g of groups) {
+		acc += g.weight / total;
+		cdf.push({ name: g.name, p: acc });
+	}
+	return cdf;
+}
+
+// Set per VU on the first iteration from setup()'s data, so groups the target cannot serve are
+// never picked; falls back to the module-level CDF when setup() reported none.
+let vuCdf;
+
+function pickGroup(unavailableGroups) {
+	if (!vuCdf) {
+		const unavailable = new Set(unavailableGroups ?? []);
+		vuCdf = unavailable.size > 0 ? buildCdf(GROUPS.filter(g => !unavailable.has(g.name))) : CDF;
+	}
 	const r = Math.random();
-	for (const entry of CDF) {
+	for (const entry of vuCdf) {
 		if (r < entry.p) {
 			return entry.name;
 		}
 	}
-	return CDF[CDF.length - 1].name;
+	return vuCdf[vuCdf.length - 1].name;
 }
 
 // ---------------------------------------------------------------------------
@@ -243,6 +262,10 @@ export function setup() {
 	];
 
 	const activeProbes = probes.filter(p => !DISABLED_GROUPS.has(p.area));
+	// Groups whose probe answered 501 Not Implemented: the target's configured connector does not
+	// serve that API at all (e.g. telemetry reads with an OpenTelemetry-only connector), so the
+	// group is disabled for this run rather than aborting the whole soak.
+	const unavailableGroups = [];
 	for (const probe of activeProbes) {
 		// eslint-disable-next-line no-console
 		console.log(`[setup] probing ${probe.area}...`);
@@ -265,14 +288,25 @@ export function setup() {
 		} else {
 			res = http.get(url, params);
 		}
-		if (!probe.ok.includes(res.status)) {
+		if (res.status === 501) {
+			unavailableGroups.push(probe.area);
+			// eslint-disable-next-line no-console
+			console.warn(
+				`[setup] area "${probe.area}" returned 501 Not Implemented at ${url} — the target does not implement this API with its configured connectors; group disabled for this run`
+			);
+		} else if (!probe.ok.includes(res.status)) {
 			fail(
 				`setup: area "${probe.area}" returned ${res.status} at ${url} — ${res.body?.slice(0, 120) ?? ''} (check feature flag, REST path, credentials, or organization param; org=${session.org})`
 			);
 		}
 	}
+	if (unavailableGroups.length === ENABLED_GROUPS.length) {
+		fail(
+			`setup: every enabled group returned 501 (${unavailableGroups.join(', ')}); nothing left to run`
+		);
+	}
 
-	return { token: session.token, org: session.org };
+	return { token: session.token, org: session.org, unavailableGroups };
 }
 
 // ---------------------------------------------------------------------------
@@ -835,10 +869,10 @@ const GROUP_FNS = {
 // Default function (per-iteration)
 // ---------------------------------------------------------------------------
 
-export default function iteration() {
+export default function iteration(data) {
 	ensureSessionToken();
 
-	const group = pickGroup();
+	const group = pickGroup(data?.unavailableGroups);
 	GROUP_FNS[group]();
 }
 

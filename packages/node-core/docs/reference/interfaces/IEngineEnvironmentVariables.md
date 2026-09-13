@@ -1109,6 +1109,52 @@ The mutex timeout in milliseconds for the telemetry connector.
 
 ***
 
+### telemetryFlushTimeout? {#telemetryflushtimeout}
+
+> `optional` **telemetryFlushTimeout?**: `string`
+
+How long in milliseconds the telemetry connector waits for its background thread to confirm
+a flush before a read continues without it.
+
+#### Default
+
+```ts
+30000
+```
+
+***
+
+### telemetryTaskCoalesce? {#telemetrytaskcoalesce}
+
+> `optional` **telemetryTaskCoalesce?**: `string`
+
+How long in milliseconds the telemetry connector holds values so several share a single
+background task, instead of creating one task per value. Set to 0 to disable coalescing.
+
+#### Default
+
+```ts
+1000
+```
+
+***
+
+### telemetryTaskStallTimeout? {#telemetrytaskstalltimeout}
+
+> `optional` **telemetryTaskStallTimeout?**: `string`
+
+How long in milliseconds the telemetry connector allows with tasks outstanding and none of
+them completing before its background thread is treated as stalled and replaced. Set to 0
+to disable the check.
+
+#### Default
+
+```ts
+60000
+```
+
+***
+
 ### telemetryMetricDefinitionCacheCapacity? {#telemetrymetricdefinitioncachecapacity}
 
 > `optional` **telemetryMetricDefinitionCacheCapacity?**: `string`

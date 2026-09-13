@@ -1,7 +1,7 @@
 # twin-node soak / load harness
 
 > Created: 2026-06-24
-> Last updated: 2026-06-24
+> Last updated: 2026-08-31
 
 Drives sustained HTTP load against a fully-bootstrapped twin-node, samples the node process's
 OS-level memory usage throughout the run, and fails the run when memory-growth / latency / error-rate
@@ -13,9 +13,9 @@ thresholds are breached.
 > summary, and exits non-zero on a k6 threshold breach or an enforced memory-growth breach.
 > Still to come: the nightly CI workflow (phase 6).
 >
-> Memory is sampled at the OS level (private bytes via the process PID), not via the node's
-> telemetry API — in a standalone node that API returns only the startup value (see the plan
-> §8.2). The growth verdict requires **two independent signals to agree**: a whole-window
+> Memory is sampled at the OS level (private bytes via the process PID) on local runs; cloud
+> runs can opt in to sampling the target node's own telemetry API instead (`SOAK_MEM_SOURCE`,
+> below). The growth verdict requires **two independent signals to agree**: a whole-window
 > least-squares fit over the raw samples, and a Theil-Sen (median of pairwise slopes) fit over
 > every post-warm-up bucket's post-GC floor (per-bucket minimum, which strips the GC sawtooth). A
 > breach is only reported when both signals independently exceed the limit; disagreement between
@@ -26,12 +26,20 @@ thresholds are breached.
 > only a _fatal_ verdict once the window is long enough (`SOAK_MEM_MIN_WINDOW`, default 10m) with
 > ≥4 post-warm-up floor buckets; shorter runs report it as informational.
 >
-> A memory breach on an otherwise-clean k6 run (local runs only — cloud runs never produce a real
-> verdict) gets one automatic extension (`SOAK_MEM_EXTEND_DURATION`, default 30m) before the run
-> is failed: a large, slow-settling warm-up can still dominate a single window's whole-window fit
-> even though it has genuinely plateaued, and running longer resolves that the same way the
-> campaign's manual re-run protocol did. A second breach after the extension is reported as-is —
-> only one extension is attempted.
+> A memory breach on an otherwise-clean k6 run gets one automatic extension
+> (`SOAK_MEM_EXTEND_DURATION`, default 30m) before the run is failed: a large, slow-settling
+> warm-up can still dominate a single window's whole-window fit even though it has genuinely
+> plateaued, and running longer resolves that the same way the campaign's manual re-run protocol
+> did. A second breach after the extension is reported as-is — only one extension is attempted.
+> The extension applies to local runs, and to cloud runs once the telemetry-sourced verdict is
+> enforced (see below).
+>
+> Cloud runs (`SOAK_SKIP_SERVER=true`) have no local process to sample; with
+> `SOAK_MEM_SOURCE=telemetry` the harness instead samples the target node's own telemetry store
+> (`process_memory_rss_bytes` via the REST API, deduped, ~60s cadence — the cloud profile enables
+> this). The resulting verdict is informational until `SOAK_MEM_ENFORCE=true`, so the growth
+> limit can be recalibrated against containerized-pod baselines first. Without it, cloud runs
+> report no memory series at all.
 >
 > Note: readiness uses the server-level `/readyz` probe (unauthenticated). The `/health`
 > endpoint is tenant-scoped and returns 401 without an `organization` param in multi-tenant
@@ -84,7 +92,9 @@ All knobs are `SOAK_*` for the harness; the node still uses `TWIN_*`. Defaults s
 | `SOAK_MEM_GROWTH_MB_PER_HR`                | `150`                             | Max growth slope; both signals must exceed it to breach (past min window)   |
 | `SOAK_WARMUP_DISCARD`                      | `2m`                              | Initial window excluded from the growth slope (warm-up)                     |
 | `SOAK_MEM_MIN_WINDOW`                      | `10m`                             | Settled-window length below which memory growth is informational, not fatal |
-| `SOAK_MEM_EXTEND_DURATION`                 | `30m`                             | One automatic extension on a memory breach before failing (local runs only) |
+| `SOAK_MEM_EXTEND_DURATION`                 | `30m`                             | One automatic extension on a memory breach (local, or enforced telemetry)   |
+| `SOAK_MEM_SOURCE`                          | `process`                         | `telemetry` samples the target node's own telemetry store (cloud runs)      |
+| `SOAK_MEM_ENFORCE`                         | `false`                           | Enforce the telemetry-sourced verdict (else breaches report, not fail)      |
 | `SOAK_WRITE_RATIO`                         | `0.3`                             | Fraction of blob/aig iterations that create new resources (vs. read)        |
 
 A k6 threshold breach **or** an enforced memory-growth breach makes the run exit non-zero.
@@ -150,11 +160,56 @@ exact, or set `SOAK_STRICT_ENV=warn` while iterating.
 
 ```text
 soak/
-  run-soak.mjs            # orchestrator: bootstrap → start → /readyz → k6 load → teardown
+  run-soak.mjs             # orchestrator: bootstrap → start → /readyz → k6 load → teardown
+  memory-verdict.mjs       # pure memory-growth verdict estimator (unit tested directly)
+  generate-report.mjs      # CLI: renders one run's report.json into the published dashboard
+  report-renderer.mjs      # pure HTML rendering functions used by generate-report.mjs
   scenarios/
     twin-soak.js          # k6 scenario: 10 weighted groups, per-group metrics, setup() preflight
   config/
     soak.file-local.env   # default profile (file-backed)
     soak.mysql-local.env  # MySQL-backed profile
+    soak.cloud.env        # targets an externally-deployed node (e.g. kitsune staging)
+  web/                    # dashboard site shell (index.html/style.css/images) — see below
   .out/                   # gitignored: server.log, file-storage data, summary.json, report.json
 ```
+
+## Published dashboard
+
+Every soak run that produces a `report.json` gets published to **<https://soaktest.twindev.org/>**
+by the `soak.yaml` workflow, immediately after the run finishes (success or failure — a failed
+run's page is exactly the one people want to read).
+
+**How it works**: `generate-report.mjs` renders the run's `report.json`/`summary.json` into a
+self-contained HTML page (no external scripts/stylesheets — it must render offline), and updates
+the site's `runs.json` manifest + `index.html` history listing. The rendered site accumulates on a
+dedicated **`soak-reports`** branch in this repo — an orphan branch, unrelated to `next`/`main`,
+that holds nothing but the deployed site (see its own `README.md` on that branch). The workflow
+checks it out, refreshes the static assets from this repo's `web/` directory, adds the new run, commits
+as "TWIN GitHub Bot" (same signed-commit pattern as `twin-schema`'s `update-schemas.yaml`), pushes,
+and deploys the branch's contents to Vercel.
+
+**To regenerate a page locally** (e.g. to preview a shell change before it publishes):
+
+```bash
+node soak/generate-report.mjs \
+  --report soak/.out/report.json \
+  --summary soak/.out/summary.json \
+  --site /tmp/site-preview \
+  --run-id local-preview
+# open /tmp/site-preview/index.html in a browser
+```
+
+**Editing the site shell**: `web/` on `next` is the source of truth for `index.html`, `style.css`,
+and the images — never edit them directly on the `soak-reports` branch, they get overwritten by the
+next publish. A shell change reaches the live site on the very next run.
+
+**Charts**: the memory panel draws an inline SVG chart (RSS over time, warm-up window shaded,
+floor-start/floor-end/peak marked) whenever `report.series` has at least 3 points — no external
+charting library, so the page stays self-contained/offline-renderable. Local runs and telemetry-
+sourced cloud runs (`SOAK_MEM_SOURCE=telemetry`) both populate it; a run with no series (the
+default cloud stub) falls back to text explaining why. A second, display-only CPU panel
+(`system_cpu_usage_percent`, no growth verdict — CPU has no leak-like failure mode) renders the
+same way whenever `report.cpuSeries` is present; today only `SOAK_MEM_SOURCE=telemetry` runs
+populate it. Every run page also links out to Grafana with the run's time range
+(`config.startedIso`/`finishedIso` in `report.json`) for full-fidelity drill-down.

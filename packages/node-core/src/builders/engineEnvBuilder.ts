@@ -737,6 +737,9 @@ async function configureTelemetry(
 						batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
 						maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
 						mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
+						flushTimeoutMs: envMs(envVars, "telemetryFlushTimeout"),
+						taskCoalesceMs: envMs(envVars, "telemetryTaskCoalesce"),
+						taskStallTimeoutMs: envMs(envVars, "telemetryTaskStallTimeout"),
 						metricDefinitionCacheCapacity: envCount(
 							envVars,
 							"telemetryMetricDefinitionCacheCapacity"

@@ -685,6 +685,28 @@ export interface IEngineEnvironmentVariables {
 	telemetryMutexTimeout?: string;
 
 	/**
+	 * How long in milliseconds the telemetry connector waits for its background thread to confirm
+	 * a flush before a read continues without it.
+	 * @default 30000
+	 */
+	telemetryFlushTimeout?: string;
+
+	/**
+	 * How long in milliseconds the telemetry connector holds values so several share a single
+	 * background task, instead of creating one task per value. Set to 0 to disable coalescing.
+	 * @default 1000
+	 */
+	telemetryTaskCoalesce?: string;
+
+	/**
+	 * How long in milliseconds the telemetry connector allows with tasks outstanding and none of
+	 * them completing before its background thread is treated as stalled and replaced. Set to 0
+	 * to disable the check.
+	 * @default 60000
+	 */
+	telemetryTaskStallTimeout?: string;
+
+	/**
 	 * The maximum number of metric definitions held in the in-memory definition cache for the telemetry connector.
 	 * @default 100
 	 */

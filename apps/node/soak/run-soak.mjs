@@ -26,6 +26,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { evaluateMemory, shouldExtendForDisambiguation } from './memory-verdict.mjs';
+import { createRemoteMemorySampler } from './remote-memory-sampler.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_DIR = path.resolve(__dirname, '..');
@@ -74,9 +75,19 @@ const cfg = {
 	// leak from cold-start cache/JIT/pool warm-up. Below this, the slope is reported as informational.
 	memMinWindowMs: durationMs(process.env.SOAK_MEM_MIN_WINDOW, '10m'),
 	// A memory breach on an otherwise-clean k6 run gets one automatic extension before failing —
-	// encodes the campaign's manual "breach -> 60m re-run" disambiguation protocol. Local runs only:
-	// cloud runs never produce a real verdict (no local process to sample), so the trigger never fires.
+	// encodes the campaign's manual "breach -> 60m re-run" disambiguation protocol. Fires on local
+	// runs, and on cloud runs only once the telemetry sampler's verdict is enforced
+	// (SOAK_MEM_SOURCE=telemetry + SOAK_MEM_ENFORCE=true).
 	memExtendDuration: process.env.SOAK_MEM_EXTEND_DURATION ?? '30m',
+	// Memory series source for cloud runs: 'process' (default — the local PID sampler, which on
+	// cloud runs degrades to the empty stub) or 'telemetry' (sample the target node's own
+	// telemetry store — Option B, see .cursor/tasks/node/soak-cloud-memory/option-b-probe-plan.md).
+	memSource: process.env.SOAK_MEM_SOURCE ?? 'process',
+	// Per-request timeout for the telemetry-sourced memory/CPU samplers, see soak-report-04/investigation.md.
+	memSamplerTimeoutMs: int(process.env.SOAK_MEM_SAMPLER_TIMEOUT_MS, 15_000),
+	// While calibrating, a telemetry-sourced breach is reported but does not fail the run.
+	// Set to true once the threshold is recalibrated against containerized-pod baselines.
+	memEnforce: bool(process.env.SOAK_MEM_ENFORCE, false),
 	// Deterministic identity/credentials so phase 2 login is reproducible.
 	tenantId: process.env.SOAK_TENANT_ID ?? '1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d',
 	tenantApiKey: process.env.SOAK_TENANT_API_KEY ?? '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
@@ -108,6 +119,11 @@ main().catch(async error => {
 
 async function main() {
 	installSignalHandlers();
+
+	// Captured here (not at writeReport time) so it reflects the orchestrator's actual start,
+	// not just the load-phase window — useful later as the left edge of a Grafana/Datadog
+	// time-range deep-link once the dashboard grows one (see feat-262 implementation plan).
+	const startedIso = new Date().toISOString();
 
 	log(
 		'info',
@@ -141,19 +157,61 @@ async function main() {
 		process.exit(0);
 	}
 
-	// Sample the node process's OS-level RSS while k6 drives load.
-	// When targeting an external node there is no local PID to sample — return an empty
-	// series so evaluateMemory reports verdict: 'insufficient' (non-fatal, informational).
-	const sampler = cfg.skipServer
-		? {
-				peek() {
-					return [];
-				},
-				stop() {
-					return [];
-				}
+	// Sample the node process's OS-level RSS while k6 drives load. When targeting an external
+	// node there is no local PID to sample: with SOAK_MEM_SOURCE=telemetry the target node's own
+	// telemetry store provides the series (Option B); otherwise return an empty series so
+	// evaluateMemory reports verdict: 'insufficient' (non-fatal, informational).
+	const usingTelemetrySampler = cfg.skipServer && cfg.memSource === 'telemetry';
+	let sampler;
+	if (!cfg.skipServer) {
+		sampler = startSampler(serverChild.pid);
+	} else if (usingTelemetrySampler) {
+		log('info', 'Memory source: target node telemetry (process_memory_rss_bytes).');
+		sampler = createRemoteMemorySampler({
+			baseUrl,
+			apiKey: cfg.tenantApiKey,
+			email: cfg.adminEmail,
+			password: cfg.adminPassword,
+			fetchTimeoutMs: cfg.memSamplerTimeoutMs,
+			log
+		});
+	} else {
+		sampler = {
+			peek() {
+				return [];
+			},
+			stop() {
+				return [];
 			}
-		: startSampler(serverChild.pid);
+		};
+	}
+
+	// Display-only CPU sampler — telemetry-sourced cloud runs only (no local OS-level equivalent
+	// exists yet). Independent of the memory sampler: its series never feeds evaluateMemory or
+	// any pass/fail decision, so a failure here cannot affect the run's exit code.
+	let cpuSampler;
+	if (usingTelemetrySampler) {
+		log('info', 'CPU source: target node telemetry (system_cpu_usage_percent), display-only.');
+		cpuSampler = createRemoteMemorySampler({
+			baseUrl,
+			apiKey: cfg.tenantApiKey,
+			email: cfg.adminEmail,
+			password: cfg.adminPassword,
+			metricId: 'system_cpu_usage_percent',
+			valueField: 'cpuPercent',
+			fetchTimeoutMs: cfg.memSamplerTimeoutMs,
+			log
+		});
+	} else {
+		cpuSampler = {
+			peek() {
+				return [];
+			},
+			stop() {
+				return [];
+			}
+		};
+	}
 
 	const memOptions = {
 		warmupDiscardMs: cfg.warmupDiscardMs,
@@ -172,7 +230,9 @@ async function main() {
 			signals: mem.signals,
 			k6Code,
 			alreadyExtended: extended,
-			skipServer: cfg.skipServer
+			// The extension exists to avoid failing on a disambiguable breach, so it only applies
+			// where a breach can fail the run: local runs, or telemetry-sourced runs under enforcement.
+			skipServer: cfg.skipServer && !(usingTelemetrySampler && cfg.memEnforce)
 		})
 	) {
 		// Read the summary.json the first runLoad() just wrote — the second runLoad() below
@@ -203,14 +263,44 @@ async function main() {
 	}
 
 	const series = sampler.stop();
+	const cpuSeries = cpuSampler.stop();
+	const memSamplerUnsupported = usingTelemetrySampler && (sampler.status?.().unsupported ?? false);
 	const k6Summary = await reportSummary();
-	reportMemory(mem);
-	await writeReport({ k6Code, k6Summary, mem, series, extended, preExtension });
+	reportMemory(mem, usingTelemetrySampler, memSamplerUnsupported);
+	const finishedIso = new Date().toISOString();
+	let memSource = 'process';
+	if (usingTelemetrySampler) {
+		memSource = 'telemetry';
+	} else if (cfg.skipServer) {
+		memSource = 'none';
+	}
+	await writeReport({
+		k6Code,
+		k6Summary,
+		mem,
+		series,
+		cpuSeries,
+		extended,
+		preExtension,
+		startedIso,
+		finishedIso,
+		memSource,
+		memSamplerUnsupported
+	});
 
 	await teardown();
 
 	const k6Failed = k6Code !== 0;
-	const memFailed = mem.verdict === 'breach';
+	// Telemetry-sourced verdicts are informational until the threshold is recalibrated for
+	// containerized pods (SOAK_MEM_ENFORCE=true) — a breach is reported but does not fail the run.
+	const memEnforced = !usingTelemetrySampler || cfg.memEnforce;
+	const memFailed = mem.verdict === 'breach' && memEnforced;
+	if (mem.verdict === 'breach' && !memEnforced) {
+		log(
+			'warn',
+			`Telemetry-sourced memory breach (floor ${mem.slopeMbPerHr.toFixed(1)} MB/hr, limit ${cfg.memGrowthLimitMbPerHr}) — NOT enforced while calibrating; set SOAK_MEM_ENFORCE=true to enforce.`
+		);
+	}
 	if (k6Failed || memFailed) {
 		if (k6Failed) {
 			log('error', `k6 reported a failure/threshold breach (exit ${k6Code}).`);
@@ -278,7 +368,8 @@ function applyProfileOverrides(profile) {
 		['SOAK_P95_MS', 'p95Ms', 500],
 		['SOAK_P99_MS', 'p99Ms', 1500],
 		['SOAK_MEM_GROWTH_MB_PER_HR', 'memGrowthLimitMbPerHr', 150],
-		['SOAK_VUS', 'vus', 5]
+		['SOAK_VUS', 'vus', 5],
+		['SOAK_MEM_SAMPLER_TIMEOUT_MS', 'memSamplerTimeoutMs', 15_000]
 	];
 	const strKeys = [
 		['SOAK_ERROR_RATE', 'errorRate'],
@@ -286,12 +377,14 @@ function applyProfileOverrides(profile) {
 		['SOAK_TENANT_MODE', 'tenantMode'],
 		['SOAK_DISABLED_GROUPS', 'disabledGroups'],
 		['SOAK_MEM_EXTEND_DURATION', 'memExtendDuration'],
+		['SOAK_MEM_SOURCE', 'memSource'],
 		['K6_WEB_DASHBOARD_EXPORT', 'k6WebDashboardExport']
 	];
 	const boolKeys = [
 		['SOAK_SKIP_SERVER', 'skipServer'],
 		['SOAK_SKIP_BOOTSTRAP', 'skipBootstrap'],
 		['SOAK_SKIP_LOAD', 'skipLoad'],
+		['SOAK_MEM_ENFORCE', 'memEnforce'],
 		['K6_WEB_DASHBOARD', 'k6WebDashboard']
 	];
 	for (const [envKey, cfgKey, fallback] of numKeys) {
@@ -532,6 +625,12 @@ function summarizeK6(exitCode, summary) {
 // its PID — always live, independent of the node's telemetry, and RSS growth is the canonical leak
 // signal. (Caveat: counts the main process; engine work in worker_threads shares this RSS, but any
 // separate child processes are not included. See the node-side follow-up in the plan.)
+//
+// UPDATE (2026-08, option-B probe): the phase-3 "frozen value" finding no longer holds on nodes
+// with a queryable telemetry connector — kitsune serves a periodic, load-tracking
+// process_memory_rss_bytes series. Cloud runs can therefore opt in to sampling the TARGET node's
+// telemetry with SOAK_MEM_SOURCE=telemetry (see remote-memory-sampler.mjs). The PID sampler below
+// remains the local-run default: it stays live even when a node is too sick to answer its own API.
 
 /**
  * Sample the node process's RSS on an interval. Returns a handle whose stop() returns the
@@ -609,7 +708,16 @@ function sampleProcessRssBytes(pid) {
 	});
 }
 
-function reportMemory(mem) {
+function reportMemory(mem, usingTelemetrySampler, memSamplerUnsupported = false) {
+	if (memSamplerUnsupported) {
+		log(
+			'info',
+			'  mem growth:  not sampled — the target answered 501 on telemetry reads (its telemetry connector does not implement them); use the server metrics dashboard for memory'
+		);
+		log('info', `  full report: ${REPORT_PATH}`);
+		log('info', '─────────────────────────────');
+		return;
+	}
 	if (mem.verdict === 'insufficient') {
 		log(
 			'info',
@@ -628,8 +736,14 @@ function reportMemory(mem) {
 	} else {
 		tag = mem.verdict.toUpperCase();
 	}
-	// Label the metric by what the OS actually reports: private bytes on Windows, RSS elsewhere.
-	const metricLabel = process.platform === 'win32' ? 'priv' : 'rss';
+	// Label the metric by its actual source: the target node's telemetry, or what the local OS
+	// reports (private bytes on Windows, RSS elsewhere).
+	let metricLabel;
+	if (usingTelemetrySampler) {
+		metricLabel = 'rss·tel';
+	} else {
+		metricLabel = process.platform === 'win32' ? 'priv' : 'rss';
+	}
 	log(
 		'info',
 		`  mem (${metricLabel}):  ${num(mem.startMb, 1)} → ${num(mem.endMb, 1)} MB   floor ${num(mem.floorStartMb, 1)} → ${num(mem.floorEndMb, 1)} MB`
@@ -644,13 +758,30 @@ function reportMemory(mem) {
 }
 
 /** Write the combined machine-readable report (config + k6 verdict + memory series + verdict). */
-async function writeReport({ k6Code, k6Summary, mem, series, extended, preExtension }) {
+async function writeReport({
+	k6Code,
+	k6Summary,
+	mem,
+	series,
+	cpuSeries,
+	extended,
+	preExtension,
+	startedIso,
+	finishedIso,
+	memSource,
+	memSamplerUnsupported = false
+}) {
 	const report = {
 		config: {
 			profile: cfg.profile,
 			tenantMode: cfg.tenantMode,
 			duration: cfg.duration,
 			vus: cfg.vus,
+			startedIso,
+			finishedIso,
+			memSource,
+			memSamplerUnsupported,
+			warmupDiscardMs: cfg.warmupDiscardMs,
 			thresholds: {
 				p95Ms: cfg.p95Ms,
 				p99Ms: cfg.p99Ms,
@@ -677,7 +808,11 @@ async function writeReport({ k6Code, k6Summary, mem, series, extended, preExtens
 			preExtensionSlopeMbPerHr: preExtension?.slopeMbPerHr ?? null,
 			preExtensionRawSlopeMbPerHr: preExtension?.rawSlopeMbPerHr ?? null
 		},
-		series
+		series,
+		// Display-only — never evaluated for a verdict, so it's absent (not an empty array) when
+		// the run didn't use the telemetry sampler, to distinguish "not collected" from "collected
+		// but empty".
+		cpuSeries: cpuSeries && cpuSeries.length > 0 ? cpuSeries : undefined
 	};
 	await writeFile(REPORT_PATH, JSON.stringify(report, null, 2), 'utf8');
 }
