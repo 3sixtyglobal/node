@@ -351,8 +351,12 @@ describe("envArray", () => {
 });
 
 describe("commaSeparatedListToArray", () => {
-	test("returns empty array for undefined", () => {
+	test("returns empty array for undefined when no default is supplied", () => {
 		expect(commaSeparatedListToArray(undefined)).toEqual([]);
+	});
+
+	test("returns undefined when an explicit undefined default is supplied", () => {
+		expect(commaSeparatedListToArray(undefined, undefined)).toBeUndefined();
 	});
 
 	test("returns empty array for empty string", () => {
@@ -399,6 +403,12 @@ describe("envListToArray", () => {
 
 	test("returns defaultValue when the env var is an empty string", () => {
 		expect(envListToArray({ converters: "" }, "converters", undefined, ["json"])).toEqual(["json"]);
+	});
+
+	test("preserves explicit undefined defaults so callers can use their own fallback", () => {
+		expect(
+			envListToArray({ converters: undefined }, "converters", undefined, undefined)
+		).toBeUndefined();
 	});
 
 	test("splits and trims comma-separated values", () => {

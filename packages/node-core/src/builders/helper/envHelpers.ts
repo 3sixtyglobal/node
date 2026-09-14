@@ -325,11 +325,16 @@ export function envListToArray<T, U>(
 	envVars: T,
 	key: keyof T,
 	expectedValues?: U[],
-	defaultValue: U[] | undefined = []
-): U[] {
+	defaultValue?: U[]
+): U[] | undefined {
 	const value = envVars[key];
+	const resolvedDefaultValue = arguments.length >= 4 ? defaultValue : [];
 
-	const values = commaSeparatedListToArray<U>(value as string, defaultValue);
+	const values = commaSeparatedListToArray<U>(value as string | undefined, resolvedDefaultValue);
+
+	if (values === undefined) {
+		return undefined;
+	}
 
 	if (Is.arrayValue(expectedValues) && !values.every(item => expectedValues.includes(item))) {
 		throw new GeneralError("node", "invalidEnvVarValue", {
@@ -350,9 +355,12 @@ export function envListToArray<T, U>(
  */
 export function commaSeparatedListToArray<U>(
 	value: string | undefined,
-	defaultValue: U[] | undefined = []
-): U[] {
+	defaultValue?: U[]
+): U[] | undefined {
 	if (!Is.stringValue(value)) {
+		if (arguments.length < 2) {
+			return [];
+		}
 		return defaultValue;
 	}
 	return value
