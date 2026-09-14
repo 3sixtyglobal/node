@@ -1101,14 +1101,6 @@ The maximum number of metric values to hold in the write-ahead cache for the tel
 
 ***
 
-### telemetryMutexTimeout? {#telemetrymutextimeout}
-
-> `optional` **telemetryMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the telemetry connector.
-
-***
-
 ### telemetryFlushTimeout? {#telemetryflushtimeout}
 
 > `optional` **telemetryFlushTimeout?**: `string`
@@ -1228,14 +1220,6 @@ The OTLP HTTP endpoint to push spans to, e.g. http://localhost:4318/v1/traces. R
 > `optional` **openTelemetryTracingProcessor?**: `string`
 
 The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
-
-***
-
-### tracingMutexTimeout? {#tracingmutextimeout}
-
-> `optional` **tracingMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the tracing connector.
 
 ***
 
@@ -1486,6 +1470,21 @@ Set to -1 to retain failures forever.
 
 ```ts
 10080
+```
+
+***
+
+### immutableProofTaskWorkerIdleTimeout? {#immutableprooftaskworkeridletimeout}
+
+> `optional` **immutableProofTaskWorkerIdleTimeout?**: `string`
+
+How long in seconds the proof task worker stays idle before it shuts down.
+Set to 0 to shut it down after every task, or -1 to never shut it down.
+
+#### Default
+
+```ts
+60
 ```
 
 ***
@@ -2018,6 +2017,16 @@ This allows components that take a long time to initialize to be healthy before 
 > `optional` **healthApplicationInterval?**: `string`
 
 The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
+
+***
+
+### healthExcludeCloneComponents? {#healthexcludeclonecomponents}
+
+> `optional` **healthExcludeCloneComponents?**: `string`
+
+Comma separated list of regular expressions matched against the engine component type keys,
+any which match are excluded from the engine clone used by the application health background
+task. Defaults to the component groups which provide no application health checks.
 
 ***
 
