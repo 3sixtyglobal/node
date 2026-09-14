@@ -11,6 +11,7 @@ import {
 	DltConfigType,
 	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
+	HealthComponentType,
 	LoggingConnectorType,
 	MailboxComponentType,
 	MetricsProducerComponentType,
@@ -26,6 +27,7 @@ import {
 	TracingConnectorType
 } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
+import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
@@ -886,5 +888,121 @@ describe("buildEngineConfiguration - background task service config", () => {
 		const config = await buildEngineConfiguration({});
 
 		expect(config.types.backgroundTaskComponent).toEqual([]);
+	});
+});
+
+describe("buildEngineConfiguration - health exclude clone components", () => {
+	/**
+	 * Read the exclude clone component patterns from a built config, narrowing the health component
+	 * config union to the service variant which carries them.
+	 * @param config The built engine configuration.
+	 * @returns The patterns, or undefined when the service health component is not configured.
+	 */
+	function excludeCloneComponents(
+		config: Awaited<ReturnType<typeof buildEngineConfiguration>>
+	): string[] | undefined {
+		const entry = config.types.healthComponent?.[0];
+		return entry?.type === HealthComponentType.Service
+			? entry.options?.config?.excludeCloneComponents
+			: undefined;
+	}
+
+	test("defaults the exclude clone component patterns when the env var is not set", async () => {
+		const config = await buildEngineConfiguration({ healthEnabled: "true" });
+
+		expect(excludeCloneComponents(config)).toEqual(DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS);
+	});
+
+	test("uses the exclude clone component patterns from the env var when set", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			healthExcludeCloneComponents: "^nft, ^attestation"
+		});
+
+		expect(excludeCloneComponents(config)).toEqual(["^nft", "^attestation"]);
+	});
+
+	test("falls back to the default exclude clone component patterns for an empty env var", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			healthExcludeCloneComponents: ""
+		});
+
+		expect(excludeCloneComponents(config)).toEqual(DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS);
+	});
+
+	test("does not exclude any component type the application health providers depend on", async () => {
+		const patterns = DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS.map(pattern => new RegExp(pattern));
+
+		// These are resolved with getRegisteredInstanceType or ComponentFactory.get by components
+		// which implement healthApplication, so removing them from the clone breaks worker startup.
+		const required = [
+			"platformComponent",
+			"contextIdHandlerComponent",
+			"loggingConnector",
+			"loggingComponent",
+			"backgroundTaskComponent",
+			"taskSchedulerComponent",
+			"entityStorageComponent",
+			"vaultConnector",
+			"blobStorageConnector",
+			"blobStorageComponent",
+			"faucetConnector",
+			"walletConnector",
+			"identityConnector",
+			"identityComponent",
+			"identityResolverConnector",
+			"identityResolverComponent",
+			"nftConnector",
+			"nftComponent",
+			"notarizationConnector",
+			"notarizationComponent",
+			"immutableProofComponent",
+			"attestationConnector",
+			"attestationComponent",
+			"auditableItemGraphComponent",
+			"auditableItemStreamComponent",
+			"dataExtractorConnector",
+			"dataProcessingComponent",
+			"documentManagementComponent",
+			"tenantAdminComponent"
+		];
+
+		for (const typeKey of required) {
+			expect(
+				patterns.some(pattern => pattern.test(typeKey)),
+				`${typeKey} must not be excluded from the health engine clone`
+			).toEqual(false);
+		}
+	});
+
+	test("excludes the component types which provide no application health checks", async () => {
+		const patterns = DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS.map(pattern => new RegExp(pattern));
+
+		const excluded = [
+			"rightsManagementPapComponent",
+			"rightsManagementPolicyArbiterComponent",
+			"dataspaceControlPlaneComponent",
+			"dataspaceDataPlaneComponent",
+			"federatedCatalogueComponent",
+			"federatedCatalogueFilterComponent",
+			"trustComponent",
+			"trustGeneratorComponent",
+			"trustVerifierComponent",
+			"automationComponent",
+			"automationAction",
+			"telemetryConnector",
+			"telemetryComponent",
+			"tracingConnector",
+			"tracingComponent",
+			"restClientProcessor"
+		];
+
+		for (const typeKey of excluded) {
+			expect(
+				patterns.some(pattern => pattern.test(typeKey)),
+				`${typeKey} should be excluded from the health engine clone`
+			).toEqual(true);
+		}
 	});
 });

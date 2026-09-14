@@ -317,10 +317,40 @@ export function envMinToMs<T>(envVars: T, key: keyof T, defaultValue?: number): 
  * @param envVars The environment variables object.
  * @param key The property name of the env var.
  * @param expectedValues An optional array of expected values.
+ * @throws GeneralError if the list contains a value not in the expected values.
+ * @returns The array, empty when the env var is absent.
+ */
+export function envListToArray<T, U>(envVars: T, key: keyof T, expectedValues?: U[]): U[];
+/**
+ * Converts a comma separated list to an array.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var.
+ * @param expectedValues An optional array of expected values.
  * @param defaultValue The default value to return when the list is empty or undefined.
  * @throws GeneralError if the list contains a value not in the expected values.
- * @returns The array.
+ * @returns The array, or the default when the env var is absent.
  */
+export function envListToArray<T, U>(
+	envVars: T,
+	key: keyof T,
+	expectedValues: U[] | undefined,
+	defaultValue: U[]
+): U[];
+/**
+ * Converts a comma separated list to an array.
+ * @param envVars The environment variables object.
+ * @param key The property name of the env var.
+ * @param expectedValues An optional array of expected values.
+ * @param defaultValue The default value to return when the list is empty or undefined.
+ * @throws GeneralError if the list contains a value not in the expected values.
+ * @returns The array, or the default when the env var is absent, which may be undefined.
+ */
+export function envListToArray<T, U>(
+	envVars: T,
+	key: keyof T,
+	expectedValues: U[] | undefined,
+	defaultValue: U[] | undefined
+): U[] | undefined;
 export function envListToArray<T, U>(
 	envVars: T,
 	key: keyof T,
@@ -350,9 +380,19 @@ export function envListToArray<T, U>(
 /**
  * Converts a comma separated list to an array.
  * @param value The comma separated list.
- * @param defaultValue The default value to return when the list is empty or undefined.
- * @returns The array.
+ * @returns The array, empty when the list is empty or undefined.
  */
+export function commaSeparatedListToArray<U>(value: string | undefined): U[];
+/**
+ * Converts a comma separated list to an array.
+ * @param value The comma separated list.
+ * @param defaultValue The default value to return when the list is empty or undefined.
+ * @returns The array, or the default when the list is empty or undefined.
+ */
+export function commaSeparatedListToArray<U>(
+	value: string | undefined,
+	defaultValue: U[] | undefined
+): U[] | undefined;
 export function commaSeparatedListToArray<U>(
 	value: string | undefined,
 	defaultValue?: U[]

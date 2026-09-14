@@ -37,6 +37,24 @@ export const CONTEXT_ID_HANDLER_FEATURE_DID = "did";
 export const CONTEXT_ID_HANDLER_FEATURE_TENANT = "tenant";
 
 /**
+ * The default component types excluded from the engine clone used by the application health
+ * background task. Each entry is a regular expression matched against the engine config type keys.
+ * None of the components in these groups implement healthApplication, and nothing that does
+ * implement it depends on them, so keeping them out of the clone removes the cost of constructing
+ * and starting them in the health worker.
+ */
+export const DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS: string[] = [
+	"^rightsManagement",
+	"^dataspace",
+	"^federatedCatalogue",
+	"^trust",
+	"^automation",
+	"^telemetry",
+	"^tracing",
+	"^restClientProcessor$"
+];
+
+/**
  * Get the default environment variables for the node.
  * @param envPrefix The environment variable prefix.
  * @returns The default environment variables.

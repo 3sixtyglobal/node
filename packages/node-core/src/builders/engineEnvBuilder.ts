@@ -99,7 +99,11 @@ import {
 	type IOpenTelemetryTracingConnectorConfig,
 	OpenTelemetryProcessorTypes
 } from "@twin.org/tracing-connector-opentelemetry";
-import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+import {
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT,
+	DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS
+} from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import {
 	commaSeparatedListToArray,
@@ -977,7 +981,13 @@ async function configureHealth(
 				config: {
 					healthCheckInterval: envSecToMs(envVars, "healthInterval"),
 					healthCheckApplicationInterval: envSecToMs(envVars, "healthApplicationInterval"),
-					initialInterval: envSecToMs(envVars, "healthStartupInterval")
+					initialInterval: envSecToMs(envVars, "healthStartupInterval"),
+					excludeCloneComponents: envListToArray<IEngineEnvironmentVariables, string>(
+						envVars,
+						"healthExcludeCloneComponents",
+						undefined,
+						DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS
+					)
 				}
 			},
 			cloneMode: EngineCloneMode.Never

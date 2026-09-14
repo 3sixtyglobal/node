@@ -277,6 +277,7 @@ const engineEnvironmentVariableKeysInternal: {
 	healthInterval: true,
 	healthStartupInterval: true,
 	healthApplicationInterval: true,
+	healthExcludeCloneComponents: true,
 	// background task
 	backgroundTaskMaxSystemWorkerCount: true,
 	backgroundTaskInterval: true,

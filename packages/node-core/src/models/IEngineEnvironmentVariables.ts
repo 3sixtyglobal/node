@@ -1214,6 +1214,13 @@ export interface IEngineEnvironmentVariables {
 	healthApplicationInterval?: string;
 
 	/**
+	 * Comma separated list of regular expressions matched against the engine component type keys,
+	 * any which match are excluded from the engine clone used by the application health background
+	 * task. Defaults to the component groups which provide no application health checks.
+	 */
+	healthExcludeCloneComponents?: string;
+
+	/**
 	 * The maximum number of workers to use for processing background tasks, defaults to twice the number of CPU cores.
 	 */
 	backgroundTaskMaxSystemWorkerCount?: string;
