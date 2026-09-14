@@ -73,7 +73,12 @@ async function runProbe(engineCore) {
 	try {
 		result = await ContextIdStore.run(ctx, async () => {
 			if (mode === 'prepare') {
-				return controlPlane.prepareTransfer(agreementId, providerEndpoint, 'HttpData-PULL', trustPayload);
+				return controlPlane.prepareTransfer(
+					agreementId,
+					providerEndpoint,
+					'HttpData-PULL',
+					trustPayload
+				);
 			}
 			return controlPlane.negotiateAgreement(datasetId, offerId, providerEndpoint, trustPayload);
 		});
