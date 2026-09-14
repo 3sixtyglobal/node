@@ -1,9 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { execSync } from "node:child_process";
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
-import { CLIDisplay } from "@twin.org/cli-core";
+import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
 import { Coerce, EnvHelper, GeneralError, Guards, I18n, Is } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
@@ -17,6 +16,7 @@ import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
 import { BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapDevEnvironmentVariableKeys.js";
+import { DEPRECATED_ENVIRONMENT_VARIABLE_KEYS } from "./models/deprecatedEnvironmentVariableKeys.js";
 import { ENGINE_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineEnvironmentVariableKeys.js";
 import { ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS } from "./models/engineServerEnvironmentVariableKeys.js";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
@@ -42,7 +42,6 @@ import {
 } from "./utils.js";
 
 const moduleCache: { [id: string]: unknown } = {};
-let npmRootCache: string | undefined;
 
 /**
  * Run the node.
@@ -68,7 +67,7 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.9.2-next.16" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.9.5-next.0" // x-release-please-version
 		};
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
@@ -177,7 +176,7 @@ export async function run(
 			availableContextIdKeys
 		);
 
-		if (!Is.empty(startResult)) {
+		if (Is.notEmpty(startResult)) {
 			showErrorDetails = false;
 
 			let isShuttingDown = false;
@@ -231,6 +230,36 @@ function matchesPatternSet(
 }
 
 /**
+ * Report any environment variables which are still recognised but no longer used.
+ * @param envVars The already-converted camelCase env variables.
+ * @param prefix The prefix used for the environment variables (e.g. "TWIN_").
+ */
+function warnDeprecatedEnvVarKeys(
+	envVars: { [id: string]: string | unknown },
+	prefix: string
+): void {
+	for (const camelKey of Object.keys(envVars)) {
+		const replacements = DEPRECATED_ENVIRONMENT_VARIABLE_KEYS.get(camelKey);
+		if (!Is.undefined(replacements)) {
+			const key = EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix);
+
+			if (Is.arrayValue(replacements)) {
+				CLIDisplay.warning(
+					I18n.formatMessage("warn.node.deprecatedEnvVar", {
+						key,
+						replacements: replacements
+							.map(replacement => EnvHelper.jsonKeyToEnvVarKey(replacement, prefix))
+							.join(", ")
+					})
+				);
+			} else {
+				CLIDisplay.warning(I18n.formatMessage("warn.node.deprecatedEnvVarNoReplacement", { key }));
+			}
+		}
+	}
+}
+
+/**
  * Validate that every key in envVars maps to a recognised property.
  * All unknown keys are collected, then reported together as a single error or warning.
  * Raw env var names listed in the allow list (e.g. TWIN_MY_EXTENSION_SECRET, TWIN_REST_PATH_*) are always accepted.
@@ -262,7 +291,8 @@ function validateEnvVarKeys(
 		.filter(
 			camelKey =>
 				!allowSets.some(set => matchesPatternSet(camelKey, set)) &&
-				!matchesPatternSet(camelKey, customSet)
+				!matchesPatternSet(camelKey, customSet) &&
+				!DEPRECATED_ENVIRONMENT_VARIABLE_KEYS.has(camelKey)
 		)
 		.map(camelKey => EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix));
 
@@ -331,6 +361,8 @@ export async function buildConfiguration(
 		processEnv,
 		options.envPrefix ?? ""
 	);
+
+	warnDeprecatedEnvVarKeys(envVars, options.envPrefix ?? "");
 
 	validateEnvVarKeys(envVars, options.envPrefix ?? "", [
 		ENGINE_ENVIRONMENT_VARIABLE_KEYS,
@@ -470,13 +502,15 @@ export function overrideModuleImport(
 
 			case ModuleProtocol.Default: {
 				try {
-					const packagePath = path.resolve(getNpmRootPath(), moduleName);
-					const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
-					const modulePath = path.resolve(packagePath, mainFile);
-					const exists = await fileExists(modulePath);
-					if (exists) {
-						resolvedPath = modulePath;
-						break;
+					const packagePath = await CLIUtils.findPackageRoot(moduleName, executionDirectory);
+					if (Is.stringValue(packagePath)) {
+						const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
+						const modulePath = path.resolve(packagePath, mainFile);
+						const exists = await fileExists(modulePath);
+						if (exists) {
+							resolvedPath = modulePath;
+							break;
+						}
 					}
 				} catch {
 					// Continue to fallback resolution
@@ -518,13 +552,4 @@ export function overrideModuleImport(
 			useDefault: true
 		};
 	});
-}
-
-/**
- * Get the root path for npm modules by executing "npm root" command and cache it.
- * @returns The root path for npm modules.
- */
-function getNpmRootPath(): string {
-	npmRootCache ??= execSync("npm root").toString().trim().replace(/\\/g, "/");
-	return npmRootCache;
 }

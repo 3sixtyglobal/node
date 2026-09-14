@@ -15,13 +15,12 @@ import {
 	VaultConnectorType,
 	WalletConnectorType
 } from "@twin.org/engine-types";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
-const basePort = Math.floor(Math.random() * 1000);
-let port = 3000 + basePort;
-const OUTPUT_TMP_DIR = "./tests/.tmp/";
+let port = 0;
+const OUTPUT_TMP_DIR = "./tests/.tmp/cli/";
 
 function valueFromEnv(line?: string): string | undefined {
 	return line?.split("=").slice(1).join("=").replace(/"/g, "");
@@ -104,8 +103,8 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR, { recursive: true, force: true });
 	});
 
-	beforeEach(() => {
-		port++;
+	beforeEach(async () => {
+		port = await getFreePort();
 
 		Factory.clearFactories();
 	});

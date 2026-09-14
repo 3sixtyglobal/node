@@ -98,7 +98,9 @@
 	},
 	"warn": {
 		"node": {
-			"unknownEnvVars": "Unknown environment variable properties [{keys}], they will be ignored. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
+			"unknownEnvVars": "Unknown environment variable properties [{keys}], they will be ignored. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST.",
+			"deprecatedEnvVar": "The environment variable \"{key}\" is deprecated and no longer has any effect, please use {replacements} instead. This variable will be removed in a future release.",
+			"deprecatedEnvVarNoReplacement": "The environment variable \"{key}\" is deprecated and no longer has any effect. This variable will be removed in a future release."
 		}
 	},
 	"node": {

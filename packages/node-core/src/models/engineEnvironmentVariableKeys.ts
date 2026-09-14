@@ -125,7 +125,6 @@ const engineEnvironmentVariableKeysInternal: {
 	loggingFileFilename: true,
 	loggingFileMaxFileSizeBytes: true,
 	loggingFileMaxRetainedFiles: true,
-	loggingMutexTimeout: true,
 	// open telemetry logging
 	openTelemetryLoggingLoggerName: true,
 	openTelemetryLoggingLoggerVersion: true,
@@ -134,11 +133,17 @@ const engineEnvironmentVariableKeysInternal: {
 	// event bus
 	eventBusConnector: true,
 	eventBusComponent: true,
+	// email
+	emailProtocolConnector: true,
 	// messaging
-	messagingEnabled: true,
 	messagingEmailConnector: true,
 	messagingSmsConnector: true,
 	messagingPushNotificationConnector: true,
+	smtpHost: true,
+	smtpPort: true,
+	smtpSecure: true,
+	smtpUsername: true,
+	smtpPassword: true,
 	// AWS SES
 	awsSesRegion: true,
 	awsSesAuthMode: true,
@@ -158,7 +163,9 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetryBatchSize: true,
 	telemetryBatchFlushInterval: true,
 	telemetryMaxCacheSize: true,
-	telemetryMutexTimeout: true,
+	telemetryFlushTimeout: true,
+	telemetryTaskCoalesce: true,
+	telemetryTaskStallTimeout: true,
 	telemetryMetricDefinitionCacheCapacity: true,
 	telemetryMetricDefinitionCacheTtiMs: true,
 	telemetrySilentComponents: true,
@@ -168,7 +175,6 @@ const engineEnvironmentVariableKeysInternal: {
 	openTelemetryTracingTracerVersion: true,
 	openTelemetryTracingEndpoint: true,
 	openTelemetryTracingProcessor: true,
-	tracingMutexTimeout: true,
 	tracingSilentComponents: true,
 	// DLT / identity
 	faucetConnector: true,
@@ -211,7 +217,6 @@ const engineEnvironmentVariableKeysInternal: {
 	attestationConnector: true,
 	attestationVerificationMethodId: true,
 	// data processing
-	dataProcessingEnabled: true,
 	dataConverterConnectors: true,
 	dataExtractorConnectors: true,
 	taskSchedulerEnabled: true,
@@ -271,6 +276,14 @@ const engineEnvironmentVariableKeysInternal: {
 	healthInterval: true,
 	healthStartupInterval: true,
 	healthApplicationInterval: true,
+	healthExcludeCloneComponents: true,
+	// background task
+	backgroundTaskMaxSystemWorkerCount: true,
+	backgroundTaskInterval: true,
+	backgroundTaskRetryInterval: true,
+	backgroundTaskCleanupInterval: true,
+	backgroundTaskWorkerShutdownTimeout: true,
+	backgroundTaskMaxDispatchCount: true,
 	// automation / mutex
 	automationActionTypes: true,
 	mutexTimeoutDefault: true

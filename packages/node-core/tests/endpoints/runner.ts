@@ -248,7 +248,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 				const colonTransform = spec.endsWith("|last-colon");
 				const dotPath = colonTransform ? spec.slice(5, -11) : spec.slice(5);
 				const val = getNestedValue(responseJson, dotPath);
-				if (!Is.empty(val)) {
+				if (Is.notEmpty(val)) {
 					const raw = Is.string(val) ? val : JSON.stringify(val);
 					// |last-colon extracts the final segment of a colon-delimited URN, e.g.
 					// "aig:uuid:changeset:changesetUUID" → "changesetUUID".
@@ -267,7 +267,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 						const json = Converter.bytesToUtf8(Converter.base64UrlToBytes(payloadB64));
 						const payload = JSON.parse(json) as { [key: string]: unknown };
 						const val = payload[claimKey];
-						if (!Is.empty(val)) {
+						if (Is.notEmpty(val)) {
 							captured = Is.string(val) ? val : JSON.stringify(val);
 						}
 					} catch {

@@ -214,7 +214,7 @@ export async function identityVerificationMethodCreate(
 				);
 			} catch {}
 
-			if (!Is.empty(verificationMethod)) {
+			if (Is.notEmpty(verificationMethod)) {
 				if (params.overwriteMode === "error") {
 					throw new GeneralError(
 						"identityVerificationMethodCreate",
@@ -271,7 +271,7 @@ export async function identityVerificationMethodCreate(
 
 	let json;
 
-	if (!Is.empty(verificationMethod)) {
+	if (Is.notEmpty(verificationMethod)) {
 		const keyParts = DocumentHelper.parseId(verificationMethod.id);
 
 		const keyPair = await vaultConnector.getKey(`${params.identity}/${keyParts.fragment}`);

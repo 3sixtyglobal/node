@@ -6986,7 +6986,7 @@
 		"/telemetry/metric": {
 			"post": {
 				"operationId": "telemetryCreateMetric",
-				"summary": "Create a telemetry metric",
+				"summary": "Create one or more telemetry metrics",
 				"tags": [
 					"Telemetry"
 				],
@@ -6996,12 +6996,12 @@
 					}
 				],
 				"requestBody": {
-					"description": "Create a new telemetry metric.",
+					"description": "Create one or more telemetry metrics.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/TelemetryMetric"
+								"$ref": "#/components/schemas/TelemetryCreateMetricRequest"
 							},
 							"examples": {
 								"telemetryCreateMetricRequestExample": {
@@ -7010,8 +7010,24 @@
 										"label": "My Counter",
 										"description": "This is my counter",
 										"type": 0,
-										"unit": "KG"
+										"unit": "KG",
+										"maxHistory": 1000
 									}
+								},
+								"telemetryCreateMetricsRequestExample": {
+									"value": [
+										{
+											"id": "my-counter",
+											"label": "My Counter",
+											"type": 0,
+											"maxHistory": 1000
+										},
+										{
+											"id": "my-gauge",
+											"label": "My Gauge",
+											"type": 2
+										}
+									]
 								}
 							}
 						}
@@ -19400,6 +19416,24 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"name": "orderBy",
+						"description": "The policy property to order the results by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "orderByDirection",
+						"description": "The direction for the order, defaults to descending.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"security": [
@@ -22201,6 +22235,9 @@
 						"type": "string",
 						"description": "The identity of the organization which controls the vertex."
 					},
+					"auditMode": {
+						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAuditMode"
+					},
 					"annotationObject": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					},
@@ -22227,11 +22264,11 @@
 					},
 					"verified": {
 						"type": "boolean",
-						"description": "Is the vertex verified, will only be populated when verification is requested."
+						"description": "Is the vertex verified, will only be populated when verification is requested.\nAlways undefined when the vertex is in bypass mode."
 					},
 					"version": {
 						"type": "number",
-						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
+						"description": "The version of the vertex, populated only when getting a specific version.\nAlways undefined when the vertex is in bypass mode.\nMaps to https://schema.org/version."
 					}
 				},
 				"required": [
@@ -22275,16 +22312,19 @@
 						"type": "string",
 						"description": "The identity of the organization which controls the vertex."
 					},
+					"auditMode": {
+						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAuditMode"
+					},
 					"annotationObject": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					},
 					"verified": {
 						"type": "boolean",
-						"description": "Is the vertex verified, will only be populated when verification is requested."
+						"description": "Is the vertex verified, will only be populated when verification is requested.\nAlways undefined when the vertex is in bypass mode."
 					},
 					"version": {
 						"type": "number",
-						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
+						"description": "The version of the vertex, populated only when getting a specific version.\nAlways undefined when the vertex is in bypass mode.\nMaps to https://schema.org/version."
 					},
 					"type": {
 						"const": "AuditableItemGraphVertex",
@@ -22344,6 +22384,9 @@
 						"type": "string",
 						"description": "The identity of the organization which controls the vertex."
 					},
+					"auditMode": {
+						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAuditMode"
+					},
 					"annotationObject": {
 						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
 					},
@@ -22370,11 +22413,11 @@
 					},
 					"verified": {
 						"type": "boolean",
-						"description": "Is the vertex verified, will only be populated when verification is requested."
+						"description": "Is the vertex verified, will only be populated when verification is requested.\nAlways undefined when the vertex is in bypass mode."
 					},
 					"version": {
 						"type": "number",
-						"description": "The version of the vertex, populated only when getting a specific version.\nMaps to https://schema.org/version."
+						"description": "The version of the vertex, populated only when getting a specific version.\nAlways undefined when the vertex is in bypass mode.\nMaps to https://schema.org/version."
 					}
 				},
 				"required": [
@@ -24515,6 +24558,20 @@
 					"value"
 				],
 				"description": "The data to be used in the update."
+			},
+			"TelemetryCreateMetricRequest": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/TelemetryMetric"
+					},
+					{
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/TelemetryMetric"
+						}
+					}
+				],
+				"description": "The data to be used in the create. A single metric fails if it already exists; an array\ndeclares the set that should exist, creating the ones that are missing."
 			},
 			"TelemetryGetMetricResponse": {
 				"type": "object",

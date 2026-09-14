@@ -1,11 +1,24 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { cpus } from "node:os";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
+import { EngineCloneMode } from "@twin.org/engine-models";
 import {
+	DataConverterConnectorType,
+	DataExtractorConnectorType,
+	DataProcessingComponentType,
 	DataspaceControlPlaneComponentType,
 	DltConfigType,
+	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
+	HealthComponentType,
 	LoggingConnectorType,
+	MailboxComponentType,
+	MetricsProducerComponentType,
+	MailStorageComponentType,
+	MessagingAdminComponentType,
+	MessagingComponentType,
+	MessagingEmailConnectorType,
 	SchemaVersionMigrationComponentType,
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
@@ -14,6 +27,7 @@ import {
 	TracingConnectorType
 } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
+import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
@@ -53,6 +67,18 @@ describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 describe("buildEngineConfiguration - task scheduler requirement", () => {
 	test("task scheduler is registered when only auditableItemGraphEnabled is set", async () => {
 		const config = await buildEngineConfiguration({ auditableItemGraphEnabled: "true" });
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
+	test("task scheduler is registered when only emailProtocolConnector is set", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Imap
+		});
 
 		expect(config.types.taskSchedulerComponent).toEqual(
 			expect.arrayContaining([
@@ -359,6 +385,224 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 	});
 });
 
+describe("buildEngineConfiguration - messaging connectors", () => {
+	test("configures SMTP connection settings", async () => {
+		const config = await buildEngineConfiguration({
+			messagingEmailConnector: MessagingEmailConnectorType.Smtp,
+			smtpHost: "smtp.example.com",
+			smtpPort: "465",
+			smtpSecure: "true",
+			smtpUsername: "smtp-user",
+			smtpPassword: "smtp-password"
+		});
+
+		expect(config.types.messagingEmailConnector).toEqual([
+			expect.objectContaining({
+				type: MessagingEmailConnectorType.Smtp,
+				options: {
+					config: {
+						host: "smtp.example.com",
+						port: 465,
+						secure: true,
+						username: "smtp-user",
+						password: "smtp-password"
+					}
+				}
+			})
+		]);
+	});
+
+	test("messaging components are registered when an email connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			messagingEmailConnector: MessagingEmailConnectorType.EntityStorage
+		});
+
+		expect(config.types.messagingEmailConnector).toEqual([
+			expect.objectContaining({ type: MessagingEmailConnectorType.EntityStorage })
+		]);
+		expect(config.types.messagingAdminComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: MessagingAdminComponentType.Service })
+			])
+		);
+		expect(config.types.messagingComponent).toEqual(
+			expect.arrayContaining([expect.objectContaining({ type: MessagingComponentType.Service })])
+		);
+	});
+
+	test("messaging components are not registered when no messaging connector is configured", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.messagingEmailConnector).toEqual([]);
+		expect(config.types.messagingSmsConnector).toEqual([]);
+		expect(config.types.messagingPushNotificationConnector).toEqual([]);
+		expect(config.types.messagingAdminComponent).toBeUndefined();
+		expect(config.types.messagingComponent).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - mailbox", () => {
+	test("no mailbox stack is registered when emailProtocolConnector is unset", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.emailProtocolConnector).toEqual([]);
+		expect(config.types.mailStorageComponent).toBeUndefined();
+		expect(config.types.mailboxComponent).toBeUndefined();
+	});
+
+	test("pop3 connector registers the mail storage and mailbox components", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Pop3
+		});
+
+		expect(config.types.emailProtocolConnector).toEqual([
+			expect.objectContaining({
+				type: EmailProtocolConnectorType.Pop3,
+				isMultiInstance: true
+			})
+		]);
+		expect(config.types.mailStorageComponent).toEqual([
+			expect.objectContaining({
+				type: MailStorageComponentType.Service,
+				cloneMode: EngineCloneMode.Never
+			})
+		]);
+		expect(config.types.mailboxComponent).toEqual([
+			expect.objectContaining({
+				type: MailboxComponentType.Service,
+				cloneMode: EngineCloneMode.Never
+			})
+		]);
+	});
+
+	test("both protocol connectors register a single mail storage and mailbox component", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: `${EmailProtocolConnectorType.Pop3},${EmailProtocolConnectorType.Imap}`
+		});
+
+		expect(config.types.emailProtocolConnector?.map(c => c.type)).toEqual([
+			EmailProtocolConnectorType.Pop3,
+			EmailProtocolConnectorType.Imap
+		]);
+		expect(config.types.mailStorageComponent).toHaveLength(1);
+		expect(config.types.mailboxComponent).toHaveLength(1);
+	});
+
+	test("gmail connector registers the mail storage and mailbox components", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Gmail
+		});
+
+		expect(config.types.emailProtocolConnector).toEqual([
+			expect.objectContaining({
+				type: EmailProtocolConnectorType.Gmail,
+				isMultiInstance: true
+			})
+		]);
+		expect(config.types.mailStorageComponent).toHaveLength(1);
+		expect(config.types.mailboxComponent).toHaveLength(1);
+	});
+
+	test("gmail connector requires the task scheduler for its polling intervals", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Gmail
+		});
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
+	test("outlook connector registers the mail storage and mailbox components", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Outlook
+		});
+
+		expect(config.types.emailProtocolConnector).toEqual([
+			expect.objectContaining({
+				type: EmailProtocolConnectorType.Outlook,
+				isMultiInstance: true
+			})
+		]);
+		expect(config.types.mailStorageComponent).toHaveLength(1);
+		expect(config.types.mailboxComponent).toHaveLength(1);
+	});
+
+	test("outlook connector requires the task scheduler for its polling intervals", async () => {
+		const config = await buildEngineConfiguration({
+			emailProtocolConnector: EmailProtocolConnectorType.Outlook
+		});
+
+		expect(config.types.taskSchedulerComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
+			])
+		);
+	});
+
+	test("throws GeneralError naming the env var for an unknown protocol connector", async () => {
+		await expect(buildEngineConfiguration({ emailProtocolConnector: "imap4" })).rejects.toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({ key: "emailProtocolConnector" })
+			})
+		);
+	});
+});
+
+describe("buildEngineConfiguration - data processing", () => {
+	test("data processing component is not registered when no connectors are configured", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.dataConverterConnector).toEqual([]);
+		expect(config.types.dataExtractorConnector).toEqual([]);
+		expect(config.types.dataProcessingComponent).toBeUndefined();
+	});
+
+	test("data processing component is registered when a converter connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			dataConverterConnectors: DataConverterConnectorType.Json
+		});
+
+		expect(config.types.dataConverterConnector).toEqual([
+			expect.objectContaining({ type: DataConverterConnectorType.Json })
+		]);
+		expect(config.types.dataProcessingComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: DataProcessingComponentType.Service })
+			])
+		);
+	});
+
+	test("data processing component is registered when only an extractor connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			dataExtractorConnectors: DataExtractorConnectorType.JsonPath
+		});
+
+		expect(config.types.dataExtractorConnector).toEqual([
+			expect.objectContaining({ type: DataExtractorConnectorType.JsonPath })
+		]);
+		expect(config.types.dataProcessingComponent).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ type: DataProcessingComponentType.Service })
+			])
+		);
+	});
+
+	test("throws GeneralError naming the env var for an unknown converter connector", async () => {
+		await expect(buildEngineConfiguration({ dataConverterConnectors: "json,xnl" })).rejects.toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({ key: "dataConverterConnectors" })
+			})
+		);
+	});
+});
+
 describe("buildEngineConfiguration - logging multi-connector", () => {
 	test("single logging connector is marked as default", async () => {
 		const config = await buildEngineConfiguration({ loggingConnector: "console" });
@@ -448,6 +692,53 @@ describe("buildEngineConfiguration - telemetry multi-connector", () => {
 	});
 });
 
+describe("buildEngineConfiguration - telemetry metrics producers", () => {
+	test("defaults to the system and process producers when the env var is unset", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.EntityStorage
+		});
+
+		expect(config.types.metricsProducerComponent?.map(p => p.type)).toEqual([
+			MetricsProducerComponentType.System,
+			MetricsProducerComponentType.Process
+		]);
+	});
+
+	test("the supplied env vars object is not mutated", async () => {
+		const envVars = { telemetryConnector: TelemetryConnectorType.EntityStorage };
+
+		await buildEngineConfiguration(envVars);
+
+		expect(envVars).toEqual({ telemetryConnector: TelemetryConnectorType.EntityStorage });
+	});
+
+	test("an explicit producer list replaces the defaults", async () => {
+		const config = await buildEngineConfiguration({
+			telemetryConnector: TelemetryConnectorType.EntityStorage,
+			telemetryMetricsProducers: MetricsProducerComponentType.Process
+		});
+
+		expect(config.types.metricsProducerComponent?.map(p => p.type)).toEqual([
+			MetricsProducerComponentType.Process
+		]);
+	});
+
+	test("throws GeneralError naming the env var for an unknown producer", async () => {
+		await expect(
+			buildEngineConfiguration({
+				telemetryConnector: TelemetryConnectorType.EntityStorage,
+				telemetryMetricsProducers: "system,disk"
+			})
+		).rejects.toThrow(
+			expect.objectContaining({
+				name: "GeneralError",
+				source: "node",
+				properties: expect.objectContaining({ key: "telemetryMetricsProducers" })
+			})
+		);
+	});
+});
+
 describe("buildEngineConfiguration - tracing multi-connector", () => {
 	test("single tracing connector is marked as default and service component is registered", async () => {
 		const config = await buildEngineConfiguration({
@@ -502,5 +793,216 @@ describe("buildEngineConfiguration - tracing multi-connector", () => {
 		expect(config.types.tracingComponent).toEqual(
 			expect.arrayContaining([expect.objectContaining({ type: TracingComponentType.Service })])
 		);
+	});
+});
+
+describe("buildEngineConfiguration - background task service config", () => {
+	test("defaults the max system worker count to twice the CPU count when the env var is not set", async () => {
+		const config = await buildEngineConfiguration({ healthEnabled: "true" });
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toEqual({
+			maxSystemWorkerCount: cpus().length * 2,
+			taskInterval: undefined,
+			retryInterval: undefined,
+			cleanupInterval: undefined,
+			workerShutdownTimeout: undefined,
+			maxDispatchCount: undefined
+		});
+	});
+
+	test("uses the max system worker count from the env var when set", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskMaxSystemWorkerCount: "3"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			maxSystemWorkerCount: 3
+		});
+	});
+
+	test("throws when the max system worker count is not an integer", async () => {
+		await expect(
+			buildEngineConfiguration({
+				healthEnabled: "true",
+				backgroundTaskMaxSystemWorkerCount: "lots"
+			})
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+
+	test("wires the interval and timeout env vars through to the service config", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskInterval: "250",
+			backgroundTaskRetryInterval: "7500",
+			backgroundTaskCleanupInterval: "240000",
+			backgroundTaskWorkerShutdownTimeout: "9000"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			taskInterval: 250,
+			retryInterval: 7500,
+			cleanupInterval: 240000,
+			workerShutdownTimeout: 9000
+		});
+	});
+
+	test("uses the max dispatch count from the env var when set", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskMaxDispatchCount: "5"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			maxDispatchCount: 5
+		});
+	});
+
+	test("allows the max dispatch count to be set to -1 for no limit", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			backgroundTaskMaxDispatchCount: "-1"
+		});
+
+		expect(config.types.backgroundTaskComponent?.[0]?.options?.config).toMatchObject({
+			maxDispatchCount: -1
+		});
+	});
+
+	test("throws when the max dispatch count is not an integer", async () => {
+		await expect(
+			buildEngineConfiguration({
+				healthEnabled: "true",
+				backgroundTaskMaxDispatchCount: "many"
+			})
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+
+	test("throws when an interval env var is not an integer", async () => {
+		await expect(
+			buildEngineConfiguration({ healthEnabled: "true", backgroundTaskInterval: "soon" })
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+
+	test("does not register the background task component when no dependent feature is enabled", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.types.backgroundTaskComponent).toEqual([]);
+	});
+});
+
+describe("buildEngineConfiguration - health exclude clone components", () => {
+	/**
+	 * Read the exclude clone component patterns from a built config, narrowing the health component
+	 * config union to the service variant which carries them.
+	 * @param config The built engine configuration.
+	 * @returns The patterns, or undefined when the service health component is not configured.
+	 */
+	function excludeCloneComponents(
+		config: Awaited<ReturnType<typeof buildEngineConfiguration>>
+	): string[] | undefined {
+		const entry = config.types.healthComponent?.[0];
+		return entry?.type === HealthComponentType.Service
+			? entry.options?.config?.excludeCloneComponents
+			: undefined;
+	}
+
+	test("defaults the exclude clone component patterns when the env var is not set", async () => {
+		const config = await buildEngineConfiguration({ healthEnabled: "true" });
+
+		expect(excludeCloneComponents(config)).toEqual(DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS);
+	});
+
+	test("uses the exclude clone component patterns from the env var when set", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			healthExcludeCloneComponents: "^nft, ^attestation"
+		});
+
+		expect(excludeCloneComponents(config)).toEqual(["^nft", "^attestation"]);
+	});
+
+	test("falls back to the default exclude clone component patterns for an empty env var", async () => {
+		const config = await buildEngineConfiguration({
+			healthEnabled: "true",
+			healthExcludeCloneComponents: ""
+		});
+
+		expect(excludeCloneComponents(config)).toEqual(DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS);
+	});
+
+	test("does not exclude any component type the application health providers depend on", async () => {
+		const patterns = DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS.map(pattern => new RegExp(pattern));
+
+		// These are resolved with getRegisteredInstanceType or ComponentFactory.get by components
+		// which implement healthApplication, so removing them from the clone breaks worker startup.
+		const required = [
+			"platformComponent",
+			"contextIdHandlerComponent",
+			"loggingConnector",
+			"loggingComponent",
+			"backgroundTaskComponent",
+			"taskSchedulerComponent",
+			"entityStorageComponent",
+			"vaultConnector",
+			"blobStorageConnector",
+			"blobStorageComponent",
+			"faucetConnector",
+			"walletConnector",
+			"identityConnector",
+			"identityComponent",
+			"identityResolverConnector",
+			"identityResolverComponent",
+			"nftConnector",
+			"nftComponent",
+			"notarizationConnector",
+			"notarizationComponent",
+			"immutableProofComponent",
+			"attestationConnector",
+			"attestationComponent",
+			"auditableItemGraphComponent",
+			"auditableItemStreamComponent",
+			"dataExtractorConnector",
+			"dataProcessingComponent",
+			"documentManagementComponent",
+			"tenantAdminComponent"
+		];
+
+		for (const typeKey of required) {
+			expect(
+				patterns.some(pattern => pattern.test(typeKey)),
+				`${typeKey} must not be excluded from the health engine clone`
+			).toEqual(false);
+		}
+	});
+
+	test("excludes the component types which provide no application health checks", async () => {
+		const patterns = DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS.map(pattern => new RegExp(pattern));
+
+		const excluded = [
+			"rightsManagementPapComponent",
+			"rightsManagementPolicyArbiterComponent",
+			"dataspaceControlPlaneComponent",
+			"dataspaceDataPlaneComponent",
+			"federatedCatalogueComponent",
+			"federatedCatalogueFilterComponent",
+			"trustComponent",
+			"trustGeneratorComponent",
+			"trustVerifierComponent",
+			"automationComponent",
+			"automationAction",
+			"telemetryConnector",
+			"telemetryComponent",
+			"tracingConnector",
+			"tracingComponent",
+			"restClientProcessor"
+		];
+
+		for (const typeKey of excluded) {
+			expect(
+				patterns.some(pattern => pattern.test(typeKey)),
+				`${typeKey} should be excluded from the health engine clone`
+			).toEqual(true);
+		}
 	});
 });

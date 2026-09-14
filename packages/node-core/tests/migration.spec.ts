@@ -18,7 +18,7 @@ import {
 	SchemaMigrationFactory
 } from "@twin.org/entity-storage-models";
 import type { ILogEntry } from "@twin.org/logging-models";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
 @entity({ version: 0 })
@@ -134,7 +134,7 @@ describe("migration", () => {
 	});
 
 	test("SchemaVersionService writes version records for all registered schemas on first node start", async () => {
-		const port = 28000 + Math.floor(Math.random() * 500);
+		const port = await getFreePort();
 
 		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
 			const nodeRun = await run({
@@ -174,8 +174,8 @@ describe("migration", () => {
 	test("Can migrate a custom entity schema from v0 to v1 when a node starts", async () => {
 		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
 			const MIGRATION_KEY = "MigrationTestEntity_0_1";
-			const PORT_1 = 28600 + Math.floor(Math.random() * 200);
-			const PORT_2 = PORT_1 + 300;
+			const PORT_1 = await getFreePort();
+			const PORT_2 = await getFreePort();
 
 			EntitySchemaFactory.register("MigrationTestEntityV0", () =>
 				EntitySchemaHelper.getSchema(MigrationTestEntityV0)
@@ -397,7 +397,7 @@ describe("migration - multi-tenant", () => {
 	});
 
 	test("SchemaVersionService writes version records for all registered schemas in multi-tenant mode", async () => {
-		const port = 29000 + Math.floor(Math.random() * 500);
+		const port = await getFreePort();
 
 		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
 			const nodeRun = await run({
@@ -433,8 +433,8 @@ describe("migration - multi-tenant", () => {
 
 	test("Migrates entity data across two tenant partitions independently", async () => {
 		const MIGRATION_KEY = "MultiTenantMigTestEntity_0_1";
-		const PORT_1 = 29600 + Math.floor(Math.random() * 200);
-		const PORT_2 = PORT_1 + 300;
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
 
 		EntitySchemaFactory.register("MultiTenantMigTestEntityV0", () =>
 			EntitySchemaHelper.getSchema(MultiTenantMigTestEntityV0)
@@ -613,8 +613,8 @@ describe("migration - multi-tenant", () => {
 
 	test("Migration skips tenant partitions with no entity data", async () => {
 		const MIGRATION_KEY = "SparseMigTestEntity_0_1";
-		const PORT_1 = 30200 + Math.floor(Math.random() * 200);
-		const PORT_2 = PORT_1 + 300;
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
 
 		EntitySchemaFactory.register("SparseMigTestEntityV0", () =>
 			EntitySchemaHelper.getSchema(SparseMigTestEntityV0)

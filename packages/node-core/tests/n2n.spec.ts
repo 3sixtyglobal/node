@@ -17,12 +17,12 @@ import {
 } from "@twin.org/identity-models";
 import type { ITrustComponent } from "@twin.org/trust-models";
 import { VaultConnectorFactory } from "@twin.org/vault-models";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
-const CATALOGUE_PORT = 24000 + Math.floor(Math.random() * 1000);
-const PROXY_PORT = CATALOGUE_PORT + 1000;
+const CATALOGUE_PORT = await getFreePort();
+const PROXY_PORT = await getFreePort();
 const TEST_FEDCAT_DATASET_ID = "urn:uuid:test-n2n-dataset-001";
 const TMP_N2N = "./tests/.tmp/n2n/";
 const CATALOGUE_DB = path.resolve(`${TMP_N2N}catalogue/db`);

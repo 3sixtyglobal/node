@@ -887,11 +887,11 @@ The type of event bus component: service.
 
 ***
 
-### messagingEnabled? {#messagingenabled}
+### emailProtocolConnector? {#emailprotocolconnector}
 
-> `optional` **messagingEnabled?**: `string`
+> `optional` **emailProtocolConnector?**: `string`
 
-Are the messaging components enabled, defaults to false.
+The email protocol connector types, comma-separated: pop3, imap, gmail, outlook.
 
 ***
 
@@ -947,7 +947,47 @@ The applications for the push notifications reference a separate json with @json
 
 > `optional` **messagingEmailConnector?**: `string`
 
-The type of messaging email connector: entity-storage, aws.
+The type of messaging email connector: entity-storage, aws, smtp.
+
+***
+
+### smtpHost? {#smtphost}
+
+> `optional` **smtpHost?**: `string`
+
+SMTP server hostname or IP address.
+
+***
+
+### smtpPort? {#smtpport}
+
+> `optional` **smtpPort?**: `string`
+
+SMTP server port, defaults to 587.
+
+***
+
+### smtpSecure? {#smtpsecure}
+
+> `optional` **smtpSecure?**: `string`
+
+Whether the SMTP connector uses TLS.
+
+***
+
+### smtpUsername? {#smtpusername}
+
+> `optional` **smtpUsername?**: `string`
+
+SMTP authentication username.
+
+***
+
+### smtpPassword? {#smtppassword}
+
+> `optional` **smtpPassword?**: `string`
+
+SMTP authentication password.
 
 ***
 
@@ -1069,6 +1109,52 @@ The mutex timeout in milliseconds for the telemetry connector.
 
 ***
 
+### telemetryFlushTimeout? {#telemetryflushtimeout}
+
+> `optional` **telemetryFlushTimeout?**: `string`
+
+How long in milliseconds the telemetry connector waits for its background thread to confirm
+a flush before a read continues without it.
+
+#### Default
+
+```ts
+30000
+```
+
+***
+
+### telemetryTaskCoalesce? {#telemetrytaskcoalesce}
+
+> `optional` **telemetryTaskCoalesce?**: `string`
+
+How long in milliseconds the telemetry connector holds values so several share a single
+background task, instead of creating one task per value. Set to 0 to disable coalescing.
+
+#### Default
+
+```ts
+1000
+```
+
+***
+
+### telemetryTaskStallTimeout? {#telemetrytaskstalltimeout}
+
+> `optional` **telemetryTaskStallTimeout?**: `string`
+
+How long in milliseconds the telemetry connector allows with tasks outstanding and none of
+them completing before its background thread is treated as stalled and replaced. Set to 0
+to disable the check.
+
+#### Default
+
+```ts
+60000
+```
+
+***
+
 ### telemetryMetricDefinitionCacheCapacity? {#telemetrymetricdefinitioncachecapacity}
 
 > `optional` **telemetryMetricDefinitionCacheCapacity?**: `string`
@@ -1109,7 +1195,7 @@ A list of components to exclude from tracing, can be a comma separated list of c
 
 > `optional` **tracingConnector?**: `string`
 
-The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
+The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, console, silent.
 
 ***
 
@@ -1495,14 +1581,6 @@ The type of attestation connector: entity-storage, iota.
 > `optional` **attestationVerificationMethodId?**: `string`
 
 The identity verification method id to use with attestation.
-
-***
-
-### dataProcessingEnabled? {#dataprocessingenabled}
-
-> `optional` **dataProcessingEnabled?**: `string`
-
-Is the data processing enabled, defaults to false.
 
 ***
 
@@ -1943,6 +2021,54 @@ The interval in seconds for running the application health lifecycle (init, appl
 
 ***
 
+### backgroundTaskMaxSystemWorkerCount? {#backgroundtaskmaxsystemworkercount}
+
+> `optional` **backgroundTaskMaxSystemWorkerCount?**: `string`
+
+The maximum number of workers to use for processing background tasks, defaults to twice the number of CPU cores.
+
+***
+
+### backgroundTaskInterval? {#backgroundtaskinterval}
+
+> `optional` **backgroundTaskInterval?**: `string`
+
+The interval in milliseconds to leave between background tasks, defaults to 100.
+
+***
+
+### backgroundTaskRetryInterval? {#backgroundtaskretryinterval}
+
+> `optional` **backgroundTaskRetryInterval?**: `string`
+
+The interval in milliseconds to leave between background task retries, defaults to 5000.
+
+***
+
+### backgroundTaskCleanupInterval? {#backgroundtaskcleanupinterval}
+
+> `optional` **backgroundTaskCleanupInterval?**: `string`
+
+The interval in milliseconds between sweeps removing retained background tasks, defaults to 120000.
+
+***
+
+### backgroundTaskWorkerShutdownTimeout? {#backgroundtaskworkershutdowntimeout}
+
+> `optional` **backgroundTaskWorkerShutdownTimeout?**: `string`
+
+The time in milliseconds to wait for each handler's workers to shut down before terminating them, defaults to 5000.
+
+***
+
+### backgroundTaskMaxDispatchCount? {#backgroundtaskmaxdispatchcount}
+
+> `optional` **backgroundTaskMaxDispatchCount?**: `string`
+
+The maximum dispatches of a background task attempt before it is failed as interrupted, defaults to 3, set to -1 for no limit.
+
+***
+
 ### automationActionTypes? {#automationactiontypes}
 
 > `optional` **automationActionTypes?**: `string`
@@ -1989,14 +2115,6 @@ The mutex timeout in milliseconds for the federated catalogue component.
 > `optional` **documentManagementMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the document management component.
-
-***
-
-### loggingMutexTimeout? {#loggingmutextimeout}
-
-> `optional` **loggingMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the logging component.
 
 ***
 

@@ -20,7 +20,7 @@ import { TraceparentHelper } from "@twin.org/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isTelemetryEnabled, isTracingEnabled } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-import { commaSeparatedListToArray, envKeyIntegerPairs } from "./helper/envHelpers.js";
+import { commaSeparatedListToArray, envKeyIntegerPairs, envMs } from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -48,7 +48,10 @@ export async function buildEngineServerConfiguration(
 		exposedHeaders: commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
 		corsOrigins: commaSeparatedListToArray(envVars.corsOrigins, undefined),
 		bodyLimits: envKeyIntegerPairs(envVars, "httpBodyLimits"),
-		publicOrigin: Coerce.string(envVars.publicOrigin)
+		publicOrigin: Coerce.string(envVars.publicOrigin),
+		customWebConfig: {
+			pluginTimeout: envMs(envVars, "fastifyPluginTimeout", 30000)
+		}
 	};
 
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;

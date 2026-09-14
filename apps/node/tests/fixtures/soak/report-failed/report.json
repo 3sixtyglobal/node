@@ -1,0 +1,101 @@
+{
+	"config": {
+		"profile": "cloud",
+		"tenantMode": "multi",
+		"duration": "30m",
+		"vus": 5,
+		"thresholds": {
+			"p95Ms": 3300,
+			"p99Ms": 10000,
+			"errorRate": "0.05",
+			"rssGrowthMbPerHr": 150
+		}
+	},
+	"k6": {
+		"exitCode": 99,
+		"httpReqDuration": {
+			"p(99)": 896.74837268,
+			"avg": 196.90383169783303,
+			"min": 3.890816,
+			"med": 139.150115,
+			"max": 10568.386138,
+			"p(95)": 527.3325592000004
+		},
+		"httpReqFailed": {
+			"rate": 0.11825159075503466,
+			"passes": 5408,
+			"fails": 40325
+		},
+		"httpReqs": {
+			"count": 45733,
+			"rate": 25.311427939275575
+		},
+		"groups": {
+			"blob": {
+				"reqs": 9670,
+				"errors": 1131,
+				"p50": 138.674314,
+				"p95": 424.4759085,
+				"p99": 691.7921265799994
+			},
+			"ais": {
+				"reqs": 11251,
+				"errors": 1277,
+				"p50": 171.474787,
+				"p95": 478.164425,
+				"p99": 738.8189245000001
+			},
+			"identity": {
+				"reqs": 11304,
+				"errors": 1427,
+				"p50": 123.4721065,
+				"p95": 372.9236754000001,
+				"p99": 602.4750736599988
+			},
+			"telemetry": {
+				"reqs": 3849,
+				"errors": 444,
+				"p50": 120.573466,
+				"p95": 382.89036239999996,
+				"p99": 608.2848611999998
+			},
+			"auth": {
+				"reqs": 3177,
+				"errors": 363,
+				"p50": 118.351141,
+				"p95": 379.6206619999998,
+				"p99": 624.4659862399983
+			},
+			"fedcat": {
+				"reqs": 3241,
+				"errors": 373,
+				"p50": 371.194088,
+				"p95": 720.272508,
+				"p99": 1028.8045639999998
+			},
+			"dataspace": {
+				"reqs": 3222,
+				"errors": 393,
+				"p50": 138.1790245,
+				"p95": 989.5363014499997,
+				"p99": 1370.6705903599996
+			}
+		}
+	},
+	"memory": {
+		"verdict": "insufficient",
+		"slopeMbPerHr": 0,
+		"rawSlopeMbPerHr": 0,
+		"windowMs": 0,
+		"samples": 0,
+		"totalSamples": 0,
+		"startMb": null,
+		"endMb": null,
+		"floorStartMb": null,
+		"floorEndMb": null,
+		"peakMb": null,
+		"buckets": 0,
+		"tailBuckets": 0
+	},
+	"series": []
+}
