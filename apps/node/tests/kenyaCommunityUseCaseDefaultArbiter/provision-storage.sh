@@ -39,6 +39,15 @@
 
 set -euo pipefail
 
+# The node installs its npm extensions on first boot; wait until it answers before the first login.
+for i in $(seq 1 120); do
+    if docker compose exec -T twin-kenya-defaultarb-node node -e 'fetch("http://127.0.0.1:3000/").then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))' >/dev/null 2>&1; then
+        break
+    fi
+    if [ "${i}" -eq 120 ]; then echo "node not ready after 120s"; exit 1; fi
+    sleep 1
+done
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "${SCRIPT_DIR}"
 

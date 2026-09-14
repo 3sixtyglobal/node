@@ -97,6 +97,7 @@ PROBE_N=0
 PROBE_LOG=""
 next_probe() { PROBE_N=$((PROBE_N + 1)); PROBE_LOG=".option3-probe-${PROBE_N}.log"; }
 run_probe() { # mode [agreementId] -> prints the PROBE-RETURN json; full output in $PROBE_LOG (set by next_probe in the parent shell)
+    # Console-only logging in the probe: a second writer on the file-store log-entry store corrupts it.
     local log="${PROBE_LOG}"
     docker compose run --rm -T --no-deps \
         -v "${SCRIPT_DIR}/probe:/app/probe:ro" \
@@ -105,6 +106,9 @@ run_probe() { # mode [agreementId] -> prints the PROBE-RETURN json; full output 
         -e PROBE_DATASET_ID="${KRA_DATASET_ID}" -e PROBE_OFFER_ID="${CATALOG_OFFER_ID}" \
         -e PROBE_PROVIDER_ENDPOINT="${PROVIDER_ENDPOINT}" -e PROBE_TRUST_JWT="${TRADER_TRUST_JWT}" \
         -e PROBE_ORG="${TRADER_DID}" -e PROBE_TENANT="${TENANT_TRADER_TENANT_ID}" \
+        -e PROBE_PROVIDER_ORG="${KRA_DID}" -e PROBE_PROVIDER_TENANT="${TENANT_KRA_TENANT_ID}" \
+        -e TWIN_DATASPACE_AUTO_START_TRANSFERS=true \
+        -e TWIN_LOGGING_CONNECTOR=console \
         twin-kenya-defaultarb-node 2>&1 | sed -E 's/\x1b\[[0-9;]*m//g' > "${log}" || true
     grep -E "^PROBE-RETURN " "${log}" | tail -1 | sed 's/^PROBE-RETURN //'
 }
@@ -186,8 +190,13 @@ step "fresh real negotiation with KRA (a NEW agreement, now the newest on both s
 REAL2=$(negotiate_kra)
 [ -n "${REAL2}" ] || fail "fresh negotiation returned no agreement id"
 case " ${DELETED} " in *" ${REAL2} "*) fail "provider returned a deleted agreement (${REAL2}) again";; esac
-st=$(pap_agreement_status "${TRADER_ORG_ENC}" "${TRADER_SESSION_JWT}" "${REAL2}")
-[ "${st}" = "200" ] || fail "fresh agreement ${REAL2} not in the Trader PAP (HTTP ${st})"
+# The consumer copy lands via the finalization callback; poll briefly instead of racing it.
+for i in $(seq 1 20); do
+    st=$(pap_agreement_status "${TRADER_ORG_ENC}" "${TRADER_SESSION_JWT}" "${REAL2}")
+    [ "${st}" = "200" ] && break
+    sleep 0.5
+done
+[ "${st}" = "200" ] || fail "fresh agreement ${REAL2} not in the Trader PAP after 10s (HTTP ${st})"
 ok "fresh agreement ${REAL2} minted and stored on the consumer"
 
 step "reuse must now return the fresh real agreement across $((FAKES + 1)) agreements"
@@ -233,7 +242,21 @@ CPID=$(echo "${r}" | jq -r '.result.consumerPid // empty')
 [ -n "${CPID}" ] || { info "${r}"; fail "prepareTransfer with the real agreement failed"; }
 ok "prepareTransfer accepted by the provider (consumerPid ${CPID})"
 
+# --- twin-api #282: the provider auto-starts an in-process transfer although neither tenant stores a
+# publicOrigin (the probe process runs with auto-start on; the main node keeps it off for the phases) ---
+step "provider auto-starts the in-process transfer (twin-api #282, tenants without a stored publicOrigin)"
+# The console logging connector prints the rendered text, not the message key: match both.
+grep -qE "autoStartPublicOriginMissing|public origin could not be resolved" "$(probe_log)" \
+    && fail "provider held the transfer in REQUESTED: autoStartPublicOriginMissing (twin-api #282, api-service < 0.9.3?) see $(probe_log)"
+PSTATE=$(echo "${r}" | jq -r '.result.providerState // empty')
+CSTATE=$(echo "${r}" | jq -r '.result.consumerState // empty')
+WAITED=$(echo "${r}" | jq -r '.result.waitedMs // empty')
+case "${PSTATE}" in
+    STARTED|COMPLETED) ok "provider auto-started the transfer (provider ${PSTATE}, consumer ${CSTATE:-unknown}, ${WAITED:-?} ms)";;
+    *) info "${r}"; fail "transfer did not leave REQUESTED on the provider (state ${PSTATE:-none}) see $(probe_log)";;
+esac
+
 echo ""
 echo "================================================================"
-echo -e "${GREEN}  ✓ #362 reproduction complete: paging reuse + stale-agreement prune verified${NC}"
+echo -e "${GREEN}  ✓ #362 reproduction complete: paging reuse + stale-agreement prune verified, #282 auto-start verified${NC}"
 echo "================================================================"

@@ -9,7 +9,7 @@ services:
       #   KENYA_DOCKERFILE=apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile.image
       dockerfile: ${KENYA_DOCKERFILE:-apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile}
       args:
-        TWIN_NODE_IMAGE: ${TWIN_NODE_IMAGE:-twinfoundation/twin-node:0.9.3}
+        TWIN_NODE_IMAGE: ${TWIN_NODE_IMAGE:-twinfoundation/twin-node:0.9.4}
     container_name: twin-kenya-defaultarb-node
     ports:
       - '3042:3000'

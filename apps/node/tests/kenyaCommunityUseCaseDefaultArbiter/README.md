@@ -62,7 +62,7 @@ mkdir -p vendor && cd vendor \
   && npm pack @twin.org/dataspace-test-app@0.9.3 --silent && tar -xzf *.tgz \
   && mv package dataspace-test-app && rm -f *.tgz && cd ..
 export KENYA_DOCKERFILE=apps/node/tests/kenyaCommunityUseCaseDefaultArbiter/Dockerfile.image
-export TWIN_NODE_IMAGE=twinfoundation/twin-node:0.9.3   # any published tag
+export TWIN_NODE_IMAGE=twinfoundation/twin-node:0.9.4   # any published tag
 ./setup.sh --clean && docker compose up -d && ./provision-storage.sh && ./kenya-usecase-test.sh
 ```
 
@@ -95,3 +95,16 @@ and checks the provider rejection, the consumer prune (`unknownAtProvider`, PAP 
 recovery to the real agreement. Both in-process methods are reached through
 `probe/option3-probe.mjs`, loaded as a `TWIN_EXTENSIONS` entry in one-shot `docker compose run`
 node processes that share the scaffold's data volume; each probe writes `.option3-probe-<n>.log`.
+
+### twin-api #282: provider auto-start on the in-process route
+
+The last option 3 step keeps the probe alive after `prepareTransfer` and runs it with
+`TWIN_DATASPACE_AUTO_START_TRANSFERS=true` (the main node keeps auto-start off, so the phases are
+unchanged). None of the scaffold's tenants stores a `publicOrigin`, so the provider's auto-start only
+works when `PlatformService.getLocalOriginContext` inherits the node origin (`@twin.org/api-service`
+0.9.3, <https://github.com/iotaledger/twin-api/issues/282>). The step fails with
+`autoStartPublicOriginMissing` on an unfixed api-service and passes when the provider record reaches
+`STARTED`. `provision-storage.sh` now waits for the node to answer before its first login, so the
+README one-liners no longer race the extension install on a fresh image. The probe process runs
+with `TWIN_LOGGING_CONNECTOR=console`: on the file connector a second writer corrupts the shared
+`log-entry` store once it has grown to a few MB.
