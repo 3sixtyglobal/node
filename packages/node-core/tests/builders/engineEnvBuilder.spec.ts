@@ -12,6 +12,7 @@ import {
 	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
 	HealthComponentType,
+	ImmutableProofComponentType,
 	LoggingConnectorType,
 	MailboxComponentType,
 	MetricsProducerComponentType,
@@ -28,6 +29,7 @@ import {
 } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
+import type { IEngineEnvironmentVariables } from "../../src/models/IEngineEnvironmentVariables.js";
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
@@ -91,6 +93,69 @@ describe("buildEngineConfiguration - task scheduler requirement", () => {
 		const config = await buildEngineConfiguration({});
 
 		expect(config.types.taskSchedulerComponent).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - immutable proof task options", () => {
+	/**
+	 * Builds the configuration with the immutable proof component enabled and returns its config.
+	 * @param envVars The immutable proof env vars to apply.
+	 * @returns The resolved immutable proof service config.
+	 */
+	async function buildImmutableProofConfig(envVars: IEngineEnvironmentVariables): Promise<{
+		taskRetryInterval?: number;
+		taskFailureRetainFor?: number;
+		taskWorkerIdleTimeout?: number;
+	}> {
+		const config = await buildEngineConfiguration({
+			auditableItemGraphEnabled: "true",
+			...envVars
+		});
+		const entry = config.types.immutableProofComponent?.find(
+			item => item.type === ImmutableProofComponentType.Service
+		);
+		if (entry?.type !== ImmutableProofComponentType.Service) {
+			throw new Error("The immutable proof service component was not configured");
+		}
+		return entry.options?.config ?? {};
+	}
+
+	test("leaves the task options undefined so the service defaults apply", async () => {
+		const proofConfig = await buildImmutableProofConfig({});
+
+		expect(proofConfig.taskRetryInterval).toBeUndefined();
+		expect(proofConfig.taskFailureRetainFor).toBeUndefined();
+		expect(proofConfig.taskWorkerIdleTimeout).toBeUndefined();
+	});
+
+	test("converts the task intervals from the env units to milliseconds", async () => {
+		const proofConfig = await buildImmutableProofConfig({
+			immutableProofTaskRetryInterval: "7",
+			immutableProofTaskFailureRetainFor: "3",
+			immutableProofTaskWorkerIdleTimeout: "120"
+		});
+
+		expect(proofConfig.taskRetryInterval).toBe(7000);
+		expect(proofConfig.taskFailureRetainFor).toBe(180_000);
+		expect(proofConfig.taskWorkerIdleTimeout).toBe(120_000);
+	});
+
+	test("passes the retain forever and never shut down sentinels through unchanged", async () => {
+		const proofConfig = await buildImmutableProofConfig({
+			immutableProofTaskFailureRetainFor: "-1",
+			immutableProofTaskWorkerIdleTimeout: "-1"
+		});
+
+		expect(proofConfig.taskFailureRetainFor).toBe(-1);
+		expect(proofConfig.taskWorkerIdleTimeout).toBe(-1);
+	});
+
+	test("passes a zero idle timeout through so the worker shuts down after every task", async () => {
+		const proofConfig = await buildImmutableProofConfig({
+			immutableProofTaskWorkerIdleTimeout: "0"
+		});
+
+		expect(proofConfig.taskWorkerIdleTimeout).toBe(0);
 	});
 });
 

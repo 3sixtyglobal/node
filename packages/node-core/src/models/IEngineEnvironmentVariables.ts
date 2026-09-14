@@ -893,6 +893,13 @@ export interface IEngineEnvironmentVariables {
 	immutableProofTaskFailureRetainFor?: string;
 
 	/**
+	 * How long in seconds the proof task worker stays idle before it shuts down.
+	 * Set to 0 to shut it down after every task, or -1 to never shut it down.
+	 * @default 60
+	 */
+	immutableProofTaskWorkerIdleTimeout?: string;
+
+	/**
 	 * How often in minutes the immutable proof reconciliation sweep runs.
 	 * @default 30
 	 */

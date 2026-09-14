@@ -259,6 +259,14 @@ describe("envSecToMs", () => {
 		expect(envSecToMs<{ secs?: string }>({ secs: "5" }, "secs", 3000)).toBe(5000);
 	});
 
+	test("returns zero unchanged", () => {
+		expect(envSecToMs<{ secs?: string }>({ secs: "0" }, "secs")).toBe(0);
+	});
+
+	test("returns a negative sentinel unchanged", () => {
+		expect(envSecToMs<{ secs?: string }>({ secs: "-1" }, "secs", 3000)).toBe(-1);
+	});
+
 	test("throws GeneralError for a non-numeric string", () => {
 		expect(() => envSecToMs<{ secs?: string }>({ secs: "five" }, "secs")).toThrow();
 	});
@@ -279,6 +287,14 @@ describe("envMinToMs", () => {
 
 	test("converts minutes to milliseconds when default given", () => {
 		expect(envMinToMs<{ mins?: string }>({ mins: "2" }, "mins", 60_000)).toBe(120_000);
+	});
+
+	test("returns zero unchanged", () => {
+		expect(envMinToMs<{ mins?: string }>({ mins: "0" }, "mins")).toBe(0);
+	});
+
+	test("returns a negative sentinel unchanged", () => {
+		expect(envMinToMs<{ mins?: string }>({ mins: "-1" }, "mins", 60_000)).toBe(-1);
 	});
 
 	test("throws GeneralError for a non-numeric string", () => {

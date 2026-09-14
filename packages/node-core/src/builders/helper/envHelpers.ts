@@ -270,6 +270,7 @@ export function envDateTime<T>(
 
 /**
  * Coerces an env var to an integer and converts from seconds to milliseconds.
+ * Values of zero or less are returned unchanged so sentinels such as -1 keep their meaning.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
  * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
@@ -287,11 +288,12 @@ export function envSecToMs<T>(envVars: T, key: keyof T, defaultValue?: number): 
 	if (Is.empty(n)) {
 		throw new GeneralError("node", "invalidEnvVarValue", { key, value, type: "integer" });
 	}
-	return n * 1000;
+	return n <= 0 ? n : n * 1000;
 }
 
 /**
  * Coerces an env var to an integer and converts from minutes to milliseconds.
+ * Values of zero or less are returned unchanged so sentinels such as -1 keep their meaning.
  * @param envVars The environment variables object.
  * @param key The property name of the env var to coerce.
  * @param defaultValue The value to return when the env var is absent. Omit to return undefined when absent.
@@ -309,7 +311,7 @@ export function envMinToMs<T>(envVars: T, key: keyof T, defaultValue?: number): 
 	if (Is.empty(n)) {
 		throw new GeneralError("node", "invalidEnvVarValue", { key, value, type: "integer" });
 	}
-	return n * 60_000;
+	return n <= 0 ? n : n * 60_000;
 }
 
 /**
