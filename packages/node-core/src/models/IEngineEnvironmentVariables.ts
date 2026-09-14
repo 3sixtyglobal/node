@@ -680,11 +680,6 @@ export interface IEngineEnvironmentVariables {
 	telemetryMaxCacheSize?: string;
 
 	/**
-	 * The mutex timeout in milliseconds for the telemetry connector.
-	 */
-	telemetryMutexTimeout?: string;
-
-	/**
 	 * How long in milliseconds the telemetry connector waits for its background thread to confirm
 	 * a flush before a read continues without it.
 	 * @default 30000
@@ -747,11 +742,6 @@ export interface IEngineEnvironmentVariables {
 	 * The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
 	 */
 	openTelemetryTracingProcessor?: string;
-
-	/**
-	 * The mutex timeout in milliseconds for the tracing connector.
-	 */
-	tracingMutexTimeout?: string;
 
 	/**
 	 * The type of faucet connector: entity-storage, iota.

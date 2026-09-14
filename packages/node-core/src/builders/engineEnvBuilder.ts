@@ -740,7 +740,6 @@ async function configureTelemetry(
 						batchSize: envCount(envVars, "telemetryBatchSize"),
 						batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
 						maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
-						mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
 						flushTimeoutMs: envMs(envVars, "telemetryFlushTimeout"),
 						taskCoalesceMs: envMs(envVars, "telemetryTaskCoalesce"),
 						taskStallTimeoutMs: envMs(envVars, "telemetryTaskStallTimeout"),
@@ -868,12 +867,7 @@ async function configureTracing(
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.EntityStorage) {
 			coreConfig.types.tracingConnector.push({
-				type: TracingConnectorType.EntityStorage,
-				options: {
-					config: {
-						mutexTimeoutMs: envMs(envVars, "tracingMutexTimeout")
-					}
-				}
+				type: TracingConnectorType.EntityStorage
 			});
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.Console) {
