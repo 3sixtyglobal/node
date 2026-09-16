@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.5-next.2](https://github.com/iotaledger/twin-node/compare/node-v0.9.5-next.1...node-v0.9.5-next.2) (2026-09-16)
+
+
+### Features
+
+* configure which factories receive tracing facades ([#412](https://github.com/iotaledger/twin-node/issues/412)) ([da56bcb](https://github.com/iotaledger/twin-node/commit/da56bcbeba04d1091b3cd237624951c31ff9c185))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.9.5-next.1 to 0.9.5-next.2
+
 ## [0.9.5-next.1](https://github.com/iotaledger/twin-node/compare/node-v0.9.5-next.0...node-v0.9.5-next.1) (2026-09-14)
 
 
