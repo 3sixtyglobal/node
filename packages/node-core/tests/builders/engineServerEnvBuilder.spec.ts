@@ -119,3 +119,38 @@ describe("buildEngineServerConfiguration - auth context keys", () => {
 		expect(config.types.authenticationComponent).toBeUndefined();
 	});
 });
+
+describe("buildEngineServerConfiguration - custom web config", () => {
+	test("defaults the Fastify plugin timeout to 30000 when the env var is not set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: 30000 });
+	});
+
+	test("uses the Fastify plugin timeout from the env var when set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, fastifyPluginTimeout: "60000" },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: 60000 });
+	});
+
+	test("throws when the Fastify plugin timeout is not an integer", async () => {
+		await expect(
+			buildEngineServerConfiguration(
+				{ ...BASE_VARS, fastifyPluginTimeout: "not-a-number" },
+				[],
+				{ types: {} },
+				SERVER_INFO
+			)
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+});

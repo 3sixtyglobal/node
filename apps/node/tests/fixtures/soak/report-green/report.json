@@ -1,0 +1,139 @@
+{
+	"config": {
+		"profile": "file-local",
+		"tenantMode": "multi",
+		"duration": "10s",
+		"vus": 5,
+		"startedIso": "2026-08-28T07:22:56.524Z",
+		"finishedIso": "2026-08-28T07:23:26.210Z",
+		"warmupDiscardMs": 120000,
+		"thresholds": {
+			"p95Ms": 3000,
+			"p99Ms": 5000,
+			"errorRate": "0.01",
+			"rssGrowthMbPerHr": 150
+		}
+	},
+	"k6": {
+		"exitCode": 0,
+		"httpReqDuration": {
+			"max": 4282.5356,
+			"p(95)": 253.642785,
+			"p(99)": 344.31046699999996,
+			"avg": 139.57611739130425,
+			"min": 11.9586,
+			"med": 111.752
+		},
+		"httpReqFailed": {
+			"rate": 0,
+			"passes": 0,
+			"fails": 414
+		},
+		"httpReqs": {
+			"count": 414,
+			"rate": 23.73713292588029
+		},
+		"groups": {
+			"logging": {
+				"reqs": 55,
+				"errors": 0,
+				"p50": 69.7962,
+				"p95": 124.81837999999996,
+				"p99": 171.58755400000004
+			},
+			"blob": {
+				"reqs": 79,
+				"errors": 0,
+				"p50": 119.8828,
+				"p95": 199.97991999999996,
+				"p99": 238.954436
+			},
+			"aig": {
+				"reqs": 43,
+				"errors": 0,
+				"p50": 157.2544,
+				"p95": 296.34891999999996,
+				"p99": 333.80887799999994
+			},
+			"ais": {
+				"reqs": 51,
+				"errors": 0,
+				"p50": 123.1098,
+				"p95": 217.0277,
+				"p99": 288.41785000000004
+			},
+			"identity": {
+				"reqs": 66,
+				"errors": 0,
+				"p50": 90.02045,
+				"p95": 202.89395000000002,
+				"p99": 245.36666999999994
+			},
+			"telemetry": {
+				"reqs": 20,
+				"errors": 0,
+				"p50": 148.10750000000002,
+				"p95": 217.17455999999999,
+				"p99": 217.47491200000002
+			},
+			"auth": {
+				"reqs": 20,
+				"errors": 0,
+				"p50": 135.5953,
+				"p95": 181.027795,
+				"p99": 184.844439
+			},
+			"notarization": {
+				"reqs": 19,
+				"errors": 0,
+				"p50": 110.4552,
+				"p95": 210.34845999999985,
+				"p99": 263.93345200000005
+			},
+			"fedcat": {
+				"reqs": 17,
+				"errors": 0,
+				"p50": 184.8115,
+				"p95": 258.40024,
+				"p99": 282.541808
+			},
+			"dataspace": {
+				"reqs": 22,
+				"errors": 0,
+				"p50": 134.18304999999998,
+				"p95": 384.203625,
+				"p99": 527.4923149999998
+			}
+		},
+		"preExtension": null
+	},
+	"memory": {
+		"verdict": "insufficient",
+		"slopeMbPerHr": 0,
+		"rawSlopeMbPerHr": 0,
+		"windowMs": 0,
+		"samples": 0,
+		"totalSamples": 2,
+		"startMb": null,
+		"endMb": null,
+		"floorStartMb": null,
+		"floorEndMb": null,
+		"peakMb": 851.37408,
+		"buckets": 0,
+		"signals": null,
+		"extended": false,
+		"preExtensionVerdict": null,
+		"preExtensionSlopeMbPerHr": null,
+		"preExtensionRawSlopeMbPerHr": null
+	},
+	"series": [
+		{
+			"t": 1036,
+			"rssBytes": 527372288
+		},
+		{
+			"t": 10751,
+			"rssBytes": 851374080
+		}
+	]
+}

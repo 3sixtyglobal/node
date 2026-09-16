@@ -1,0 +1,169 @@
+{
+	"config": {
+		"profile": "cloud",
+		"tenantMode": "multi",
+		"duration": "15m",
+		"vus": 5,
+		"startedIso": "2026-08-31T11:05:58.818Z",
+		"finishedIso": "2026-08-31T11:21:08.176Z",
+		"memSource": "telemetry",
+		"warmupDiscardMs": 120000,
+		"thresholds": {
+			"p95Ms": 3300,
+			"p99Ms": 10000,
+			"errorRate": "0.05",
+			"rssGrowthMbPerHr": 150
+		}
+	},
+	"k6": {
+		"exitCode": 0,
+		"httpReqDuration": {
+			"p(95)": 903.0298219499989,
+			"p(99)": 6133.9528596400005,
+			"avg": 420.60315488186524,
+			"min": 21.968154,
+			"med": 198.323193,
+			"max": 22266.092545
+		},
+		"httpReqFailed": {
+			"passes": 0,
+			"fails": 10742,
+			"rate": 0
+		},
+		"httpReqs": {
+			"count": 10742,
+			"rate": 11.816759196057086
+		},
+		"groups": {
+			"logging": {
+				"reqs": 1471,
+				"errors": 0,
+				"p50": 114.07149,
+				"p95": 495.72823600000004,
+				"p99": 3143.1134118
+			},
+			"blob": {
+				"reqs": 1963,
+				"errors": 0,
+				"p50": 203.004532,
+				"p95": 809.2059478999926,
+				"p99": 6415.886019059996
+			},
+			"ais": {
+				"reqs": 2247,
+				"errors": 0,
+				"p50": 266.512318,
+				"p95": 831.7676694999996,
+				"p99": 6137.98281014
+			},
+			"identity": {
+				"reqs": 2266,
+				"errors": 0,
+				"p50": 180.82394499999998,
+				"p95": 616.18009325,
+				"p99": 3238.9727349500004
+			},
+			"telemetry": {
+				"reqs": 757,
+				"errors": 0,
+				"p50": 150.000693,
+				"p95": 555.0374677999976,
+				"p99": 3198.56817292
+			},
+			"auth": {
+				"reqs": 664,
+				"errors": 0,
+				"p50": 143.21875699999998,
+				"p95": 750.1087507000001,
+				"p99": 3540.57144632
+			},
+			"fedcat": {
+				"reqs": 685,
+				"errors": 0,
+				"p50": 524.903197,
+				"p95": 4463.563520599993,
+				"p99": 9936.679647639943
+			},
+			"dataspace": {
+				"reqs": 669,
+				"errors": 0,
+				"p50": 205.291698,
+				"p95": 847.7067326000005,
+				"p99": 3061.6189812000016
+			}
+		},
+		"preExtension": null
+	},
+	"memory": {
+		"verdict": "informational",
+		"slopeMbPerHr": 19.304375362854277,
+		"rawSlopeMbPerHr": 583.4937619556706,
+		"windowMs": 606297,
+		"samples": 10,
+		"totalSamples": 12,
+		"buckets": 7,
+		"startMb": 662.397,
+		"endMb": 777.679,
+		"floorStartMb": 662.397,
+		"floorEndMb": 777.679,
+		"peakMb": 809.419,
+		"signals": {
+			"floorBreach": false,
+			"rawBreach": true
+		},
+		"extended": false,
+		"preExtensionVerdict": null,
+		"preExtensionSlopeMbPerHr": null,
+		"preExtensionRawSlopeMbPerHr": null
+	},
+	"series": [
+		{
+			"t": 37599,
+			"rssBytes": 649335000
+		},
+		{
+			"t": 40637,
+			"rssBytes": 650121000
+		},
+		{
+			"t": 127047,
+			"rssBytes": 662397000
+		},
+		{
+			"t": 212882,
+			"rssBytes": 663204000
+		},
+		{
+			"t": 438723,
+			"rssBytes": 661930000
+		},
+		{
+			"t": 443214,
+			"rssBytes": 662168000
+		},
+		{
+			"t": 531738,
+			"rssBytes": 663257000
+		},
+		{
+			"t": 531795,
+			"rssBytes": 662487000
+		},
+		{
+			"t": 617128,
+			"rssBytes": 663020000
+		},
+		{
+			"t": 627752,
+			"rssBytes": 662946000
+		},
+		{
+			"t": 705018,
+			"rssBytes": 809419000
+		},
+		{
+			"t": 733344,
+			"rssBytes": 777679000
+		}
+	]
+}

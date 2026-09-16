@@ -5,10 +5,10 @@ import { ComponentFactory, Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import { EntityStorageConnectorType } from "@twin.org/engine-types";
 import type { ITelemetryComponent } from "@twin.org/telemetry-models";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
-const BASE_PORT = 4500 + Math.floor(Math.random() * 400);
+const BASE_PORT = await getFreePort();
 const TEST_NODE_ID =
 	"did:iota:testnet:0x8f7b71cedde408974606e404bce76980fd17a570d03ec319788fefd5eabbe9e8";
 const TEST_NODE_ORG_ID =

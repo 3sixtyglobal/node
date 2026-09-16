@@ -176,7 +176,7 @@ export function constructCliCommand(
 				});
 			}
 
-			if (!Is.empty(paramValue)) {
+			if (Is.notEmpty(paramValue)) {
 				cliParams[StringHelper.camelCase(commandDefParam.key)] = paramValue;
 			}
 

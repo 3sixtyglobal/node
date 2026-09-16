@@ -549,9 +549,9 @@ export interface IEngineEnvironmentVariables {
 	eventBusComponent?: string;
 
 	/**
-	 * Are the messaging components enabled, defaults to false.
+	 * The email protocol connector types, comma-separated: pop3, imap, gmail, outlook.
 	 */
-	messagingEnabled?: string;
+	emailProtocolConnector?: string;
 
 	/**
 	 * AWS SES region.
@@ -584,9 +584,34 @@ export interface IEngineEnvironmentVariables {
 	awsMessagingPushNotificationApplications?: string;
 
 	/**
-	 * The type of messaging email connector: entity-storage, aws.
+	 * The type of messaging email connector: entity-storage, aws, smtp.
 	 */
 	messagingEmailConnector?: string;
+
+	/**
+	 * SMTP server hostname or IP address.
+	 */
+	smtpHost?: string;
+
+	/**
+	 * SMTP server port, defaults to 587.
+	 */
+	smtpPort?: string;
+
+	/**
+	 * Whether the SMTP connector uses TLS.
+	 */
+	smtpSecure?: string;
+
+	/**
+	 * SMTP authentication username.
+	 */
+	smtpUsername?: string;
+
+	/**
+	 * SMTP authentication password.
+	 */
+	smtpPassword?: string;
 
 	/**
 	 * The type of messaging sms connector: entity-storage, aws.
@@ -655,9 +680,26 @@ export interface IEngineEnvironmentVariables {
 	telemetryMaxCacheSize?: string;
 
 	/**
-	 * The mutex timeout in milliseconds for the telemetry connector.
+	 * How long in milliseconds the telemetry connector waits for its background thread to confirm
+	 * a flush before a read continues without it.
+	 * @default 30000
 	 */
-	telemetryMutexTimeout?: string;
+	telemetryFlushTimeout?: string;
+
+	/**
+	 * How long in milliseconds the telemetry connector holds values so several share a single
+	 * background task, instead of creating one task per value. Set to 0 to disable coalescing.
+	 * @default 1000
+	 */
+	telemetryTaskCoalesce?: string;
+
+	/**
+	 * How long in milliseconds the telemetry connector allows with tasks outstanding and none of
+	 * them completing before its background thread is treated as stalled and replaced. Set to 0
+	 * to disable the check.
+	 * @default 60000
+	 */
+	telemetryTaskStallTimeout?: string;
 
 	/**
 	 * The maximum number of metric definitions held in the in-memory definition cache for the telemetry connector.
@@ -677,9 +719,53 @@ export interface IEngineEnvironmentVariables {
 	tracingSilentComponents?: string;
 
 	/**
-	 * The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, silent.
+	 * The type of tracing connector, comma-separated for multiple: entity-storage, open-telemetry, console, silent.
 	 */
 	tracingConnector?: string;
+
+	/**
+	 * The type of facade to activate, comma-separated for multiple: tracing. When this is not set no
+	 * facades are activated.
+	 */
+	facade?: string;
+
+	/**
+	 * The factories the tracing facade is activated on, as a comma separated list of factory type names
+	 * e.g. "component,vault", replacing the default set rather than adding to it. Only applies when the
+	 * tracing facade is activated.
+	 */
+	tracingFacadeFactories?: string;
+
+	/**
+	 * Additional instance types the tracing facade is not applied to in the component factory, as a comma
+	 * separated list of regular expressions matched anywhere in the type name e.g. "^my-tracing-service$".
+	 * These extend the types which are always excluded, "tracing", "telemetry", "metrics", "logging" and
+	 * "platform", they do not replace them.
+	 */
+	tracingFacadeComponentExcludeTypes?: string;
+
+	/**
+	 * Additional parameter names the tracing facade does not record, as a comma separated list
+	 * e.g. "ssn,accountNumber". These extend the names which are always excluded, they do not
+	 * replace them.
+	 */
+	tracingFacadeExcludeParams?: string;
+
+	/**
+	 * Additional method names the tracing facade does not record a span for, as a comma separated
+	 * list e.g. "health,ping". These extend the names which are always excluded, they do not
+	 * replace them.
+	 */
+	tracingFacadeExcludeMethods?: string;
+
+	/**
+	 * The object values the tracing facade records, as a comma separated list of patterns matched
+	 * against the end of "parameter" or "parameter.property", where the returned value is named
+	 * "resolved" e.g. "filter.id,resolved.id". Naming the parameter records the whole object
+	 * including any secrets it holds, naming a property records only that property. Object
+	 * parameters and returned objects are omitted unless matched here.
+	 */
+	tracingFacadeIncludeObjects?: string;
 
 	/**
 	 * The name of the Open Telemetry tracer to use, only required if using open-telemetry as tracing connector, defaults to twin-node.
@@ -700,11 +786,6 @@ export interface IEngineEnvironmentVariables {
 	 * The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
 	 */
 	openTelemetryTracingProcessor?: string;
-
-	/**
-	 * The mutex timeout in milliseconds for the tracing connector.
-	 */
-	tracingMutexTimeout?: string;
 
 	/**
 	 * The type of faucet connector: entity-storage, iota.
@@ -856,6 +937,13 @@ export interface IEngineEnvironmentVariables {
 	immutableProofTaskFailureRetainFor?: string;
 
 	/**
+	 * How long in seconds the proof task worker stays idle before it shuts down.
+	 * Set to 0 to shut it down after every task, or -1 to never shut it down.
+	 * @default 60
+	 */
+	immutableProofTaskWorkerIdleTimeout?: string;
+
+	/**
 	 * How often in minutes the immutable proof reconciliation sweep runs.
 	 * @default 30
 	 */
@@ -899,11 +987,6 @@ export interface IEngineEnvironmentVariables {
 	 * The identity verification method id to use with attestation.
 	 */
 	attestationVerificationMethodId?: string;
-
-	/**
-	 * Is the data processing enabled, defaults to false.
-	 */
-	dataProcessingEnabled?: string;
 
 	/**
 	 * The type of the default data converters, can be a comma separated list: json, xml.
@@ -1172,6 +1255,43 @@ export interface IEngineEnvironmentVariables {
 	healthApplicationInterval?: string;
 
 	/**
+	 * Comma separated list of regular expressions matched against the engine component type keys,
+	 * any which match are excluded from the engine clone used by the application health background
+	 * task. Defaults to the component groups which provide no application health checks.
+	 */
+	healthExcludeCloneComponents?: string;
+
+	/**
+	 * The maximum number of workers to use for processing background tasks, defaults to twice the number of CPU cores.
+	 */
+	backgroundTaskMaxSystemWorkerCount?: string;
+
+	/**
+	 * The interval in milliseconds to leave between background tasks, defaults to 100.
+	 */
+	backgroundTaskInterval?: string;
+
+	/**
+	 * The interval in milliseconds to leave between background task retries, defaults to 5000.
+	 */
+	backgroundTaskRetryInterval?: string;
+
+	/**
+	 * The interval in milliseconds between sweeps removing retained background tasks, defaults to 120000.
+	 */
+	backgroundTaskCleanupInterval?: string;
+
+	/**
+	 * The time in milliseconds to wait for each handler's workers to shut down before terminating them, defaults to 5000.
+	 */
+	backgroundTaskWorkerShutdownTimeout?: string;
+
+	/**
+	 * The maximum dispatches of a background task attempt before it is failed as interrupted, defaults to 3, set to -1 for no limit.
+	 */
+	backgroundTaskMaxDispatchCount?: string;
+
+	/**
 	 * The type of the automation action to create, comma separate for more than one connector.
 	 * values: fetch
 	 */
@@ -1201,11 +1321,6 @@ export interface IEngineEnvironmentVariables {
 	 * The mutex timeout in milliseconds for the document management component.
 	 */
 	documentManagementMutexTimeout?: string;
-
-	/**
-	 * The mutex timeout in milliseconds for the logging component.
-	 */
-	loggingMutexTimeout?: string;
 
 	/**
 	 * The mutex timeout in milliseconds for the memory and file entity storage connectors.

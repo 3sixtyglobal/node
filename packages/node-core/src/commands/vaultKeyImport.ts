@@ -121,7 +121,7 @@ export async function vaultKeyImport(
 	let existingKey;
 	try {
 		existingKey = await vaultConnector.getKey(fullKeyId);
-		if (!Is.empty(existingKey)) {
+		if (Is.notEmpty(existingKey)) {
 			await vaultConnector.removeKey(fullKeyId);
 		}
 	} catch {}

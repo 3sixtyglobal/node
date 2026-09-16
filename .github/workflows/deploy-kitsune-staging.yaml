@@ -2,9 +2,114 @@ name: Deploy Kitsune to Staging
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Twin Node image version to deploy; next resolves to the current versioned next image'
+        required: true
+        default: next
+        type: string
+
+concurrency:
+  group: kitsune-staging-environment
+  cancel-in-progress: false
+
+env:
+  TWIN_DOCKER_REPO: twinfoundation/twin-node
+  DOCKER_REGISTRY_URL: https://registry-1.docker.io
+  DOCKER_AUTH_URL: https://auth.docker.io/token
+  TFC_API_URL: https://app.terraform.io/api/v2
 
 jobs:
   deploy:
+    name: Deploy Kitsune to staging
     runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
     steps:
-      - run: echo "Deploy Kitsune Staging Workflow Placeholder"
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Resolve Kitsune image version
+        id: resolve-image
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          SEMVER_PATTERN='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$'
+          MANIFEST_ACCEPT='application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json'
+
+          REGISTRY_TOKEN="$(curl --fail --silent --show-error --retry 3 \
+            "$DOCKER_AUTH_URL?service=registry.docker.io&scope=repository:$TWIN_DOCKER_REPO:pull" \
+            | jq -r '.token')"
+          if [[ -z "$REGISTRY_TOKEN" || "$REGISTRY_TOKEN" == "null" ]]; then
+            echo "ERROR: Docker Registry did not return a pull token for $TWIN_DOCKER_REPO." >&2
+            exit 1
+          fi
+
+          registry_manifest_digest() {
+            local tag="$1"
+            curl --fail --silent --show-error --retry 3 --head \
+              -H "Authorization: Bearer $REGISTRY_TOKEN" \
+              -H "Accept: $MANIFEST_ACCEPT" \
+              "$DOCKER_REGISTRY_URL/v2/$TWIN_DOCKER_REPO/manifests/$tag" \
+              | awk 'BEGIN { IGNORECASE=1 } /^docker-content-digest:/ { sub(/\r$/, "", $2); print $2; exit }'
+          }
+
+          RESOLVED_VERSION="$REQUESTED_VERSION"
+
+          if [[ "$REQUESTED_VERSION" == "next" ]]; then
+            NEXT_DIGEST="$(registry_manifest_digest next)"
+
+            if [[ -z "$NEXT_DIGEST" ]]; then
+              echo "ERROR: Docker Registry did not return a digest for $TWIN_DOCKER_REPO:next" >&2
+              exit 1
+            fi
+
+            TAGS_RESPONSE="$(curl --fail --silent --show-error --retry 3 \
+              -H "Authorization: Bearer $REGISTRY_TOKEN" \
+              "$DOCKER_REGISTRY_URL/v2/$TWIN_DOCKER_REPO/tags/list?n=1000")"
+            MATCHING_TAGS=()
+            while IFS= read -r tag; do
+              [[ -z "$tag" ]] && continue
+              tag_digest="$(registry_manifest_digest "$tag")"
+              if [[ "$tag_digest" == "$NEXT_DIGEST" ]]; then
+                MATCHING_TAGS+=("$tag")
+              fi
+            done < <(echo "$TAGS_RESPONSE" | jq -r --arg pattern "$SEMVER_PATTERN" \
+              '.tags[] | select(test($pattern))')
+
+            if [[ "${#MATCHING_TAGS[@]}" -eq 0 ]]; then
+              echo "ERROR: No immutable semantic version tag matches $TWIN_DOCKER_REPO:next ($NEXT_DIGEST)" >&2
+              exit 1
+            fi
+
+            RESOLVED_VERSION="$(printf '%s\n' "${MATCHING_TAGS[@]}" | sort -V | tail -n 1)"
+          fi
+
+          if [[ ! "$RESOLVED_VERSION" =~ $SEMVER_PATTERN ]]; then
+            echo "ERROR: version must be 'next' or a semantic version tag. Received '$REQUESTED_VERSION'." >&2
+            exit 1
+          fi
+
+          if [[ -z "$(registry_manifest_digest "$RESOLVED_VERSION")" ]]; then
+            echo "ERROR: Docker Registry image $TWIN_DOCKER_REPO:$RESOLVED_VERSION was not found." >&2
+            exit 1
+          fi
+
+          echo "Requested version: $REQUESTED_VERSION"
+          echo "Resolved image: $TWIN_DOCKER_REPO:$RESOLVED_VERSION"
+          echo "image_reference=$TWIN_DOCKER_REPO:$RESOLVED_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update Kitsune image and auto-apply Terraform run
+        env:
+          TARGET_ENVIRONMENT: staging
+          IMAGE_REFERENCE: ${{ steps.resolve-image.outputs.image_reference }}
+          TFC_WORKSPACE_ID: ${{ secrets.TFC_WORKSPACE_ID_STAGING || vars.TFC_WORKSPACE_ID_STAGING }}
+          TFC_VARIABLE_ID: ${{ secrets.TFC_KITSUNE_TWIN_NODE_IMAGE_VAR_ID_STAGING || vars.TFC_KITSUNE_TWIN_NODE_IMAGE_VAR_ID_STAGING }}
+          TFC_TOKEN: ${{ secrets.TFC_TOKEN }}
+          TFC_API_URL: ${{ env.TFC_API_URL }}
+          DEPLOY_TIMEOUT_SECONDS: 2700
+          DEPLOY_POLL_INTERVAL_SECONDS: 15
+        run: bash ./scripts/deploy-kitsune-via-tfc.sh

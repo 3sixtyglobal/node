@@ -36,6 +36,11 @@
 - [AUTH\_SIGNING\_KEY\_ID](variables/AUTH_SIGNING_KEY_ID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_DID](variables/CONTEXT_ID_HANDLER_FEATURE_DID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_TENANT](variables/CONTEXT_ID_HANDLER_FEATURE_TENANT.md)
+- [DEFAULT\_HEALTH\_EXCLUDE\_CLONE\_COMPONENTS](variables/DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS.md)
+- [TRACING\_FACADE\_NAME](variables/TRACING_FACADE_NAME.md)
+- [COMPONENT\_FACTORY\_TYPE\_NAME](variables/COMPONENT_FACTORY_TYPE_NAME.md)
+- [DEFAULT\_TRACING\_FACADE\_FACTORIES](variables/DEFAULT_TRACING_FACADE_FACTORIES.md)
+- [DEFAULT\_TRACING\_FACADE\_COMPONENT\_EXCLUDE\_TYPES](variables/DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES.md)
 - [ModuleProtocol](variables/ModuleProtocol.md)
 
 ## Functions
@@ -50,6 +55,7 @@
 - [isAutomationRequired](functions/isAutomationRequired.md)
 - [isTelemetryEnabled](functions/isTelemetryEnabled.md)
 - [isTracingEnabled](functions/isTracingEnabled.md)
+- [isMailboxEnabled](functions/isMailboxEnabled.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
 - [extensionsConfiguration](functions/extensionsConfiguration.md)

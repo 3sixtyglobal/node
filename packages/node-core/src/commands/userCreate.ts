@@ -233,7 +233,7 @@ export async function userCreate(
 				existingUser = await authenticationAdminComponent.get(paramsEmail);
 			} catch {}
 
-			if (!Is.empty(existingUser)) {
+			if (Is.notEmpty(existingUser)) {
 				if (params.overwriteMode === "error") {
 					throw new GeneralError("userCreate", "userAlreadyExists");
 				} else if (params.overwriteMode === "skip") {

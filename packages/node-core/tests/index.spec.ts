@@ -12,6 +12,7 @@ import {
 import {
 	AttestationConnectorType,
 	BlobStorageConnectorType,
+	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
 	EventBusComponentType,
 	EventBusConnectorType,
@@ -20,6 +21,7 @@ import {
 	IdentityProfileConnectorType,
 	IdentityResolverConnectorType,
 	LoggingConnectorType,
+	MessagingEmailConnectorType,
 	NftConnectorType,
 	NotarizationConnectorType,
 	TelemetryConnectorType,
@@ -37,7 +39,7 @@ import {
 	PolicyRequesterFactory
 } from "@twin.org/rights-management-models";
 import { TrustGeneratorFactory, TrustVerifierFactory } from "@twin.org/trust-models";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { getEnvDefaults } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
@@ -51,20 +53,40 @@ const TEST_NODE_ORG_ID =
 	"did:iota:testnet:0x7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b";
 const TEST_NODE_TENANT_ID = "4cfc10fd12d2a206f681ea9b01b306c0";
 
-const basePort = Math.floor(Math.random() * 1000);
-let port = 13000 + basePort;
+let port = 0;
+
+/**
+ * Wait for the web server to start accepting connections on the given port.
+ * @param serverPort The port the server should be listening on.
+ */
+async function waitForServer(serverPort: number): Promise<void> {
+	const expiry = Date.now() + 30000;
+	let lastError: unknown;
+
+	while (Date.now() < expiry) {
+		try {
+			await fetch(`http://localhost:${serverPort}/info`);
+			return;
+		} catch (err) {
+			lastError = err;
+			await new Promise(resolve => setTimeout(resolve, 100));
+		}
+	}
+
+	throw new Error(`The server did not start on port ${serverPort}`, { cause: lastError });
+}
 
 describe("node-core", () => {
 	beforeEach(async () => {
-		port++;
+		port = await getFreePort();
 
 		Factory.clearFactories();
 
-		await mkdir("./tests/.tmp", { recursive: true });
+		await mkdir("./tests/.tmp/index", { recursive: true });
 	});
 
 	afterEach(async () => {
-		await rm("./tests/.tmp", { recursive: true, force: true });
+		await rm("./tests/.tmp/index", { recursive: true, force: true });
 	});
 
 	test("Can fail to run the node with no config as default is for file storage and this requires a storageFileRoot", async () => {
@@ -120,14 +142,14 @@ describe("node-core", () => {
 				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 				TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
 				TWIN_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
-				TWIN_DATA_PROCESSING_ENABLED: "true",
 				TWIN_DATA_CONVERTER_CONNECTORS: "json,xml",
 				TWIN_DATA_EXTRACTOR_CONNECTORS: "json-path",
 				TWIN_AUDITABLE_ITEM_GRAPH_ENABLED: "true",
 				TWIN_AUDITABLE_ITEM_STREAM_ENABLED: "true",
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true",
+				TWIN_MESSAGING_EMAIL_CONNECTOR: MessagingEmailConnectorType.EntityStorage,
+				TWIN_EMAIL_PROTOCOL_CONNECTOR: `${EmailProtocolConnectorType.Imap},${EmailProtocolConnectorType.Pop3},${EmailProtocolConnectorType.Gmail},${EmailProtocolConnectorType.Outlook}`,
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
 				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
@@ -166,7 +188,6 @@ describe("node-core", () => {
 				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 				TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
 				TWIN_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
-				TWIN_DATA_PROCESSING_ENABLED: "true",
 				TWIN_DATA_CONVERTER_CONNECTORS: "json,xml",
 				TWIN_DATA_EXTRACTOR_CONNECTORS: "json-path",
 				TWIN_AUDITABLE_ITEM_GRAPH_ENABLED: "true",
@@ -186,7 +207,6 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 				TWIN_DATASPACE_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
 				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
@@ -226,7 +246,6 @@ describe("node-core", () => {
 				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 				TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
 				TWIN_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
-				TWIN_DATA_PROCESSING_ENABLED: "true",
 				TWIN_DATA_CONVERTER_CONNECTORS: "json,xml",
 				TWIN_DATA_EXTRACTOR_CONNECTORS: "json-path",
 				TWIN_AUDITABLE_ITEM_GRAPH_ENABLED: "true",
@@ -246,7 +265,6 @@ describe("node-core", () => {
 				TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 				TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 				TWIN_DATASPACE_ENABLED: "true",
-				TWIN_MESSAGING_ENABLED: "true",
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
 				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
@@ -331,8 +349,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -382,7 +400,6 @@ describe("node-core", () => {
 			TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 			TWIN_EVENT_BUS_CONNECTOR: EventBusConnectorType.Local,
 			TWIN_EVENT_BUS_COMPONENT: EventBusComponentType.Service,
-			TWIN_DATA_PROCESSING_ENABLED: "true",
 			TWIN_DATA_CONVERTER_CONNECTORS: "json,xml",
 			TWIN_DATA_EXTRACTOR_CONNECTORS: "json-path",
 			TWIN_AUDITABLE_ITEM_GRAPH_ENABLED: "true",
@@ -402,7 +419,8 @@ describe("node-core", () => {
 			TWIN_RIGHTS_MANAGEMENT_POLICY_ARBITERS: "pass-through",
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 			TWIN_DATASPACE_ENABLED: "true",
-			TWIN_MESSAGING_ENABLED: "true",
+			TWIN_MESSAGING_EMAIL_CONNECTOR: MessagingEmailConnectorType.EntityStorage,
+			TWIN_EMAIL_PROTOCOL_CONNECTOR: `${EmailProtocolConnectorType.Imap},${EmailProtocolConnectorType.Pop3},${EmailProtocolConnectorType.Gmail},${EmailProtocolConnectorType.Outlook}`,
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
@@ -443,8 +461,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -466,6 +484,8 @@ describe("node-core", () => {
 			"automation-service",
 			"messaging-admin-service",
 			"messaging-service",
+			"mail-storage-service",
+			"mailbox-service",
 			"blob-storage-service",
 			"identity-service",
 			"identity-resolver-service",
@@ -639,6 +659,16 @@ describe("node-core", () => {
 			"GET      /documents/:auditableItemGraphDocumentId/:revision",
 			"DELETE   /documents/:auditableItemGraphDocumentId/:revision",
 			"GET      /documents",
+			"GET      /mailbox/mail",
+			"GET      /mailbox/mail/:id",
+			"DELETE   /mailbox/mail/:id",
+			"GET      /mailbox/connectors/:connectorType/schema",
+			"GET      /mailbox/authcallback",
+			"POST     /mailbox",
+			"GET      /mailbox",
+			"GET      /mailbox/:id",
+			"PUT      /mailbox/:id",
+			"DELETE   /mailbox/:id",
 			"POST     /rights-management/policy/admin",
 			"PUT      /rights-management/policy/admin/:id",
 			"GET      /rights-management/policy/admin/:id",
@@ -858,8 +888,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -924,8 +954,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -987,8 +1017,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -1125,8 +1155,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -1194,7 +1224,7 @@ describe("node-core", () => {
 	test("should load multiple extensions in correct order", async () => {
 		// Write first extension
 		await writeFile(
-			"./tests/.tmp/first-extension.js",
+			"./tests/.tmp/index/first-extension.js",
 			`
 				export async function extensionInitialise() {
 					global.extensionCallOrder = global.extensionCallOrder || [];
@@ -1217,7 +1247,7 @@ describe("node-core", () => {
 
 		// Write second extension
 		await writeFile(
-			"./tests/.tmp/second-extension.js",
+			"./tests/.tmp/index/second-extension.js",
 			`
 				export async function extensionInitialise() {
 					global.extensionCallOrder = global.extensionCallOrder || [];
@@ -1244,7 +1274,8 @@ describe("node-core", () => {
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/first-extension.js,./tests/.tmp/second-extension.js"
+			TWIN_EXTENSIONS:
+				"./tests/.tmp/index/first-extension.js,./tests/.tmp/index/second-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1271,8 +1302,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait for server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		// Verify extensions loaded
 		const res = await fetch(`http://localhost:${port}/info`);
@@ -1298,14 +1329,14 @@ describe("node-core", () => {
 		]);
 
 		// Cleanup
-		await rm("./tests/.tmp/first-extension.js", { force: true });
-		await rm("./tests/.tmp/second-extension.js", { force: true });
+		await rm("./tests/.tmp/index/first-extension.js", { force: true });
+		await rm("./tests/.tmp/index/second-extension.js", { force: true });
 	});
 
 	test("should execute all extension lifecycle hooks in correct sequence", async () => {
 		// Write extension that tracks all lifecycle hooks
 		await writeFile(
-			"./tests/.tmp/lifecycle-test.js",
+			"./tests/.tmp/index/lifecycle-test.js",
 			`
 				export async function extensionInitialise(config) {
 					global.lifecycleOrder = global.lifecycleOrder || [];
@@ -1335,7 +1366,7 @@ describe("node-core", () => {
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/lifecycle-test.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/index/lifecycle-test.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1362,8 +1393,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait for server
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		// Verify server is running
 		const res = await fetch(`http://localhost:${port}/info`);
@@ -1388,13 +1419,13 @@ describe("node-core", () => {
 		expect(server).toBeDefined();
 
 		// Cleanup
-		await rm("./tests/.tmp/lifecycle-test.js", { force: true });
+		await rm("./tests/.tmp/index/lifecycle-test.js", { force: true });
 	});
 
 	test("should handle extension initialization failure gracefully", async () => {
 		// Write extension that throws error
 		await writeFile(
-			"./tests/.tmp/failing-extension.js",
+			"./tests/.tmp/index/failing-extension.js",
 			`
 				export async function extensionInitialise() {
 					throw new Error("Extension initialization failed");
@@ -1408,7 +1439,7 @@ describe("node-core", () => {
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/failing-extension.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/index/failing-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1436,7 +1467,7 @@ describe("node-core", () => {
 	test("should use custom cache directory when configured", async () => {
 		// Write test extension
 		await writeFile(
-			"./tests/.tmp/cache-test.js",
+			"./tests/.tmp/index/cache-test.js",
 			`
 	export async function extensionInitialise() {
 		global.cacheTestCalled = true;
@@ -1444,14 +1475,14 @@ describe("node-core", () => {
 	`
 		);
 
-		const customCacheDir = "./tests/.tmp/custom-cache";
+		const customCacheDir = "./tests/.tmp/index/custom-cache";
 		const envVars = {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/cache-test.js",
+			TWIN_EXTENSIONS: "./tests/.tmp/index/cache-test.js",
 			TWIN_EXTENSIONS_CACHE_DIRECTORY: customCacheDir
 		};
 
@@ -1484,8 +1515,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait for server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		// Verify server is running
 		const res = await fetch(`http://localhost:${port}/info`);
