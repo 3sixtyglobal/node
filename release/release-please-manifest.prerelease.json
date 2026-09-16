@@ -1,4 +1,4 @@
 {
-	"packages/node-core": "0.9.5-next.2",
-	"apps/node": "0.9.5-next.2"
+	"packages/node-core": "0.10.1-next.0",
+	"apps/node": "0.10.1-next.0"
 }
