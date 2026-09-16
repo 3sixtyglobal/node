@@ -55,6 +55,44 @@ export const DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS: string[] = [
 ];
 
 /**
+ * The name the tracing facade is registered with in the facade factory
+ */
+export const TRACING_FACADE_NAME = "tracing-facade";
+
+/**
+ * The type name of the component factory.
+ */
+export const COMPONENT_FACTORY_TYPE_NAME = "component";
+
+/**
+ * The default factories the tracing facade is activated on.
+ */
+export const DEFAULT_TRACING_FACADE_FACTORIES: string[] = [
+	"component",
+	"nft-connector",
+	"identity-connector",
+	"attestation",
+	"notarization-connector",
+	"blob-storage",
+	"vault",
+	"wallet-connector"
+];
+
+/**
+ * The instance types the tracing facade is never applied to in the component factory, matched as
+ * regular expressions anywhere in the type name. The facade resolves the tracing and logging
+ * components while recording a span, so wrapping those results in an endless call chain. The
+ * remaining patterns cover the high volume infrastructure services whose spans carry little value.
+ */
+export const DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES: string[] = [
+	"tracing",
+	"telemetry",
+	"metrics",
+	"logging",
+	"platform"
+];
+
+/**
  * Get the default environment variables for the node.
  * @param envPrefix The environment variable prefix.
  * @returns The default environment variables.

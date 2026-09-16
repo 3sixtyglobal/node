@@ -171,6 +171,13 @@ const engineEnvironmentVariableKeysInternal: {
 	telemetrySilentComponents: true,
 	// tracing
 	tracingConnector: true,
+	// facades
+	facade: true,
+	tracingFacadeFactories: true,
+	tracingFacadeComponentExcludeTypes: true,
+	tracingFacadeExcludeParams: true,
+	tracingFacadeExcludeMethods: true,
+	tracingFacadeIncludeObjects: true,
 	openTelemetryTracingTracerName: true,
 	openTelemetryTracingTracerVersion: true,
 	openTelemetryTracingEndpoint: true,

@@ -4,7 +4,11 @@ import { cpus } from "node:os";
 import path from "node:path";
 import { Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { EngineCloneMode } from "@twin.org/engine-models";
+import {
+	EngineCloneMode,
+	type IEngineCoreTypeConfig,
+	type IEngineFacadeConfig
+} from "@twin.org/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -30,6 +34,8 @@ import {
 	EntityStorageConnectorType,
 	EventBusComponentType,
 	EventBusConnectorType,
+	type FacadeConfig,
+	FacadeType,
 	FaucetConnectorType,
 	FederatedCatalogueComponentType,
 	FederatedCatalogueFilterComponentType,
@@ -99,10 +105,15 @@ import {
 	type IOpenTelemetryTracingConnectorConfig,
 	OpenTelemetryProcessorTypes
 } from "@twin.org/tracing-connector-opentelemetry";
+import { type ITracingFacadeConfig, TracingFacade } from "@twin.org/tracing-facades";
 import {
 	CONTEXT_ID_HANDLER_FEATURE_DID,
 	CONTEXT_ID_HANDLER_FEATURE_TENANT,
-	DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS
+	COMPONENT_FACTORY_TYPE_NAME,
+	DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS,
+	DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
+	DEFAULT_TRACING_FACADE_FACTORIES,
+	TRACING_FACADE_NAME
 } from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import {
@@ -169,6 +180,7 @@ export async function buildEngineConfiguration(
 	await configureTelemetry(coreConfig, envVars);
 	await configureMetricsCollector(coreConfig, envVars);
 	await configureTracing(coreConfig, envVars);
+	await configureFacades(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureMailbox(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
@@ -919,6 +931,109 @@ async function configureTracing(
 	if (additionalConnectorCount > 0) {
 		coreConfig.types.tracingComponent ??= [];
 		coreConfig.types.tracingComponent.push({ type: TracingComponentType.Service });
+	}
+}
+
+/**
+ * Configures the facades.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the facade configuration has been applied.
+ */
+async function configureFacades(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	const facadeTypes = envListToArray<IEngineEnvironmentVariables, FacadeType>(
+		envVars,
+		"facade",
+		Object.values(FacadeType)
+	);
+
+	if (!Is.arrayValue(facadeTypes)) {
+		return;
+	}
+
+	coreConfig.types.facade ??= [];
+	coreConfig.facades ??= {};
+
+	for (const facadeType of facadeTypes) {
+		if (facadeType === FacadeType.Tracing) {
+			configureTracingFacade(coreConfig.types.facade, coreConfig.facades, envVars);
+		}
+	}
+}
+
+/**
+ * Configures the tracing facade.
+ * @param facadeTypeConfigs The facade type configs to add to.
+ * @param facades The facades to activate, keyed by the type name of the factory they apply to.
+ * @param envVars The environment variables.
+ */
+function configureTracingFacade(
+	facadeTypeConfigs: IEngineCoreTypeConfig<FacadeConfig>[],
+	facades: { [factoryTypeName: string]: IEngineFacadeConfig[] },
+	envVars: IEngineEnvironmentVariables
+): void {
+	// The facade records its spans through the tracing subsystem, without it there is nothing to record to.
+	if (!isTracingEnabled(envVars)) {
+		return;
+	}
+
+	// The facade is meaningless without factories to activate it on, so fall back to the defaults.
+	const configuredFactoryTypeNames = commaSeparatedListToArray<string>(
+		envVars.tracingFacadeFactories
+	);
+	const factoryTypeNames = [
+		...new Set(
+			Is.arrayValue(configuredFactoryTypeNames)
+				? configuredFactoryTypeNames
+				: DEFAULT_TRACING_FACADE_FACTORIES
+		)
+	];
+
+	const config: ITracingFacadeConfig = {};
+
+	// Adding to the default excludes. We want to keep default list as a base and only add to it.
+	const excludeParams = commaSeparatedListToArray<string>(envVars.tracingFacadeExcludeParams);
+	if (Is.arrayValue(excludeParams)) {
+		config.excludeParams = [
+			...new Set([...TracingFacade.DEFAULT_EXCLUDE_PARAMS, ...excludeParams])
+		];
+	}
+
+	const excludeMethods = commaSeparatedListToArray<string>(envVars.tracingFacadeExcludeMethods);
+	if (Is.arrayValue(excludeMethods)) {
+		config.excludeMethods = [
+			...new Set([...TracingFacade.DEFAULT_EXCLUDE_METHODS, ...excludeMethods])
+		];
+	}
+
+	const includeObjects = commaSeparatedListToArray<string>(envVars.tracingFacadeIncludeObjects);
+	if (Is.arrayValue(includeObjects)) {
+		config.includeObjects = includeObjects;
+	}
+
+	facadeTypeConfigs.push({
+		type: FacadeType.Tracing,
+		options: Is.objectValue(config) ? { config } : undefined,
+		cloneMode: EngineCloneMode.Always
+	});
+
+	const componentExcludeTypes = [
+		...new Set([
+			...DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
+			...commaSeparatedListToArray<string>(envVars.tracingFacadeComponentExcludeTypes)
+		])
+	];
+
+	for (const factoryTypeName of factoryTypeNames) {
+		facades[factoryTypeName] ??= [];
+		facades[factoryTypeName].push({
+			name: TRACING_FACADE_NAME,
+			excludeTypes:
+				factoryTypeName === COMPONENT_FACTORY_TYPE_NAME ? componentExcludeTypes : undefined
+		});
 	}
 }
 
