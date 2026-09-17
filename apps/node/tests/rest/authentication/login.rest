@@ -1,5 +1,5 @@
 ### Login
-POST http://localhost:3000/authentication/login?x-api-key=019c272ca9857973ace855c977a62cd5
+POST http://localhost:3000/authentication/login?x-api-key=01a084afecb6716490349b5fb775b05f
 content-type: application/json
 
 {
