@@ -1593,7 +1593,7 @@ describe("node-core", () => {
 		const storePath = `${OUTPUT_TMP_DIR}db/tenant/store.json`;
 		const store = (await CLIUtils.readJsonFile<any[]>(storePath)) ?? [];
 		const idx = store.findIndex(t => t?.id === nodeTenantJson.tenantId);
-		store[idx].organizationIdLegacy = `|${nodeIdentityJson.did}|`;
+		store[idx].organizationIdLegacy = [nodeIdentityJson.did];
 		await writeFile(storePath, JSON.stringify(store, undefined, "\t"));
 
 		await executeCliCommand(

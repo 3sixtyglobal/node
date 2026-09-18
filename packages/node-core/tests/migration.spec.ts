@@ -1,5 +1,10 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type {
+	AuditableItemGraphVertexIndex,
+	AuditableItemGraphVertexV1
+} from "@twin.org/auditable-item-graph-service";
+import { initSchema as initSchemaAuditableItemGraph } from "@twin.org/auditable-item-graph-service";
 import { ContextIdStore } from "@twin.org/context";
 import { Factory } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
@@ -18,6 +23,8 @@ import {
 	SchemaMigrationFactory
 } from "@twin.org/entity-storage-models";
 import type { ILogEntry } from "@twin.org/logging-models";
+import type { OdrlPolicyIndex, OdrlPolicyV0 } from "@twin.org/rights-management-pap-service";
+import { initSchema as initSchemaPolicyAdministrationPoint } from "@twin.org/rights-management-pap-service";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
@@ -749,5 +756,346 @@ describe("migration - multi-tenant", () => {
 				// Ignore if already removed.
 			}
 		}
+	});
+});
+
+describe("migration - index rebuilds", () => {
+	beforeAll(async () => {
+		// See the note in the "migration" suite - MigrationHelper calls ContextIdStore.run({}, fn)
+		// for empty partitions, which would otherwise leave partition-aware connectors without a
+		// node context.
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0 ? { node: TEST_NODE_ID } : ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		Factory.clearFactories();
+	});
+
+	test("Rebuilds the auditable item graph vertex indexes when migrating a vertex from v1 to v2", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const PORT_1 = await getFreePort();
+			const PORT_2 = await getFreePort();
+
+			// Registers AuditableItemGraphVertex (v2), its v0/v1 history and the new index entity,
+			// so SchemaVersionService resolves the v1 to v2 step against the real schemas.
+			initSchemaAuditableItemGraph();
+
+			const extendConfig = async (
+				unusedEnvVars: unknown,
+				config: { types: { [id: string]: unknown[] | undefined } }
+			): Promise<void> => {
+				config.types.entityStorageComponent ??= [];
+				config.types.entityStorageComponent.push(
+					{
+						type: EntityStorageComponentType.Service,
+						options: { entityStorageType: "AuditableItemGraphVertex", partitionContextIds: [] }
+					},
+					{
+						type: EntityStorageComponentType.Service,
+						options: {
+							entityStorageType: "AuditableItemGraphVertexIndex",
+							partitionContextIds: []
+						}
+					}
+				);
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			};
+
+			// Run 1: bring the storage and the schema-version records up, then back-date the vertex
+			// record to v1 and seed v1-shaped vertices so run 2 performs the real migration.
+			const run1 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) },
+				extendConfig
+			});
+
+			const svConnector = EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<{
+					schemaName: string;
+					version: number;
+				}>
+			>("schema-version");
+			const svRecords = await svConnector.getStore();
+			const svRecord = svRecords.find(r => r.schemaName === "AuditableItemGraphVertex");
+			expect(svRecord?.version, "vertex schema registered at v2").toBe(2);
+			if (svRecord) {
+				await svConnector.set({ ...svRecord, version: 1 });
+			}
+
+			// Seed through the v1 schema so the pipe delimited indexes are not stripped.
+			// The first vertex exercises case folding on the vertex id, the multi-value alias index
+			// and the resource type index. The second carries neither index, proving a vertex which
+			// had nothing to index still gets its own entry.
+			const seedConnector = new MemoryEntityStorageConnector<AuditableItemGraphVertexV1>({
+				entitySchema: "AuditableItemGraphVertexV1",
+				config: { storageKey: "auditable-item-graph-vertex" }
+			});
+			await seedConnector.setBatch([
+				{
+					id: "vertex-AAA",
+					organizationIdentity: TEST_NODE_ORG_ID,
+					dateCreated: "2026-01-01T00:00:00.000Z",
+					dateModified: "2026-01-02T00:00:00.000Z",
+					aliasIndex: "||alias-one||Alias-Two||",
+					resourceTypeIndex: "||Note||"
+				},
+				{
+					id: "vertex-bbb",
+					organizationIdentity: TEST_NODE_ORG_ID,
+					dateCreated: "2026-02-01T00:00:00.000Z"
+				}
+			]);
+
+			await run1?.shutdown();
+
+			let run2;
+			try {
+				run2 = await run({
+					localesDirectory: LOCALES_DIR,
+					stateStorage: new MemoryStateStorage(false, {
+						nodeId: TEST_NODE_ID,
+						nodeOrganizationId: TEST_NODE_ORG_ID
+					}),
+					disableProcessExitOnFailure: true,
+					envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_2) },
+					extendConfig
+				});
+
+				const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+				const { entities: versionRecords } = await versionConnector.query();
+				const migrationRecord = (versionRecords ?? []).find(
+					r => (r as { schemaName: string }).schemaName === "AuditableItemGraphVertex"
+				) as { version: number } | undefined;
+				expect(migrationRecord?.version).toBe(2);
+
+				// The vertices themselves must have dropped the old columns.
+				const vertexConnector = EntityStorageConnectorFactory.get("auditable-item-graph-vertex");
+				const { entities: vertices } = await vertexConnector.query();
+				expect(vertices).toHaveLength(2);
+				for (const vertex of vertices ?? []) {
+					expect((vertex as { aliasIndex?: string }).aliasIndex).toBeUndefined();
+					expect((vertex as { resourceTypeIndex?: string }).resourceTypeIndex).toBeUndefined();
+				}
+
+				const indexConnector = EntityStorageConnectorFactory.get(
+					"auditable-item-graph-vertex-index"
+				);
+				const { entities: indexEntities } = await indexConnector.query();
+				const rows = (indexEntities ?? []) as AuditableItemGraphVertexIndex[];
+
+				// 4 entries for the first vertex (itself, two aliases, one resource type) and 1 for
+				// the second. Every entry carries its own id, which is what keeps two vertices
+				// sharing an alias or a resource type from overwriting each other.
+				expect(rows).toHaveLength(5);
+				expect(new Set(rows.map(r => r.id)).size, "index entry ids are unique").toBe(5);
+
+				const firstVertexRows = rows.filter(r => r.vertexId === "vertex-AAA");
+				expect(firstVertexRows).toHaveLength(4);
+				expect(firstVertexRows.map(r => `${r.type}:${r.value}`).sort()).toEqual([
+					"alias:alias-one",
+					"alias:alias-two",
+					"resourceType:note",
+					"vertex:vertex-aaa"
+				]);
+				for (const row of firstVertexRows) {
+					expect(row.dateCreated).toBe("2026-01-01T00:00:00.000Z");
+					expect(row.dateModified).toBe("2026-01-02T00:00:00.000Z");
+				}
+
+				// A vertex with no aliases and no resources still gets its own entry, and its
+				// modified date falls back to the creation date so both can be paged the same way.
+				const secondVertexRows = rows.filter(r => r.vertexId === "vertex-bbb");
+				expect(secondVertexRows).toHaveLength(1);
+				expect(secondVertexRows[0].type).toBe("vertex");
+				expect(secondVertexRows[0].value).toBe("vertex-bbb");
+				expect(secondVertexRows[0].dateCreated).toBe("2026-02-01T00:00:00.000Z");
+				expect(secondVertexRows[0].dateModified).toBe("2026-02-01T00:00:00.000Z");
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Rebuilds the policy administration point indexes when migrating a policy from v0 to v1", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const PORT_1 = await getFreePort();
+			const PORT_2 = await getFreePort();
+
+			// Registers OdrlPolicy (v1), its v0 history and the new index entity.
+			initSchemaPolicyAdministrationPoint();
+
+			const extendConfig = async (
+				unusedEnvVars: unknown,
+				config: { types: { [id: string]: unknown[] | undefined } }
+			): Promise<void> => {
+				config.types.entityStorageComponent ??= [];
+				config.types.entityStorageComponent.push(
+					{
+						type: EntityStorageComponentType.Service,
+						options: { entityStorageType: "OdrlPolicy", partitionContextIds: [] }
+					},
+					{
+						type: EntityStorageComponentType.Service,
+						options: { entityStorageType: "OdrlPolicyIndex", partitionContextIds: [] }
+					}
+				);
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			};
+
+			const run1 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) },
+				extendConfig
+			});
+
+			const svConnector = EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<{
+					schemaName: string;
+					version: number;
+				}>
+			>("schema-version");
+			const svRecords = await svConnector.getStore();
+			const svRecord = svRecords.find(r => r.schemaName === "OdrlPolicy");
+			expect(svRecord?.version, "policy schema registered at v1").toBe(1);
+			if (svRecord) {
+				await svConnector.set({ ...svRecord, version: 0 });
+			}
+
+			// The first policy exercises case folding and de-duplication on the assigner dimension
+			// and the cartesian product across assignee and action. The second has no values in any
+			// dimension, and the third has no creation date.
+			const seedConnector = new MemoryEntityStorageConnector<OdrlPolicyV0>({
+				entitySchema: "OdrlPolicyV0",
+				config: { storageKey: "odrl-policy" }
+			});
+			await seedConnector.setBatch([
+				{
+					id: "policy-1",
+					type: "Set",
+					dateCreated: "2026-03-01T00:00:00.000Z",
+					assignerIndex: "|DID:A|did:a|",
+					assigneeIndex: "|did:b|did:c|",
+					targetIndex: "|urn:t1|",
+					actionIndex: "|use|read|"
+				},
+				{
+					id: "policy-2",
+					type: "Offer",
+					dateCreated: "2026-04-01T00:00:00.000Z",
+					assignerIndex: "||",
+					assigneeIndex: "||",
+					targetIndex: "||",
+					actionIndex: "||"
+				},
+				{
+					id: "policy-3",
+					type: "Agreement",
+					assignerIndex: "|did:d|",
+					assigneeIndex: "||",
+					targetIndex: "||",
+					actionIndex: "||"
+				}
+			]);
+
+			await run1?.shutdown();
+
+			let run2;
+			try {
+				run2 = await run({
+					localesDirectory: LOCALES_DIR,
+					stateStorage: new MemoryStateStorage(false, {
+						nodeId: TEST_NODE_ID,
+						nodeOrganizationId: TEST_NODE_ORG_ID
+					}),
+					disableProcessExitOnFailure: true,
+					envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_2) },
+					extendConfig
+				});
+
+				const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+				const { entities: versionRecords } = await versionConnector.query();
+				const migrationRecord = (versionRecords ?? []).find(
+					r => (r as { schemaName: string }).schemaName === "OdrlPolicy"
+				) as { version: number } | undefined;
+				expect(migrationRecord?.version).toBe(1);
+
+				// The policies themselves must have dropped the four pipe delimited columns.
+				const policyConnector = EntityStorageConnectorFactory.get("odrl-policy");
+				const { entities: policies } = await policyConnector.query();
+				expect(policies).toHaveLength(3);
+				for (const policy of policies ?? []) {
+					for (const column of ["assignerIndex", "assigneeIndex", "targetIndex", "actionIndex"]) {
+						expect((policy as { [id: string]: unknown })[column]).toBeUndefined();
+					}
+				}
+
+				const indexConnector = EntityStorageConnectorFactory.get("odrl-policy-index");
+				const { entities: indexEntities } = await indexConnector.query();
+				const rows = (indexEntities ?? []) as OdrlPolicyIndex[];
+
+				expect(rows).toHaveLength(6);
+				expect(new Set(rows.map(r => r.id)).size, "index entry ids are unique").toBe(6);
+
+				// One entry per combination: 1 assigner x 2 assignees x 1 target x 2 actions.
+				const firstPolicyRows = rows.filter(r => r.policyId === "policy-1");
+				expect(firstPolicyRows).toHaveLength(4);
+				expect(
+					firstPolicyRows.map(r => [r.assigner, r.assignee, r.target, r.action].join(",")).sort()
+				).toEqual([
+					"did:a,did:b,urn:t1,read",
+					"did:a,did:b,urn:t1,use",
+					"did:a,did:c,urn:t1,read",
+					"did:a,did:c,urn:t1,use"
+				]);
+				for (const row of firstPolicyRows) {
+					expect(row.dateCreated).toBe("2026-03-01T00:00:00.000Z");
+				}
+
+				// An absent dimension contributes a single undefined value rather than collapsing the
+				// combinations, so a policy with nothing to index is still reachable by policy id.
+				const secondPolicyRows = rows.filter(r => r.policyId === "policy-2");
+				expect(secondPolicyRows).toHaveLength(1);
+				expect(secondPolicyRows[0].assigner).toBeUndefined();
+				expect(secondPolicyRows[0].assignee).toBeUndefined();
+				expect(secondPolicyRows[0].target).toBeUndefined();
+				expect(secondPolicyRows[0].action).toBeUndefined();
+				expect(secondPolicyRows[0].dateCreated).toBe("2026-04-01T00:00:00.000Z");
+
+				// A policy stored before the creation date was recorded is given the migration time,
+				// as the index orders and pages on that column.
+				const thirdPolicyRows = rows.filter(r => r.policyId === "policy-3");
+				expect(thirdPolicyRows).toHaveLength(1);
+				expect(thirdPolicyRows[0].assigner).toBe("did:d");
+				expect(thirdPolicyRows[0].assignee).toBeUndefined();
+				expect(new Date(thirdPolicyRows[0].dateCreated).toString()).not.toBe("Invalid Date");
+			} finally {
+				await run2?.shutdown();
+			}
+		});
 	});
 });
