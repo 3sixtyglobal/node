@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1-next.2](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.1...node-core-v0.10.1-next.2) (2026-09-18)
+
+
+### Features
+
+* index migration ([#421](https://github.com/iotaledger/twin-node/issues/421)) ([b3790a9](https://github.com/iotaledger/twin-node/commit/b3790a987c4ac60b7d1e74da9aa496e7ca24c2c3))
+
 ## [0.10.1-next.1](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.0...node-core-v0.10.1-next.1) (2026-09-17)
 
 
