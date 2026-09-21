@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1-next.3](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.2...node-core-v0.10.1-next.3) (2026-09-21)
+
+
+### Features
+
+* node modules as env var ([9acd6cc](https://github.com/iotaledger/twin-node/commit/9acd6ccb228f4ae1aec6dc07a49e07bf68a29d64))
+
 ## [0.10.1-next.2](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.1...node-core-v0.10.1-next.2) (2026-09-18)
 
 
