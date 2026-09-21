@@ -4,6 +4,20 @@ The environment variables for the node.
 
 ## Properties
 
+### nativeModules? {#nativemodules}
+
+> `optional` **nativeModules?**: `string`
+
+Comma separated list of native modules to initialise.
+
+#### Default
+
+```ts
+"node:buffer,node:crypto,node:zlib"
+```
+
+***
+
 ### extensionsMaxSizeMb? {#extensionsmaxsizemb}
 
 > `optional` **extensionsMaxSizeMb?**: `number`
