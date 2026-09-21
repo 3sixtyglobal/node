@@ -1551,6 +1551,20 @@ Set to 0 to shut it down after every task, or -1 to never shut it down.
 
 ***
 
+### immutableProofTaskWorkerCount? {#immutableprooftaskworkercount}
+
+> `optional` **immutableProofTaskWorkerCount?**: `string`
+
+The maximum number of proof task workers that can run in parallel.
+
+#### Default
+
+```ts
+1
+```
+
+***
+
 ### immutableProofSweepInterval? {#immutableproofsweepinterval}
 
 > `optional` **immutableProofSweepInterval?**: `string`
