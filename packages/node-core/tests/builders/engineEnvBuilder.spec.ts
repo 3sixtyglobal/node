@@ -106,6 +106,7 @@ describe("buildEngineConfiguration - immutable proof task options", () => {
 		taskRetryInterval?: number;
 		taskFailureRetainFor?: number;
 		taskWorkerIdleTimeout?: number;
+		taskWorkerCount?: number;
 	}> {
 		const config = await buildEngineConfiguration({
 			auditableItemGraphEnabled: "true",
@@ -126,6 +127,21 @@ describe("buildEngineConfiguration - immutable proof task options", () => {
 		expect(proofConfig.taskRetryInterval).toBeUndefined();
 		expect(proofConfig.taskFailureRetainFor).toBeUndefined();
 		expect(proofConfig.taskWorkerIdleTimeout).toBeUndefined();
+		expect(proofConfig.taskWorkerCount).toBeUndefined();
+	});
+
+	test("passes the task worker count through as a number", async () => {
+		const proofConfig = await buildImmutableProofConfig({
+			immutableProofTaskWorkerCount: "3"
+		});
+
+		expect(proofConfig.taskWorkerCount).toBe(3);
+	});
+
+	test("rejects a task worker count that is not a number", async () => {
+		await expect(
+			buildImmutableProofConfig({ immutableProofTaskWorkerCount: "three" })
+		).rejects.toThrow("invalidEnvVarValue");
 	});
 
 	test("converts the task intervals from the env units to milliseconds", async () => {

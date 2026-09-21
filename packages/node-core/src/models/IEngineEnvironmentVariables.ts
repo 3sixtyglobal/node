@@ -944,6 +944,12 @@ export interface IEngineEnvironmentVariables {
 	immutableProofTaskWorkerIdleTimeout?: string;
 
 	/**
+	 * The maximum number of proof task workers that can run in parallel.
+	 * @default 1
+	 */
+	immutableProofTaskWorkerCount?: string;
+
+	/**
 	 * How often in minutes the immutable proof reconciliation sweep runs.
 	 * @default 30
 	 */

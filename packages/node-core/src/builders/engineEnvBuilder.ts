@@ -1547,6 +1547,7 @@ async function configureImmutableProof(
 					taskRetryInterval: envSecToMs(envVars, "immutableProofTaskRetryInterval"),
 					taskFailureRetainFor: envMinToMs(envVars, "immutableProofTaskFailureRetainFor"),
 					taskWorkerIdleTimeout: envSecToMs(envVars, "immutableProofTaskWorkerIdleTimeout"),
+					taskWorkerCount: envCount(envVars, "immutableProofTaskWorkerCount"),
 					sweepIntervalMinutes: envMinutes(envVars, "immutableProofSweepInterval"),
 					sweepStaleThresholdMs: envMinToMs(envVars, "immutableProofSweepStaleThreshold"),
 					sweepMaxAttempts: envCount(envVars, "immutableProofSweepMaxAttempts"),

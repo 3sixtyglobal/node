@@ -216,6 +216,7 @@ const engineEnvironmentVariableKeysInternal: {
 	immutableProofTaskRetryInterval: true,
 	immutableProofTaskFailureRetainFor: true,
 	immutableProofTaskWorkerIdleTimeout: true,
+	immutableProofTaskWorkerCount: true,
 	immutableProofSweepInterval: true,
 	immutableProofSweepStaleThreshold: true,
 	immutableProofSweepMaxAttempts: true,
