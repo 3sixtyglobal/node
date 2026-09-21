@@ -9,6 +9,9 @@ import type { INodeEnvironmentVariables } from "./INodeEnvironmentVariables.js";
 const nodeEnvironmentVariableKeysInternal: {
 	[K in keyof Required<INodeEnvironmentVariables>]: true;
 } = {
+	// INodeEnvironmentVariables - native modules
+	nativeModules: true,
+
 	// INodeEnvironmentVariables - extensions
 	extensionsMaxSizeMb: true,
 	extensionsClearCache: true,

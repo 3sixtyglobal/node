@@ -89,7 +89,6 @@ export async function run(
 
 		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
 		await initialiseLocales(nodeOptions.localesDirectory);
-		await initialiseNativeModules(["node:buffer", "node:crypto", "node:zlib"]);
 
 		nodeOptions.envPrefix ??= "TWIN_";
 
@@ -164,6 +163,14 @@ export async function run(
 			finalEnvVars,
 			nodeOptions,
 			serverInfo
+		);
+
+		await initialiseNativeModules(
+			commaSeparatedListToArray<string>(nodeEnvVars.nativeModules, [
+				"node:buffer",
+				"node:crypto",
+				"node:zlib"
+			]) ?? []
 		);
 
 		debugEnabled = Coerce.boolean(nodeEnvVars.debug) ?? debugEnabled;

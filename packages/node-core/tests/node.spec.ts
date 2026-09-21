@@ -50,6 +50,19 @@ describe("node", () => {
 			expect(nodeEnvVars.debug).toBe("true");
 		});
 
+		test("native modules env var is recognised", async () => {
+			const envFile = path.join(tempDir, ".env.native-modules");
+			await writeFile(envFile, "");
+
+			const { nodeEnvVars } = await buildConfiguration(
+				{ TWIN_NATIVE_MODULES: "node:buffer, node:crypto" },
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
+				SERVER_INFO
+			);
+
+			expect(nodeEnvVars.nativeModules).toBe("node:buffer, node:crypto");
+		});
+
 		test("processEnv value takes precedence over same key in env file", async () => {
 			const envFile = path.join(tempDir, ".env.precedence");
 			await writeFile(envFile, "TWIN_PORT=9999\n");
