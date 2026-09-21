@@ -35,6 +35,7 @@ import {
 	handleHttpsProtocol,
 	handleNpmProtocol,
 	initialiseLocales,
+	initialiseNativeModules,
 	loadJsonFile,
 	loadTextFile,
 	parseModuleProtocol,
@@ -88,6 +89,7 @@ export async function run(
 
 		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
 		await initialiseLocales(nodeOptions.localesDirectory);
+		await initialiseNativeModules(["node:buffer", "node:crypto", "node:zlib"]);
 
 		nodeOptions.envPrefix ??= "TWIN_";
 

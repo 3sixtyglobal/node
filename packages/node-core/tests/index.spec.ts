@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { AutomationActionFactory } from "@twin.org/automation-models";
-import { ComponentFactory, Factory } from "@twin.org/core";
+import { ComponentFactory, Factory, NativeModules } from "@twin.org/core";
 import { DataspaceAppFactory } from "@twin.org/dataspace-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
@@ -112,6 +112,7 @@ describe("node-core", () => {
 		});
 		expect(result).toBeDefined();
 		expect(result?.shutdown).toBeInstanceOf(Function);
+		expect(NativeModules.getModule("node:crypto")).toBeDefined();
 		await result?.shutdown();
 	});
 

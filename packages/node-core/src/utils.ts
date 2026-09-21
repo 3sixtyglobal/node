@@ -11,6 +11,7 @@ import {
 	GeneralError,
 	I18n,
 	Is,
+	NativeModules,
 	type ILocaleDictionary
 } from "@twin.org/core";
 import { Sha256 } from "@twin.org/crypto";
@@ -33,6 +34,23 @@ export async function initialiseLocales(localesDirectory: string): Promise<void>
 		I18n.addDictionary("en", JSON.parse(enLangContent) as ILocaleDictionary);
 	} else {
 		CLIDisplay.error(`Locales file not found: ${localesFile}`);
+	}
+}
+
+/**
+ * Register the native modules the framework classes prefer over their pure JavaScript fallbacks.
+ * @param modules The module specifiers to register.
+ * @returns A promise that resolves when registration has been attempted for every specifier.
+ */
+export async function initialiseNativeModules(modules: string[]): Promise<void> {
+	const failures = await NativeModules.init(modules);
+	for (const specifier of Object.keys(failures)) {
+		CLIDisplay.warning(
+			I18n.formatMessage("warn.node.nativeModuleUnavailable", {
+				specifier,
+				error: failures[specifier].message
+			})
+		);
 	}
 }
 
