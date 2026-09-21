@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1-next.4](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.3...node-core-v0.10.1-next.4) (2026-09-21)
+
+
+### Features
+
+* add immutable proof task worker count env var ([#430](https://github.com/iotaledger/twin-node/issues/430)) ([5926e9f](https://github.com/iotaledger/twin-node/commit/5926e9f10582ee9ced0148aa7da5574741b977f9))
+
 ## [0.10.1-next.3](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.2...node-core-v0.10.1-next.3) (2026-09-21)
 
 
