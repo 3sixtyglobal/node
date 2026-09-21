@@ -74,6 +74,7 @@
 - [overrideModuleImport](functions/overrideModuleImport.md)
 - [start](functions/start.md)
 - [initialiseLocales](functions/initialiseLocales.md)
+- [initialiseNativeModules](functions/initialiseNativeModules.md)
 - [getExecutionDirectory](functions/getExecutionDirectory.md)
 - [getScriptDirectory](functions/getScriptDirectory.md)
 - [fileExists](functions/fileExists.md)
