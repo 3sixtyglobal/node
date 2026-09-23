@@ -224,7 +224,7 @@ These variables are only read when running the `bootstrap-dev` CLI command. They
 
 The URL path for any REST component can be overridden at startup using variables in the form:
 
-```
+```shell
 TWIN_REST_PATH_<COMPONENT>=<path>
 ```
 
@@ -241,7 +241,7 @@ The pattern extends to any component that has a default REST path configured. Th
 
 Because the set of components is open-ended, these variables are validated as a prefix group. To allow custom `TWIN_REST_PATH_*` variables when using `TWIN_ENV_ALLOW_LIST`, include the wildcard entry:
 
-```
+```shell
 TWIN_ENV_ALLOW_LIST=restPath*
 ```
 
