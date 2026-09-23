@@ -1,12 +1,15 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { Tenant } from "@twin.org/api-tenant-processor";
 import type {
 	AuditableItemGraphVertex,
 	AuditableItemGraphVertexIndex,
 	AuditableItemGraphVertexV1
 } from "@twin.org/auditable-item-graph-service";
-import { Converter, RandomHelper, StringHelper } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
+import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
+import { Converter, GeneralError, Is, RandomHelper, StringHelper } from "@twin.org/core";
+import { IntegrityAlgorithm } from "@twin.org/crypto";
+import type { IEngineCore, IEngineCoreConfig } from "@twin.org/engine-models";
 import type { IEntitySchemaProperty } from "@twin.org/entity";
 import {
 	EntityStorageConnectorFactory,
@@ -14,6 +17,7 @@ import {
 	type IEntityStorageConnector,
 	type ISchemaMigration
 } from "@twin.org/entity-storage-models";
+import type { ImmutableProof, ImmutableProofV0 } from "@twin.org/immutable-proof-service";
 import { nameof } from "@twin.org/nameof";
 import type {
 	OdrlPolicy,
@@ -22,6 +26,7 @@ import type {
 } from "@twin.org/rights-management-pap-service";
 import { envBoolean } from "./envHelpers.js";
 import type { IEnvironmentVariables } from "../../models/IEnvironmentVariables.js";
+import type { INodeEngineState } from "../../models/INodeEngineState.js";
 
 /**
  * Initialise schema migrations for the engine.
@@ -29,7 +34,7 @@ import type { IEnvironmentVariables } from "../../models/IEnvironmentVariables.j
  * @param envVars The environment variables.
  */
 export function initialiseMigrations(
-	engineCore: IEngineCore,
+	engineCore: IEngineCore<IEngineCoreConfig, INodeEngineState>,
 	envVars: IEnvironmentVariables
 ): void {
 	if (!envBoolean(envVars, "schemaMigrationEnabled", true)) {
@@ -38,6 +43,7 @@ export function initialiseMigrations(
 
 	migrationAigIndexes();
 	migrationPapIndexes();
+	migrationImmutableProof(engineCore);
 }
 
 /**
@@ -187,6 +193,56 @@ function migrationPapIndexes(): void {
 	SchemaMigrationFactory.register(
 		`${nameof<OdrlPolicy>()}_0_1`,
 		() => migrationPapV0V1 as ISchemaMigration
+	);
+}
+
+/**
+ * Perform migration for proofs stored before organizationId existed on the entity.
+ * @param engineCore The engine core instance, used to resolve the node organization for
+ * single-tenant deployments.
+ */
+function migrationImmutableProof(
+	engineCore: IEngineCore<IEngineCoreConfig, INodeEngineState>
+): void {
+	let tenantEntityStorage: IEntityStorageConnector<Tenant> | undefined;
+
+	const migrationImmutableProofV0V1: ISchemaMigration<ImmutableProofV0, ImmutableProof> = {
+		transformEntity: async proof => {
+			const proofObjectIntegrity =
+				proof.proofObjectIntegrity ??
+				// Before February 2026 the digest was stored as "sha256:" followed by base64 of the
+				// same bytes that now hash to "sha256-".
+				proof.proofObjectHash?.replace(/^sha256:/, `${IntegrityAlgorithm.Sha256}-`);
+
+			let organizationId = proof.organizationId;
+			if (!Is.stringValue(organizationId)) {
+				const contextIds = await ContextIdStore.getContextIds();
+				const tenantId = contextIds?.[ContextIdKeys.Tenant];
+
+				if (Is.stringValue(tenantId)) {
+					tenantEntityStorage ??= EntityStorageConnectorFactory.get<
+						IEntityStorageConnector<Tenant>
+					>(StringHelper.kebabCase(nameof<Tenant>()));
+					organizationId = (await tenantEntityStorage.get(tenantId))?.organizationId;
+				} else {
+					organizationId = engineCore.getState().nodeOrganizationId;
+				}
+
+				if (!Is.stringValue(organizationId)) {
+					throw new GeneralError("node", "legacyProofOrganizationUnknown", {
+						id: proof.id,
+						tenantId
+					});
+				}
+			}
+
+			return { ...proof, organizationId, proofObjectIntegrity };
+		}
+	};
+
+	SchemaMigrationFactory.register(
+		`${nameof<ImmutableProof>()}_0_1`,
+		() => migrationImmutableProofV0V1 as ISchemaMigration
 	);
 }
 

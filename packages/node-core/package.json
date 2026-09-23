@@ -51,6 +51,7 @@
 		"@twin.org/entity-storage-models": "next",
 		"@twin.org/identity-connector-entity-storage": "next",
 		"@twin.org/identity-models": "next",
+		"@twin.org/immutable-proof-service": "next",
 		"@twin.org/logging-connector-opentelemetry": "next",
 		"@twin.org/modules": "next",
 		"@twin.org/nameof": "next",

@@ -16,7 +16,8 @@
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
 			"invalidEnvVarValue": "Environment variable \"{key}\" has an invalid value \"{value}\", expected {type} type",
 			"invalidEnvVarPair": "Environment variable \"{key}\" has an invalid entry \"{value}\", expected unique name=integer pairs",
-			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST."
+			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST.",
+			"legacyProofOrganizationUnknown": "Could not determine the organization for proof \"{id}\" stored before organizationId existed on the entity; the node organization is not set and no tenant matched \"{tenantId}\"."
 		},
 		"bootstrapDev": {
 			"noFeaturesEnabled": "No features are enabled, at least one feature must be enabled.",

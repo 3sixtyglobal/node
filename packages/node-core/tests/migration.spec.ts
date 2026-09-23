@@ -1,12 +1,14 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { Tenant } from "@twin.org/api-tenant-processor";
+import { initSchema as initSchemaTenant } from "@twin.org/api-tenant-processor";
 import type {
 	AuditableItemGraphVertexIndex,
 	AuditableItemGraphVertexV1
 } from "@twin.org/auditable-item-graph-service";
 import { initSchema as initSchemaAuditableItemGraph } from "@twin.org/auditable-item-graph-service";
 import { ContextIdStore } from "@twin.org/context";
-import { Factory } from "@twin.org/core";
+import { Factory, SharedObjectBuffer } from "@twin.org/core";
 import { MemoryStateStorage } from "@twin.org/engine-core";
 import {
 	BackgroundTaskComponentType,
@@ -22,6 +24,8 @@ import {
 	EntityStorageConnectorFactory,
 	SchemaMigrationFactory
 } from "@twin.org/entity-storage-models";
+import type { ImmutableProof, ImmutableProofV0 } from "@twin.org/immutable-proof-service";
+import { initSchema as initSchemaImmutableProof } from "@twin.org/immutable-proof-service";
 import type { ILogEntry } from "@twin.org/logging-models";
 import type { OdrlPolicyIndex, OdrlPolicyV0 } from "@twin.org/rights-management-pap-service";
 import { initSchema as initSchemaPolicyAdministrationPoint } from "@twin.org/rights-management-pap-service";
@@ -105,6 +109,8 @@ const TEST_NODE_ID = "did:iota:0x1234";
 const TEST_NODE_ORG_ID = "did:iota:0x456";
 const TEST_TENANT_ID_A = "a1111111111111111111111111111111";
 const TEST_TENANT_ID_B = "b2222222222222222222222222222222";
+const TEST_TENANT_A_ORG_ID = "did:iota:org-a";
+const TEST_TENANT_B_ORG_ID = "did:iota:org-b";
 
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
@@ -375,6 +381,110 @@ describe("migration", () => {
 				} catch {
 					// Ignore if already removed.
 				}
+			}
+		});
+	});
+
+	test("Supplies the node organization and converts the hash when migrating a proof stored before organizationId existed", async () => {
+		// The underlying store for "immutable-proof" is keyed by schema name and outlives a
+		// single test, unlike the other fixtures in this file which each use their own schema.
+		SharedObjectBuffer.remove("immutable-proof");
+
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const PORT_1 = await getFreePort();
+			const PORT_2 = await getFreePort();
+
+			// Registers ImmutableProof (v1) and its v0 history.
+			initSchemaImmutableProof();
+
+			const extendConfig = async (
+				unusedEnvVars: unknown,
+				config: { types: { [id: string]: unknown[] | undefined } }
+			): Promise<void> => {
+				config.types.entityStorageComponent ??= [];
+				config.types.entityStorageComponent.push({
+					type: EntityStorageComponentType.Service,
+					options: { entityStorageType: "ImmutableProof", partitionContextIds: [] }
+				});
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			};
+
+			const run1 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_1) },
+				extendConfig
+			});
+
+			const svConnector = EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<{
+					schemaName: string;
+					version: number;
+				}>
+			>("schema-version");
+			const svRecords = await svConnector.getStore();
+			const svRecord = svRecords.find(r => r.schemaName === "ImmutableProof");
+			expect(svRecord?.version, "immutable proof schema registered at v1").toBe(1);
+			if (svRecord) {
+				await svConnector.set({ ...svRecord, version: 0 });
+			}
+
+			// A proof stored before organizationId existed: no organizationId, the digest under
+			// its pre-#31 property name.
+			const seedConnector = new MemoryEntityStorageConnector<ImmutableProofV0>({
+				entitySchema: "ImmutableProofV0",
+				config: { storageKey: "immutable-proof" }
+			});
+			await seedConnector.setBatch([
+				{
+					id: "legacy-1",
+					dateCreated: "2026-01-15T10:00:00.000Z",
+					proofObjectId: "aig:vertex-1",
+					proofObjectHash: "sha256:0kGVLYNcCnQRmYc3nnLBRGGPkxFTZLE7ClkIvLTFGQ4="
+				}
+			]);
+
+			await run1?.shutdown();
+
+			let run2;
+			try {
+				run2 = await run({
+					localesDirectory: LOCALES_DIR,
+					stateStorage: new MemoryStateStorage(false, {
+						nodeId: TEST_NODE_ID,
+						nodeOrganizationId: TEST_NODE_ORG_ID
+					}),
+					disableProcessExitOnFailure: true,
+					envVars: { ...BASE_ENV, TWIN_PORT: String(PORT_2) },
+					extendConfig
+				});
+
+				const versionConnector = EntityStorageConnectorFactory.get("schema-version");
+				const { entities: versionRecords } = await versionConnector.query();
+				const migrationRecord = (versionRecords ?? []).find(
+					r => (r as { schemaName: string }).schemaName === "ImmutableProof"
+				) as { version: number } | undefined;
+				expect(migrationRecord?.version).toBe(1);
+
+				const proofConnector = EntityStorageConnectorFactory.get("immutable-proof");
+				const { entities: proofs } = await proofConnector.query();
+				expect(proofs).toHaveLength(1);
+
+				const migrated = proofs?.[0] as ImmutableProof & { proofObjectHash?: string };
+				expect(migrated.organizationId).toBe(TEST_NODE_ORG_ID);
+				expect(migrated.proofObjectIntegrity).toBe(
+					"sha256-0kGVLYNcCnQRmYc3nnLBRGGPkxFTZLE7ClkIvLTFGQ4="
+				);
+				expect(migrated.proofObjectHash).toBeUndefined();
+			} finally {
+				await run2?.shutdown();
 			}
 		});
 	});
@@ -755,6 +865,277 @@ describe("migration - multi-tenant", () => {
 			} catch {
 				// Ignore if already removed.
 			}
+		}
+	});
+
+	test("Supplies each tenant's organization when migrating proofs stored before organizationId existed", async () => {
+		// "immutable-proof" and "tenant" are the real schema names, shared with the other
+		// ImmutableProof migration tests in this file, so each one starts from a clean store.
+		SharedObjectBuffer.remove("immutable-proof");
+		SharedObjectBuffer.remove("tenant");
+
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
+
+		// Registers ImmutableProof (v1), its v0 history, and Tenant.
+		initSchemaImmutableProof();
+		initSchemaTenant();
+
+		const extendConfig = async (
+			unusedEnvVars: unknown,
+			config: { types: { [id: string]: unknown[] | undefined } }
+		): Promise<void> => {
+			config.types.entityStorageComponent ??= [];
+			config.types.entityStorageComponent.push(
+				{
+					type: EntityStorageComponentType.Service,
+					options: { entityStorageType: "ImmutableProof", partitionContextIds: ["node", "tenant"] }
+				},
+				{
+					type: EntityStorageComponentType.Service,
+					options: { entityStorageType: "Tenant", partitionContextIds: ["node"] }
+				}
+			);
+			config.types.schemaVersionMigrationComponent = [
+				{ type: SchemaVersionMigrationComponentType.Service }
+			];
+			config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+		};
+
+		const run1 = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+			disableProcessExitOnFailure: true,
+			envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_1) },
+			extendConfig
+		});
+
+		const svConnector = EntityStorageConnectorFactory.get<
+			MemoryEntityStorageConnector<{
+				schemaName: string;
+				version: number;
+			}>
+		>("schema-version");
+		const svRecords = await svConnector.getStore();
+		const svRecord = svRecords.find(r => r.schemaName === "ImmutableProof");
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 0 });
+		}
+
+		// Each tenant already exists, with a different organization.
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const tenantSeedConnector = new MemoryEntityStorageConnector<Tenant>({
+				entitySchema: "Tenant",
+				partitionContextIds: ["node"],
+				config: { storageKey: "tenant" }
+			});
+			await tenantSeedConnector.setBatch([
+				{
+					id: TEST_TENANT_ID_A,
+					apiKey: "api-key-a",
+					label: "Tenant A",
+					dateCreated: "2026-01-01T00:00:00.000Z",
+					dateModified: "2026-01-01T00:00:00.000Z",
+					organizationId: TEST_TENANT_A_ORG_ID
+				},
+				{
+					id: TEST_TENANT_ID_B,
+					apiKey: "api-key-b",
+					label: "Tenant B",
+					dateCreated: "2026-01-01T00:00:00.000Z",
+					dateModified: "2026-01-01T00:00:00.000Z",
+					organizationId: TEST_TENANT_B_ORG_ID
+				}
+			]);
+		});
+
+		// One legacy proof in each tenant's partition, stored before organizationId existed.
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
+			const seedConnector = new MemoryEntityStorageConnector<ImmutableProofV0>({
+				entitySchema: "ImmutableProofV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "immutable-proof" }
+			});
+			await seedConnector.setBatch([
+				{
+					id: "legacy-a",
+					dateCreated: "2026-01-15T10:00:00.000Z",
+					proofObjectId: "aig:vertex-a",
+					proofObjectHash: "sha256:0kGVLYNcCnQRmYc3nnLBRGGPkxFTZLE7ClkIvLTFGQ4="
+				}
+			]);
+		});
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B }, async () => {
+			const seedConnector = new MemoryEntityStorageConnector<ImmutableProofV0>({
+				entitySchema: "ImmutableProofV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "immutable-proof" }
+			});
+			await seedConnector.setBatch([
+				{
+					id: "legacy-b",
+					dateCreated: "2026-02-20T10:00:00.000Z",
+					proofObjectId: "aig:vertex-b",
+					proofObjectHash: "sha256:vE9CQrgUcTMHEwSpTVpF4nJoXtWlBAxbxg38IE73Snw="
+				}
+			]);
+		});
+
+		await run1?.shutdown();
+
+		let run2;
+		try {
+			run2 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+				disableProcessExitOnFailure: true,
+				envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_2) },
+				extendConfig
+			});
+
+			const proofConnector = EntityStorageConnectorFactory.get("immutable-proof");
+			const { entities: proofsA } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A },
+				async () => proofConnector.query()
+			);
+			expect(proofsA).toHaveLength(1);
+			expect((proofsA?.[0] as ImmutableProof).organizationId).toBe(TEST_TENANT_A_ORG_ID);
+			expect((proofsA?.[0] as ImmutableProof).proofObjectIntegrity).toBe(
+				"sha256-0kGVLYNcCnQRmYc3nnLBRGGPkxFTZLE7ClkIvLTFGQ4="
+			);
+
+			const { entities: proofsB } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_B },
+				async () => proofConnector.query()
+			);
+			expect(proofsB).toHaveLength(1);
+			expect((proofsB?.[0] as ImmutableProof).organizationId).toBe(TEST_TENANT_B_ORG_ID);
+			expect((proofsB?.[0] as ImmutableProof).proofObjectIntegrity).toBe(
+				"sha256-vE9CQrgUcTMHEwSpTVpF4nJoXtWlBAxbxg38IE73Snw="
+			);
+		} finally {
+			await run2?.shutdown();
+		}
+	});
+
+	test("Fails the migration when a legacy proof's tenant no longer exists", async () => {
+		// "immutable-proof" and "tenant" are the real schema names, shared with the other
+		// ImmutableProof migration tests in this file, so each one starts from a clean store.
+		SharedObjectBuffer.remove("immutable-proof");
+		SharedObjectBuffer.remove("tenant");
+
+		const PORT_1 = await getFreePort();
+		const PORT_2 = await getFreePort();
+
+		initSchemaImmutableProof();
+		initSchemaTenant();
+
+		const extendConfig = async (
+			unusedEnvVars: unknown,
+			config: { types: { [id: string]: unknown[] | undefined } }
+		): Promise<void> => {
+			config.types.entityStorageComponent ??= [];
+			config.types.entityStorageComponent.push(
+				{
+					type: EntityStorageComponentType.Service,
+					options: { entityStorageType: "ImmutableProof", partitionContextIds: ["node", "tenant"] }
+				},
+				{
+					type: EntityStorageComponentType.Service,
+					options: { entityStorageType: "Tenant", partitionContextIds: ["node"] }
+				}
+			);
+			config.types.schemaVersionMigrationComponent = [
+				{ type: SchemaVersionMigrationComponentType.Service }
+			];
+			config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+		};
+
+		const run1 = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+			disableProcessExitOnFailure: true,
+			envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_1) },
+			extendConfig
+		});
+
+		const svConnector = EntityStorageConnectorFactory.get<
+			MemoryEntityStorageConnector<{
+				schemaName: string;
+				version: number;
+			}>
+		>("schema-version");
+		const svRecords = await svConnector.getStore();
+		const svRecord = svRecords.find(r => r.schemaName === "ImmutableProof");
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 0 });
+		}
+
+		// No Tenant record is seeded for TEST_TENANT_ID_A: the migration has nowhere to
+		// source the organization from.
+		await ContextIdStore.run({ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }, async () => {
+			const seedConnector = new MemoryEntityStorageConnector<ImmutableProofV0>({
+				entitySchema: "ImmutableProofV0",
+				partitionContextIds: ["node", "tenant"],
+				config: { storageKey: "immutable-proof" }
+			});
+			await seedConnector.setBatch([
+				{
+					id: "legacy-orphan",
+					dateCreated: "2026-01-15T10:00:00.000Z",
+					proofObjectId: "aig:vertex-orphan",
+					proofObjectHash: "sha256:0kGVLYNcCnQRmYc3nnLBRGGPkxFTZLE7ClkIvLTFGQ4="
+				}
+			]);
+		});
+
+		await run1?.shutdown();
+
+		let run2;
+		try {
+			await expect(
+				run({
+					localesDirectory: LOCALES_DIR,
+					stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+					disableProcessExitOnFailure: true,
+					envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(PORT_2) },
+					extendConfig
+				})
+			).rejects.toMatchObject({
+				message: "migrationHelper.migrateSchemaFailed",
+				cause: expect.objectContaining({
+					message: "node.legacyProofOrganizationUnknown"
+				})
+			});
+
+			// The source row survives a failed migration attempt.
+			run2 = await run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, { nodeId: TEST_NODE_ID }),
+				disableProcessExitOnFailure: true,
+				envVars: { ...MULTI_TENANT_BASE_ENV, TWIN_PORT: String(await getFreePort()) },
+				extendConfig: async (unusedEnvVars2, config) => {
+					await extendConfig(unusedEnvVars2, config);
+					config.types.schemaVersionMigrationComponent = [
+						{
+							type: SchemaVersionMigrationComponentType.Service,
+							options: { config: { enabled: false } }
+						}
+					];
+				}
+			});
+
+			const proofConnector = EntityStorageConnectorFactory.get("immutable-proof");
+			const { entities: proofs } = await ContextIdStore.run(
+				{ node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A },
+				async () => proofConnector.query()
+			);
+			expect(proofs).toHaveLength(1);
+			expect((proofs?.[0] as ImmutableProofV0 & { proofObjectHash?: string }).proofObjectHash).toBe(
+				"sha256:0kGVLYNcCnQRmYc3nnLBRGGPkxFTZLE7ClkIvLTFGQ4="
+			);
+		} finally {
+			await run2?.shutdown();
 		}
 	});
 });
