@@ -5,7 +5,8 @@ import type {
 	AuditableItemGraphVertexIndex,
 	AuditableItemGraphVertexV1
 } from "@twin.org/auditable-item-graph-service";
-import { Converter, RandomHelper, StringHelper } from "@twin.org/core";
+import { Converter, GeneralError, JsonHelper, ObjectHelper, StringHelper } from "@twin.org/core";
+import { Blake2b } from "@twin.org/crypto";
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { IEntitySchemaProperty } from "@twin.org/entity";
 import {
@@ -76,16 +77,10 @@ function migrationAigIndexes(): void {
 				IEntityStorageConnector<AuditableItemGraphVertexIndex>
 			>(StringHelper.kebabCase(nameof<AuditableItemGraphVertexIndex>()));
 
-			await aigIndexEntityStorage.set({
-				id: Converter.bytesToHex(RandomHelper.generate(16)),
-				vertexId: entity.id,
-				type: "vertex",
-				value: entity.id.toLowerCase(),
-				dateCreated: entity.dateCreated,
-				dateModified: entity.dateModified ?? entity.dateCreated
-			});
+			const values: { type: string; value: string }[] = [
+				{ type: "vertex", value: entity.id.toLowerCase() }
+			];
 
-			// The context ids already contain the correct partition information for the indexes.
 			const aliases: string[] =
 				entity.aliasIndex
 					?.split("||")
@@ -93,14 +88,7 @@ function migrationAigIndexes(): void {
 					.filter(alias => alias.length > 0) ?? [];
 
 			for (const alias of aliases) {
-				await aigIndexEntityStorage.set({
-					id: Converter.bytesToHex(RandomHelper.generate(16)),
-					vertexId: entity.id,
-					type: "alias",
-					value: alias.toLowerCase(),
-					dateCreated: entity.dateCreated,
-					dateModified: entity.dateModified ?? entity.dateCreated
-				});
+				values.push({ type: "alias", value: alias.toLowerCase() });
 			}
 
 			const resourceTypes: string[] =
@@ -110,15 +98,20 @@ function migrationAigIndexes(): void {
 					.filter(resourceType => resourceType.length > 0) ?? [];
 
 			for (const resourceType of resourceTypes) {
-				await aigIndexEntityStorage.set({
-					id: Converter.bytesToHex(RandomHelper.generate(16)),
-					vertexId: entity.id,
-					type: "resourceType",
-					value: resourceType.toLowerCase(),
-					dateCreated: entity.dateCreated,
-					dateModified: entity.dateModified ?? entity.dateCreated
-				});
+				values.push({ type: "resourceType", value: resourceType.toLowerCase() });
 			}
+
+			// The context ids already contain the correct partition information for the indexes.
+			const entries: AuditableItemGraphVertexIndex[] = values.map(({ type, value }) => ({
+				id: indexRowId({ vertexId: entity.id, type, value }),
+				vertexId: entity.id,
+				type,
+				value,
+				dateCreated: entity.dateCreated,
+				dateModified: entity.dateModified ?? entity.dateCreated
+			}));
+
+			await writeIndexEntries(aigIndexEntityStorage, entries, entity.id);
 		}
 	};
 	SchemaMigrationFactory.register(
@@ -167,7 +160,7 @@ function migrationPapIndexes(): void {
 					for (const target of targets) {
 						for (const action of actions) {
 							entries.push({
-								id: Converter.bytesToHex(RandomHelper.generate(16)),
+								id: indexRowId({ policyId: entity.id, assigner, assignee, target, action }),
 								policyId: entity.id,
 								assigner,
 								assignee,
@@ -181,7 +174,7 @@ function migrationPapIndexes(): void {
 			}
 
 			// The context ids already contain the correct partition information for the indexes.
-			await papIndexEntityStorage.setBatch(entries);
+			await writeIndexEntries(papIndexEntityStorage, entries, entity.id);
 		}
 	};
 	SchemaMigrationFactory.register(
@@ -207,4 +200,34 @@ function splitPolicyIndex(index: string | undefined): (string | undefined)[] {
 	}
 
 	return values.length === 0 ? [undefined] : values;
+}
+
+/**
+ * Build the id of an index row from the values which identify it, so a repeated migration
+ * writes the same row instead of a duplicate.
+ * @param identity The owner id and the index values of the row.
+ * @returns The hex encoded hash.
+ */
+function indexRowId(identity: { [id: string]: string | undefined }): string {
+	return Converter.bytesToHex(
+		Blake2b.sum256(ObjectHelper.toBytes(JsonHelper.canonicalize(identity)))
+	);
+}
+
+/**
+ * Write the index rows of one entity, naming the entity when a row cannot be written.
+ * @param indexEntityStorage The index storage to write to.
+ * @param entries The rows to write.
+ * @param id The id of the entity the rows belong to.
+ */
+async function writeIndexEntries<T>(
+	indexEntityStorage: IEntityStorageConnector<T>,
+	entries: T[],
+	id: string
+): Promise<void> {
+	try {
+		await indexEntityStorage.setBatch(entries);
+	} catch (error) {
+		throw new GeneralError("node", "migrationIndexWriteFailed", { id }, error);
+	}
 }
