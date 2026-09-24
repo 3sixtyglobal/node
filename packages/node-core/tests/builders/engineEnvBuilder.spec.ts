@@ -12,6 +12,8 @@ import {
 	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
 	HealthComponentType,
+	IdentityConnectorType,
+	IdentityResolverConnectorType,
 	ImmutableProofComponentType,
 	LoggingConnectorType,
 	MailboxComponentType,
@@ -24,8 +26,10 @@ import {
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
+	TenantAdminComponentType,
 	TracingComponentType,
-	TracingConnectorType
+	TracingConnectorType,
+	TrustVerifierComponentType
 } from "@twin.org/engine-types";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
@@ -320,6 +324,101 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 
 		expect(memoryMutexTimeoutMs).toBeUndefined();
 		expect(fileMutexTimeoutMs).toBeUndefined();
+	});
+
+	test("mutex timeout default seeds the connector timeouts when no component value is set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "memory,file",
+			mutexTimeoutDefault: "60000",
+			storageFileRoot: "."
+		});
+
+		const memoryConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.Memory
+		);
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+
+		const memoryMutexTimeoutMs = (
+			memoryConnector?.options as { config?: { mutexTimeoutMs?: number } }
+		)?.config?.mutexTimeoutMs;
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(memoryMutexTimeoutMs).toBe(60000);
+		expect(fileMutexTimeoutMs).toBe(60000);
+	});
+
+	test("component mutex timeout overrides the mutex timeout default", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "file",
+			entityStorageMutexTimeout: "4321",
+			mutexTimeoutDefault: "60000",
+			storageFileRoot: "."
+		});
+
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(fileMutexTimeoutMs).toBe(4321);
+	});
+
+	test("mutex timeout default seeds the component cache and lock timeouts", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: LoggingConnectorType.File,
+			tenantEnabled: "true",
+			identityConnector: IdentityConnectorType.EntityStorage,
+			identityResolverConnector: IdentityResolverConnectorType.EntityStorage,
+			mutexTimeoutDefault: "60000",
+			storageFileRoot: "."
+		});
+
+		const getConfig = (
+			entries: { type: string; options?: unknown }[] | undefined,
+			type: string
+		): { [key: string]: unknown } | undefined =>
+			(
+				entries?.find(entry => entry.type === type)?.options as {
+					config?: { [key: string]: unknown };
+				}
+			)?.config;
+
+		expect(
+			getConfig(config.types.loggingConnector, LoggingConnectorType.File)?.mutexTimeoutMs
+		).toBe(60000);
+		expect(
+			getConfig(config.types.tenantAdminComponent, TenantAdminComponentType.Service)
+				?.tenantCacheMutexTimeoutMs
+		).toBe(60000);
+		expect(
+			getConfig(config.types.identityConnector, IdentityConnectorType.EntityStorage)
+				?.didResolutionCacheMutexTimeoutMs
+		).toBe(60000);
+		expect(
+			getConfig(config.types.identityResolverConnector, IdentityResolverConnectorType.EntityStorage)
+				?.didResolutionCacheMutexTimeoutMs
+		).toBe(60000);
+	});
+
+	test("mutex timeout default seeds the jwt verifiable credential verifier cache timeout", async () => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true",
+			trustVerifiers: TrustVerifierComponentType.JwtVerifiableCredential,
+			mutexTimeoutDefault: "60000"
+		});
+
+		const verifier = config.types.trustVerifierComponent?.find(
+			entry => entry.type === TrustVerifierComponentType.JwtVerifiableCredential
+		);
+
+		expect(
+			(verifier?.options as { config?: { verificationCacheMutexTimeoutMs?: number } })?.config
+				?.verificationCacheMutexTimeoutMs
+		).toBe(60000);
 	});
 });
 

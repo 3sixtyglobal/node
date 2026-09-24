@@ -250,7 +250,8 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId,
+					tokenCacheMutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
 				}
 			}
 		});
@@ -258,7 +259,8 @@ export async function buildEngineServerConfiguration(
 			type: SocketRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId,
+					tokenCacheMutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
 				}
 			}
 		});

@@ -210,6 +210,19 @@ export async function buildEngineConfiguration(
 }
 
 /**
+ * Resolves a component mutex timeout, falling back to the default so engine clones inherit it.
+ * @param envVars The environment variables.
+ * @param key The component mutex timeout env var.
+ * @returns The mutex timeout in milliseconds, or undefined when neither is set.
+ */
+function envMutexMs(
+	envVars: IEngineEnvironmentVariables,
+	key: keyof IEngineEnvironmentVariables
+): number | undefined {
+	return envMs(envVars, key) ?? envMs(envVars, "mutexTimeoutDefault");
+}
+
+/**
  * Configures the entity storage.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -233,7 +246,7 @@ async function configureEntityStorage(
 				type: EntityStorageConnectorType.Memory,
 				options: {
 					config: {
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					}
 				}
 			});
@@ -243,7 +256,7 @@ async function configureEntityStorage(
 				options: {
 					config: {
 						directory: envVars.storageFileRoot ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					folderPrefix: envVars.entityStorageTablePrefix
 				}
@@ -259,7 +272,7 @@ async function configureEntityStorage(
 						secretAccessKey: envVars.awsDynamodbSecretAccessKey,
 						endpoint: envVars.awsDynamodbEndpoint,
 						connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout"),
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
 				}
@@ -273,7 +286,7 @@ async function configureEntityStorage(
 						key: envVars.azureCosmosdbKey ?? "",
 						databaseId: envVars.azureCosmosdbDatabaseId ?? "",
 						containerId: envVars.azureCosmosdbContainerId ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
 				}
@@ -288,7 +301,7 @@ async function configureEntityStorage(
 						databaseId: envVars.gcpFirestoreDatabaseId ?? "",
 						collectionName: envVars.gcpFirestoreCollectionName ?? "",
 						endpoint: envVars.gcpFirestoreEndpoint ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
 				}
@@ -302,7 +315,7 @@ async function configureEntityStorage(
 						localDataCenter: envVars.scylladbLocalDataCenter ?? "",
 						keyspace: envVars.scylladbKeyspace ?? "",
 						port: envInteger(envVars, "scylladbPort"),
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
 							coreConnectionsPerHost: envCount(envVars, "scylladbPoolCoreConnectionsPerHost"),
 							maxRequestsPerConnection: envCount(envVars, "scylladbPoolMaxRequestsPerConnection")
@@ -321,7 +334,7 @@ async function configureEntityStorage(
 						user: envVars.mySqlUser ?? "",
 						password: envVars.mySqlPassword ?? "",
 						database: envVars.mySqlDatabase ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
 							connectionLimit: envCount(envVars, "mySqlPoolConnectionLimit"),
 							maxIdle: envCount(envVars, "mySqlPoolMaxIdle"),
@@ -344,7 +357,7 @@ async function configureEntityStorage(
 						user: envVars.mongoDbUser ?? "",
 						password: envVars.mongoDbPassword ?? "",
 						database: envVars.mongoDbDatabase ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
 							maxPoolSize: envCount(envVars, "mongoDbPoolMaxPoolSize"),
 							minPoolSize: envCount(envVars, "mongoDbPoolMinPoolSize"),
@@ -365,7 +378,7 @@ async function configureEntityStorage(
 						user: envVars.postgreSqlUser ?? "",
 						password: envVars.postgreSqlPassword ?? "",
 						database: envVars.postgreSqlDatabase ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
 							max: envCount(envVars, "postgreSqlPoolMax"),
 							idleTimeout: envSeconds(envVars, "postgreSqlPoolIdleTimeout"),
@@ -584,7 +597,8 @@ async function configureLogging(
 						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
 						filename: envVars.loggingFileFilename,
 						maxFileSizeBytes: envCount(envVars, "loggingFileMaxFileSizeBytes"),
-						maxRetainedFiles: envCount(envVars, "loggingFileMaxRetainedFiles")
+						maxRetainedFiles: envCount(envVars, "loggingFileMaxRetainedFiles"),
+						mutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
 					}
 				}
 			});
@@ -1163,7 +1177,12 @@ async function configureTenant(
 	if (isTenantEnabled) {
 		coreConfig.types.tenantAdminComponent ??= [];
 		coreConfig.types.tenantAdminComponent.push({
-			type: TenantAdminComponentType.Service
+			type: TenantAdminComponentType.Service,
+			options: {
+				config: {
+					tenantCacheMutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
+				}
+			}
 		});
 	}
 }
@@ -1583,7 +1602,15 @@ async function configureIdentity(
 
 	if (identityConnectorType === IdentityConnectorType.EntityStorage) {
 		coreConfig.types.identityConnector.push({
-			type: IdentityConnectorType.EntityStorage
+			type: IdentityConnectorType.EntityStorage,
+			options: {
+				config: {
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					)
+				}
+			}
 		});
 	} else if (identityConnectorType === IdentityConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
@@ -1602,7 +1629,7 @@ async function configureIdentity(
 					walletAddressIndex: envCount(envVars, "identityWalletAddressIndex") ?? 0,
 					didResolutionCacheTtlMs: envMs(envVars, "identityDidResolutionCacheTtl"),
 					didResolutionCacheCapacity: envCount(envVars, "identityDidResolutionCacheCapacity"),
-					didResolutionCacheMutexTimeoutMs: envMs(
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
 						envVars,
 						"identityDidResolutionCacheMutexTimeout"
 					),
@@ -1638,7 +1665,15 @@ async function configureIdentityResolver(
 
 	if (identityResolverConnectorType === IdentityResolverConnectorType.EntityStorage) {
 		coreConfig.types.identityResolverConnector.push({
-			type: IdentityResolverConnectorType.EntityStorage
+			type: IdentityResolverConnectorType.EntityStorage,
+			options: {
+				config: {
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					)
+				}
+			}
 		});
 	} else if (identityResolverConnectorType === IdentityResolverConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
@@ -1653,7 +1688,11 @@ async function configureIdentityResolver(
 					...(dltConfig?.options?.config as IIotaConfig),
 					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
 						? envVars.iotaIdentityPackageId
-						: undefined
+						: undefined,
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					)
 				}
 			}
 		});
@@ -1758,7 +1797,7 @@ async function configureAuditableItemGraph(
 			type: AuditableItemGraphComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "auditableItemGraphMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "auditableItemGraphMutexTimeout")
 				}
 			}
 		});
@@ -1781,7 +1820,7 @@ async function configureAuditableItemStream(
 			type: AuditableItemStreamComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "auditableItemStreamMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "auditableItemStreamMutexTimeout")
 				}
 			}
 		});
@@ -1846,7 +1885,7 @@ async function configureDocumentManagement(
 			type: DocumentManagementComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "documentManagementMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "documentManagementMutexTimeout")
 				}
 			}
 		});
@@ -1905,7 +1944,12 @@ async function configureTrust(
 				});
 			} else if (trustVerifierType === TrustVerifierComponentType.JwtVerifiableCredential) {
 				coreConfig.types.trustVerifierComponent.push({
-					type: TrustVerifierComponentType.JwtVerifiableCredential
+					type: TrustVerifierComponentType.JwtVerifiableCredential,
+					options: {
+						config: {
+							verificationCacheMutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
+						}
+					}
 				});
 			}
 		}
@@ -1980,7 +2024,7 @@ async function configureRightsManagement(
 				config: {
 					callbackPath: rightsManagementPath,
 					includeErrorDetails: coreConfig.debug ?? false,
-					mutexTimeoutMs: envMs(envVars, "rightsManagementMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "rightsManagementMutexTimeout")
 				}
 			},
 			isDefault: true
@@ -1991,7 +2035,7 @@ async function configureRightsManagement(
 			type: RightsManagementPnapComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "rightsManagementMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "rightsManagementMutexTimeout")
 				}
 			}
 		});
@@ -2147,7 +2191,7 @@ async function configureFederatedCatalogue(
 				type: FederatedCatalogueComponentType.Service,
 				options: {
 					config: {
-						mutexTimeoutMs: envMs(envVars, "federatedCatalogueMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "federatedCatalogueMutexTimeout")
 					}
 				}
 			});
@@ -2236,7 +2280,7 @@ async function configureDataspace(
 						"dataspacePushSubscriptionCleanupInterval"
 					),
 					agreementCacheTtlMs: envMs(envVars, "dataspaceAgreementCacheTtl"),
-					agreementCacheMutexTimeoutMs: envMs(envVars, "dataspaceAgreementCacheMutexTimeout")
+					agreementCacheMutexTimeoutMs: envMutexMs(envVars, "dataspaceAgreementCacheMutexTimeout")
 				}
 			}
 		});
