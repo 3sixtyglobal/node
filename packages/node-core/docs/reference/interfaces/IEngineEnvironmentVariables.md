@@ -2083,7 +2083,7 @@ The interval in seconds for performing health checks, defaults to 60.
 
 > `optional` **healthStartupInterval?**: `string`
 
-The interval in seconds for performing health checks at startup, defaults to 2.
+The interval in seconds for performing health checks at startup, defaults to 30.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
 
 ***
