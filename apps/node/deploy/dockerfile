@@ -8,8 +8,9 @@ RUN npm install -g pnpm@12.4.1
 WORKDIR /app
 
 # The repository pnpm-workspace.yaml is outside the build context, so recreate the
-# settings the install relies on, the @twin.org next builds are exempt from the release age hold
-RUN printf "minimumReleaseAgeExclude:\n  - '@twin.org/*'\n" > pnpm-workspace.yaml
+# settings the install relies on, the @twin.org next builds are exempt from the release age hold.
+# Use a flat node_modules, as code run in worker threads imports transitive dependencies by name
+RUN printf "nodeLinker: hoisted\nminimumReleaseAgeExclude:\n  - '@twin.org/*'\n" > pnpm-workspace.yaml
 
 # Copy the package.json
 COPY package.json .

@@ -99,15 +99,19 @@ jobs:
         with:
           node-version: 24
 
+      # Setup pnpm after node, the runners have no system node for its installer to use.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Install dependencies
         run: |
           for i in {1..5}; do
-            npm ci && break || {
+            pnpm install --frozen-lockfile && break || {
               if [ $i -eq 5 ]; then
-                echo "npm ci failed after 5 attempts"
+                echo "pnpm install failed after 5 attempts"
                 exit 1
               fi
-              echo "npm ci failed, retrying in 30 seconds (attempt $i/5)..."
+              echo "pnpm install failed, retrying in 30 seconds (attempt $i/5)..."
               sleep 30
             }
           done
@@ -163,7 +167,7 @@ jobs:
           [ -n "$INPUT_P99_MS" ] && export SOAK_P99_MS="$INPUT_P99_MS"
           [ -n "$INPUT_MEM_GROWTH_MB_PER_HR" ] && export SOAK_MEM_GROWTH_MB_PER_HR="$INPUT_MEM_GROWTH_MB_PER_HR"
           [ -n "$INPUT_DISABLED_GROUPS" ] && export SOAK_DISABLED_GROUPS="$INPUT_DISABLED_GROUPS"
-          npm run test:soak --prefix apps/node
+          pnpm --dir apps/node run test:soak
 
       - name: Upload soak artifacts
         if: always()
