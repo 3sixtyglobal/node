@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1-next.7](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.6...node-core-v0.10.1-next.7) (2026-09-24)
+
+
+### Features
+
+* default mutex ([#445](https://github.com/iotaledger/twin-node/issues/445)) ([8c82c14](https://github.com/iotaledger/twin-node/commit/8c82c146263b6023e2deeab6c55566e8eedf7040))
+
 ## [0.10.1-next.6](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.5...node-core-v0.10.1-next.6) (2026-09-24)
 
 
