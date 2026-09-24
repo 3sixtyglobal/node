@@ -1090,7 +1090,7 @@ async function configureHealth(
 				config: {
 					healthCheckInterval: envSecToMs(envVars, "healthInterval"),
 					healthCheckApplicationInterval: envSecToMs(envVars, "healthApplicationInterval"),
-					initialInterval: envSecToMs(envVars, "healthStartupInterval"),
+					initialInterval: envSecToMs(envVars, "healthStartupInterval", 30000),
 					excludeCloneComponents: envListToArray<IEngineEnvironmentVariables, string>(
 						envVars,
 						"healthExcludeCloneComponents",

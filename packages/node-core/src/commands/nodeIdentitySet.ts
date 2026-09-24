@@ -1,9 +1,10 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@twin.org/cli-core";
-import { I18n, Is, NotFoundError } from "@twin.org/core";
+import { BaseError, I18n, Is, NotFoundError } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { Did, IdentityResolverConnectorFactory } from "@twin.org/identity-models";
+import type { IDidDocument } from "@twin.org/standards-w3c-did";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -84,7 +85,21 @@ export async function nodeIdentitySet(
 		defaultIdentityResolverConnectorType
 	);
 
-	const identityDocument = await identityResolverConnector.resolveDocument(params.identity);
+	let identityDocument: IDidDocument | undefined;
+	try {
+		identityDocument = await identityResolverConnector.resolveDocument(params.identity);
+	} catch (error) {
+		if (BaseError.someErrorName(error, NotFoundError.CLASS_NAME)) {
+			throw new NotFoundError(
+				"nodeIdentitySet",
+				"identityNotFound",
+				params.identity,
+				undefined,
+				error
+			);
+		}
+		throw error;
+	}
 	if (Is.empty(identityDocument)) {
 		throw new NotFoundError("nodeIdentitySet", "identityNotFound", params.identity);
 	}

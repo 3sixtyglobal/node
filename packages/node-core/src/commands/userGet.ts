@@ -75,9 +75,13 @@ export async function userGet(
 	}
 ): Promise<IAuthenticationUser> {
 	Guards.email("userGet", "email", params.email);
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
+		if (!tenantEnabled) {
+			throw new GeneralError("userGet", "tenantIdNotAllowed");
+		}
 		Guards.stringHexLength("userGet", "tenant-id", params.tenantId, 32);
-	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	} else if (tenantEnabled) {
 		throw new GeneralError("userGet", "tenantIdRequired");
 	}
 

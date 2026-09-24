@@ -123,7 +123,7 @@ export async function tenantUpdate(
 	}
 
 	const defaultTenantAdminComponentType =
-		engineCore.getRegisteredInstanceType("tenantAdminComponent");
+		engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
 
 	if (!Is.stringValue(defaultTenantAdminComponentType)) {
 		throw new GeneralError("tenantUpdate", "tenantAdminComponentNotRegistered");

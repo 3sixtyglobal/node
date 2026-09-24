@@ -152,9 +152,13 @@ export async function userUpdate(
 	if (Is.stringValue(paramsOrganizationIdentity)) {
 		Did.guard("userUpdate", "organization-identity", paramsOrganizationIdentity);
 	}
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
+		if (!tenantEnabled) {
+			throw new GeneralError("userUpdate", "tenantIdNotAllowed");
+		}
 		Guards.stringHexLength("userUpdate", "tenant-id", params.tenantId, 32);
-	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	} else if (tenantEnabled) {
 		throw new GeneralError("userUpdate", "tenantIdRequired");
 	}
 

@@ -70,7 +70,9 @@ export async function extensionsInitialiseEngine(
 
 				let initialiseEngineMethod: NodeExtensionInitialiseEngineMethod | undefined;
 				try {
-					engineCore.logInfo(I18n.formatMessage("node.extensionInitialisingEngine", { extension }));
+					await engineCore.logInfo(
+						I18n.formatMessage("node.extensionInitialisingEngine", { extension })
+					);
 					initialiseEngineMethod =
 						await ModuleHelper.getModuleMethod<NodeExtensionInitialiseEngineMethod>(
 							extension,
@@ -104,7 +106,7 @@ export async function extensionsInitialiseEngineServer(
 		for (const extension of extensions) {
 			let initialiseEngineServerMethod: NodeExtensionInitialiseEngineServerMethod | undefined;
 			try {
-				engineCore.logInfo(
+				await engineCore.logInfo(
 					I18n.formatMessage("node.extensionInitialisingEngineServer", { extension })
 				);
 				initialiseEngineServerMethod =
@@ -141,7 +143,7 @@ export async function shutdownExtensions(
 				extensionState[extension].initialised = false;
 				let shutdownMethod: NodeExtensionShutdownMethod | undefined;
 				try {
-					engineCore.logInfo(I18n.formatMessage("node.extensionShutdown", { extension }));
+					await engineCore.logInfo(I18n.formatMessage("node.extensionShutdown", { extension }));
 					shutdownMethod = await ModuleHelper.getModuleMethod<NodeExtensionShutdownMethod>(
 						extension,
 						"extensionShutdown"

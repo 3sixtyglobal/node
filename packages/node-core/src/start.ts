@@ -254,7 +254,7 @@ async function enforceTenantOrganizationIds(
 	if (missingIds.length === 1) {
 		const state = engineCore.getState();
 		if (Is.stringValue(state.nodeOrganizationId)) {
-			engineCore.logInfo(
+			await engineCore.logInfo(
 				I18n.formatMessage("node.tenantOrganizationIdAutoAssigned", {
 					tenantId: missingIds[0],
 					organizationId: state.nodeOrganizationId

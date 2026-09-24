@@ -8,19 +8,20 @@ import { Did } from "@twin.org/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
-const COMMAND_NAME = "remove-tenant-org-alias";
+const COMMAND_NAME = "tenant-org-alias-remove";
 
 /**
  * Get the command definition parameters.
  * @param commandDefinitions The registered command definitions.
  */
-export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
+export function getCommandDefinitionTenantOrgAliasRemove(commandDefinitions: {
 	[id: string]: ICliCommandDefinition;
 }): void {
 	commandDefinitions[COMMAND_NAME] = {
 		command: COMMAND_NAME,
-		description: I18n.formatMessage("node.cli.commands.remove-tenant-org-alias.description"),
-		example: I18n.formatMessage("node.cli.commands.remove-tenant-org-alias.example"),
+		description: I18n.formatMessage("node.cli.commands.tenant-org-alias-remove.description"),
+		example: I18n.formatMessage("node.cli.commands.tenant-org-alias-remove.example"),
+		aliases: ["remove-tenant-org-alias"],
 		requiresNodeIdentity: false,
 		requiresOrgIdentity: false,
 		params: [
@@ -28,7 +29,7 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
 				key: "env-prefix",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.remove-tenant-org-alias.params.env-prefix.description"
+					"node.cli.commands.tenant-org-alias-remove.params.env-prefix.description"
 				),
 				required: false
 			},
@@ -37,7 +38,7 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
 				type: "string",
 				extendedType: "hex(32)",
 				description: I18n.formatMessage(
-					"node.cli.commands.remove-tenant-org-alias.params.tenant-id.description"
+					"node.cli.commands.tenant-org-alias-remove.params.tenant-id.description"
 				),
 				required: true
 			},
@@ -46,7 +47,7 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
 				type: "string",
 				extendedType: "did",
 				description: I18n.formatMessage(
-					"node.cli.commands.remove-tenant-org-alias.params.alias.description"
+					"node.cli.commands.tenant-org-alias-remove.params.alias.description"
 				),
 				required: true
 			},
@@ -54,12 +55,12 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
 				key: "load-env",
 				type: "string",
 				description: I18n.formatMessage(
-					"node.cli.commands.remove-tenant-org-alias.params.load-env.description"
+					"node.cli.commands.tenant-org-alias-remove.params.load-env.description"
 				),
 				required: false
 			}
 		],
-		action: async (engineCore, envVars, params) => removeTenantOrgAlias(engineCore, envVars, params)
+		action: async (engineCore, envVars, params) => tenantOrgAliasRemove(engineCore, envVars, params)
 	};
 }
 
@@ -73,7 +74,7 @@ export function getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions: {
  * @returns A promise that resolves when the alias has been removed.
  * @throws GeneralError if the tenant admin component is not registered, or the alias is not found.
  */
-export async function removeTenantOrgAlias(
+export async function tenantOrgAliasRemove(
 	engineCore: IEngineCore,
 	envVars: IEnvironmentVariables,
 	params: {
@@ -85,30 +86,30 @@ export async function removeTenantOrgAlias(
 		engineCore.getRegisteredInstanceTypeOptional("tenantAdminComponent");
 
 	if (!Is.stringValue(defaultTenantAdminComponentType)) {
-		throw new GeneralError("removeTenantOrgAlias", "tenantAdminComponentNotRegistered");
+		throw new GeneralError("tenantOrgAliasRemove", "tenantAdminComponentNotRegistered");
 	}
 
-	Guards.stringHexLength("removeTenantOrgAlias", "tenant-id", params.tenantId, 32);
+	Guards.stringHexLength("tenantOrgAliasRemove", "tenant-id", params.tenantId, 32);
 
-	Did.guard("removeTenantOrgAlias", "alias", params.alias);
+	Did.guard("tenantOrgAliasRemove", "alias", params.alias);
 
 	const tenantAdminComponent = ComponentFactory.get<ITenantAdminComponent>(
 		defaultTenantAdminComponentType
 	);
 
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.remove-tenant-org-alias.labels.reading"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-org-alias-remove.labels.reading"));
 
 	const tenant = await tenantAdminComponent.get(params.tenantId);
 	const legacy = [...(tenant.organizationIdLegacy ?? [])];
 	const index = legacy.indexOf(params.alias);
 
 	if (index < 0) {
-		throw new GeneralError("removeTenantOrgAlias", "aliasNotFound", { alias: params.alias });
+		throw new GeneralError("tenantOrgAliasRemove", "aliasNotFound", { alias: params.alias });
 	}
 
 	legacy.splice(index, 1);
 
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.remove-tenant-org-alias.labels.updating"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-org-alias-remove.labels.updating"));
 	CLIDisplay.spinnerStart();
 
 	await tenantAdminComponent.update({
@@ -117,7 +118,7 @@ export async function removeTenantOrgAlias(
 	});
 
 	CLIDisplay.spinnerStop();
-	CLIDisplay.task(I18n.formatMessage("node.cli.commands.remove-tenant-org-alias.labels.removed"));
+	CLIDisplay.task(I18n.formatMessage("node.cli.commands.tenant-org-alias-remove.labels.removed"));
 
 	CLIDisplay.done();
 }

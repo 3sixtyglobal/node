@@ -48,15 +48,17 @@
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
 		"userCreate": {
-			"passwordTooShort": "The password provided is too short, it must be at least {minLength} characters long.",
 			"userAlreadyExists": "The user with ID already exists and overwriteMode is set to \"error\".",
-			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
+			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled."
 		},
 		"userGet": {
-			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
+			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled."
 		},
 		"userUpdate": {
-			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled."
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
+			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled."
 		},
 		"orgUsersList": {
 			"orgDidRequired": "The organization DID is required in multi-tenant mode. Provide --org-did or switch to single-tenant mode."
@@ -77,7 +79,7 @@
 		"applyOrganizationIdToTenant": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
 		},
-		"removeTenantOrgAlias": {
+		"tenantOrgAliasRemove": {
 			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command.",
 			"aliasNotFound": "The alias \"{alias}\" was not found in the tenant organization legacy list."
 		},
@@ -95,6 +97,27 @@
 		},
 		"identityResolve": {
 			"identityNotFound": "The identity \"{identity}\" was not found."
+		},
+		"tenantRemove": {
+			"tenantAdminComponentNotRegistered": "Multi-tenant support must be enabled to use this command."
+		},
+		"userRemove": {
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
+			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled."
+		},
+		"userUpdatePassword": {
+			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
+			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled."
+		},
+		"identityRemove": {
+			"nodeIdentityNotRemovable": "The node identity cannot be removed.",
+			"nodeOrganizationIdentityNotRemovable": "The node organization identity cannot be removed."
+		},
+		"vaultKeyRemove": {
+			"vaultKeyNotFound": "The vault key \"{keyId}\" was not found."
+		},
+		"vaultKeyUpdate": {
+			"vaultKeyNotFound": "The vault key \"{keyId}\" was not found."
 		}
 	},
 	"warn": {
@@ -538,7 +561,7 @@
 							"description": "The organization DID to associate the user with."
 						},
 						"tenant-id": {
-							"description": "The tenant ID to associate the user with."
+							"description": "The tenant ID to associate the user with (multi-tenant mode only)."
 						},
 						"email": {
 							"description": "The email address of the user."
@@ -596,7 +619,7 @@
 							"description": "The organization DID to associate the user with."
 						},
 						"tenant-id": {
-							"description": "The tenant ID to associate the user with."
+							"description": "The tenant ID to associate the user with (multi-tenant mode only)."
 						},
 						"email": {
 							"description": "The email address of the user."
@@ -721,9 +744,9 @@
 						"stored": "The tenant organization ID has been stored"
 					}
 				},
-				"remove-tenant-org-alias": {
+				"tenant-org-alias-remove": {
 					"description": "Remove an alias from the tenant organization ID legacy list",
-					"example": "remove-tenant-org-alias --tenant-id=\"0011..aabb\" --alias=\"did:iota:...\"",
+					"example": "tenant-org-alias-remove --tenant-id=\"0011..aabb\" --alias=\"did:iota:...\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -917,6 +940,161 @@
 						"identity": "Identity",
 						"scope": "Scope",
 						"count": "Total users"
+					}
+				},
+				"identity-remove": {
+					"description": "Remove an identity",
+					"example": "identity-remove --identity=\"did:iota:....\" --remove-keys=true",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID of the identity to remove."
+						},
+						"controller": {
+							"description": "The DID of the controller for the identity, defaults to the identity itself."
+						},
+						"remove-keys": {
+							"description": "Also remove the keys and mnemonic held in the vault for the identity."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"removingIdentity": "Removing identity",
+						"removingKeys": "Removing vault keys",
+						"removedIdentity": "Removed identity"
+					}
+				},
+				"tenant-remove": {
+					"description": "Remove a tenant",
+					"example": "tenant-remove --tenant-id=\"0011..aabb\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"tenant-id": {
+							"description": "The tenant ID to remove."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"removing": "Removing tenant",
+						"removed": "Removed tenant"
+					}
+				},
+				"user-remove": {
+					"description": "Remove a user and their identity profile",
+					"example": "user-remove --email=\"user@example.com\" --tenant-id=\"0011..aabb\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"email": {
+							"description": "The email address of the user to remove."
+						},
+						"tenant-id": {
+							"description": "The tenant ID the user belongs to (multi-tenant mode only)."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"removingUser": "Removing user",
+						"removingProfile": "Removing identity profile",
+						"noProfile": "No identity profile found for user",
+						"userRemoved": "Removed user"
+					}
+				},
+				"user-update-password": {
+					"description": "Update the password of a user",
+					"example": "user-update-password --email=\"user@example.com\" --tenant-id=\"0011..aabb\" --output-env=\"user-password.env\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"email": {
+							"description": "The email address of the user to update."
+						},
+						"password": {
+							"description": "The new password. If not provided a random password will be generated."
+						},
+						"current-password": {
+							"description": "The current password, verified before the change when provided."
+						},
+						"tenant-id": {
+							"description": "The tenant ID the user belongs to (multi-tenant mode only)."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						},
+						"output-json": {
+							"description": "Output the details of the password update to a JSON file."
+						},
+						"output-env": {
+							"description": "Output the details of the password update to an .env file."
+						},
+						"output-env-prefix": {
+							"description": "Prefix to use for variables in the output .env file."
+						}
+					},
+					"labels": {
+						"updating": "Updating password",
+						"updated": "Updated password",
+						"email": "Email",
+						"password": "Password"
+					}
+				},
+				"vault-key-remove": {
+					"description": "Remove a vault key for an identity",
+					"example": "vault-key-remove --identity=\"did:iota:....\" --key-id=\"my-key\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID the key is associated with."
+						},
+						"key-id": {
+							"description": "The ID of the key."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"removing": "Removing key",
+						"removed": "Removed key"
+					}
+				},
+				"vault-key-update": {
+					"description": "Replace the key material of an existing vault key for an identity",
+					"example": "vault-key-update --identity=\"did:iota:....\" --key-id=\"my-key\" --private-key-hex=\"15...a2\"",
+					"params": {
+						"env-prefix": {
+							"description": "Prefix to use for standard .env files e.g. TWIN_."
+						},
+						"identity": {
+							"description": "The DID the key is associated with."
+						},
+						"key-id": {
+							"description": "The ID of the key."
+						},
+						"private-key-hex": {
+							"description": "The replacement private key in hex format, the key type is kept."
+						},
+						"load-env": {
+							"description": "Comma separated list of paths to .env files to read input parameters from."
+						}
+					},
+					"labels": {
+						"updating": "Updating key",
+						"updated": "Updated key"
 					}
 				}
 			}

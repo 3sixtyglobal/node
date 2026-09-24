@@ -16,7 +16,14 @@ import {
 	LoggingConnectorType,
 	SchemaVersionMigrationComponentType
 } from "@twin.org/engine-types";
-import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@twin.org/entity";
+import type { IEntitySchemaProperty } from "@twin.org/entity";
+import {
+	entity,
+	EntitySchemaFactory,
+	EntitySchemaHelper,
+	EntitySchemaPropertyType,
+	property
+} from "@twin.org/entity";
 import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
 import {
 	EntityStorageConnectorFactory,
@@ -198,10 +205,14 @@ describe("migration", () => {
 				],
 				transformEntityProperty: (
 					migrationEntity: unknown,
-					fromProp: unknown,
-					toProp: unknown,
+					fromProp: IEntitySchemaProperty,
+					toProp: IEntitySchemaProperty,
 					value: unknown
-				) => [`item:${value as number}`]
+				) => {
+					if (toProp.type === EntitySchemaPropertyType.Array) {
+						return [`item:${value as number}`];
+					}
+				}
 			}));
 
 			// Run 1: start the node with schemaVersionMigration to initialise the schema-version
@@ -457,10 +468,14 @@ describe("migration - multi-tenant", () => {
 			],
 			transformEntityProperty: (
 				migrationEntity: unknown,
-				fromProp: unknown,
-				toProp: unknown,
+				fromProp: IEntitySchemaProperty,
+				toProp: IEntitySchemaProperty,
 				value: unknown
-			) => [`item:${value as number}`]
+			) => {
+				if (toProp.type === EntitySchemaPropertyType.Array) {
+					return [`item:${value as number}`];
+				}
+			}
 		}));
 
 		// Run 1: initialise schema-version records then back-date the entity to v0.
@@ -637,10 +652,14 @@ describe("migration - multi-tenant", () => {
 			],
 			transformEntityProperty: (
 				migrationEntity: unknown,
-				fromProp: unknown,
-				toProp: unknown,
+				fromProp: IEntitySchemaProperty,
+				toProp: IEntitySchemaProperty,
 				value: unknown
-			) => [`item:${value as number}`]
+			) => {
+				if (toProp.type === EntitySchemaPropertyType.Array) {
+					return [`item:${value as number}`];
+				}
+			}
 		}));
 
 		// Run 1: initialise schema-version records, then back-date entity to v0.
