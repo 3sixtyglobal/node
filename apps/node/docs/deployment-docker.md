@@ -6,25 +6,32 @@ To run the API server in the docker environment there is an example dockerfile i
 
 ```shell
 # Set the base image
-FROM node:22
+FROM node:24
+
+# Install pnpm, matching the version used by the repository
+RUN npm install -g pnpm@12.4.1
 
 # Create the app directory
 WORKDIR /app
+
+# The repository pnpm-workspace.yaml is outside the build context, so recreate the
+# settings the install relies on, the @twin.org next builds are exempt from the release age hold
+RUN printf "minimumReleaseAgeExclude:\n  - '@twin.org/*'\n" > pnpm-workspace.yaml
 
 # Copy the package.json
 COPY package.json .
 
 # Install dependencies including dev dependencies needed for merge-locales
-RUN npm install --ignore-scripts
+RUN pnpm install --ignore-scripts --no-frozen-lockfile
 
 # Copy the rest of the files to the image
 COPY . .
 
 # Compile translation messages
-RUN npm run merge-locales
+RUN pnpm run merge-locales
 
 # Remove dev dependencies to reduce image size
-RUN npm prune --omit=dev
+RUN pnpm prune --prod --ignore-scripts
 
 # Expose the port the app runs on
 EXPOSE 3000
@@ -35,7 +42,7 @@ ENV TWIN_PORT=3000
 ENV TWIN_STORAGE_FILE_ROOT=/twin-node/data
 
 # Start the server
-CMD ["node", "src/index.mjs"]
+CMD ["node", "src/index.js"]
 ```
 
 You can build and execute this using docker from the root of the package with the following command.
