@@ -18,7 +18,7 @@ docker pull twinfoundation/twin-node:latest
 
 ## Building the Image
 
-The dockerfile is in [deploy/dockerfile](../deploy/dockerfile). It installs the published `@twin.org/node-core` package and its dependencies with pnpm, merges the translation messages, and then removes the development dependencies. The files in `apps/node` form the build context, and [deploy/dockerfile.dockerignore](../deploy/dockerfile.dockerignore) keeps your local `node_modules` and `.env` out of the image.
+The dockerfile is in `deploy/dockerfile`. It installs the published `@twin.org/node-core` package and its dependencies with pnpm, merges the translation messages, and then removes the development dependencies. The files in `apps/node` form the build context, and `deploy/dockerfile.dockerignore` keeps your local `node_modules` and `.env` out of the image.
 
 Build the image from the `apps/node` directory:
 
