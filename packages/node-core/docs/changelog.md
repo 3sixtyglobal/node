@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1-next.8](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.7...node-core-v0.10.1-next.8) (2026-09-25)
+
+
+### Features
+
+* improved module loading ([#448](https://github.com/iotaledger/twin-node/issues/448)) ([f6971ba](https://github.com/iotaledger/twin-node/commit/f6971ba526ddb8a21aa8a5456cf6cceff9619cd3))
+
 ## [0.10.1-next.7](https://github.com/iotaledger/twin-node/compare/node-core-v0.10.1-next.6...node-core-v0.10.1-next.7) (2026-09-24)
 
 
