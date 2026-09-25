@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@twin.org/core";
 import { Engine } from "@twin.org/engine";
 import { FileStateStorage } from "@twin.org/engine-core";
 import {
@@ -18,9 +18,8 @@ import {
 	extensionsInitialiseEngineServer,
 	shutdownExtensions
 } from "./builders/extensionsBuilder.js";
-import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
-import { finalizeMigrations, initialiseMigrations } from "./builders/helper/migrationHelper.js";
 import { executeCommand } from "./cli.js";
+import { finalizeMigrations, initialiseMigrations } from "./migration.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
 import type { IEngineEnvironmentVariables } from "./models/IEngineEnvironmentVariables.js";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
@@ -51,8 +50,12 @@ export async function start(
 	  }
 	| undefined
 > {
-	const entityStorageConnectorType = commaSeparatedListToArray(envVars.entityStorageConnectorType);
-	const blobStorageConnectorType = commaSeparatedListToArray(envVars.blobStorageConnectorType);
+	const entityStorageConnectorType = EnvHelper.commaSeparatedListToArray(
+		envVars.entityStorageConnectorType
+	);
+	const blobStorageConnectorType = EnvHelper.commaSeparatedListToArray(
+		envVars.blobStorageConnectorType
+	);
 
 	const requiresEngineStarted = cliCommand?.definition?.requiresEngineStarted ?? true;
 	const requiresNodeIdentity = cliCommand?.definition?.requiresNodeIdentity ?? true;

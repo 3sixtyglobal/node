@@ -1,13 +1,15 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { I18n } from "@twin.org/core";
+import { ModuleHelper, ModuleResolutionHelper } from "@twin.org/modules";
 import { DEPRECATED_ENVIRONMENT_VARIABLE_KEYS } from "../src/models/deprecatedEnvironmentVariableKeys.js";
-import { buildConfiguration } from "../src/node.js";
+import { buildConfiguration, overrideModuleImport } from "../src/node.js";
 
 vi.mock("../src/builders/engineEnvBuilder.js", () => ({
 	buildEngineConfiguration: vi.fn().mockResolvedValue({ types: {} })
@@ -231,7 +233,7 @@ describe("node", () => {
 					SERVER_INFO
 				)
 			).rejects.toMatchObject({
-				source: "node",
+				source: "EnvHelper",
 				message: expect.stringContaining("unknownEnvVars"),
 				properties: { keys: expect.stringContaining("TWIN_HEALTH_CHECK_STARTUP_INTERVAL") }
 			});
@@ -412,7 +414,7 @@ describe("node", () => {
 					SERVER_INFO
 				)
 			).rejects.toMatchObject({
-				source: "node",
+				source: "EnvHelper",
 				message: expect.stringContaining("unknownEnvVars"),
 				properties: { keys: expect.stringContaining("TWIN_REST_ROUTE_TENANT_ADMIN") }
 			});
@@ -449,7 +451,7 @@ describe("node", () => {
 						SERVER_INFO
 					)
 				).rejects.toMatchObject({
-					source: "node",
+					source: "EnvHelper",
 					message: expect.stringContaining("unknownEnvVars"),
 					properties: { keys: expect.stringContaining("MYAPP_UNKNOWN_SETTING") }
 				});
@@ -492,6 +494,83 @@ describe("node", () => {
 						SERVER_INFO
 					)
 				).resolves.toBeDefined();
+			});
+		});
+	});
+
+	describe("overrideModuleImport", () => {
+		test("worker threads import local modules from the execution directory", async () => {
+			await writeFile(
+				path.join(tempDir, "workerModule.js"),
+				"export function add(a, b) { return a + b; }"
+			);
+
+			overrideModuleImport(tempDir);
+
+			await expect(
+				ModuleHelper.execModuleMethodThread("./workerModule.js", "add", [2, 3])
+			).resolves.toEqual(5);
+		});
+
+		describe("nested dependencies", () => {
+			let hostDir: string;
+
+			beforeAll(async () => {
+				// The host only depends on host-dep, nested-dep is installed below host-dep and not hoisted.
+				hostDir = path.join(tempDir, "nested-host");
+				const hostDepDir = path.join(hostDir, "node_modules", "host-dep");
+				const nestedDepDir = path.join(hostDepDir, "node_modules", "nested-dep");
+				await mkdir(nestedDepDir, { recursive: true });
+				await writeFile(
+					path.join(hostDir, "package.json"),
+					JSON.stringify({ name: "nested-host", dependencies: { "host-dep": "1.0.0" } })
+				);
+				await writeFile(
+					path.join(hostDepDir, "package.json"),
+					JSON.stringify({ name: "host-dep", dependencies: { "nested-dep": "1.0.0" } })
+				);
+				await writeFile(
+					path.join(nestedDepDir, "package.json"),
+					JSON.stringify({ name: "nested-dep", type: "module", main: "index.js" })
+				);
+				await writeFile(
+					path.join(nestedDepDir, "index.js"),
+					"export function multiply(a, b) { return a * b; }"
+				);
+			});
+
+			test("worker threads import a package only installed as a nested dependency", async () => {
+				overrideModuleImport(hostDir);
+
+				await expect(
+					ModuleHelper.execModuleMethodThread("nested-dep", "multiply", [2, 3])
+				).resolves.toEqual(6);
+			});
+
+			test("main thread imports a package only installed as a nested dependency", async () => {
+				overrideModuleImport(hostDir);
+
+				const multiply = await ModuleHelper.getModuleEntry<(a: number, b: number) => number>(
+					"nested-dep",
+					"multiply"
+				);
+				expect(multiply(3, 4)).toEqual(12);
+			});
+
+			test("resolves a file URL to the module path", async () => {
+				overrideModuleImport(hostDir);
+
+				const modulePath = path.join(
+					hostDir,
+					"node_modules",
+					"host-dep",
+					"node_modules",
+					"nested-dep",
+					"index.js"
+				);
+				await expect(ModuleHelper.resolveModule(pathToFileURL(modulePath).href)).resolves.toEqual(
+					ModuleResolutionHelper.createModuleImportUrl(modulePath)
+				);
 			});
 		});
 	});

@@ -1106,13 +1106,13 @@ describe("migration - index rebuilds", () => {
 				expect(secondPolicyRows[0].action).toBeUndefined();
 				expect(secondPolicyRows[0].dateCreated).toBe("2026-04-01T00:00:00.000Z");
 
-				// A policy stored before the creation date was recorded is given the migration time,
-				// as the index orders and pages on that column.
+				// A policy stored before the creation date was recorded is given the epoch, as the
+				// index orders and pages on that column and a repeated run must produce the same entry.
 				const thirdPolicyRows = rows.filter(r => r.policyId === "policy-3");
 				expect(thirdPolicyRows).toHaveLength(1);
 				expect(thirdPolicyRows[0].assigner).toBe("did:d");
 				expect(thirdPolicyRows[0].assignee).toBeUndefined();
-				expect(new Date(thirdPolicyRows[0].dateCreated).toString()).not.toBe("Invalid Date");
+				expect(thirdPolicyRows[0].dateCreated).toBe("1970-01-01T00:00:00.000Z");
 			} finally {
 				await run2?.shutdown();
 			}
@@ -1312,8 +1312,7 @@ describe("migration - index rebuilds", () => {
 
 			// The policies are migrated in descending creation order with the undated one first, so
 			// the rows of the first two are in the live index when the third fails on an assigner
-			// longer than the index bound. The undated one is stamped with the migration time on
-			// every run.
+			// longer than the index bound. The undated one is stamped with the epoch on every run.
 			const seedConnector = new MemoryEntityStorageConnector<OdrlPolicyV0>({
 				entitySchema: "OdrlPolicyV0",
 				config: { storageKey: "odrl-policy" }
@@ -1389,7 +1388,7 @@ describe("migration - index rebuilds", () => {
 				);
 
 				// The rows the failed run wrote are written again under the same ids, including the
-				// undated policy whose creation date differs between the runs.
+				// undated policy.
 				expect(
 					rows
 						.map(r => `${r.policyId}|${[r.assigner, r.assignee, r.target, r.action].join(",")}`)

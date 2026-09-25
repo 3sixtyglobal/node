@@ -726,7 +726,7 @@ describe("buildEngineConfiguration - mailbox", () => {
 		await expect(buildEngineConfiguration({ emailProtocolConnector: "imap4" })).rejects.toThrow(
 			expect.objectContaining({
 				name: "GeneralError",
-				source: "node",
+				source: "EnvHelper",
 				properties: expect.objectContaining({ key: "emailProtocolConnector" })
 			})
 		);
@@ -776,7 +776,7 @@ describe("buildEngineConfiguration - data processing", () => {
 		await expect(buildEngineConfiguration({ dataConverterConnectors: "json,xnl" })).rejects.toThrow(
 			expect.objectContaining({
 				name: "GeneralError",
-				source: "node",
+				source: "EnvHelper",
 				properties: expect.objectContaining({ key: "dataConverterConnectors" })
 			})
 		);
@@ -912,7 +912,7 @@ describe("buildEngineConfiguration - telemetry metrics producers", () => {
 		).rejects.toThrow(
 			expect.objectContaining({
 				name: "GeneralError",
-				source: "node",
+				source: "EnvHelper",
 				properties: expect.objectContaining({ key: "telemetryMetricsProducers" })
 			})
 		);

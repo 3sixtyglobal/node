@@ -6,3 +6,4 @@ pnpm-lock.yaml
 changelog.md
 release/**
 **/.out
+_tmp_*

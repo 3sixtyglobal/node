@@ -1,10 +1,9 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@twin.org/cli-core";
-import { GeneralError, I18n, Is } from "@twin.org/core";
+import { EnvHelper, GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore, IEngineServer } from "@twin.org/engine-models";
 import { ModuleHelper } from "@twin.org/modules";
-import { commaSeparatedListToArray } from "./helper/envHelpers.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { NodeExtensionInitialiseEngineMethod } from "../models/nodeExtensionInitialiseEngineMethod.js";
@@ -25,7 +24,7 @@ export async function extensionsConfiguration(
 	nodeEngineConfig: INodeEngineConfig
 ): Promise<INodeEngineConfig> {
 	if (Is.stringValue(envVars.extensions)) {
-		const extensions = commaSeparatedListToArray<string>(envVars.extensions);
+		const extensions = EnvHelper.commaSeparatedListToArray<string>(envVars.extensions);
 
 		for (const extension of extensions) {
 			let initialiseConfigMethod: NodeExtensionInitialiseMethod | undefined;
@@ -60,7 +59,7 @@ export async function extensionsInitialiseEngine(
 	engineCore: IEngineCore
 ): Promise<void> {
 	if (Is.stringValue(envVars.extensions)) {
-		const extensions = commaSeparatedListToArray<string>(envVars.extensions);
+		const extensions = EnvHelper.commaSeparatedListToArray<string>(envVars.extensions);
 
 		for (const extension of extensions) {
 			extensionState[extension] ??= { initialised: false };
@@ -101,7 +100,7 @@ export async function extensionsInitialiseEngineServer(
 	engineServer: IEngineServer
 ): Promise<void> {
 	if (Is.stringValue(envVars.extensions)) {
-		const extensions = commaSeparatedListToArray<string>(envVars.extensions);
+		const extensions = EnvHelper.commaSeparatedListToArray<string>(envVars.extensions);
 
 		for (const extension of extensions) {
 			let initialiseEngineServerMethod: NodeExtensionInitialiseEngineServerMethod | undefined;
@@ -134,7 +133,7 @@ export async function shutdownExtensions(
 	engineCore: IEngineCore
 ): Promise<void> {
 	if (Is.stringValue(envVars.extensions)) {
-		const extensions = commaSeparatedListToArray<string>(envVars.extensions);
+		const extensions = EnvHelper.commaSeparatedListToArray<string>(envVars.extensions);
 
 		for (const extension of extensions) {
 			extensionState[extension] ??= { initialised: false };

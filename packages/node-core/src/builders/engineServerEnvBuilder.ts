@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IServerInfo, IWebServerOptions } from "@twin.org/api-models";
 import { ContextIdKeys } from "@twin.org/context";
-import { Coerce, Is, StringHelper } from "@twin.org/core";
+import { Coerce, EnvHelper, Is, StringHelper } from "@twin.org/core";
 import type { IEngineCoreConfig } from "@twin.org/engine-models";
 import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
 import {
@@ -20,7 +20,6 @@ import { TraceparentHelper } from "@twin.org/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isTelemetryEnabled, isTracingEnabled } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-import { commaSeparatedListToArray, envKeyIntegerPairs, envMs } from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -43,14 +42,14 @@ export async function buildEngineServerConfiguration(
 	const webServerOptions: IWebServerOptions = {
 		port: Coerce.number(envVars.port),
 		host: Coerce.string(envVars.host),
-		methods: commaSeparatedListToArray(envVars.httpMethods, undefined),
-		allowedHeaders: commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
-		exposedHeaders: commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
-		corsOrigins: commaSeparatedListToArray(envVars.corsOrigins, undefined),
-		bodyLimits: envKeyIntegerPairs(envVars, "httpBodyLimits"),
+		methods: EnvHelper.commaSeparatedListToArray(envVars.httpMethods, undefined),
+		allowedHeaders: EnvHelper.commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
+		exposedHeaders: EnvHelper.commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
+		corsOrigins: EnvHelper.commaSeparatedListToArray(envVars.corsOrigins, undefined),
+		bodyLimits: EnvHelper.envKeyIntegerPairs(envVars, "httpBodyLimits"),
 		publicOrigin: Coerce.string(envVars.publicOrigin),
 		customWebConfig: {
-			pluginTimeout: envMs(envVars, "fastifyPluginTimeout", 30000)
+			pluginTimeout: EnvHelper.envMs(envVars, "fastifyPluginTimeout", 30000)
 		}
 	};
 
@@ -91,7 +90,7 @@ export async function buildEngineServerConfiguration(
 	};
 
 	if (Is.stringValue(envVars.mimeTypeProcessors)) {
-		const mimeTypeProcessors = commaSeparatedListToArray(envVars.mimeTypeProcessors);
+		const mimeTypeProcessors = EnvHelper.commaSeparatedListToArray(envVars.mimeTypeProcessors);
 
 		if (Is.arrayValue(mimeTypeProcessors)) {
 			serverConfig.types.mimeTypeProcessor ??= [];
@@ -171,7 +170,7 @@ export async function buildEngineServerConfiguration(
 	if (!coreEngineConfig.silent) {
 		const includeBody = Coerce.boolean(envVars.routeLoggingIncludeBody) ?? coreEngineConfig.debug;
 		const fullBase64 = Coerce.boolean(envVars.routeLoggingFullBase64) ?? false;
-		const obfuscateProperties = commaSeparatedListToArray<string>(
+		const obfuscateProperties = EnvHelper.commaSeparatedListToArray<string>(
 			envVars.routeLoggingObfuscateProperties,
 			undefined
 		);
@@ -251,7 +250,7 @@ export async function buildEngineServerConfiguration(
 			options: {
 				config: {
 					signingKeyName: envVars.authSigningKeyId,
-					tokenCacheMutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
+					tokenCacheMutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
 				}
 			}
 		});
@@ -260,7 +259,7 @@ export async function buildEngineServerConfiguration(
 			options: {
 				config: {
 					signingKeyName: envVars.authSigningKeyId,
-					tokenCacheMutexTimeoutMs: envMs(envVars, "mutexTimeoutDefault")
+					tokenCacheMutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
 				}
 			}
 		});
@@ -285,7 +284,7 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.Metrics,
 			options: {
 				config: {
-					excludePaths: commaSeparatedListToArray<string>(
+					excludePaths: EnvHelper.commaSeparatedListToArray<string>(
 						envVars.routeMetricsExcludePaths,
 						undefined
 					)
@@ -299,7 +298,7 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.Tracing,
 			options: {
 				config: {
-					excludePaths: commaSeparatedListToArray<string>(
+					excludePaths: EnvHelper.commaSeparatedListToArray<string>(
 						envVars.routeTracingExcludePaths,
 						undefined
 					)

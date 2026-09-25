@@ -1,12 +1,12 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type {
-	AuditableItemGraphVertex,
-	AuditableItemGraphVertexIndex,
-	AuditableItemGraphVertexV1
+import {
+	AuditableItemGraphVertexIndexHelper,
+	type AuditableItemGraphVertex,
+	type AuditableItemGraphVertexIndex,
+	type AuditableItemGraphVertexV1
 } from "@twin.org/auditable-item-graph-service";
-import { Converter, GeneralError, JsonHelper, ObjectHelper, StringHelper } from "@twin.org/core";
-import { Blake2b } from "@twin.org/crypto";
+import { EnvHelper, GeneralError, StringHelper } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import type { IEntitySchemaProperty } from "@twin.org/entity";
 import {
@@ -16,13 +16,13 @@ import {
 	type ISchemaMigration
 } from "@twin.org/entity-storage-models";
 import { nameof } from "@twin.org/nameof";
-import type {
-	OdrlPolicy,
-	OdrlPolicyIndex,
-	OdrlPolicyV0
+import {
+	OdrlPolicyIndexHelper,
+	type OdrlPolicy,
+	type OdrlPolicyIndex,
+	type OdrlPolicyV0
 } from "@twin.org/rights-management-pap-service";
-import { envBoolean } from "./envHelpers.js";
-import type { IEnvironmentVariables } from "../../models/IEnvironmentVariables.js";
+import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 
 /**
  * Initialise schema migrations for the engine.
@@ -33,7 +33,7 @@ export function initialiseMigrations(
 	engineCore: IEngineCore,
 	envVars: IEnvironmentVariables
 ): void {
-	if (!envBoolean(envVars, "schemaMigrationEnabled", true)) {
+	if (!EnvHelper.envBoolean(envVars, "schemaMigrationEnabled", true)) {
 		return;
 	}
 
@@ -102,14 +102,15 @@ function migrationAigIndexes(): void {
 			}
 
 			// The context ids already contain the correct partition information for the indexes.
-			const entries: AuditableItemGraphVertexIndex[] = values.map(({ type, value }) => ({
-				id: indexRowId({ vertexId: entity.id, type, value }),
-				vertexId: entity.id,
-				type,
-				value,
-				dateCreated: entity.dateCreated,
-				dateModified: entity.dateModified ?? entity.dateCreated
-			}));
+			const entries: AuditableItemGraphVertexIndex[] = values.map(v =>
+				AuditableItemGraphVertexIndexHelper.createIndexEntry(
+					entity.id,
+					v.type,
+					v.value,
+					entity.dateCreated,
+					entity.dateModified ?? entity.dateCreated
+				)
+			);
 
 			await writeIndexEntries(aigIndexEntityStorage, entries, entity.id);
 		}
@@ -149,8 +150,8 @@ function migrationPapIndexes(): void {
 			const actions = splitPolicyIndex(entity.actionIndex);
 
 			// The entries are ordered by the creation date, so a policy stored before the date was
-			// recorded is given the migration time rather than leaving the column empty.
-			const dateCreated = entity.dateCreated ?? new Date(Date.now()).toISOString();
+			// recorded is given the epoch, which keeps a repeated run producing the same entries.
+			const dateCreated = entity.dateCreated ?? new Date(0).toISOString();
 
 			// One entry per combination of assigner, assignee, target and action, which is what lets
 			// a locator covering several of those fields be answered by a single lookup.
@@ -159,15 +160,16 @@ function migrationPapIndexes(): void {
 				for (const assignee of assignees) {
 					for (const target of targets) {
 						for (const action of actions) {
-							entries.push({
-								id: indexRowId({ policyId: entity.id, assigner, assignee, target, action }),
-								policyId: entity.id,
-								assigner,
-								assignee,
-								target,
-								action,
-								dateCreated
-							});
+							entries.push(
+								OdrlPolicyIndexHelper.createIndexEntry(
+									entity.id,
+									dateCreated,
+									assigner,
+									assignee,
+									target,
+									action
+								)
+							);
 						}
 					}
 				}
@@ -200,18 +202,6 @@ function splitPolicyIndex(index: string | undefined): (string | undefined)[] {
 	}
 
 	return values.length === 0 ? [undefined] : values;
-}
-
-/**
- * Build the id of an index row from the values which identify it, so a repeated migration
- * writes the same row instead of a duplicate.
- * @param identity The owner id and the index values of the row.
- * @returns The hex encoded hash.
- */
-function indexRowId(identity: { [id: string]: string | undefined }): string {
-	return Converter.bytesToHex(
-		Blake2b.sum256(ObjectHelper.toBytes(JsonHelper.canonicalize(identity)))
-	);
 }
 
 /**

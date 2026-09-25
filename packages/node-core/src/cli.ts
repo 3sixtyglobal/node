@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdStore } from "@twin.org/context";
-import { Coerce, GeneralError, I18n, Is, StringHelper } from "@twin.org/core";
+import { Coerce, EnvHelper, GeneralError, I18n, Is, StringHelper } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import * as dotenv from "dotenv";
-import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { getCommandDefinitionBootstrapDev } from "./commands/bootstrapDev.js";
 import { getCommandDefinitionHelp } from "./commands/help.js";
 import { getCommandDefinitionIdentityCreate } from "./commands/identityCreate.js";
@@ -277,7 +276,7 @@ export function processEnvOptions(
 	const inputEnv = options.find(option => option.key === "load-env")?.value;
 
 	if (Is.stringValue(inputEnv)) {
-		const envFiles = commaSeparatedListToArray<string>(inputEnv);
+		const envFiles = EnvHelper.commaSeparatedListToArray<string>(inputEnv);
 		for (const envFile of envFiles) {
 			const output = dotenv.config({
 				path: envFile,

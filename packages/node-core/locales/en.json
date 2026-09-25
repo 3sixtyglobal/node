@@ -6,17 +6,10 @@
 			"tenantsWithoutOrganizationId": "The following tenants have no organization ID assigned. Use the \"tenant-org-id-set\" command to assign one before starting the node: {tenantIds}",
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
 			"extensionLoadingError": "Failed to load extension \"{extension}\"",
-			"insecureProtocol": "Cannot load extension from insecure protocol: {protocol}. Only HTTPS is allowed for remote extensions.",
-			"extensionDownloadFailed": "Failed to download extension from {url}",
-			"extensionNpmInstallFailed": "Failed to install npm extension: {package}",
-			"extensionSizeLimitExceeded": "Extension download size exceeds limit: {size} bytes > {limit} bytes",
 			"cliCommandMissing": "CLI command \"{command}\" is not recognised",
 			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
-			"invalidEnvVarValue": "Environment variable \"{key}\" has an invalid value \"{value}\", expected {type} type",
-			"invalidEnvVarPair": "Environment variable \"{key}\" has an invalid entry \"{value}\", expected unique name=integer pairs",
-			"unknownEnvVars": "Unknown environment variable properties [{keys}]. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST.",
 			"migrationIndexWriteFailed": "Failed to write the index entries for entity \"{id}\" during migration"
 		},
 		"bootstrapDev": {
@@ -135,11 +128,6 @@
 		"extensionShutdown": "Shutdown extension \"{extension}\"",
 		"extendingEngine": "Extending Engine",
 		"extendingEngineServer": "Extending Engine Server",
-		"extensionSecurityWarning": "SECURITY WARNING: Loading extension from external URL: {url}",
-		"extensionNpmInstalling": "Installing npm extension",
-		"extensionHttpsDownloading": "Downloading HTTPS extension",
-		"extensionCacheExpired": "Cache expired for extension: {url}",
-		"extensionForceRefresh": "Force refresh enabled for extension: {url}",
 		"tenantOrganizationIdAutoAssigned": "Legacy migration: automatically assigned organization ID \"{organizationId}\" to tenant \"{tenantId}\".",
 		"cli": {
 			"commands": {

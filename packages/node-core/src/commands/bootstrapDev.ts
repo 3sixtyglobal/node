@@ -4,14 +4,13 @@ import type { IAuthenticationAdminComponent } from "@twin.org/api-auth-entity-st
 import type { ITenantAdminComponent } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
 import { tenantCreate } from "./tenantCreate.js";
 import { userCreate } from "./userCreate.js";
 import { vaultKeyCreate } from "./vaultKeyCreate.js";
-import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -67,7 +66,7 @@ export async function bootstrapDev(
 	envVars: IEnvironmentVariables,
 	params: {}
 ): Promise<void> {
-	const features = commaSeparatedListToArray(envVars.features ?? "admin-user,wallet");
+	const features = EnvHelper.commaSeparatedListToArray(envVars.features ?? "admin-user,wallet");
 
 	const state = engineCore.getState();
 	const requireWallet = features.includes("wallet");
