@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.1-next.9](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.8...node-v0.10.1-next.9) (2026-09-26)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.10.1-next.8 to 0.10.1-next.9
+
 ## [0.10.1-next.8](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.7...node-v0.10.1-next.8) (2026-09-25)
 
 
