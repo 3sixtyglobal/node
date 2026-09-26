@@ -205,7 +205,7 @@ function splitPolicyIndex(index: string | undefined): (string | undefined)[] {
 }
 
 /**
- * Write the index rows of one entity, naming the entity when a row cannot be written.
+ * Write the index rows of one entity.
  * @param indexEntityStorage The index storage to write to.
  * @param entries The rows to write.
  * @param id The id of the entity the rows belong to.
