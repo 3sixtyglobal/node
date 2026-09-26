@@ -2,7 +2,7 @@
 	"group": "Federated Catalogue",
 	"steps": [
 		{
-			"description": "POST /catalog/datasets — create dataset",
+			"description": "POST /catalog/datasets - create dataset",
 			"method": "POST",
 			"path": "/catalog/datasets",
 			"headers": {
@@ -38,7 +38,7 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /catalog/request — 400 missing @type",
+			"description": "POST /catalog/request - 400 missing @type",
 			"method": "POST",
 			"path": "/catalog/request",
 			"headers": {
@@ -51,7 +51,7 @@
 			"assert": { "body.@type": "CatalogError" }
 		},
 		{
-			"description": "POST /catalog/request — 400 filter not an array",
+			"description": "POST /catalog/request - 400 filter not an array",
 			"method": "POST",
 			"path": "/catalog/request",
 			"headers": {
@@ -66,7 +66,7 @@
 			"assert": { "body.@type": "CatalogError" }
 		},
 		{
-			"description": "GET /catalog/datasets/:datasetId — 200 known dataset",
+			"description": "GET /catalog/datasets/:datasetId - 200 known dataset",
 			"method": "GET",
 			"path": "/catalog/datasets/{{fedCatDatasetId}}",
 			"headers": {
@@ -76,7 +76,7 @@
 			"assert": { "body.@type": "Dataset" }
 		},
 		{
-			"description": "GET /catalog/datasets/:datasetId — 404 unknown dataset",
+			"description": "GET /catalog/datasets/:datasetId - 404 unknown dataset",
 			"method": "GET",
 			"path": "/catalog/datasets/{{fakeId}}",
 			"headers": {
@@ -86,7 +86,7 @@
 			"assert": { "body.@type": "CatalogError" }
 		},
 		{
-			"description": "DELETE /catalog/datasets/:datasetId — delete dataset",
+			"description": "DELETE /catalog/datasets/:datasetId - delete dataset",
 			"method": "DELETE",
 			"path": "/catalog/datasets/{{fedCatDatasetId}}",
 			"headers": {

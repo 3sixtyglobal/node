@@ -2,7 +2,7 @@
 	"group": "Global Admin - Unauthorised user cannot use override-tenant",
 	"steps": [
 		{
-			"description": "POST /identity — create identity for regular test user",
+			"description": "POST /identity - create identity for regular test user",
 			"method": "POST",
 			"path": "/identity",
 			"body": {},
@@ -10,7 +10,7 @@
 			"capture": { "regularUserDid": "body.id" }
 		},
 		{
-			"description": "POST /authentication/admin/users — create user without global-admin scope",
+			"description": "POST /authentication/admin/users - create user without global-admin scope",
 			"method": "POST",
 			"path": "/authentication/admin/users",
 			"body": {
@@ -23,7 +23,7 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /authentication/login — login as regular user (no global-admin scope)",
+			"description": "POST /authentication/login - login as regular user (no global-admin scope)",
 			"method": "POST",
 			"path": "/authentication/login",
 			"apiKey": true,
@@ -32,7 +32,7 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "POST /aig?override-tenant — rejected without global-admin scope",
+			"description": "POST /aig?override-tenant - rejected without global-admin scope",
 			"method": "POST",
 			"path": "/aig?override-tenant={{secondTenantId}}",
 			"body": {
@@ -42,7 +42,7 @@
 			"expectedStatus": 403
 		},
 		{
-			"description": "POST /authentication/login — restore admin session",
+			"description": "POST /authentication/login - restore admin session",
 			"method": "POST",
 			"path": "/authentication/login",
 			"apiKey": true,
@@ -51,13 +51,13 @@
 			"capture": { "authToken": "cookie:access_token", "organizationId": "jwt-claim:org" }
 		},
 		{
-			"description": "DELETE /authentication/admin/users — remove regular test user",
+			"description": "DELETE /authentication/admin/users - remove regular test user",
 			"method": "DELETE",
 			"path": "/authentication/admin/users/regular-user%40node",
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /identity/:regularUserDid — remove regular user identity",
+			"description": "DELETE /identity/:regularUserDid - remove regular user identity",
 			"method": "DELETE",
 			"path": "/identity/{{regularUserDid}}",
 			"expectedStatus": 204

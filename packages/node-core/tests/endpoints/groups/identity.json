@@ -2,7 +2,7 @@
 	"group": "Identity",
 	"steps": [
 		{
-			"description": "POST /identity — create test identity",
+			"description": "POST /identity - create test identity",
 			"method": "POST",
 			"path": "/identity",
 			"body": {},
@@ -139,7 +139,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "DELETE /identity/profile — remove before recreating",
+			"description": "DELETE /identity/profile - remove before recreating",
 			"method": "DELETE",
 			"path": "/identity/profile",
 			"expectedStatus": 204

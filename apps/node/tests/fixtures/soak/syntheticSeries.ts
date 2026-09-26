@@ -42,7 +42,7 @@ export interface ISyntheticSeriesOptions {
 	 */
 	floorSlopeMbPerHr?: number;
 	/**
-	 * Extra floor rise (MB) that ramps in linearly and then plateaus — models cold-cache/pool
+	 * Extra floor rise (MB) that ramps in linearly and then plateaus - models cold-cache/pool
 	 * fill rather than a genuine leak. Zero disables it.
 	 */
 	warmupRiseMb?: number;
@@ -106,7 +106,7 @@ export function generateSyntheticSeries(options: ISyntheticSeriesOptions): IMemo
 }
 
 /**
- * A flat series with no real growth — the ground truth is "pass". Different seeds give
+ * A flat series with no real growth - the ground truth is "pass". Different seeds give
  * independent noise realizations of the same identical-code scenario the issue describes.
  * @param seed The PRNG seed.
  * @returns The generated series.
@@ -116,11 +116,11 @@ export function generateFlatSeries(seed: number): IMemorySample[] {
 }
 
 /**
- * A genuine sustained leak — the ground truth is "breach". The positive control the issue's
+ * A genuine sustained leak - the ground truth is "breach". The positive control the issue's
  * second acceptance criterion requires, since no archived run has a real sampled leak.
  * @param seed The PRNG seed.
  * @param slopeMbPerHr The sustained floor growth rate, in MB/hour. Defaults to 300.
- * @param sampleCount Total samples — 181 for a 30m run, 361 to model one 30m extension.
+ * @param sampleCount Total samples - 181 for a 30m run, 361 to model one 30m extension.
  * @returns The generated series.
  */
 export function generateLeakSeries(
@@ -132,7 +132,7 @@ export function generateLeakSeries(
 }
 
 /**
- * A rise that plateaus well before the run ends (cold-cache/pool fill, not a leak) — the
+ * A rise that plateaus well before the run ends (cold-cache/pool fill, not a leak) - the
  * ground truth is "pass". Models the settling pattern, not a sustained trend.
  * @param seed The PRNG seed.
  * @returns The generated series.
@@ -142,7 +142,7 @@ export function generateWarmupOnlySeries(seed: number): IMemorySample[] {
 }
 
 /**
- * A rise that only plateaus near the very end of the run — the harder edge case, since a
+ * A rise that only plateaus near the very end of the run - the harder edge case, since a
  * short-tailed estimator may still see it as rising. Ground truth is still "pass": it settles
  * within the window, it just does so late. Models next16-run2-clean-db's cold-start pattern
  * more closely than generateWarmupOnlySeries.
@@ -154,14 +154,14 @@ export function generateWarmupLateSeries(seed: number): IMemorySample[] {
 }
 
 /**
- * A slow-settling rise that takes half the run to plateau (15m of a 30m window) — long enough,
+ * A slow-settling rise that takes half the run to plateau (15m of a 30m window) - long enough,
  * and large enough relative to the window, that the whole-window fit still reads as a breach at
  * 30 minutes even though the system has genuinely settled. Ground truth is "pass", but only
  * once observed for longer: this is the real edge case the Phase 4 auto-extend protocol exists
  * for, verified empirically to resolve once the same series is generated with a larger
  * sampleCount (the PRNG draws are identical for the shared prefix, so extending is exact).
  * @param seed The PRNG seed.
- * @param sampleCount Total samples — 181 for the initial 30m run, 361 to model one 30m extension.
+ * @param sampleCount Total samples - 181 for the initial 30m run, 361 to model one 30m extension.
  * @returns The generated series.
  */
 export function generateSlowSettlingSeries(seed: number, sampleCount = 181): IMemorySample[] {
@@ -176,7 +176,7 @@ export function generateSlowSettlingSeries(seed: number, sampleCount = 181): IMe
 /**
  * A short window (12m) carrying a leak-like slope. Landed as "informational" (window too short
  * to enforce, not "breach") when measured: 72 samples at the default 10s cadence span ~590s of
- * usable window after a 2m discard — just under the 10m minimum. Useful for the Phase 4 trigger
+ * usable window after a 2m discard - just under the 10m minimum. Useful for the Phase 4 trigger
  * table test's negative case (informational never extends), not for the estimator-selection
  * matrix or for exercising a resolved breach.
  * @param seed The PRNG seed.

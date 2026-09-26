@@ -2,7 +2,7 @@
 	"group": "Automation",
 	"steps": [
 		{
-			"description": "POST /automation — 400 missing actionType",
+			"description": "POST /automation - 400 missing actionType",
 			"method": "POST",
 			"path": "/automation",
 			"body": {
@@ -12,7 +12,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /automation — 400 missing trigger",
+			"description": "POST /automation - 400 missing trigger",
 			"method": "POST",
 			"path": "/automation",
 			"body": {
@@ -43,7 +43,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /automation — list",
+			"description": "GET /automation - list",
 			"method": "GET",
 			"path": "/automation",
 			"expectedStatus": 200
@@ -62,7 +62,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /automation/:actionId — 404 after delete",
+			"description": "GET /automation/:actionId - 404 after delete",
 			"method": "GET",
 			"path": "/automation/{{automationActionId}}",
 			"expectedStatus": 404

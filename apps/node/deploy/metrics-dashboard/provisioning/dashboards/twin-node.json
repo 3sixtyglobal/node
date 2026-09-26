@@ -279,7 +279,7 @@
 			"collapsed": false,
 			"gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
 			"id": 11,
-			"title": "App Demo Metrics (app_*) — copy src/metrics/ for your own app",
+			"title": "App Demo Metrics (app_*) - copy src/metrics/ for your own app",
 			"type": "row"
 		},
 		{
@@ -307,7 +307,7 @@
 					"refId": "A"
 				}
 			],
-			"title": "Event Loop Lag — Mean (ms)",
+			"title": "Event Loop Lag - Mean (ms)",
 			"type": "timeseries"
 		},
 		{
@@ -335,7 +335,7 @@
 					"refId": "A"
 				}
 			],
-			"title": "Event Loop Lag — Max (ms)",
+			"title": "Event Loop Lag - Max (ms)",
 			"type": "timeseries"
 		},
 		{
@@ -367,7 +367,7 @@
 					"format": "table"
 				}
 			],
-			"title": "App Info (version / platform / nodeEnv — customData labels)",
+			"title": "App Info (version / platform / nodeEnv - customData labels)",
 			"type": "table",
 			"transformations": [
 				{

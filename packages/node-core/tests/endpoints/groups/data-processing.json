@@ -2,7 +2,7 @@
 	"group": "Data Processing",
 	"steps": [
 		{
-			"description": "PUT /data-processing/rule-group/:id — create rule group",
+			"description": "PUT /data-processing/rule-group/:id - create rule group",
 			"method": "PUT",
 			"path": "/data-processing/rule-group/{{ruleGroupId}}",
 			"body": { "label": "Test Rule Group", "rules": [{ "source": "$.name", "target": "name" }] },
@@ -15,7 +15,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /data-processing/rule-group — list",
+			"description": "GET /data-processing/rule-group - list",
 			"method": "GET",
 			"path": "/data-processing/rule-group",
 			"expectedStatus": 200

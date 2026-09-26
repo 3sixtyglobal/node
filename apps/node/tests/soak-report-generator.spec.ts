@@ -45,7 +45,7 @@ describe("soak report generator", () => {
 			expect(entry.p95).toBeCloseTo(527.3325592000004);
 			expect(entry.p95Threshold).toEqual(3300);
 			expect(entry.runUrl).toBeNull();
-			// No startedIso in this fixture — falls back to the epoch sentinel (sorts last in
+			// No startedIso in this fixture - falls back to the epoch sentinel (sorts last in
 			// updateManifest) rather than throwing or producing the literal string "undefined".
 			expect(entry.date).toEqual(new Date(0).toISOString());
 		});
@@ -403,7 +403,7 @@ describe("soak report generator", () => {
 
 			expect(redacted.setup_data.token).toEqual("******");
 			expect(redacted.setup_data.org).toEqual("did:x");
-			// The input is not mutated — callers that hold a reference to the original see it unchanged.
+			// The input is not mutated - callers that hold a reference to the original see it unchanged.
 			expect(summary.setup_data.token).toEqual("eyJ.real.jwt");
 		});
 

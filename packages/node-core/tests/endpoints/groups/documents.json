@@ -2,7 +2,7 @@
 	"group": "Document Management",
 	"steps": [
 		{
-			"description": "POST /documents — 400 missing blob",
+			"description": "POST /documents - 400 missing blob",
 			"method": "POST",
 			"path": "/documents",
 			"body": {
@@ -15,7 +15,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /documents — 400 missing documentId",
+			"description": "POST /documents - 400 missing documentId",
 			"method": "POST",
 			"path": "/documents",
 			"body": {
@@ -43,13 +43,13 @@
 			"capture": { "docGraphId": "location-last-segment" }
 		},
 		{
-			"description": "GET /documents/:id — 404 for unknown id",
+			"description": "GET /documents/:id - 404 for unknown id",
 			"method": "GET",
 			"path": "/documents/aig:nonexistent",
 			"expectedStatus": 404
 		},
 		{
-			"description": "GET /documents/:id — initial revision",
+			"description": "GET /documents/:id - initial revision",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}",
 			"expectedStatus": 200,
@@ -57,13 +57,13 @@
 			"assert": { "body.itemListElement.[0].documentRevision": 0 }
 		},
 		{
-			"description": "GET /documents/:id/:revision — get revision 0",
+			"description": "GET /documents/:id/:revision - get revision 0",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}/{{documentRevision}}",
 			"expectedStatus": 200
 		},
 		{
-			"description": "PATCH /documents/:id — update blob",
+			"description": "PATCH /documents/:id - update blob",
 			"method": "PATCH",
 			"path": "/documents/{{docGraphId}}",
 			"body": {
@@ -72,7 +72,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /documents/:id — revision 1 after blob update",
+			"description": "GET /documents/:id - revision 1 after blob update",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}",
 			"expectedStatus": 200,
@@ -80,19 +80,19 @@
 			"assert": { "body.itemListElement.[0].documentRevision": 1 }
 		},
 		{
-			"description": "GET /documents/:id/:revision — get revision 1",
+			"description": "GET /documents/:id/:revision - get revision 1",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}/{{documentRevision1}}",
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /documents/:id?limit=2 — both revisions in history",
+			"description": "GET /documents/:id?limit=2 - both revisions in history",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}?limit=2",
 			"expectedStatus": 200
 		},
 		{
-			"description": "PATCH /documents/:id — update blob and documentCode",
+			"description": "PATCH /documents/:id - update blob and documentCode",
 			"method": "PATCH",
 			"path": "/documents/{{docGraphId}}",
 			"body": {
@@ -104,7 +104,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /documents/:id — revision 2 after metadata update",
+			"description": "GET /documents/:id - revision 2 after metadata update",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}",
 			"expectedStatus": 200,
@@ -112,25 +112,25 @@
 			"assert": { "body.itemListElement.[0].documentRevision": 2 }
 		},
 		{
-			"description": "GET /documents/:id/:revision — get revision 2",
+			"description": "GET /documents/:id/:revision - get revision 2",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}/{{documentRevision2}}",
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /documents — list by documentId",
+			"description": "GET /documents - list by documentId",
 			"method": "GET",
 			"path": "/documents?documentId={{docId}}",
 			"expectedStatus": 200
 		},
 		{
-			"description": "DELETE /documents/:id/:revision — delete initial revision",
+			"description": "DELETE /documents/:id/:revision - delete initial revision",
 			"method": "DELETE",
 			"path": "/documents/{{docGraphId}}/{{documentRevision}}",
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /documents/:id/:revision — dateDeleted set after delete",
+			"description": "GET /documents/:id/:revision - dateDeleted set after delete",
 			"method": "GET",
 			"path": "/documents/{{docGraphId}}/{{documentRevision}}",
 			"expectedStatus": 200,

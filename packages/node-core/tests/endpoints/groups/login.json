@@ -12,7 +12,7 @@
 			"assert": { "body.expiry": "isDefined" }
 		},
 		{
-			"description": "GET /authentication/admin/users/:email — capture identities",
+			"description": "GET /authentication/admin/users/:email - capture identities",
 			"method": "GET",
 			"path": "/authentication/admin/users/{{adminEmail}}",
 			"expectedStatus": 200,
