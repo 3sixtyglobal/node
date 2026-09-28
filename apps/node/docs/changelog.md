@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.1-next.12](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.11...node-v0.10.1-next.12) (2026-09-28)
+
+
+### Features
+
+* dataspace retention config ([#458](https://github.com/iotaledger/twin-node/issues/458)) ([9d0b4ad](https://github.com/iotaledger/twin-node/commit/9d0b4adca35a959ad920b93951f5154f6841b80e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.10.1-next.11 to 0.10.1-next.12
+
 ## [0.10.1-next.11](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.10...node-v0.10.1-next.11) (2026-09-28)
 
 
