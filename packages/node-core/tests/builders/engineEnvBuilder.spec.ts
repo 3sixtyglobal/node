@@ -415,6 +415,37 @@ describe("buildEngineConfiguration - dataspace provider idle transfer policy", (
 	});
 });
 
+describe("buildEngineConfiguration - dataspace terminal transfer retention", () => {
+	const getRetention = async (value?: string): Promise<number | undefined> => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true",
+			dataspaceRetainTerminalTransfersFor: value
+		});
+
+		const dataspaceService = config.types.dataspaceControlPlaneComponent?.find(
+			entry => entry.type === DataspaceControlPlaneComponentType.Service
+		);
+
+		const dataspaceConfig = dataspaceService?.options?.config as {
+			retainTerminalTransfersForMs?: number;
+		};
+
+		return dataspaceConfig.retainTerminalTransfersForMs;
+	};
+
+	test("retention is wired in seconds and converted to milliseconds", async () => {
+		expect(await getRetention("86400")).toBe(86400000);
+	});
+
+	test("retention of -1 is passed through unchanged", async () => {
+		expect(await getRetention("-1")).toBe(-1);
+	});
+
+	test("unset retention leaves the service default in place", async () => {
+		expect(await getRetention()).toBeUndefined();
+	});
+});
+
 describe("buildEngineConfiguration - entity storage shared mutex timeout", () => {
 	test("entity storage mutex timeout applies to both memory and file connectors", async () => {
 		const config = await buildEngineConfiguration({

@@ -278,6 +278,7 @@ const engineEnvironmentVariableKeysInternal: {
 	dataspaceAutoStartTransfers: true,
 	dataspaceStalledNegotiationTimeout: true,
 	dataspaceStalledTransferTimeout: true,
+	dataspaceRetainTerminalTransfersFor: true,
 	dataspaceProviderTransferIdleTimeout: true,
 	dataspaceProviderTransferPolicySweepInterval: true,
 	dataspaceCallbackPath: true,

@@ -425,7 +425,7 @@ importers:
         version: 0.10.1-next.2
       '@twin.org/dataspace-models':
         specifier: next
-        version: 0.10.1-next.3(typescript@6.0.3)
+        version: 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/entity-storage-connector-memory':
         specifier: next
         version: 0.10.1-next.14
@@ -1989,32 +1989,32 @@ packages:
     resolution: {integrity: sha512-F2ZK2YrTpqenF8VoqTjKhNccXx6iN9UNdXkZqgVClSBwTkKe6IpYK5LqprRqSgAUUfDLySMEa3xm4PzFm/rjFQ==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-app-runner@0.10.1-next.3':
-    resolution: {integrity: sha512-Sb/KY3T19PeoapzZdsIGZsJMMQlwNdzbWAy2T0ucF9C7xprLWKDnR3JGPh327Of1LuoXFgVXIWYMqZzHNG5LGQ==}
+  '@twin.org/dataspace-app-runner@0.10.1-next.4':
+    resolution: {integrity: sha512-THirNNvaTtbGGCVoXsWdYaS2pvws4Sxl1RYRzfZNjhbzn+/Mt8CxKVVadZ7+cbn0jJsucxqIeGm46l3eYypkXg==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-control-plane-rest-client@0.10.1-next.3':
-    resolution: {integrity: sha512-wqkSiKevyaZnBVSmG6q30DOqtJmwbGBLGaini1LSNr/zqFoR4qoUeaAFvJnTyT35ZzImNR4Px3K8xrADviNobw==}
+  '@twin.org/dataspace-control-plane-rest-client@0.10.1-next.4':
+    resolution: {integrity: sha512-3b+W5gvFu0cU7O6gDUsC6HNVd8fpq1JcRt9892ghZYU5R9hDoIxHPtBSOsGTxjies3nlIhY8xcs+yd8XrVYunw==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-control-plane-service@0.10.1-next.3':
-    resolution: {integrity: sha512-kYpLaiYxffqh0vqGFwc2VIpjvo97auRW09oymv8wm1E7EPOx8Ubut5AlKkrvm0wqN5xfMtM8v15aKwZ4b9AdHA==}
+  '@twin.org/dataspace-control-plane-service@0.10.1-next.4':
+    resolution: {integrity: sha512-oBoaRYB0HixUETKdcbQHGu1/m1aheUsV9wt2PlJ5i3mAfmbFv4/WRBBNDUuDgXVYPybC68PYIIophkQC3hM1gg==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-data-plane-rest-client@0.10.1-next.3':
-    resolution: {integrity: sha512-fFvkByFoSH8m2OdHPnwlss+aoEnNQYvDI36jDugpcld3Bg8vZyLLlFAxKMkgCuQzId80UPAnEkASD4sgWOrA1g==}
+  '@twin.org/dataspace-data-plane-rest-client@0.10.1-next.4':
+    resolution: {integrity: sha512-Z5yj7mGUO0GIQkPcvmvqiXuzH2P6FpVU3OUED19i23nGIJt5lmcxwFamhfZ29TJ0XxGiZlpZtn0FEEqcbcIUCQ==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-data-plane-service@0.10.1-next.3':
-    resolution: {integrity: sha512-6P5lOSu9EpLsqwU/PNrASpT35pPSo9qaLRh2Dxm//rvM+fnVZ34NeEcdnVqO5D7UtgZH2CZ+PVmcBK5EQq8kcQ==}
+  '@twin.org/dataspace-data-plane-service@0.10.1-next.4':
+    resolution: {integrity: sha512-W9mg65De8Wulpem0NVkdE1DQSnv899D+scirsnFYWtTFT/nxQ1xwHgH0c/EqL4t1ZwrRshj13OUo9KFaSJLfgA==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-data-plane-socket-client@0.10.1-next.3':
-    resolution: {integrity: sha512-50tJPorkMVLxLqz3i+S/FF3BoERkQeuBI6ARECWqpH6TOg9STHrpRmLKoWNRvckRy8IJpGXZ8w6t6L8NkMorjw==}
+  '@twin.org/dataspace-data-plane-socket-client@0.10.1-next.4':
+    resolution: {integrity: sha512-bxh51eiF3WPlHkdwKHBJ4tsTmkmRFA0hANju1Zb7384cGaz+aPObaSaMWOe9Pj2lyL1D4HqYW44j6CVXTR3cBg==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/dataspace-models@0.10.1-next.3':
-    resolution: {integrity: sha512-LaqM9yG4A+3ILKK8nH2lqQlz9t3SJ1iBEAOijCQR4/HcpBqe6fc5aMqBJm+47mJMavqWGH6/sAdcdfnCxME63w==}
+  '@twin.org/dataspace-models@0.10.1-next.4':
+    resolution: {integrity: sha512-Tg85bEog2+AstKFTeql5/DRnZdgJH013mC2B0qKVqvIEID8kNS6at5a8z0bl1qCOs+DqRXEaR0akEyCvb+uBRA==}
     engines: {node: '>=24.0.0'}
 
   '@twin.org/dlt-account@0.9.2-next.2':
@@ -7879,11 +7879,11 @@ snapshots:
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
-  '@twin.org/dataspace-app-runner@0.10.1-next.3(typescript@6.0.3)':
+  '@twin.org/dataspace-app-runner@0.10.1-next.4(typescript@6.0.3)':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
+      '@twin.org/dataspace-models': 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
@@ -7894,13 +7894,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@twin.org/dataspace-control-plane-rest-client@0.10.1-next.3(supports-color@10.2.2)(typescript@6.0.3)':
+  '@twin.org/dataspace-control-plane-rest-client@0.10.1-next.4(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-core': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
+      '@twin.org/dataspace-models': 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -7911,7 +7911,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@twin.org/dataspace-control-plane-service@0.10.1-next.3(typescript@6.0.3)':
+  '@twin.org/dataspace-control-plane-service@0.10.1-next.4(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/api-tenant-processor': 0.10.1-next.8
@@ -7919,7 +7919,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
+      '@twin.org/dataspace-models': 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
       '@twin.org/federated-catalogue-models': 0.10.1-next.2
@@ -7936,7 +7936,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@twin.org/dataspace-data-plane-rest-client@0.10.1-next.3(supports-color@10.2.2)':
+  '@twin.org/dataspace-data-plane-rest-client@0.10.1-next.4(supports-color@10.2.2)':
     dependencies:
       '@twin.org/api-core': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/api-models': 0.10.1-next.8
@@ -7951,7 +7951,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@twin.org/dataspace-data-plane-service@0.10.1-next.3(typescript@6.0.3)':
+  '@twin.org/dataspace-data-plane-service@0.10.1-next.4(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/background-task-models': 0.10.1-next.1
@@ -7960,8 +7960,8 @@ snapshots:
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/data-core': 0.10.1-next.2
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/dataspace-app-runner': 0.10.1-next.3(typescript@6.0.3)
-      '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
+      '@twin.org/dataspace-app-runner': 0.10.1-next.4(typescript@6.0.3)
+      '@twin.org/dataspace-models': 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
       '@twin.org/logging-models': 0.10.1-next.4
@@ -7979,13 +7979,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@twin.org/dataspace-data-plane-socket-client@0.10.1-next.3(supports-color@10.2.2)(typescript@6.0.3)':
+  '@twin.org/dataspace-data-plane-socket-client@0.10.1-next.4(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-core': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
+      '@twin.org/dataspace-models': 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/standards-w3c-activity-streams': 0.10.1-next.1
@@ -7995,7 +7995,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@twin.org/dataspace-models@0.10.1-next.3(typescript@6.0.3)':
+  '@twin.org/dataspace-models@0.10.1-next.4(typescript@6.0.3)':
     dependencies:
       '@twin.org/background-task-models': 0.10.1-next.1
       '@twin.org/core': 0.10.1-next.12
@@ -8228,12 +8228,12 @@ snapshots:
       '@twin.org/data-processing-models': 0.10.1-next.1
       '@twin.org/data-processing-rest-client': 0.10.1-next.1(supports-color@10.2.2)
       '@twin.org/data-processing-service': 0.10.1-next.1
-      '@twin.org/dataspace-control-plane-rest-client': 0.10.1-next.3(supports-color@10.2.2)(typescript@6.0.3)
-      '@twin.org/dataspace-control-plane-service': 0.10.1-next.3(typescript@6.0.3)
-      '@twin.org/dataspace-data-plane-rest-client': 0.10.1-next.3(supports-color@10.2.2)
-      '@twin.org/dataspace-data-plane-service': 0.10.1-next.3(typescript@6.0.3)
-      '@twin.org/dataspace-data-plane-socket-client': 0.10.1-next.3(supports-color@10.2.2)(typescript@6.0.3)
-      '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
+      '@twin.org/dataspace-control-plane-rest-client': 0.10.1-next.4(supports-color@10.2.2)(typescript@6.0.3)
+      '@twin.org/dataspace-control-plane-service': 0.10.1-next.4(typescript@6.0.3)
+      '@twin.org/dataspace-data-plane-rest-client': 0.10.1-next.4(supports-color@10.2.2)
+      '@twin.org/dataspace-data-plane-service': 0.10.1-next.4(typescript@6.0.3)
+      '@twin.org/dataspace-data-plane-socket-client': 0.10.1-next.4(supports-color@10.2.2)(typescript@6.0.3)
+      '@twin.org/dataspace-models': 0.10.1-next.4(typescript@6.0.3)
       '@twin.org/dlt-iota': 0.9.2-next.2(typescript@6.0.3)
       '@twin.org/document-management-models': 0.10.1-next.2(typescript@6.0.3)
       '@twin.org/document-management-rest-client': 0.10.1-next.2(supports-color@10.2.2)(typescript@6.0.3)

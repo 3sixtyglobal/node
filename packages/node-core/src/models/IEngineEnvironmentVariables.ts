@@ -1233,6 +1233,13 @@ export interface IEngineEnvironmentVariables {
 	dataspaceStalledTransferTimeout?: string;
 
 	/**
+	 * How long in seconds COMPLETED and TERMINATED transfer records are kept before removal.
+	 * Set to -1 to keep them forever; -1 is the only value that disables removal.
+	 * @default 2592000
+	 */
+	dataspaceRetainTerminalTransfersFor?: string;
+
+	/**
 	 * How long in seconds a provider transfer may stay idle before the idle policy marks it as stalled.
 	 */
 	dataspaceProviderTransferIdleTimeout?: string;

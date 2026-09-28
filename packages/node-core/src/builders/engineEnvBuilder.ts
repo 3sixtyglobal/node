@@ -2298,6 +2298,10 @@ async function configureDataspace(
 						envVars,
 						"dataspaceStalledTransferTimeout"
 					),
+					retainTerminalTransfersForMs: EnvHelper.envSecToMs(
+						envVars,
+						"dataspaceRetainTerminalTransfersFor"
+					),
 					providerTransferIdleTimeoutMs: EnvHelper.envSecToMs(
 						envVars,
 						"dataspaceProviderTransferIdleTimeout"
