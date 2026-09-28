@@ -1,6 +1,7 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, rm, writeFile } from "node:fs/promises";
+import type { IServerInfo } from "@twin.org/api-models";
 import { AutomationActionFactory } from "@twin.org/automation-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ComponentFactory, Factory, NativeModules } from "@twin.org/core";
@@ -44,7 +45,13 @@ import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { getEnvDefaults } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
-import { buildConfiguration, overrideModuleImport, run } from "../src/node.js";
+import {
+	buildConfiguration,
+	loadEnvironmentVariables,
+	overrideModuleImport,
+	processEnvironmentVariables,
+	run
+} from "../src/node.js";
 import { start } from "../src/start.js";
 import { initialiseLocales } from "../src/utils.js";
 
@@ -75,6 +82,32 @@ async function waitForServer(serverPort: number): Promise<void> {
 	}
 
 	throw new Error(`The server did not start on port ${serverPort}`, { cause: lastError });
+}
+
+/**
+ * Load and process the env vars then build the configuration in the same way as the node.
+ * @param processEnv The process environment variables.
+ * @param nodeOptions The node options.
+ * @param serverInfo The server information.
+ * @returns The configuration and the env vars for the node.
+ */
+async function buildTestConfiguration(
+	processEnv: { [id: string]: string },
+	nodeOptions: INodeOptions,
+	serverInfo: IServerInfo
+): Promise<
+	Awaited<ReturnType<typeof buildConfiguration>> & {
+		nodeEnvVars: Awaited<ReturnType<typeof processEnvironmentVariables>>;
+	}
+> {
+	const nodeEnvVars = await processEnvironmentVariables(
+		loadEnvironmentVariables(processEnv, nodeOptions),
+		nodeOptions
+	);
+	return {
+		...(await buildConfiguration(nodeEnvVars, nodeOptions, serverInfo)),
+		nodeEnvVars
+	};
 }
 
 describe("node-core", () => {
@@ -141,6 +174,37 @@ describe("node-core", () => {
 		} finally {
 			colorSpy.mockRestore();
 			CLIDisplay.setColorEnabled(true);
+		}
+	});
+
+	test("Can disable colour in the CLI display from an env file", async () => {
+		const envFile = "./tests/.tmp/index/.env.disable-color";
+		await writeFile(envFile, 'TWIN_DISABLE_COLOR="true"\n');
+		const colorSpy = vi.spyOn(CLIDisplay, "setColorEnabled");
+
+		try {
+			const result = await run({
+				localesDirectory: "./dist/locales/",
+				envFilenames: [envFile],
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_PORT: port.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+				}
+			});
+			expect(colorSpy).toHaveBeenCalledWith(false);
+			await result?.shutdown();
+		} finally {
+			colorSpy.mockRestore();
+			CLIDisplay.setColorEnabled(true);
+			// Loading the env file also populates process.env, so remove it for the following tests.
+			delete process.env.TWIN_DISABLE_COLOR;
 		}
 	});
 
@@ -394,7 +458,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -498,7 +562,7 @@ describe("node-core", () => {
 		overrideModuleImport(nodeOptions.executionDirectory ?? "", undefined);
 
 		// Use buildConfiguration to get the proper nodeEngineConfig structure
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(
 			{
 				...getEnvDefaults("TWIN_"),
 				...envVars
@@ -851,7 +915,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(
 			{
 				...getEnvDefaults("TWIN_"),
 				...envVars
@@ -933,7 +997,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -999,7 +1063,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1062,7 +1126,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1126,7 +1190,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1162,7 +1226,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1197,7 +1261,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1267,7 +1331,7 @@ describe("node-core", () => {
 				storageFileRoot: "./.local-data",
 				extensions: "http://example.com/insecure-extension.js"
 			});
-			const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 				name: "foo",
 				version: "0.0.0"
 			});
@@ -1347,7 +1411,7 @@ describe("node-core", () => {
 		// Clear any previous call order
 		(global as typeof globalThis & { extensionCallOrder?: string[] }).extensionCallOrder = [];
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1438,7 +1502,7 @@ describe("node-core", () => {
 		// Clear previous lifecycle data
 		(global as typeof globalThis & { lifecycleOrder?: string[] }).lifecycleOrder = [];
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1510,7 +1574,7 @@ describe("node-core", () => {
 
 		// Extension failure should cause start to fail
 		await expect(async () => {
-			const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 				name: "foo",
 				version: "0.0.0"
 			});
@@ -1560,7 +1624,7 @@ describe("node-core", () => {
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
 		// Use buildConfiguration to get the proper nodeEngineConfig structure
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});

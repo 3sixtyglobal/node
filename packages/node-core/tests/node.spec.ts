@@ -4,12 +4,16 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import type { IServerInfo } from "@twin.org/api-models";
 import { CLIDisplay } from "@twin.org/cli-core";
 import { I18n } from "@twin.org/core";
 import { ModuleHelper, ModuleResolutionHelper } from "@twin.org/modules";
 import { DEPRECATED_ENVIRONMENT_VARIABLE_KEYS } from "../src/models/deprecatedEnvironmentVariableKeys.js";
-import { buildConfiguration, overrideModuleImport } from "../src/node.js";
+import type { INodeOptions } from "../src/models/INodeOptions.js";
+import {
+	loadEnvironmentVariables,
+	overrideModuleImport,
+	processEnvironmentVariables
+} from "../src/node.js";
 
 vi.mock("../src/builders/engineEnvBuilder.js", () => ({
 	buildEngineConfiguration: vi.fn().mockResolvedValue({ types: {} })
@@ -23,9 +27,25 @@ vi.mock("../src/builders/extensionsBuilder.js", () => ({
 	extensionsConfiguration: vi.fn().mockImplementation(async (e: unknown, cfg: unknown) => cfg)
 }));
 
-const SERVER_INFO: IServerInfo = { name: "test-node", version: "0.0.0" };
 const ENV_PREFIX = "TWIN_";
 
+/**
+ * Load and process the env vars in the same way as the node.
+ * @param processEnv The process environment variables.
+ * @param options The node options.
+ * @returns The processed env vars.
+ */
+async function buildEnvVars(
+	processEnv: { [id: string]: string },
+	options: INodeOptions
+): Promise<{ nodeEnvVars: Awaited<ReturnType<typeof processEnvironmentVariables>> }> {
+	return {
+		nodeEnvVars: await processEnvironmentVariables(
+			loadEnvironmentVariables(processEnv, options),
+			options
+		)
+	};
+}
 describe("node", () => {
 	let tempDir: string;
 
@@ -37,15 +57,14 @@ describe("node", () => {
 		await rm(tempDir, { recursive: true, force: true });
 	});
 
-	describe("Can buildConfiguration", () => {
+	describe("Can load and process environment variables", () => {
 		test("env vars from processEnv appear in nodeEnvVars", async () => {
 			const envFile = path.join(tempDir, ".env.basic");
 			await writeFile(envFile, "");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_PORT: "4000", TWIN_DEBUG: "true" },
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect(nodeEnvVars.port).toBe("4000");
@@ -56,10 +75,9 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.native-modules");
 			await writeFile(envFile, "");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_NATIVE_MODULES: "node:buffer, node:crypto" },
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect(nodeEnvVars.nativeModules).toBe("node:buffer, node:crypto");
@@ -69,10 +87,9 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.precedence");
 			await writeFile(envFile, "TWIN_PORT=9999\n");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_PORT: "4000" },
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect(nodeEnvVars.port).toBe("4000");
@@ -82,10 +99,9 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.fill");
 			await writeFile(envFile, "TWIN_PORT=7777\n");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{},
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect(nodeEnvVars.port).toBe("7777");
@@ -97,14 +113,13 @@ describe("node", () => {
 			await writeFile(envFile1, "TWIN_PORT=1111\n");
 			await writeFile(envFile2, "TWIN_PORT=2222\n");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_PORT: "8080" },
 				{
 					envFilenames: [envFile1, envFile2],
 					envPrefix: ENV_PREFIX,
 					executionDirectory: tempDir
-				},
-				SERVER_INFO
+				}
 			);
 
 			expect(nodeEnvVars.port).toBe("8080");
@@ -116,14 +131,13 @@ describe("node", () => {
 			await writeFile(envFile1, "TWIN_PORT=3001\n");
 			await writeFile(envFile2, "TWIN_DEBUG=true\n");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{},
 				{
 					envFilenames: [envFile1, envFile2],
 					envPrefix: ENV_PREFIX,
 					executionDirectory: tempDir
-				},
-				SERVER_INFO
+				}
 			);
 
 			expect(nodeEnvVars.port).toBe("3001");
@@ -134,23 +148,18 @@ describe("node", () => {
 			const missingFile = path.join(tempDir, "does-not-exist.env");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{},
-					{ envFilenames: [missingFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [missingFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).rejects.toThrow();
 		});
 
 		test("missing default .env file does not throw", async () => {
-			// When envFilenames is omitted, buildConfiguration defaults to .env in executionDirectory.
+			// When envFilenames is omitted, loadEnvironmentVariables defaults to .env in executionDirectory.
 			// A missing default file is silently ignored (defaultEnvOnly path).
 			await expect(
-				buildConfiguration(
-					{ TWIN_PORT: "3000" },
-					{ executionDirectory: tempDir, envPrefix: ENV_PREFIX },
-					SERVER_INFO
-				)
+				buildEnvVars({ TWIN_PORT: "3000" }, { executionDirectory: tempDir, envPrefix: ENV_PREFIX })
 			).resolves.toBeDefined();
 		});
 
@@ -159,10 +168,9 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.textref");
 			await writeFile(envFile, "");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_VAULT_PREFIX: "@text:secret.txt" },
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect(nodeEnvVars.vaultPrefix).toBe("my-secret-value");
@@ -176,10 +184,9 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.jsonref");
 			await writeFile(envFile, "");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_VAULT_PREFIX: "@json:config.json" },
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect((nodeEnvVars as { [key: string]: unknown }).vaultPrefix).toEqual({
@@ -192,7 +199,7 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.extend");
 			await writeFile(envFile, "");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_PORT: "3000" },
 				{
 					envFilenames: [envFile],
@@ -201,8 +208,7 @@ describe("node", () => {
 					extendEnvVars: async envVars => {
 						(envVars as { [key: string]: unknown }).port = "5555";
 					}
-				},
-				SERVER_INFO
+				}
 			);
 
 			expect(nodeEnvVars.port).toBe("5555");
@@ -212,10 +218,9 @@ describe("node", () => {
 			const envFile = path.join(tempDir, ".env.prefix");
 			await writeFile(envFile, "");
 
-			const { nodeEnvVars } = await buildConfiguration(
+			const { nodeEnvVars } = await buildEnvVars(
 				{ TWIN_PORT: "3000", OTHER_VAR: "should-not-appear" },
-				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-				SERVER_INFO
+				{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 			);
 
 			expect(nodeEnvVars.port).toBe("3000");
@@ -227,10 +232,9 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{ TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500" },
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).rejects.toMatchObject({
 				source: "EnvHelper",
@@ -246,10 +250,9 @@ describe("node", () => {
 			const formatSpy = vi.spyOn(I18n, "formatMessage");
 
 			try {
-				await buildConfiguration(
+				await buildEnvVars(
 					{ TWIN_HEALTH_CHECK_STARTUP_INTERVAL: "500", TWIN_STRICT_ENV: "warn" },
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				);
 				expect(formatSpy).toHaveBeenCalledWith(
 					"warn.node.unknownEnvVars",
@@ -272,10 +275,9 @@ describe("node", () => {
 
 			try {
 				await expect(
-					buildConfiguration(
+					buildEnvVars(
 						{ TWIN_MESSAGING_ENABLED: "true" },
-						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-						SERVER_INFO
+						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 					)
 				).resolves.toBeDefined();
 
@@ -299,10 +301,9 @@ describe("node", () => {
 
 			try {
 				await expect(
-					buildConfiguration(
+					buildEnvVars(
 						{ TWIN_DATA_PROCESSING_ENABLED: "true" },
-						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-						SERVER_INFO
+						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 					)
 				).resolves.toBeDefined();
 
@@ -327,10 +328,9 @@ describe("node", () => {
 
 			try {
 				await expect(
-					buildConfiguration(
+					buildEnvVars(
 						{ TWIN_WITHDRAWN_SETTING: "true" },
-						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-						SERVER_INFO
+						{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 					)
 				).resolves.toBeDefined();
 
@@ -350,13 +350,12 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{
 						TWIN_MY_EXTENSION_SECRET: "value",
 						TWIN_ENV_ALLOW_LIST: "TWIN_MY_EXTENSION_SECRET"
 					},
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).resolves.toBeDefined();
 		});
@@ -366,10 +365,9 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{ TWIN_STRICT_ENV: "strict" },
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).rejects.toThrow();
 		});
@@ -379,10 +377,9 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{ TWIN_PORT: "3000", OTHER_TOOL_SETTING: "any-value" },
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).resolves.toBeDefined();
 		});
@@ -392,13 +389,12 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{
 						TWIN_REST_PATH_TENANT_ADMIN: "my-tenants",
 						TWIN_REST_PATH_IDENTITY: "id"
 					},
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).resolves.toBeDefined();
 		});
@@ -408,10 +404,9 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{ TWIN_REST_ROUTE_TENANT_ADMIN: "my-tenants" },
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).rejects.toMatchObject({
 				source: "EnvHelper",
@@ -425,14 +420,13 @@ describe("node", () => {
 			await writeFile(envFile, "");
 
 			await expect(
-				buildConfiguration(
+				buildEnvVars(
 					{
 						TWIN_MY_EXT_SECRET: "value",
 						TWIN_MY_EXT_API_KEY: "key",
 						TWIN_ENV_ALLOW_LIST: "TWIN_MY_EXT_*"
 					},
-					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir },
-					SERVER_INFO
+					{ envFilenames: [envFile], envPrefix: ENV_PREFIX, executionDirectory: tempDir }
 				)
 			).resolves.toBeDefined();
 		});
@@ -445,10 +439,9 @@ describe("node", () => {
 				await writeFile(envFile, "");
 
 				await expect(
-					buildConfiguration(
+					buildEnvVars(
 						{ MYAPP_UNKNOWN_SETTING: "value" },
-						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir },
-						SERVER_INFO
+						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir }
 					)
 				).rejects.toMatchObject({
 					source: "EnvHelper",
@@ -464,10 +457,9 @@ describe("node", () => {
 				const formatSpy = vi.spyOn(I18n, "formatMessage");
 
 				try {
-					await buildConfiguration(
+					await buildEnvVars(
 						{ MYAPP_UNKNOWN_SETTING: "value", MYAPP_STRICT_ENV: "warn" },
-						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir },
-						SERVER_INFO
+						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir }
 					);
 					expect(formatSpy).toHaveBeenCalledWith(
 						"warn.node.unknownEnvVars",
@@ -485,13 +477,12 @@ describe("node", () => {
 				await writeFile(envFile, "");
 
 				await expect(
-					buildConfiguration(
+					buildEnvVars(
 						{
 							MYAPP_MY_EXTENSION_SECRET: "value",
 							MYAPP_ENV_ALLOW_LIST: "MYAPP_MY_EXTENSION_SECRET"
 						},
-						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir },
-						SERVER_INFO
+						{ envFilenames: [envFile], envPrefix: CUSTOM_PREFIX, executionDirectory: tempDir }
 					)
 				).resolves.toBeDefined();
 			});

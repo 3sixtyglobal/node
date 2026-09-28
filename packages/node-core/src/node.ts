@@ -70,28 +70,18 @@ export async function run(
 			nodeOptions.envPrefix = Coerce.string(hasEnvPrefix.value) ?? nodeOptions.envPrefix;
 		}
 
-		// This is the only location in the code base that should access process.env directly
-		// So we can safely disable the linting rule here.
-		let finalEnvVars =
+		const isDefaultEnvFile = Is.empty(nodeOptions.envFilenames);
+
+		const processEnv = loadEnvironmentVariables(
+			// This is the only location in the code base that should access process.env directly
+			// So we can safely disable the linting rule here.
 			// eslint-disable-next-line no-restricted-syntax
-			process.env as {
-				[id: string]: string;
-			};
-
-		if (Is.objectValue(nodeOptions?.envVars)) {
-			finalEnvVars = {
-				...finalEnvVars,
-				...nodeOptions.envVars
-			};
-		}
-
-		finalEnvVars = {
-			...getEnvDefaults(nodeOptions.envPrefix),
-			...finalEnvVars
-		};
+			process.env,
+			nodeOptions
+		);
 
 		// Applied before any output so the header is also uncoloured.
-		if (Coerce.boolean(finalEnvVars[`${nodeOptions.envPrefix}DISABLE_COLOR`]) ?? false) {
+		if (Coerce.boolean(processEnv[`${nodeOptions.envPrefix}DISABLE_COLOR`]) ?? false) {
 			CLIDisplay.setColorEnabled(false);
 		}
 
@@ -121,11 +111,11 @@ export async function run(
 		let cliCommand;
 		if (Is.arrayValue(commandLineArgs.options)) {
 			registerCommands();
-			cliCommand = constructCliCommand(finalEnvVars, commandLineArgs);
+			cliCommand = constructCliCommand(processEnv, commandLineArgs);
 		}
 
 		if (Is.object(cliCommand)) {
-			finalEnvVars[`${nodeOptions.envPrefix}SILENT`] ??= "true";
+			processEnv[`${nodeOptions.envPrefix}SILENT`] ??= "true";
 		} else {
 			if (Is.empty(nodeOptions?.openApiSpecFile)) {
 				const specFile = path.resolve(
@@ -154,8 +144,14 @@ export async function run(
 			}
 		}
 
-		const { nodeEngineConfig, nodeEnvVars, availableContextIdKeys } = await buildConfiguration(
-			finalEnvVars,
+		if (isDefaultEnvFile) {
+			CLIDisplay.value("Default Environment File", nodeOptions.envFilenames?.[0]);
+		}
+
+		const nodeEnvVars = await processEnvironmentVariables(processEnv, nodeOptions);
+
+		const { nodeEngineConfig, availableContextIdKeys } = await buildConfiguration(
+			nodeEnvVars,
 			nodeOptions,
 			serverInfo
 		);
@@ -211,56 +207,61 @@ export async function run(
 }
 
 /**
- * Build the configuration for the TWIN Node.
+ * Load the environment variables for the TWIN Node, without producing any output.
  * @param processEnv The environment variables from the process.
- * @param options The options for running the server.
- * @param serverInfo The server information.
- * @returns A promise that resolves to the engine server configuration, environment prefix, environment variables,
- * and options.
+ * @param options The options for running the server, envFilenames defaults to the .env file in the execution directory.
+ * @returns The environment variables, with the options and env files applied.
+ * @throws Error if a custom env file cannot be loaded.
  */
-export async function buildConfiguration(
-	processEnv: {
-		[id: string]: string;
-	},
-	options: INodeOptions,
-	serverInfo: IServerInfo
-): Promise<{
-	nodeEnvVars: IEnvironmentVariables & { [id: string]: string | unknown };
-	nodeEngineConfig: INodeEngineConfig;
-	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[];
-}> {
-	const availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
+export function loadEnvironmentVariables(
+	processEnv: { [id: string]: string | undefined },
+	options: INodeOptions
+): { [id: string]: string } {
+	const loadedEnv: { [id: string]: string } = {
+		...getEnvDefaults(options.envPrefix ?? ""),
+		...(processEnv as { [id: string]: string }),
+		...options.envVars
+	};
 
 	let defaultEnvOnly = false;
-	if (Is.empty(options?.envFilenames)) {
-		const envFile = path.resolve(path.join(options.executionDirectory ?? "", ".env"));
-		CLIDisplay.value("Default Environment File", envFile);
-		options ??= {};
-		options.envFilenames = [envFile];
+	if (Is.empty(options.envFilenames)) {
+		options.envFilenames = [path.resolve(path.join(options.executionDirectory ?? "", ".env"))];
 		defaultEnvOnly = true;
 	}
 
-	if (Is.arrayValue(options?.envFilenames)) {
-		const output = dotenv.config({
-			path: options?.envFilenames,
-			quiet: true
-		});
+	const output = dotenv.config({
+		path: options.envFilenames,
+		quiet: true
+	});
 
-		// We don't want to throw an error if the default environment file is not found.
-		// Only if we have custom environment files.
-		if (!defaultEnvOnly && output.error) {
-			throw output.error;
-		}
+	// We don't want to throw an error if the default environment file is not found.
+	// Only if we have custom environment files.
+	if (!defaultEnvOnly && output.error) {
+		throw output.error;
+	}
 
-		if (Is.objectValue(output.parsed)) {
-			for (const [key, value] of Object.entries(output.parsed)) {
-				// Only set environment variables that are not already set in
-				// the process environment or provided via options.envVars
-				processEnv[key] ??= value;
-			}
+	if (Is.objectValue(output.parsed)) {
+		for (const [key, value] of Object.entries(output.parsed)) {
+			// Only set environment variables that are not already set in
+			// the process environment or provided via options.envVars
+			loadedEnv[key] ??= value;
 		}
 	}
 
+	return loadedEnv;
+}
+
+/**
+ * Process the loaded environment variables for the TWIN Node.
+ * @param processEnv The loaded environment variables.
+ * @param options The options for running the server.
+ * @returns A promise that resolves to the environment variables for the node.
+ * @throws GeneralError if an environment variable is not recognised in strict mode.
+ */
+export async function processEnvironmentVariables(
+	processEnv: { [id: string]: string },
+	options: INodeOptions
+): Promise<IEnvironmentVariables & { [id: string]: string | unknown }> {
 	const envVars = EnvHelper.envToJson<{ [id: string]: string | undefined }>(
 		processEnv,
 		options.envPrefix ?? ""
@@ -332,6 +333,26 @@ export async function buildConfiguration(
 		await options.extendEnvVars(envVars);
 	}
 
+	return envVars;
+}
+
+/**
+ * Build the configuration for the TWIN Node.
+ * @param envVars The environment variables for the node.
+ * @param options The options for running the server.
+ * @param serverInfo The server information.
+ * @returns A promise that resolves to the engine server configuration and the available context ID keys.
+ */
+export async function buildConfiguration(
+	envVars: IEnvironmentVariables & { [id: string]: string | unknown },
+	options: INodeOptions,
+	serverInfo: IServerInfo
+): Promise<{
+	nodeEngineConfig: INodeEngineConfig;
+	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[];
+}> {
+	const availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
+
 	// Build the engine configuration from the environment variables.
 	const coreConfig = await buildEngineConfiguration(envVars);
 	const engineServerConfig = await buildEngineServerConfiguration(
@@ -366,7 +387,7 @@ export async function buildConfiguration(
 
 	const nodeEngineConfig = await extensionsConfiguration(envVars, engineServerConfig);
 
-	return { nodeEngineConfig, nodeEnvVars: envVars, availableContextIdKeys };
+	return { nodeEngineConfig, availableContextIdKeys };
 }
 
 /**
