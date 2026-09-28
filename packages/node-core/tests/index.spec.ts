@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { AutomationActionFactory } from "@twin.org/automation-models";
+import { CLIDisplay } from "@twin.org/cli-core";
 import { ComponentFactory, Factory, NativeModules } from "@twin.org/core";
 import { DataspaceAppFactory } from "@twin.org/dataspace-models";
 import { MemoryStateStorage } from "@twin.org/engine-core";
@@ -114,6 +115,58 @@ describe("node-core", () => {
 		expect(result?.shutdown).toBeInstanceOf(Function);
 		expect(NativeModules.getModule("node:crypto")).toBeDefined();
 		await result?.shutdown();
+	});
+
+	test("Can disable colour in the CLI display", async () => {
+		const colorSpy = vi.spyOn(CLIDisplay, "setColorEnabled");
+
+		try {
+			const result = await run({
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_DISABLE_COLOR: "true",
+					TWIN_PORT: port.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+				}
+			});
+			expect(colorSpy).toHaveBeenCalledWith(false);
+			await result?.shutdown();
+		} finally {
+			colorSpy.mockRestore();
+			CLIDisplay.setColorEnabled(true);
+		}
+	});
+
+	test("Leaves the CLI display colour unchanged when disable colour is not set", async () => {
+		const colorSpy = vi.spyOn(CLIDisplay, "setColorEnabled");
+
+		try {
+			const result = await run({
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_PORT: port.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+				}
+			});
+			expect(colorSpy).not.toHaveBeenCalled();
+			await result?.shutdown();
+		} finally {
+			colorSpy.mockRestore();
+		}
 	});
 
 	test("Can run the node with config", async () => {

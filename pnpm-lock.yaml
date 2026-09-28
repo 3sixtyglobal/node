@@ -337,22 +337,22 @@ importers:
         version: 0.9.2-next.2(typescript@6.0.3)
       '@twin.org/engine':
         specifier: next
-        version: 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/engine-core':
         specifier: next
-        version: 0.10.1-next.6
+        version: 0.10.1-next.7
       '@twin.org/engine-models':
         specifier: next
-        version: 0.10.1-next.6
+        version: 0.10.1-next.7
       '@twin.org/engine-server':
         specifier: next
-        version: 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/engine-server-types':
         specifier: next
-        version: 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/engine-types':
         specifier: next
-        version: 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/entity':
         specifier: next
         version: 0.10.1-next.12
@@ -367,7 +367,10 @@ importers:
         version: 0.10.1-next.6
       '@twin.org/logging-connector-opentelemetry':
         specifier: next
-        version: 0.10.1-next.3(@opentelemetry/api@1.9.1)
+        version: 0.10.1-next.4(@opentelemetry/api@1.9.1)
+      '@twin.org/logging-models':
+        specifier: next
+        version: 0.10.1-next.4
       '@twin.org/modules':
         specifier: next
         version: 0.10.1-next.12
@@ -388,13 +391,13 @@ importers:
         version: 0.10.1-next.1
       '@twin.org/tracing-connector-opentelemetry':
         specifier: next
-        version: 0.10.1-next.1
+        version: 0.10.1-next.2
       '@twin.org/tracing-facades':
         specifier: next
-        version: 0.10.1-next.1
+        version: 0.10.1-next.2
       '@twin.org/tracing-models':
         specifier: next
-        version: 0.10.1-next.1
+        version: 0.10.1-next.2
       '@twin.org/vault-models':
         specifier: next
         version: 0.10.1-next.4
@@ -429,9 +432,6 @@ importers:
       '@twin.org/federated-catalogue-models':
         specifier: next
         version: 0.10.1-next.2
-      '@twin.org/logging-models':
-        specifier: next
-        version: 0.10.1-next.3
       '@twin.org/merge-locales':
         specifier: next
         version: 0.10.1-next.12
@@ -1484,8 +1484,8 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
 
-  '@opentelemetry/exporter-trace-otlp-proto@0.221.0':
-    resolution: {integrity: sha512-Z9i2T7vgZbWe9rSLYxXVIbeW+XyzUq4rZanW3ZyVNwVDqCsh0EJKUgBWWQ0CZfeuUA+RQPzKgJQHMuWAUnKqXw==}
+  '@opentelemetry/exporter-trace-otlp-proto@0.222.0':
+    resolution: {integrity: sha512-imLrLzNhnABJt3tUyT63h6MqfZrG3Gdv3TE7+OUQTvwD088RfCUx3rF01lcgfu2KXBFk13vwi0yKZLvFEalkIA==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
@@ -2037,28 +2037,28 @@ packages:
     resolution: {integrity: sha512-y+rQpr5Rz9QDpL3SctWus8uKu+0L6f1+rd2jEuA4Xeqt9rNz7t6nXvrdSDz7FC+m5vzij/7obRa9x5z7f2sKxA==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/engine-core@0.10.1-next.6':
-    resolution: {integrity: sha512-hKoh+X6GrX5MJ+jU3oKzjtyEsq/GRNKuSAvtQIvfwKaf0QM2YKGhtixt+JdwSyiuZHHnE9FC5iHSR64Jn0KFWA==}
+  '@twin.org/engine-core@0.10.1-next.7':
+    resolution: {integrity: sha512-I6OVrVEkXdQLMmvdFpqYKsWTD893n/5bTeMuffYWiiR3vuqGDqHI7WkzEaoRZ2g2uBFDYHih/JRj1wvKJjIgQQ==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/engine-models@0.10.1-next.6':
-    resolution: {integrity: sha512-eRm53i69ogQTWE4+zVew8a514qkAXvZd6Tcmi08WXFqrWYuRcec1deBOuIeleVu26qoFJJ6dGBi+tNxaVts1rQ==}
+  '@twin.org/engine-models@0.10.1-next.7':
+    resolution: {integrity: sha512-tMKJQ87fSdRCXevuU2ipkKsFPAUN8dTL8whsdDDZ/5BNo7tA29Pf03v2Ai4OZjN9c79iLXp81C9tw40zNs4V5w==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/engine-server-types@0.10.1-next.6':
-    resolution: {integrity: sha512-wSSrRST/EEwD65zWqCktYKPMoVN7owYROvQ5/Op/38l9v7dsdk+iLNw6Zqdj8OJWTg+w8R6gdOkStiXwbMSqhQ==}
+  '@twin.org/engine-server-types@0.10.1-next.7':
+    resolution: {integrity: sha512-V0k0RnXdbAsTx0hkrCvCgJGuDHidBwJFmBO6SPx/IWdrWVY0wR5gLQun0UXQG50CvDGmHKdGQMi3laGXBA5KBQ==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/engine-server@0.10.1-next.6':
-    resolution: {integrity: sha512-yw0auIY8GJGzGIXTpmJDrDTy5zb6TfIEb2iwQYVZZP3UwcX8rS68e+5927C52xk5mNdymFX1rsYLtN0FXLRmLQ==}
+  '@twin.org/engine-server@0.10.1-next.7':
+    resolution: {integrity: sha512-tvBPGzw6bSq+XBdsJGFEtFmrJNjYSawXYzZTF8PWwTtJOOZztueX2RBf4CWWkSEWF47slRUaN+vbViwgI7gucA==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/engine-types@0.10.1-next.6':
-    resolution: {integrity: sha512-zd5DKsXwZYtp/NHb/673LuvXv5jFGD6iYTlzruBmkSh9ylKFWJ0av1L07Pc4X+kqKIwAmXZdNPjRbyTGMvuJGQ==}
+  '@twin.org/engine-types@0.10.1-next.7':
+    resolution: {integrity: sha512-alyZ7KXZkrQP/+6zp/iMMKboofgtHCY57AUUgAQKwOWE2Tk2V11xNBK6JacKgqE/6q+naPUL8ST+rKr+q1wtdw==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/engine@0.10.1-next.6':
-    resolution: {integrity: sha512-Dd1hxySsdUvxu+MrVTGlMv8JfSSTWj0Fuf1BrqX+QLlDNJqvXUiCABKizjvo2+tRktWDJNeDrMA9nh0EoOwogA==}
+  '@twin.org/engine@0.10.1-next.7':
+    resolution: {integrity: sha512-LoXYQb5vI3jNSHNomSeCGAWRc79IXdgH82p0kt3pq7+rH4RkhYZXZYl2zFY77G3gPp7dAKW2mEgiSkyT+WwXEg==}
     engines: {node: '>=24.0.0'}
 
   '@twin.org/entity-storage-connector-cosmosdb@0.10.1-next.14':
@@ -2185,36 +2185,36 @@ packages:
     resolution: {integrity: sha512-Uu5p6qiyHTQEGZE/MQVDV8YPa3srQYtaSyLqhOvw9CrxwKgVosBUfqvDczy4DjAgpO8MtFLeT83z2FNLQPTB9g==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-connector-console@0.10.1-next.3':
-    resolution: {integrity: sha512-8JJz2xWUmxzRFmNkvlSwQITcPOs3ViwF2nxTNGYf7UpV0/ptlZUKO9mNDKY6i1UnwasnwvjTKX884nvd2zv47w==}
+  '@twin.org/logging-connector-console@0.10.1-next.4':
+    resolution: {integrity: sha512-gVP+4n1NqS0epGhqMUpLj1cDUibgnrWfn7llE3dbnfRiNvnP6zIFr4jBvyY2tBIxHEF5Um0DgEM3TtwhIvKDeA==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-connector-elk@0.10.1-next.3':
-    resolution: {integrity: sha512-paXgd9+3SGPwswDMaL0tVODBVPfJP8n81AHNu1n3YHYvu0hls8AlA6uP4Ix/CoyR0JrtBP5K18TOxOm8TX0c/g==}
+  '@twin.org/logging-connector-elk@0.10.1-next.4':
+    resolution: {integrity: sha512-kZSX/h9SAPcpwiR2ula8/3jiFL0WpjTAYWS3Gl94UuXI7UfHQB6vFhvJ2BaxgekX/sDaO2sbEAxUoyXrJvRXzg==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-connector-entity-storage@0.10.1-next.3':
-    resolution: {integrity: sha512-DbEaibAKAh2eKTeFrEApLMjLcjseYUuxz/4W9BNw0vS1VYtZUxT95o9q6ZxxF4DYP4EVpGQkW8fnoJGsaq2cYQ==}
+  '@twin.org/logging-connector-entity-storage@0.10.1-next.4':
+    resolution: {integrity: sha512-lm8p9Psy6gU/7XSCW5KKlkePhbiBuu9UHnsxTzb7HjbTccQUXOOZFqeysvWiYP3tuAWagFLd9NvmKH10wjO+pw==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-connector-file@0.10.1-next.3':
-    resolution: {integrity: sha512-x7cLBKXr0Kl/QHpJziu1Nmlw45KxWATaL3VTRrMAOnpZk437kcqtFmdcy9iOhuxFf9eFxkN1UQcCAAAdg0PQjA==}
+  '@twin.org/logging-connector-file@0.10.1-next.4':
+    resolution: {integrity: sha512-seZ5ct2seUaOJpnn17vpZ4MkDEj7rjiLT67NIgvj1AOpVCgl/Xet2XTh1sE9nCzOeYbGDAhcatBr+6vLYGy6VA==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-connector-opentelemetry@0.10.1-next.3':
-    resolution: {integrity: sha512-KIcVG8/S3tURKCPFZdGiE7IonvoXJ6TErAbEwkOe8PShPMwpAFyKH9fh6lMS2Xo8sP8VLYaMJ0VwtXFE4xXkSQ==}
+  '@twin.org/logging-connector-opentelemetry@0.10.1-next.4':
+    resolution: {integrity: sha512-5u8KCT5UHtcoVqIxVwQH8lDZD6U3JbwGtW11Jz/+ua5nacrj4UY50Kp0oJCtMgyvjEJIc5+g87RfkTBmFS2F+w==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-models@0.10.1-next.3':
-    resolution: {integrity: sha512-UCy/SQCuHu5h+QwVXeeomSU1qJ86QoaPhAwdqaQQzNNfDgj121AEzGv/pY5p9uVRr+2lEdi3z+s+nAD5U7ynTQ==}
+  '@twin.org/logging-models@0.10.1-next.4':
+    resolution: {integrity: sha512-+zvOA0s1cs0IMWHZbCX8T3Q68nNBqmlcqq49k4YnEpURx+8xm7+B/b08dowc+oc+KzV3o6CYxFHxJy1kiGcO/w==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-rest-client@0.10.1-next.3':
-    resolution: {integrity: sha512-rTY5gYt8ClK3wuc7raCsxUJCx/rY1ufOc1YO6L/Uv4wSF3bk8YYMR5P7d74E/9YXTdxTppDBC0/E+U9yP1e7fg==}
+  '@twin.org/logging-rest-client@0.10.1-next.4':
+    resolution: {integrity: sha512-amKHz/v3ys5sWGkT8jjFlJuwEzMXAYy7HJsZlF9hqNQX6pZp741eZAJP5trVFRkywFckZ34pOUE7ObTeqS7Nmg==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/logging-service@0.10.1-next.3':
-    resolution: {integrity: sha512-kmfON3y2pN85a/px6kKvMxUUX5RnO2OTvxBLCk2p4t0lNZP6MnKT8LjfWuD4dLf6BnQMILRLchLF3wGvY2zgzQ==}
+  '@twin.org/logging-service@0.10.1-next.4':
+    resolution: {integrity: sha512-OjMxLfzVK3WCHaOFg6StyFgAb96UHjOsyG3PHx6TZCd6oz6OQVYIMkOnJ/YeYgZunvhRhhQ8P8FqnkMxoab71w==}
     engines: {node: '>=24.0.0'}
 
   '@twin.org/mailbox-connector-gmail@0.10.1-next.1':
@@ -2450,36 +2450,36 @@ packages:
     resolution: {integrity: sha512-DpIVllcrO9eBR84wAg/Wt1KplxliKqmCyS5t3eIeN3+Ums7KBI3cxdPPvCeBk8PVrC5u8BuXrU/TKsCYWtfFrg==}
     engines: {node: '>=24.0.0'}
 
-  '@twin.org/tracing-connector-console@0.10.1-next.1':
-    resolution: {integrity: sha512-VnFXL3o2N7JFc5PM9Z8X7xdEOO9dQR30Y9FSBx6eMeVw+U5sEynYEFEIH+MyHTYS8r3FVf3OLR85pcuRGfC6Xg==}
+  '@twin.org/tracing-connector-console@0.10.1-next.2':
+    resolution: {integrity: sha512-DYgjOGSqevKvJmXtkNM+uUpdVPS9DH6iHs3JWNFsHpmjI5mSTSX7HfNGF7A5Uh7yTygHqGvndV+ItSuXB39NlQ==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-connector-entity-storage@0.10.1-next.1':
-    resolution: {integrity: sha512-tAIsBYbKMu8mVJFH3oB1+QxbLaxdGJFYzscVCvQ/DcV79efZoV+hQndqimjT7/fO81ENuOFHAae/QzE6uJBGig==}
+  '@twin.org/tracing-connector-entity-storage@0.10.1-next.2':
+    resolution: {integrity: sha512-/NNCU9zPUhDzBa09XWoRlsBGyWYxBgcZXU/BT/HYyFgeYM9N7BqFIuZEWwRsvsJum1OWKvas3JhVMdUm11sCHQ==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-connector-opentelemetry@0.10.1-next.1':
-    resolution: {integrity: sha512-maorD0Uf3AIPA8Wm+oMShoR3/cLOi2qAbEBD7xmqMaP6nSBgqWvftm4t6U4+HpslAEAl10QXLYhHDwZAj2wGaA==}
+  '@twin.org/tracing-connector-opentelemetry@0.10.1-next.2':
+    resolution: {integrity: sha512-X+2zvV8d6nnc3DlVGeU/O6olJen+dY5X2H+emDceYQSePGw87a1ScAhiduu/2E5iJ6NwPR8z9SRFYm9/GbPWeQ==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-facades@0.10.1-next.1':
-    resolution: {integrity: sha512-evDmRZh5aTY1jz/knX709tESenODFuAAmuSfAKDjm73Oia8ThJ1HGz1In6vFl+XHgFFPKo/4AgWdFGCI9EkcbQ==}
+  '@twin.org/tracing-facades@0.10.1-next.2':
+    resolution: {integrity: sha512-hRbSbgsQ/3BPPKhenh7L0LBSN8Kj2CyvmkljUbJ7olSgiiDGr4zYEx6K1fJ8Gpgqujz4M/FknZpie9b8dUQkCQ==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-models@0.10.1-next.1':
-    resolution: {integrity: sha512-8VEcIhY3+Erj6qaXjDNt0OOESn4inZARhNNvqtXuXb4ICEkydUjawCHb4eCmDhTbDWMFsW2ob46jGEXe+GfjZw==}
+  '@twin.org/tracing-models@0.10.1-next.2':
+    resolution: {integrity: sha512-bSPwC3M6xFaUa+te5E/V2QxWEOInE5s9ILRitlFJbX+ZYKtFz9Ak2utx8c7w1Hdmf5VZR5mR2kDhs4r3l0eRDg==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-processors@0.10.1-next.1':
-    resolution: {integrity: sha512-gKSDlPAsc7nY7tjW5Vjw7m3aK2qe5uUr4agXczVOMLgwl/eF+E43ZrPDj9rUKRMivEVQ+Sy/254cnbreAY+VTg==}
+  '@twin.org/tracing-processors@0.10.1-next.2':
+    resolution: {integrity: sha512-a4w7MGENhCWyFRL2xDUp2MfTs+Xn0IZ8rYiDwdZ244sl5UaIaJFtIgK4a6mje5hJs/TTGqQ+yoqvra2+5V/9Xw==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-rest-client@0.10.1-next.1':
-    resolution: {integrity: sha512-5EjqPG0nZ/DUWNHW9YWNdATAJC0bxyEfGJjjelmFORE1gVcjF+xvOU/4ldt9tPsyEK3gArssedlN5iznbNQwNw==}
+  '@twin.org/tracing-rest-client@0.10.1-next.2':
+    resolution: {integrity: sha512-QM6F6r1dem7F7IjbMh4veJD5wBOSXJg2NeF7eedxHcawToFEp8ktL6aFApw1Cr6AKp/b4s5xZS2EuYO1IpOx6A==}
     engines: {node: '>=20.0.0'}
 
-  '@twin.org/tracing-service@0.10.1-next.1':
-    resolution: {integrity: sha512-2heerq/wBw6rmPVdMLQhV9+y9fJngJy95CJwGNfg+i6D8vRz/Cdmeu+UG0YoQkD3aJPiI5MoH5XmdKxBU6XEdw==}
+  '@twin.org/tracing-service@0.10.1-next.2':
+    resolution: {integrity: sha512-Gpsi14ZSlMqBIey93aSF4uwNN+sc1swHuXGx67ZlWCAp1BpRbNARWFgxJ3fuU+pGUpyY8wmvgXRhMfrcfiWQPg==}
     engines: {node: '>=20.0.0'}
 
   '@twin.org/trust-generators@0.10.1-next.1':
@@ -7017,12 +7017,12 @@ snapshots:
       '@opentelemetry/sdk-metrics': 2.10.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
 
-  '@opentelemetry/exporter-trace-otlp-proto@0.221.0(@opentelemetry/api@1.9.1)':
+  '@opentelemetry/exporter-trace-otlp-proto@0.222.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@opentelemetry/otlp-exporter-base': 0.221.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/otlp-transformer': 0.221.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-trace': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/otlp-exporter-base': 0.222.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/otlp-transformer': 0.222.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace': 2.11.0(@opentelemetry/api@1.9.1)
 
   '@opentelemetry/otlp-exporter-base@0.221.0(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -7326,7 +7326,7 @@ snapshots:
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/vault-models': 0.10.1-next.4
       '@twin.org/web': 0.10.1-next.12
@@ -7360,7 +7360,7 @@ snapshots:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
@@ -7384,7 +7384,7 @@ snapshots:
       '@twin.org/api-processors': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
       fastify: 5.12.5
@@ -7402,7 +7402,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/vault-models': 0.10.1-next.4
@@ -7589,7 +7589,7 @@ snapshots:
       '@twin.org/automation-models': 0.10.1-next.1
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
@@ -7620,7 +7620,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
@@ -7636,7 +7636,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/background-task-service@0.10.1-next.1':
@@ -7648,7 +7648,7 @@ snapshots:
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
 
@@ -7660,7 +7660,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - typescript
@@ -7673,7 +7673,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - supports-color
@@ -7686,7 +7686,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - typescript
@@ -7699,7 +7699,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
       google-auth-library: 11.1.0(supports-color@10.2.2)
@@ -7715,7 +7715,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
     transitivePeerDependencies:
@@ -7728,7 +7728,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - typescript
@@ -7884,7 +7884,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
@@ -7923,7 +7923,7 @@ snapshots:
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
       '@twin.org/federated-catalogue-models': 0.10.1-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -7964,7 +7964,7 @@ snapshots:
       '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
@@ -7986,7 +7986,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/dataspace-models': 0.10.1-next.3(typescript@6.0.3)
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/standards-w3c-activity-streams': 0.10.1-next.1
     transitivePeerDependencies:
@@ -8029,7 +8029,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/dlt-account': 0.9.2-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/vault-models': 0.10.1-next.4
       '@twin.org/wallet-models': 0.10.1-next.1
@@ -8093,28 +8093,28 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@twin.org/engine-core@0.10.1-next.6':
+  '@twin.org/engine-core@0.10.1-next.7':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/data-core': 0.10.1-next.2
-      '@twin.org/engine-models': 0.10.1-next.6
+      '@twin.org/engine-models': 0.10.1-next.7
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-connector-console': 0.10.1-next.3
-      '@twin.org/logging-models': 0.10.1-next.3
-      '@twin.org/logging-service': 0.10.1-next.3
+      '@twin.org/logging-connector-console': 0.10.1-next.4
+      '@twin.org/logging-models': 0.10.1-next.4
+      '@twin.org/logging-service': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/engine-models@0.10.1-next.6':
+  '@twin.org/engine-models@0.10.1-next.7':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/engine-server-types@0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@twin.org/engine-server-types@0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-auth-entity-storage-rest-client': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/api-auth-entity-storage-service': 0.10.1-next.8(supports-color@10.2.2)
@@ -8127,12 +8127,12 @@ snapshots:
       '@twin.org/api-tenant-processor': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/engine-models': 0.10.1-next.6
-      '@twin.org/engine-types': 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+      '@twin.org/engine-models': 0.10.1-next.7
+      '@twin.org/engine-types': 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/telemetry-processors': 0.10.1-next.1
-      '@twin.org/tracing-processors': 0.10.1-next.1
+      '@twin.org/tracing-processors': 0.10.1-next.2
     transitivePeerDependencies:
       - '@aws-sdk/credential-providers'
       - '@azure/identity'
@@ -8155,14 +8155,14 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@twin.org/engine-server@0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@twin.org/engine-server@0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/api-server-fastify': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/engine-models': 0.10.1-next.6
-      '@twin.org/engine-server-types': 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+      '@twin.org/engine-models': 0.10.1-next.7
+      '@twin.org/engine-server-types': 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
@@ -8187,7 +8187,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@twin.org/engine-types@0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@twin.org/engine-types@0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/api-rest-client': 0.10.1-next.8(supports-color@10.2.2)
@@ -8238,8 +8238,8 @@ snapshots:
       '@twin.org/document-management-models': 0.10.1-next.2(typescript@6.0.3)
       '@twin.org/document-management-rest-client': 0.10.1-next.2(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/document-management-service': 0.10.1-next.2(typescript@6.0.3)
-      '@twin.org/engine-core': 0.10.1-next.6
-      '@twin.org/engine-models': 0.10.1-next.6
+      '@twin.org/engine-core': 0.10.1-next.7
+      '@twin.org/engine-models': 0.10.1-next.7
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-connector-cosmosdb': 0.10.1-next.14(supports-color@10.2.2)
       '@twin.org/entity-storage-connector-dynamodb': 0.10.1-next.14
@@ -8270,14 +8270,14 @@ snapshots:
       '@twin.org/immutable-proof-models': 0.10.1-next.6
       '@twin.org/immutable-proof-rest-client': 0.10.1-next.6(supports-color@10.2.2)
       '@twin.org/immutable-proof-service': 0.10.1-next.6
-      '@twin.org/logging-connector-console': 0.10.1-next.3
-      '@twin.org/logging-connector-elk': 0.10.1-next.3
-      '@twin.org/logging-connector-entity-storage': 0.10.1-next.3
-      '@twin.org/logging-connector-file': 0.10.1-next.3
-      '@twin.org/logging-connector-opentelemetry': 0.10.1-next.3(@opentelemetry/api@1.9.1)
-      '@twin.org/logging-models': 0.10.1-next.3
-      '@twin.org/logging-rest-client': 0.10.1-next.3(supports-color@10.2.2)
-      '@twin.org/logging-service': 0.10.1-next.3
+      '@twin.org/logging-connector-console': 0.10.1-next.4
+      '@twin.org/logging-connector-elk': 0.10.1-next.4
+      '@twin.org/logging-connector-entity-storage': 0.10.1-next.4
+      '@twin.org/logging-connector-file': 0.10.1-next.4
+      '@twin.org/logging-connector-opentelemetry': 0.10.1-next.4(@opentelemetry/api@1.9.1)
+      '@twin.org/logging-models': 0.10.1-next.4
+      '@twin.org/logging-rest-client': 0.10.1-next.4(supports-color@10.2.2)
+      '@twin.org/logging-service': 0.10.1-next.4
       '@twin.org/mailbox-connector-gmail': 0.10.1-next.1(supports-color@10.2.2)
       '@twin.org/mailbox-connector-imap': 0.10.1-next.1
       '@twin.org/mailbox-connector-outlook': 0.10.1-next.1(buffer@6.0.3)
@@ -8320,14 +8320,14 @@ snapshots:
       '@twin.org/telemetry-producers': 0.10.1-next.1
       '@twin.org/telemetry-rest-client': 0.10.1-next.1(supports-color@10.2.2)
       '@twin.org/telemetry-service': 0.10.1-next.1
-      '@twin.org/tracing-connector-console': 0.10.1-next.1
-      '@twin.org/tracing-connector-entity-storage': 0.10.1-next.1
-      '@twin.org/tracing-connector-opentelemetry': 0.10.1-next.1
-      '@twin.org/tracing-facades': 0.10.1-next.1
-      '@twin.org/tracing-models': 0.10.1-next.1
-      '@twin.org/tracing-processors': 0.10.1-next.1
-      '@twin.org/tracing-rest-client': 0.10.1-next.1(supports-color@10.2.2)
-      '@twin.org/tracing-service': 0.10.1-next.1
+      '@twin.org/tracing-connector-console': 0.10.1-next.2
+      '@twin.org/tracing-connector-entity-storage': 0.10.1-next.2
+      '@twin.org/tracing-connector-opentelemetry': 0.10.1-next.2
+      '@twin.org/tracing-facades': 0.10.1-next.2
+      '@twin.org/tracing-models': 0.10.1-next.2
+      '@twin.org/tracing-processors': 0.10.1-next.2
+      '@twin.org/tracing-rest-client': 0.10.1-next.2(supports-color@10.2.2)
+      '@twin.org/tracing-service': 0.10.1-next.2
       '@twin.org/trust-generators': 0.10.1-next.1
       '@twin.org/trust-models': 0.10.1-next.1
       '@twin.org/trust-service': 0.10.1-next.1
@@ -8360,13 +8360,13 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@twin.org/engine@0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@twin.org/engine@0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/engine-core': 0.10.1-next.6
-      '@twin.org/engine-models': 0.10.1-next.6
-      '@twin.org/engine-types': 0.10.1-next.6(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
+      '@twin.org/engine-core': 0.10.1-next.7
+      '@twin.org/engine-models': 0.10.1-next.7
+      '@twin.org/engine-types': 0.10.1-next.7(@opentelemetry/api@1.9.1)(@types/node@26.6.2)(buffer@6.0.3)(socks@2.8.9)(supports-color@10.2.2)(typescript@6.0.3)
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
@@ -8399,7 +8399,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - supports-color
@@ -8414,7 +8414,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/entity-storage-connector-file@0.10.1-next.14':
@@ -8424,7 +8424,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/entity-storage-connector-gcp-firestore@0.10.1-next.14(supports-color@10.2.2)':
@@ -8435,7 +8435,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       google-auth-library: 11.1.0(supports-color@10.2.2)
     transitivePeerDependencies:
@@ -8448,7 +8448,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/entity-storage-connector-mongodb@0.10.1-next.14(socks@2.8.9)':
@@ -8458,7 +8458,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       mongodb: 7.6.0(socks@2.8.9)
     transitivePeerDependencies:
@@ -8478,7 +8478,7 @@ snapshots:
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       mysql2: 3.24.4(@types/node@26.6.2)
     transitivePeerDependencies:
@@ -8491,7 +8491,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       postgres: 3.4.9
 
@@ -8502,7 +8502,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       cassandra-driver: 4.9.0
 
@@ -8512,7 +8512,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/entity-storage-rest-client@0.10.1-next.14(supports-color@10.2.2)':
@@ -8536,7 +8536,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
@@ -8551,7 +8551,7 @@ snapshots:
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/event-bus-models': 0.9.2-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/event-bus-models@0.9.2-next.2':
@@ -8564,7 +8564,7 @@ snapshots:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/event-bus-models': 0.9.2-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/event-bus-socket-client@0.9.2-next.2(supports-color@10.2.2)':
@@ -8573,7 +8573,7 @@ snapshots:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/event-bus-models': 0.9.2-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - bufferutil
@@ -8589,7 +8589,7 @@ snapshots:
       '@twin.org/entity-storage-models': 0.10.1-next.14
       '@twin.org/federated-catalogue-models': 0.10.1-next.2
       '@twin.org/federated-catalogue-service': 0.10.1-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
       '@twin.org/standards-w3c-dcat': 0.10.1-next.1
@@ -8637,7 +8637,7 @@ snapshots:
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
       '@twin.org/federated-catalogue-models': 0.10.1-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
       '@twin.org/standards-dublin-core': 0.10.1-next.1
@@ -8779,7 +8779,7 @@ snapshots:
       '@twin.org/identity-models': 0.10.1-next.6
       '@twin.org/immutable-proof-models': 0.10.1-next.6
       '@twin.org/immutable-proof-task': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/notarization-models': 0.10.1-next.1
       '@twin.org/standards-w3c-did': 0.10.1-next.1
@@ -8793,44 +8793,44 @@ snapshots:
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/identity-models': 0.10.1-next.6
       '@twin.org/immutable-proof-models': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/notarization-models': 0.10.1-next.1
       '@twin.org/standards-w3c-did': 0.10.1-next.1
 
-  '@twin.org/logging-connector-console@0.10.1-next.3':
+  '@twin.org/logging-connector-console@0.10.1-next.4':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/logging-connector-elk@0.10.1-next.3':
+  '@twin.org/logging-connector-elk@0.10.1-next.4':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
-  '@twin.org/logging-connector-entity-storage@0.10.1-next.3':
+  '@twin.org/logging-connector-entity-storage@0.10.1-next.4':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/logging-connector-file@0.10.1-next.3':
+  '@twin.org/logging-connector-file@0.10.1-next.4':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/logging-connector-opentelemetry@0.10.1-next.3(@opentelemetry/api@1.9.1)':
+  '@twin.org/logging-connector-opentelemetry@0.10.1-next.4(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api-logs': 0.222.0
       '@opentelemetry/exporter-logs-otlp-http': 0.222.0(@opentelemetry/api@1.9.1)
@@ -8839,24 +8839,24 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.43.0
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@twin.org/logging-models@0.10.1-next.3':
+  '@twin.org/logging-models@0.10.1-next.4':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/logging-rest-client@0.10.1-next.3(supports-color@10.2.2)':
+  '@twin.org/logging-rest-client@0.10.1-next.4(supports-color@10.2.2)':
     dependencies:
       '@twin.org/api-core': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
     transitivePeerDependencies:
@@ -8864,12 +8864,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@twin.org/logging-service@0.10.1-next.3':
+  '@twin.org/logging-service@0.10.1-next.4':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
 
@@ -8878,7 +8878,7 @@ snapshots:
       '@twin.org/background-task-models': 0.10.1-next.1
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/mailbox-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
       googleapis: 178.1.1(supports-color@10.2.2)
@@ -8890,7 +8890,7 @@ snapshots:
       '@twin.org/background-task-models': 0.10.1-next.1
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/mailbox-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
       imapflow: 1.7.7
@@ -8902,7 +8902,7 @@ snapshots:
       '@twin.org/background-task-models': 0.10.1-next.1
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/mailbox-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
     transitivePeerDependencies:
@@ -8916,7 +8916,7 @@ snapshots:
       '@twin.org/background-task-models': 0.10.1-next.1
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/mailbox-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
       node-pop3: 0.15.0
@@ -8951,7 +8951,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/mailbox-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/telemetry-models': 0.10.1-next.1
@@ -8972,7 +8972,7 @@ snapshots:
       '@aws-sdk/client-sns': 3.1105.0
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/messaging-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/web': 0.10.1-next.12
@@ -8982,14 +8982,14 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/messaging-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
 
   '@twin.org/messaging-connector-smtp@0.10.1-next.1':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/messaging-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
       nodemailer: 9.1.0
@@ -9004,7 +9004,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/messaging-models': 0.10.1-next.1
       '@twin.org/nameof': 0.10.1-next.12
 
@@ -9054,7 +9054,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/dlt-account': 0.9.2-next.2
       '@twin.org/dlt-iota': 0.9.2-next.2(typescript@6.0.3)
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/nft-models': 0.10.1-next.1
       '@twin.org/vault-models': 0.10.1-next.4
@@ -9101,7 +9101,7 @@ snapshots:
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/notarization-models': 0.10.1-next.1
 
@@ -9112,7 +9112,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/dlt-account': 0.9.2-next.2
       '@twin.org/dlt-iota': 0.9.2-next.2(typescript@6.0.3)
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/notarization-models': 0.10.1-next.1
       '@twin.org/vault-models': 0.10.1-next.4
@@ -9162,7 +9162,7 @@ snapshots:
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
       '@twin.org/identity-models': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.0.3-next.9
       '@twin.org/standards-w3c-did': 0.10.1-next.1
@@ -9173,7 +9173,7 @@ snapshots:
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/engine-models': 0.10.1-next.6
+      '@twin.org/engine-models': 0.10.1-next.7
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/identity-models': 0.10.1-next.6
       '@twin.org/nameof': 0.10.1-next.12
@@ -9186,7 +9186,7 @@ snapshots:
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/engine-models': 0.10.1-next.6
+      '@twin.org/engine-models': 0.10.1-next.7
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/identity-models': 0.10.1-next.6
       '@twin.org/nameof': 0.10.1-next.12
@@ -9203,7 +9203,7 @@ snapshots:
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -9213,7 +9213,7 @@ snapshots:
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -9223,7 +9223,7 @@ snapshots:
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -9234,7 +9234,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/identity-models': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-w3c-odrl': 0.10.1-next.1
@@ -9247,7 +9247,7 @@ snapshots:
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/data-json-path': 0.10.1-next.2
       '@twin.org/identity-models': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -9257,7 +9257,7 @@ snapshots:
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
 
@@ -9269,7 +9269,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-dataspace-protocol': 0.10.1-next.1
@@ -9280,7 +9280,7 @@ snapshots:
   '@twin.org/rights-management-pxp-service@0.10.1-next.5':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/rights-management-models': 0.10.1-next.5
       '@twin.org/standards-w3c-odrl': 0.10.1-next.1
@@ -9398,7 +9398,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/modules': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/telemetry-models': 0.10.1-next.1
@@ -9413,7 +9413,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/telemetry-connector-entity-storage': 0.10.1-next.1
       '@twin.org/telemetry-models': 0.10.1-next.1
@@ -9429,7 +9429,7 @@ snapshots:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/telemetry-models': 0.10.1-next.1
 
@@ -9459,7 +9459,7 @@ snapshots:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/telemetry-models': 0.10.1-next.1
       '@twin.org/web': 0.10.1-next.12
@@ -9477,13 +9477,13 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/tracing-connector-console@0.10.1-next.1':
+  '@twin.org/tracing-connector-console@0.10.1-next.2':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
 
-  '@twin.org/tracing-connector-entity-storage@0.10.1-next.1':
+  '@twin.org/tracing-connector-entity-storage@0.10.1-next.2':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
@@ -9491,70 +9491,70 @@ snapshots:
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-connector-memory': 0.10.1-next.14
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
 
-  '@twin.org/tracing-connector-opentelemetry@0.10.1-next.1':
+  '@twin.org/tracing-connector-opentelemetry@0.10.1-next.2':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/exporter-trace-otlp-proto': 0.221.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/resources': 2.10.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-trace': 2.10.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/core': 2.11.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/exporter-trace-otlp-proto': 0.222.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/resources': 2.11.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace': 2.11.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
 
-  '@twin.org/tracing-facades@0.10.1-next.1':
+  '@twin.org/tracing-facades@0.10.1-next.2':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
 
-  '@twin.org/tracing-models@0.10.1-next.1':
+  '@twin.org/tracing-models@0.10.1-next.2':
     dependencies:
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
 
-  '@twin.org/tracing-processors@0.10.1-next.1':
+  '@twin.org/tracing-processors@0.10.1-next.2':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/context': 0.10.1-next.12
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
       '@twin.org/web': 0.10.1-next.12
 
-  '@twin.org/tracing-rest-client@0.10.1-next.1(supports-color@10.2.2)':
+  '@twin.org/tracing-rest-client@0.10.1-next.2(supports-color@10.2.2)':
     dependencies:
       '@twin.org/api-core': 0.10.1-next.8(supports-color@10.2.2)
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
       '@twin.org/web': 0.10.1-next.12
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@twin.org/tracing-service@0.10.1-next.1':
+  '@twin.org/tracing-service@0.10.1-next.2':
     dependencies:
       '@twin.org/api-models': 0.10.1-next.8
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/nameof': 0.10.1-next.12
-      '@twin.org/tracing-models': 0.10.1-next.1
+      '@twin.org/tracing-models': 0.10.1-next.2
       '@twin.org/web': 0.10.1-next.12
 
   '@twin.org/trust-generators@0.10.1-next.1':
@@ -9562,7 +9562,7 @@ snapshots:
       '@twin.org/core': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/identity-models': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/trust-models': 0.10.1-next.1
       '@twin.org/web': 0.10.1-next.12
@@ -9577,7 +9577,7 @@ snapshots:
   '@twin.org/trust-service@0.10.1-next.1':
     dependencies:
       '@twin.org/core': 0.10.1-next.12
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/trust-models': 0.10.1-next.1
 
@@ -9587,7 +9587,7 @@ snapshots:
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/data-json-ld': 0.10.1-next.2
       '@twin.org/identity-models': 0.10.1-next.6
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/trust-models': 0.10.1-next.1
       '@twin.org/web': 0.10.1-next.12
@@ -9629,7 +9629,7 @@ snapshots:
       '@twin.org/crypto': 0.10.1-next.12
       '@twin.org/entity': 0.10.1-next.12
       '@twin.org/entity-storage-models': 0.10.1-next.14
-      '@twin.org/logging-models': 0.10.1-next.3
+      '@twin.org/logging-models': 0.10.1-next.4
       '@twin.org/nameof': 0.10.1-next.12
       '@twin.org/vault-models': 0.10.1-next.4
       '@twin.org/web': 0.10.1-next.12

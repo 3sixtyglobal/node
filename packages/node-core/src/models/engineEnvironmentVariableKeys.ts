@@ -12,6 +12,7 @@ const engineEnvironmentVariableKeysInternal: {
 	// global
 	debug: true,
 	silent: true,
+	disableColor: true,
 	strictEnv: true,
 	envAllowList: true,
 	storageFileRoot: true,
@@ -121,6 +122,7 @@ const engineEnvironmentVariableKeysInternal: {
 	loggingRetentionInterval: true,
 	loggingRetentionBatchSize: true,
 	loggingSilentComponents: true,
+	loggingLevels: true,
 	loggingFileDirectory: true,
 	loggingFileFilename: true,
 	loggingFileMaxFileSizeBytes: true,

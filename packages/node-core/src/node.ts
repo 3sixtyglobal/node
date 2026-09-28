@@ -61,28 +61,7 @@ export async function run(
 			version: nodeOptions?.serverVersion ?? "0.10.1-next.9" // x-release-please-version
 		};
 
-		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
-
-		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
-			nodeOptions.executionDirectory = getExecutionDirectory();
-		}
-		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
-
-		if (!Is.stringValue(nodeOptions?.scriptDirectory)) {
-			nodeOptions.scriptDirectory = getScriptDirectory(args);
-		}
-		CLIDisplay.value("Script Directory", nodeOptions.scriptDirectory);
-
-		nodeOptions.localesDirectory =
-			nodeOptions?.localesDirectory ??
-			path.resolve(path.join(nodeOptions.scriptDirectory, "dist", "locales"));
-
-		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
-		await initialiseLocales(nodeOptions.localesDirectory);
-
 		nodeOptions.envPrefix ??= "TWIN_";
-
-		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
 		const commandLineArgs = parseCommandLineArgs(args);
 
@@ -90,8 +69,6 @@ export async function run(
 		if (hasEnvPrefix) {
 			nodeOptions.envPrefix = Coerce.string(hasEnvPrefix.value) ?? nodeOptions.envPrefix;
 		}
-
-		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		// This is the only location in the code base that should access process.env directly
 		// So we can safely disable the linting rule here.
@@ -112,6 +89,34 @@ export async function run(
 			...getEnvDefaults(nodeOptions.envPrefix),
 			...finalEnvVars
 		};
+
+		// Applied before any output so the header is also uncoloured.
+		if (Coerce.boolean(finalEnvVars[`${nodeOptions.envPrefix}DISABLE_COLOR`]) ?? false) {
+			CLIDisplay.setColorEnabled(false);
+		}
+
+		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
+
+		if (!Is.stringValue(nodeOptions?.executionDirectory)) {
+			nodeOptions.executionDirectory = getExecutionDirectory();
+		}
+		CLIDisplay.value("Execution Directory", nodeOptions.executionDirectory);
+
+		if (!Is.stringValue(nodeOptions?.scriptDirectory)) {
+			nodeOptions.scriptDirectory = getScriptDirectory(args);
+		}
+		CLIDisplay.value("Script Directory", nodeOptions.scriptDirectory);
+
+		nodeOptions.localesDirectory =
+			nodeOptions?.localesDirectory ??
+			path.resolve(path.join(nodeOptions.scriptDirectory, "dist", "locales"));
+
+		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
+		await initialiseLocales(nodeOptions.localesDirectory);
+
+		overrideModuleImport(nodeOptions.executionDirectory ?? "");
+
+		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
 
 		let cliCommand;
 		if (Is.arrayValue(commandLineArgs.options)) {
@@ -154,7 +159,6 @@ export async function run(
 			nodeOptions,
 			serverInfo
 		);
-
 		await initialiseNativeModules(
 			EnvHelper.commaSeparatedListToArray<string>(nodeEnvVars.nativeModules, [
 				"node:buffer",

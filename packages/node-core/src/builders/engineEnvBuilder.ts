@@ -6,6 +6,7 @@ import { EnvHelper, Is, Mutex } from "@twin.org/core";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
 import {
 	EngineCloneMode,
+	EngineLogLevel,
 	type IEngineCoreTypeConfig,
 	type IEngineFacadeConfig
 } from "@twin.org/engine-models";
@@ -97,6 +98,7 @@ import {
 	type IOpenTelemetryOtlpExporterConfig,
 	OpenTelemetryExporterTypes
 } from "@twin.org/logging-connector-opentelemetry";
+import { LogLevel } from "@twin.org/logging-models";
 import {
 	type IOpenTelemetryTelemetryConnectorConfig,
 	OpenTelemetryReaderTypes
@@ -132,9 +134,29 @@ export async function buildEngineConfiguration(
 		envVars.stateFilename = path.join(envVars.storageFileRoot, envVars.stateFilename);
 	}
 
+	const silent = EnvHelper.envBoolean(envVars, "silent", false);
+	const loggingLevels = getLoggingLevels(envVars);
+
+	let logLevel: EngineLogLevel | undefined;
+	if (silent) {
+		// Silent still reports errors, so a failure during bootstrap or start is not hidden.
+		logLevel = EngineLogLevel.Error;
+	} else if (Is.arrayValue(loggingLevels)) {
+		// The engine logger only supports thresholds, so use the nearest one which hides nothing listed.
+		if (loggingLevels.some(level => level !== LogLevel.Error && level !== LogLevel.Warn)) {
+			logLevel = EngineLogLevel.All;
+		} else if (loggingLevels.includes(LogLevel.Warn)) {
+			logLevel = EngineLogLevel.Warn;
+		} else {
+			logLevel = EngineLogLevel.Error;
+		}
+	}
+
 	const coreConfig: IEngineConfig = {
 		debug: EnvHelper.envBoolean(envVars, "debug", false),
-		silent: EnvHelper.envBoolean(envVars, "silent", false),
+		silent,
+		logLevel,
+		disableColor: EnvHelper.envBoolean(envVars, "disableColor", false),
 		silentComponents: {
 			logging: EnvHelper.commaSeparatedListToArray(envVars.loggingSilentComponents),
 			telemetry: EnvHelper.commaSeparatedListToArray(envVars.telemetrySilentComponents),
@@ -527,6 +549,7 @@ async function configureLogging(
 		IEngineEnvironmentVariables,
 		LoggingConnectorType
 	>(envVars, "loggingConnector", Object.values(LoggingConnectorType));
+	const levels = getLoggingLevels(envVars);
 	let additionalConnectorCount = 0;
 
 	for (const loggingConnector of loggingConnectorTypes) {
@@ -536,7 +559,10 @@ async function configureLogging(
 				options: {
 					config: {
 						translateMessages: true,
-						hideGroups: true
+						hideGroups: true,
+						disableColor: coreConfig.disableColor,
+						// Silent still reports errors, matching the engine logger.
+						levels: coreConfig.silent ? [LogLevel.Error] : levels
 					}
 				}
 			});
@@ -546,6 +572,7 @@ async function configureLogging(
 				type: LoggingConnectorType.EntityStorage,
 				options: {
 					config: {
+						levels,
 						batchSize: EnvHelper.envCount(envVars, "loggingBatchSize"),
 						batchIntervalMs: EnvHelper.envSecToMs(envVars, "loggingBatchFlushInterval"),
 						retainForMs: EnvHelper.envMinToMs(envVars, "loggingRetainFor"),
@@ -558,6 +585,7 @@ async function configureLogging(
 			additionalConnectorCount++;
 		} else if (loggingConnector === LoggingConnectorType.OpenTelemetry) {
 			const otelLoggingConfig: IOpenTelemetryLoggingConnectorConfig = {
+				levels,
 				loggerName: envVars.openTelemetryLoggingLoggerName,
 				loggerVersion: envVars.openTelemetryLoggingLoggerVersion
 			};
@@ -584,6 +612,7 @@ async function configureLogging(
 				type: LoggingConnectorType.File,
 				options: {
 					config: {
+						levels,
 						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
 						filename: envVars.loggingFileFilename,
 						maxFileSizeBytes: EnvHelper.envCount(envVars, "loggingFileMaxFileSizeBytes"),
@@ -889,7 +918,12 @@ async function configureTracing(
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.Console) {
 			coreConfig.types.tracingConnector.push({
-				type: TracingConnectorType.Console
+				type: TracingConnectorType.Console,
+				options: {
+					config: {
+						disableColor: coreConfig.disableColor
+					}
+				}
 			});
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.OpenTelemetry) {
@@ -2491,5 +2525,20 @@ export function isMailboxEnabled(envVars: IEngineEnvironmentVariables): boolean 
 			t === EmailProtocolConnectorType.Pop3 ||
 			t === EmailProtocolConnectorType.Gmail ||
 			t === EmailProtocolConnectorType.Outlook
+	);
+}
+
+/**
+ * Get the log levels the logging connectors should record.
+ * @param envVars The environment variables.
+ * @returns The log levels, or undefined when not configured.
+ * @throws GeneralError if the list contains an unknown log level.
+ */
+function getLoggingLevels(envVars: IEngineEnvironmentVariables): LogLevel[] | undefined {
+	return EnvHelper.envListToArray<IEngineEnvironmentVariables, LogLevel>(
+		envVars,
+		"loggingLevels",
+		Object.values(LogLevel),
+		undefined
 	);
 }

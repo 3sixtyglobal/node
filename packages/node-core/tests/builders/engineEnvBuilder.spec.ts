@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { EngineCloneMode } from "@twin.org/engine-models";
+import { EngineCloneMode, EngineLogLevel } from "@twin.org/engine-models";
 import {
 	DataConverterConnectorType,
 	DataExtractorConnectorType,
@@ -31,9 +31,146 @@ import {
 	TracingConnectorType,
 	TrustVerifierComponentType
 } from "@twin.org/engine-types";
+import { LogLevel } from "@twin.org/logging-models";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
 import type { IEngineEnvironmentVariables } from "../../src/models/IEngineEnvironmentVariables.js";
+
+describe("buildEngineConfiguration - silent", () => {
+	test("log level is left unset when silent is not enabled", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.silent).toBe(false);
+		expect(config.logLevel).toBeUndefined();
+	});
+
+	test("log level is restricted to errors when silent is enabled", async () => {
+		const config = await buildEngineConfiguration({ silent: "true" });
+
+		expect(config.silent).toBe(true);
+		expect(config.logLevel).toBe(EngineLogLevel.Error);
+	});
+
+	test("console logging connector shows all levels when silent is not enabled", async () => {
+		const config = await buildEngineConfiguration({ loggingConnector: "console" });
+
+		const consoleConnector = config.types.loggingConnector?.find(
+			c => c.type === LoggingConnectorType.Console
+		);
+		expect(consoleConnector?.options?.config?.levels).toBeUndefined();
+	});
+
+	test("console logging connector is restricted to errors when silent is enabled", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage",
+			silent: "true"
+		});
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const entityStorage = connectors.find(c => c.type === LoggingConnectorType.EntityStorage);
+		expect(consoleConnector?.options?.config?.levels).toEqual([LogLevel.Error]);
+		expect(entityStorage?.options?.config?.levels).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - loggingLevels", () => {
+	test("logging levels are applied to every logging connector", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage,open-telemetry,file",
+			loggingLevels: "error,warn",
+			storageFileRoot: "./logs"
+		});
+
+		const connectors = (config.types.loggingConnector ?? []).filter(
+			c => c.type !== LoggingConnectorType.Multi
+		);
+		expect(connectors).toHaveLength(4);
+		for (const connector of connectors) {
+			expect(connector.options?.config?.levels).toEqual([LogLevel.Error, LogLevel.Warn]);
+		}
+	});
+
+	test("silent takes precedence over logging levels for the console connector only", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage",
+			loggingLevels: "error,info",
+			silent: "true"
+		});
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const entityStorage = connectors.find(c => c.type === LoggingConnectorType.EntityStorage);
+		expect(consoleConnector?.options?.config?.levels).toEqual([LogLevel.Error]);
+		expect(entityStorage?.options?.config?.levels).toEqual([LogLevel.Error, LogLevel.Info]);
+		expect(config.logLevel).toBe(EngineLogLevel.Error);
+	});
+
+	test("unknown logging levels are rejected when silent is enabled", async () => {
+		await expect(
+			buildEngineConfiguration({ loggingLevels: "error,verbose", silent: "true" })
+		).rejects.toThrow();
+	});
+
+	test("engine log level is errors only when only errors are listed", async () => {
+		const config = await buildEngineConfiguration({ loggingLevels: "error" });
+
+		expect(config.logLevel).toBe(EngineLogLevel.Error);
+	});
+
+	test("engine log level includes warnings when warn is listed", async () => {
+		const config = await buildEngineConfiguration({ loggingLevels: "warn,error" });
+
+		expect(config.logLevel).toBe(EngineLogLevel.Warn);
+	});
+
+	test("engine log level is all when a level below warn is listed", async () => {
+		const config = await buildEngineConfiguration({ loggingLevels: "error,debug" });
+
+		expect(config.logLevel).toBe(EngineLogLevel.All);
+	});
+
+	test("unknown logging levels are rejected", async () => {
+		await expect(buildEngineConfiguration({ loggingLevels: "error,verbose" })).rejects.toThrow();
+	});
+});
+
+describe("buildEngineConfiguration - disableColor", () => {
+	test("console connectors keep colour when disableColor is not set", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console",
+			tracingConnector: "console"
+		});
+
+		const logging = config.types.loggingConnector?.find(
+			c => c.type === LoggingConnectorType.Console
+		);
+		const tracing = config.types.tracingConnector?.find(
+			c => c.type === TracingConnectorType.Console
+		);
+		expect(config.disableColor).toBe(false);
+		expect(logging?.options?.config?.disableColor).toBe(false);
+		expect(tracing?.options?.config?.disableColor).toBe(false);
+	});
+
+	test("console connectors disable colour when disableColor is enabled", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console",
+			tracingConnector: "console",
+			disableColor: "true"
+		});
+
+		const logging = config.types.loggingConnector?.find(
+			c => c.type === LoggingConnectorType.Console
+		);
+		const tracing = config.types.tracingConnector?.find(
+			c => c.type === TracingConnectorType.Console
+		);
+		expect(config.disableColor).toBe(true);
+		expect(logging?.options?.config?.disableColor).toBe(true);
+		expect(tracing?.options?.config?.disableColor).toBe(true);
+	});
+});
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
