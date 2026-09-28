@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.1-next.10](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.9...node-v0.10.1-next.10) (2026-09-28)
+
+
+### Features
+
+* disable console colour ([#453](https://github.com/iotaledger/twin-node/issues/453)) ([e877127](https://github.com/iotaledger/twin-node/commit/e877127d3caf79eec8ba8bb0a7d2683c652a8cf6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.10.1-next.9 to 0.10.1-next.10
+
 ## [0.10.1-next.9](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.8...node-v0.10.1-next.9) (2026-09-26)
 
 
