@@ -65,6 +65,8 @@
 - [registerCommands](functions/registerCommands.md)
 - [getEnvDefaults](functions/getEnvDefaults.md)
 - [run](functions/run.md)
+- [loadEnvironmentVariables](functions/loadEnvironmentVariables.md)
+- [processEnvironmentVariables](functions/processEnvironmentVariables.md)
 - [buildConfiguration](functions/buildConfiguration.md)
 - [overrideModuleImport](functions/overrideModuleImport.md)
 - [start](functions/start.md)
