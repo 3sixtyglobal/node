@@ -16,7 +16,15 @@ Start the engine in debug mode.
 
 > `optional` **silent?**: `string`
 
-Start the engine in silent mode.
+Start the engine in silent mode, errors are still reported.
+
+***
+
+### disableColor? {#disablecolor}
+
+> `optional` **disableColor?**: `string`
+
+Disable colour in the console output.
 
 ***
 
@@ -796,6 +804,15 @@ Keeping this value smaller helps avoid spikes in database load.
 > `optional` **loggingSilentComponents?**: `string`
 
 A list of components to exclude from logging, can be a comma separated list of component Class names e.g. "ComponentA,ComponentB".
+
+***
+
+### loggingLevels? {#logginglevels}
+
+> `optional` **loggingLevels?**: `string`
+
+The log levels to record on all logging connectors, can be a comma separated list: error, warn, info, debug, trace.
+Silent takes precedence for the console logging connector, defaults to all levels.
 
 ***
 
