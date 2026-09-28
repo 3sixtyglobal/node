@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.1-next.11](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.10...node-v0.10.1-next.11) (2026-09-28)
+
+
+### Features
+
+* additional colour stripping ([429abbe](https://github.com/iotaledger/twin-node/commit/429abbe6c7efba57f42904eef904096d17aee5f3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/node-core bumped from 0.10.1-next.10 to 0.10.1-next.11
+
 ## [0.10.1-next.10](https://github.com/iotaledger/twin-node/compare/node-v0.10.1-next.9...node-v0.10.1-next.10) (2026-09-28)
 
 
