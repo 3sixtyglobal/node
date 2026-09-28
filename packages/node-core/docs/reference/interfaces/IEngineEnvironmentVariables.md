@@ -2048,6 +2048,21 @@ progressing it before it is treated as timed out.
 
 ***
 
+### dataspaceRetainTerminalTransfersFor? {#dataspaceretainterminaltransfersfor}
+
+> `optional` **dataspaceRetainTerminalTransfersFor?**: `string`
+
+How long in seconds COMPLETED and TERMINATED transfer records are kept before removal.
+Set to -1 to keep them forever; -1 is the only value that disables removal.
+
+#### Default
+
+```ts
+2592000
+```
+
+***
+
 ### dataspaceProviderTransferIdleTimeout? {#dataspaceprovidertransferidletimeout}
 
 > `optional` **dataspaceProviderTransferIdleTimeout?**: `string`
