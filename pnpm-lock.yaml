@@ -242,7 +242,7 @@ importers:
   apps/node:
     dependencies:
       '@twin.org/node-core':
-        specifier: 0.10.1-next.12
+        specifier: 0.11.1-next.0
         version: link:../../packages/node-core
     devDependencies:
       '@twin.org/entity-storage-connector-memory':

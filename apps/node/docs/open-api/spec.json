@@ -2399,6 +2399,15 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"name": "removeDocumentKey",
+						"description": "Also remove the document key from the vault.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"security": [
@@ -12777,7 +12786,7 @@
 					},
 					{
 						"name": "limit",
-						"description": "Limit the number of entities to return.",
+						"description": "The maximum number of entities to return, a page can contain fewer so follow the cursor\nuntil it is absent to read them all.",
 						"in": "query",
 						"required": false,
 						"schema": {
