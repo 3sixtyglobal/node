@@ -6,6 +6,12 @@
  */
 export interface INodeEnvironmentVariables {
 	/**
+	 * Comma separated list of native modules to initialise.
+	 * @default "node:buffer,node:crypto,node:zlib"
+	 */
+	nativeModules?: string;
+
+	/**
 	 * Maximum size in MB for HTTPS extensions downloads.
 	 * @default 10
 	 */

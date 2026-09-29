@@ -60,7 +60,7 @@ thresholds are breached.
 
 ```bash
 # from the repo, target this app:
-npm --workspace apps/node run test:soak
+pnpm --dir apps/node run test:soak
 ```
 
 Phase 1 prints progress and exits 0 once the node is healthy. Server stdout/stderr is

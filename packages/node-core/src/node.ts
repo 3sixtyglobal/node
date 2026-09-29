@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
 import type { IServerInfo } from "@twin.org/api-models";
-import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
-import { Coerce, EnvHelper, GeneralError, Guards, I18n, Is } from "@twin.org/core";
+import { CLIDisplay } from "@twin.org/cli-core";
+import { Coerce, EnvHelper, I18n, Is } from "@twin.org/core";
 import type { Engine } from "@twin.org/engine";
 import type { EngineServer } from "@twin.org/engine-server";
 import type { IEngineServerConfig } from "@twin.org/engine-server-types";
@@ -12,7 +12,6 @@ import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
 import { extensionsConfiguration } from "./builders/extensionsBuilder.js";
-import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { constructCliCommand, parseCommandLineArgs, registerCommands } from "./cli.js";
 import { getEnvDefaults } from "./defaults.js";
 import { BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS } from "./models/bootstrapDevEnvironmentVariableKeys.js";
@@ -23,25 +22,17 @@ import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
-import { ModuleProtocol } from "./models/moduleProtocol.js";
 import { NODE_ENVIRONMENT_VARIABLE_KEYS } from "./models/nodeEnvironmentVariableKeys.js";
 import { start } from "./start.js";
 import {
-	createModuleImportUrl,
 	fileExists,
 	getExecutionDirectory,
-	getExtensionsCacheDir,
 	getScriptDirectory,
-	handleHttpsProtocol,
-	handleNpmProtocol,
 	initialiseLocales,
+	initialiseNativeModules,
 	loadJsonFile,
-	loadTextFile,
-	parseModuleProtocol,
-	resolvePackageEntryPoint
+	loadTextFile
 } from "./utils.js";
-
-const moduleCache: { [id: string]: unknown } = {};
 
 /**
  * Run the node.
@@ -67,8 +58,32 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.10.0" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.10.1-next.12" // x-release-please-version
 		};
+
+		nodeOptions.envPrefix ??= "TWIN_";
+
+		const commandLineArgs = parseCommandLineArgs(args);
+
+		const hasEnvPrefix = commandLineArgs.options?.find(option => option.key === "env-prefix");
+		if (hasEnvPrefix) {
+			nodeOptions.envPrefix = Coerce.string(hasEnvPrefix.value) ?? nodeOptions.envPrefix;
+		}
+
+		const isDefaultEnvFile = Is.empty(nodeOptions.envFilenames);
+
+		const processEnv = loadEnvironmentVariables(
+			// This is the only location in the code base that should access process.env directly
+			// So we can safely disable the linting rule here.
+			// eslint-disable-next-line no-restricted-syntax
+			process.env,
+			nodeOptions
+		);
+
+		// Applied before any output so the header is also uncoloured.
+		if (Coerce.boolean(processEnv[`${nodeOptions.envPrefix}DISABLE_COLOR`]) ?? false) {
+			CLIDisplay.setColorEnabled(false);
+		}
 
 		CLIDisplay.header(serverInfo.name, serverInfo.version, "🌩️ ");
 
@@ -89,47 +104,18 @@ export async function run(
 		CLIDisplay.value("Locales Directory", nodeOptions.localesDirectory);
 		await initialiseLocales(nodeOptions.localesDirectory);
 
-		nodeOptions.envPrefix ??= "TWIN_";
-
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
-		const commandLineArgs = parseCommandLineArgs(args);
-
-		const hasEnvPrefix = commandLineArgs.options?.find(option => option.key === "env-prefix");
-		if (hasEnvPrefix) {
-			nodeOptions.envPrefix = Coerce.string(hasEnvPrefix.value) ?? nodeOptions.envPrefix;
-		}
-
 		CLIDisplay.value("Environment Variable Prefix", nodeOptions.envPrefix);
-
-		// This is the only location in the code base that should access process.env directly
-		// So we can safely disable the linting rule here.
-		let finalEnvVars =
-			// eslint-disable-next-line no-restricted-syntax
-			process.env as {
-				[id: string]: string;
-			};
-
-		if (Is.objectValue(nodeOptions?.envVars)) {
-			finalEnvVars = {
-				...finalEnvVars,
-				...nodeOptions.envVars
-			};
-		}
-
-		finalEnvVars = {
-			...getEnvDefaults(nodeOptions.envPrefix),
-			...finalEnvVars
-		};
 
 		let cliCommand;
 		if (Is.arrayValue(commandLineArgs.options)) {
 			registerCommands();
-			cliCommand = constructCliCommand(finalEnvVars, commandLineArgs);
+			cliCommand = constructCliCommand(processEnv, commandLineArgs);
 		}
 
 		if (Is.object(cliCommand)) {
-			finalEnvVars[`${nodeOptions.envPrefix}SILENT`] ??= "true";
+			processEnv[`${nodeOptions.envPrefix}SILENT`] ??= "true";
 		} else {
 			if (Is.empty(nodeOptions?.openApiSpecFile)) {
 				const specFile = path.resolve(
@@ -158,10 +144,23 @@ export async function run(
 			}
 		}
 
-		const { nodeEngineConfig, nodeEnvVars, availableContextIdKeys } = await buildConfiguration(
-			finalEnvVars,
+		if (isDefaultEnvFile) {
+			CLIDisplay.value("Default Environment File", nodeOptions.envFilenames?.[0]);
+		}
+
+		const nodeEnvVars = await processEnvironmentVariables(processEnv, nodeOptions);
+
+		const { nodeEngineConfig, availableContextIdKeys } = await buildConfiguration(
+			nodeEnvVars,
 			nodeOptions,
 			serverInfo
+		);
+		await initialiseNativeModules(
+			EnvHelper.commaSeparatedListToArray<string>(nodeEnvVars.nativeModules, [
+				"node:buffer",
+				"node:crypto",
+				"node:zlib"
+			]) ?? []
 		);
 
 		debugEnabled = Coerce.boolean(nodeEnvVars.debug) ?? debugEnabled;
@@ -208,168 +207,105 @@ export async function run(
 }
 
 /**
- * Test whether a camelCase key matches an entry in a pattern set.
- * Entries ending with "*" are treated as prefix patterns; all others require an exact match.
- * @param camelKey The camelCase key to test.
- * @param patternSet The set of exact keys and/or wildcard patterns (e.g. "restPath*").
- * @returns True if the key matches any entry.
- */
-function matchesPatternSet(
-	camelKey: string,
-	patternSet: ReadonlySet<string> | Set<string>
-): boolean {
-	if (patternSet.has(camelKey)) {
-		return true;
-	}
-	for (const pattern of patternSet) {
-		if (pattern.endsWith("*") && camelKey.startsWith(pattern.slice(0, -1))) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
- * Report any environment variables which are still recognised but no longer used.
- * @param envVars The already-converted camelCase env variables.
- * @param prefix The prefix used for the environment variables (e.g. "TWIN_").
- */
-function warnDeprecatedEnvVarKeys(
-	envVars: { [id: string]: string | unknown },
-	prefix: string
-): void {
-	for (const camelKey of Object.keys(envVars)) {
-		const replacements = DEPRECATED_ENVIRONMENT_VARIABLE_KEYS.get(camelKey);
-		if (!Is.undefined(replacements)) {
-			const key = EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix);
-
-			if (Is.arrayValue(replacements)) {
-				CLIDisplay.warning(
-					I18n.formatMessage("warn.node.deprecatedEnvVar", {
-						key,
-						replacements: replacements
-							.map(replacement => EnvHelper.jsonKeyToEnvVarKey(replacement, prefix))
-							.join(", ")
-					})
-				);
-			} else {
-				CLIDisplay.warning(I18n.formatMessage("warn.node.deprecatedEnvVarNoReplacement", { key }));
-			}
-		}
-	}
-}
-
-/**
- * Validate that every key in envVars maps to a recognised property.
- * All unknown keys are collected, then reported together as a single error or warning.
- * Raw env var names listed in the allow list (e.g. TWIN_MY_EXTENSION_SECRET, TWIN_REST_PATH_*) are always accepted.
- * Wildcard patterns ending with * are supported in both allow sets and the allow list.
- * @param envVars The already-converted camelCase env variables.
- * @param prefix The prefix used for the environment variables (e.g. "TWIN_").
- * @param allowSets An array of sets of allowed keys and/or wildcard patterns.
- * @throws GeneralError If any unknown env var properties are found and strict mode is "error", or if the strict mode value is invalid.
- */
-function validateEnvVarKeys(
-	envVars: { [id: string]: string | unknown },
-	prefix: string,
-	allowSets: ReadonlySet<string>[]
-): void {
-	const mode = Is.stringValue(envVars.strictEnv) ? envVars.strictEnv : "error";
-	Guards.arrayOneOf("node", `${prefix}STRICT_ENV`, mode, ["error", "warn", "ignore"]);
-
-	if (mode === "ignore") {
-		return;
-	}
-
-	const customSet = new Set(
-		commaSeparatedListToArray<string>(envVars.envAllowList as string).map(k =>
-			EnvHelper.envVarKeyToJsonKey(k.trim(), prefix)
-		)
-	);
-
-	const unknown = Object.keys(envVars)
-		.filter(
-			camelKey =>
-				!allowSets.some(set => matchesPatternSet(camelKey, set)) &&
-				!matchesPatternSet(camelKey, customSet) &&
-				!DEPRECATED_ENVIRONMENT_VARIABLE_KEYS.has(camelKey)
-		)
-		.map(camelKey => EnvHelper.jsonKeyToEnvVarKey(camelKey, prefix));
-
-	if (unknown.length > 0) {
-		if (mode === "error") {
-			throw new GeneralError("node", "unknownEnvVars", { keys: unknown.join(", "), prefix });
-		}
-		CLIDisplay.warning(
-			I18n.formatMessage("warn.node.unknownEnvVars", { keys: unknown.join(", "), prefix })
-		);
-	}
-}
-
-/**
- * Build the configuration for the TWIN Node.
+ * Load the environment variables for the TWIN Node, without producing any output.
  * @param processEnv The environment variables from the process.
- * @param options The options for running the server.
- * @param serverInfo The server information.
- * @returns A promise that resolves to the engine server configuration, environment prefix, environment variables,
- * and options.
+ * @param options The options for running the server, envFilenames defaults to the .env file in the execution directory.
+ * @returns The environment variables, with the options and env files applied.
+ * @throws Error if a custom env file cannot be loaded.
  */
-export async function buildConfiguration(
-	processEnv: {
-		[id: string]: string;
-	},
-	options: INodeOptions,
-	serverInfo: IServerInfo
-): Promise<{
-	nodeEnvVars: IEnvironmentVariables & { [id: string]: string | unknown };
-	nodeEngineConfig: INodeEngineConfig;
-	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[];
-}> {
-	const availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
+export function loadEnvironmentVariables(
+	processEnv: { [id: string]: string | undefined },
+	options: INodeOptions
+): { [id: string]: string } {
+	const loadedEnv: { [id: string]: string } = {
+		...getEnvDefaults(options.envPrefix ?? ""),
+		...(processEnv as { [id: string]: string }),
+		...options.envVars
+	};
 
 	let defaultEnvOnly = false;
-	if (Is.empty(options?.envFilenames)) {
-		const envFile = path.resolve(path.join(options.executionDirectory ?? "", ".env"));
-		CLIDisplay.value("Default Environment File", envFile);
-		options ??= {};
-		options.envFilenames = [envFile];
+	if (Is.empty(options.envFilenames)) {
+		options.envFilenames = [path.resolve(path.join(options.executionDirectory ?? "", ".env"))];
 		defaultEnvOnly = true;
 	}
 
-	if (Is.arrayValue(options?.envFilenames)) {
-		const output = dotenv.config({
-			path: options?.envFilenames,
-			quiet: true
-		});
+	const output = dotenv.config({
+		path: options.envFilenames,
+		quiet: true
+	});
 
-		// We don't want to throw an error if the default environment file is not found.
-		// Only if we have custom environment files.
-		if (!defaultEnvOnly && output.error) {
-			throw output.error;
-		}
+	// We don't want to throw an error if the default environment file is not found.
+	// Only if we have custom environment files.
+	if (!defaultEnvOnly && output.error) {
+		throw output.error;
+	}
 
-		if (Is.objectValue(output.parsed)) {
-			for (const [key, value] of Object.entries(output.parsed)) {
-				// Only set environment variables that are not already set in
-				// the process environment or provided via options.envVars
-				processEnv[key] ??= value;
-			}
+	if (Is.objectValue(output.parsed)) {
+		for (const [key, value] of Object.entries(output.parsed)) {
+			// Only set environment variables that are not already set in
+			// the process environment or provided via options.envVars
+			loadedEnv[key] ??= value;
 		}
 	}
 
-	const envVars = EnvHelper.envToJson<{ [id: string]: string | unknown }>(
+	return loadedEnv;
+}
+
+/**
+ * Process the loaded environment variables for the TWIN Node.
+ * @param processEnv The loaded environment variables.
+ * @param options The options for running the server.
+ * @returns A promise that resolves to the environment variables for the node.
+ * @throws GeneralError if an environment variable is not recognised in strict mode.
+ */
+export async function processEnvironmentVariables(
+	processEnv: { [id: string]: string },
+	options: INodeOptions
+): Promise<IEnvironmentVariables & { [id: string]: string | unknown }> {
+	const envVars = EnvHelper.envToJson<{ [id: string]: string | undefined }>(
 		processEnv,
 		options.envPrefix ?? ""
 	);
 
-	warnDeprecatedEnvVarKeys(envVars, options.envPrefix ?? "");
+	const deprecated = EnvHelper.warnDeprecatedEnvVarKeys(
+		envVars,
+		options.envPrefix ?? "",
+		DEPRECATED_ENVIRONMENT_VARIABLE_KEYS
+	);
+	for (const warn of deprecated) {
+		if (Is.arrayValue(warn.replacements)) {
+			CLIDisplay.warning(
+				I18n.formatMessage("warn.node.deprecatedEnvVar", {
+					key: warn.key,
+					replacements: warn.replacements.join(", ")
+				})
+			);
+		} else {
+			CLIDisplay.warning(
+				I18n.formatMessage("warn.node.deprecatedEnvVarNoReplacement", { key: warn.key })
+			);
+		}
+	}
 
-	validateEnvVarKeys(envVars, options.envPrefix ?? "", [
-		ENGINE_ENVIRONMENT_VARIABLE_KEYS,
-		ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS,
-		NODE_ENVIRONMENT_VARIABLE_KEYS,
-		BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS
-	]);
+	const invalidKeys = EnvHelper.validateEnvVarKeys(
+		envVars,
+		options.envPrefix ?? "",
+		[
+			ENGINE_ENVIRONMENT_VARIABLE_KEYS,
+			ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS,
+			NODE_ENVIRONMENT_VARIABLE_KEYS,
+			BOOTSTRAP_DEV_ENVIRONMENT_VARIABLE_KEYS
+		],
+		DEPRECATED_ENVIRONMENT_VARIABLE_KEYS
+	);
+	if (Is.arrayValue(invalidKeys)) {
+		CLIDisplay.warning(
+			I18n.formatMessage("warn.node.unknownEnvVars", {
+				keys: invalidKeys.join(", "),
+				prefix: options.envPrefix ?? ""
+			})
+		);
+	}
 
 	// Expand any environment variables that use the @file: syntax
 	const keys = Object.keys(envVars);
@@ -396,6 +332,26 @@ export async function buildConfiguration(
 		CLIDisplay.task("Extending Environment Variables");
 		await options.extendEnvVars(envVars);
 	}
+
+	return envVars;
+}
+
+/**
+ * Build the configuration for the TWIN Node.
+ * @param envVars The environment variables for the node.
+ * @param options The options for running the server.
+ * @param serverInfo The server information.
+ * @returns A promise that resolves to the engine server configuration and the available context ID keys.
+ */
+export async function buildConfiguration(
+	envVars: IEnvironmentVariables & { [id: string]: string | unknown },
+	options: INodeOptions,
+	serverInfo: IServerInfo
+): Promise<{
+	nodeEngineConfig: INodeEngineConfig;
+	availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[];
+}> {
+	const availableContextIdKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
 
 	// Build the engine configuration from the environment variables.
 	const coreConfig = await buildEngineConfiguration(envVars);
@@ -431,11 +387,11 @@ export async function buildConfiguration(
 
 	const nodeEngineConfig = await extensionsConfiguration(envVars, engineServerConfig);
 
-	return { nodeEngineConfig, nodeEnvVars: envVars, availableContextIdKeys };
+	return { nodeEngineConfig, availableContextIdKeys };
 }
 
 /**
- * Override module imports to support protocol-based loading (npm:, https:) and local files.
+ * Configure module resolution to support protocol-based loading (npm:, https:) and local files.
  * @param executionDirectory The execution directory for resolving local module paths.
  * @param envVars The environment variables containing extension configuration (optional, uses defaults if not provided).
  */
@@ -443,113 +399,19 @@ export function overrideModuleImport(
 	executionDirectory: string,
 	envVars?: IEnvironmentVariables
 ): void {
-	const maxSizeMb = Coerce.number(envVars?.extensionsMaxSizeMb) ?? 10;
-	const cacheDirectory = envVars?.extensionsCacheDirectory;
-
-	ModuleHelper.overrideImport(async moduleName => {
-		if (moduleCache[moduleName]) {
-			return {
-				module: moduleCache[moduleName],
-				useDefault: false
-			};
-		}
-
-		const parsed = parseModuleProtocol(moduleName);
-		let resolvedPath: string | undefined;
-
-		switch (parsed.protocol) {
-			case ModuleProtocol.Npm: {
-				const result = await handleNpmProtocol(
-					parsed.identifier,
-					executionDirectory,
-					cacheDirectory
-				);
-				resolvedPath = result.resolvedPath;
-				break;
-			}
-
-			case ModuleProtocol.Https: {
-				const result = await handleHttpsProtocol(
-					parsed.identifier,
-					executionDirectory,
-					maxSizeMb,
-					cacheDirectory,
-					envVars?.extensionsCacheTtlHours,
-					envVars?.extensionsForceRefresh
-				);
-				resolvedPath = result.resolvedPath;
-				break;
-			}
-
-			case ModuleProtocol.Http: {
-				throw new GeneralError("node", "insecureProtocol", { protocol: ModuleProtocol.Http });
-			}
-
-			case ModuleProtocol.Local: {
-				let localFilename = path.resolve(moduleName);
-
-				let exists = await fileExists(localFilename);
-				if (!exists) {
-					localFilename = path.resolve(executionDirectory, moduleName);
-					exists = await fileExists(localFilename);
-				}
-
-				if (exists) {
-					resolvedPath = localFilename;
-				}
-				break;
-			}
-
-			case ModuleProtocol.Default: {
-				try {
-					const packagePath = await CLIUtils.findPackageRoot(moduleName, executionDirectory);
-					if (Is.stringValue(packagePath)) {
-						const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
-						const modulePath = path.resolve(packagePath, mainFile);
-						const exists = await fileExists(modulePath);
-						if (exists) {
-							resolvedPath = modulePath;
-							break;
-						}
-					}
-				} catch {
-					// Continue to fallback resolution
-				}
-
-				// Fallback: resolve from npm protocol cache directory (installed via handleNpmProtocol)
-				try {
-					const cacheNpmRoot = path.resolve(
-						getExtensionsCacheDir(executionDirectory, ModuleProtocol.Npm, cacheDirectory),
-						"node_modules"
-					);
-
-					const packagePath = path.resolve(cacheNpmRoot, moduleName);
-					const mainFile = await resolvePackageEntryPoint(packagePath, moduleName);
-					const modulePath = path.resolve(packagePath, mainFile);
-					const exists = await fileExists(modulePath);
-					if (exists) {
-						resolvedPath = modulePath;
-					}
-				} catch {
-					// No cached resolution either; fall through
-				}
-				break;
+	ModuleHelper.setOptions({
+		executionDirectory,
+		maxSizeMb: Coerce.number(envVars?.extensionsMaxSizeMb) ?? 10,
+		cacheDirectory: envVars?.extensionsCacheDirectory,
+		cacheTtlHours: envVars?.extensionsCacheTtlHours,
+		forceRefresh: envVars?.extensionsForceRefresh,
+		onMessage: (level, key, properties) => {
+			const message = I18n.formatMessage(key, properties);
+			if (level === "warning") {
+				CLIDisplay.warning(message);
+			} else {
+				CLIDisplay.task(message);
 			}
 		}
-
-		// Common module loading and caching logic
-		if (resolvedPath) {
-			const module = await import(createModuleImportUrl(resolvedPath));
-			moduleCache[moduleName] = module;
-			return {
-				module,
-				useDefault: false
-			};
-		}
-
-		return {
-			module: undefined,
-			useDefault: true
-		};
 	});
 }

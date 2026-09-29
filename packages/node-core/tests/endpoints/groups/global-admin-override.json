@@ -2,7 +2,7 @@
 	"group": "Global Admin - Cross-tenant override",
 	"steps": [
 		{
-			"description": "POST /aig?override-tenant — create vertex in second tenant partition",
+			"description": "POST /aig?override-tenant - create vertex in second tenant partition",
 			"method": "POST",
 			"path": "/aig?override-tenant={{secondTenantId}}",
 			"body": {
@@ -13,14 +13,14 @@
 			"capture": { "overriddenVertexId": "location-last-segment" }
 		},
 		{
-			"description": "GET /aig/:id?override-tenant — read vertex from second tenant partition",
+			"description": "GET /aig/:id?override-tenant - read vertex from second tenant partition",
 			"method": "GET",
 			"path": "/aig/{{overriddenVertexId}}?override-tenant={{secondTenantId}}",
 			"expectedStatus": 200,
 			"assert": { "body.id": "isDefined" }
 		},
 		{
-			"description": "GET /aig/:id (no override) — same id is absent in caller's own partition",
+			"description": "GET /aig/:id (no override) - same id is absent in caller's own partition",
 			"method": "GET",
 			"path": "/aig/{{overriddenVertexId}}",
 			"expectedStatus": 404

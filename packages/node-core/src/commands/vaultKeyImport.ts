@@ -58,7 +58,7 @@ export function getCommandDefinitionVaultKeyImport(commandDefinitions: {
 				description: I18n.formatMessage(
 					"node.cli.commands.vault-key-import.params.key-type.description"
 				),
-				options: ["Ed25519", "Secp256k1", "ChaCha20Poly1305"],
+				options: ["Ed25519", "ChaCha20Poly1305"],
 				defaultValue: "Ed25519",
 				required: false
 			},
@@ -106,11 +106,7 @@ export async function vaultKeyImport(
 ): Promise<void> {
 	Did.guard("vaultKeyImport", "identity", params.identity);
 	Guards.stringValue("vaultKeyImport", "key-id", params.keyId);
-	Guards.arrayOneOf("vaultKeyImport", "key-type", params.keyType, [
-		"Ed25519",
-		"Secp256k1",
-		"ChaCha20Poly1305"
-	]);
+	Guards.arrayOneOf("vaultKeyImport", "key-type", params.keyType, ["Ed25519", "ChaCha20Poly1305"]);
 	Guards.stringHex("vaultKeyImport", "private-key-hex", params.privateKeyHex, true);
 
 	const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");

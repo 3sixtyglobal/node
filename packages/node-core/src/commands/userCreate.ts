@@ -59,7 +59,8 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 				extendedType: "hex(32)",
 				description: I18n.formatMessage(
 					"node.cli.commands.user-create.params.tenant-id.description"
-				)
+				),
+				required: false
 			},
 			{
 				key: "email",
@@ -198,14 +199,14 @@ export async function userCreate(
 	Guards.email("userCreate", "email", paramsEmail);
 	Did.guard("userCreate", "user-identity", paramsUserIdentity);
 	Did.guard("userCreate", "organization-identity", paramsOrganizationIdentity);
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
+		if (!tenantEnabled) {
+			throw new GeneralError("userCreate", "tenantIdNotAllowed");
+		}
 		Guards.stringHexLength("userCreate", "tenant-id", params.tenantId, 32);
-	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	} else if (tenantEnabled) {
 		throw new GeneralError("userCreate", "tenantIdRequired");
-	}
-
-	if (Is.stringValue(params.password) && params.password.length < 16) {
-		throw new GeneralError("userCreate", "passwordTooShort", { minLength: 16 });
 	}
 
 	const defaultIdentityProfileConnectorType = engineCore.getRegisteredInstanceType(

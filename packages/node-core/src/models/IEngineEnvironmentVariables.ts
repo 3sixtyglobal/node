@@ -11,9 +11,14 @@ export interface IEngineEnvironmentVariables {
 	debug?: string;
 
 	/**
-	 * Start the engine in silent mode.
+	 * Start the engine in silent mode, errors are still reported.
 	 */
 	silent?: string;
+
+	/**
+	 * Disable colour in the console output.
+	 */
+	disableColor?: string;
 
 	/**
 	 * Controls how unrecognised TWIN_* environment variables are handled at startup.
@@ -494,6 +499,12 @@ export interface IEngineEnvironmentVariables {
 	loggingSilentComponents?: string;
 
 	/**
+	 * The log levels to record on all logging connectors, can be a comma separated list: error, warn, info, debug, trace.
+	 * Silent takes precedence for the console logging connector, defaults to all levels.
+	 */
+	loggingLevels?: string;
+
+	/**
 	 * The directory to write log files into when using the file logging connector. Required when TWIN_LOGGING_CONNECTOR includes "file".
 	 */
 	loggingFileDirectory?: string;
@@ -944,6 +955,12 @@ export interface IEngineEnvironmentVariables {
 	immutableProofTaskWorkerIdleTimeout?: string;
 
 	/**
+	 * The maximum number of proof task workers that can run in parallel.
+	 * @default 1
+	 */
+	immutableProofTaskWorkerCount?: string;
+
+	/**
 	 * How often in minutes the immutable proof reconciliation sweep runs.
 	 * @default 30
 	 */
@@ -1216,6 +1233,13 @@ export interface IEngineEnvironmentVariables {
 	dataspaceStalledTransferTimeout?: string;
 
 	/**
+	 * How long in seconds COMPLETED and TERMINATED transfer records are kept before removal.
+	 * Set to -1 to keep them forever; -1 is the only value that disables removal.
+	 * @default 2592000
+	 */
+	dataspaceRetainTerminalTransfersFor?: string;
+
+	/**
 	 * How long in seconds a provider transfer may stay idle before the idle policy marks it as stalled.
 	 */
 	dataspaceProviderTransferIdleTimeout?: string;
@@ -1244,7 +1268,7 @@ export interface IEngineEnvironmentVariables {
 	healthInterval?: string;
 
 	/**
-	 * The interval in seconds for performing health checks at startup, defaults to 2.
+	 * The interval in seconds for performing health checks at startup, defaults to 30.
 	 * This allows components that take a long time to initialize to be healthy before the first health check is performed.
 	 */
 	healthStartupInterval?: string;
@@ -1298,7 +1322,7 @@ export interface IEngineEnvironmentVariables {
 	automationActionTypes?: string;
 
 	/**
-	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+	 * The default mutex timeout in milliseconds, used when no component-specific timeout is set and passed to the component configurations so engine clones use it, defaults to 5000 if omitted.
 	 */
 	mutexTimeoutDefault?: string;
 

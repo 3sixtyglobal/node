@@ -2,7 +2,7 @@
 	"group": "NFT",
 	"steps": [
 		{
-			"description": "POST /nft — 400 missing tag",
+			"description": "POST /nft - 400 missing tag",
 			"method": "POST",
 			"path": "/nft",
 			"body": { "immutableMetadata": { "@type": "TestNFT", "name": "Test NFT" } },
@@ -46,7 +46,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /nft/:id — 404 after delete",
+			"description": "GET /nft/:id - 404 after delete",
 			"method": "GET",
 			"path": "/nft/{{nftId}}",
 			"expectedStatus": 404

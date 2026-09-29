@@ -1,14 +1,16 @@
 # Function: buildConfiguration()
 
-> **buildConfiguration**(`processEnv`, `options`, `serverInfo`): `Promise`\<\{ `nodeEnvVars`: [`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`; `nodeEngineConfig`: [`INodeEngineConfig`](../interfaces/INodeEngineConfig.md); `availableContextIdKeys`: `object`[]; \}\>
+> **buildConfiguration**(`envVars`, `options`, `serverInfo`): `Promise`\<\{ `nodeEngineConfig`: [`INodeEngineConfig`](../interfaces/INodeEngineConfig.md); `availableContextIdKeys`: `object`[]; \}\>
 
 Build the configuration for the TWIN Node.
 
 ## Parameters
 
-### processEnv
+### envVars
 
-The environment variables from the process.
+[`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`
+
+The environment variables for the node.
 
 ### options
 
@@ -24,7 +26,6 @@ The server information.
 
 ## Returns
 
-`Promise`\<\{ `nodeEnvVars`: [`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`; `nodeEngineConfig`: [`INodeEngineConfig`](../interfaces/INodeEngineConfig.md); `availableContextIdKeys`: `object`[]; \}\>
+`Promise`\<\{ `nodeEngineConfig`: [`INodeEngineConfig`](../interfaces/INodeEngineConfig.md); `availableContextIdKeys`: `object`[]; \}\>
 
-A promise that resolves to the engine server configuration, environment prefix, environment variables,
-and options.
+A promise that resolves to the engine server configuration and the available context ID keys.

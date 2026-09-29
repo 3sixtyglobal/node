@@ -57,7 +57,7 @@ export function getCommandDefinitionVaultKeyCreate(commandDefinitions: {
 				description: I18n.formatMessage(
 					"node.cli.commands.vault-key-create.params.key-type.description"
 				),
-				options: ["Ed25519", "Secp256k1", "ChaCha20Poly1305"],
+				options: ["Ed25519", "ChaCha20Poly1305"],
 				defaultValue: "Ed25519",
 				required: false
 			},
@@ -148,11 +148,7 @@ export async function vaultKeyCreate(
 > {
 	Did.guard("vaultKeyCreate", "identity", params.identity);
 	Guards.stringValue("vaultKeyCreate", "key-id", params.keyId);
-	Guards.arrayOneOf("vaultKeyCreate", "key-type", params.keyType, [
-		"Ed25519",
-		"Secp256k1",
-		"ChaCha20Poly1305"
-	]);
+	Guards.arrayOneOf("vaultKeyCreate", "key-type", params.keyType, ["Ed25519", "ChaCha20Poly1305"]);
 
 	const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
 	const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);

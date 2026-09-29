@@ -2,7 +2,7 @@
 	"group": "Dataspace - Transfers",
 	"steps": [
 		{
-			"description": "POST /dataspace/transfers/request — 401 without organization context",
+			"description": "POST /dataspace/transfers/request - 401 without organization context",
 			"skipIfOrgParamOmitted": true,
 			"appendOrgParam": false,
 			"method": "POST",
@@ -22,7 +22,7 @@
 			"expectedStatus": 401
 		},
 		{
-			"description": "POST /dataspace/transfers/request — 400 missing @type",
+			"description": "POST /dataspace/transfers/request - 400 missing @type",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/request",
@@ -40,7 +40,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /dataspace/transfers/request — 400 missing consumerPid",
+			"description": "POST /dataspace/transfers/request - 400 missing consumerPid",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/request",
@@ -58,7 +58,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /dataspace/transfers/request — 400 missing agreementId",
+			"description": "POST /dataspace/transfers/request - 400 missing agreementId",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/request",
@@ -76,7 +76,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /dataspace/transfers/request — 400 missing callbackAddress",
+			"description": "POST /dataspace/transfers/request - 400 missing callbackAddress",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/request",
@@ -94,7 +94,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /dataspace/transfers/request — 404 unknown agreementId (DSP validation passes, PAP lookup fails)",
+			"description": "POST /dataspace/transfers/request - 404 unknown agreementId (DSP validation passes, PAP lookup fails)",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/request",
@@ -114,7 +114,7 @@
 			"assert": { "body.@type": "TransferError" }
 		},
 		{
-			"description": "GET /dataspace/transfers/:pid — 404 unknown pid",
+			"description": "GET /dataspace/transfers/:pid - 404 unknown pid",
 			"appendOrgParam": true,
 			"method": "GET",
 			"path": "/dataspace/transfers/{{fakeId}}",
@@ -126,7 +126,7 @@
 			"assert": { "body.@type": "TransferError" }
 		},
 		{
-			"description": "POST /dataspace/transfers/:pid/start — 404 unknown pid",
+			"description": "POST /dataspace/transfers/:pid/start - 404 unknown pid",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/{{fakeId}}/start",
@@ -144,7 +144,7 @@
 			"assert": { "body.@type": "TransferError" }
 		},
 		{
-			"description": "POST /dataspace/transfers/:pid/suspend — 404 unknown pid",
+			"description": "POST /dataspace/transfers/:pid/suspend - 404 unknown pid",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/{{fakeId}}/suspend",
@@ -163,7 +163,7 @@
 			"assert": { "body.@type": "TransferError" }
 		},
 		{
-			"description": "POST /dataspace/transfers/:pid/terminate — 404 unknown pid",
+			"description": "POST /dataspace/transfers/:pid/terminate - 404 unknown pid",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/{{fakeId}}/terminate",
@@ -182,7 +182,7 @@
 			"assert": { "body.@type": "TransferError" }
 		},
 		{
-			"description": "POST /dataspace/transfers/:pid/complete — 404 unknown pid",
+			"description": "POST /dataspace/transfers/:pid/complete - 404 unknown pid",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/{{fakeId}}/complete",
@@ -200,7 +200,7 @@
 			"assert": { "body.@type": "TransferError" }
 		},
 		{
-			"description": "POST /dataspace/transfers/request — 200 create transfer",
+			"description": "POST /dataspace/transfers/request - 200 create transfer",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/request",
@@ -220,7 +220,7 @@
 			"capture": { "transferProviderPid": "body.providerPid" }
 		},
 		{
-			"description": "GET /dataspace/transfers/:pid — 200 REQUESTED state",
+			"description": "GET /dataspace/transfers/:pid - 200 REQUESTED state",
 			"appendOrgParam": true,
 			"method": "GET",
 			"path": "/dataspace/transfers/{{transferProviderPid}}",
@@ -231,7 +231,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /dataspace/transfers/:pid/start — 200",
+			"description": "POST /dataspace/transfers/:pid/start - 200",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/{{transferProviderPid}}/start",

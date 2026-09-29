@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@twin.org/cli-core";
 import { ContextIdStore } from "@twin.org/context";
-import { Coerce, GeneralError, I18n, Is, StringHelper } from "@twin.org/core";
+import { Coerce, EnvHelper, GeneralError, I18n, Is, StringHelper } from "@twin.org/core";
 import type { IEngineCore } from "@twin.org/engine-models";
 import * as dotenv from "dotenv";
-import { commaSeparatedListToArray } from "./builders/helper/envHelpers.js";
 import { getCommandDefinitionBootstrapDev } from "./commands/bootstrapDev.js";
 import { getCommandDefinitionHelp } from "./commands/help.js";
 import { getCommandDefinitionIdentityCreate } from "./commands/identityCreate.js";
 import { getCommandDefinitionIdentityImport } from "./commands/identityImports.js";
 import { getCommandDefinitionIdentityList } from "./commands/identityList.js";
+import { getCommandDefinitionIdentityRemove } from "./commands/identityRemove.js";
 import { getCommandDefinitionIdentityResolve } from "./commands/identityResolve.js";
 import { getCommandDefinitionIdentityVerifiableCredentialCreate } from "./commands/identityVerifiableCredentialCreate.js";
 import { getCommandDefinitionIdentityVerificationMethodCreate } from "./commands/identityVerificationMethodCreate.js";
@@ -20,19 +20,24 @@ import { getCommandDefinitionNodeIdentitySet } from "./commands/nodeIdentitySet.
 import { getCommandDefinitionNodeOrgIdGet } from "./commands/nodeOrgIdGet.js";
 import { getCommandDefinitionNodeOrgIdSet } from "./commands/nodeOrgIdSet.js";
 import { getCommandDefinitionOrgUsersList } from "./commands/orgUsersList.js";
-import { getCommandDefinitionRemoveTenantOrgAlias } from "./commands/removeTenantOrgAlias.js";
 import { getCommandDefinitionTenantCreate } from "./commands/tenantCreate.js";
 import { getCommandDefinitionTenantGet } from "./commands/tenantGet.js";
 import { getCommandDefinitionTenantImport } from "./commands/tenantImport.js";
 import { getCommandDefinitionTenantList } from "./commands/tenantList.js";
 import { getCommandDefinitionTenantListByOrg } from "./commands/tenantListByOrg.js";
+import { getCommandDefinitionTenantOrgAliasRemove } from "./commands/tenantOrgAliasRemove.js";
 import { getCommandDefinitionTenantOrgIdSet } from "./commands/tenantOrgIdSet.js";
+import { getCommandDefinitionTenantRemove } from "./commands/tenantRemove.js";
 import { getCommandDefinitionTenantUpdate } from "./commands/tenantUpdate.js";
 import { getCommandDefinitionUserCreate } from "./commands/userCreate.js";
 import { getCommandDefinitionUserGet } from "./commands/userGet.js";
+import { getCommandDefinitionUserRemove } from "./commands/userRemove.js";
 import { getCommandDefinitionUserUpdate } from "./commands/userUpdate.js";
+import { getCommandDefinitionUserUpdatePassword } from "./commands/userUpdatePassword.js";
 import { getCommandDefinitionVaultKeyCreate } from "./commands/vaultKeyCreate.js";
 import { getCommandDefinitionVaultKeyImport } from "./commands/vaultKeyImport.js";
+import { getCommandDefinitionVaultKeyRemove } from "./commands/vaultKeyRemove.js";
+import { getCommandDefinitionVaultKeyUpdate } from "./commands/vaultKeyUpdate.js";
 import type { CliCommandParamType } from "./models/cliCommandParamType.js";
 import type { ICliArgs } from "./models/ICliArgs.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
@@ -271,7 +276,7 @@ export function processEnvOptions(
 	const inputEnv = options.find(option => option.key === "load-env")?.value;
 
 	if (Is.stringValue(inputEnv)) {
-		const envFiles = commaSeparatedListToArray<string>(inputEnv);
+		const envFiles = EnvHelper.commaSeparatedListToArray<string>(inputEnv);
 		for (const envFile of envFiles) {
 			const output = dotenv.config({
 				path: envFile,
@@ -328,6 +333,7 @@ export function registerCommands(): void {
 	getCommandDefinitionIdentityCreate(commandDefinitions);
 	getCommandDefinitionIdentityImport(commandDefinitions);
 	getCommandDefinitionIdentityList(commandDefinitions);
+	getCommandDefinitionIdentityRemove(commandDefinitions);
 	getCommandDefinitionIdentityResolve(commandDefinitions);
 	getCommandDefinitionIdentityVerificationMethodCreate(commandDefinitions);
 	getCommandDefinitionIdentityVerificationMethodImport(commandDefinitions);
@@ -335,19 +341,24 @@ export function registerCommands(): void {
 	getCommandDefinitionNodeIdentityGet(commandDefinitions);
 	getCommandDefinitionNodeIdentitySet(commandDefinitions);
 	getCommandDefinitionOrgUsersList(commandDefinitions);
-	getCommandDefinitionRemoveTenantOrgAlias(commandDefinitions);
 	getCommandDefinitionNodeOrgIdGet(commandDefinitions);
 	getCommandDefinitionNodeOrgIdSet(commandDefinitions);
 	getCommandDefinitionTenantOrgIdSet(commandDefinitions);
+	getCommandDefinitionTenantOrgAliasRemove(commandDefinitions);
 	getCommandDefinitionTenantCreate(commandDefinitions);
 	getCommandDefinitionTenantGet(commandDefinitions);
 	getCommandDefinitionTenantImport(commandDefinitions);
 	getCommandDefinitionTenantList(commandDefinitions);
 	getCommandDefinitionTenantListByOrg(commandDefinitions);
+	getCommandDefinitionTenantRemove(commandDefinitions);
 	getCommandDefinitionTenantUpdate(commandDefinitions);
 	getCommandDefinitionUserCreate(commandDefinitions);
 	getCommandDefinitionUserGet(commandDefinitions);
+	getCommandDefinitionUserRemove(commandDefinitions);
 	getCommandDefinitionUserUpdate(commandDefinitions);
+	getCommandDefinitionUserUpdatePassword(commandDefinitions);
 	getCommandDefinitionVaultKeyCreate(commandDefinitions);
 	getCommandDefinitionVaultKeyImport(commandDefinitions);
+	getCommandDefinitionVaultKeyRemove(commandDefinitions);
+	getCommandDefinitionVaultKeyUpdate(commandDefinitions);
 }

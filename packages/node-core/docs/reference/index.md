@@ -3,25 +3,21 @@
 ## Interfaces
 
 - [IBootstrapDevEnvironmentVariables](interfaces/IBootstrapDevEnvironmentVariables.md)
-- [ICacheMetadata](interfaces/ICacheMetadata.md)
 - [ICliArgs](interfaces/ICliArgs.md)
 - [ICliCommand](interfaces/ICliCommand.md)
 - [ICliCommandDefinition](interfaces/ICliCommandDefinition.md)
 - [ICliCommandDefinitionParam](interfaces/ICliCommandDefinitionParam.md)
 - [IEngineEnvironmentVariables](interfaces/IEngineEnvironmentVariables.md)
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
-- [IModuleProtocol](interfaces/IModuleProtocol.md)
 - [INodeEngineConfig](interfaces/INodeEngineConfig.md)
 - [INodeEngineState](interfaces/INodeEngineState.md)
 - [INodeEnvironmentVariables](interfaces/INodeEnvironmentVariables.md)
 - [INodeOptions](interfaces/INodeOptions.md)
-- [IProtocolHandlerResult](interfaces/IProtocolHandlerResult.md)
 
 ## Type Aliases
 
 - [IEnvironmentVariables](type-aliases/IEnvironmentVariables.md)
 - [CliCommandParamType](type-aliases/CliCommandParamType.md)
-- [ModuleProtocol](type-aliases/ModuleProtocol.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
 - [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)
@@ -41,7 +37,6 @@
 - [COMPONENT\_FACTORY\_TYPE\_NAME](variables/COMPONENT_FACTORY_TYPE_NAME.md)
 - [DEFAULT\_TRACING\_FACADE\_FACTORIES](variables/DEFAULT_TRACING_FACADE_FACTORIES.md)
 - [DEFAULT\_TRACING\_FACADE\_COMPONENT\_EXCLUDE\_TYPES](variables/DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES.md)
-- [ModuleProtocol](variables/ModuleProtocol.md)
 
 ## Functions
 
@@ -70,10 +65,13 @@
 - [registerCommands](functions/registerCommands.md)
 - [getEnvDefaults](functions/getEnvDefaults.md)
 - [run](functions/run.md)
+- [loadEnvironmentVariables](functions/loadEnvironmentVariables.md)
+- [processEnvironmentVariables](functions/processEnvironmentVariables.md)
 - [buildConfiguration](functions/buildConfiguration.md)
 - [overrideModuleImport](functions/overrideModuleImport.md)
 - [start](functions/start.md)
 - [initialiseLocales](functions/initialiseLocales.md)
+- [initialiseNativeModules](functions/initialiseNativeModules.md)
 - [getExecutionDirectory](functions/getExecutionDirectory.md)
 - [getScriptDirectory](functions/getScriptDirectory.md)
 - [fileExists](functions/fileExists.md)
@@ -82,11 +80,3 @@
 - [getFiles](functions/getFiles.md)
 - [loadTextFile](functions/loadTextFile.md)
 - [loadJsonFile](functions/loadJsonFile.md)
-- [parseModuleProtocol](functions/parseModuleProtocol.md)
-- [hashUrl](functions/hashUrl.md)
-- [getExtensionsCacheDir](functions/getExtensionsCacheDir.md)
-- [handleNpmProtocol](functions/handleNpmProtocol.md)
-- [isCacheExpired](functions/isCacheExpired.md)
-- [handleHttpsProtocol](functions/handleHttpsProtocol.md)
-- [resolvePackageEntryPoint](functions/resolvePackageEntryPoint.md)
-- [createModuleImportUrl](functions/createModuleImportUrl.md)

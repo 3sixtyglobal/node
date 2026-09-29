@@ -20,7 +20,7 @@ At a high level, node:
 5. handles context IDs and tenant or identity requirements,
 6. and exposes controlled shutdown behaviour.
 
-The central functions are `run()`, `buildConfiguration()`, and `start()` in `node-core`.
+The central functions are `run()`, `loadEnvironmentVariables()`, `processEnvironmentVariables()`, `buildConfiguration()`, and `start()` in `node-core`.
 
 {NodeBootstrapDiagram()}
 
@@ -35,7 +35,7 @@ Node intentionally centralises direct process environment access in one place. T
 5. optional dynamic expansion values (`@text:` and `@json:`),
 6. optional custom extension hook (`extendEnvVars`).
 
-This produces one normalised env object that is then passed to both config builders.
+Steps 1 to 4 are performed by `loadEnvironmentVariables()` before any output, so settings such as `TWIN_DISABLE_COLOR` apply from the start. Steps 5 and 6, along with the deprecated and unknown key checks, are performed by `processEnvironmentVariables()`. This produces one normalised env object that is then passed to `buildConfiguration()` for both config builders.
 
 `@text:` and `@json:` expansion allows sensitive or large values to be sourced from files while still using environment-variable semantics.
 

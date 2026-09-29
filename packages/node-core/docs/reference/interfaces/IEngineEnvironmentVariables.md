@@ -16,7 +16,15 @@ Start the engine in debug mode.
 
 > `optional` **silent?**: `string`
 
-Start the engine in silent mode.
+Start the engine in silent mode, errors are still reported.
+
+***
+
+### disableColor? {#disablecolor}
+
+> `optional` **disableColor?**: `string`
+
+Disable colour in the console output.
 
 ***
 
@@ -799,6 +807,15 @@ A list of components to exclude from logging, can be a comma separated list of c
 
 ***
 
+### loggingLevels? {#logginglevels}
+
+> `optional` **loggingLevels?**: `string`
+
+The log levels to record on all logging connectors, can be a comma separated list: error, warn, info, debug, trace.
+Silent takes precedence for the console logging connector, defaults to all levels.
+
+***
+
 ### loggingFileDirectory? {#loggingfiledirectory}
 
 > `optional` **loggingFileDirectory?**: `string`
@@ -1551,6 +1568,20 @@ Set to 0 to shut it down after every task, or -1 to never shut it down.
 
 ***
 
+### immutableProofTaskWorkerCount? {#immutableprooftaskworkercount}
+
+> `optional` **immutableProofTaskWorkerCount?**: `string`
+
+The maximum number of proof task workers that can run in parallel.
+
+#### Default
+
+```ts
+1
+```
+
+***
+
 ### immutableProofSweepInterval? {#immutableproofsweepinterval}
 
 > `optional` **immutableProofSweepInterval?**: `string`
@@ -2017,6 +2048,21 @@ progressing it before it is treated as timed out.
 
 ***
 
+### dataspaceRetainTerminalTransfersFor? {#dataspaceretainterminaltransfersfor}
+
+> `optional` **dataspaceRetainTerminalTransfersFor?**: `string`
+
+How long in seconds COMPLETED and TERMINATED transfer records are kept before removal.
+Set to -1 to keep them forever; -1 is the only value that disables removal.
+
+#### Default
+
+```ts
+2592000
+```
+
+***
+
 ### dataspaceProviderTransferIdleTimeout? {#dataspaceprovidertransferidletimeout}
 
 > `optional` **dataspaceProviderTransferIdleTimeout?**: `string`
@@ -2069,7 +2115,7 @@ The interval in seconds for performing health checks, defaults to 60.
 
 > `optional` **healthStartupInterval?**: `string`
 
-The interval in seconds for performing health checks at startup, defaults to 2.
+The interval in seconds for performing health checks at startup, defaults to 30.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
 
 ***
@@ -2153,7 +2199,7 @@ values: fetch
 
 > `optional` **mutexTimeoutDefault?**: `string`
 
-The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+The default mutex timeout in milliseconds, used when no component-specific timeout is set and passed to the component configurations so engine clones use it, defaults to 5000 if omitted.
 
 ***
 

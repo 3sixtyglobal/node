@@ -2,7 +2,7 @@
 	"group": "Rights Management - Policy Admin",
 	"steps": [
 		{
-			"description": "POST /rights-management/policy/admin — create Set policy",
+			"description": "POST /rights-management/policy/admin - create Set policy",
 			"method": "POST",
 			"path": "/rights-management/policy/admin",
 			"body": {
@@ -14,7 +14,7 @@
 			"capture": { "setPolicyId": "location-last-segment" }
 		},
 		{
-			"description": "GET /rights-management/policy/admin/:id — 404 for unknown id",
+			"description": "GET /rights-management/policy/admin/:id - 404 for unknown id",
 			"method": "GET",
 			"path": "/rights-management/policy/admin/rights-management:nonexistent",
 			"expectedStatus": 404
@@ -32,7 +32,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /rights-management/policy/admin — create Offer policy",
+			"description": "POST /rights-management/policy/admin - create Offer policy",
 			"method": "POST",
 			"path": "/rights-management/policy/admin",
 			"body": {
@@ -51,7 +51,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /rights-management/policy/admin — create Agreement policy",
+			"description": "POST /rights-management/policy/admin - create Agreement policy",
 			"method": "POST",
 			"path": "/rights-management/policy/admin",
 			"body": {
@@ -95,7 +95,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /rights-management/policy/admin/:id — 404 after delete",
+			"description": "GET /rights-management/policy/admin/:id - 404 after delete",
 			"method": "GET",
 			"path": "/rights-management/policy/admin/{{setPolicyId}}",
 			"expectedStatus": 404

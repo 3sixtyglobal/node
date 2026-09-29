@@ -57,7 +57,12 @@ if (runtime) {
 ```typescript
 import type { IServerInfo } from '@twin.org/api-models';
 import type { INodeOptions } from '@twin.org/node-core';
-import { buildConfiguration, start } from '@twin.org/node-core';
+import {
+  buildConfiguration,
+  loadEnvironmentVariables,
+  processEnvironmentVariables,
+  start
+} from '@twin.org/node-core';
 
 const processEnv: Record<string, string> = {
   TWIN_HOST: '127.0.0.1',
@@ -78,8 +83,13 @@ const serverInfo: IServerInfo = {
   version: '0.0.0-dev'
 };
 
-const { nodeEngineConfig, nodeEnvVars, availableContextIdKeys } = await buildConfiguration(
-  processEnv,
+const nodeEnvVars = await processEnvironmentVariables(
+  loadEnvironmentVariables(processEnv, options),
+  options
+);
+
+const { nodeEngineConfig, availableContextIdKeys } = await buildConfiguration(
+  nodeEnvVars,
   options,
   serverInfo
 );

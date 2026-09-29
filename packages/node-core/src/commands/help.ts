@@ -93,7 +93,8 @@ function displayCommandHelp(commandDefinition: ICliCommandDefinition): void {
 			if (Is.notEmpty(param.defaultValue)) {
 				typeParts.push(`${defaultLabel}: '${param.defaultValue}'`);
 			}
-			if (param.required) {
+			// Match the command line parser, which treats a param without a required flag as required
+			if (param.required ?? true) {
 				typeParts.push(requiredLabel);
 			} else {
 				typeParts.push(optionalLabel);

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
 import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { EngineCloneMode } from "@twin.org/engine-models";
+import { EngineCloneMode, EngineLogLevel } from "@twin.org/engine-models";
 import {
 	DataConverterConnectorType,
 	DataExtractorConnectorType,
@@ -12,6 +12,8 @@ import {
 	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
 	HealthComponentType,
+	IdentityConnectorType,
+	IdentityResolverConnectorType,
 	ImmutableProofComponentType,
 	LoggingConnectorType,
 	MailboxComponentType,
@@ -24,12 +26,151 @@ import {
 	TaskSchedulerComponentType,
 	TelemetryComponentType,
 	TelemetryConnectorType,
+	TenantAdminComponentType,
 	TracingComponentType,
-	TracingConnectorType
+	TracingConnectorType,
+	TrustVerifierComponentType
 } from "@twin.org/engine-types";
+import { LogLevel } from "@twin.org/logging-models";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
 import type { IEngineEnvironmentVariables } from "../../src/models/IEngineEnvironmentVariables.js";
+
+describe("buildEngineConfiguration - silent", () => {
+	test("log level is left unset when silent is not enabled", async () => {
+		const config = await buildEngineConfiguration({});
+
+		expect(config.silent).toBe(false);
+		expect(config.logLevel).toBeUndefined();
+	});
+
+	test("log level is restricted to errors when silent is enabled", async () => {
+		const config = await buildEngineConfiguration({ silent: "true" });
+
+		expect(config.silent).toBe(true);
+		expect(config.logLevel).toBe(EngineLogLevel.Error);
+	});
+
+	test("console logging connector shows all levels when silent is not enabled", async () => {
+		const config = await buildEngineConfiguration({ loggingConnector: "console" });
+
+		const consoleConnector = config.types.loggingConnector?.find(
+			c => c.type === LoggingConnectorType.Console
+		);
+		expect(consoleConnector?.options?.config?.levels).toBeUndefined();
+	});
+
+	test("console logging connector is restricted to errors when silent is enabled", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage",
+			silent: "true"
+		});
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const entityStorage = connectors.find(c => c.type === LoggingConnectorType.EntityStorage);
+		expect(consoleConnector?.options?.config?.levels).toEqual([LogLevel.Error]);
+		expect(entityStorage?.options?.config?.levels).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - loggingLevels", () => {
+	test("logging levels are applied to every logging connector", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage,open-telemetry,file",
+			loggingLevels: "error,warn",
+			storageFileRoot: "./logs"
+		});
+
+		const connectors = (config.types.loggingConnector ?? []).filter(
+			c => c.type !== LoggingConnectorType.Multi
+		);
+		expect(connectors).toHaveLength(4);
+		for (const connector of connectors) {
+			expect(connector.options?.config?.levels).toEqual([LogLevel.Error, LogLevel.Warn]);
+		}
+	});
+
+	test("silent takes precedence over logging levels for the console connector only", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console,entity-storage",
+			loggingLevels: "error,info",
+			silent: "true"
+		});
+
+		const connectors = config.types.loggingConnector ?? [];
+		const consoleConnector = connectors.find(c => c.type === LoggingConnectorType.Console);
+		const entityStorage = connectors.find(c => c.type === LoggingConnectorType.EntityStorage);
+		expect(consoleConnector?.options?.config?.levels).toEqual([LogLevel.Error]);
+		expect(entityStorage?.options?.config?.levels).toEqual([LogLevel.Error, LogLevel.Info]);
+		expect(config.logLevel).toBe(EngineLogLevel.Error);
+	});
+
+	test("unknown logging levels are rejected when silent is enabled", async () => {
+		await expect(
+			buildEngineConfiguration({ loggingLevels: "error,verbose", silent: "true" })
+		).rejects.toThrow();
+	});
+
+	test("engine log level is errors only when only errors are listed", async () => {
+		const config = await buildEngineConfiguration({ loggingLevels: "error" });
+
+		expect(config.logLevel).toBe(EngineLogLevel.Error);
+	});
+
+	test("engine log level includes warnings when warn is listed", async () => {
+		const config = await buildEngineConfiguration({ loggingLevels: "warn,error" });
+
+		expect(config.logLevel).toBe(EngineLogLevel.Warn);
+	});
+
+	test("engine log level is all when a level below warn is listed", async () => {
+		const config = await buildEngineConfiguration({ loggingLevels: "error,debug" });
+
+		expect(config.logLevel).toBe(EngineLogLevel.All);
+	});
+
+	test("unknown logging levels are rejected", async () => {
+		await expect(buildEngineConfiguration({ loggingLevels: "error,verbose" })).rejects.toThrow();
+	});
+});
+
+describe("buildEngineConfiguration - disableColor", () => {
+	test("console connectors keep colour when disableColor is not set", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console",
+			tracingConnector: "console"
+		});
+
+		const logging = config.types.loggingConnector?.find(
+			c => c.type === LoggingConnectorType.Console
+		);
+		const tracing = config.types.tracingConnector?.find(
+			c => c.type === TracingConnectorType.Console
+		);
+		expect(config.disableColor).toBe(false);
+		expect(logging?.options?.config?.disableColor).toBe(false);
+		expect(tracing?.options?.config?.disableColor).toBe(false);
+	});
+
+	test("console connectors disable colour when disableColor is enabled", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: "console",
+			tracingConnector: "console",
+			disableColor: "true"
+		});
+
+		const logging = config.types.loggingConnector?.find(
+			c => c.type === LoggingConnectorType.Console
+		);
+		const tracing = config.types.tracingConnector?.find(
+			c => c.type === TracingConnectorType.Console
+		);
+		expect(config.disableColor).toBe(true);
+		expect(logging?.options?.config?.disableColor).toBe(true);
+		expect(tracing?.options?.config?.disableColor).toBe(true);
+	});
+});
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
@@ -106,6 +247,7 @@ describe("buildEngineConfiguration - immutable proof task options", () => {
 		taskRetryInterval?: number;
 		taskFailureRetainFor?: number;
 		taskWorkerIdleTimeout?: number;
+		taskWorkerCount?: number;
 	}> {
 		const config = await buildEngineConfiguration({
 			auditableItemGraphEnabled: "true",
@@ -126,6 +268,21 @@ describe("buildEngineConfiguration - immutable proof task options", () => {
 		expect(proofConfig.taskRetryInterval).toBeUndefined();
 		expect(proofConfig.taskFailureRetainFor).toBeUndefined();
 		expect(proofConfig.taskWorkerIdleTimeout).toBeUndefined();
+		expect(proofConfig.taskWorkerCount).toBeUndefined();
+	});
+
+	test("passes the task worker count through as a number", async () => {
+		const proofConfig = await buildImmutableProofConfig({
+			immutableProofTaskWorkerCount: "3"
+		});
+
+		expect(proofConfig.taskWorkerCount).toBe(3);
+	});
+
+	test("rejects a task worker count that is not a number", async () => {
+		await expect(
+			buildImmutableProofConfig({ immutableProofTaskWorkerCount: "three" })
+		).rejects.toThrow("invalidEnvVarValue");
 	});
 
 	test("converts the task intervals from the env units to milliseconds", async () => {
@@ -258,6 +415,37 @@ describe("buildEngineConfiguration - dataspace provider idle transfer policy", (
 	});
 });
 
+describe("buildEngineConfiguration - dataspace terminal transfer retention", () => {
+	const getRetention = async (value?: string): Promise<number | undefined> => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true",
+			dataspaceRetainTerminalTransfersFor: value
+		});
+
+		const dataspaceService = config.types.dataspaceControlPlaneComponent?.find(
+			entry => entry.type === DataspaceControlPlaneComponentType.Service
+		);
+
+		const dataspaceConfig = dataspaceService?.options?.config as {
+			retainTerminalTransfersForMs?: number;
+		};
+
+		return dataspaceConfig.retainTerminalTransfersForMs;
+	};
+
+	test("retention is wired in seconds and converted to milliseconds", async () => {
+		expect(await getRetention("86400")).toBe(86400000);
+	});
+
+	test("retention of -1 is passed through unchanged", async () => {
+		expect(await getRetention("-1")).toBe(-1);
+	});
+
+	test("unset retention leaves the service default in place", async () => {
+		expect(await getRetention()).toBeUndefined();
+	});
+});
+
 describe("buildEngineConfiguration - entity storage shared mutex timeout", () => {
 	test("entity storage mutex timeout applies to both memory and file connectors", async () => {
 		const config = await buildEngineConfiguration({
@@ -304,6 +492,101 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 
 		expect(memoryMutexTimeoutMs).toBeUndefined();
 		expect(fileMutexTimeoutMs).toBeUndefined();
+	});
+
+	test("mutex timeout default seeds the connector timeouts when no component value is set", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "memory,file",
+			mutexTimeoutDefault: "60000",
+			storageFileRoot: "."
+		});
+
+		const memoryConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.Memory
+		);
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+
+		const memoryMutexTimeoutMs = (
+			memoryConnector?.options as { config?: { mutexTimeoutMs?: number } }
+		)?.config?.mutexTimeoutMs;
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(memoryMutexTimeoutMs).toBe(60000);
+		expect(fileMutexTimeoutMs).toBe(60000);
+	});
+
+	test("component mutex timeout overrides the mutex timeout default", async () => {
+		const config = await buildEngineConfiguration({
+			entityStorageConnectorType: "file",
+			entityStorageMutexTimeout: "4321",
+			mutexTimeoutDefault: "60000",
+			storageFileRoot: "."
+		});
+
+		const fileConnector = config.types.entityStorageConnector?.find(
+			entry => entry.type === EntityStorageConnectorType.File
+		);
+		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
+			?.config?.mutexTimeoutMs;
+
+		expect(fileMutexTimeoutMs).toBe(4321);
+	});
+
+	test("mutex timeout default seeds the component cache and lock timeouts", async () => {
+		const config = await buildEngineConfiguration({
+			loggingConnector: LoggingConnectorType.File,
+			tenantEnabled: "true",
+			identityConnector: IdentityConnectorType.EntityStorage,
+			identityResolverConnector: IdentityResolverConnectorType.EntityStorage,
+			mutexTimeoutDefault: "60000",
+			storageFileRoot: "."
+		});
+
+		const getConfig = (
+			entries: { type: string; options?: unknown }[] | undefined,
+			type: string
+		): { [key: string]: unknown } | undefined =>
+			(
+				entries?.find(entry => entry.type === type)?.options as {
+					config?: { [key: string]: unknown };
+				}
+			)?.config;
+
+		expect(
+			getConfig(config.types.loggingConnector, LoggingConnectorType.File)?.mutexTimeoutMs
+		).toBe(60000);
+		expect(
+			getConfig(config.types.tenantAdminComponent, TenantAdminComponentType.Service)
+				?.tenantCacheMutexTimeoutMs
+		).toBe(60000);
+		expect(
+			getConfig(config.types.identityConnector, IdentityConnectorType.EntityStorage)
+				?.didResolutionCacheMutexTimeoutMs
+		).toBe(60000);
+		expect(
+			getConfig(config.types.identityResolverConnector, IdentityResolverConnectorType.EntityStorage)
+				?.didResolutionCacheMutexTimeoutMs
+		).toBe(60000);
+	});
+
+	test("mutex timeout default seeds the jwt verifiable credential verifier cache timeout", async () => {
+		const config = await buildEngineConfiguration({
+			dataspaceEnabled: "true",
+			trustVerifiers: TrustVerifierComponentType.JwtVerifiableCredential,
+			mutexTimeoutDefault: "60000"
+		});
+
+		const verifier = config.types.trustVerifierComponent?.find(
+			entry => entry.type === TrustVerifierComponentType.JwtVerifiableCredential
+		);
+
+		expect(
+			(verifier?.options as { config?: { verificationCacheMutexTimeoutMs?: number } })?.config
+				?.verificationCacheMutexTimeoutMs
+		).toBe(60000);
 	});
 });
 
@@ -611,7 +894,7 @@ describe("buildEngineConfiguration - mailbox", () => {
 		await expect(buildEngineConfiguration({ emailProtocolConnector: "imap4" })).rejects.toThrow(
 			expect.objectContaining({
 				name: "GeneralError",
-				source: "node",
+				source: "EnvHelper",
 				properties: expect.objectContaining({ key: "emailProtocolConnector" })
 			})
 		);
@@ -661,7 +944,7 @@ describe("buildEngineConfiguration - data processing", () => {
 		await expect(buildEngineConfiguration({ dataConverterConnectors: "json,xnl" })).rejects.toThrow(
 			expect.objectContaining({
 				name: "GeneralError",
-				source: "node",
+				source: "EnvHelper",
 				properties: expect.objectContaining({ key: "dataConverterConnectors" })
 			})
 		);
@@ -797,7 +1080,7 @@ describe("buildEngineConfiguration - telemetry metrics producers", () => {
 		).rejects.toThrow(
 			expect.objectContaining({
 				name: "GeneralError",
-				source: "node",
+				source: "EnvHelper",
 				properties: expect.objectContaining({ key: "telemetryMetricsProducers" })
 			})
 		);

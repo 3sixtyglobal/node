@@ -2,7 +2,7 @@
 	"group": "Blob Storage",
 	"steps": [
 		{
-			"description": "POST /blob — 400 missing blob field",
+			"description": "POST /blob - 400 missing blob field",
 			"method": "POST",
 			"path": "/blob",
 			"body": {},
@@ -48,13 +48,13 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /blob/:id — 404 after delete",
+			"description": "GET /blob/:id - 404 after delete",
 			"method": "GET",
 			"path": "/blob/{{blobId}}",
 			"expectedStatus": 404
 		},
 		{
-			"description": "DELETE /blob — delete all",
+			"description": "DELETE /blob - delete all",
 			"method": "DELETE",
 			"path": "/blob",
 			"expectedStatus": 204

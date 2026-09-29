@@ -2,7 +2,7 @@
 	"group": "Auditable Item Graph",
 	"steps": [
 		{
-			"description": "POST /aig — 400 missing type",
+			"description": "POST /aig - 400 missing type",
 			"method": "POST",
 			"path": "/aig",
 			"body": {
@@ -11,7 +11,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /aig — create vertex",
+			"description": "POST /aig - create vertex",
 			"method": "POST",
 			"path": "/aig",
 			"body": {
@@ -22,7 +22,7 @@
 			"capture": { "vertexId": "location-last-segment" }
 		},
 		{
-			"description": "GET /aig/:id — 404 for unknown id",
+			"description": "GET /aig/:id - 404 for unknown id",
 			"method": "GET",
 			"path": "/aig/aig:nonexistent",
 			"expectedStatus": 404
@@ -35,7 +35,7 @@
 			"assert": { "body.id": "isDefined" }
 		},
 		{
-			"description": "PUT /aig/:id — update with annotation",
+			"description": "PUT /aig/:id - update with annotation",
 			"method": "PUT",
 			"path": "/aig/{{vertexId}}",
 			"body": {
@@ -54,7 +54,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "PATCH /aig/:id — partial update of annotation",
+			"description": "PATCH /aig/:id - partial update of annotation",
 			"method": "PATCH",
 			"path": "/aig/{{vertexId}}",
 			"body": {
@@ -95,13 +95,13 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /aig — list vertices",
+			"description": "GET /aig - list vertices",
 			"method": "GET",
 			"path": "/aig",
 			"expectedStatus": 200
 		},
 		{
-			"description": "DELETE /aig/:id/proof — remove proof from all changesets",
+			"description": "DELETE /aig/:id/proof - remove proof from all changesets",
 			"method": "DELETE",
 			"path": "/aig/{{vertexId}}/proof",
 			"expectedStatus": 204

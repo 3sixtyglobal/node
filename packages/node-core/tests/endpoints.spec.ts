@@ -467,7 +467,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — admin user receives global-admin scope so it can use override-tenant.
+		// Phase 1: Bootstrap admin user receives global-admin scope so it can use override-tenant.
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{

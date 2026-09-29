@@ -11,6 +11,33 @@ import { buildEngineServerConfiguration } from "../../src/builders/engineServerE
 const SERVER_INFO = { name: "test", version: "0.0.0" };
 const BASE_VARS = { port: "3000" };
 
+describe("buildEngineServerConfiguration - auth header processors", () => {
+	test("mutex timeout default seeds the auth header token cache timeout", async () => {
+		const config = await buildEngineServerConfiguration(
+			{
+				...BASE_VARS,
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				mutexTimeoutDefault: "60000"
+			},
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		const processors = [
+			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.AuthHeader),
+			config.types.socketRouteProcessor?.find(p => p.type === SocketRouteProcessorType.AuthHeader)
+		];
+
+		for (const processor of processors) {
+			expect(
+				(processor?.options as { config?: { tokenCacheMutexTimeoutMs?: number } })?.config
+					?.tokenCacheMutexTimeoutMs
+			).toBe(60000);
+		}
+	});
+});
+
 describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 	test("registers TenantOverride REST and socket processors when tenant mode and auth are enabled", async () => {
 		const contextKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];

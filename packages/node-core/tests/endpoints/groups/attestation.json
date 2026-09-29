@@ -2,7 +2,7 @@
 	"group": "Attestation",
 	"steps": [
 		{
-			"description": "POST /attestation — 400 missing attestationObject",
+			"description": "POST /attestation - 400 missing attestationObject",
 			"method": "POST",
 			"path": "/attestation",
 			"body": {},
@@ -42,7 +42,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /attestation/:id — 404 after delete",
+			"description": "GET /attestation/:id - 404 after delete",
 			"method": "GET",
 			"path": "/attestation/{{attestationId}}",
 			"expectedStatus": 404
