@@ -260,6 +260,8 @@ runs:
     - name: Build Packages
       if: ${{ steps.check-changes.outputs.has_changes == 'true' }}
       shell: bash
+      env:
+        NODE_OPTIONS: --max-old-space-size=4096
       run: |
         cd "$TARGET_DIR"
         pnpm run quality:no-test

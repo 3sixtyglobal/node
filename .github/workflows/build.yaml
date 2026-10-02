@@ -77,6 +77,8 @@ jobs:
 
       # Run Lint and Dist
       - name: Run Lint and Dist
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: |
           pnpm run quality
           pnpm run docs
