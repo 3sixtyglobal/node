@@ -1782,7 +1782,25 @@ async function configureIdentityProfile(
 
 	if (coreConfig.types.identityProfileConnector.length > 0) {
 		coreConfig.types.identityProfileComponent ??= [];
-		coreConfig.types.identityProfileComponent.push({ type: IdentityProfileComponentType.Service });
+		coreConfig.types.identityProfileComponent.push({
+			type: IdentityProfileComponentType.Service,
+			options: {
+				config: {
+					selfUpdateDeniedProperties: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
+						envVars,
+						"identityProfileSelfUpdateDeniedProperties",
+						undefined,
+						undefined
+					),
+					adminScopes: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
+						envVars,
+						"identityProfileAdminScopes",
+						undefined,
+						undefined
+					)
+				}
+			}
+		});
 	}
 }
 
