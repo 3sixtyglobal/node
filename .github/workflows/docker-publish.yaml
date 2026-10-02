@@ -87,6 +87,35 @@ jobs:
           echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
           echo "Docker tags: $TAGS"
 
+      # Determine the OCI labels, also applied as index annotations so GitHub Packages shows them for the multi-platform image
+      - name: Determine image metadata
+        id: image-metadata
+        run: |
+          LABELS=$(cat <<EOF
+          org.opencontainers.image.title=TWIN Node
+          org.opencontainers.image.description=$(jq -r '.description' apps/node/package.json)
+          org.opencontainers.image.version=${{ steps.package-version.outputs.version }}
+          org.opencontainers.image.revision=$(git rev-parse HEAD)
+          org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}/pkgs/container/${{ env.TWIN_IMAGE_NAME }}
+          org.opencontainers.image.documentation=$(jq -r '.homepage' apps/node/package.json)
+          org.opencontainers.image.licenses=$(jq -r '.license' apps/node/package.json)
+          EOF
+          )
+
+          {
+            echo "labels<<LABELS_EOF"
+            echo "$LABELS"
+            echo "LABELS_EOF"
+            echo "annotations<<ANNOTATIONS_EOF"
+            echo "$LABELS" | sed 's/^/index:/'
+            echo "ANNOTATIONS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Image labels:"
+          echo "$LABELS"
+
       # Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -129,8 +158,10 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.docker-tags.outputs.tags }}
-          # Links the package to this repository in GitHub Packages
-          labels: org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          labels: ${{ steps.image-metadata.outputs.labels }}
+          annotations: ${{ steps.image-metadata.outputs.annotations }}
+          # Skip the provenance attestation, it is listed as an unknown/unknown platform in GitHub Packages
+          provenance: false
 
       # Output publish summary
       - name: Publish Summary
