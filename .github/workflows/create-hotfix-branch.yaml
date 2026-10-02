@@ -23,7 +23,7 @@ jobs:
     name: Create Hotfix Branch
     runs-on:
       labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      group: ${{ github.event.repository.private && 'twin' || 'Default' }}
     timeout-minutes: 15
     permissions:
       contents: write
