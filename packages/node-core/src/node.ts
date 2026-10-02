@@ -58,7 +58,7 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.11.2-next.1" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.11.3-next.0" // x-release-please-version
 		};
 
 		nodeOptions.envPrefix ??= "TWIN_";
