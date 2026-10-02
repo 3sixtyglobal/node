@@ -19,7 +19,7 @@ jobs:
   deploy:
     runs-on:
       labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || '' }}
+      group: ${{ github.event.repository.private && 'twin' || 'Default' }}
     permissions:
       contents: write # Needed for creating/updating branches for deployment updates
       pull-requests: write # Needed for creating the PR

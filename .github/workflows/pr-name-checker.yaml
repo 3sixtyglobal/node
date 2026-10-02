@@ -9,7 +9,7 @@ jobs:
     if: ${{ github.event.action == 'opened' || github.event.changes.title != null }}
     runs-on:
       labels: ${{ github.event.repository.private && 'self-hosted-small' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || '' }}
+      group: ${{ github.event.repository.private && 'twin' || 'Default' }}
 
     steps:
       # Clone the repository to the runner

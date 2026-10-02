@@ -24,7 +24,7 @@ jobs:
   build-and-push:
     runs-on:
       labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || '' }}
+      group: ${{ github.event.repository.private && 'twin' || 'Default' }}
     steps:
       # Set branch variable based on release type
       - name: Set target branch

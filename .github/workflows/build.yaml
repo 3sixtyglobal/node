@@ -26,7 +26,7 @@ jobs:
     if: "${{ github.event_name != 'push' || (!startsWith(github.event.head_commit.message, 'Merge pull request') && !startsWith(github.event.head_commit.message, 'chore: release next') && !startsWith(github.event.head_commit.message, 'docs: regenerate package documentation') && !startsWith(github.event.head_commit.message, 'chore: merge next into main for production release')) }}"
     runs-on:
       labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || '' }}
+      group: ${{ github.event.repository.private && 'twin' || 'Default' }}
 
     steps:
       # Clone the repository to the runner
