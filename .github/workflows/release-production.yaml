@@ -74,8 +74,7 @@ jobs:
     name: 'Guard: Validate custom version'
     if: github.event_name == 'workflow_dispatch' && inputs.customVersion != ''
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: read
@@ -115,8 +114,7 @@ jobs:
     env:
       SOURCE_BRANCH: ${{ inputs.hotfixBranch || 'next' }}
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
@@ -257,8 +255,7 @@ jobs:
       needs.merge-next-to-main.result == 'success' &&
       needs.merge-next-to-main.outputs.has_changes == 'true'
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 360
     permissions:
       contents: read
@@ -292,8 +289,7 @@ jobs:
       (needs.merge-next-to-main.result == 'success' || needs.merge-next-to-main.result == 'skipped') &&
       (needs.gate-next-to-main.result == 'success' || needs.gate-next-to-main.result == 'skipped')
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 90
     permissions:
       contents: write
@@ -370,8 +366,7 @@ jobs:
       needs.prepare-main.result == 'success' &&
       needs.prepare-main.outputs.has_changes == 'true'
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 360
     permissions:
       contents: read
@@ -417,8 +412,7 @@ jobs:
       (needs.prepare-main.result == 'success' || needs.prepare-main.result == 'skipped') &&
       (needs.gate-main-alignment.result == 'success' || needs.gate-main-alignment.result == 'skipped')
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 60
     permissions:
       checks: read
@@ -498,8 +492,7 @@ jobs:
       needs.prepare-release.result == 'success' &&
       needs.prepare-release.outputs.pr_number != ''
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 360
     permissions:
       contents: read
@@ -535,8 +528,7 @@ jobs:
     needs: [merge-next-to-main, prepare-main, prepare-release, gate-release-pr]
     if: github.event_name == 'workflow_dispatch' && always() && !cancelled() && needs.gate-release-pr.result == 'success'
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     permissions:
       actions: read
 
@@ -615,8 +607,7 @@ jobs:
       github.event.pull_request.merged == true &&
       contains(github.event.pull_request.labels.*.name, 'autorelease: pending')
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     permissions:
       contents: read
     outputs:
@@ -670,8 +661,7 @@ jobs:
   publish-packages:
     name: Publish Package (${{ matrix.package || 'later phase only' }})
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -816,8 +806,7 @@ jobs:
   publish-gh-releases:
     name: Publish GitHub Releases
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     permissions:
       contents: read
     needs: [process-workspaces, publish-packages]
@@ -853,8 +842,7 @@ jobs:
   notify-workspace:
     name: Notify Workspace
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     needs: [process-workspaces, publish-gh-releases]
 
     steps:
@@ -883,8 +871,7 @@ jobs:
   realign-next:
     name: Realign Next Branch
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     needs: [process-workspaces, notify-workspace]
     permissions:
       contents: write
@@ -929,8 +916,7 @@ jobs:
     needs: realign-next
     if: ${{ needs.realign-next.outputs.has_changes == 'true' }}
     runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+      labels: ubuntu-latest
     timeout-minutes: 360
     permissions:
       contents: read
