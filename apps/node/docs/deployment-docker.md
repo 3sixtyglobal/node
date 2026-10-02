@@ -4,7 +4,7 @@ The TWIN Node can be run as a Docker container, either from the published image 
 
 ## Published Image
 
-Images are published to Docker Hub as [twinfoundation/twin-node](https://hub.docker.com/r/twinfoundation/twin-node) for `linux/amd64` and `linux/arm64`, with the following tags:
+Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/twin-node](https://github.com/3sixtyglobal/twin-node/pkgs/container/twin-node) for `linux/amd64` and `linux/arm64`, with the following tags:
 
 | Tag       | Description                                      |
 | --------- | ------------------------------------------------ |
@@ -13,7 +13,7 @@ Images are published to Docker Hub as [twinfoundation/twin-node](https://hub.doc
 | `<x.y.z>` | A specific version, for example `0.10.1-next.6`. |
 
 ```shell
-docker pull twinfoundation/twin-node:latest
+docker pull ghcr.io/3sixtyglobal/twin-node:latest
 ```
 
 ## Building the Image
@@ -35,7 +35,7 @@ docker buildx create --name twin-multiplatform-builder --driver docker-container
 docker buildx build --platform linux/amd64,linux/arm64 -t twin-node -f deploy/dockerfile .
 ```
 
-The examples below use the locally built `twin-node` image, replace it with `twinfoundation/twin-node:<tag>` to use the published image.
+The examples below use the locally built `twin-node` image, replace it with `ghcr.io/3sixtyglobal/twin-node:<tag>` to use the published image.
 
 ## Configuration
 
