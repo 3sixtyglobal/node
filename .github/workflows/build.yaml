@@ -25,7 +25,8 @@ jobs:
     # or 'docs: regenerate package documentation' as they have already performed a build
     if: "${{ github.event_name != 'push' || (!startsWith(github.event.head_commit.message, 'Merge pull request') && !startsWith(github.event.head_commit.message, 'chore: release next') && !startsWith(github.event.head_commit.message, 'docs: regenerate package documentation') && !startsWith(github.event.head_commit.message, 'chore: merge next into main for production release')) }}"
     runs-on:
-      labels: ubuntu-latest
+      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
+      group: ${{ github.event.repository.private && 'twin' || 'default' }}
 
     steps:
       # Clone the repository to the runner
@@ -76,8 +77,6 @@ jobs:
 
       # Run Lint and Dist
       - name: Run Lint and Dist
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
         run: |
           pnpm run quality
           pnpm run docs
