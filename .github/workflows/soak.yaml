@@ -79,9 +79,8 @@ concurrency:
 jobs:
   soak:
     name: "Soak (${{ inputs.profile || 'cloud' }}, ${{ inputs.duration || 'profile default' }})"
-    runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'Default' }}
+    runs-on: ${{ github.event.repository.private && fromJSON('{"group":"twin","labels":"self-hosted"}') || 'ubuntu-latest' }}
+
     # 6 h ceiling — accommodates the default 1 h run plus setup overhead, and allows
     # manual dispatches up to ~5 h without adjusting the workflow.
     timeout-minutes: 360
