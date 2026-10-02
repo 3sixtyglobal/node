@@ -124,7 +124,7 @@ jobs:
         if: steps.check-existing-tag.outputs.version_exists != 'true'
         uses: docker/build-push-action@v7
         with:
-          context: ./apps/node
+          context: .
           file: ./apps/node/deploy/dockerfile
           platforms: linux/amd64,linux/arm64
           push: true

@@ -18,12 +18,12 @@ docker pull ghcr.io/3sixtyglobal/twin-node:latest
 
 ## Building the Image
 
-The dockerfile is in `deploy/dockerfile`. It installs the published `@twin.org/node-core` package and its dependencies with pnpm, merges the translation messages, and then removes the development dependencies. The files in `apps/node` form the build context, and `deploy/dockerfile.dockerignore` keeps your local `node_modules` and `.env` out of the image.
+The dockerfile is in `apps/node/deploy/dockerfile`. It builds `@twin.org/node-core` from the repository source and packs it, then installs that package and the other dependencies with pnpm, merges the translation messages, and removes the development dependencies. The repository root forms the build context, and `apps/node/deploy/dockerfile.dockerignore` keeps your local `node_modules`, build output and `.env` files out of the image.
 
-Build the image from the `apps/node` directory:
+Build the image from the repository root:
 
 ```shell
-docker build -t twin-node -f deploy/dockerfile . --load
+docker build -t twin-node -f apps/node/deploy/dockerfile . --load
 ```
 
 > **Note**: The `--load` flag is required when using Docker Buildx to ensure the image is loaded into your local Docker registry. Without it, the image will only exist in the build cache.
@@ -32,7 +32,7 @@ To build for both of the published platforms use a Buildx builder with the `dock
 
 ```shell
 docker buildx create --name twin-multiplatform-builder --driver docker-container --use
-docker buildx build --platform linux/amd64,linux/arm64 -t twin-node -f deploy/dockerfile .
+docker buildx build --platform linux/amd64,linux/arm64 -t twin-node -f apps/node/deploy/dockerfile .
 ```
 
 The examples below use the locally built `twin-node` image, replace it with `ghcr.io/3sixtyglobal/twin-node:<tag>` to use the published image.
