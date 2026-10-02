@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/node",
-	"version": "0.11.0",
+	"version": "0.11.1-next.1",
 	"description": "TWIN Node serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
@@ -32,15 +32,15 @@
 		"start": "node src/index.js"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "^0.11.0"
+		"@twin.org/node-core": "0.11.1-next.1"
 	},
 	"devDependencies": {
-		"@twin.org/entity-storage-connector-memory": "^0.11.0",
-		"@twin.org/merge-locales": "^0.11.0",
-		"@twin.org/nameof-transformer": "^0.11.0",
-		"@twin.org/nameof-vitest-plugin": "^0.11.0",
-		"@twin.org/ts-to-openapi": "^0.11.0",
-		"@twin.org/validate-locales": "^0.11.0",
+		"@twin.org/entity-storage-connector-memory": "next",
+		"@twin.org/merge-locales": "next",
+		"@twin.org/nameof-transformer": "next",
+		"@twin.org/nameof-vitest-plugin": "next",
+		"@twin.org/ts-to-openapi": "next",
+		"@twin.org/validate-locales": "next",
 		"@types/node": "26.6.2",
 		"@vitest/coverage-v8": "5.0.1",
 		"concurrently": "10.0.5",
