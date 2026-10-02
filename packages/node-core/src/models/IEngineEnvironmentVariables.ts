@@ -924,6 +924,18 @@ export interface IEngineEnvironmentVariables {
 	identityProfileConnector?: string;
 
 	/**
+	 * Comma separated list of public and private profile properties which can only be added, changed
+	 * or removed by callers with an admin scope. Defaults to none.
+	 */
+	identityProfileSelfUpdateDeniedProperties?: string;
+
+	/**
+	 * Comma separated list of scopes which allow the self update denied profile properties to be
+	 * modified, any one is sufficient. Defaults to user-admin, global-admin.
+	 */
+	identityProfileAdminScopes?: string;
+
+	/**
 	 * The identity verification method id to use with immutable proofs.
 	 */
 	immutableProofVerificationMethodId?: string;

@@ -200,6 +200,8 @@ const engineEnvironmentVariableKeysInternal: {
 	identityDidResolutionRetryDelay: true,
 	identityResolverConnector: true,
 	identityProfileConnector: true,
+	identityProfileSelfUpdateDeniedProperties: true,
+	identityProfileAdminScopes: true,
 	universalResolverEndpoint: true,
 	// IOTA
 	iotaFaucetEndpoint: true,

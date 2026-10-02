@@ -1502,6 +1502,24 @@ The type of identity profile connector: entity-storage.
 
 ***
 
+### identityProfileSelfUpdateDeniedProperties? {#identityprofileselfupdatedeniedproperties}
+
+> `optional` **identityProfileSelfUpdateDeniedProperties?**: `string`
+
+Comma separated list of public and private profile properties which can only be added, changed
+or removed by callers with an admin scope. Defaults to none.
+
+***
+
+### identityProfileAdminScopes? {#identityprofileadminscopes}
+
+> `optional` **identityProfileAdminScopes?**: `string`
+
+Comma separated list of scopes which allow the self update denied profile properties to be
+modified, any one is sufficient. Defaults to user-admin, global-admin.
+
+***
+
 ### immutableProofVerificationMethodId? {#immutableproofverificationmethodid}
 
 > `optional` **immutableProofVerificationMethodId?**: `string`

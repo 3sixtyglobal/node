@@ -13,6 +13,8 @@ import {
 	EntityStorageConnectorType,
 	HealthComponentType,
 	IdentityConnectorType,
+	IdentityProfileComponentType,
+	IdentityProfileConnectorType,
 	IdentityResolverConnectorType,
 	ImmutableProofComponentType,
 	LoggingConnectorType,
@@ -1352,5 +1354,51 @@ describe("buildEngineConfiguration - health exclude clone components", () => {
 				`${typeKey} should be excluded from the health engine clone`
 			).toEqual(true);
 		}
+	});
+});
+
+describe("buildEngineConfiguration - identity profile", () => {
+	/**
+	 * Read the identity profile service config from a built config.
+	 * @param config The built engine configuration.
+	 * @returns The service config, or undefined when the service component is not configured.
+	 */
+	function identityProfileConfig(
+		config: Awaited<ReturnType<typeof buildEngineConfiguration>>
+	): { selfUpdateDeniedProperties?: string[]; adminScopes?: string[] } | undefined {
+		const entry = config.types.identityProfileComponent?.[0];
+		return entry?.type === IdentityProfileComponentType.Service ? entry.options?.config : undefined;
+	}
+
+	test("leaves the service defaults in place when the env vars are not set", async () => {
+		const config = await buildEngineConfiguration({
+			identityProfileConnector: IdentityProfileConnectorType.EntityStorage
+		});
+
+		expect(identityProfileConfig(config)).toEqual({
+			selfUpdateDeniedProperties: undefined,
+			adminScopes: undefined
+		});
+	});
+
+	test("uses the self update denied properties and admin scopes from the env vars", async () => {
+		const config = await buildEngineConfiguration({
+			identityProfileConnector: IdentityProfileConnectorType.EntityStorage,
+			identityProfileSelfUpdateDeniedProperties: "email, jobTitle",
+			identityProfileAdminScopes: "profile-admin"
+		});
+
+		expect(identityProfileConfig(config)).toEqual({
+			selfUpdateDeniedProperties: ["email", "jobTitle"],
+			adminScopes: ["profile-admin"]
+		});
+	});
+
+	test("does not register the service when no identity profile connector is configured", async () => {
+		const config = await buildEngineConfiguration({
+			identityProfileSelfUpdateDeniedProperties: "email"
+		});
+
+		expect(config.types.identityProfileComponent).toBeUndefined();
 	});
 });

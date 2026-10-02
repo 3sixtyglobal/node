@@ -76,6 +76,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
 	TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
+	TWIN_IDENTITY_PROFILE_SELF_UPDATE_DENIED_PROPERTIES: "roles",
 	TWIN_NFT_CONNECTOR: NftConnectorType.EntityStorage,
 	TWIN_NOTARIZATION_CONNECTOR: NotarizationConnectorType.EntityStorage,
 	TWIN_ATTESTATION_CONNECTOR: AttestationConnectorType.Nft,
