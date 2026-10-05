@@ -25,3 +25,7 @@ Together, the workspace packages and applications define a practical baseline fo
 ## Contributing
 
 To contribute to this repository see the guidelines for building and publishing in [CONTRIBUTING](./CONTRIBUTING.md)
+
+## Origin
+
+This repository is derived from the original [iotaledger/twin-node](https://github.com/iotaledger/twin-node) repository.

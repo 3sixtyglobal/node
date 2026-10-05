@@ -4,7 +4,7 @@
 	"description": "TWIN Node Core for serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/iotaledger/twin-node.git",
+		"url": "git+https://github.com/3sixtyglobal/twin-node.git",
 		"directory": "packages/node-core"
 	},
 	"author": "martyn.janes@iota.org",
@@ -123,7 +123,7 @@
 		"utilities"
 	],
 	"bugs": {
-		"url": "git+https://github.com/iotaledger/twin-node/issues"
+		"url": "git+https://github.com/3sixtyglobal/twin-node/issues"
 	},
 	"homepage": "https://twindev.org"
 }

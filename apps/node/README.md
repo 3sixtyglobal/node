@@ -29,3 +29,7 @@ Detailed reference documentation for the API can be found in [docs/open-api/spec
 ## Changelog
 
 The changes between each version can be found in [docs/changelog.md](docs/changelog.md)
+
+## Origin
+
+This package is derived from the original [iotaledger/twin-node](https://github.com/iotaledger/twin-node/tree/next/apps/node) repository.
