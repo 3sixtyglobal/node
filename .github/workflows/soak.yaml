@@ -76,6 +76,10 @@ concurrency:
   group: kitsune-staging-environment
   cancel-in-progress: false
 
+env:
+  TWIN_GPG_EMAIL: ${{ secrets.TWIN_GPG_EMAIL }}
+  TWIN_GPG_NAME: ${{ secrets.TWIN_GPG_NAME }}
+
 jobs:
   soak:
     name: "Soak (${{ inputs.profile || 'cloud' }}, ${{ inputs.duration || 'profile default' }})"
@@ -252,8 +256,8 @@ jobs:
       - name: Commit and push soak-reports
         if: always() && steps.soak_result.outputs.found == 'true'
         run: |
-          git -C .soak-reports config user.email "github@twindev.org"
-          git -C .soak-reports config user.name "TWIN GitHub Bot"
+          git -C .soak-reports config user.email "$TWIN_GPG_EMAIL"
+          git -C .soak-reports config user.name "$TWIN_GPG_NAME"
           git -C .soak-reports config user.signingkey "$TWIN_GPG_KEY_ID"
           git -C .soak-reports config commit.gpgsign true
           git -C .soak-reports add .
