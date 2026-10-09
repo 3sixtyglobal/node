@@ -43,7 +43,7 @@ The command reads the following environment variables (use `load-env` to supply 
 Run the complete bootstrap sequence using values from `.env.bootstrap-dev`:
 
 ```shell
-twin-node bootstrap-dev --load-env=".env.bootstrap-dev"
+3sixty-node bootstrap-dev --load-env=".env.bootstrap-dev"
 ```
 
 The step-by-step equivalent is shown in the [usage guide](../usage.md#bootstrap-step-by-step).

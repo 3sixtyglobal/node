@@ -49,7 +49,7 @@ Example: identity-verification-method-create --identity="did:iota:...." --verifi
 Add the trust verification method to the organisation identity:
 
 ```shell
-twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-trust.json" --output-env="organization-trust.env"
+3sixty-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-trust.json" --output-env="organization-trust.env"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

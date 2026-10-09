@@ -558,7 +558,7 @@ function doAig() {
 
 	if (!ctx.aigId || Math.random() < WRITE_RATIO) {
 		const body = JSON.stringify({
-			'@context': ['https://schema.twindev.org/aig/', 'https://schema.twindev.org/common/'],
+			'@context': ['https://schema.3sixty.global/aig/', 'https://schema.3sixty.global/common/'],
 			type: 'AuditableItemGraphVertex',
 			annotationObject: {
 				'@context': 'https://schema.org',
@@ -605,8 +605,8 @@ function doAis() {
 		const body = JSON.stringify({
 			'@context': [
 				'https://schema.org',
-				'https://schema.twindev.org/ais/',
-				'https://schema.twindev.org/common/'
+				'https://schema.3sixty.global/ais/',
+				'https://schema.3sixty.global/common/'
 			],
 			type: 'AuditableItemStream',
 			// Disables gas-consuming immutable-proof checks for this stream (0 = never, per the

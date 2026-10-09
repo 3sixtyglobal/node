@@ -31,13 +31,13 @@ Example: user-remove --email="user@example.com" --tenant-id="0011..aabb"
 Remove a user and their identity profile in single-tenant mode:
 
 ```shell
-twin-node user-remove --email="bob@example.com"
+3sixty-node user-remove --email="bob@example.com"
 ```
 
 Remove a user in multi-tenant mode:
 
 ```shell
-twin-node user-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="bob@example.com"
+3sixty-node user-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="bob@example.com"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

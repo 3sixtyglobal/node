@@ -26,7 +26,7 @@ Example: node-org-id-get
 Display the organisation DID currently assigned to the node:
 
 ```shell
-twin-node node-org-id-get
+3sixty-node node-org-id-get
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

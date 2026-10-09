@@ -33,7 +33,7 @@ Example: tenant-org-alias-remove --tenant-id="0011..aabb" --alias="did:iota:..."
 Remove a stale organisation alias from a tenant:
 
 ```shell
-twin-node tenant-org-alias-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --alias=!OLD_ORGANIZATION_DID
+3sixty-node tenant-org-alias-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --alias=!OLD_ORGANIZATION_DID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

@@ -1,11 +1,11 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { ContextIdKeys } from "@twin.org/context";
+import { ContextIdKeys } from "@3sixty/context";
 import {
 	AuthenticationComponentType,
 	RestRouteProcessorType,
 	SocketRouteProcessorType
-} from "@twin.org/engine-server-types";
+} from "@3sixty/engine-server-types";
 import { buildEngineServerConfiguration } from "../../src/builders/engineServerEnvBuilder.js";
 
 const SERVER_INFO = { name: "test", version: "0.0.0" };

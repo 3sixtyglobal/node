@@ -34,13 +34,13 @@ Example: identity-remove --identity="did:iota:...." --remove-keys=true
 Remove an identity document, keeping its keys in the vault:
 
 ```shell
-twin-node identity-remove --identity="did:iota:..."
+3sixty-node identity-remove --identity="did:iota:..."
 ```
 
 Remove an identity document together with all of its vault keys and its mnemonic:
 
 ```shell
-twin-node identity-remove --identity="did:iota:..." --remove-keys=true
+3sixty-node identity-remove --identity="did:iota:..." --remove-keys=true
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

@@ -33,7 +33,7 @@ Example: tenant-org-id-set --tenant-id="0011..aabb" --organization-id="did:iota:
 Associate an organisation with the node tenant:
 
 ```shell
-twin-node tenant-org-id-set --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
+3sixty-node tenant-org-id-set --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

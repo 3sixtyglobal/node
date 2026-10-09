@@ -1,4 +1,4 @@
-# @twin.org/node-core
+# @3sixty/node-core
 
 ## Interfaces
 

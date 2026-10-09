@@ -1,6 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineCore } from "@twin.org/engine-models";
+import type { IEngineCore } from "@3sixty/engine-models";
 import type { CliCommandParamType } from "./cliCommandParamType.js";
 import type { ICliCommandDefinitionParam } from "./ICliCommandDefinitionParam.js";
 import type { IEnvironmentVariables } from "./IEnvironmentVariables.js";

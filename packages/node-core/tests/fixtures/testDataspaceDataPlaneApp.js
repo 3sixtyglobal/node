@@ -1,9 +1,9 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@twin.org/context';
-import { ComponentFactory, Guards } from '@twin.org/core';
-import { DataTypeHandlerFactory } from '@twin.org/data-core';
-import { DataRequestType } from '@twin.org/dataspace-models';
+import { ContextIdHelper, ContextIdKeys, ContextIdStore } from '@3sixty/context';
+import { ComponentFactory, Guards } from '@3sixty/core';
+import { DataTypeHandlerFactory } from '@3sixty/data-core';
+import { DataRequestType } from '@3sixty/dataspace-models';
 // Dummy Data
 const id = 'urn:ucr:24PLP051219453I002610799053311';
 const entities = [

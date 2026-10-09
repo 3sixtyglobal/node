@@ -28,7 +28,7 @@ Example: tenant-remove --tenant-id="0011..aabb"
 Remove a tenant:
 
 ```shell
-twin-node tenant-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID
+3sixty-node tenant-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

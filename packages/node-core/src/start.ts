@@ -1,18 +1,14 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { ITenantAdminComponent } from "@twin.org/api-models";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@twin.org/core";
-import { Engine } from "@twin.org/engine";
-import { FileStateStorage } from "@twin.org/engine-core";
-import {
-	EngineCoreFactory,
-	type IEngineCore,
-	type IEngineCoreConfig
-} from "@twin.org/engine-models";
-import { EngineServer } from "@twin.org/engine-server";
-import type { IEngineServerConfig } from "@twin.org/engine-server-types";
-import { BlobStorageConnectorType, EntityStorageConnectorType } from "@twin.org/engine-types";
+import type { ITenantAdminComponent } from "@3sixty/api-models";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
+import { Engine } from "@3sixty/engine";
+import { FileStateStorage } from "@3sixty/engine-core";
+import { EngineCoreFactory, type IEngineCore, type IEngineCoreConfig } from "@3sixty/engine-models";
+import { EngineServer } from "@3sixty/engine-server";
+import type { IEngineServerConfig } from "@3sixty/engine-server-types";
+import { BlobStorageConnectorType, EntityStorageConnectorType } from "@3sixty/engine-types";
 import {
 	extensionsInitialiseEngine,
 	extensionsInitialiseEngineServer,

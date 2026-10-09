@@ -3,11 +3,11 @@
 import type {
 	AuditableItemGraphVertexIndex,
 	AuditableItemGraphVertexV1
-} from "@twin.org/auditable-item-graph-service";
-import { initSchema as initSchemaAuditableItemGraph } from "@twin.org/auditable-item-graph-service";
-import { ContextIdStore } from "@twin.org/context";
-import { BaseError, Factory } from "@twin.org/core";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+} from "@3sixty/auditable-item-graph-service";
+import { initSchema as initSchemaAuditableItemGraph } from "@3sixty/auditable-item-graph-service";
+import { ContextIdStore } from "@3sixty/context";
+import { BaseError, Factory } from "@3sixty/core";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	BackgroundTaskComponentType,
 	EntityStorageComponentType,
@@ -15,23 +15,23 @@ import {
 	LoggingComponentType,
 	LoggingConnectorType,
 	SchemaVersionMigrationComponentType
-} from "@twin.org/engine-types";
-import type { IEntitySchemaProperty } from "@twin.org/entity";
+} from "@3sixty/engine-types";
+import type { IEntitySchemaProperty } from "@3sixty/entity";
 import {
 	entity,
 	EntitySchemaFactory,
 	EntitySchemaHelper,
 	EntitySchemaPropertyType,
 	property
-} from "@twin.org/entity";
-import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
+} from "@3sixty/entity";
+import { MemoryEntityStorageConnector } from "@3sixty/entity-storage-connector-memory";
 import {
 	EntityStorageConnectorFactory,
 	SchemaMigrationFactory
-} from "@twin.org/entity-storage-models";
-import type { ILogEntry } from "@twin.org/logging-models";
-import type { OdrlPolicyIndex, OdrlPolicyV0 } from "@twin.org/rights-management-pap-service";
-import { initSchema as initSchemaPolicyAdministrationPoint } from "@twin.org/rights-management-pap-service";
+} from "@3sixty/entity-storage-models";
+import type { ILogEntry } from "@3sixty/logging-models";
+import type { OdrlPolicyIndex, OdrlPolicyV0 } from "@3sixty/rights-management-pap-service";
+import { initSchema as initSchemaPolicyAdministrationPoint } from "@3sixty/rights-management-pap-service";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
 import { run } from "../src/node.js";

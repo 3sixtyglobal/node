@@ -7,23 +7,23 @@ These commands cover local installation, on demand execution, and a complete boo
 To install and run the CLI locally use either npm or pnpm:
 
 ```shell
-npm install @twin.org/node -g
-twin-node
+npm install @3sixty/node -g
+3sixty-node
 ```
 
 ```shell
-pnpm add @twin.org/node -g
-twin-node
+pnpm add @3sixty/node -g
+3sixty-node
 ```
 
 or run it directly without installing, using npx or pnpm dlx:
 
 ```shell
-npx "@twin.org/node"
+npx "@3sixty/node"
 ```
 
 ```shell
-pnpm dlx "@twin.org/node"
+pnpm dlx "@3sixty/node"
 ```
 
 ## Commands
@@ -111,7 +111,7 @@ Key environment variables that control how the node server handles authenticatio
 Runs the complete bootstrap sequence in one step using values from `.env.bootstrap-dev`, see [bootstrap-dev](commands/bootstrap-dev.md) for the variables it reads:
 
 ```shell
-twin-node bootstrap-dev --load-env=".env.bootstrap-dev"
+3sixty-node bootstrap-dev --load-env=".env.bootstrap-dev"
 ```
 
 The sections below show the equivalent step-by-step commands that replicate the bootstrap-dev process.
@@ -123,65 +123,65 @@ The sections below show the equivalent step-by-step commands that replicate the 
 Supply `--fund-wallet=true` when the `wallet` feature is enabled. `--node-id=true` sets the created identity as the node identity in the same step.
 
 ```shell
-twin-node identity-create --node-id=true --fund-wallet=true --output-json="node-identity.json" --output-env="node-identity.env" --output-env-prefix=node
+3sixty-node identity-create --node-id=true --fund-wallet=true --output-json="node-identity.json" --output-env="node-identity.env" --output-env-prefix=node
 ```
 
 ### Step 2 - Create the authentication signing key for the node
 
 ```shell
-twin-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID --key-type=Ed25519 --key-id=!TWIN_AUTH_SIGNING_KEY_ID --overwrite-mode=skip --output-json="node-auth-key.json" --output-env="node-auth-key.env"
+3sixty-node vault-key-create --load-env="node-identity.env" --identity=!NODE_DID --key-type=Ed25519 --key-id=!TWIN_AUTH_SIGNING_KEY_ID --overwrite-mode=skip --output-json="node-auth-key.json" --output-env="node-auth-key.env"
 ```
 
 To import an existing authentication signing key instead:
 
 ```shell
-twin-node vault-key-import --load-env="node-identity.env,node-auth-key.json" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
+3sixty-node vault-key-import --load-env="node-identity.env,node-auth-key.json" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
 ```
 
 ### Step 3 - Create the organisation identity
 
 ```shell
-twin-node identity-create --load-env="node-identity.env" --fund-wallet=true --output-json="organization-identity.json" --output-env="organization-identity.env" --output-env-prefix=organization
+3sixty-node identity-create --load-env="node-identity.env" --fund-wallet=true --output-json="organization-identity.json" --output-env="organization-identity.env" --output-env-prefix=organization
 ```
 
 ### Step 4 - Add the trust verification method to the organisation identity
 
 ```shell
-twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-trust.json" --output-env="organization-trust.env"
+3sixty-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_TRUST_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-trust.json" --output-env="organization-trust.env"
 ```
 
 ### Step 5 - Set the organisation identity on the node (single-tenant)
 
 ```shell
-twin-node node-org-id-set --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
+3sixty-node node-org-id-set --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
 ```
 
 ### Step 6 - Create the node tenant and associate the organisation (multi-tenant only)
 
 ```shell
-twin-node tenant-create --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID --label="Node" --output-json="node-tenant.json" --output-env="node-tenant.env" --output-env-prefix=node
+3sixty-node tenant-create --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID --label="Node" --output-json="node-tenant.json" --output-env="node-tenant.env" --output-env-prefix=node
 ```
 
 ```shell
-twin-node tenant-org-id-set --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
+3sixty-node tenant-org-id-set --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --organization-id=!ORGANIZATION_DID
 ```
 
 To import an existing tenant instead:
 
 ```shell
-twin-node tenant-import --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --organization-id=!ORGANIZATION_DID --label=!NODE_LABEL --public-origin="https://api.example.com"
+3sixty-node tenant-import --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --organization-id=!ORGANIZATION_DID --label=!NODE_LABEL --public-origin="https://api.example.com"
 ```
 
 To update an existing tenant:
 
 ```shell
-twin-node tenant-update --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --label="New Label"
+3sixty-node tenant-update --load-env="node-tenant.json" --tenant-id=!NODE_TENANT_ID --label="New Label"
 ```
 
 To remove a stale organisation alias from a tenant:
 
 ```shell
-twin-node tenant-org-alias-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --alias=!OLD_ORGANIZATION_DID
+3sixty-node tenant-org-alias-remove --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --alias=!OLD_ORGANIZATION_DID
 ```
 
 ---
@@ -191,37 +191,37 @@ The following steps run when the `admin-user` feature is enabled.
 ### Step 7 - Add the blob encryption key to the organisation (if blob encryption is enabled)
 
 ```shell
-twin-node vault-key-create --load-env="organization-identity.env" --identity=!ORGANIZATION_DID --key-type=ChaCha20Poly1305 --key-id=!TWIN_BLOB_STORAGE_ENCRYPTION_KEY_ID --overwrite-mode=skip --output-json="organization-blob-encryption.json" --output-env="organization-blob-encryption.env"
+3sixty-node vault-key-create --load-env="organization-identity.env" --identity=!ORGANIZATION_DID --key-type=ChaCha20Poly1305 --key-id=!TWIN_BLOB_STORAGE_ENCRYPTION_KEY_ID --overwrite-mode=skip --output-json="organization-blob-encryption.json" --output-env="organization-blob-encryption.env"
 ```
 
 ### Step 8 - Add the attestation verification method to the organisation (if attestation is enabled)
 
 ```shell
-twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-attestation.json" --output-env="organization-attestation.env"
+3sixty-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-attestation.json" --output-env="organization-attestation.env"
 ```
 
 To import an existing attestation verification method:
 
 ```shell
-twin-node identity-verification-method-import --load-env="node-identity.env,organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!DID_VERIFICATION_METHOD_ID --private-key-hex=!DID_VERIFICATION_METHOD_PRIVATE_KEY_HEX
+3sixty-node identity-verification-method-import --load-env="node-identity.env,organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!DID_VERIFICATION_METHOD_ID --private-key-hex=!DID_VERIFICATION_METHOD_PRIVATE_KEY_HEX
 ```
 
 To create a verifiable credential using the attestation verification method:
 
 ```shell
-twin-node identity-verifiable-credential-create --load-env="organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID --subject-json="subject.json" --output-json="organization-attestation-credential.json" --output-env="organization-attestation-credential.env"
+3sixty-node identity-verifiable-credential-create --load-env="organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-id=!TWIN_ATTESTATION_VERIFICATION_METHOD_ID --subject-json="subject.json" --output-json="organization-attestation-credential.json" --output-env="organization-attestation-credential.env"
 ```
 
 ### Step 9 - Add the immutable proof verification method to the organisation (if immutable proofs are enabled)
 
 ```shell
-twin-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-immutable-proof.json" --output-env="organization-immutable-proof.env"
+3sixty-node identity-verification-method-create --load-env="node-identity.env,organization-identity.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!TWIN_IMMUTABLE_PROOF_VERIFICATION_METHOD_ID --overwrite-mode=skip --output-json="organization-immutable-proof.json" --output-env="organization-immutable-proof.env"
 ```
 
 ### Step 10 - Create the admin user identity
 
 ```shell
-twin-node identity-create --load-env="organization-identity.env" --controller=!ORGANIZATION_DID --output-json="admin-user-identity.json" --output-env="admin-user-identity.env" --output-env-prefix=admin_user
+3sixty-node identity-create --load-env="organization-identity.env" --controller=!ORGANIZATION_DID --output-json="admin-user-identity.json" --output-env="admin-user-identity.env" --output-env-prefix=admin_user
 ```
 
 ### Step 11 - Create the admin user account
@@ -229,11 +229,11 @@ twin-node identity-create --load-env="organization-identity.env" --controller=!O
 In single-tenant mode omit `--tenant-id` and `node-tenant.env`.
 
 ```shell
-twin-node user-create --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --tenant-id=!NODE_TENANT_ID --email="admin@node" --given-name="Node" --family-name="Admin" --scope="tenant-admin,user-admin" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
+3sixty-node user-create --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --tenant-id=!NODE_TENANT_ID --email="admin@node" --given-name="Node" --family-name="Admin" --scope="tenant-admin,user-admin" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
 ```
 
 To update an existing user:
 
 ```shell
-twin-node user-update --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@node" --scope="tenant-admin,user-admin,foo"
+3sixty-node user-update --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@node" --scope="tenant-admin,user-admin,foo"
 ```

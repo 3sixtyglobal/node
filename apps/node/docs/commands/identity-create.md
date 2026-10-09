@@ -55,13 +55,13 @@ Example: identity-create --mnemonic="..." --fund-wallet=true
 Create the node identity, fund its wallet and set it as the node identity:
 
 ```shell
-twin-node identity-create --node-id=true --fund-wallet=true --output-json="node-identity.json" --output-env="node-identity.env" --output-env-prefix=node
+3sixty-node identity-create --node-id=true --fund-wallet=true --output-json="node-identity.json" --output-env="node-identity.env" --output-env-prefix=node
 ```
 
 Create an identity controlled by an organisation:
 
 ```shell
-twin-node identity-create --load-env="organization-identity.env" --controller=!ORGANIZATION_DID --output-json="user-identity.json" --output-env="user-identity.env" --output-env-prefix=user
+3sixty-node identity-create --load-env="organization-identity.env" --controller=!ORGANIZATION_DID --output-json="user-identity.json" --output-env="user-identity.env" --output-env-prefix=user
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

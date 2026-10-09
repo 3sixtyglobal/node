@@ -10,7 +10,7 @@ The dashboard has three rows:
 
 > **Two metric layers visible on this dashboard:**
 >
-> - **Library metrics** (`system_*`, `process_*`) are built into `@twin.org/node-core`.
+> - **Library metrics** (`system_*`, `process_*`) are built into `@3sixty/node-core`.
 > - **App demo metrics** (`app_*`) live in [`apps/node/src/metrics/`](../src/metrics/). Wired in [`apps/node/src/index.js`](../src/index.js). **Copy that folder when adding metrics to your own twin-based app — see [`AppMetricsExample.md`](../src/metrics/AppMetricsExample.md).**
 
 ---

@@ -31,13 +31,13 @@ Example: user-get --email="bob@example.com"
 Get a user in single-tenant mode:
 
 ```shell
-twin-node user-get --email="admin@node"
+3sixty-node user-get --email="admin@node"
 ```
 
 Get a user in multi-tenant mode:
 
 ```shell
-twin-node user-get --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@tenant"
+3sixty-node user-get --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@tenant"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

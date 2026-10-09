@@ -25,7 +25,7 @@ Example: identity-list
 List every identity held in custody by the node, showing each DID and its controller:
 
 ```shell
-twin-node identity-list
+3sixty-node identity-list
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

@@ -28,7 +28,7 @@ Example: tenant-get --tenant-id="0011..aabb"
 Get the full record for a tenant:
 
 ```shell
-twin-node tenant-get --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID
+3sixty-node tenant-get --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

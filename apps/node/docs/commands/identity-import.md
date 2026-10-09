@@ -31,7 +31,7 @@ Example: identity-import --identity="did:iota:..." --mnemonic="..."
 Import an identity that already exists, storing its mnemonic in the vault:
 
 ```shell
-twin-node identity-import --identity="did:iota:..." --mnemonic="..."
+3sixty-node identity-import --identity="did:iota:..." --mnemonic="..."
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

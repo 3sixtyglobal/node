@@ -3,11 +3,11 @@
 import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
-} from "@twin.org/api-auth-entity-storage-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
+} from "@3sixty/api-auth-entity-storage-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 

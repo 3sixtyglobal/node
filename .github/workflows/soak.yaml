@@ -4,7 +4,7 @@ name: Soak
 # Nightly at 02:00 UTC; also manually dispatchable with overridable inputs.
 #
 # Required repo secret (single blob, newline-separated KEY=VALUE):
-#   TWIN_SOAK_ENV_VARS — must contain:
+#   ORG_SOAK_ENV_VARS — must contain:
 #     SOAK_BASE_URL           base URL of the cloud twin-node
 #     SOAK_ADMIN_PASSWORD     admin user password
 #     SOAK_SLACK_WEBHOOK_URL  Slack incoming webhook for pass/fail alerts
@@ -14,7 +14,7 @@ name: Soak
 #
 # Required: SOAK_TENANT_API_KEY — kitsune runs multi-tenant and rejects every request,
 # including /authentication/login itself, with 401 tenantProcessor.missingApiKey without it
-# (verified live 2026-08-27). Included in the TWIN_SOAK_ENV_VARS blob above.
+# (verified live 2026-08-27). Included in the ORG_SOAK_ENV_VARS blob above.
 #
 # After every run (including failed soaks), generates a static HTML report and publishes it to the
 # soak-reports branch + Vercel (soaktest.twindev.org) — see apps/node/soak/README.md.
@@ -77,13 +77,13 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  TWIN_GPG_EMAIL: ${{ secrets.TWIN_GPG_EMAIL }}
-  TWIN_GPG_NAME: ${{ secrets.TWIN_GPG_NAME }}
+  ORG_GPG_EMAIL: ${{ secrets.ORG_GPG_EMAIL }}
+  ORG_GPG_NAME: ${{ secrets.ORG_GPG_NAME }}
 
 jobs:
   soak:
     name: "Soak (${{ inputs.profile || 'cloud' }}, ${{ inputs.duration || 'profile default' }})"
-    runs-on: ${{ github.event.repository.private && fromJSON('{"group":"twin","labels":"self-hosted"}') || 'ubuntu-latest' }}
+    runs-on: ${{ github.event.repository.private && fromJSON('{"group":"3sixty","labels":"self-hosted"}') || 'ubuntu-latest' }}
 
     # 6 h ceiling — accommodates the default 1 h run plus setup overhead, and allows
     # manual dispatches up to ~5 h without adjusting the workflow.
@@ -129,7 +129,7 @@ jobs:
         # wherever a later step echoes its env (e.g. the "Run soak" step below).
         # Read via env rather than inline ${{ }} for the same reason as the INPUT_* vars below.
         env:
-          SOAK_ENV_VARS: ${{ secrets.TWIN_SOAK_ENV_VARS }}
+          SOAK_ENV_VARS: ${{ secrets.ORG_SOAK_ENV_VARS }}
         run: |
           while IFS= read -r line; do
             line="${line%$'\r'}"
@@ -153,7 +153,7 @@ jobs:
           INPUT_MEM_GROWTH_MB_PER_HR: ${{ inputs.mem_growth_mb_per_hr }}
           INPUT_DISABLED_GROUPS: ${{ inputs.disabled_groups }}
           # SOAK_BASE_URL, SOAK_TENANT_API_KEY, SOAK_ADMIN_EMAIL, SOAK_ADMIN_PASSWORD,
-          # and SOAK_SLACK_WEBHOOK_URL come from the TWIN_SOAK_ENV_VARS blob loaded above.
+          # and SOAK_SLACK_WEBHOOK_URL come from the ORG_SOAK_ENV_VARS blob loaded above.
           # Credentials stay in env (not CLI args) so they never appear in the process list.
         run: |
           # SOAK_PROFILE always needs a value — it selects which profile file to load, so
@@ -245,20 +245,20 @@ jobs:
       - name: Import GPG key
         if: always() && steps.soak_result.outputs.found == 'true'
         env:
-          TWIN_GPG_PRIVATE_KEY: ${{ secrets.TWIN_GPG_PRIVATE_KEY }}
-          TWIN_GPG_KEY_ID: ${{ secrets.TWIN_GPG_KEY_ID }}
+          ORG_GPG_PRIVATE_KEY: ${{ secrets.ORG_GPG_PRIVATE_KEY }}
+          ORG_GPG_KEY_ID: ${{ secrets.ORG_GPG_KEY_ID }}
         run: |
-          echo "$TWIN_GPG_PRIVATE_KEY" | base64 --decode | gpg --import
-          echo "TWIN_GPG_KEY_ID=$TWIN_GPG_KEY_ID" >> $GITHUB_ENV
+          echo "$ORG_GPG_PRIVATE_KEY" | base64 --decode | gpg --import
+          echo "ORG_GPG_KEY_ID=$ORG_GPG_KEY_ID" >> $GITHUB_ENV
 
       # Config is scoped to the soak-reports checkout only (git -C), not --global, since this
       # job's earlier steps also run git as the default Actions identity.
       - name: Commit and push soak-reports
         if: always() && steps.soak_result.outputs.found == 'true'
         run: |
-          git -C .soak-reports config user.email "$TWIN_GPG_EMAIL"
-          git -C .soak-reports config user.name "$TWIN_GPG_NAME"
-          git -C .soak-reports config user.signingkey "$TWIN_GPG_KEY_ID"
+          git -C .soak-reports config user.email "$ORG_GPG_EMAIL"
+          git -C .soak-reports config user.name "$ORG_GPG_NAME"
+          git -C .soak-reports config user.signingkey "$ORG_GPG_KEY_ID"
           git -C .soak-reports config commit.gpgsign true
           git -C .soak-reports add .
           # [skip ci] — this is a data-only push and must never trigger another workflow run.
@@ -268,7 +268,7 @@ jobs:
       - name: Cleanup GPG key
         if: always() && steps.soak_result.outputs.found == 'true'
         run: |
-          FINGERPRINT=$(gpg --list-secret-keys --with-colons "$TWIN_GPG_KEY_ID" | awk -F: '/fpr:/ {print $10}' | head -1)
+          FINGERPRINT=$(gpg --list-secret-keys --with-colons "$ORG_GPG_KEY_ID" | awk -F: '/fpr:/ {print $10}' | head -1)
           if [ -n "$FINGERPRINT" ]; then
             gpg --batch --yes --delete-secret-keys "$FINGERPRINT" || true
             gpg --batch --yes --delete-keys "$FINGERPRINT" || true
@@ -286,9 +286,9 @@ jobs:
         if: always() && steps.soak_result.outputs.found == 'true'
         env:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_SOAKTEST }}
-          VERCEL_ORG_ID: ${{ secrets.TWIN_VERCEL_ORG_ID }}
-          VERCEL_TOKEN: ${{ secrets.TWIN_VERCEL_TOKEN }}
-          VERCEL_SCOPE: ${{ secrets.TWIN_VERCEL_SCOPE }}
+          VERCEL_ORG_ID: ${{ secrets.ORG_VERCEL_ORG_ID }}
+          VERCEL_TOKEN: ${{ secrets.ORG_VERCEL_TOKEN }}
+          VERCEL_SCOPE: ${{ secrets.ORG_VERCEL_SCOPE }}
         run: |
           vercel deploy --cwd .soak-reports --token="$VERCEL_TOKEN" --scope="$VERCEL_SCOPE" \
             --target=production --yes --force

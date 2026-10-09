@@ -61,13 +61,13 @@ Example: user-create --user-identity="did:iota:...." --organization-identity="di
 Create a user in single-tenant mode:
 
 ```shell
-twin-node user-create --load-env="organization-identity.env,admin-user-identity.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --email="admin@node" --given-name="Node" --family-name="Admin" --scope="user-admin" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
+3sixty-node user-create --load-env="organization-identity.env,admin-user-identity.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --email="admin@node" --given-name="Node" --family-name="Admin" --scope="user-admin" --output-json="user-account-admin.json" --output-env="user-account-admin.env" --output-env-prefix=admin
 ```
 
 Create a user in multi-tenant mode:
 
 ```shell
-twin-node user-create --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --tenant-id=!NODE_TENANT_ID --email="admin@tenant" --scope="tenant-admin,user-admin" --output-json="user-account-admin.json"
+3sixty-node user-create --load-env="organization-identity.env,admin-user-identity.env,node-tenant.env" --user-identity=!ADMIN_USER_DID --organization-identity=!ORGANIZATION_DID --tenant-id=!NODE_TENANT_ID --email="admin@tenant" --scope="tenant-admin,user-admin" --output-json="user-account-admin.json"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

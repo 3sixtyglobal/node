@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineCore, IEngineServer, IEngineStateStorage } from "@twin.org/engine-models";
-import type { IEngineConfig } from "@twin.org/engine-types";
+import type { IEngineCore, IEngineServer, IEngineStateStorage } from "@3sixty/engine-models";
+import type { IEngineConfig } from "@3sixty/engine-types";
 import type { IEnvironmentVariables } from "./IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./INodeEngineConfig.js";
 
@@ -10,8 +10,8 @@ import type { INodeEngineConfig } from "./INodeEngineConfig.js";
  */
 export interface INodeOptions {
 	/**
-	 * The name of the server, defaults to "TWIN Node".
-	 * @default "TWIN Node"
+	 * The name of the server, defaults to "3Sixty Node".
+	 * @default "3Sixty Node"
 	 */
 	serverName?: string;
 

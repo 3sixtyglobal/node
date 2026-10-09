@@ -1,17 +1,17 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { MemoryStateStorage } from "@twin.org/engine-core";
-import { EngineCloneMode } from "@twin.org/engine-models";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { ComponentFactory, Factory } from "@3sixty/core";
+import { MemoryStateStorage } from "@3sixty/engine-core";
+import { EngineCloneMode } from "@3sixty/engine-models";
 import {
 	EntityStorageConnectorType,
 	FacadeType,
 	TracingComponentType,
 	TracingConnectorType
-} from "@twin.org/engine-types";
-import { TracingFacade, TracingFacadeAttributes } from "@twin.org/tracing-facades";
-import { type ISpan, SpanStatus, TracingConnectorFactory } from "@twin.org/tracing-models";
+} from "@3sixty/engine-types";
+import { TracingFacade, TracingFacadeAttributes } from "@3sixty/tracing-facades";
+import { type ISpan, SpanStatus, TracingConnectorFactory } from "@3sixty/tracing-models";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { buildEngineConfiguration } from "../src/builders/engineEnvBuilder.js";
 import {

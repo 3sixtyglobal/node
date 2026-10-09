@@ -1,8 +1,8 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
-import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { EngineCloneMode, EngineLogLevel } from "@twin.org/engine-models";
+import type { IIotaConfig } from "@3sixty/dlt-iota";
+import { EngineCloneMode, EngineLogLevel } from "@3sixty/engine-models";
 import {
 	DataConverterConnectorType,
 	DataExtractorConnectorType,
@@ -32,8 +32,8 @@ import {
 	TracingComponentType,
 	TracingConnectorType,
 	TrustVerifierComponentType
-} from "@twin.org/engine-types";
-import { LogLevel } from "@twin.org/logging-models";
+} from "@3sixty/engine-types";
+import { LogLevel } from "@3sixty/logging-models";
 import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
 import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
 import type { IEngineEnvironmentVariables } from "../../src/models/IEngineEnvironmentVariables.js";

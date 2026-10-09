@@ -4,7 +4,7 @@ set -euo pipefail
 
 readonly EXPECTED_WORKSPACE_NAME="k8s-staging"
 readonly EXPECTED_VARIABLE_KEY="KITSUNE_TWIN_NODE_IMAGE"
-readonly EXPECTED_IMAGE_REPOSITORY="twinfoundation/twin-node"
+readonly EXPECTED_IMAGE_REPOSITORY="ghcr.io/3sixtyglobal/3sixty-node"
 
 stderr() {
   printf '%s\n' "$*" >&2
@@ -54,7 +54,7 @@ require_tfc_api_url() {
 
 require_kitsune_image_reference() {
   local value="$1"
-  if [[ ! "$value" =~ ^twinfoundation/twin-node:[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
+  if [[ ! "$value" =~ ^ghcr\.io/3sixtyglobal/3sixty-node:[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z][0-9A-Za-z.-]*)?$ ]]; then
     stderr "ERROR: IMAGE_REFERENCE must be an immutable $EXPECTED_IMAGE_REPOSITORY semantic version tag, not a channel tag. Received '$value'."
     exit 1
   fi

@@ -8,8 +8,8 @@
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				]
 			},
 			"expectedStatus": 400
@@ -21,8 +21,8 @@
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStream"
 			},
@@ -44,8 +44,8 @@
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStream",
 				"dateCreated": "{{streamDateCreated}}",
@@ -77,8 +77,8 @@
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStreamEntry",
 				"entryObject": {
@@ -97,8 +97,8 @@
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStreamEntry",
 				"entryObject": {
@@ -128,8 +128,8 @@
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStreamEntry",
 				"entryObject": {

@@ -49,7 +49,7 @@ Example: tenant-create --tenant-id="0011..aabb" --api-key="aabb..0099" --organiz
 Create the node tenant for an organisation:
 
 ```shell
-twin-node tenant-create --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID --label="Node" --output-json="node-tenant.json" --output-env="node-tenant.env" --output-env-prefix=node
+3sixty-node tenant-create --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID --label="Node" --output-json="node-tenant.json" --output-env="node-tenant.env" --output-env-prefix=node
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

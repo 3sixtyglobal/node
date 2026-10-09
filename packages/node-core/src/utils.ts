@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { I18n, Is, NativeModules, type ILocaleDictionary } from "@twin.org/core";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { I18n, Is, NativeModules, type ILocaleDictionary } from "@3sixty/core";
 
 /**
  * Initialise the locales for the application.

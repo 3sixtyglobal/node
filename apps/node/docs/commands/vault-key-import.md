@@ -37,7 +37,7 @@ Example: vault-key-import --identity="did:iota:...." --key-id="my-key" --key-typ
 Import an existing authentication signing key:
 
 ```shell
-twin-node vault-key-import --load-env="node-identity.env,node-auth-key.env" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
+3sixty-node vault-key-import --load-env="node-identity.env,node-auth-key.env" --identity=!NODE_DID --key-id=!TWIN_AUTH_SIGNING_KEY_ID --key-type=!KEY_TYPE --private-key-hex=!PRIVATE_KEY_HEX
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

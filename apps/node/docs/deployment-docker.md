@@ -1,10 +1,10 @@
 # Node Deployment Docker
 
-The TWIN Node can be run as a Docker container, either from the published image or from an image you build yourself.
+The 3Sixty Node can be run as a Docker container, either from the published image or from an image you build yourself.
 
 ## Published Image
 
-Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/twin-node](https://github.com/3sixtyglobal/twin-node/pkgs/container/twin-node) for `linux/amd64` and `linux/arm64`, with the following tags:
+Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/node](https://github.com/3sixtyglobal/node/pkgs/container/3sixty-node) for `linux/amd64` and `linux/arm64`, with the following tags:
 
 | Tag       | Description                                      |
 | --------- | ------------------------------------------------ |
@@ -13,17 +13,17 @@ Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/twin-node](http
 | `<x.y.z>` | A specific version, for example `0.10.1-next.6`. |
 
 ```shell
-docker pull ghcr.io/3sixtyglobal/twin-node:latest
+docker pull ghcr.io/3sixtyglobal/node:latest
 ```
 
 ## Building the Image
 
-The dockerfile is in `apps/node/deploy/dockerfile`. It builds `@twin.org/node-core` from the repository source and packs it, then installs that package and the other dependencies with pnpm, merges the translation messages, and removes the development dependencies. The repository root forms the build context, and `apps/node/deploy/dockerfile.dockerignore` keeps your local `node_modules`, build output and `.env` files out of the image.
+The dockerfile is in `apps/node/deploy/dockerfile`. It builds `@3sixty/node-core` from the repository source and packs it, then installs that package and the other dependencies with pnpm, merges the translation messages, and removes the development dependencies. The repository root forms the build context, and `apps/node/deploy/dockerfile.dockerignore` keeps your local `node_modules`, build output and `.env` files out of the image.
 
 Build the image from the repository root:
 
 ```shell
-docker build -t twin-node -f apps/node/deploy/dockerfile . --load
+docker build -t 3sixty-node -f apps/node/deploy/dockerfile . --load
 ```
 
 > **Note**: The `--load` flag is required when using Docker Buildx to ensure the image is loaded into your local Docker registry. Without it, the image will only exist in the build cache.
@@ -31,11 +31,11 @@ docker build -t twin-node -f apps/node/deploy/dockerfile . --load
 To build for both of the published platforms use a Buildx builder with the `docker-container` driver:
 
 ```shell
-docker buildx create --name twin-multiplatform-builder --driver docker-container --use
-docker buildx build --platform linux/amd64,linux/arm64 -t twin-node -f apps/node/deploy/dockerfile .
+docker buildx create --name 3sixty-multiplatform-builder --driver docker-container --use
+docker buildx build --platform linux/amd64,linux/arm64 -t 3sixty-node -f apps/node/deploy/dockerfile .
 ```
 
-The examples below use the locally built `twin-node` image, replace it with `ghcr.io/3sixtyglobal/twin-node:<tag>` to use the published image.
+The examples below use the locally built `3sixty-node` image, replace it with `ghcr.io/3sixtyglobal/node:<tag>` to use the published image.
 
 ## Configuration
 
@@ -82,7 +82,7 @@ docker run --rm \
   -v /home/twin-node/.env:/app/.env:ro \
   -v /home/twin-node/.env.bootstrap-dev:/app/.env.bootstrap-dev:ro \
   -v /home/twin-node/data:/twin-node/data \
-  twin-node node src/index.js bootstrap-dev --load-env=.env.bootstrap-dev
+  3sixty-node node src/index.js bootstrap-dev --load-env=.env.bootstrap-dev
 ```
 
 The values it reads are described in [bootstrap-dev](./commands/bootstrap-dev.md), and `.env.example-bootstrap-dev` is a starting point for the file. Any value that is not provided is generated. Generated mnemonics and passwords are only shown in the command output, so record them.
@@ -90,7 +90,7 @@ The values it reads are described in [bootstrap-dev](./commands/bootstrap-dev.md
 To bootstrap a production node step by step, or to manage identities, tenants and users later, run the relevant commands from [Node Usage](./usage.md) in the same way. Use `help` to list the commands available in the image:
 
 ```shell
-docker run --rm twin-node node src/index.js help
+docker run --rm 3sixty-node node src/index.js help
 ```
 
 ## Running the Node
@@ -98,14 +98,14 @@ docker run --rm twin-node node src/index.js help
 Once bootstrapped, start the node with the same configuration and data directory:
 
 ```shell
-docker run -d --name twin-node \
+docker run -d --name 3sixty-node \
   -v /home/twin-node/.env:/app/.env:ro \
   -v /home/twin-node/data:/twin-node/data \
   -p 3000:3000 \
-  twin-node
+  3sixty-node
 ```
 
-Follow the output with `docker logs -f twin-node`. When the node is ready you should see:
+Follow the output with `docker logs -f 3sixty-node`. When the node is ready you should see:
 
 ```shell
 INFO [2026-09-24T04:57:23.320Z] EngineCore Engine has started
@@ -118,7 +118,7 @@ You should now be able to access the server in the browser at [http://localhost:
 
 ```json
 {
-  "name": "TWIN Node",
+  "name": "3Sixty Node",
   "version": "0.10.1-next.6"
 }
 ```
@@ -127,16 +127,16 @@ The request and response are also shown in the logs:
 
 ```shell
 INFO [2026-09-24T04:57:25.150Z] LoggingProcessor ===> GET /info {}
-INFO [2026-09-24T04:57:25.150Z] LoggingProcessor <=== 200 GET /info duration: 722µs {"body":{"name":"TWIN Node","version":"0.10.1-next.6"}}
+INFO [2026-09-24T04:57:25.150Z] LoggingProcessor <=== 200 GET /info duration: 722µs {"body":{"name":"3Sixty Node","version":"0.10.1-next.6"}}
 ```
 
 ## Stopping the Node
 
-The node responds to the standard termination signals, so `docker stop twin-node` stops the components gracefully before the container exits:
+The node responds to the standard termination signals, so `docker stop 3sixty-node` stops the components gracefully before the container exits:
 
 ```shell
 INFO [2026-09-24T05:00:09.380Z] EngineCore Components have stopped
 INFO [2026-09-24T05:00:09.380Z] EngineCore Engine has stopped
 ```
 
-Starting the container again with `docker start twin-node` reuses the existing engine state, so the bootstrap does not need to be repeated.
+Starting the container again with `docker start 3sixty-node` reuses the existing engine state, so the bootstrap does not need to be repeated.

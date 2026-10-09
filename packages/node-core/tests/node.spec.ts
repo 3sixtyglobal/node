@@ -4,9 +4,9 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { I18n } from "@twin.org/core";
-import { ModuleHelper, ModuleResolutionHelper } from "@twin.org/modules";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { I18n } from "@3sixty/core";
+import { ModuleHelper, ModuleResolutionHelper } from "@3sixty/modules";
 import { DEPRECATED_ENVIRONMENT_VARIABLE_KEYS } from "../src/models/deprecatedEnvironmentVariableKeys.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
 import {

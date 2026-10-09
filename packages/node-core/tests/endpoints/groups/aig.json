@@ -6,7 +6,7 @@
 			"method": "POST",
 			"path": "/aig",
 			"body": {
-				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"]
+				"@context": ["https://schema.3sixty.global/aig/", "https://schema.3sixty.global/common/"]
 			},
 			"expectedStatus": 400
 		},
@@ -15,7 +15,7 @@
 			"method": "POST",
 			"path": "/aig",
 			"body": {
-				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"],
+				"@context": ["https://schema.3sixty.global/aig/", "https://schema.3sixty.global/common/"],
 				"type": "AuditableItemGraphVertex"
 			},
 			"expectedStatus": 201,
@@ -40,8 +40,8 @@
 			"path": "/aig/{{vertexId}}",
 			"body": {
 				"@context": [
-					"https://schema.twindev.org/aig/",
-					"https://schema.twindev.org/common/",
+					"https://schema.3sixty.global/aig/",
+					"https://schema.3sixty.global/common/",
 					"https://schema.org"
 				],
 				"type": "AuditableItemGraphVertex",
@@ -58,7 +58,7 @@
 			"method": "PATCH",
 			"path": "/aig/{{vertexId}}",
 			"body": {
-				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"],
+				"@context": ["https://schema.3sixty.global/aig/", "https://schema.3sixty.global/common/"],
 				"type": "AuditableItemGraphVertex",
 				"annotationObject": {
 					"@context": "https://schema.org",

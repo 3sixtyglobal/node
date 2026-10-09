@@ -5,7 +5,7 @@ These snippets show practical runtime setup patterns, state inspection, and cont
 ## Engine
 
 ```typescript
-import { run } from '@twin.org/node-core';
+import { run } from '@3sixty/node-core';
 
 const runtime = await run(
   {
@@ -29,7 +29,7 @@ if (runtime) {
 ```
 
 ```typescript
-import { run } from '@twin.org/node-core';
+import { run } from '@3sixty/node-core';
 
 const runtime = await run(
   {
@@ -55,14 +55,14 @@ if (runtime) {
 ## EngineServer
 
 ```typescript
-import type { IServerInfo } from '@twin.org/api-models';
-import type { INodeOptions } from '@twin.org/node-core';
+import type { IServerInfo } from '@3sixty/api-models';
+import type { INodeOptions } from '@3sixty/node-core';
 import {
   buildConfiguration,
   loadEnvironmentVariables,
   processEnvironmentVariables,
   start
-} from '@twin.org/node-core';
+} from '@3sixty/node-core';
 
 const processEnv: Record<string, string> = {
   TWIN_HOST: '127.0.0.1',

@@ -34,7 +34,7 @@ Example: vault-key-update --identity="did:iota:...." --key-id="my-key" --private
 Replace the material of an existing key:
 
 ```shell
-twin-node vault-key-update --load-env="node-identity.env" --identity=!NODE_DID --key-id="my-key" --private-key-hex="0x..."
+3sixty-node vault-key-update --load-env="node-identity.env" --identity=!NODE_DID --key-id="my-key" --private-key-hex="0x..."
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

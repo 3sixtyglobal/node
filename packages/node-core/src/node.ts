@@ -1,13 +1,13 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import type { IServerInfo } from "@twin.org/api-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { Coerce, EnvHelper, I18n, Is } from "@twin.org/core";
-import type { Engine } from "@twin.org/engine";
-import type { EngineServer } from "@twin.org/engine-server";
-import type { IEngineServerConfig } from "@twin.org/engine-server-types";
-import { ModuleHelper } from "@twin.org/modules";
+import type { IServerInfo } from "@3sixty/api-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { Coerce, EnvHelper, I18n, Is } from "@3sixty/core";
+import type { Engine } from "@3sixty/engine";
+import type { EngineServer } from "@3sixty/engine-server";
+import type { IEngineServerConfig } from "@3sixty/engine-server-types";
+import { ModuleHelper } from "@3sixty/modules";
 import * as dotenv from "dotenv";
 import { buildEngineConfiguration } from "./builders/engineEnvBuilder.js";
 import { buildEngineServerConfiguration } from "./builders/engineServerEnvBuilder.js";
@@ -57,8 +57,8 @@ export async function run(
 		nodeOptions ??= {};
 
 		const serverInfo: IServerInfo = {
-			name: nodeOptions?.serverName ?? "TWIN Node",
-			version: nodeOptions?.serverVersion ?? "0.11.3-next.0" // x-release-please-version
+			name: nodeOptions?.serverName ?? "3Sixty Node",
+			version: nodeOptions?.serverVersion ?? "0.20.0-next.0" // x-release-please-version
 		};
 
 		nodeOptions.envPrefix ??= "TWIN_";
@@ -207,7 +207,7 @@ export async function run(
 }
 
 /**
- * Load the environment variables for the TWIN Node, without producing any output.
+ * Load the environment variables for the 3Sixty Node, without producing any output.
  * @param processEnv The environment variables from the process.
  * @param options The options for running the server, envFilenames defaults to the .env file in the execution directory.
  * @returns The environment variables, with the options and env files applied.
@@ -252,7 +252,7 @@ export function loadEnvironmentVariables(
 }
 
 /**
- * Process the loaded environment variables for the TWIN Node.
+ * Process the loaded environment variables for the 3Sixty Node.
  * @param processEnv The loaded environment variables.
  * @param options The options for running the server.
  * @returns A promise that resolves to the environment variables for the node.
@@ -337,7 +337,7 @@ export async function processEnvironmentVariables(
 }
 
 /**
- * Build the configuration for the TWIN Node.
+ * Build the configuration for the 3Sixty Node.
  * @param envVars The environment variables for the node.
  * @param options The options for running the server.
  * @param serverInfo The server information.

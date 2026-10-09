@@ -30,7 +30,7 @@ Example: node-identity-set --identity="did:iota..."
 Set an existing identity as the node identity:
 
 ```shell
-twin-node node-identity-set --load-env="node-identity.env" --identity=!NODE_DID
+3sixty-node node-identity-set --load-env="node-identity.env" --identity=!NODE_DID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

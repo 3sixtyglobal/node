@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { DataspaceAppFactory } from '@twin.org/dataspace-models';
-import { EngineTypeHelper } from '@twin.org/engine-types';
+import { DataspaceAppFactory } from '@3sixty/dataspace-models';
+import { EngineTypeHelper } from '@3sixty/engine-types';
 import { TestDataspaceDataPlaneApp } from './testDataspaceDataPlaneApp.js';
 
 /**

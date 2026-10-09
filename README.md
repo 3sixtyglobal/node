@@ -1,4 +1,4 @@
-# TWIN Node
+# 3Sixty Node
 
 This repository provides a core runtime toolkit and executable application for running service workloads through a consistent [Node.js](https://nodejs.org) server model.
 

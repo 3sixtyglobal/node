@@ -28,13 +28,13 @@ Example: org-users-list --org-did="did:iota:..."
 In single-tenant mode list the users of the node organisation:
 
 ```shell
-twin-node org-users-list
+3sixty-node org-users-list
 ```
 
 List the users of a specific organisation:
 
 ```shell
-twin-node org-users-list --load-env="organization-identity.env" --org-did=!ORGANIZATION_DID
+3sixty-node org-users-list --load-env="organization-identity.env" --org-did=!ORGANIZATION_DID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

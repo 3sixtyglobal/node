@@ -31,7 +31,7 @@ Example: vault-key-remove --identity="did:iota:...." --key-id="my-key"
 Remove a vault key:
 
 ```shell
-twin-node vault-key-remove --load-env="node-identity.env" --identity=!NODE_DID --key-id="my-key"
+3sixty-node vault-key-remove --load-env="node-identity.env" --identity=!NODE_DID --key-id="my-key"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

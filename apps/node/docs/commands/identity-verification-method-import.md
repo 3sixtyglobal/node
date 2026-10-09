@@ -40,7 +40,7 @@ Example: identity-verification-method-import --identity="did:iota:...." --verifi
 Import an existing attestation verification method key:
 
 ```shell
-twin-node identity-verification-method-import --load-env="node-identity.env,organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!DID_VERIFICATION_METHOD_ID --private-key-hex=!DID_VERIFICATION_METHOD_PRIVATE_KEY_HEX
+3sixty-node identity-verification-method-import --load-env="node-identity.env,organization-identity.env,organization-attestation.env" --identity=!ORGANIZATION_DID --verification-method-type=assertionMethod --verification-method-id=!DID_VERIFICATION_METHOD_ID --private-key-hex=!DID_VERIFICATION_METHOD_PRIVATE_KEY_HEX
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

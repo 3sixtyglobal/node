@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
-import type { ITenantAdminComponent } from "@twin.org/api-models";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { DataspaceAppFactory } from "@twin.org/dataspace-models";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+import type { ITenantAdminComponent } from "@3sixty/api-models";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { ComponentFactory, Factory } from "@3sixty/core";
+import { DataspaceAppFactory } from "@3sixty/dataspace-models";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
-} from "@twin.org/engine-server-types";
+} from "@3sixty/engine-server-types";
 import {
 	AttestationConnectorType,
 	BlobStorageConnectorType,
@@ -28,8 +28,8 @@ import {
 	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
-import type { ITrustComponent } from "@twin.org/trust-models";
+} from "@3sixty/engine-types";
+import type { ITrustComponent } from "@3sixty/trust-models";
 import { loadAndRunGroups } from "./endpoints/runner.js";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";

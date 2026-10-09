@@ -40,7 +40,7 @@ Example: tenant-import --tenant-id="0011..aabb" --api-key="aabb..0099" --organiz
 Import an existing tenant:
 
 ```shell
-twin-node tenant-import --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --organization-id=!ORGANIZATION_DID --label="Node" --public-origin="https://api.example.com"
+3sixty-node tenant-import --load-env="node-tenant.env,organization-identity.env" --tenant-id=!NODE_TENANT_ID --api-key=!NODE_API_KEY --organization-id=!ORGANIZATION_DID --label="Node" --public-origin="https://api.example.com"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

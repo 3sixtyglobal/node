@@ -1,4 +1,4 @@
-# TWIN Node
+# 3Sixty Node
 
 This app provides the executable server runtime for delivering service workloads through a deployable Node.js application. It assembles shared runtime components into a practical entry point so teams can run, configure, and operate service endpoints with predictable behaviour.
 
@@ -7,7 +7,7 @@ It supports local development and production aligned operation while keeping con
 ## Installation
 
 ```shell
-npm install -D @twin.org/node
+npm install -D @3sixty/node
 ```
 
 ## Configuration

@@ -1,7 +1,7 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { writeFile } from "node:fs/promises";
-import { CLIDisplay } from "@twin.org/cli-core";
+import { CLIDisplay } from "@3sixty/cli-core";
 import {
 	readStoreRecords,
 	setupCliTestContext,

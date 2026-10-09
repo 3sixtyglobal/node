@@ -1,7 +1,7 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { createServer } from "node:net";
-import { Is } from "@twin.org/core";
+import { Is } from "@3sixty/core";
 
 /**
  * CI environments (e.g. GitHub Actions) set TWIN_GPG_KEY_ID for signing.

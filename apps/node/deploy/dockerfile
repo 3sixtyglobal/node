@@ -10,7 +10,7 @@ WORKDIR /repo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/node-core/package.json packages/node-core/
 COPY apps/node/package.json apps/node/
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter @twin.org/node-core
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter @3sixty/node-core
 
 # Compile node-core and pack it as it would be published
 COPY packages/node-core packages/node-core
@@ -31,14 +31,14 @@ RUN npm install -g pnpm@12.4.1
 WORKDIR /app
 
 # The repository pnpm-workspace.yaml is outside the app directory, so recreate the
-# settings the install relies on, the @twin.org next builds are exempt from the release age hold.
+# settings the install relies on, the @3sixty next builds are exempt from the release age hold.
 # Use a flat node_modules, as code run in worker threads imports transitive dependencies by name
-RUN printf "nodeLinker: hoisted\nminimumReleaseAgeExclude:\n  - '@twin.org/*'\n" > pnpm-workspace.yaml
+RUN printf "nodeLinker: hoisted\nminimumReleaseAgeExclude:\n  - '@3sixty/*'\n" > pnpm-workspace.yaml
 
 # Copy the package.json and point node-core at the locally built package
 COPY apps/node/package.json .
 COPY --from=node-core /pack/node-core.tgz ./deploy/node-core.tgz
-RUN npm pkg set "dependencies[@twin.org/node-core]=file:./deploy/node-core.tgz"
+RUN npm pkg set "dependencies[@3sixty/node-core]=file:./deploy/node-core.tgz"
 
 # Install dependencies including dev dependencies needed for merge-locales
 RUN pnpm install --ignore-scripts --no-frozen-lockfile
@@ -47,7 +47,7 @@ RUN pnpm install --ignore-scripts --no-frozen-lockfile
 COPY apps/node .
 
 # The app package.json was replaced by the copy, so point it at the local package again
-RUN npm pkg set "dependencies[@twin.org/node-core]=file:./deploy/node-core.tgz"
+RUN npm pkg set "dependencies[@3sixty/node-core]=file:./deploy/node-core.tgz"
 
 # Compile translation messages
 RUN pnpm run merge-locales

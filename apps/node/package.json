@@ -1,10 +1,10 @@
 {
-	"name": "@twin.org/node",
-	"version": "0.11.3-next.0",
-	"description": "TWIN Node serving APIs using the specified configuration",
+	"name": "@3sixty/node",
+	"version": "0.20.0-next.0",
+	"description": "3Sixty Node serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/3sixtyglobal/twin-node.git",
+		"url": "git+https://github.com/3sixtyglobal/node.git",
 		"directory": "apps/node"
 	},
 	"author": "martyn.janes@iota.org",
@@ -32,15 +32,15 @@
 		"start": "node src/index.js"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "0.11.3-next.0"
+		"@3sixty/node-core": "0.20.0-next.0"
 	},
 	"devDependencies": {
-		"@twin.org/entity-storage-connector-memory": "next",
-		"@twin.org/merge-locales": "next",
-		"@twin.org/nameof-transformer": "next",
-		"@twin.org/nameof-vitest-plugin": "next",
-		"@twin.org/ts-to-openapi": "next",
-		"@twin.org/validate-locales": "next",
+		"@3sixty/entity-storage-connector-memory": "next",
+		"@3sixty/merge-locales": "next",
+		"@3sixty/nameof-transformer": "next",
+		"@3sixty/nameof-vitest-plugin": "next",
+		"@3sixty/ts-to-openapi": "next",
+		"@3sixty/validate-locales": "next",
 		"@types/node": "26.6.2",
 		"@vitest/coverage-v8": "5.0.1",
 		"concurrently": "10.0.5",
@@ -54,9 +54,9 @@
 		"vitest": "5.0.1"
 	},
 	"bugs": {
-		"url": "git+https://github.com/3sixtyglobal/twin-node/issues"
+		"url": "git+https://github.com/3sixtyglobal/node/issues"
 	},
-	"homepage": "https://twindev.org",
+	"homepage": "https://3sixty.global",
 	"main": "./src/index.js",
 	"exports": {
 		".": {
@@ -72,6 +72,6 @@
 		"docs"
 	],
 	"bin": {
-		"twin-node": "bin/index.js"
+		"3sixty-node": "bin/index.js"
 	}
 }

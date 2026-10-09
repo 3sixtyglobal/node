@@ -3,14 +3,14 @@
 import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
-} from "@twin.org/api-auth-entity-storage-models";
-import { ScopeHelper } from "@twin.org/api-models";
-import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import { PasswordGenerator } from "@twin.org/crypto";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
+} from "@3sixty/api-auth-entity-storage-models";
+import { ScopeHelper } from "@3sixty/api-models";
+import { CLIDisplay, CLIUtils } from "@3sixty/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import { PasswordGenerator } from "@3sixty/crypto";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";

@@ -31,8 +31,8 @@ Example: identity-resolve --identity="did:iota:..."
 Resolve any DID to its full document, pass `--output-json` to save the document to a file:
 
 ```shell
-twin-node identity-resolve --identity="did:iota:..."
-twin-node identity-resolve --identity="did:iota:..." --output-json="did-document.json"
+3sixty-node identity-resolve --identity="did:iota:..."
+3sixty-node identity-resolve --identity="did:iota:..." --output-json="did-document.json"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

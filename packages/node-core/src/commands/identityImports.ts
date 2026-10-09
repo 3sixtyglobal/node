@@ -1,13 +1,13 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay } from "@twin.org/cli-core";
-import { BaseError, GeneralError, Guards, I18n, Is, NotFoundError } from "@twin.org/core";
-import { Bip39 } from "@twin.org/crypto";
-import { AccountHelper } from "@twin.org/dlt-account";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { Did, IdentityResolverConnectorFactory } from "@twin.org/identity-models";
-import type { IDidDocument } from "@twin.org/standards-w3c-did";
-import { VaultConnectorFactory } from "@twin.org/vault-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { BaseError, GeneralError, Guards, I18n, Is, NotFoundError } from "@3sixty/core";
+import { Bip39 } from "@3sixty/crypto";
+import { AccountHelper } from "@3sixty/dlt-account";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { Did, IdentityResolverConnectorFactory } from "@3sixty/identity-models";
+import type { IDidDocument } from "@3sixty/standards-w3c-did";
+import { VaultConnectorFactory } from "@3sixty/vault-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";

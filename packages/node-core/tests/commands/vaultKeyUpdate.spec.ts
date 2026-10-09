@@ -1,7 +1,7 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Converter, RandomHelper } from "@twin.org/core";
-import { VaultKeyType } from "@twin.org/vault-models";
+import { Converter, RandomHelper } from "@3sixty/core";
+import { VaultKeyType } from "@3sixty/vault-models";
 import { readStoreRecords, setupCliTestContext, TENANT_MODES } from "./cliTestHelper.js";
 
 interface IVaultKeyRecord {

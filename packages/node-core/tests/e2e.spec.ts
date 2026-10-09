@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ModuleProtocol, ModuleResolutionHelper } from "@twin.org/modules";
+import { ModuleProtocol, ModuleResolutionHelper } from "@3sixty/modules";
 import {
 	initialiseLocales,
 	initialiseNativeModules,
@@ -70,7 +70,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 	test("should install npm package from real registry", async () => {
 		// Using a small TWIN package
-		const packageName = "@twin.org/nameof@0.0.2-next.19";
+		const packageName = "@3sixty/nameof@0.0.2-next.19";
 
 		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
 			executionDirectory: TEST_EXECUTION_DIR
@@ -115,7 +115,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 	test("should download file from HTTPS URL", async () => {
 		// Using a small file from jsDelivr CDN
-		const url = "https://cdn.jsdelivr.net/npm/@twin.org/nameof@0.0.2-next.19/package.json";
+		const url = "https://cdn.jsdelivr.net/npm/@3sixty/nameof@0.0.2-next.19/package.json";
 
 		const result = await ModuleResolutionHelper.handleHttpsProtocol(url, {
 			executionDirectory: TEST_EXECUTION_DIR,
@@ -170,7 +170,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 	test("should handle npm package with scoped name", async () => {
 		// Using a different scoped TWIN package
-		const packageName = "@twin.org/nameof-transformer@0.0.2-next.14";
+		const packageName = "@3sixty/nameof-transformer@0.0.2-next.14";
 
 		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
 			executionDirectory: TEST_EXECUTION_DIR
@@ -179,7 +179,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		// Verify the result
 		expect(result).toBeDefined();
 		expect(result.resolvedPath).toBeDefined();
-		expect(result.resolvedPath).toContain("@twin.org");
+		expect(result.resolvedPath).toContain("@3sixty");
 		expect(result.resolvedPath).toContain("nameof-transformer");
 
 		// Verify the file exists
@@ -188,8 +188,8 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should download, install, and import a real TWIN module", async () => {
-		// Using @twin.org/nameof - we know it has nameofKebabCase export from code usage
-		const packageName = "@twin.org/nameof@0.0.2-next.19";
+		// Using @3sixty/nameof - we know it has nameofKebabCase export from code usage
+		const packageName = "@3sixty/nameof@0.0.2-next.19";
 
 		// 1. Download/install the package
 		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
@@ -235,7 +235,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test.skip("should download and verify real TWIN extension with lifecycle hooks", async () => {
-		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.15";
+		const packageName = "@3sixty/dataspace-test-app@0.0.3-next.15";
 
 		// 1. Download real TWIN extension
 		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {

@@ -1,10 +1,10 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile, rm } from "node:fs/promises";
-import { CLIUtils } from "@twin.org/cli-core";
-import { Factory } from "@twin.org/core";
-import { MemoryStateStorage } from "@twin.org/engine-core";
-import { AuthenticationAdminComponentType } from "@twin.org/engine-server-types";
+import { CLIUtils } from "@3sixty/cli-core";
+import { Factory } from "@3sixty/core";
+import { MemoryStateStorage } from "@3sixty/engine-core";
+import { AuthenticationAdminComponentType } from "@3sixty/engine-server-types";
 import {
 	EntityStorageConnectorType,
 	FaucetConnectorType,
@@ -13,7 +13,7 @@ import {
 	IdentityResolverConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
+} from "@3sixty/engine-types";
 import type { INodeEngineState } from "../../src/models/INodeEngineState.js";
 import { run } from "../../src/node.js";
 import { CI_ENV_VARS, getFreePort } from "../setupTestEnv.js";

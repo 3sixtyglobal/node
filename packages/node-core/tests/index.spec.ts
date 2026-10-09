@@ -1,16 +1,16 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, rm, writeFile } from "node:fs/promises";
-import type { IServerInfo } from "@twin.org/api-models";
-import { AutomationActionFactory } from "@twin.org/automation-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { ComponentFactory, Factory, NativeModules } from "@twin.org/core";
-import { DataspaceAppFactory } from "@twin.org/dataspace-models";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+import type { IServerInfo } from "@3sixty/api-models";
+import { AutomationActionFactory } from "@3sixty/automation-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { ComponentFactory, Factory, NativeModules } from "@3sixty/core";
+import { DataspaceAppFactory } from "@3sixty/dataspace-models";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
-} from "@twin.org/engine-server-types";
+} from "@3sixty/engine-server-types";
 import {
 	AttestationConnectorType,
 	BlobStorageConnectorType,
@@ -30,8 +30,8 @@ import {
 	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
-import { FederatedCatalogueFilterFactory } from "@twin.org/federated-catalogue-models";
+} from "@3sixty/engine-types";
+import { FederatedCatalogueFilterFactory } from "@3sixty/federated-catalogue-models";
 import {
 	PolicyArbiterFactory,
 	PolicyEnforcementProcessorFactory,
@@ -39,8 +39,8 @@ import {
 	PolicyInformationSourceFactory,
 	PolicyNegotiatorFactory,
 	PolicyRequesterFactory
-} from "@twin.org/rights-management-models";
-import { TrustGeneratorFactory, TrustVerifierFactory } from "@twin.org/trust-models";
+} from "@3sixty/rights-management-models";
+import { TrustGeneratorFactory, TrustVerifierFactory } from "@3sixty/trust-models";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { getEnvDefaults } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";

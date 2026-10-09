@@ -46,13 +46,13 @@ Example: user-update --email="bob@examples.com" --user-identity="did:iota:...." 
 Update the scope of a user in single-tenant mode:
 
 ```shell
-twin-node user-update --email="admin@node" --scope="user-admin,foo"
+3sixty-node user-update --email="admin@node" --scope="user-admin,foo"
 ```
 
 Update a user in multi-tenant mode:
 
 ```shell
-twin-node user-update --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@tenant" --given-name="Tenant" --family-name="Admin"
+3sixty-node user-update --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="admin@tenant" --given-name="Tenant" --family-name="Admin"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
 import path from "node:path";
-import { EnvHelper, Is, Mutex } from "@twin.org/core";
-import type { IIotaConfig } from "@twin.org/dlt-iota";
+import { EnvHelper, Is, Mutex } from "@3sixty/core";
+import type { IIotaConfig } from "@3sixty/dlt-iota";
 import {
 	EngineCloneMode,
 	EngineLogLevel,
 	type IEngineCoreTypeConfig,
 	type IEngineFacadeConfig
-} from "@twin.org/engine-models";
+} from "@3sixty/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -92,22 +92,22 @@ import {
 	TrustVerifierComponentType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
+} from "@3sixty/engine-types";
 import {
 	type IOpenTelemetryLoggingConnectorConfig,
 	type IOpenTelemetryOtlpExporterConfig,
 	OpenTelemetryExporterTypes
-} from "@twin.org/logging-connector-opentelemetry";
-import { LogLevel } from "@twin.org/logging-models";
+} from "@3sixty/logging-connector-opentelemetry";
+import { LogLevel } from "@3sixty/logging-models";
 import {
 	type IOpenTelemetryTelemetryConnectorConfig,
 	OpenTelemetryReaderTypes
-} from "@twin.org/telemetry-connector-opentelemetry";
+} from "@3sixty/telemetry-connector-opentelemetry";
 import {
 	type IOpenTelemetryTracingConnectorConfig,
 	OpenTelemetryProcessorTypes
-} from "@twin.org/tracing-connector-opentelemetry";
-import { type ITracingFacadeConfig, TracingFacade } from "@twin.org/tracing-facades";
+} from "@3sixty/tracing-connector-opentelemetry";
+import { type ITracingFacadeConfig, TracingFacade } from "@3sixty/tracing-facades";
 import {
 	CONTEXT_ID_HANDLER_FEATURE_DID,
 	CONTEXT_ID_HANDLER_FEATURE_TENANT,

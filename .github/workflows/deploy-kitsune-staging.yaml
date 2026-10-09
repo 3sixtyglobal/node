@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Twin Node image version to deploy; next resolves to the current versioned next image'
+        description: '3Sixty Node image version to deploy; next resolves to the current versioned next image'
         required: true
         default: next
         type: string
@@ -14,9 +14,10 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  TWIN_DOCKER_REPO: twinfoundation/twin-node
-  DOCKER_REGISTRY_URL: https://registry-1.docker.io
-  DOCKER_AUTH_URL: https://auth.docker.io/token
+  ORG_REGISTRY: ghcr.io
+  ORG_DOCKER_REPO: 3sixtyglobal/3sixty-node
+  DOCKER_REGISTRY_URL: https://ghcr.io
+  DOCKER_AUTH_URL: https://ghcr.io/token
   TFC_API_URL: https://app.terraform.io/api/v2
 
 jobs:
@@ -41,10 +42,10 @@ jobs:
           MANIFEST_ACCEPT='application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json'
 
           REGISTRY_TOKEN="$(curl --fail --silent --show-error --retry 3 \
-            "$DOCKER_AUTH_URL?service=registry.docker.io&scope=repository:$TWIN_DOCKER_REPO:pull" \
+            "$DOCKER_AUTH_URL?service=$ORG_REGISTRY&scope=repository:$ORG_DOCKER_REPO:pull" \
             | jq -r '.token')"
           if [[ -z "$REGISTRY_TOKEN" || "$REGISTRY_TOKEN" == "null" ]]; then
-            echo "ERROR: Docker Registry did not return a pull token for $TWIN_DOCKER_REPO." >&2
+            echo "ERROR: Docker Registry did not return a pull token for $ORG_DOCKER_REPO." >&2
             exit 1
           fi
 
@@ -53,7 +54,7 @@ jobs:
             curl --fail --silent --show-error --retry 3 --head \
               -H "Authorization: Bearer $REGISTRY_TOKEN" \
               -H "Accept: $MANIFEST_ACCEPT" \
-              "$DOCKER_REGISTRY_URL/v2/$TWIN_DOCKER_REPO/manifests/$tag" \
+              "$DOCKER_REGISTRY_URL/v2/$ORG_DOCKER_REPO/manifests/$tag" \
               | awk 'BEGIN { IGNORECASE=1 } /^docker-content-digest:/ { sub(/\r$/, "", $2); print $2; exit }'
           }
 
@@ -63,13 +64,13 @@ jobs:
             NEXT_DIGEST="$(registry_manifest_digest next)"
 
             if [[ -z "$NEXT_DIGEST" ]]; then
-              echo "ERROR: Docker Registry did not return a digest for $TWIN_DOCKER_REPO:next" >&2
+              echo "ERROR: Docker Registry did not return a digest for $ORG_DOCKER_REPO:next" >&2
               exit 1
             fi
 
             TAGS_RESPONSE="$(curl --fail --silent --show-error --retry 3 \
               -H "Authorization: Bearer $REGISTRY_TOKEN" \
-              "$DOCKER_REGISTRY_URL/v2/$TWIN_DOCKER_REPO/tags/list?n=1000")"
+              "$DOCKER_REGISTRY_URL/v2/$ORG_DOCKER_REPO/tags/list?n=1000")"
             MATCHING_TAGS=()
             while IFS= read -r tag; do
               [[ -z "$tag" ]] && continue
@@ -81,7 +82,7 @@ jobs:
               '.tags[] | select(test($pattern))')
 
             if [[ "${#MATCHING_TAGS[@]}" -eq 0 ]]; then
-              echo "ERROR: No immutable semantic version tag matches $TWIN_DOCKER_REPO:next ($NEXT_DIGEST)" >&2
+              echo "ERROR: No immutable semantic version tag matches $ORG_DOCKER_REPO:next ($NEXT_DIGEST)" >&2
               exit 1
             fi
 
@@ -94,13 +95,13 @@ jobs:
           fi
 
           if [[ -z "$(registry_manifest_digest "$RESOLVED_VERSION")" ]]; then
-            echo "ERROR: Docker Registry image $TWIN_DOCKER_REPO:$RESOLVED_VERSION was not found." >&2
+            echo "ERROR: Docker Registry image $ORG_DOCKER_REPO:$RESOLVED_VERSION was not found." >&2
             exit 1
           fi
 
           echo "Requested version: $REQUESTED_VERSION"
-          echo "Resolved image: $TWIN_DOCKER_REPO:$RESOLVED_VERSION"
-          echo "image_reference=$TWIN_DOCKER_REPO:$RESOLVED_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved image: $ORG_REGISTRY/$ORG_DOCKER_REPO:$RESOLVED_VERSION"
+          echo "image_reference=$ORG_REGISTRY/$ORG_DOCKER_REPO:$RESOLVED_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Update Kitsune image and auto-apply Terraform run
         env:

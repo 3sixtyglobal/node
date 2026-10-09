@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay } from "@twin.org/cli-core";
-import { I18n, NativeModules } from "@twin.org/core";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { I18n, NativeModules } from "@3sixty/core";
 import { initialiseNativeModules } from "../src/utils.js";
 
 describe("Protocol Parsing Utilities", () => {

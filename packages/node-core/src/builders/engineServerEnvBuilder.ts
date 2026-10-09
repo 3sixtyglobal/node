@@ -1,10 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IServerInfo, IWebServerOptions } from "@twin.org/api-models";
-import { ContextIdKeys } from "@twin.org/context";
-import { Coerce, EnvHelper, Is, StringHelper } from "@twin.org/core";
-import type { IEngineCoreConfig } from "@twin.org/engine-models";
-import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
+import type { IServerInfo, IWebServerOptions } from "@3sixty/api-models";
+import { ContextIdKeys } from "@3sixty/context";
+import { Coerce, EnvHelper, Is, StringHelper } from "@3sixty/core";
+import type { IEngineCoreConfig } from "@3sixty/engine-models";
+import { addDefaultRestPaths, addDefaultSocketPaths } from "@3sixty/engine-server";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationAuditComponentType,
@@ -15,8 +15,8 @@ import {
 	type MimeTypeProcessorType,
 	RestRouteProcessorType,
 	SocketRouteProcessorType
-} from "@twin.org/engine-server-types";
-import { TraceparentHelper } from "@twin.org/tracing-models";
+} from "@3sixty/engine-server-types";
+import { TraceparentHelper } from "@3sixty/tracing-models";
 import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
 import { isTelemetryEnabled, isTracingEnabled } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";

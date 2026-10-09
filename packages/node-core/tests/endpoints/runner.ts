@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { Converter, Is } from "@twin.org/core";
+import { Converter, Is } from "@3sixty/core";
 export type { GroupDefinition } from "./models/groupDefinition.js";
 export type { RunnerContext } from "./models/runnerContext.js";
 export type { StepDefinition } from "./models/stepDefinition.js";

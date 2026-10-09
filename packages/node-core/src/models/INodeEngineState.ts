@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IEngineState } from "@twin.org/engine-models";
+import type { IEngineState } from "@3sixty/engine-models";
 
 /**
  * The engine state for the node.

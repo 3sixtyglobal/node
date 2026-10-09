@@ -25,7 +25,7 @@ Example: tenant-list
 List all tenants:
 
 ```shell
-twin-node tenant-list
+3sixty-node tenant-list
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

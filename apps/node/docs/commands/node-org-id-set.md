@@ -31,7 +31,7 @@ Example: node-org-id-set --organization-id="did:iota:..."
 Set the organisation identity on the node:
 
 ```shell
-twin-node node-org-id-set --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
+3sixty-node node-org-id-set --load-env="organization-identity.env" --organization-id=!ORGANIZATION_DID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

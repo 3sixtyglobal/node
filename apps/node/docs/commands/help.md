@@ -49,13 +49,13 @@ vault-key-update: Replace the key material of an existing vault key for an ident
 List all the commands:
 
 ```shell
-twin-node --help
+3sixty-node --help
 ```
 
 Show the help for a single command:
 
 ```shell
-twin-node identity-create --help
+3sixty-node identity-create --help
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

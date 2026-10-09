@@ -40,7 +40,7 @@ Example: tenant-update --tenant-id="0011..aabb" --api-key="aabb..0099" --label="
 Update the label of a tenant:
 
 ```shell
-twin-node tenant-update --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --label="New Label"
+3sixty-node tenant-update --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --label="New Label"
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

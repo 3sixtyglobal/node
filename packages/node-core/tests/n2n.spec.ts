@@ -2,21 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+import { ComponentFactory, Factory } from "@3sixty/core";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	EntityStorageConnectorType,
 	IdentityConnectorType,
 	IdentityResolverConnectorType,
 	VaultConnectorType
-} from "@twin.org/engine-types";
-import { EntityStorageConnectorFactory } from "@twin.org/entity-storage-models";
+} from "@3sixty/engine-types";
+import { EntityStorageConnectorFactory } from "@3sixty/entity-storage-models";
 import {
 	IdentityConnectorFactory,
 	IdentityResolverConnectorFactory
-} from "@twin.org/identity-models";
-import type { ITrustComponent } from "@twin.org/trust-models";
-import { VaultConnectorFactory } from "@twin.org/vault-models";
+} from "@3sixty/identity-models";
+import type { ITrustComponent } from "@3sixty/trust-models";
+import { VaultConnectorFactory } from "@3sixty/vault-models";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";

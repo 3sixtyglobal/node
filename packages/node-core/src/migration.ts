@@ -5,23 +5,23 @@ import {
 	type AuditableItemGraphVertex,
 	type AuditableItemGraphVertexIndex,
 	type AuditableItemGraphVertexV1
-} from "@twin.org/auditable-item-graph-service";
-import { EnvHelper, GeneralError, StringHelper } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
-import type { IEntitySchemaProperty } from "@twin.org/entity";
+} from "@3sixty/auditable-item-graph-service";
+import { EnvHelper, GeneralError, StringHelper } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
+import type { IEntitySchemaProperty } from "@3sixty/entity";
 import {
 	EntityStorageConnectorFactory,
 	SchemaMigrationFactory,
 	type IEntityStorageConnector,
 	type ISchemaMigration
-} from "@twin.org/entity-storage-models";
-import { nameof } from "@twin.org/nameof";
+} from "@3sixty/entity-storage-models";
+import { nameof } from "@3sixty/nameof";
 import {
 	OdrlPolicyIndexHelper,
 	type OdrlPolicy,
 	type OdrlPolicyIndex,
 	type OdrlPolicyV0
-} from "@twin.org/rights-management-pap-service";
+} from "@3sixty/rights-management-pap-service";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 
 /**

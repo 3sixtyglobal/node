@@ -28,7 +28,7 @@ Example: tenant-list-by-org --org-id="did:iota:..."
 List the tenants for an organisation:
 
 ```shell
-twin-node tenant-list-by-org --load-env="organization-identity.env" --org-id=!ORGANIZATION_DID
+3sixty-node tenant-list-by-org --load-env="organization-identity.env" --org-id=!ORGANIZATION_DID
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

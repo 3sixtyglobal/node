@@ -36,7 +36,7 @@
 			"method": "POST",
 			"path": "/aig?override-tenant={{secondTenantId}}",
 			"body": {
-				"@context": ["https://schema.twindev.org/aig/", "https://schema.twindev.org/common/"],
+				"@context": ["https://schema.3sixty.global/aig/", "https://schema.3sixty.global/common/"],
 				"type": "AuditableItemGraphVertex"
 			},
 			"expectedStatus": 403

@@ -94,7 +94,7 @@ Run `sudo systemctl enable nginx` to auto start the server on instance startup.
 We clone the repo, build it and then make a copy of the relevant .env file.
 
 ```shell
-git clone https://github.com/3sixtyglobal/twin-node.git
+git clone https://github.com/3sixtyglobal/node.git
 cd apps
 npm install
 npm run dist
@@ -130,7 +130,7 @@ You might need to modify the location for the node version, you can find this ou
 
 ```shell
 [Unit]
-Description=TWIN Node
+Description=3Sixty Node
 After=network.target
 
 [Service]

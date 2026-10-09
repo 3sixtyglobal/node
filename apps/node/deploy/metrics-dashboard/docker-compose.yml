@@ -1,9 +1,9 @@
-name: twin-node-metrics
+name: 3sixty-node-metrics
 
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: twin-node-prometheus
+    container_name: 3sixty-node-prometheus
     ports:
       - '9090:9090'
     volumes:
@@ -15,7 +15,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: twin-node-grafana
+    container_name: 3sixty-node-grafana
     ports:
       # Port 4000 avoids conflict with the twin-node REST server on :3000.
       - '4000:3000'

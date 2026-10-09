@@ -25,7 +25,7 @@ Example: node-identity-get
 Resolve and display the DID document currently assigned as the node identity:
 
 ```shell
-twin-node node-identity-get
+3sixty-node node-identity-get
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

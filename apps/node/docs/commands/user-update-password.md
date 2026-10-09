@@ -46,13 +46,13 @@ Example: user-update-password --email="user@example.com" --tenant-id="0011..aabb
 Generate a new password for a user and store it in an .env file:
 
 ```shell
-twin-node user-update-password --email="bob@example.com" --output-env="bob-password.env"
+3sixty-node user-update-password --email="bob@example.com" --output-env="bob-password.env"
 ```
 
 Set a specific password in multi-tenant mode, verifying the current password first:
 
 ```shell
-twin-node user-update-password --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="bob@example.com" --current-password="..." --password="..."
+3sixty-node user-update-password --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="bob@example.com" --current-password="..." --password="..."
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

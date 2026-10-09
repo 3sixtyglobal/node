@@ -13,16 +13,16 @@ on:
           - '🌳 production (main branch)' # For production releases (e.g., 1.0.0, 1.1.0, 1.1.1)
 
 concurrency:
-  group: twin-node-docker-publish
+  group: 3sixty-node-docker-publish
   cancel-in-progress: false
 
 env:
-  TWIN_REGISTRY: ghcr.io
-  TWIN_IMAGE_NAME: twin-node
+  ORG_REGISTRY: ghcr.io
+  ORG_IMAGE_NAME: 3sixty-node
 
 jobs:
   build-and-push:
-    runs-on: ${{ github.event.repository.private && fromJSON('{"group":"twin","labels":"self-hosted"}') || 'ubuntu-latest' }}
+    runs-on: ${{ github.event.repository.private && fromJSON('{"group":"3sixty","labels":"self-hosted"}') || 'ubuntu-latest' }}
     permissions:
       contents: read
       packages: write
@@ -71,7 +71,7 @@ jobs:
         run: |
           # GHCR requires lowercase image names
           OWNER="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
-          REPO="${{ env.TWIN_REGISTRY }}/$OWNER/${{ env.TWIN_IMAGE_NAME }}"
+          REPO="${{ env.ORG_REGISTRY }}/$OWNER/${{ env.ORG_IMAGE_NAME }}"
           VERSION_TAG="$REPO:${{ steps.package-version.outputs.version }}"
           BRANCH="${{ steps.set-branch.outputs.branch }}"
 
@@ -98,7 +98,7 @@ jobs:
           org.opencontainers.image.revision=$(git rev-parse HEAD)
           org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-          org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}/pkgs/container/${{ env.TWIN_IMAGE_NAME }}
+          org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}/pkgs/container/${{ env.ORG_IMAGE_NAME }}
           org.opencontainers.image.documentation=$(jq -r '.homepage' apps/node/package.json)
           org.opencontainers.image.licenses=$(jq -r '.license' apps/node/package.json)
           EOF
@@ -120,7 +120,7 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
         with:
-          registry: ${{ env.TWIN_REGISTRY }}
+          registry: ${{ env.ORG_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -168,7 +168,7 @@ jobs:
         run: |
           VERSION="${{ steps.package-version.outputs.version }}"
           BRANCH="${{ steps.set-branch.outputs.branch }}"
-          IMAGE_NAME="${{ env.TWIN_IMAGE_NAME }}"
+          IMAGE_NAME="${{ env.ORG_IMAGE_NAME }}"
           IMAGE_REPO="${{ steps.docker-tags.outputs.repo }}"
           PACKAGE_URL="${{ github.server_url }}/${{ github.repository }}/pkgs/container/$IMAGE_NAME"
           VERSION_EXISTS="${{ steps.check-existing-tag.outputs.version_exists }}"

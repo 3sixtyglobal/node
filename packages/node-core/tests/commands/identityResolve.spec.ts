@@ -1,6 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIUtils } from "@twin.org/cli-core";
+import { CLIUtils } from "@3sixty/cli-core";
 import { setupCliTestContext, TENANT_MODES, UNKNOWN_DID } from "./cliTestHelper.js";
 
 describe.each(TENANT_MODES)("identity-resolve in $mode mode", ({ mode, tenantEnabled }) => {

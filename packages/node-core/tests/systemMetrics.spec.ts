@@ -1,10 +1,10 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { MemoryStateStorage } from "@twin.org/engine-core";
-import { EntityStorageConnectorType } from "@twin.org/engine-types";
-import type { ITelemetryComponent } from "@twin.org/telemetry-models";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { ComponentFactory, Factory } from "@3sixty/core";
+import { MemoryStateStorage } from "@3sixty/engine-core";
+import { EntityStorageConnectorType } from "@3sixty/engine-types";
+import type { ITelemetryComponent } from "@3sixty/telemetry-models";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { run } from "../src/node.js";
 
