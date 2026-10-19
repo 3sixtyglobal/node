@@ -3,6 +3,7 @@
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
+import { SchemaAliasHelper } from "@3sixty/data-core";
 import { Engine } from "@3sixty/engine";
 import { FileStateStorage } from "@3sixty/engine-core";
 import { EngineCoreFactory, type IEngineCore, type IEngineCoreConfig } from "@3sixty/engine-models";
@@ -70,6 +71,9 @@ export async function start(
 			storageFileRoot: `${nodeOptions?.envPrefix ?? ""}STORAGE_FILE_ROOT`
 		});
 	}
+
+	// Alias the schemas which have moved domain, engine clones receive the aliases in their clone data.
+	SchemaAliasHelper.addAlias("https://schema.twindev.org/", "https://schema.3sixty.global/");
 
 	// Create the engine instance using file state storage unless one is configured in options
 	const engine = new Engine<IEngineServerConfig, INodeEngineState>({

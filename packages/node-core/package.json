@@ -38,6 +38,7 @@
 		"@3sixty/context": "next",
 		"@3sixty/core": "next",
 		"@3sixty/crypto": "next",
+		"@3sixty/data-core": "next",
 		"@3sixty/data-json-ld": "next",
 		"@3sixty/dlt-account": "next",
 		"@3sixty/dlt-iota": "next",
@@ -71,7 +72,6 @@
 	},
 	"devDependencies": {
 		"@3sixty/automation-models": "next",
-		"@3sixty/data-core": "next",
 		"@3sixty/dataspace-models": "next",
 		"@3sixty/entity-storage-connector-memory": "next",
 		"@3sixty/federated-catalogue-models": "next",
