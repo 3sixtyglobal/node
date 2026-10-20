@@ -14,13 +14,13 @@
 		"node": ">=24.0.0"
 	},
 	"scripts": {
-		"clean": "rimraf dist coverage",
+		"clean": "rimraf dist coverage .cache",
 		"build": "echo There is no build step for this package",
 		"dev": "concurrently \"nodemon\"",
 		"merge-locales": "merge-locales",
 		"test": "vitest --run --config ./vitest.config.ts --no-cache",
 		"test:coverage": "vitest --run --coverage --config ./vitest.config.ts --no-cache",
-		"test:build": "tspc -p ./tests/tsconfig.json --noEmit",
+		"test:build": "tspc -p ./tests/tsconfig.json --noEmit --incremental --tsBuildInfoFile .cache/tests.tsbuildinfo",
 		"validate-locales": "validate-locales",
 		"docs:clean": "rimraf docs/open-api",
 		"docs:api": "ts-to-openapi ./ts-to-openapi.json ./docs/open-api/spec.json",
