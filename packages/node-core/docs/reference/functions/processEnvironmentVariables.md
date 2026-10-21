@@ -2,11 +2,13 @@
 
 > **processEnvironmentVariables**(`processEnv`, `options`): `Promise`\<[`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`\>
 
-Process the loaded environment variables for the TWIN Node.
+Process the loaded environment variables for the 3Sixty Node.
 
 ## Parameters
 
 ### processEnv
+
+\{\[`id`: `string`\]: `string`; \}
 
 The loaded environment variables.
 

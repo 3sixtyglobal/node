@@ -8,6 +8,8 @@ Load the env files and process the options.
 
 ### processEnv
 
+\{\[`id`: `string`\]: `string`; \}
+
 The environment variables from the process.
 
 ### options

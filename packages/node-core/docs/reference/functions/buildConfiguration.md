@@ -2,7 +2,7 @@
 
 > **buildConfiguration**(`envVars`, `options`, `serverInfo`): `Promise`\<\{ `nodeEngineConfig`: [`INodeEngineConfig`](../interfaces/INodeEngineConfig.md); `availableContextIdKeys`: `object`[]; \}\>
 
-Build the configuration for the TWIN Node.
+Build the configuration for the 3Sixty Node.
 
 ## Parameters
 

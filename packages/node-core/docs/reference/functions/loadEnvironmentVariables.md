@@ -2,11 +2,13 @@
 
 > **loadEnvironmentVariables**(`processEnv`, `options`): `object`
 
-Load the environment variables for the TWIN Node, without producing any output.
+Load the environment variables for the 3Sixty Node, without producing any output.
 
 ## Parameters
 
 ### processEnv
+
+\{\[`id`: `string`\]: `string` \| `undefined`; \}
 
 The environment variables from the process.
 
