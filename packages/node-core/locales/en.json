@@ -4,6 +4,7 @@
 			"nodeIdentityNotSet": "The node identity is enabled in config but is not set, please set it using the \"node-identity-set\" CLI command.",
 			"nodeOrganizationIdNotSet": "The node organization is not set, please set it using the \"node-org-id-set\".",
 			"tenantsWithoutOrganizationId": "The following tenants have no organization ID assigned. Use the \"tenant-org-id-set\" command to assign one before starting the node: {tenantIds}",
+			"schemaAliasInvalid": "The schema alias \"{alias}\" is invalid, it must be in the form from=to",
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
 			"extensionLoadingError": "Failed to load extension \"{extension}\"",
 			"cliCommandMissing": "CLI command \"{command}\" is not recognised",

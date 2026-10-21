@@ -3,6 +3,7 @@
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
+import { SchemaAliasHelper } from "@3sixty/data-core";
 import { Engine } from "@3sixty/engine";
 import { FileStateStorage } from "@3sixty/engine-core";
 import { EngineCoreFactory, type IEngineCore, type IEngineCoreConfig } from "@3sixty/engine-models";
@@ -15,6 +16,7 @@ import {
 	shutdownExtensions
 } from "./builders/extensionsBuilder.js";
 import { executeCommand } from "./cli.js";
+import { DEFAULT_SCHEMA_ALIASES } from "./defaults.js";
 import { finalizeMigrations, initialiseMigrations } from "./migration.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
 import type { IEngineEnvironmentVariables } from "./models/IEngineEnvironmentVariables.js";
@@ -70,6 +72,9 @@ export async function start(
 			storageFileRoot: `${nodeOptions?.envPrefix ?? ""}STORAGE_FILE_ROOT`
 		});
 	}
+
+	// Alias the schemas which have moved domain, engine clones receive the aliases in their clone data.
+	configureSchemaAliases(envVars);
 
 	// Create the engine instance using file state storage unless one is configured in options
 	const engine = new Engine<IEngineServerConfig, INodeEngineState>({
@@ -141,6 +146,26 @@ export async function start(
 			await shutdownExtensions(envVars, engine);
 			throw err;
 		}
+	}
+}
+
+/**
+ * Register the schema aliases from the comma separated from=to pairs.
+ * @param envVars The environment variables.
+ * @throws GeneralError if an alias is not a from=to pair.
+ */
+function configureSchemaAliases(envVars: IEngineEnvironmentVariables): void {
+	const aliases = EnvHelper.commaSeparatedListToArray<string>(
+		envVars.schemaAliases,
+		DEFAULT_SCHEMA_ALIASES
+	);
+
+	for (const alias of aliases ?? []) {
+		const [from, to, ...rest] = alias.split("=").map(part => part.trim());
+		if (!Is.stringValue(from) || !Is.stringValue(to) || rest.length > 0) {
+			throw new GeneralError("node", "schemaAliasInvalid", { alias });
+		}
+		SchemaAliasHelper.addAlias(from, to);
 	}
 }
 

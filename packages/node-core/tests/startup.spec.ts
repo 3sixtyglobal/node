@@ -3,6 +3,7 @@
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdStore } from "@3sixty/context";
 import { ComponentFactory, Factory } from "@3sixty/core";
+import { SchemaAliasHelper } from "@3sixty/data-core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import { EntityStorageConnectorType } from "@3sixty/engine-types";
 import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@3sixty/entity";
@@ -61,6 +62,86 @@ function getTenantAdminComponent(result: Awaited<ReturnType<typeof run>>): ITena
 	}
 	return ComponentFactory.get<ITenantAdminComponent>(type);
 }
+
+describe("startup - schema aliases", () => {
+	beforeEach(() => {
+		Factory.clearFactories();
+		SchemaAliasHelper.setAliases([]);
+	});
+
+	afterEach(() => {
+		SchemaAliasHelper.setAliases([]);
+	});
+
+	test("registers the schema domain alias and includes it in the engine clone data", async () => {
+		const result = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_ORG_ID
+			}),
+			disableProcessExitOnFailure: true,
+			envVars: { ...BASE_ENV, TWIN_TENANT_ENABLED: "false", TWIN_PORT: String(await getFreePort()) }
+		});
+
+		try {
+			expect(
+				SchemaAliasHelper.resolve("https://schema.twindev.org/framework/TimestampMilliseconds")
+			).toEqual("https://schema.3sixty.global/framework/TimestampMilliseconds");
+			expect(result?.engine.getCloneData().schemaAliases).toEqual([
+				{ from: "https://schema.twindev.org/", to: "https://schema.3sixty.global/" }
+			]);
+		} finally {
+			await result?.shutdown();
+		}
+	});
+
+	test("registers the schema aliases from the environment variable", async () => {
+		const result = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_ORG_ID
+			}),
+			disableProcessExitOnFailure: true,
+			envVars: {
+				...BASE_ENV,
+				TWIN_TENANT_ENABLED: "false",
+				TWIN_PORT: String(await getFreePort()),
+				TWIN_SCHEMA_ALIASES:
+					"https://a.example/=https://b.example/, https://c.example/=https://d.example/"
+			}
+		});
+
+		try {
+			expect(result?.engine.getCloneData().schemaAliases).toEqual([
+				{ from: "https://a.example/", to: "https://b.example/" },
+				{ from: "https://c.example/", to: "https://d.example/" }
+			]);
+		} finally {
+			await result?.shutdown();
+		}
+	});
+
+	test("fails startup when a schema alias is not a from=to pair", async () => {
+		await expect(
+			run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...BASE_ENV,
+					TWIN_TENANT_ENABLED: "false",
+					TWIN_PORT: String(await getFreePort()),
+					TWIN_SCHEMA_ALIASES: "https://a.example/"
+				}
+			})
+		).rejects.toThrow();
+	});
+});
 
 describe("startup - tenant organization ID enforcement", () => {
 	beforeAll(async () => {

@@ -59,6 +59,12 @@ export interface IEngineEnvironmentVariables {
 	schemaMigrationEnabled?: string;
 
 	/**
+	 * Schema domain aliases as comma separated from=to pairs,
+	 * defaults to https://schema.twindev.org/=https://schema.3sixty.global/.
+	 */
+	schemaAliases?: string;
+
+	/**
 	 * The type of the entity storage to create, comma separate for more than one connector.
 	 * values: file, memory, aws-dynamodb, azure-cosmosdb, gcp-firestoredb, scylladb, mysql, mongodb, postgresql
 	 */

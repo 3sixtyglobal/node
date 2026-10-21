@@ -19,6 +19,7 @@ const engineEnvironmentVariableKeysInternal: {
 	stateFilename: true,
 	tenantEnabled: true,
 	schemaMigrationEnabled: true,
+	schemaAliases: true,
 	extensions: true,
 	// entity storage
 	entityStorageConnectorType: true,
