@@ -62,6 +62,8 @@ The method to execute for the command.
 
 ##### params
 
+\{\[`id`: `string`\]: [`CliCommandParamType`](../type-aliases/CliCommandParamType.md); \}
+
 #### Returns
 
 `Promise`\<`unknown`\>

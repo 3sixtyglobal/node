@@ -89,6 +89,15 @@ Enable schema migration, defaults to true.
 
 ***
 
+### schemaAliases? {#schemaaliases}
+
+> `optional` **schemaAliases?**: `string`
+
+Schema domain aliases as comma separated from=to pairs,
+defaults to https://schema.twindev.org/=https://schema.3sixty.global/.
+
+***
+
 ### entityStorageConnectorType? {#entitystorageconnectortype}
 
 > `optional` **entityStorageConnectorType?**: `string`

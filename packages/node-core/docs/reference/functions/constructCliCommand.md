@@ -8,6 +8,8 @@ Construct the CLI command from the parsed arguments.
 
 ### processEnv
 
+\{\[`id`: `string`\]: `string`; \}
+
 The environment variables from the process.
 
 ### cliArgs

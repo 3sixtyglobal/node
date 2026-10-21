@@ -6,7 +6,7 @@ Load the JSON file.
 
 ## Type Parameters
 
-### T
+### T {#t}
 
 `T`
 
