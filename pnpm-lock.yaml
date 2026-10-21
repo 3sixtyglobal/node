@@ -242,7 +242,7 @@ importers:
   apps/node:
     dependencies:
       '@3sixty/node-core':
-        specifier: 0.20.0-next.0
+        specifier: 0.20.0-next.1
         version: link:../../packages/node-core
     devDependencies:
       '@3sixty/entity-storage-connector-memory':
