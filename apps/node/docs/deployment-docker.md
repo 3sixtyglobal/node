@@ -4,7 +4,7 @@ The 3Sixty Node can be run as a Docker container, either from the published imag
 
 ## Published Image
 
-Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/node](https://github.com/3sixtyglobal/node/pkgs/container/3sixty-node) for `linux/amd64` and `linux/arm64`, with the following tags:
+Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/3sixty-node](https://github.com/3sixtyglobal/node/pkgs/container/3sixty-node) for `linux/amd64` and `linux/arm64`, with the following tags:
 
 | Tag       | Description                                      |
 | --------- | ------------------------------------------------ |
@@ -13,7 +13,7 @@ Images are published to GitHub Packages as [ghcr.io/3sixtyglobal/node](https://g
 | `<x.y.z>` | A specific version, for example `0.10.1-next.6`. |
 
 ```shell
-docker pull ghcr.io/3sixtyglobal/node:latest
+docker pull ghcr.io/3sixtyglobal/3sixty-node:latest
 ```
 
 ## Building the Image
@@ -35,7 +35,7 @@ docker buildx create --name 3sixty-multiplatform-builder --driver docker-contain
 docker buildx build --platform linux/amd64,linux/arm64 -t 3sixty-node -f apps/node/deploy/dockerfile .
 ```
 
-The examples below use the locally built `3sixty-node` image, replace it with `ghcr.io/3sixtyglobal/node:<tag>` to use the published image.
+The examples below use the locally built `3sixty-node` image, replace it with `ghcr.io/3sixtyglobal/3sixty-node:<tag>` to use the published image.
 
 ## Configuration
 
