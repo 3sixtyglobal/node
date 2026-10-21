@@ -93,6 +93,13 @@ export const DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES: string[] = [
 ];
 
 /**
+ * The default schema domain aliases as from=to pairs.
+ */
+export const DEFAULT_SCHEMA_ALIASES: string[] = [
+	"https://schema.twindev.org/=https://schema.3sixty.global/"
+];
+
+/**
  * Get the default environment variables for the node.
  * @param envPrefix The environment variable prefix.
  * @returns The default environment variables.

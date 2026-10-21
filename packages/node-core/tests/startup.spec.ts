@@ -95,6 +95,52 @@ describe("startup - schema aliases", () => {
 			await result?.shutdown();
 		}
 	});
+
+	test("registers the schema aliases from the environment variable", async () => {
+		const result = await run({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_ORG_ID
+			}),
+			disableProcessExitOnFailure: true,
+			envVars: {
+				...BASE_ENV,
+				TWIN_TENANT_ENABLED: "false",
+				TWIN_PORT: String(await getFreePort()),
+				TWIN_SCHEMA_ALIASES:
+					"https://a.example/=https://b.example/, https://c.example/=https://d.example/"
+			}
+		});
+
+		try {
+			expect(result?.engine.getCloneData().schemaAliases).toEqual([
+				{ from: "https://a.example/", to: "https://b.example/" },
+				{ from: "https://c.example/", to: "https://d.example/" }
+			]);
+		} finally {
+			await result?.shutdown();
+		}
+	});
+
+	test("fails startup when a schema alias is not a from=to pair", async () => {
+		await expect(
+			run({
+				localesDirectory: LOCALES_DIR,
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_ORG_ID
+				}),
+				disableProcessExitOnFailure: true,
+				envVars: {
+					...BASE_ENV,
+					TWIN_TENANT_ENABLED: "false",
+					TWIN_PORT: String(await getFreePort()),
+					TWIN_SCHEMA_ALIASES: "https://a.example/"
+				}
+			})
+		).rejects.toThrow();
+	});
 });
 
 describe("startup - tenant organization ID enforcement", () => {
