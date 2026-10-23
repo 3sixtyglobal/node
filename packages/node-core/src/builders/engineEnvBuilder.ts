@@ -111,9 +111,11 @@ import {
 } from "@3sixty/tracing-connector-opentelemetry";
 import { type ITracingFacadeConfig, TracingFacade } from "@3sixty/tracing-facades";
 import {
+	AUTHORIZATION_MODEL_ID,
 	CONTEXT_ID_HANDLER_FEATURE_DID,
 	CONTEXT_ID_HANDLER_FEATURE_TENANT,
 	COMPONENT_FACTORY_TYPE_NAME,
+	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS,
 	DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
 	DEFAULT_TRACING_FACADE_FACTORIES,
@@ -1836,6 +1838,12 @@ async function configureIdentityProfile(
 			type: IdentityProfileComponentType.Service,
 			options: {
 				config: {
+					authorizationModelId: EnvHelper.envString(
+						envVars,
+						"authorizationModelId",
+						AUTHORIZATION_MODEL_ID
+					),
+					escalatedPrivilegeRole: DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 					selfUpdateDeniedProperties: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
 						envVars,
 						"identityProfileSelfUpdateDeniedProperties",

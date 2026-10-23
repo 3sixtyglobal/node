@@ -1388,9 +1388,14 @@ describe("buildEngineConfiguration - identity profile", () => {
 	 * @param config The built engine configuration.
 	 * @returns The service config, or undefined when the service component is not configured.
 	 */
-	function identityProfileConfig(
-		config: Awaited<ReturnType<typeof buildEngineConfiguration>>
-	): { selfUpdateDeniedProperties?: string[]; adminScopes?: string[] } | undefined {
+	function identityProfileConfig(config: Awaited<ReturnType<typeof buildEngineConfiguration>>):
+		| {
+				authorizationModelId?: string;
+				escalatedPrivilegeRole?: string;
+				selfUpdateDeniedProperties?: string[];
+				adminScopes?: string[];
+		  }
+		| undefined {
 		const entry = config.types.identityProfileComponent?.[0];
 		return entry?.type === IdentityProfileComponentType.Service ? entry.options?.config : undefined;
 	}
@@ -1401,19 +1406,24 @@ describe("buildEngineConfiguration - identity profile", () => {
 		});
 
 		expect(identityProfileConfig(config)).toEqual({
+			authorizationModelId: "system",
+			escalatedPrivilegeRole: "global-admin",
 			selfUpdateDeniedProperties: undefined,
 			adminScopes: undefined
 		});
 	});
 
-	test("uses the self update denied properties and admin scopes from the env vars", async () => {
+	test("uses the authorization model, self update denied properties and admin scopes from the env vars", async () => {
 		const config = await buildEngineConfiguration({
 			identityProfileConnector: IdentityProfileConnectorType.EntityStorage,
+			authorizationModelId: "custom",
 			identityProfileSelfUpdateDeniedProperties: "email, jobTitle",
 			identityProfileAdminScopes: "profile-admin"
 		});
 
 		expect(identityProfileConfig(config)).toEqual({
+			authorizationModelId: "custom",
+			escalatedPrivilegeRole: "global-admin",
 			selfUpdateDeniedProperties: ["email", "jobTitle"],
 			adminScopes: ["profile-admin"]
 		});
