@@ -1,7 +1,8 @@
 name: Soak
 
 # Runs the soak harness against the cloud-hosted twin-node.
-# Nightly at 02:00 UTC; also manually dispatchable with overridable inputs.
+# Nightly at 22:17 UTC (00:17 Bucharest in winter), off the full hour because GitHub queues
+# top-of-the-hour schedules for hours; also manually dispatchable with overridable inputs.
 #
 # Required repo secret (single blob, newline-separated KEY=VALUE):
 #   ORG_SOAK_ENV_VARS — must contain:
@@ -22,7 +23,7 @@ name: Soak
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '17 22 * * *'
   workflow_dispatch:
     # All inputs below default to '' (blank) rather than a hardcoded number. The "Run soak"
     # step only exports the corresponding SOAK_* env var when an input is non-blank, so a
