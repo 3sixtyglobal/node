@@ -1,0 +1,173 @@
+{
+	"group": "Identity Profile - Self Update Denied Properties",
+	"steps": [
+		{
+			"description": "POST /identity - create identity for profile test user",
+			"method": "POST",
+			"path": "/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "profileUserDid": "body.id" }
+		},
+		{
+			"description": "POST /authentication/admin/users - create profile test user without admin scope",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": {
+				"email": "profile-user@node",
+				"password": "Profile@Node12345!",
+				"userIdentity": "{{profileUserDid}}",
+				"organizationIdentity": "{{adminOrgIdentity}}",
+				"scope": ["read-only"]
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/login - login as profile test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "profile-user@node", "password": "Profile@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /identity/profile - 401 setting denied property without admin scope",
+			"method": "POST",
+			"path": "/identity/profile",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Profile User",
+					"roles": ["admin"]
+				}
+			},
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /identity/profile - create profile without denied property",
+			"method": "POST",
+			"path": "/identity/profile",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Profile User"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "PUT /identity/profile - 401 adding denied property without admin scope",
+			"method": "PUT",
+			"path": "/identity/profile",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Profile User",
+					"roles": ["admin"]
+				}
+			},
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/login - login as admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token", "organizationId": "jwt-claim:org" }
+		},
+		{
+			"description": "PUT /identity/profile/:userIdentity - admin can set denied property",
+			"method": "PUT",
+			"path": "/identity/profile/{{profileUserDid}}",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Profile User",
+					"roles": ["member"]
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as profile test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "profile-user@node", "password": "Profile@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "PUT /identity/profile - 401 changing denied property without admin scope",
+			"method": "PUT",
+			"path": "/identity/profile",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Profile User",
+					"roles": ["admin"]
+				}
+			},
+			"expectedStatus": 401
+		},
+		{
+			"description": "PUT /identity/profile - allowed when denied property is unchanged",
+			"method": "PUT",
+			"path": "/identity/profile",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Updated Profile User",
+					"roles": ["member"]
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /identity/profile - denied property unchanged by self update",
+			"method": "GET",
+			"path": "/identity/profile",
+			"expectedStatus": 200,
+			"assert": {
+				"body.publicProfile.name": "Updated Profile User",
+				"body.publicProfile.roles.[0]": "member"
+			}
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token", "organizationId": "jwt-claim:org" }
+		},
+		{
+			"description": "DELETE /identity/profile/:userIdentity - remove profile test user profile",
+			"method": "DELETE",
+			"path": "/identity/profile/{{profileUserDid}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove profile test user",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/profile-user%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /identity/:profileUserDid - remove profile test user identity",
+			"method": "DELETE",
+			"path": "/identity/{{profileUserDid}}",
+			"expectedStatus": 204
+		}
+	]
+}

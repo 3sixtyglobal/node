@@ -9,7 +9,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /authentication/login — re-login with new password",
+			"description": "POST /authentication/login - re-login with new password",
 			"method": "POST",
 			"path": "/authentication/login",
 			"apiKey": true,
@@ -18,14 +18,14 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "POST /authentication/audit — 400 missing event",
+			"description": "POST /authentication/audit - 400 missing event",
 			"method": "POST",
 			"path": "/authentication/audit",
 			"body": {},
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /authentication/audit — create audit entry",
+			"description": "POST /authentication/audit - create audit entry",
 			"method": "POST",
 			"path": "/authentication/audit",
 			"body": { "event": "login-success" },
@@ -52,7 +52,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /authentication/audit/:id — 404 after delete",
+			"description": "GET /authentication/audit/:id - 404 after delete",
 			"method": "GET",
 			"path": "/authentication/audit/{{auditId}}",
 			"expectedStatus": 404

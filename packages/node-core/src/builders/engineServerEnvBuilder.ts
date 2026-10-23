@@ -1,10 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IServerInfo, IWebServerOptions } from "@twin.org/api-models";
-import { ContextIdKeys } from "@twin.org/context";
-import { Coerce, Is, StringHelper } from "@twin.org/core";
-import type { IEngineCoreConfig } from "@twin.org/engine-models";
-import { addDefaultRestPaths, addDefaultSocketPaths } from "@twin.org/engine-server";
+import type { IServerInfo, IWebServerOptions } from "@3sixty/api-models";
+import { ContextIdKeys } from "@3sixty/context";
+import { Coerce, EnvHelper, Is, StringHelper } from "@3sixty/core";
+import type { IEngineCoreConfig } from "@3sixty/engine-models";
+import { addDefaultRestPaths, addDefaultSocketPaths } from "@3sixty/engine-server";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationAuditComponentType,
@@ -14,9 +14,10 @@ import {
 	InformationComponentType,
 	type MimeTypeProcessorType,
 	RestRouteProcessorType,
-	SocketRouteProcessorType
-} from "@twin.org/engine-server-types";
-import { TraceparentHelper } from "@twin.org/tracing-models";
+	SocketRouteProcessorType,
+	WebServerType
+} from "@3sixty/engine-server-types";
+import { TraceparentHelper } from "@3sixty/tracing-models";
 import {
 	AUTHORIZATION_MODEL_ID,
 	CONTEXT_ID_HANDLER_FEATURE_DID,
@@ -28,12 +29,6 @@ import {
 	isTracingEnabled
 } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-import {
-	commaSeparatedListToArray,
-	envInteger,
-	envKeyIntegerPairs,
-	envString
-} from "./helper/envHelpers.js";
 
 /**
  * Handles the configuration of the server.
@@ -56,12 +51,15 @@ export async function buildEngineServerConfiguration(
 	const webServerOptions: IWebServerOptions = {
 		port: Coerce.number(envVars.port),
 		host: Coerce.string(envVars.host),
-		methods: commaSeparatedListToArray(envVars.httpMethods, undefined),
-		allowedHeaders: commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
-		exposedHeaders: commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
-		corsOrigins: commaSeparatedListToArray(envVars.corsOrigins, undefined),
-		bodyLimits: envKeyIntegerPairs(envVars, "httpBodyLimits"),
-		publicOrigin: Coerce.string(envVars.publicOrigin)
+		methods: EnvHelper.commaSeparatedListToArray(envVars.httpMethods, undefined),
+		allowedHeaders: EnvHelper.commaSeparatedListToArray(envVars.httpAllowedHeaders, undefined),
+		exposedHeaders: EnvHelper.commaSeparatedListToArray(envVars.httpExposedHeaders, undefined),
+		corsOrigins: EnvHelper.commaSeparatedListToArray(envVars.corsOrigins, undefined),
+		bodyLimits: EnvHelper.envKeyIntegerPairs(envVars, "httpBodyLimits"),
+		publicOrigin: Coerce.string(envVars.publicOrigin),
+		customWebConfig: {
+			pluginTimeout: EnvHelper.envMs(envVars, "fastifyPluginTimeout", 30000)
+		}
 	};
 
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
@@ -82,6 +80,7 @@ export async function buildEngineServerConfiguration(
 
 	const serverConfig: IEngineServerConfig = {
 		...coreEngineConfig,
+		webServerType: EnvHelper.envChoice(envVars, "webServerType", Object.values(WebServerType)),
 		web: webServerOptions,
 		types: {
 			...coreEngineConfig.types,
@@ -101,7 +100,7 @@ export async function buildEngineServerConfiguration(
 	};
 
 	if (Is.stringValue(envVars.mimeTypeProcessors)) {
-		const mimeTypeProcessors = commaSeparatedListToArray(envVars.mimeTypeProcessors);
+		const mimeTypeProcessors = EnvHelper.commaSeparatedListToArray(envVars.mimeTypeProcessors);
 
 		if (Is.arrayValue(mimeTypeProcessors)) {
 			serverConfig.types.mimeTypeProcessor ??= [];
@@ -181,7 +180,7 @@ export async function buildEngineServerConfiguration(
 	if (!coreEngineConfig.silent) {
 		const includeBody = Coerce.boolean(envVars.routeLoggingIncludeBody) ?? coreEngineConfig.debug;
 		const fullBase64 = Coerce.boolean(envVars.routeLoggingFullBase64) ?? false;
-		const obfuscateProperties = commaSeparatedListToArray<string>(
+		const obfuscateProperties = EnvHelper.commaSeparatedListToArray<string>(
 			envVars.routeLoggingObfuscateProperties,
 			undefined
 		);
@@ -253,8 +252,8 @@ export async function buildEngineServerConfiguration(
 			options: {
 				config: {
 					signingKeyName: envVars.authSigningKeyId,
-					minPasswordLength: envInteger(envVars, "authMinPasswordLength"),
-					maxPasswordLength: envInteger(envVars, "authMaxPasswordLength")
+					minPasswordLength: EnvHelper.envInteger(envVars, "authMinPasswordLength"),
+					maxPasswordLength: EnvHelper.envInteger(envVars, "authMaxPasswordLength")
 				}
 			}
 		});
@@ -262,7 +261,8 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId,
+					tokenCacheMutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
 				}
 			}
 		});
@@ -270,7 +270,8 @@ export async function buildEngineServerConfiguration(
 			type: SocketRouteProcessorType.AuthHeader,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId,
+					tokenCacheMutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
 				}
 			}
 		});
@@ -279,7 +280,11 @@ export async function buildEngineServerConfiguration(
 				type: RestRouteProcessorType.Authorization,
 				options: {
 					config: {
-						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
+						authorizationModelId: EnvHelper.envString(
+							envVars,
+							"authorizationModelId",
+							AUTHORIZATION_MODEL_ID
+						)
 					}
 				}
 			});
@@ -287,7 +292,11 @@ export async function buildEngineServerConfiguration(
 				type: SocketRouteProcessorType.Authorization,
 				options: {
 					config: {
-						authorizationModelId: envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID)
+						authorizationModelId: EnvHelper.envString(
+							envVars,
+							"authorizationModelId",
+							AUTHORIZATION_MODEL_ID
+						)
 					}
 				}
 			});
@@ -297,7 +306,7 @@ export async function buildEngineServerConfiguration(
 					type: RestRouteProcessorType.TenantOverride,
 					options: {
 						config: {
-							authorizationModelId: envString(
+							authorizationModelId: EnvHelper.envString(
 								envVars,
 								"authorizationModelId",
 								AUTHORIZATION_MODEL_ID
@@ -309,7 +318,7 @@ export async function buildEngineServerConfiguration(
 					type: SocketRouteProcessorType.TenantOverride,
 					options: {
 						config: {
-							authorizationModelId: envString(
+							authorizationModelId: EnvHelper.envString(
 								envVars,
 								"authorizationModelId",
 								AUTHORIZATION_MODEL_ID
@@ -325,7 +334,7 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.Metrics,
 			options: {
 				config: {
-					excludePaths: commaSeparatedListToArray<string>(
+					excludePaths: EnvHelper.commaSeparatedListToArray<string>(
 						envVars.routeMetricsExcludePaths,
 						undefined
 					)
@@ -339,7 +348,7 @@ export async function buildEngineServerConfiguration(
 			type: RestRouteProcessorType.Tracing,
 			options: {
 				config: {
-					excludePaths: commaSeparatedListToArray<string>(
+					excludePaths: EnvHelper.commaSeparatedListToArray<string>(
 						envVars.routeTracingExcludePaths,
 						undefined
 					)

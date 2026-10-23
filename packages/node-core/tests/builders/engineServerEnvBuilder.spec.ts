@@ -1,16 +1,44 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { ContextIdKeys } from "@twin.org/context";
+import { ContextIdKeys } from "@3sixty/context";
 import {
 	AuthenticationComponentType,
 	RestRouteProcessorType,
-	SocketRouteProcessorType
-} from "@twin.org/engine-server-types";
-import { AuthorizationConnectorType } from "@twin.org/engine-types";
+	SocketRouteProcessorType,
+	WebServerType
+} from "@3sixty/engine-server-types";
+import { AuthorizationConnectorType } from "@3sixty/engine-types";
 import { buildEngineServerConfiguration } from "../../src/builders/engineServerEnvBuilder.js";
 
 const SERVER_INFO = { name: "test", version: "0.0.0" };
 const BASE_VARS = { port: "3000" };
+
+describe("buildEngineServerConfiguration - auth header processors", () => {
+	test("mutex timeout default seeds the auth header token cache timeout", async () => {
+		const config = await buildEngineServerConfiguration(
+			{
+				...BASE_VARS,
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				mutexTimeoutDefault: "60000"
+			},
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		const processors = [
+			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.AuthHeader),
+			config.types.socketRouteProcessor?.find(p => p.type === SocketRouteProcessorType.AuthHeader)
+		];
+
+		for (const processor of processors) {
+			expect(
+				(processor?.options as { config?: { tokenCacheMutexTimeoutMs?: number } })?.config
+					?.tokenCacheMutexTimeoutMs
+			).toBe(60000);
+		}
+	});
+});
 
 describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 	test("registers TenantOverride REST and socket processors when tenant mode and auth are enabled", async () => {
@@ -148,5 +176,81 @@ describe("buildEngineServerConfiguration - auth context keys", () => {
 		const keys = contextKeys.map(k => k.key);
 		expect(keys).not.toContain(ContextIdKeys.User);
 		expect(config.types.authenticationComponent).toBeUndefined();
+	});
+});
+
+describe("buildEngineServerConfiguration - custom web config", () => {
+	test("defaults the Fastify plugin timeout to 30000 when the env var is not set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: 30000 });
+	});
+
+	test("uses the Fastify plugin timeout from the env var when set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, fastifyPluginTimeout: "60000" },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: 60000 });
+	});
+
+	test("throws when the Fastify plugin timeout is not an integer", async () => {
+		await expect(
+			buildEngineServerConfiguration(
+				{ ...BASE_VARS, fastifyPluginTimeout: "not-a-number" },
+				[],
+				{ types: {} },
+				SERVER_INFO
+			)
+		).rejects.toThrow("invalidEnvVarValue");
+	});
+});
+
+describe("buildEngineServerConfiguration - web server type", () => {
+	test("leaves the web server type unset by default", async () => {
+		const config = await buildEngineServerConfiguration(BASE_VARS, [], { types: {} }, SERVER_INFO);
+
+		expect(config.webServerType).toBeUndefined();
+	});
+
+	test("uses the web server type from the env var when set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, webServerType: WebServerType.Hono },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.webServerType).toBe(WebServerType.Hono);
+	});
+
+	test("uses the native web server type from the env var when set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, webServerType: WebServerType.Native },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.webServerType).toBe(WebServerType.Native);
+	});
+
+	test("throws when the web server type is not supported", async () => {
+		await expect(
+			buildEngineServerConfiguration(
+				{ ...BASE_VARS, webServerType: "express" },
+				[],
+				{ types: {} },
+				SERVER_INFO
+			)
+		).rejects.toThrow();
 	});
 });

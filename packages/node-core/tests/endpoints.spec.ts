@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
-import type { ITenantAdminComponent } from "@twin.org/api-models";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { DataspaceAppFactory } from "@twin.org/dataspace-models";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+import type { ITenantAdminComponent } from "@3sixty/api-models";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { ComponentFactory, Factory } from "@3sixty/core";
+import { DataspaceAppFactory } from "@3sixty/dataspace-models";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
-} from "@twin.org/engine-server-types";
+} from "@3sixty/engine-server-types";
 import {
 	AttestationConnectorType,
 	AuthorizationConnectorType,
@@ -29,10 +29,10 @@ import {
 	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
-import type { ITrustComponent } from "@twin.org/trust-models";
+} from "@3sixty/engine-types";
+import type { ITrustComponent } from "@3sixty/trust-models";
 import { loadAndRunGroups } from "./endpoints/runner.js";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import {
 	DEFAULT_DEVOPS_ROLE,
 	DEFAULT_IDENTITY_ADMIN_ROLE,
@@ -43,11 +43,11 @@ import {
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
 
-const TEST_PORT = 21000 + Math.floor(Math.random() * 1000);
-const TEST_PORT_ST = TEST_PORT + 1000;
-const TEST_PORT_SO = TEST_PORT + 2000;
-const TEST_PORT_FC = TEST_PORT + 3000;
-const TEST_PORT_GA = TEST_PORT + 4000;
+const TEST_PORT = await getFreePort();
+const TEST_PORT_ST = await getFreePort();
+const TEST_PORT_SO = await getFreePort();
+const TEST_PORT_FC = await getFreePort();
+const TEST_PORT_GA = await getFreePort();
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_GA_TENANT_API_KEY = "aabb1122ccdd3344eeff5566aabb7788";
@@ -85,6 +85,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
 	TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
 	TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
+	TWIN_IDENTITY_PROFILE_SELF_UPDATE_DENIED_PROPERTIES: "roles",
 	TWIN_NFT_CONNECTOR: NftConnectorType.EntityStorage,
 	TWIN_NOTARIZATION_CONNECTOR: NotarizationConnectorType.EntityStorage,
 	TWIN_ATTESTATION_CONNECTOR: AttestationConnectorType.Nft,
@@ -495,7 +496,7 @@ describe("node-core", () => {
 		await rm(OUTPUT_TMP_DIR_GA, { recursive: true, force: true });
 		Factory.clearFactories();
 
-		// Phase 1: Bootstrap — admin user receives global-admin role so it can use override-tenant.
+		// Phase 1: Bootstrap admin user receives global-admin role so it can use override-tenant.
 		const bootstrapState: INodeEngineState = {};
 		await run(
 			{

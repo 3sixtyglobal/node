@@ -3,16 +3,15 @@
 import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
-} from "@twin.org/api-auth-entity-storage-models";
-import type { IAuthorizationComponent } from "@twin.org/authorization-models";
-import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import { PasswordGenerator } from "@twin.org/crypto";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
+} from "@3sixty/api-auth-entity-storage-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
+import { CLIDisplay, CLIUtils } from "@3sixty/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import { PasswordGenerator } from "@3sixty/crypto";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
-import { commaSeparatedListToArray, envString } from "../builders/helper/envHelpers.js";
 import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
@@ -61,7 +60,8 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 				extendedType: "hex(32)",
 				description: I18n.formatMessage(
 					"node.cli.commands.user-create.params.tenant-id.description"
-				)
+				),
+				required: false
 			},
 			{
 				key: "email",
@@ -197,18 +197,22 @@ export async function userCreate(
 	const paramsEmail = params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
-	const authorizationModelId = envString(envVars, "authorizationModelId", AUTHORIZATION_MODEL_ID);
+	const authorizationModelId = EnvHelper.envString(
+		envVars,
+		"authorizationModelId",
+		AUTHORIZATION_MODEL_ID
+	);
 	Guards.email("userCreate", "email", paramsEmail);
 	Did.guard("userCreate", "user-identity", paramsUserIdentity);
 	Did.guard("userCreate", "organization-identity", paramsOrganizationIdentity);
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
+		if (!tenantEnabled) {
+			throw new GeneralError("userCreate", "tenantIdNotAllowed");
+		}
 		Guards.stringHexLength("userCreate", "tenant-id", params.tenantId, 32);
-	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	} else if (tenantEnabled) {
 		throw new GeneralError("userCreate", "tenantIdRequired");
-	}
-
-	if (Is.stringValue(params.password) && params.password.length < 16) {
-		throw new GeneralError("userCreate", "passwordTooShort", { minLength: 16 });
 	}
 
 	const defaultIdentityProfileConnectorType = engineCore.getRegisteredInstanceType(
@@ -231,7 +235,7 @@ export async function userCreate(
 	);
 
 	let createUser = true;
-	const roles = commaSeparatedListToArray<string>(params.roles);
+	const roles = EnvHelper.commaSeparatedListToArray<string>(params.roles);
 	if (roles.length === 0) {
 		roles.push(DEFAULT_USER_ROLE);
 	}

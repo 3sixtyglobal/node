@@ -1,8 +1,8 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay } from "@twin.org/cli-core";
-import { I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -93,7 +93,8 @@ function displayCommandHelp(commandDefinition: ICliCommandDefinition): void {
 			if (Is.notEmpty(param.defaultValue)) {
 				typeParts.push(`${defaultLabel}: '${param.defaultValue}'`);
 			}
-			if (param.required) {
+			// Match the command line parser, which treats a param without a required flag as required
+			if (param.required ?? true) {
 				typeParts.push(requiredLabel);
 			} else {
 				typeParts.push(optionalLabel);

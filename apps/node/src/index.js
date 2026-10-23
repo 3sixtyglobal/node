@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from 'node:path';
-import { run } from '@twin.org/node-core';
+import { run } from '@3sixty/node-core';
 
 await run(
 	{

@@ -1,14 +1,14 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IPlatformComponent } from "@twin.org/api-models";
-import type { IAuthorizationComponent } from "@twin.org/authorization-models";
-import { ContextIdStore } from "@twin.org/context";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+import type { IPlatformComponent } from "@3sixty/api-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
+import { ContextIdStore } from "@3sixty/context";
+import { ComponentFactory, Factory } from "@3sixty/core";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
-} from "@twin.org/engine-server-types";
+} from "@3sixty/engine-server-types";
 import {
 	BlobStorageConnectorType,
 	EntityStorageConnectorType,
@@ -16,7 +16,7 @@ import {
 	IdentityProfileConnectorType,
 	IdentityResolverConnectorType,
 	VaultConnectorType
-} from "@twin.org/engine-types";
+} from "@3sixty/engine-types";
 import { CI_ENV_VARS } from "./setupTestEnv.js";
 import {
 	AUTHORIZATION_MODEL_ID,

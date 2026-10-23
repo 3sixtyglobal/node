@@ -2,7 +2,7 @@
 	"group": "Dataspace - Data Plane",
 	"steps": [
 		{
-			"description": "POST /dataspace/inbox — 400 missing @type (schema validation)",
+			"description": "POST /dataspace/inbox - 400 missing @type (schema validation)",
 			"method": "POST",
 			"path": "/dataspace/inbox",
 			"headers": {
@@ -14,7 +14,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "GET /dataspace/activity-logs/:id — 404 unknown id",
+			"description": "GET /dataspace/activity-logs/:id - 404 unknown id",
 			"method": "GET",
 			"path": "/dataspace/activity-logs/{{fakeId}}",
 			"headers": {
@@ -23,7 +23,7 @@
 			"expectedStatus": 404
 		},
 		{
-			"description": "GET /dataspace/entities — 404 unknown consumerPid",
+			"description": "GET /dataspace/entities - 404 unknown consumerPid",
 			"method": "GET",
 			"path": "/dataspace/entities?consumerPid={{fakeId}}&type=https://vocabulary.uncefact.org/Consignment",
 			"headers": {
@@ -32,7 +32,7 @@
 			"expectedStatus": 404
 		},
 		{
-			"description": "POST /dataspace/entities/query — 404 unknown consumerPid",
+			"description": "POST /dataspace/entities/query - 404 unknown consumerPid",
 			"method": "POST",
 			"path": "/dataspace/entities/query",
 			"headers": {
@@ -48,7 +48,7 @@
 			"expectedStatus": 404
 		},
 		{
-			"description": "GET /dataspace/entities — 200 (STARTED transfer from transfers group)",
+			"description": "GET /dataspace/entities - 200 (STARTED transfer from transfers group)",
 			"appendOrgParam": true,
 			"method": "GET",
 			"path": "/dataspace/entities?consumerPid={{transferConsumerPid}}&type=https://vocabulary.uncefact.org/Consignment",
@@ -58,7 +58,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /dataspace/entities/query — 200",
+			"description": "POST /dataspace/entities/query - 200",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/entities/query",
@@ -75,7 +75,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /dataspace/transfers/:pid/complete — 200",
+			"description": "POST /dataspace/transfers/:pid/complete - 200",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/dataspace/transfers/{{transferProviderPid}}/complete",
@@ -92,13 +92,13 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "DELETE /dataspace/app-datasets/:id — 204",
+			"description": "DELETE /dataspace/app-datasets/:id - 204",
 			"method": "DELETE",
 			"path": "/dataspace/app-datasets/{{dataspaceAppDatasetId}}",
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /dataspace/app-datasets/:id — 404 after delete",
+			"description": "GET /dataspace/app-datasets/:id - 404 after delete",
 			"method": "GET",
 			"path": "/dataspace/app-datasets/{{dataspaceAppDatasetId}}",
 			"expectedStatus": 404

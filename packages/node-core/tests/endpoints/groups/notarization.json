@@ -2,7 +2,7 @@
 	"group": "Notarization",
 	"steps": [
 		{
-			"description": "POST /notarization — 400 missing data",
+			"description": "POST /notarization - 400 missing data",
 			"method": "POST",
 			"path": "/notarization",
 			"body": { "mode": "dynamic" },
@@ -56,7 +56,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /notarization/:id — 404 after delete",
+			"description": "GET /notarization/:id - 404 after delete",
 			"method": "GET",
 			"path": "/notarization/{{notarizationId}}",
 			"expectedStatus": 404

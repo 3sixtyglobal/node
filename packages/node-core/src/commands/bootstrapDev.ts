@@ -1,12 +1,11 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IAuthenticationAdminComponent } from "@twin.org/api-auth-entity-storage-models";
-import type { ITenantAdminComponent } from "@twin.org/api-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
+import type { IAuthenticationAdminComponent } from "@3sixty/api-auth-entity-storage-models";
+import type { ITenantAdminComponent } from "@3sixty/api-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
 import {
 	DEFAULT_DEVOPS_ROLE,
 	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
@@ -75,7 +74,7 @@ export async function bootstrapDev(
 	envVars: IEnvironmentVariables,
 	params: {}
 ): Promise<void> {
-	const features = commaSeparatedListToArray(envVars.features ?? "admin-user,wallet");
+	const features = EnvHelper.commaSeparatedListToArray(envVars.features ?? "admin-user,wallet");
 
 	const state = engineCore.getState();
 	const requireWallet = features.includes("wallet");

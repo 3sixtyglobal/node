@@ -3,15 +3,14 @@
 import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
-} from "@twin.org/api-auth-entity-storage-models";
-import type { IAuthorizationComponent } from "@twin.org/authorization-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { Did, IdentityProfileConnectorFactory } from "@twin.org/identity-models";
+} from "@3sixty/api-auth-entity-storage-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
-import { commaSeparatedListToArray } from "../builders/helper/envHelpers.js";
 import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
@@ -155,9 +154,13 @@ export async function userUpdate(
 	if (Is.stringValue(paramsOrganizationIdentity)) {
 		Did.guard("userUpdate", "organization-identity", paramsOrganizationIdentity);
 	}
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
+		if (!tenantEnabled) {
+			throw new GeneralError("userUpdate", "tenantIdNotAllowed");
+		}
 		Guards.stringHexLength("userUpdate", "tenant-id", params.tenantId, 32);
-	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	} else if (tenantEnabled) {
 		throw new GeneralError("userUpdate", "tenantIdRequired");
 	}
 
@@ -203,7 +206,7 @@ export async function userUpdate(
 			);
 
 			if (Is.stringValue(params.roles)) {
-				const roles = commaSeparatedListToArray<string>(params.roles);
+				const roles = EnvHelper.commaSeparatedListToArray<string>(params.roles);
 				if (roles.length === 0) {
 					roles.push(DEFAULT_USER_ROLE);
 				}

@@ -2,7 +2,7 @@
 	"group": "DSP version discovery",
 	"steps": [
 		{
-			"description": "GET /.well-known/dspace-version — public, no auth required",
+			"description": "GET /.well-known/dspace-version - public, no auth required",
 			"method": "GET",
 			"path": "/.well-known/dspace-version",
 			"appendOrgParam": false,

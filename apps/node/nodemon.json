@@ -1,6 +1,6 @@
 {
 	"verbose": false,
-	"watch": ["dist/", ".env", ".env.dev", "../../node_modules/@twin.org"],
+	"watch": ["dist/", ".env", ".env.dev", "../../node_modules/@3sixty"],
 	"ext": "js,cjs,mjs,json",
 	"ignoreRoot": [".git"],
 	"ignore": ["**/rest/**", "**/.local-data/**"]

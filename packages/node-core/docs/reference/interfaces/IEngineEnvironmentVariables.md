@@ -16,7 +16,15 @@ Start the engine in debug mode.
 
 > `optional` **silent?**: `string`
 
-Start the engine in silent mode.
+Start the engine in silent mode, errors are still reported.
+
+***
+
+### disableColor? {#disablecolor}
+
+> `optional` **disableColor?**: `string`
+
+Disable colour in the console output.
 
 ***
 
@@ -78,6 +86,15 @@ Is multi-tenant support enabled, defaults to false.
 > `optional` **schemaMigrationEnabled?**: `string`
 
 Enable schema migration, defaults to true.
+
+***
+
+### schemaAliases? {#schemaaliases}
+
+> `optional` **schemaAliases?**: `string`
+
+Schema domain aliases as comma separated from=to pairs,
+defaults to https://schema.twindev.org/=https://schema.3sixty.global/.
 
 ***
 
@@ -799,6 +816,15 @@ A list of components to exclude from logging, can be a comma separated list of c
 
 ***
 
+### loggingLevels? {#logginglevels}
+
+> `optional` **loggingLevels?**: `string`
+
+The log levels to record on all logging connectors, can be a comma separated list: error, warn, info, debug, trace.
+Silent takes precedence for the console logging connector, defaults to all levels.
+
+***
+
 ### loggingFileDirectory? {#loggingfiledirectory}
 
 > `optional` **loggingFileDirectory?**: `string`
@@ -891,7 +917,7 @@ The type of event bus component: service.
 
 > `optional` **emailProtocolConnector?**: `string`
 
-The email protocol connector types, comma-separated: pop3, imap.
+The email protocol connector types, comma-separated: pop3, imap, gmail, outlook.
 
 ***
 
@@ -1101,11 +1127,49 @@ The maximum number of metric values to hold in the write-ahead cache for the tel
 
 ***
 
-### telemetryMutexTimeout? {#telemetrymutextimeout}
+### telemetryFlushTimeout? {#telemetryflushtimeout}
 
-> `optional` **telemetryMutexTimeout?**: `string`
+> `optional` **telemetryFlushTimeout?**: `string`
 
-The mutex timeout in milliseconds for the telemetry connector.
+How long in milliseconds the telemetry connector waits for its background thread to confirm
+a flush before a read continues without it.
+
+#### Default
+
+```ts
+30000
+```
+
+***
+
+### telemetryTaskCoalesce? {#telemetrytaskcoalesce}
+
+> `optional` **telemetryTaskCoalesce?**: `string`
+
+How long in milliseconds the telemetry connector holds values so several share a single
+background task, instead of creating one task per value. Set to 0 to disable coalescing.
+
+#### Default
+
+```ts
+1000
+```
+
+***
+
+### telemetryTaskStallTimeout? {#telemetrytaskstalltimeout}
+
+> `optional` **telemetryTaskStallTimeout?**: `string`
+
+How long in milliseconds the telemetry connector allows with tasks outstanding and none of
+them completing before its background thread is treated as stalled and replaced. Set to 0
+to disable the check.
+
+#### Default
+
+```ts
+60000
+```
 
 ***
 
@@ -1153,6 +1217,68 @@ The type of tracing connector, comma-separated for multiple: entity-storage, ope
 
 ***
 
+### facade? {#facade}
+
+> `optional` **facade?**: `string`
+
+The type of facade to activate, comma-separated for multiple: tracing. When this is not set no
+facades are activated.
+
+***
+
+### tracingFacadeFactories? {#tracingfacadefactories}
+
+> `optional` **tracingFacadeFactories?**: `string`
+
+The factories the tracing facade is activated on, as a comma separated list of factory type names
+e.g. "component,vault", replacing the default set rather than adding to it. Only applies when the
+tracing facade is activated.
+
+***
+
+### tracingFacadeComponentExcludeTypes? {#tracingfacadecomponentexcludetypes}
+
+> `optional` **tracingFacadeComponentExcludeTypes?**: `string`
+
+Additional instance types the tracing facade is not applied to in the component factory, as a comma
+separated list of regular expressions matched anywhere in the type name e.g. "^my-tracing-service$".
+These extend the types which are always excluded, "tracing", "telemetry", "metrics", "logging" and
+"platform", they do not replace them.
+
+***
+
+### tracingFacadeExcludeParams? {#tracingfacadeexcludeparams}
+
+> `optional` **tracingFacadeExcludeParams?**: `string`
+
+Additional parameter names the tracing facade does not record, as a comma separated list
+e.g. "ssn,accountNumber". These extend the names which are always excluded, they do not
+replace them.
+
+***
+
+### tracingFacadeExcludeMethods? {#tracingfacadeexcludemethods}
+
+> `optional` **tracingFacadeExcludeMethods?**: `string`
+
+Additional method names the tracing facade does not record a span for, as a comma separated
+list e.g. "health,ping". These extend the names which are always excluded, they do not
+replace them.
+
+***
+
+### tracingFacadeIncludeObjects? {#tracingfacadeincludeobjects}
+
+> `optional` **tracingFacadeIncludeObjects?**: `string`
+
+The object values the tracing facade records, as a comma separated list of patterns matched
+against the end of "parameter" or "parameter.property", where the returned value is named
+"resolved" e.g. "filter.id,resolved.id". Naming the parameter records the whole object
+including any secrets it holds, naming a property records only that property. Object
+parameters and returned objects are omitted unless matched here.
+
+***
+
 ### openTelemetryTracingTracerName? {#opentelemetrytracingtracername}
 
 > `optional` **openTelemetryTracingTracerName?**: `string`
@@ -1182,14 +1308,6 @@ The OTLP HTTP endpoint to push spans to, e.g. http://localhost:4318/v1/traces. R
 > `optional` **openTelemetryTracingProcessor?**: `string`
 
 The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNECTOR=open-telemetry.
-
-***
-
-### tracingMutexTimeout? {#tracingmutextimeout}
-
-> `optional` **tracingMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the tracing connector.
 
 ***
 
@@ -1393,6 +1511,24 @@ The type of identity profile connector: entity-storage.
 
 ***
 
+### identityProfileSelfUpdateDeniedProperties? {#identityprofileselfupdatedeniedproperties}
+
+> `optional` **identityProfileSelfUpdateDeniedProperties?**: `string`
+
+Comma separated list of public and private profile properties which can only be added, changed
+or removed by callers with an admin scope. Defaults to none.
+
+***
+
+### identityProfileAdminScopes? {#identityprofileadminscopes}
+
+> `optional` **identityProfileAdminScopes?**: `string`
+
+Comma separated list of scopes which allow the self update denied profile properties to be
+modified, any one is sufficient. Defaults to user-admin, global-admin.
+
+***
+
 ### immutableProofVerificationMethodId? {#immutableproofverificationmethodid}
 
 > `optional` **immutableProofVerificationMethodId?**: `string`
@@ -1440,6 +1576,35 @@ Set to -1 to retain failures forever.
 
 ```ts
 10080
+```
+
+***
+
+### immutableProofTaskWorkerIdleTimeout? {#immutableprooftaskworkeridletimeout}
+
+> `optional` **immutableProofTaskWorkerIdleTimeout?**: `string`
+
+How long in seconds the proof task worker stays idle before it shuts down.
+Set to 0 to shut it down after every task, or -1 to never shut it down.
+
+#### Default
+
+```ts
+60
+```
+
+***
+
+### immutableProofTaskWorkerCount? {#immutableprooftaskworkercount}
+
+> `optional` **immutableProofTaskWorkerCount?**: `string`
+
+The maximum number of proof task workers that can run in parallel.
+
+#### Default
+
+```ts
+1
 ```
 
 ***
@@ -1910,6 +2075,21 @@ progressing it before it is treated as timed out.
 
 ***
 
+### dataspaceRetainTerminalTransfersFor? {#dataspaceretainterminaltransfersfor}
+
+> `optional` **dataspaceRetainTerminalTransfersFor?**: `string`
+
+How long in seconds COMPLETED and TERMINATED transfer records are kept before removal.
+Set to -1 to keep them forever; -1 is the only value that disables removal.
+
+#### Default
+
+```ts
+2592000
+```
+
+***
+
 ### dataspaceProviderTransferIdleTimeout? {#dataspaceprovidertransferidletimeout}
 
 > `optional` **dataspaceProviderTransferIdleTimeout?**: `string`
@@ -1962,7 +2142,7 @@ The interval in seconds for performing health checks, defaults to 60.
 
 > `optional` **healthStartupInterval?**: `string`
 
-The interval in seconds for performing health checks at startup, defaults to 2.
+The interval in seconds for performing health checks at startup, defaults to 30.
 This allows components that take a long time to initialize to be healthy before the first health check is performed.
 
 ***
@@ -1972,6 +2152,64 @@ This allows components that take a long time to initialize to be healthy before 
 > `optional` **healthApplicationInterval?**: `string`
 
 The interval in seconds for running the application health lifecycle (init, application, teardown), defaults to 300.
+
+***
+
+### healthExcludeCloneComponents? {#healthexcludeclonecomponents}
+
+> `optional` **healthExcludeCloneComponents?**: `string`
+
+Comma separated list of regular expressions matched against the engine component type keys,
+any which match are excluded from the engine clone used by the application health background
+task. Defaults to the component groups which provide no application health checks.
+
+***
+
+### backgroundTaskMaxSystemWorkerCount? {#backgroundtaskmaxsystemworkercount}
+
+> `optional` **backgroundTaskMaxSystemWorkerCount?**: `string`
+
+The maximum number of workers to use for processing background tasks, defaults to twice the number of CPU cores.
+
+***
+
+### backgroundTaskInterval? {#backgroundtaskinterval}
+
+> `optional` **backgroundTaskInterval?**: `string`
+
+The interval in milliseconds to leave between background tasks, defaults to 100.
+
+***
+
+### backgroundTaskRetryInterval? {#backgroundtaskretryinterval}
+
+> `optional` **backgroundTaskRetryInterval?**: `string`
+
+The interval in milliseconds to leave between background task retries, defaults to 5000.
+
+***
+
+### backgroundTaskCleanupInterval? {#backgroundtaskcleanupinterval}
+
+> `optional` **backgroundTaskCleanupInterval?**: `string`
+
+The interval in milliseconds between sweeps removing retained background tasks, defaults to 120000.
+
+***
+
+### backgroundTaskWorkerShutdownTimeout? {#backgroundtaskworkershutdowntimeout}
+
+> `optional` **backgroundTaskWorkerShutdownTimeout?**: `string`
+
+The time in milliseconds to wait for each handler's workers to shut down before terminating them, defaults to 5000.
+
+***
+
+### backgroundTaskMaxDispatchCount? {#backgroundtaskmaxdispatchcount}
+
+> `optional` **backgroundTaskMaxDispatchCount?**: `string`
+
+The maximum dispatches of a background task attempt before it is failed as interrupted, defaults to 3, set to -1 for no limit.
 
 ***
 
@@ -1988,7 +2226,7 @@ values: fetch
 
 > `optional` **mutexTimeoutDefault?**: `string`
 
-The default mutex timeout in milliseconds, used when no component-specific timeout is set, defaults to 5000 if omitted.
+The default mutex timeout in milliseconds, used when no component-specific timeout is set and passed to the component configurations so engine clones use it, defaults to 5000 if omitted.
 
 ***
 
@@ -2021,14 +2259,6 @@ The mutex timeout in milliseconds for the federated catalogue component.
 > `optional` **documentManagementMutexTimeout?**: `string`
 
 The mutex timeout in milliseconds for the document management component.
-
-***
-
-### loggingMutexTimeout? {#loggingmutextimeout}
-
-> `optional` **loggingMutexTimeout?**: `string`
-
-The mutex timeout in milliseconds for the logging component.
 
 ***
 

@@ -18,6 +18,8 @@ const engineServerEnvironmentVariableKeysInternal: {
 	httpExposedHeaders: true,
 	httpBodyLimits: true,
 	publicOrigin: true,
+	fastifyPluginTimeout: true,
+	webServerType: true,
 	// IEngineServerEnvironmentVariables - auth
 	authAdminProcessorType: true,
 	authProcessorType: true,

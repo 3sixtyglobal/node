@@ -2,7 +2,7 @@
 
 > **overrideModuleImport**(`executionDirectory`, `envVars?`): `void`
 
-Override module imports to support protocol-based loading (npm:, https:) and local files.
+Configure module resolution to support protocol-based loading (npm:, https:) and local files.
 
 ## Parameters
 

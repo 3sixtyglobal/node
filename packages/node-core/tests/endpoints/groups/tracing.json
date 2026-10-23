@@ -2,14 +2,14 @@
 	"group": "Tracing",
 	"steps": [
 		{
-			"description": "POST /tracing — 400 missing name",
+			"description": "POST /tracing - 400 missing name",
 			"method": "POST",
 			"path": "/tracing",
 			"body": {},
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /tracing — start a span",
+			"description": "POST /tracing - start a span",
 			"method": "POST",
 			"path": "/tracing",
 			"body": { "name": "test-span" },
@@ -21,20 +21,20 @@
 			}
 		},
 		{
-			"description": "PUT /tracing/:spanId — end the span",
+			"description": "PUT /tracing/:spanId - end the span",
 			"method": "PUT",
 			"path": "/tracing/{{spanId}}",
 			"body": "{{spanBody}}",
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /tracing/trace/:traceId — retrieve spans for a trace",
+			"description": "GET /tracing/trace/:traceId - retrieve spans for a trace",
 			"method": "GET",
 			"path": "/tracing/trace/{{traceId}}",
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /tracing — list spans",
+			"description": "GET /tracing - list spans",
 			"method": "GET",
 			"path": "/tracing",
 			"expectedStatus": 200

@@ -2,27 +2,27 @@
 	"group": "Auditable Item Stream",
 	"steps": [
 		{
-			"description": "POST /ais — 400 missing type",
+			"description": "POST /ais - 400 missing type",
 			"method": "POST",
 			"path": "/ais",
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				]
 			},
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /ais — create stream",
+			"description": "POST /ais - create stream",
 			"method": "POST",
 			"path": "/ais",
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStream"
 			},
@@ -38,14 +38,14 @@
 			"capture": { "streamDateCreated": "body.dateCreated" }
 		},
 		{
-			"description": "PUT /ais/:id — update stream",
+			"description": "PUT /ais/:id - update stream",
 			"method": "PUT",
 			"path": "/ais/{{streamId}}",
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStream",
 				"dateCreated": "{{streamDateCreated}}",
@@ -58,27 +58,27 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /ais — list streams",
+			"description": "GET /ais - list streams",
 			"method": "GET",
 			"path": "/ais",
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /ais/:id/entries — 400 missing entryObject",
+			"description": "POST /ais/:id/entries - 400 missing entryObject",
 			"method": "POST",
 			"path": "/ais/{{streamId}}/entries",
 			"body": {},
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /ais/:id/entries — add entry 1",
+			"description": "POST /ais/:id/entries - add entry 1",
 			"method": "POST",
 			"path": "/ais/{{streamId}}/entries",
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStreamEntry",
 				"entryObject": {
@@ -91,14 +91,14 @@
 			"capture": { "entryId": "location-last-segment" }
 		},
 		{
-			"description": "POST /ais/:id/entries — add entry 2",
+			"description": "POST /ais/:id/entries - add entry 2",
 			"method": "POST",
 			"path": "/ais/{{streamId}}/entries",
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStreamEntry",
 				"entryObject": {
@@ -122,14 +122,14 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "PUT /ais/:id/entries/:entryId — update entry",
+			"description": "PUT /ais/:id/entries/:entryId - update entry",
 			"method": "PUT",
 			"path": "/ais/{{streamId}}/entries/{{entryId}}",
 			"body": {
 				"@context": [
 					"https://schema.org",
-					"https://schema.twindev.org/ais/",
-					"https://schema.twindev.org/common/"
+					"https://schema.3sixty.global/ais/",
+					"https://schema.3sixty.global/common/"
 				],
 				"type": "AuditableItemStreamEntry",
 				"entryObject": {
@@ -153,13 +153,13 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /ais/entries — global entries list",
+			"description": "GET /ais/entries - global entries list",
 			"method": "GET",
 			"path": "/ais/entries",
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /ais/entries/objects — global entry objects",
+			"description": "GET /ais/entries/objects - global entry objects",
 			"method": "GET",
 			"path": "/ais/entries/objects",
 			"expectedStatus": 200
@@ -171,25 +171,25 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /ais/:id/proof — remove proof from stream",
+			"description": "DELETE /ais/:id/proof - remove proof from stream",
 			"method": "DELETE",
 			"path": "/ais/{{streamId}}/proof",
 			"expectedStatus": 204
 		},
 		{
-			"description": "PUT /ais/:id/close — close stream",
+			"description": "PUT /ais/:id/close - close stream",
 			"method": "PUT",
 			"path": "/ais/{{streamId}}/close",
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /ais/:id — delete stream",
+			"description": "DELETE /ais/:id - delete stream",
 			"method": "DELETE",
 			"path": "/ais/{{streamId}}",
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /ais/:id — 404 after delete",
+			"description": "GET /ais/:id - 404 after delete",
 			"method": "GET",
 			"path": "/ais/{{streamId}}",
 			"expectedStatus": 404

@@ -1,24 +1,24 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
-import { Coerce, GeneralError, I18n, Is, RandomHelper, StringHelper } from "@twin.org/core";
-import { Bip39 } from "@twin.org/crypto";
-import { AccountHelper } from "@twin.org/dlt-account";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { IdentityConnectorType, WalletConnectorType } from "@twin.org/engine-types";
+import { CLIDisplay, CLIUtils } from "@3sixty/cli-core";
+import { Coerce, GeneralError, I18n, Is, RandomHelper, StringHelper } from "@3sixty/core";
+import { Bip39 } from "@3sixty/crypto";
+import { AccountHelper } from "@3sixty/dlt-account";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { IdentityConnectorType, WalletConnectorType } from "@3sixty/engine-types";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
-} from "@twin.org/entity-storage-models";
+} from "@3sixty/entity-storage-models";
 import {
 	Did,
 	IdentityConnectorFactory,
 	IdentityResolverConnectorFactory
-} from "@twin.org/identity-models";
-import { nameofKebabCase } from "@twin.org/nameof";
-import { type IVaultConnector, VaultConnectorFactory } from "@twin.org/vault-models";
-import type { WalletAddress } from "@twin.org/wallet-connector-entity-storage";
-import { WalletConnectorFactory } from "@twin.org/wallet-models";
+} from "@3sixty/identity-models";
+import { nameofKebabCase } from "@3sixty/nameof";
+import { type IVaultConnector, VaultConnectorFactory } from "@3sixty/vault-models";
+import type { WalletAddress } from "@3sixty/wallet-connector-entity-storage";
+import { WalletConnectorFactory } from "@3sixty/wallet-models";
 import { nodeIdentitySet } from "./nodeIdentitySet.js";
 import { applyOrganizationIdToTenant } from "./tenantOrgIdSet.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";

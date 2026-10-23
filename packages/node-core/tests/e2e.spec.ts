@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ModuleProtocol } from "../src/models/moduleProtocol.js";
+import { ModuleProtocol, ModuleResolutionHelper } from "@3sixty/modules";
 import {
-	handleNpmProtocol,
-	handleHttpsProtocol,
-	getExtensionsCacheDir,
 	initialiseLocales,
+	initialiseNativeModules,
 	fileExists,
-	directoryExists,
-	hashUrl
+	directoryExists
 } from "../src/utils.js";
 
 /**
@@ -26,17 +23,24 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	beforeAll(async () => {
 		// Initialize I18n locales to avoid "Missing en" messages
 		await initialiseLocales("locales");
+		await initialiseNativeModules(ModuleResolutionHelper.NATIVE_MODULES);
 
 		// Clean up any previous test artifacts
 		try {
-			await rm(getExtensionsCacheDir(TEST_EXECUTION_DIR, ModuleProtocol.Npm, ".tmp"), {
-				recursive: true,
-				force: true
-			});
-			await rm(getExtensionsCacheDir(TEST_EXECUTION_DIR, ModuleProtocol.Https, ".tmp"), {
-				recursive: true,
-				force: true
-			});
+			await rm(
+				ModuleResolutionHelper.getCacheDirectory(TEST_EXECUTION_DIR, ModuleProtocol.Npm, ".tmp"),
+				{
+					recursive: true,
+					force: true
+				}
+			);
+			await rm(
+				ModuleResolutionHelper.getCacheDirectory(TEST_EXECUTION_DIR, ModuleProtocol.Https, ".tmp"),
+				{
+					recursive: true,
+					force: true
+				}
+			);
 		} catch {
 			// Ignore errors if directories don't exist
 		}
@@ -45,14 +49,20 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	afterAll(async () => {
 		// Clean up test artifacts after all tests
 		try {
-			await rm(getExtensionsCacheDir(TEST_EXECUTION_DIR, ModuleProtocol.Npm, ".tmp"), {
-				recursive: true,
-				force: true
-			});
-			await rm(getExtensionsCacheDir(TEST_EXECUTION_DIR, ModuleProtocol.Https, ".tmp"), {
-				recursive: true,
-				force: true
-			});
+			await rm(
+				ModuleResolutionHelper.getCacheDirectory(TEST_EXECUTION_DIR, ModuleProtocol.Npm, ".tmp"),
+				{
+					recursive: true,
+					force: true
+				}
+			);
+			await rm(
+				ModuleResolutionHelper.getCacheDirectory(TEST_EXECUTION_DIR, ModuleProtocol.Https, ".tmp"),
+				{
+					recursive: true,
+					force: true
+				}
+			);
 		} catch {
 			// Ignore errors
 		}
@@ -60,9 +70,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 	test("should install npm package from real registry", async () => {
 		// Using a small TWIN package
-		const packageName = "@twin.org/nameof@0.0.2-next.19";
+		const packageName = "@3sixty/nameof@0.20.0-next.1";
 
-		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
+		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+			executionDirectory: TEST_EXECUTION_DIR
+		});
 
 		// Verify the result
 		expect(result).toBeDefined();
@@ -80,14 +92,18 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 		// First call (should install)
 		const startTime1 = Date.now();
-		const result1 = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
+		const result1 = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+			executionDirectory: TEST_EXECUTION_DIR
+		});
 		const duration1 = Date.now() - startTime1;
 
 		expect(result1.cached).toBe(false);
 
 		// Second call (should use cache)
 		const startTime2 = Date.now();
-		const result2 = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
+		const result2 = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+			executionDirectory: TEST_EXECUTION_DIR
+		});
 		const duration2 = Date.now() - startTime2;
 
 		expect(result2.cached).toBe(true);
@@ -99,9 +115,12 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 	test("should download file from HTTPS URL", async () => {
 		// Using a small file from jsDelivr CDN
-		const url = "https://cdn.jsdelivr.net/npm/@twin.org/nameof@0.0.2-next.19/package.json";
+		const url = "https://cdn.jsdelivr.net/npm/@3sixty/nameof@0.20.0-next.1/package.json";
 
-		const result = await handleHttpsProtocol(url, TEST_EXECUTION_DIR, 10);
+		const result = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory: TEST_EXECUTION_DIR,
+			maxSizeMb: 10
+		});
 
 		// Verify the result
 		expect(result).toBeDefined();
@@ -118,12 +137,18 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		const url = "https://cdn.jsdelivr.net/npm/is-number@7.0.0/package.json";
 
 		// First call (should download)
-		const result1 = await handleHttpsProtocol(url, TEST_EXECUTION_DIR, 10);
+		const result1 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory: TEST_EXECUTION_DIR,
+			maxSizeMb: 10
+		});
 
 		expect(result1.cached).toBe(false);
 
 		// Second call (should use cache)
-		const result2 = await handleHttpsProtocol(url, TEST_EXECUTION_DIR, 10);
+		const result2 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory: TEST_EXECUTION_DIR,
+			maxSizeMb: 10
+		});
 
 		expect(result2.cached).toBe(true);
 		expect(result2.resolvedPath).toBe(result1.resolvedPath);
@@ -136,20 +161,25 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 		// Should throw due to size limit
 		await expect(async () => {
-			await handleHttpsProtocol(url, TEST_EXECUTION_DIR, maxSizeMb);
+			await ModuleResolutionHelper.handleHttpsProtocol(url, {
+				executionDirectory: TEST_EXECUTION_DIR,
+				maxSizeMb
+			});
 		}).rejects.toThrow();
 	});
 
 	test("should handle npm package with scoped name", async () => {
 		// Using a different scoped TWIN package
-		const packageName = "@twin.org/nameof-transformer@0.0.2-next.14";
+		const packageName = "@3sixty/nameof-transformer@0.20.0-next.1";
 
-		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
+		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+			executionDirectory: TEST_EXECUTION_DIR
+		});
 
 		// Verify the result
 		expect(result).toBeDefined();
 		expect(result.resolvedPath).toBeDefined();
-		expect(result.resolvedPath).toContain("@twin.org");
+		expect(result.resolvedPath).toContain("@3sixty");
 		expect(result.resolvedPath).toContain("nameof-transformer");
 
 		// Verify the file exists
@@ -158,11 +188,13 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test("should download, install, and import a real TWIN module", async () => {
-		// Using @twin.org/nameof - we know it has nameofKebabCase export from code usage
-		const packageName = "@twin.org/nameof@0.0.2-next.19";
+		// Using @3sixty/nameof - we know it has nameofKebabCase export from code usage
+		const packageName = "@3sixty/nameof@0.20.0-next.1";
 
 		// 1. Download/install the package
-		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
+		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+			executionDirectory: TEST_EXECUTION_DIR
+		});
 
 		// 2. Verify download succeeded
 		expect(result).toBeDefined();
@@ -203,10 +235,12 @@ describe("E2E Protocol-Based Extension Loading", () => {
 	});
 
 	test.skip("should download and verify real TWIN extension with lifecycle hooks", async () => {
-		const packageName = "@twin.org/dataspace-test-app@0.0.3-next.15";
+		const packageName = "@3sixty/dataspace-test-app@0.20.0-next.0";
 
 		// 1. Download real TWIN extension
-		const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR);
+		const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+			executionDirectory: TEST_EXECUTION_DIR
+		});
 
 		// 2. Verify download succeeded
 		expect(result).toBeDefined();
@@ -262,7 +296,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 		try {
 			// 1. Ensure custom cache directory doesn't exist initially
-			const customCachePath = getExtensionsCacheDir(TEST_EXECUTION_DIR, "npm", customCacheDir);
+			const customCachePath = ModuleResolutionHelper.getCacheDirectory(
+				TEST_EXECUTION_DIR,
+				"npm",
+				customCacheDir
+			);
 			try {
 				await rm(customCachePath, { recursive: true, force: true });
 			} catch {
@@ -270,7 +308,10 @@ describe("E2E Protocol-Based Extension Loading", () => {
 			}
 
 			// 2. Download package to custom cache directory
-			const result = await handleNpmProtocol(packageName, TEST_EXECUTION_DIR, customCacheDir);
+			const result = await ModuleResolutionHelper.handleNpmProtocol(packageName, {
+				executionDirectory: TEST_EXECUTION_DIR,
+				cacheDirectory: customCacheDir
+			});
 
 			// 3. Verify the package was downloaded
 			expect(result).toBeDefined();
@@ -294,7 +335,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 			expect(await directoryExists(resolvedDir)).toBe(true);
 
 			// 7. Verify it's NOT in the default cache directory
-			const defaultCachePath = getExtensionsCacheDir(
+			const defaultCachePath = ModuleResolutionHelper.getCacheDirectory(
 				TEST_EXECUTION_DIR,
 				ModuleProtocol.Npm,
 				".tmp"
@@ -304,7 +345,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		} finally {
 			// Cleanup: Remove custom cache directory
 			try {
-				const customCachePath = getExtensionsCacheDir(TEST_EXECUTION_DIR, "npm", customCacheDir);
+				const customCachePath = ModuleResolutionHelper.getCacheDirectory(
+					TEST_EXECUTION_DIR,
+					"npm",
+					customCacheDir
+				);
 				await rm(customCachePath, { recursive: true, force: true });
 			} catch {
 				// Ignore cleanup errors
@@ -319,7 +364,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 
 		try {
 			// 1. Ensure custom cache directory doesn't exist initially
-			const customCachePath = getExtensionsCacheDir(TEST_EXECUTION_DIR, "https", customCacheDir);
+			const customCachePath = ModuleResolutionHelper.getCacheDirectory(
+				TEST_EXECUTION_DIR,
+				"https",
+				customCacheDir
+			);
 			try {
 				await rm(customCachePath, { recursive: true, force: true });
 			} catch {
@@ -327,12 +376,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 			}
 
 			// 2. Download file to custom cache directory
-			const result = await handleHttpsProtocol(
-				testUrl,
-				TEST_EXECUTION_DIR,
+			const result = await ModuleResolutionHelper.handleHttpsProtocol(testUrl, {
+				executionDirectory: TEST_EXECUTION_DIR,
 				maxSizeMb,
-				customCacheDir
-			);
+				cacheDirectory: customCacheDir
+			});
 
 			// 3. Verify the file was downloaded
 			expect(result).toBeDefined();
@@ -350,7 +398,7 @@ describe("E2E Protocol-Based Extension Loading", () => {
 			expect(await fileExists(result.resolvedPath)).toBe(true);
 
 			// 7. Verify it's NOT in the default cache directory
-			const defaultCachePath = getExtensionsCacheDir(
+			const defaultCachePath = ModuleResolutionHelper.getCacheDirectory(
 				TEST_EXECUTION_DIR,
 				ModuleProtocol.Https,
 				".tmp"
@@ -362,7 +410,11 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		} finally {
 			// Cleanup: Remove custom cache directory
 			try {
-				const customCachePath = getExtensionsCacheDir(TEST_EXECUTION_DIR, "https", customCacheDir);
+				const customCachePath = ModuleResolutionHelper.getCacheDirectory(
+					TEST_EXECUTION_DIR,
+					"https",
+					customCacheDir
+				);
 				await rm(customCachePath, { recursive: true, force: true });
 			} catch {
 				// Ignore cleanup errors
@@ -375,12 +427,24 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		const executionDirectory = TEST_EXECUTION_DIR;
 
 		// First download with very short TTL (0.001 hours = 3.6 seconds)
-		const result1 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 0.001, false);
+		const result1 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 0.001,
+			forceRefresh: false
+		});
 		expect(result1.cached).toBe(false);
 		expect(await fileExists(result1.resolvedPath)).toBe(true);
 
 		// Immediate second call should use cache (not expired yet)
-		const result2 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 0.001, false);
+		const result2 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 0.001,
+			forceRefresh: false
+		});
 		expect(result2.cached).toBe(true);
 		expect(result2.resolvedPath).toBe(result1.resolvedPath);
 
@@ -388,7 +452,13 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		await new Promise(resolve => setTimeout(resolve, 4000));
 
 		// Third call should re-download (cache expired)
-		const result3 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 0.001, false);
+		const result3 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 0.001,
+			forceRefresh: false
+		});
 		expect(result3.cached).toBe(false);
 		expect(result3.resolvedPath).toBe(result1.resolvedPath);
 	});
@@ -398,17 +468,35 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		const executionDirectory = TEST_EXECUTION_DIR;
 
 		// First download
-		const result1 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 24, false);
+		const result1 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 24,
+			forceRefresh: false
+		});
 		expect(result1.cached).toBe(false);
 		expect(await fileExists(result1.resolvedPath)).toBe(true);
 
 		// Second call with force refresh should re-download
-		const result2 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 24, true);
+		const result2 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 24,
+			forceRefresh: true
+		});
 		expect(result2.cached).toBe(false);
 		expect(result2.resolvedPath).toBe(result1.resolvedPath);
 
 		// Third call without force refresh should use cache (TTL not expired)
-		const result3 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 24, false);
+		const result3 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 24,
+			forceRefresh: false
+		});
 		expect(result3.cached).toBe(true);
 		expect(result3.resolvedPath).toBe(result1.resolvedPath);
 	});
@@ -419,8 +507,12 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		const executionDirectory = TEST_EXECUTION_DIR;
 
 		// Clean any existing cache for this URL first
-		const cacheDir = getExtensionsCacheDir(executionDirectory, ModuleProtocol.Https, ".tmp");
-		const filename = hashUrl(url);
+		const cacheDir = ModuleResolutionHelper.getCacheDirectory(
+			executionDirectory,
+			ModuleProtocol.Https,
+			".tmp"
+		);
+		const filename = ModuleResolutionHelper.hashUrl(url);
 		const cachedPath = path.join(cacheDir, filename);
 		const metadataPath = `${cachedPath}.meta`;
 
@@ -432,7 +524,13 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		}
 
 		// Download file (should be fresh download)
-		const result = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 24, false);
+		const result = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 24,
+			forceRefresh: false
+		});
 		expect(result.cached).toBe(false);
 
 		// Check that metadata file exists
@@ -454,8 +552,12 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		const executionDirectory = TEST_EXECUTION_DIR;
 
 		// Clean any existing cache for this URL first
-		const cacheDir = getExtensionsCacheDir(executionDirectory, ModuleProtocol.Https, ".tmp");
-		const filename = hashUrl(url);
+		const cacheDir = ModuleResolutionHelper.getCacheDirectory(
+			executionDirectory,
+			ModuleProtocol.Https,
+			".tmp"
+		);
+		const filename = ModuleResolutionHelper.hashUrl(url);
 		const cachedPath = path.join(cacheDir, filename);
 		const metadataPath = `${cachedPath}.meta`;
 
@@ -467,14 +569,26 @@ describe("E2E Protocol-Based Extension Loading", () => {
 		}
 
 		// First download (should be fresh)
-		const result1 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 24, false);
+		const result1 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 24,
+			forceRefresh: false
+		});
 		expect(result1.cached).toBe(false);
 
 		// Corrupt the metadata file
 		await writeFile(metadataPath, "invalid json content");
 
 		// Second call should treat as expired and re-download
-		const result2 = await handleHttpsProtocol(url, executionDirectory, 10, ".tmp", 24, false);
+		const result2 = await ModuleResolutionHelper.handleHttpsProtocol(url, {
+			executionDirectory,
+			maxSizeMb: 10,
+			cacheDirectory: ".tmp",
+			cacheTtlHours: 24,
+			forceRefresh: false
+		});
 		expect(result2.cached).toBe(false);
 		expect(result2.resolvedPath).toBe(result1.resolvedPath);
 

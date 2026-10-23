@@ -2,7 +2,7 @@
 	"group": "Telemetry",
 	"steps": [
 		{
-			"description": "POST /telemetry/metric — 400 missing id",
+			"description": "POST /telemetry/metric - 400 missing id",
 			"method": "POST",
 			"path": "/telemetry/metric",
 			"body": {
@@ -44,7 +44,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /telemetry/metric/:id/value — 400 missing value",
+			"description": "POST /telemetry/metric/:id/value - 400 missing value",
 			"method": "POST",
 			"path": "/telemetry/metric/{{metricId}}/value",
 			"body": {},

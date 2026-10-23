@@ -1,10 +1,10 @@
 {
-	"name": "@twin.org/node",
-	"version": "0.9.4-next.2",
-	"description": "TWIN Node serving APIs using the specified configuration",
+	"name": "@3sixty/node",
+	"version": "0.20.0-next.1",
+	"description": "3Sixty Node serving APIs using the specified configuration",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/iotaledger/twin-node.git",
+		"url": "git+https://github.com/3sixtyglobal/node.git",
 		"directory": "apps/node"
 	},
 	"author": "martyn.janes@iota.org",
@@ -14,49 +14,49 @@
 		"node": ">=24.0.0"
 	},
 	"scripts": {
-		"clean": "rimraf dist coverage",
+		"clean": "rimraf dist coverage .cache",
 		"build": "echo There is no build step for this package",
 		"dev": "concurrently \"nodemon\"",
 		"merge-locales": "merge-locales",
 		"test": "vitest --run --config ./vitest.config.ts --no-cache",
-		"test:build": "tspc -p ./tests/tsconfig.json --noEmit",
-		"test:n2n": "vitest --run --config ./vitest.config.ts tests/node-to-node/n2n-synced-storage.spec.ts",
-		"test:soak": "node ./soak/run-soak.mjs",
-		"validate-locales": "validate-locales",
 		"test:coverage": "vitest --run --coverage --config ./vitest.config.ts --no-cache",
+		"test:build": "tspc -p ./tests/tsconfig.json --noEmit --incremental --tsBuildInfoFile .cache/tests.tsbuildinfo",
+		"validate-locales": "validate-locales",
 		"docs:clean": "rimraf docs/open-api",
 		"docs:api": "ts-to-openapi ./ts-to-openapi.json ./docs/open-api/spec.json",
-		"docs": "npm run docs:clean && npm run docs:api",
-		"dist": "npm run clean && npm run build && npm run merge-locales && npm run validate-locales && npm run test:build && npm run test",
-		"dist:no-test": "npm run clean && npm run build && npm run merge-locales",
+		"docs": "pnpm run docs:clean && pnpm run docs:api",
+		"dist": "pnpm run clean && concurrently -g -n build,merge,locales,types,test \"pnpm run build\" \"pnpm run merge-locales\" \"pnpm run validate-locales\" \"pnpm run test:build\" \"pnpm run test\"",
+		"dist:no-test": "pnpm run clean && concurrently -g -n build,merge,locales,types \"pnpm run build\" \"pnpm run merge-locales\" \"pnpm run validate-locales\" \"pnpm run test:build\"",
+		"test:n2n": "vitest --run --config ./vitest.config.ts tests/node-to-node/n2n-synced-storage.spec.ts",
+		"test:soak": "node ./soak/run-soak.mjs",
 		"start": "node src/index.js"
 	},
 	"dependencies": {
-		"@twin.org/node-core": "0.9.4-next.2"
+		"@3sixty/node-core": "0.20.0-next.1"
 	},
 	"devDependencies": {
-		"@twin.org/entity-storage-connector-memory": "next",
-		"@twin.org/merge-locales": "next",
-		"@twin.org/nameof-transformer": "next",
-		"@twin.org/nameof-vitest-plugin": "next",
-		"@twin.org/ts-to-openapi": "next",
-		"@twin.org/validate-locales": "next",
-		"@types/node": "26.1.2",
-		"@vitest/coverage-v8": "4.1.10",
-		"concurrently": "10.0.4",
+		"@3sixty/entity-storage-connector-memory": "next",
+		"@3sixty/merge-locales": "next",
+		"@3sixty/nameof-transformer": "next",
+		"@3sixty/nameof-vitest-plugin": "next",
+		"@3sixty/ts-to-openapi": "next",
+		"@3sixty/validate-locales": "next",
+		"@types/node": "26.6.5",
+		"@vitest/coverage-v8": "5.0.5",
+		"concurrently": "10.0.6",
 		"copyfiles": "2.4.1",
 		"nodemon": "3.1.14",
 		"rimraf": "6.1.3",
 		"ts-patch": "4.0.1",
 		"typedoc": "0.28.20",
-		"typedoc-plugin-markdown": "4.12.0",
+		"typedoc-plugin-markdown": "4.14.1",
 		"typescript": "6.0.3",
-		"vitest": "4.1.10"
+		"vitest": "5.0.5"
 	},
 	"bugs": {
-		"url": "git+https://github.com/iotaledger/twin-node/issues"
+		"url": "git+https://github.com/3sixtyglobal/node/issues"
 	},
-	"homepage": "https://twindev.org",
+	"homepage": "https://3sixty.global",
 	"main": "./src/index.js",
 	"exports": {
 		".": {
@@ -72,6 +72,6 @@
 		"docs"
 	],
 	"bin": {
-		"twin-node": "bin/index.js"
+		"3sixty-node": "bin/index.js"
 	}
 }

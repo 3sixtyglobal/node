@@ -8,12 +8,12 @@ The options when running the node.
 
 > `optional` **serverName?**: `string`
 
-The name of the server, defaults to "TWIN Node".
+The name of the server, defaults to "3Sixty Node".
 
 #### Default
 
 ```ts
-"TWIN Node"
+"3Sixty Node"
 ```
 
 ***

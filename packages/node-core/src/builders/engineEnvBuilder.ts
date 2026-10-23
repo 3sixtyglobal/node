@@ -1,9 +1,15 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { cpus } from "node:os";
 import path from "node:path";
-import { GeneralError, Is, Mutex } from "@twin.org/core";
-import type { IIotaConfig } from "@twin.org/dlt-iota";
-import { EngineCloneMode } from "@twin.org/engine-models";
+import { EnvHelper, GeneralError, Is, Mutex } from "@3sixty/core";
+import type { IIotaConfig } from "@3sixty/dlt-iota";
+import {
+	EngineCloneMode,
+	EngineLogLevel,
+	type IEngineCoreTypeConfig,
+	type IEngineFacadeConfig
+} from "@3sixty/engine-models";
 import {
 	AttestationComponentType,
 	AttestationConnectorType,
@@ -31,6 +37,8 @@ import {
 	EntityStorageConnectorType,
 	EventBusComponentType,
 	EventBusConnectorType,
+	type FacadeConfig,
+	FacadeType,
 	FaucetConnectorType,
 	FederatedCatalogueComponentType,
 	FederatedCatalogueFilterComponentType,
@@ -86,38 +94,33 @@ import {
 	TrustVerifierComponentType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
+} from "@3sixty/engine-types";
 import {
 	type IOpenTelemetryLoggingConnectorConfig,
 	type IOpenTelemetryOtlpExporterConfig,
 	OpenTelemetryExporterTypes
-} from "@twin.org/logging-connector-opentelemetry";
+} from "@3sixty/logging-connector-opentelemetry";
+import { LogLevel } from "@3sixty/logging-models";
 import {
 	type IOpenTelemetryTelemetryConnectorConfig,
 	OpenTelemetryReaderTypes
-} from "@twin.org/telemetry-connector-opentelemetry";
+} from "@3sixty/telemetry-connector-opentelemetry";
 import {
 	type IOpenTelemetryTracingConnectorConfig,
 	OpenTelemetryProcessorTypes
-} from "@twin.org/tracing-connector-opentelemetry";
-import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
+} from "@3sixty/tracing-connector-opentelemetry";
+import { type ITracingFacadeConfig, TracingFacade } from "@3sixty/tracing-facades";
+import {
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT,
+	COMPONENT_FACTORY_TYPE_NAME,
+	DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS,
+	DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
+	DEFAULT_TRACING_FACADE_FACTORIES,
+	TRACING_FACADE_NAME
+} from "../defaults.js";
 import { isAuthEntityStorageRequired } from "./engineServerEnvBuilder.js";
 import type { IEngineEnvironmentVariables } from "../models/IEngineEnvironmentVariables.js";
-import {
-	commaSeparatedListToArray,
-	envArray,
-	envBoolean,
-	envChoice,
-	envCount,
-	envDateTime,
-	envInteger,
-	envListToArray,
-	envMinToMs,
-	envMinutes,
-	envMs,
-	envSeconds,
-	envSecToMs
-} from "./helper/envHelpers.js";
 
 /**
  * Build the engine core configuration from environment variables.
@@ -133,18 +136,38 @@ export async function buildEngineConfiguration(
 		envVars.stateFilename = path.join(envVars.storageFileRoot, envVars.stateFilename);
 	}
 
+	const silent = EnvHelper.envBoolean(envVars, "silent", false);
+	const loggingLevels = getLoggingLevels(envVars);
+
+	let logLevel: EngineLogLevel | undefined;
+	if (silent) {
+		// Silent still reports errors, so a failure during bootstrap or start is not hidden.
+		logLevel = EngineLogLevel.Error;
+	} else if (Is.arrayValue(loggingLevels)) {
+		// The engine logger only supports thresholds, so use the nearest one which hides nothing listed.
+		if (loggingLevels.some(level => level !== LogLevel.Error && level !== LogLevel.Warn)) {
+			logLevel = EngineLogLevel.All;
+		} else if (loggingLevels.includes(LogLevel.Warn)) {
+			logLevel = EngineLogLevel.Warn;
+		} else {
+			logLevel = EngineLogLevel.Error;
+		}
+	}
+
 	const coreConfig: IEngineConfig = {
-		debug: envBoolean(envVars, "debug", false),
-		silent: envBoolean(envVars, "silent", false),
+		debug: EnvHelper.envBoolean(envVars, "debug", false),
+		silent,
+		logLevel,
+		disableColor: EnvHelper.envBoolean(envVars, "disableColor", false),
 		silentComponents: {
-			logging: commaSeparatedListToArray(envVars.loggingSilentComponents),
-			telemetry: commaSeparatedListToArray(envVars.telemetrySilentComponents),
-			tracing: commaSeparatedListToArray(envVars.tracingSilentComponents)
+			logging: EnvHelper.commaSeparatedListToArray(envVars.loggingSilentComponents),
+			telemetry: EnvHelper.commaSeparatedListToArray(envVars.telemetrySilentComponents),
+			tracing: EnvHelper.commaSeparatedListToArray(envVars.tracingSilentComponents)
 		},
 		types: {}
 	};
 
-	const mutexTimeoutMs = envMs(envVars, "mutexTimeoutDefault");
+	const mutexTimeoutMs = EnvHelper.envMs(envVars, "mutexTimeoutDefault");
 	if (Is.notEmpty(mutexTimeoutMs)) {
 		Mutex.setDefaultTimeoutMs(mutexTimeoutMs);
 	}
@@ -167,6 +190,7 @@ export async function buildEngineConfiguration(
 	await configureMetricsCollector(coreConfig, envVars);
 	await configureTracing(coreConfig, envVars);
 	await configureAuthorization(coreConfig, envVars);
+	await configureFacades(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureMailbox(coreConfig, envVars);
 	await configureAutomation(coreConfig, envVars);
@@ -196,6 +220,19 @@ export async function buildEngineConfiguration(
 }
 
 /**
+ * Resolves a component mutex timeout, falling back to the default so engine clones inherit it.
+ * @param envVars The environment variables.
+ * @param key The component mutex timeout env var.
+ * @returns The mutex timeout in milliseconds, or undefined when neither is set.
+ */
+function envMutexMs(
+	envVars: IEngineEnvironmentVariables,
+	key: keyof IEngineEnvironmentVariables
+): number | undefined {
+	return EnvHelper.envMs(envVars, key) ?? EnvHelper.envMs(envVars, "mutexTimeoutDefault");
+}
+
+/**
  * Configures the entity storage.
  * @param coreConfig The core config.
  * @param envVars The environment variables.
@@ -208,7 +245,7 @@ async function configureEntityStorage(
 	coreConfig.types ??= {};
 	coreConfig.types.entityStorageConnector ??= [];
 
-	const entityStorageConnectorTypes = envListToArray<
+	const entityStorageConnectorTypes = EnvHelper.envListToArray<
 		IEngineEnvironmentVariables,
 		EntityStorageConnectorType
 	>(envVars, "entityStorageConnectorType", Object.values(EntityStorageConnectorType));
@@ -219,7 +256,7 @@ async function configureEntityStorage(
 				type: EntityStorageConnectorType.Memory,
 				options: {
 					config: {
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					}
 				}
 			});
@@ -229,7 +266,7 @@ async function configureEntityStorage(
 				options: {
 					config: {
 						directory: envVars.storageFileRoot ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					folderPrefix: envVars.entityStorageTablePrefix
 				}
@@ -244,8 +281,8 @@ async function configureEntityStorage(
 						accessKeyId: envVars.awsDynamodbAccessKeyId,
 						secretAccessKey: envVars.awsDynamodbSecretAccessKey,
 						endpoint: envVars.awsDynamodbEndpoint,
-						connectionTimeoutMs: envMs(envVars, "awsDynamodbConnectionTimeout"),
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						connectionTimeoutMs: EnvHelper.envMs(envVars, "awsDynamodbConnectionTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
 				}
@@ -259,7 +296,7 @@ async function configureEntityStorage(
 						key: envVars.azureCosmosdbKey ?? "",
 						databaseId: envVars.azureCosmosdbDatabaseId ?? "",
 						containerId: envVars.azureCosmosdbContainerId ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
 				}
@@ -274,7 +311,7 @@ async function configureEntityStorage(
 						databaseId: envVars.gcpFirestoreDatabaseId ?? "",
 						collectionName: envVars.gcpFirestoreCollectionName ?? "",
 						endpoint: envVars.gcpFirestoreEndpoint ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout")
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
 				}
@@ -284,14 +321,20 @@ async function configureEntityStorage(
 				type: EntityStorageConnectorType.ScyllaDb,
 				options: {
 					config: {
-						hosts: commaSeparatedListToArray(envVars.scylladbHosts),
+						hosts: EnvHelper.commaSeparatedListToArray(envVars.scylladbHosts),
 						localDataCenter: envVars.scylladbLocalDataCenter ?? "",
 						keyspace: envVars.scylladbKeyspace ?? "",
-						port: envInteger(envVars, "scylladbPort"),
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						port: EnvHelper.envInteger(envVars, "scylladbPort"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
-							coreConnectionsPerHost: envCount(envVars, "scylladbPoolCoreConnectionsPerHost"),
-							maxRequestsPerConnection: envCount(envVars, "scylladbPoolMaxRequestsPerConnection")
+							coreConnectionsPerHost: EnvHelper.envCount(
+								envVars,
+								"scylladbPoolCoreConnectionsPerHost"
+							),
+							maxRequestsPerConnection: EnvHelper.envCount(
+								envVars,
+								"scylladbPoolMaxRequestsPerConnection"
+							)
 						}
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
@@ -303,18 +346,18 @@ async function configureEntityStorage(
 				options: {
 					config: {
 						host: envVars.mySqlHost ?? "",
-						port: envInteger(envVars, "mySqlPort"),
+						port: EnvHelper.envInteger(envVars, "mySqlPort"),
 						user: envVars.mySqlUser ?? "",
 						password: envVars.mySqlPassword ?? "",
 						database: envVars.mySqlDatabase ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
-							connectionLimit: envCount(envVars, "mySqlPoolConnectionLimit"),
-							maxIdle: envCount(envVars, "mySqlPoolMaxIdle"),
-							idleTimeout: envMs(envVars, "mySqlPoolIdleTimeout"),
-							enableKeepAlive: envBoolean(envVars, "mySqlPoolEnableKeepAlive"),
-							waitForConnections: envBoolean(envVars, "mySqlPoolWaitForConnections"),
-							queueLimit: envCount(envVars, "mySqlPoolQueueLimit")
+							connectionLimit: EnvHelper.envCount(envVars, "mySqlPoolConnectionLimit"),
+							maxIdle: EnvHelper.envCount(envVars, "mySqlPoolMaxIdle"),
+							idleTimeout: EnvHelper.envMs(envVars, "mySqlPoolIdleTimeout"),
+							enableKeepAlive: EnvHelper.envBoolean(envVars, "mySqlPoolEnableKeepAlive"),
+							waitForConnections: EnvHelper.envBoolean(envVars, "mySqlPoolWaitForConnections"),
+							queueLimit: EnvHelper.envCount(envVars, "mySqlPoolQueueLimit")
 						}
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
@@ -326,16 +369,16 @@ async function configureEntityStorage(
 				options: {
 					config: {
 						host: envVars.mongoDbHost ?? "",
-						port: envInteger(envVars, "mongoDbPort"),
+						port: EnvHelper.envInteger(envVars, "mongoDbPort"),
 						user: envVars.mongoDbUser ?? "",
 						password: envVars.mongoDbPassword ?? "",
 						database: envVars.mongoDbDatabase ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
-							maxPoolSize: envCount(envVars, "mongoDbPoolMaxPoolSize"),
-							minPoolSize: envCount(envVars, "mongoDbPoolMinPoolSize"),
-							maxIdleTimeMs: envMs(envVars, "mongoDbPoolMaxIdleTime"),
-							waitQueueTimeoutMs: envMs(envVars, "mongoDbPoolWaitQueueTimeout")
+							maxPoolSize: EnvHelper.envCount(envVars, "mongoDbPoolMaxPoolSize"),
+							minPoolSize: EnvHelper.envCount(envVars, "mongoDbPoolMinPoolSize"),
+							maxIdleTimeMs: EnvHelper.envMs(envVars, "mongoDbPoolMaxIdleTime"),
+							waitQueueTimeoutMs: EnvHelper.envMs(envVars, "mongoDbPoolWaitQueueTimeout")
 						}
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
@@ -347,16 +390,16 @@ async function configureEntityStorage(
 				options: {
 					config: {
 						host: envVars.postgreSqlHost ?? "",
-						port: envInteger(envVars, "postgreSqlPort"),
+						port: EnvHelper.envInteger(envVars, "postgreSqlPort"),
 						user: envVars.postgreSqlUser ?? "",
 						password: envVars.postgreSqlPassword ?? "",
 						database: envVars.postgreSqlDatabase ?? "",
-						mutexTimeoutMs: envMs(envVars, "entityStorageMutexTimeout"),
+						mutexTimeoutMs: envMutexMs(envVars, "entityStorageMutexTimeout"),
 						pool: {
-							max: envCount(envVars, "postgreSqlPoolMax"),
-							idleTimeout: envSeconds(envVars, "postgreSqlPoolIdleTimeout"),
-							connectTimeout: envSeconds(envVars, "postgreSqlPoolConnectTimeout"),
-							maxLifetime: envSeconds(envVars, "postgreSqlPoolMaxLifetime")
+							max: EnvHelper.envCount(envVars, "postgreSqlPoolMax"),
+							idleTimeout: EnvHelper.envSeconds(envVars, "postgreSqlPoolIdleTimeout"),
+							connectTimeout: EnvHelper.envSeconds(envVars, "postgreSqlPoolConnectTimeout"),
+							maxLifetime: EnvHelper.envSeconds(envVars, "postgreSqlPoolMaxLifetime")
 						}
 					},
 					tablePrefix: envVars.entityStorageTablePrefix
@@ -390,7 +433,7 @@ async function configureBlobStorage(
 ): Promise<void> {
 	coreConfig.types.blobStorageConnector ??= [];
 
-	const blobStorageConnectorTypes = envListToArray<
+	const blobStorageConnectorTypes = EnvHelper.envListToArray<
 		IEngineEnvironmentVariables,
 		BlobStorageConnectorType
 	>(envVars, "blobStorageConnectorType", Object.values(BlobStorageConnectorType));
@@ -505,11 +548,11 @@ async function configureLogging(
 ): Promise<void> {
 	coreConfig.types.loggingConnector ??= [];
 
-	const loggingConnectorTypes = envListToArray<IEngineEnvironmentVariables, LoggingConnectorType>(
-		envVars,
-		"loggingConnector",
-		Object.values(LoggingConnectorType)
-	);
+	const loggingConnectorTypes = EnvHelper.envListToArray<
+		IEngineEnvironmentVariables,
+		LoggingConnectorType
+	>(envVars, "loggingConnector", Object.values(LoggingConnectorType));
+	const levels = getLoggingLevels(envVars);
 	let additionalConnectorCount = 0;
 
 	for (const loggingConnector of loggingConnectorTypes) {
@@ -519,7 +562,10 @@ async function configureLogging(
 				options: {
 					config: {
 						translateMessages: true,
-						hideGroups: true
+						hideGroups: true,
+						disableColor: coreConfig.disableColor,
+						// Silent still reports errors, matching the engine logger.
+						levels: coreConfig.silent ? [LogLevel.Error] : levels
 					}
 				}
 			});
@@ -529,19 +575,20 @@ async function configureLogging(
 				type: LoggingConnectorType.EntityStorage,
 				options: {
 					config: {
-						batchSize: envCount(envVars, "loggingBatchSize"),
-						batchIntervalMs: envSecToMs(envVars, "loggingBatchFlushInterval"),
-						retainForMs: envMinToMs(envVars, "loggingRetainFor"),
-						maxEntries: envCount(envVars, "loggingMaxEntries"),
-						retentionIntervalMs: envMinToMs(envVars, "loggingRetentionInterval"),
-						retentionBatchSize: envCount(envVars, "loggingRetentionBatchSize"),
-						mutexTimeoutMs: envMs(envVars, "loggingMutexTimeout")
+						levels,
+						batchSize: EnvHelper.envCount(envVars, "loggingBatchSize"),
+						batchIntervalMs: EnvHelper.envSecToMs(envVars, "loggingBatchFlushInterval"),
+						retainForMs: EnvHelper.envMinToMs(envVars, "loggingRetainFor"),
+						maxEntries: EnvHelper.envCount(envVars, "loggingMaxEntries"),
+						retentionIntervalMs: EnvHelper.envMinToMs(envVars, "loggingRetentionInterval"),
+						retentionBatchSize: EnvHelper.envCount(envVars, "loggingRetentionBatchSize")
 					}
 				}
 			});
 			additionalConnectorCount++;
 		} else if (loggingConnector === LoggingConnectorType.OpenTelemetry) {
 			const otelLoggingConfig: IOpenTelemetryLoggingConnectorConfig = {
+				levels,
 				loggerName: envVars.openTelemetryLoggingLoggerName,
 				loggerVersion: envVars.openTelemetryLoggingLoggerVersion
 			};
@@ -568,11 +615,12 @@ async function configureLogging(
 				type: LoggingConnectorType.File,
 				options: {
 					config: {
+						levels,
 						directory: envVars.loggingFileDirectory ?? envVars.storageFileRoot ?? "",
 						filename: envVars.loggingFileFilename,
-						maxFileSizeBytes: envCount(envVars, "loggingFileMaxFileSizeBytes"),
-						maxRetainedFiles: envCount(envVars, "loggingFileMaxRetainedFiles"),
-						mutexTimeoutMs: envMs(envVars, "loggingMutexTimeout")
+						maxFileSizeBytes: EnvHelper.envCount(envVars, "loggingFileMaxFileSizeBytes"),
+						maxRetainedFiles: EnvHelper.envCount(envVars, "loggingFileMaxRetainedFiles"),
+						mutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
 					}
 				}
 			});
@@ -616,7 +664,7 @@ async function configureVault(
 ): Promise<void> {
 	coreConfig.types.vaultConnector ??= [];
 
-	const vaultConnectorType = envChoice<IEngineEnvironmentVariables, VaultConnectorType>(
+	const vaultConnectorType = EnvHelper.envChoice<IEngineEnvironmentVariables, VaultConnectorType>(
 		envVars,
 		"vaultConnector",
 		Object.values(VaultConnectorType)
@@ -659,7 +707,21 @@ async function configureBackgroundTask(
 
 	if (isBackgroundTasksRequired(envVars)) {
 		coreConfig.types.backgroundTaskComponent.push({
-			type: BackgroundTaskComponentType.Service
+			type: BackgroundTaskComponentType.Service,
+			options: {
+				config: {
+					maxSystemWorkerCount: EnvHelper.envCount(
+						envVars,
+						"backgroundTaskMaxSystemWorkerCount",
+						cpus().length * 2
+					),
+					taskInterval: EnvHelper.envMs(envVars, "backgroundTaskInterval"),
+					retryInterval: EnvHelper.envMs(envVars, "backgroundTaskRetryInterval"),
+					cleanupInterval: EnvHelper.envMs(envVars, "backgroundTaskCleanupInterval"),
+					workerShutdownTimeout: EnvHelper.envMs(envVars, "backgroundTaskWorkerShutdownTimeout"),
+					maxDispatchCount: EnvHelper.envCount(envVars, "backgroundTaskMaxDispatchCount")
+				}
+			}
 		});
 	}
 }
@@ -676,11 +738,10 @@ async function configureEventBus(
 ): Promise<void> {
 	coreConfig.types.eventBusConnector ??= [];
 
-	const eventBusConnectorType = envChoice<IEngineEnvironmentVariables, EventBusConnectorType>(
-		envVars,
-		"eventBusConnector",
-		Object.values(EventBusConnectorType)
-	);
+	const eventBusConnectorType = EnvHelper.envChoice<
+		IEngineEnvironmentVariables,
+		EventBusConnectorType
+	>(envVars, "eventBusConnector", Object.values(EventBusConnectorType));
 
 	if (eventBusConnectorType === EventBusConnectorType.Local) {
 		coreConfig.types.eventBusConnector.push({
@@ -706,7 +767,7 @@ async function configureTelemetry(
 ): Promise<void> {
 	coreConfig.types.telemetryConnector ??= [];
 
-	const telemetryConnectorTypes = envListToArray<
+	const telemetryConnectorTypes = EnvHelper.envListToArray<
 		IEngineEnvironmentVariables,
 		TelemetryConnectorType
 	>(envVars, "telemetryConnector", Object.values(TelemetryConnectorType));
@@ -723,15 +784,20 @@ async function configureTelemetry(
 				type: TelemetryConnectorType.EntityStorage,
 				options: {
 					config: {
-						batchSize: envCount(envVars, "telemetryBatchSize"),
-						batchIntervalMs: envSecToMs(envVars, "telemetryBatchFlushInterval"),
-						maxCacheSize: envCount(envVars, "telemetryMaxCacheSize"),
-						mutexTimeoutMs: envMs(envVars, "telemetryMutexTimeout"),
-						metricDefinitionCacheCapacity: envCount(
+						batchSize: EnvHelper.envCount(envVars, "telemetryBatchSize"),
+						batchIntervalMs: EnvHelper.envSecToMs(envVars, "telemetryBatchFlushInterval"),
+						maxCacheSize: EnvHelper.envCount(envVars, "telemetryMaxCacheSize"),
+						flushTimeoutMs: EnvHelper.envMs(envVars, "telemetryFlushTimeout"),
+						taskCoalesceMs: EnvHelper.envMs(envVars, "telemetryTaskCoalesce"),
+						taskStallTimeoutMs: EnvHelper.envMs(envVars, "telemetryTaskStallTimeout"),
+						metricDefinitionCacheCapacity: EnvHelper.envCount(
 							envVars,
 							"telemetryMetricDefinitionCacheCapacity"
 						),
-						metricDefinitionCacheTtiMs: envMs(envVars, "telemetryMetricDefinitionCacheTtiMs")
+						metricDefinitionCacheTtiMs: EnvHelper.envMs(
+							envVars,
+							"telemetryMetricDefinitionCacheTtiMs"
+						)
 					}
 				}
 			});
@@ -742,7 +808,7 @@ async function configureTelemetry(
 				readers = {
 					prometheus: {
 						type: OpenTelemetryReaderTypes.Prometheus,
-						port: envCount(envVars, "openTelemetryPrometheusPort")
+						port: EnvHelper.envCount(envVars, "openTelemetryPrometheusPort")
 					}
 				};
 			}
@@ -798,7 +864,7 @@ async function configureMetricsCollector(
 			type: MetricsCollectorComponentType.Service,
 			options: {
 				config: {
-					intervalMs: envSecToMs(envVars, "telemetryMetricsCollectorInterval")
+					intervalMs: EnvHelper.envSecToMs(envVars, "telemetryMetricsCollectorInterval")
 				}
 			},
 			cloneMode: EngineCloneMode.Never
@@ -806,7 +872,7 @@ async function configureMetricsCollector(
 
 		coreConfig.types.metricsProducerComponent ??= [];
 
-		const metricsProducers = envListToArray<
+		const metricsProducers = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			MetricsProducerComponentType
 		>(envVars, "telemetryMetricsProducers", Object.values(MetricsProducerComponentType), [
@@ -817,7 +883,7 @@ async function configureMetricsCollector(
 		for (const producerType of metricsProducers) {
 			coreConfig.types.metricsProducerComponent.push({
 				type: producerType,
-				options: { maxHistory: envCount(envVars, "telemetryMetricsProducerMaxHistory") },
+				options: { maxHistory: EnvHelper.envCount(envVars, "telemetryMetricsProducerMaxHistory") },
 				cloneMode: EngineCloneMode.Never
 			});
 		}
@@ -836,11 +902,10 @@ async function configureTracing(
 ): Promise<void> {
 	coreConfig.types.tracingConnector ??= [];
 
-	const tracingConnectorTypes = envListToArray<IEngineEnvironmentVariables, TracingConnectorType>(
-		envVars,
-		"tracingConnector",
-		Object.values(TracingConnectorType)
-	);
+	const tracingConnectorTypes = EnvHelper.envListToArray<
+		IEngineEnvironmentVariables,
+		TracingConnectorType
+	>(envVars, "tracingConnector", Object.values(TracingConnectorType));
 	let additionalConnectorCount = 0;
 
 	for (const tracingConnectorType of tracingConnectorTypes) {
@@ -851,17 +916,17 @@ async function configureTracing(
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.EntityStorage) {
 			coreConfig.types.tracingConnector.push({
-				type: TracingConnectorType.EntityStorage,
-				options: {
-					config: {
-						mutexTimeoutMs: envMs(envVars, "tracingMutexTimeout")
-					}
-				}
+				type: TracingConnectorType.EntityStorage
 			});
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.Console) {
 			coreConfig.types.tracingConnector.push({
-				type: TracingConnectorType.Console
+				type: TracingConnectorType.Console,
+				options: {
+					config: {
+						disableColor: coreConfig.disableColor
+					}
+				}
 			});
 			additionalConnectorCount++;
 		} else if (tracingConnectorType === TracingConnectorType.OpenTelemetry) {
@@ -935,7 +1000,7 @@ async function configureAuthorization(
 					endpoint: envVars.casbinEndpoint ?? "",
 					clientId: envVars.casbinClientId ?? "",
 					clientSecret: envVars.casbinClientSecret ?? "",
-					timeoutMs: envMs(envVars, "casbinTimeoutMs")
+					timeoutMs: EnvHelper.envMs(envVars, "casbinTimeoutMs")
 				}
 			}
 		});
@@ -950,10 +1015,119 @@ async function configureAuthorization(
 			type: AuthorizationComponentType.Service,
 			options: {
 				config: {
-					checkCacheCapacity: envInteger(envVars, "authorizationCheckCacheCapacity"),
-					checkCacheTtiMs: envMs(envVars, "authorizationCheckCacheTtiMs")
+					checkCacheCapacity: EnvHelper.envInteger(envVars, "authorizationCheckCacheCapacity"),
+					checkCacheTtiMs: EnvHelper.envMs(envVars, "authorizationCheckCacheTtiMs")
 				}
 			}
+		});
+	}
+}
+
+/**
+ * Configures the facades.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the facade configuration has been applied.
+ */
+async function configureFacades(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	const facadeTypes = EnvHelper.envListToArray<IEngineEnvironmentVariables, FacadeType>(
+		envVars,
+		"facade",
+		Object.values(FacadeType)
+	);
+
+	if (!Is.arrayValue(facadeTypes)) {
+		return;
+	}
+
+	coreConfig.types.facade ??= [];
+	coreConfig.facades ??= {};
+
+	for (const facadeType of facadeTypes) {
+		if (facadeType === FacadeType.Tracing) {
+			configureTracingFacade(coreConfig.types.facade, coreConfig.facades, envVars);
+		}
+	}
+}
+
+/**
+ * Configures the tracing facade.
+ * @param facadeTypeConfigs The facade type configs to add to.
+ * @param facades The facades to activate, keyed by the type name of the factory they apply to.
+ * @param envVars The environment variables.
+ */
+function configureTracingFacade(
+	facadeTypeConfigs: IEngineCoreTypeConfig<FacadeConfig>[],
+	facades: { [factoryTypeName: string]: IEngineFacadeConfig[] },
+	envVars: IEngineEnvironmentVariables
+): void {
+	// The facade records its spans through the tracing subsystem, without it there is nothing to record to.
+	if (!isTracingEnabled(envVars)) {
+		return;
+	}
+
+	// The facade is meaningless without factories to activate it on, so fall back to the defaults.
+	const configuredFactoryTypeNames = EnvHelper.commaSeparatedListToArray<string>(
+		envVars.tracingFacadeFactories
+	);
+	const factoryTypeNames = [
+		...new Set(
+			Is.arrayValue(configuredFactoryTypeNames)
+				? configuredFactoryTypeNames
+				: DEFAULT_TRACING_FACADE_FACTORIES
+		)
+	];
+
+	const config: ITracingFacadeConfig = {};
+
+	// Adding to the default excludes. We want to keep default list as a base and only add to it.
+	const excludeParams = EnvHelper.commaSeparatedListToArray<string>(
+		envVars.tracingFacadeExcludeParams
+	);
+	if (Is.arrayValue(excludeParams)) {
+		config.excludeParams = [
+			...new Set([...TracingFacade.DEFAULT_EXCLUDE_PARAMS, ...excludeParams])
+		];
+	}
+
+	const excludeMethods = EnvHelper.commaSeparatedListToArray<string>(
+		envVars.tracingFacadeExcludeMethods
+	);
+	if (Is.arrayValue(excludeMethods)) {
+		config.excludeMethods = [
+			...new Set([...TracingFacade.DEFAULT_EXCLUDE_METHODS, ...excludeMethods])
+		];
+	}
+
+	const includeObjects = EnvHelper.commaSeparatedListToArray<string>(
+		envVars.tracingFacadeIncludeObjects
+	);
+	if (Is.arrayValue(includeObjects)) {
+		config.includeObjects = includeObjects;
+	}
+
+	facadeTypeConfigs.push({
+		type: FacadeType.Tracing,
+		options: Is.objectValue(config) ? { config } : undefined,
+		cloneMode: EngineCloneMode.Always
+	});
+
+	const componentExcludeTypes = [
+		...new Set([
+			...DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
+			...EnvHelper.commaSeparatedListToArray<string>(envVars.tracingFacadeComponentExcludeTypes)
+		])
+	];
+
+	for (const factoryTypeName of factoryTypeNames) {
+		facades[factoryTypeName] ??= [];
+		facades[factoryTypeName].push({
+			name: TRACING_FACADE_NAME,
+			excludeTypes:
+				factoryTypeName === COMPONENT_FACTORY_TYPE_NAME ? componentExcludeTypes : undefined
 		});
 	}
 }
@@ -975,11 +1149,10 @@ async function configureAutomation(
 			type: AutomationComponentType.Service
 		});
 
-		const automationActionTypes = envListToArray<IEngineEnvironmentVariables, AutomationActionType>(
-			envVars,
-			"automationActionTypes",
-			Object.values(AutomationActionType)
-		);
+		const automationActionTypes = EnvHelper.envListToArray<
+			IEngineEnvironmentVariables,
+			AutomationActionType
+		>(envVars, "automationActionTypes", Object.values(AutomationActionType));
 
 		coreConfig.types.automationAction ??= [];
 
@@ -1004,14 +1177,23 @@ async function configureHealth(
 ): Promise<void> {
 	coreConfig.types.healthComponent ??= [];
 
-	if (envBoolean(envVars, "healthEnabled", false)) {
+	if (EnvHelper.envBoolean(envVars, "healthEnabled", false)) {
 		coreConfig.types.healthComponent.push({
 			type: HealthComponentType.Service,
 			options: {
 				config: {
-					healthCheckInterval: envSecToMs(envVars, "healthInterval"),
-					healthCheckApplicationInterval: envSecToMs(envVars, "healthApplicationInterval"),
-					initialInterval: envSecToMs(envVars, "healthStartupInterval")
+					healthCheckInterval: EnvHelper.envSecToMs(envVars, "healthInterval"),
+					healthCheckApplicationInterval: EnvHelper.envSecToMs(
+						envVars,
+						"healthApplicationInterval"
+					),
+					initialInterval: EnvHelper.envSecToMs(envVars, "healthStartupInterval", 30000),
+					excludeCloneComponents: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
+						envVars,
+						"healthExcludeCloneComponents",
+						undefined,
+						DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS
+					)
 				}
 			},
 			cloneMode: EngineCloneMode.Never
@@ -1029,7 +1211,7 @@ async function configureSchemaMigration(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	const isSchemaMigrationEnabled = envBoolean(envVars, "schemaMigrationEnabled", true);
+	const isSchemaMigrationEnabled = EnvHelper.envBoolean(envVars, "schemaMigrationEnabled", true);
 
 	coreConfig.types.schemaVersionMigrationComponent ??= [];
 	coreConfig.types.schemaVersionMigrationComponent.push({
@@ -1049,7 +1231,7 @@ async function configurePlatform(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	const isTenantEnabled = envBoolean(envVars, "tenantEnabled", false);
+	const isTenantEnabled = EnvHelper.envBoolean(envVars, "tenantEnabled", false);
 
 	coreConfig.types.platformComponent ??= [];
 	coreConfig.types.platformComponent.push({
@@ -1073,12 +1255,17 @@ async function configureTenant(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	const isTenantEnabled = envBoolean(envVars, "tenantEnabled", false);
+	const isTenantEnabled = EnvHelper.envBoolean(envVars, "tenantEnabled", false);
 
 	if (isTenantEnabled) {
 		coreConfig.types.tenantAdminComponent ??= [];
 		coreConfig.types.tenantAdminComponent.push({
-			type: TenantAdminComponentType.Service
+			type: TenantAdminComponentType.Service,
+			options: {
+				config: {
+					tenantCacheMutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
+				}
+			}
 		});
 	}
 }
@@ -1099,7 +1286,7 @@ async function configureContextIdHandlers(
 		features: [CONTEXT_ID_HANDLER_FEATURE_DID],
 		cloneMode: EngineCloneMode.Always
 	});
-	if (envBoolean(envVars, "tenantEnabled", false)) {
+	if (EnvHelper.envBoolean(envVars, "tenantEnabled", false)) {
 		coreConfig.types.contextIdHandlerComponent.push({
 			type: ContextIdHandlerComponentType.Tenant,
 			features: [CONTEXT_ID_HANDLER_FEATURE_TENANT],
@@ -1122,7 +1309,7 @@ async function configureMessaging(
 	coreConfig.types.messagingSmsConnector ??= [];
 	coreConfig.types.messagingPushNotificationConnector ??= [];
 
-	const messagingEmailConnectorType = envChoice<
+	const messagingEmailConnectorType = EnvHelper.envChoice<
 		IEngineEnvironmentVariables,
 		MessagingEmailConnectorType
 	>(envVars, "messagingEmailConnector", Object.values(MessagingEmailConnectorType));
@@ -1150,8 +1337,8 @@ async function configureMessaging(
 			options: {
 				config: {
 					host: envVars.smtpHost ?? "",
-					port: envInteger(envVars, "smtpPort"),
-					secure: envBoolean(envVars, "smtpSecure"),
+					port: EnvHelper.envInteger(envVars, "smtpPort"),
+					secure: EnvHelper.envBoolean(envVars, "smtpSecure"),
 					username: envVars.smtpUsername,
 					password: envVars.smtpPassword
 				}
@@ -1159,7 +1346,7 @@ async function configureMessaging(
 		});
 	}
 
-	const messagingSmsConnectorType = envChoice<
+	const messagingSmsConnectorType = EnvHelper.envChoice<
 		IEngineEnvironmentVariables,
 		MessagingSmsConnectorType
 	>(envVars, "messagingSmsConnector", Object.values(MessagingSmsConnectorType));
@@ -1183,7 +1370,7 @@ async function configureMessaging(
 		});
 	}
 
-	const messagingPushConnectorType = envChoice<
+	const messagingPushConnectorType = EnvHelper.envChoice<
 		IEngineEnvironmentVariables,
 		MessagingPushNotificationConnectorType
 	>(
@@ -1206,7 +1393,11 @@ async function configureMessaging(
 					accessKeyId: envVars.awsSesAccessKeyId,
 					secretAccessKey: envVars.awsSesSecretAccessKey,
 					endpoint: envVars.awsSesEndpoint,
-					applicationsSettings: envArray(envVars, "awsMessagingPushNotificationApplications", [])
+					applicationsSettings: EnvHelper.envArray(
+						envVars,
+						"awsMessagingPushNotificationApplications",
+						[]
+					)
 				}
 			}
 		});
@@ -1241,7 +1432,7 @@ async function configureMailbox(
 ): Promise<void> {
 	coreConfig.types.emailProtocolConnector ??= [];
 
-	const emailProtocolConnectorTypes = envListToArray<
+	const emailProtocolConnectorTypes = EnvHelper.envListToArray<
 		IEngineEnvironmentVariables,
 		EmailProtocolConnectorType
 	>(envVars, "emailProtocolConnector", Object.values(EmailProtocolConnectorType));
@@ -1285,7 +1476,7 @@ async function configureFaucet(
 ): Promise<void> {
 	coreConfig.types.faucetConnector ??= [];
 
-	const faucetConnectorType = envChoice<IEngineEnvironmentVariables, FaucetConnectorType>(
+	const faucetConnectorType = EnvHelper.envChoice<IEngineEnvironmentVariables, FaucetConnectorType>(
 		envVars,
 		"faucetConnector",
 		Object.values(FaucetConnectorType)
@@ -1329,7 +1520,7 @@ async function configureWallet(
 ): Promise<void> {
 	coreConfig.types.walletConnector ??= [];
 
-	const walletConnectorType = envChoice<IEngineEnvironmentVariables, WalletConnectorType>(
+	const walletConnectorType = EnvHelper.envChoice<IEngineEnvironmentVariables, WalletConnectorType>(
 		envVars,
 		"walletConnector",
 		Object.values(WalletConnectorType)
@@ -1366,7 +1557,7 @@ async function configureNft(
 ): Promise<void> {
 	coreConfig.types.nftConnector ??= [];
 
-	const nftConnectorType = envChoice<IEngineEnvironmentVariables, NftConnectorType>(
+	const nftConnectorType = EnvHelper.envChoice<IEngineEnvironmentVariables, NftConnectorType>(
 		envVars,
 		"nftConnector",
 		Object.values(NftConnectorType)
@@ -1412,7 +1603,7 @@ async function configureNotarization(
 ): Promise<void> {
 	coreConfig.types.notarizationConnector ??= [];
 
-	const notarizationConnectorType = envChoice<
+	const notarizationConnectorType = EnvHelper.envChoice<
 		IEngineEnvironmentVariables,
 		NotarizationConnectorType
 	>(envVars, "notarizationConnector", Object.values(NotarizationConnectorType));
@@ -1458,15 +1649,20 @@ async function configureImmutableProof(
 			options: {
 				config: {
 					verificationMethodId: envVars.immutableProofVerificationMethodId,
-					taskRetryCount: envCount(envVars, "immutableProofTaskRetryCount"),
-					taskRetryInterval: envSecToMs(envVars, "immutableProofTaskRetryInterval"),
-					taskFailureRetainFor: envMinToMs(envVars, "immutableProofTaskFailureRetainFor"),
-					sweepIntervalMinutes: envMinutes(envVars, "immutableProofSweepInterval"),
-					sweepStaleThresholdMs: envMinToMs(envVars, "immutableProofSweepStaleThreshold"),
-					sweepMaxAttempts: envCount(envVars, "immutableProofSweepMaxAttempts"),
-					sweepBatchLimit: envCount(envVars, "immutableProofSweepBatchLimit"),
-					sweepBackoffMs: envMinToMs(envVars, "immutableProofSweepBackoff"),
-					sweepAssumeRetryableBefore: envDateTime(
+					taskRetryCount: EnvHelper.envCount(envVars, "immutableProofTaskRetryCount"),
+					taskRetryInterval: EnvHelper.envSecToMs(envVars, "immutableProofTaskRetryInterval"),
+					taskFailureRetainFor: EnvHelper.envMinToMs(envVars, "immutableProofTaskFailureRetainFor"),
+					taskWorkerIdleTimeout: EnvHelper.envSecToMs(
+						envVars,
+						"immutableProofTaskWorkerIdleTimeout"
+					),
+					taskWorkerCount: EnvHelper.envCount(envVars, "immutableProofTaskWorkerCount"),
+					sweepIntervalMinutes: EnvHelper.envMinutes(envVars, "immutableProofSweepInterval"),
+					sweepStaleThresholdMs: EnvHelper.envMinToMs(envVars, "immutableProofSweepStaleThreshold"),
+					sweepMaxAttempts: EnvHelper.envCount(envVars, "immutableProofSweepMaxAttempts"),
+					sweepBatchLimit: EnvHelper.envCount(envVars, "immutableProofSweepBatchLimit"),
+					sweepBackoffMs: EnvHelper.envMinToMs(envVars, "immutableProofSweepBackoff"),
+					sweepAssumeRetryableBefore: EnvHelper.envDateTime(
 						envVars,
 						"immutableProofSweepAssumeRetryableBefore"
 					)
@@ -1488,15 +1684,22 @@ async function configureIdentity(
 ): Promise<void> {
 	coreConfig.types.identityConnector ??= [];
 
-	const identityConnectorType = envChoice<IEngineEnvironmentVariables, IdentityConnectorType>(
-		envVars,
-		"identityConnector",
-		Object.values(IdentityConnectorType)
-	);
+	const identityConnectorType = EnvHelper.envChoice<
+		IEngineEnvironmentVariables,
+		IdentityConnectorType
+	>(envVars, "identityConnector", Object.values(IdentityConnectorType));
 
 	if (identityConnectorType === IdentityConnectorType.EntityStorage) {
 		coreConfig.types.identityConnector.push({
-			type: IdentityConnectorType.EntityStorage
+			type: IdentityConnectorType.EntityStorage,
+			options: {
+				config: {
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					)
+				}
+			}
 		});
 	} else if (identityConnectorType === IdentityConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
@@ -1512,15 +1715,18 @@ async function configureIdentity(
 					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
 						? envVars.iotaIdentityPackageId
 						: undefined,
-					walletAddressIndex: envCount(envVars, "identityWalletAddressIndex") ?? 0,
-					didResolutionCacheTtlMs: envMs(envVars, "identityDidResolutionCacheTtl"),
-					didResolutionCacheCapacity: envCount(envVars, "identityDidResolutionCacheCapacity"),
-					didResolutionCacheMutexTimeoutMs: envMs(
+					walletAddressIndex: EnvHelper.envCount(envVars, "identityWalletAddressIndex") ?? 0,
+					didResolutionCacheTtlMs: EnvHelper.envMs(envVars, "identityDidResolutionCacheTtl"),
+					didResolutionCacheCapacity: EnvHelper.envCount(
+						envVars,
+						"identityDidResolutionCacheCapacity"
+					),
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
 						envVars,
 						"identityDidResolutionCacheMutexTimeout"
 					),
-					didResolutionRetries: envCount(envVars, "identityDidResolutionRetries"),
-					didResolutionRetryDelayMs: envMs(envVars, "identityDidResolutionRetryDelay")
+					didResolutionRetries: EnvHelper.envCount(envVars, "identityDidResolutionRetries"),
+					didResolutionRetryDelayMs: EnvHelper.envMs(envVars, "identityDidResolutionRetryDelay")
 				}
 			}
 		});
@@ -1544,14 +1750,22 @@ async function configureIdentityResolver(
 ): Promise<void> {
 	coreConfig.types.identityResolverConnector ??= [];
 
-	const identityResolverConnectorType = envChoice<
+	const identityResolverConnectorType = EnvHelper.envChoice<
 		IEngineEnvironmentVariables,
 		IdentityResolverConnectorType
 	>(envVars, "identityResolverConnector", Object.values(IdentityResolverConnectorType));
 
 	if (identityResolverConnectorType === IdentityResolverConnectorType.EntityStorage) {
 		coreConfig.types.identityResolverConnector.push({
-			type: IdentityResolverConnectorType.EntityStorage
+			type: IdentityResolverConnectorType.EntityStorage,
+			options: {
+				config: {
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					)
+				}
+			}
 		});
 	} else if (identityResolverConnectorType === IdentityResolverConnectorType.Iota) {
 		const dltConfig = EngineTypeHelper.getConfigOfType<DltConfig>(
@@ -1566,7 +1780,11 @@ async function configureIdentityResolver(
 					...(dltConfig?.options?.config as IIotaConfig),
 					identityPkgId: Is.stringValue(envVars.iotaIdentityPackageId)
 						? envVars.iotaIdentityPackageId
-						: undefined
+						: undefined,
+					didResolutionCacheMutexTimeoutMs: envMutexMs(
+						envVars,
+						"identityDidResolutionCacheMutexTimeout"
+					)
 				}
 			}
 		});
@@ -1601,7 +1819,7 @@ async function configureIdentityProfile(
 ): Promise<void> {
 	coreConfig.types.identityProfileConnector ??= [];
 
-	const identityProfileConnectorType = envChoice<
+	const identityProfileConnectorType = EnvHelper.envChoice<
 		IEngineEnvironmentVariables,
 		IdentityProfileConnectorType
 	>(envVars, "identityProfileConnector", Object.values(IdentityProfileConnectorType));
@@ -1614,7 +1832,25 @@ async function configureIdentityProfile(
 
 	if (coreConfig.types.identityProfileConnector.length > 0) {
 		coreConfig.types.identityProfileComponent ??= [];
-		coreConfig.types.identityProfileComponent.push({ type: IdentityProfileComponentType.Service });
+		coreConfig.types.identityProfileComponent.push({
+			type: IdentityProfileComponentType.Service,
+			options: {
+				config: {
+					selfUpdateDeniedProperties: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
+						envVars,
+						"identityProfileSelfUpdateDeniedProperties",
+						undefined,
+						undefined
+					),
+					adminScopes: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
+						envVars,
+						"identityProfileAdminScopes",
+						undefined,
+						undefined
+					)
+				}
+			}
+		});
 	}
 }
 
@@ -1630,11 +1866,10 @@ async function configureAttestation(
 ): Promise<void> {
 	coreConfig.types.attestationConnector ??= [];
 
-	const attestationConnectorType = envChoice<IEngineEnvironmentVariables, AttestationConnectorType>(
-		envVars,
-		"attestationConnector",
-		Object.values(AttestationConnectorType)
-	);
+	const attestationConnectorType = EnvHelper.envChoice<
+		IEngineEnvironmentVariables,
+		AttestationConnectorType
+	>(envVars, "attestationConnector", Object.values(AttestationConnectorType));
 
 	if (attestationConnectorType === AttestationConnectorType.Nft) {
 		coreConfig.types.attestationConnector.push({
@@ -1665,13 +1900,13 @@ async function configureAuditableItemGraph(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (envBoolean(envVars, "auditableItemGraphEnabled", false)) {
+	if (EnvHelper.envBoolean(envVars, "auditableItemGraphEnabled", false)) {
 		coreConfig.types.auditableItemGraphComponent ??= [];
 		coreConfig.types.auditableItemGraphComponent.push({
 			type: AuditableItemGraphComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "auditableItemGraphMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "auditableItemGraphMutexTimeout")
 				}
 			}
 		});
@@ -1688,13 +1923,13 @@ async function configureAuditableItemStream(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (envBoolean(envVars, "auditableItemStreamEnabled", false)) {
+	if (EnvHelper.envBoolean(envVars, "auditableItemStreamEnabled", false)) {
 		coreConfig.types.auditableItemStreamComponent ??= [];
 		coreConfig.types.auditableItemStreamComponent.push({
 			type: AuditableItemStreamComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "auditableItemStreamMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "auditableItemStreamMutexTimeout")
 				}
 			}
 		});
@@ -1713,7 +1948,7 @@ async function configureDataProcessing(
 ): Promise<void> {
 	coreConfig.types.dataConverterConnector ??= [];
 
-	const converterConnectors = envListToArray<
+	const converterConnectors = EnvHelper.envListToArray<
 		IEngineEnvironmentVariables,
 		DataConverterConnectorType
 	>(envVars, "dataConverterConnectors", Object.values(DataConverterConnectorType));
@@ -1724,7 +1959,7 @@ async function configureDataProcessing(
 	}
 
 	coreConfig.types.dataExtractorConnector ??= [];
-	const extractorConnectors = envListToArray<
+	const extractorConnectors = EnvHelper.envListToArray<
 		IEngineEnvironmentVariables,
 		DataExtractorConnectorType
 	>(envVars, "dataExtractorConnectors", Object.values(DataExtractorConnectorType));
@@ -1753,13 +1988,13 @@ async function configureDocumentManagement(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (envBoolean(envVars, "documentManagementEnabled", false)) {
+	if (EnvHelper.envBoolean(envVars, "documentManagementEnabled", false)) {
 		coreConfig.types.documentManagementComponent ??= [];
 		coreConfig.types.documentManagementComponent.push({
 			type: DocumentManagementComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "documentManagementMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "documentManagementMutexTimeout")
 				}
 			}
 		});
@@ -1783,7 +2018,7 @@ async function configureTrust(
 		});
 
 		coreConfig.types.trustGeneratorComponent ??= [];
-		const trustGeneratorTypes = envListToArray<
+		const trustGeneratorTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			TrustGeneratorComponentType
 		>(envVars, "trustGenerators", Object.values(TrustGeneratorComponentType));
@@ -1794,14 +2029,14 @@ async function configureTrust(
 				options: {
 					config: {
 						verificationMethodId: envVars.trustVerificationMethodId ?? "",
-						tokenTtlInSeconds: envCount(envVars, "trustJwtTtl")
+						tokenTtlInSeconds: EnvHelper.envCount(envVars, "trustJwtTtl")
 					}
 				}
 			});
 		}
 
 		coreConfig.types.trustVerifierComponent ??= [];
-		const trustVerifierTypes = envListToArray<
+		const trustVerifierTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			TrustVerifierComponentType
 		>(envVars, "trustVerifiers", Object.values(TrustVerifierComponentType));
@@ -1811,14 +2046,23 @@ async function configureTrust(
 					type: TrustVerifierComponentType.IdentityAllowDeny,
 					options: {
 						config: {
-							allowIdentities: commaSeparatedListToArray<string>(envVars.trustIdentitiesAllow),
-							denyIdentities: commaSeparatedListToArray<string>(envVars.trustIdentitiesDeny)
+							allowIdentities: EnvHelper.commaSeparatedListToArray<string>(
+								envVars.trustIdentitiesAllow
+							),
+							denyIdentities: EnvHelper.commaSeparatedListToArray<string>(
+								envVars.trustIdentitiesDeny
+							)
 						}
 					}
 				});
 			} else if (trustVerifierType === TrustVerifierComponentType.JwtVerifiableCredential) {
 				coreConfig.types.trustVerifierComponent.push({
-					type: TrustVerifierComponentType.JwtVerifiableCredential
+					type: TrustVerifierComponentType.JwtVerifiableCredential,
+					options: {
+						config: {
+							verificationCacheMutexTimeoutMs: EnvHelper.envMs(envVars, "mutexTimeoutDefault")
+						}
+					}
 				});
 			}
 		}
@@ -1869,7 +2113,8 @@ async function configureRightsManagement(
 		coreConfig.types.rightsManagementPnpComponent ??= [];
 
 		// Single source of truth for the rights-management mount path.
-		const rightsManagementPath = envVars.rightsManagementCallbackPath ?? "rights-management";
+		const rightsManagementPath =
+			EnvHelper.envString(envVars, "rightsManagementCallbackPath") ?? "rights-management";
 
 		// We add a multi instance REST client for the remote negotiations
 		// use a dummy endpoint for now as the actual endpoint will be provided in the config
@@ -1893,7 +2138,7 @@ async function configureRightsManagement(
 				config: {
 					callbackPath: rightsManagementPath,
 					includeErrorDetails: coreConfig.debug ?? false,
-					mutexTimeoutMs: envMs(envVars, "rightsManagementMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "rightsManagementMutexTimeout")
 				}
 			},
 			isDefault: true
@@ -1904,13 +2149,13 @@ async function configureRightsManagement(
 			type: RightsManagementPnapComponentType.Service,
 			options: {
 				config: {
-					mutexTimeoutMs: envMs(envVars, "rightsManagementMutexTimeout")
+					mutexTimeoutMs: envMutexMs(envVars, "rightsManagementMutexTimeout")
 				}
 			}
 		});
 
 		coreConfig.types.rightsManagementPolicyArbiterComponent ??= [];
-		const policyArbiterTypes = envListToArray<
+		const policyArbiterTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyArbiterComponentType
 		>(
@@ -1925,7 +2170,7 @@ async function configureRightsManagement(
 		}
 
 		coreConfig.types.rightsManagementPolicyObligationEnforcerComponent ??= [];
-		const policyObligationEnforcerTypes = envListToArray<
+		const policyObligationEnforcerTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyObligationEnforcerComponentType
 		>(
@@ -1940,7 +2185,7 @@ async function configureRightsManagement(
 		}
 
 		coreConfig.types.rightsManagementPolicyEnforcementProcessorComponent ??= [];
-		const policyEnforcementProcessTypes = envListToArray<
+		const policyEnforcementProcessTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyEnforcementProcessorComponentType
 		>(
@@ -1955,7 +2200,7 @@ async function configureRightsManagement(
 		}
 
 		coreConfig.types.rightsManagementPolicyExecutionActionComponent ??= [];
-		const policyExecutionActionTypes = envListToArray<
+		const policyExecutionActionTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyExecutionActionComponentType
 		>(
@@ -1970,7 +2215,7 @@ async function configureRightsManagement(
 		}
 
 		coreConfig.types.rightsManagementPolicyInformationSourceComponent ??= [];
-		const policyInformationSourceTypes = envListToArray<
+		const policyInformationSourceTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyInformationSourceComponentType
 		>(
@@ -1985,7 +2230,7 @@ async function configureRightsManagement(
 		}
 
 		coreConfig.types.rightsManagementPolicyRequesterComponent ??= [];
-		const policyRequesterTypes = envListToArray<
+		const policyRequesterTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyRequesterComponentType
 		>(
@@ -2000,7 +2245,7 @@ async function configureRightsManagement(
 		}
 
 		coreConfig.types.rightsManagementPolicyNegotiatorComponent ??= [];
-		const policyNegotiatorTypes = envListToArray<
+		const policyNegotiatorTypes = EnvHelper.envListToArray<
 			IEngineEnvironmentVariables,
 			RightsManagementPolicyNegotiatorComponentType
 		>(
@@ -2060,13 +2305,13 @@ async function configureFederatedCatalogue(
 				type: FederatedCatalogueComponentType.Service,
 				options: {
 					config: {
-						mutexTimeoutMs: envMs(envVars, "federatedCatalogueMutexTimeout")
+						mutexTimeoutMs: envMutexMs(envVars, "federatedCatalogueMutexTimeout")
 					}
 				}
 			});
 
 			coreConfig.types.federatedCatalogueFilterComponent ??= [];
-			const filters = envListToArray<
+			const filters = EnvHelper.envListToArray<
 				IEngineEnvironmentVariables,
 				FederatedCatalogueFilterComponentType
 			>(envVars, "federatedCatalogueFilters", Object.values(FederatedCatalogueFilterComponentType));
@@ -2091,7 +2336,7 @@ async function configureDataspace(
 	coreConfig: IEngineConfig,
 	envVars: IEngineEnvironmentVariables
 ): Promise<void> {
-	if (envBoolean(envVars, "dataspaceEnabled", false)) {
+	if (EnvHelper.envBoolean(envVars, "dataspaceEnabled", false)) {
 		coreConfig.types.dataspaceControlPlaneComponent ??= [];
 		// We add a multi instance REST client for remote/consumer-initiated transfers.
 		coreConfig.types.dataspaceControlPlaneComponent.push({
@@ -2112,19 +2357,29 @@ async function configureDataspace(
 					// Base mount path of the data plane only; the transfer handlers append the
 					// sub-paths themselves (`/entities` for PULL, `/inbox` for PUSH).
 					dataPlanePath: envVars.dataspaceDataPlanePath,
-					autoStartTransfers: envBoolean(envVars, "dataspaceAutoStartTransfers", false),
-					stalledNegotiationTimeoutMs: envSecToMs(envVars, "dataspaceStalledNegotiationTimeout"),
-					stalledTransferTimeoutMs: envSecToMs(envVars, "dataspaceStalledTransferTimeout"),
-					providerTransferIdleTimeoutMs: envSecToMs(
+					autoStartTransfers: EnvHelper.envBoolean(envVars, "dataspaceAutoStartTransfers", false),
+					stalledNegotiationTimeoutMs: EnvHelper.envSecToMs(
+						envVars,
+						"dataspaceStalledNegotiationTimeout"
+					),
+					stalledTransferTimeoutMs: EnvHelper.envSecToMs(
+						envVars,
+						"dataspaceStalledTransferTimeout"
+					),
+					retainTerminalTransfersForMs: EnvHelper.envSecToMs(
+						envVars,
+						"dataspaceRetainTerminalTransfersFor"
+					),
+					providerTransferIdleTimeoutMs: EnvHelper.envSecToMs(
 						envVars,
 						"dataspaceProviderTransferIdleTimeout"
 					),
-					providerTransferPolicySweepIntervalMs: envSecToMs(
+					providerTransferPolicySweepIntervalMs: EnvHelper.envSecToMs(
 						envVars,
 						"dataspaceProviderTransferPolicySweepInterval"
 					),
-					agreementUnusedThresholdMs: envMs(envVars, "dataspaceAgreementUnusedThreshold"),
-					agreementSweepIntervalMs: envMs(envVars, "dataspaceAgreementSweepInterval")
+					agreementUnusedThresholdMs: EnvHelper.envMs(envVars, "dataspaceAgreementUnusedThreshold"),
+					agreementSweepIntervalMs: EnvHelper.envMs(envVars, "dataspaceAgreementSweepInterval")
 				}
 			},
 			isDefault: true
@@ -2135,21 +2390,21 @@ async function configureDataspace(
 			type: DataspaceDataPlaneComponentType.Service,
 			options: {
 				config: {
-					retainActivityLogsForMs: envSecToMs(envVars, "dataspaceRetainActivityLogsFor"),
-					activityLogsCleanUpIntervalMs: envSecToMs(
+					retainActivityLogsForMs: EnvHelper.envSecToMs(envVars, "dataspaceRetainActivityLogsFor"),
+					activityLogsCleanUpIntervalMs: EnvHelper.envSecToMs(
 						envVars,
 						"dataspaceActivityLogsCleanupInterval"
 					),
-					retryCount: envCount(envVars, "dataspaceRetryCount"),
-					pushRetryCount: envCount(envVars, "dataspacePushRetryCount"),
-					pushRetryBaseDelayMs: envMs(envVars, "dataspacePushRetryBaseDelay"),
-					pushTimeoutMs: envMs(envVars, "dataspacePushTimeout"),
-					pushSubscriptionCleanupIntervalMs: envMs(
+					retryCount: EnvHelper.envCount(envVars, "dataspaceRetryCount"),
+					pushRetryCount: EnvHelper.envCount(envVars, "dataspacePushRetryCount"),
+					pushRetryBaseDelayMs: EnvHelper.envMs(envVars, "dataspacePushRetryBaseDelay"),
+					pushTimeoutMs: EnvHelper.envMs(envVars, "dataspacePushTimeout"),
+					pushSubscriptionCleanupIntervalMs: EnvHelper.envMs(
 						envVars,
 						"dataspacePushSubscriptionCleanupInterval"
 					),
-					agreementCacheTtlMs: envMs(envVars, "dataspaceAgreementCacheTtl"),
-					agreementCacheMutexTimeoutMs: envMs(envVars, "dataspaceAgreementCacheMutexTimeout")
+					agreementCacheTtlMs: EnvHelper.envMs(envVars, "dataspaceAgreementCacheTtl"),
+					agreementCacheMutexTimeoutMs: envMutexMs(envVars, "dataspaceAgreementCacheMutexTimeout")
 				}
 			}
 		});
@@ -2188,10 +2443,10 @@ async function configureDlt(
 						url: envVars.iotaNodeEndpoint ?? ""
 					},
 					network: envVars.iotaNetwork ?? "",
-					coinType: envCount(envVars, "iotaCoinType"),
+					coinType: EnvHelper.envCount(envVars, "iotaCoinType"),
 					gasStation: gasStationConfig,
-					gasBudget: envCount(envVars, "iotaGasBudget"),
-					gasReservationDuration: envSeconds(envVars, "iotaGasReservationDuration")
+					gasBudget: EnvHelper.envCount(envVars, "iotaGasBudget"),
+					gasReservationDuration: EnvHelper.envSeconds(envVars, "iotaGasReservationDuration")
 				}
 			}
 		});
@@ -2207,7 +2462,7 @@ async function configureDlt(
 export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
 		isRightsManagementRequired(envVars) ||
-		envBoolean(envVars, "dataspaceEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "dataspaceEnabled", false) ||
 		isFederatedCatalogueRequired(envVars)
 	);
 }
@@ -2220,12 +2475,12 @@ export function isTrustRequired(envVars: IEngineEnvironmentVariables): boolean {
  */
 export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envBoolean(envVars, "dataspaceEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "dataspaceEnabled", false) ||
 		isImmutableProofRequired(envVars) ||
-		envBoolean(envVars, "healthEnabled", false) ||
-		commaSeparatedListToArray<TelemetryConnectorType>(envVars.telemetryConnector).includes(
-			TelemetryConnectorType.EntityStorage
-		)
+		EnvHelper.envBoolean(envVars, "healthEnabled", false) ||
+		EnvHelper.commaSeparatedListToArray<TelemetryConnectorType>(
+			envVars.telemetryConnector
+		).includes(TelemetryConnectorType.EntityStorage)
 	);
 }
 
@@ -2237,9 +2492,9 @@ export function isBackgroundTasksRequired(envVars: IEngineEnvironmentVariables):
  */
 export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envBoolean(envVars, "auditableItemGraphEnabled", false) ||
-		envBoolean(envVars, "auditableItemStreamEnabled", false) ||
-		envBoolean(envVars, "documentManagementEnabled", false)
+		EnvHelper.envBoolean(envVars, "auditableItemGraphEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "auditableItemStreamEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "documentManagementEnabled", false)
 	);
 }
 
@@ -2251,10 +2506,10 @@ export function isImmutableProofRequired(envVars: IEngineEnvironmentVariables): 
  */
 export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envBoolean(envVars, "federatedCatalogueEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "federatedCatalogueEnabled", false) ||
 		Is.stringValue(envVars.federatedCatalogueRemoteEndpoint) ||
 		Is.stringValue(envVars.federatedCatalogueFilters) ||
-		envBoolean(envVars, "dataspaceEnabled", false)
+		EnvHelper.envBoolean(envVars, "dataspaceEnabled", false)
 	);
 }
 
@@ -2268,7 +2523,7 @@ export function isFederatedCatalogueRequired(envVars: IEngineEnvironmentVariable
  * @returns True if rights management is enabled.
  */
 export function isRightsManagementRequired(envVars: IEngineEnvironmentVariables): boolean {
-	return envBoolean(envVars, "dataspaceEnabled", false);
+	return EnvHelper.envBoolean(envVars, "dataspaceEnabled", false);
 }
 
 /**
@@ -2279,8 +2534,8 @@ export function isRightsManagementRequired(envVars: IEngineEnvironmentVariables)
  */
 export function isTaskSchedulerRequired(envVars: IEngineEnvironmentVariables): boolean {
 	return (
-		envBoolean(envVars, "taskSchedulerEnabled", false) ||
-		envBoolean(envVars, "dataspaceEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "taskSchedulerEnabled", false) ||
+		EnvHelper.envBoolean(envVars, "dataspaceEnabled", false) ||
 		isRightsManagementRequired(envVars) ||
 		isAuthEntityStorageRequired(envVars) ||
 		isImmutableProofRequired(envVars) ||
@@ -2305,7 +2560,9 @@ export function isAutomationRequired(envVars: IEngineEnvironmentVariables): bool
  * @returns True if telemetry is enabled.
  */
 export function isTelemetryEnabled(envVars: IEngineEnvironmentVariables): boolean {
-	return commaSeparatedListToArray<TelemetryConnectorType>(envVars.telemetryConnector).some(
+	return EnvHelper.commaSeparatedListToArray<TelemetryConnectorType>(
+		envVars.telemetryConnector
+	).some(
 		t => t === TelemetryConnectorType.EntityStorage || t === TelemetryConnectorType.OpenTelemetry
 	);
 }
@@ -2317,7 +2574,7 @@ export function isTelemetryEnabled(envVars: IEngineEnvironmentVariables): boolea
  * @returns True if tracing is enabled.
  */
 export function isTracingEnabled(envVars: IEngineEnvironmentVariables): boolean {
-	return commaSeparatedListToArray<TracingConnectorType>(envVars.tracingConnector).some(
+	return EnvHelper.commaSeparatedListToArray<TracingConnectorType>(envVars.tracingConnector).some(
 		t =>
 			t === TracingConnectorType.EntityStorage ||
 			t === TracingConnectorType.OpenTelemetry ||
@@ -2345,7 +2602,28 @@ export function isAuthorizationRequired(envVars: IEngineEnvironmentVariables): b
  * @returns True if mailbox is enabled.
  */
 export function isMailboxEnabled(envVars: IEngineEnvironmentVariables): boolean {
-	return commaSeparatedListToArray<EmailProtocolConnectorType>(envVars.emailProtocolConnector).some(
-		t => t === EmailProtocolConnectorType.Imap || t === EmailProtocolConnectorType.Pop3
+	return EnvHelper.commaSeparatedListToArray<EmailProtocolConnectorType>(
+		envVars.emailProtocolConnector
+	).some(
+		t =>
+			t === EmailProtocolConnectorType.Imap ||
+			t === EmailProtocolConnectorType.Pop3 ||
+			t === EmailProtocolConnectorType.Gmail ||
+			t === EmailProtocolConnectorType.Outlook
+	);
+}
+
+/**
+ * Get the log levels the logging connectors should record.
+ * @param envVars The environment variables.
+ * @returns The log levels, or undefined when not configured.
+ * @throws GeneralError if the list contains an unknown log level.
+ */
+function getLoggingLevels(envVars: IEngineEnvironmentVariables): LogLevel[] | undefined {
+	return EnvHelper.envListToArray<IEngineEnvironmentVariables, LogLevel>(
+		envVars,
+		"loggingLevels",
+		Object.values(LogLevel),
+		undefined
 	);
 }

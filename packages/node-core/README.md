@@ -1,4 +1,4 @@
-# TWIN Node Core
+# 3Sixty Node Core
 
 This package provides the shared runtime foundation for hosting service workloads in a Node.js environment. It brings together reusable server capabilities, command tooling support, and integration patterns that help teams run API driven workloads with consistent behaviour.
 
@@ -7,7 +7,7 @@ By centralising this functionality, the package reduces duplication across appli
 ## Installation
 
 ```shell
-npm install @twin.org/node-core
+npm install @3sixty/node-core
 ```
 
 ## Examples
@@ -21,3 +21,7 @@ Detailed reference documentation for the API can be found in [docs/reference/ind
 ## Changelog
 
 The changes between each version can be found in [docs/changelog.md](docs/changelog.md)
+
+## Origin
+
+This package is derived from the original [iotaledger/twin-node](https://github.com/iotaledger/twin-node/tree/next/packages/node-core) repository.

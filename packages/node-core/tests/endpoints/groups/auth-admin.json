@@ -15,7 +15,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /authentication/admin/users — 400 missing email",
+			"description": "POST /authentication/admin/users - 400 missing email",
 			"method": "POST",
 			"path": "/authentication/admin/users",
 			"body": {
@@ -27,7 +27,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /authentication/admin/users — 400 missing password",
+			"description": "POST /authentication/admin/users - 400 missing password",
 			"method": "POST",
 			"path": "/authentication/admin/users",
 			"body": {
@@ -39,7 +39,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /authentication/admin/users — create test user",
+			"description": "POST /authentication/admin/users - create test user",
 			"method": "POST",
 			"path": "/authentication/admin/users",
 			"body": {
@@ -64,7 +64,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "PUT /authentication/admin/users/:testUserEmail — update",
+			"description": "PUT /authentication/admin/users/:testUserEmail - update",
 			"method": "PUT",
 			"path": "/authentication/admin/users/{{testUserEmail}}",
 			"body": {
@@ -89,7 +89,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /identity/:testIdentity — cleanup test identity",
+			"description": "DELETE /identity/:testIdentity - cleanup test identity",
 			"method": "DELETE",
 			"path": "/identity/{{testIdentity}}",
 			"expectedStatus": 204

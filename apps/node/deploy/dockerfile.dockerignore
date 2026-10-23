@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/dist
+**/coverage
+**/.tmp
+**/.local-data
+**/*.tgz
+**/.env
+**/.env.*
+!**/.env.example-*

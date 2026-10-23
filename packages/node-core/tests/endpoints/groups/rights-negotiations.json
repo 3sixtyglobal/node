@@ -2,7 +2,7 @@
 	"group": "Rights Management - Negotiations",
 	"steps": [
 		{
-			"description": "POST /rights-management/negotiations/request — 401 without organization context",
+			"description": "POST /rights-management/negotiations/request - 401 without organization context",
 			"skipIfOrgParamOmitted": true,
 			"appendOrgParam": false,
 			"method": "POST",
@@ -24,7 +24,7 @@
 			"expectedStatus": 401
 		},
 		{
-			"description": "POST /rights-management/negotiations/request — 400 missing consumerPid",
+			"description": "POST /rights-management/negotiations/request - 400 missing consumerPid",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
@@ -44,7 +44,7 @@
 			"expectedStatus": 400
 		},
 		{
-			"description": "POST /rights-management/negotiations/request — initiate negotiation",
+			"description": "POST /rights-management/negotiations/request - initiate negotiation",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
@@ -77,7 +77,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /rights-management/negotiations/:id/request — consumer counter-request",
+			"description": "POST /rights-management/negotiations/:id/request - consumer counter-request",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/request",
@@ -99,7 +99,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /rights-management/negotiations/:id/termination — terminate negotiation",
+			"description": "POST /rights-management/negotiations/:id/termination - terminate negotiation",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiationProviderPid}}/termination",
@@ -116,7 +116,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /rights-management/negotiations/request — second negotiation for full flow",
+			"description": "POST /rights-management/negotiations/request - second negotiation for full flow",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/request",
@@ -137,7 +137,7 @@
 			"capture": { "negotiation2ProviderPid": "body.providerPid" }
 		},
 		{
-			"description": "POST /rights-management/negotiations/admin — pre-register consumer side for offers test",
+			"description": "POST /rights-management/negotiations/admin - pre-register consumer side for offers test",
 			"method": "POST",
 			"path": "/rights-management/negotiations/admin",
 			"body": {
@@ -146,7 +146,7 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /rights-management/negotiations/:id/offers — provider sends counter-offer",
+			"description": "POST /rights-management/negotiations/:id/offers - provider sends counter-offer",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/offers",
@@ -168,7 +168,7 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "POST /rights-management/negotiations/:id/events — consumer accepts offer",
+			"description": "POST /rights-management/negotiations/:id/events - consumer accepts offer",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/events",
@@ -187,7 +187,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /rights-management/negotiations/:id/agreement — provider sends agreement",
+			"description": "POST /rights-management/negotiations/:id/agreement - provider sends agreement",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/{{negotiation2ProviderPid}}/agreement",
@@ -210,7 +210,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /rights-management/negotiations/:id/agreement/verification — consumer verifies",
+			"description": "POST /rights-management/negotiations/:id/agreement/verification - consumer verifies",
 			"appendOrgParam": true,
 			"delayMs": 150,
 			"method": "POST",
@@ -228,7 +228,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /rights-management/negotiations/admin — pre-register consumer side for initial offer test",
+			"description": "POST /rights-management/negotiations/admin - pre-register consumer side for initial offer test",
 			"method": "POST",
 			"path": "/rights-management/negotiations/admin",
 			"body": {
@@ -237,7 +237,7 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /rights-management/negotiations/offers — provider-initiated offer",
+			"description": "POST /rights-management/negotiations/offers - provider-initiated offer",
 			"appendOrgParam": true,
 			"method": "POST",
 			"path": "/rights-management/negotiations/offers",
@@ -259,7 +259,7 @@
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /rights-management/negotiations/admin — pre-register consumer-side negotiation",
+			"description": "POST /rights-management/negotiations/admin - pre-register consumer-side negotiation",
 			"method": "POST",
 			"path": "/rights-management/negotiations/admin",
 			"body": {
@@ -295,7 +295,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /rights-management/negotiations/admin/:id — 404 after delete",
+			"description": "GET /rights-management/negotiations/admin/:id - 404 after delete",
 			"method": "GET",
 			"path": "/rights-management/negotiations/admin/{{negotiationAdminId}}",
 			"expectedStatus": 404

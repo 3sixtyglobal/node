@@ -2,7 +2,7 @@
 	"group": "Immutable Proof",
 	"steps": [
 		{
-			"description": "POST /immutable-proof — 400 missing document",
+			"description": "POST /immutable-proof - 400 missing document",
 			"method": "POST",
 			"path": "/immutable-proof",
 			"body": {},
@@ -23,7 +23,7 @@
 			"capture": { "immutableProofId": "location-last-segment" }
 		},
 		{
-			"description": "GET /immutable-proof/:id — 404 for unknown id",
+			"description": "GET /immutable-proof/:id - 404 for unknown id",
 			"method": "GET",
 			"path": "/immutable-proof/immutable-proof:nonexistent",
 			"expectedStatus": 404
@@ -53,7 +53,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /immutable-proof/:id — 404 after delete",
+			"description": "GET /immutable-proof/:id - 404 after delete",
 			"method": "GET",
 			"path": "/immutable-proof/{{immutableProofId}}",
 			"expectedStatus": 404

@@ -8,7 +8,7 @@
  */
 import { mkdir, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { directoryExists, fileExists, loadJson, saveJson } from './common.mjs';
+import { directoryExists, fileExists, loadJson, loadWorkspaceDirs, saveJson } from './common.mjs';
 
 /**
  * Execute the process.
@@ -28,9 +28,7 @@ async function run() {
 
 	process.stdout.write(`Target Directory: ${targetDirectory}\n`);
 
-	const packageJson = await loadJson('package.json');
-
-	const packageNames = packageJson.workspaces;
+	const packageNames = await loadWorkspaceDirs();
 
 	await generateConfig(targetDirectory, 'prod', packageNames);
 	await generateConfig(targetDirectory, 'prerelease', packageNames);
@@ -72,6 +70,15 @@ async function generateConfig(targetDirectory, releaseType, packageNames) {
 		config['prerelease-type'] = 'next';
 	}
 
+	// Keep the changelog anchor maintained by the versions-prepare workflow.
+	const filename = path.join(targetDirectory, `release-please-config.${releaseType}.json`);
+	if (await fileExists(filename)) {
+		const existingConfig = await loadJson(filename);
+		if (existingConfig['last-release-sha']) {
+			config['last-release-sha'] = existingConfig['last-release-sha'];
+		}
+	}
+
 	config.packages = {};
 	config.plugins = [
 		'node-workspace',
@@ -103,7 +110,7 @@ async function generateConfig(targetDirectory, releaseType, packageNames) {
 		await mkdir(targetDirectory, { recursive: true });
 	}
 
-	await saveJson(path.join(targetDirectory, `release-please-config.${releaseType}.json`), config);
+	await saveJson(filename, config);
 }
 
 /**

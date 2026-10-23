@@ -3,12 +3,12 @@
 import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
-} from "@twin.org/api-auth-entity-storage-models";
-import type { IAuthorizationComponent } from "@twin.org/authorization-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { ContextIdKeys, ContextIdStore } from "@twin.org/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
+} from "@3sixty/api-auth-entity-storage-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
+import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
 import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
@@ -77,9 +77,13 @@ export async function userGet(
 	}
 ): Promise<IAuthenticationUser> {
 	Guards.email("userGet", "email", params.email);
+	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
+		if (!tenantEnabled) {
+			throw new GeneralError("userGet", "tenantIdNotAllowed");
+		}
 		Guards.stringHexLength("userGet", "tenant-id", params.tenantId, 32);
-	} else if (Coerce.boolean(envVars.tenantEnabled) ?? false) {
+	} else if (tenantEnabled) {
 		throw new GeneralError("userGet", "tenantIdRequired");
 	}
 

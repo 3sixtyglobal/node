@@ -1,17 +1,17 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { AuthenticationUser } from "@twin.org/api-auth-entity-storage-service";
-import type { IPlatformComponent } from "@twin.org/api-models";
-import { CLIDisplay } from "@twin.org/cli-core";
-import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { ComparisonOperator } from "@twin.org/entity";
+import type { AuthenticationUser } from "@3sixty/api-auth-entity-storage-service";
+import type { IPlatformComponent } from "@3sixty/api-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { ComparisonOperator } from "@3sixty/entity";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
-} from "@twin.org/entity-storage-models";
-import { Did } from "@twin.org/identity-models";
-import { nameofKebabCase } from "@twin.org/nameof";
+} from "@3sixty/entity-storage-models";
+import { Did } from "@3sixty/identity-models";
+import { nameofKebabCase } from "@3sixty/nameof";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";

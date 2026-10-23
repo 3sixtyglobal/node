@@ -8,6 +8,7 @@
 	"release-type": "node",
 	"initial-version": "0.0.1",
 	"versioning": "default",
+	"last-release-sha": "997069cf1fb192b371b3f24183347e676348ef1b",
 	"packages": {
 		"packages/node-core": {
 			"package-name": "node-core",

@@ -1,12 +1,13 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay } from "@twin.org/cli-core";
-import { GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import { Bip39 } from "@twin.org/crypto";
-import { AccountHelper } from "@twin.org/dlt-account";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { Did, IdentityResolverConnectorFactory } from "@twin.org/identity-models";
-import { VaultConnectorFactory } from "@twin.org/vault-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { BaseError, GeneralError, Guards, I18n, Is, NotFoundError } from "@3sixty/core";
+import { Bip39 } from "@3sixty/crypto";
+import { AccountHelper } from "@3sixty/dlt-account";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { Did, IdentityResolverConnectorFactory } from "@3sixty/identity-models";
+import type { IDidDocument } from "@3sixty/standards-w3c-did";
+import { VaultConnectorFactory } from "@3sixty/vault-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -99,7 +100,20 @@ export async function identityImport(
 	);
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.identity-import.labels.resolvingIdentity"));
-	const identityDocument = await identityResolverConnector.resolveDocument(params.identity);
+	let identityDocument: IDidDocument | undefined;
+	try {
+		identityDocument = await identityResolverConnector.resolveDocument(params.identity);
+	} catch (error) {
+		if (BaseError.someErrorName(error, NotFoundError.CLASS_NAME)) {
+			throw new GeneralError(
+				"identityImport",
+				"identityNotFound",
+				{ identity: params.identity },
+				error
+			);
+		}
+		throw error;
+	}
 
 	if (Is.empty(identityDocument)) {
 		throw new GeneralError("identityImport", "identityNotFound", {

@@ -1,17 +1,20 @@
 // Copyright 2025 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, rm, writeFile } from "node:fs/promises";
-import { AutomationActionFactory } from "@twin.org/automation-models";
-import { ComponentFactory, Factory } from "@twin.org/core";
-import { DataspaceAppFactory } from "@twin.org/dataspace-models";
-import { MemoryStateStorage } from "@twin.org/engine-core";
+import type { IServerInfo } from "@3sixty/api-models";
+import { AutomationActionFactory } from "@3sixty/automation-models";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { ComponentFactory, Factory, NativeModules } from "@3sixty/core";
+import { DataspaceAppFactory } from "@3sixty/dataspace-models";
+import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthenticationAdminComponentType,
 	AuthenticationComponentType
-} from "@twin.org/engine-server-types";
+} from "@3sixty/engine-server-types";
 import {
 	AttestationConnectorType,
 	BlobStorageConnectorType,
+	EmailProtocolConnectorType,
 	EntityStorageConnectorType,
 	EventBusComponentType,
 	EventBusConnectorType,
@@ -27,8 +30,8 @@ import {
 	TracingConnectorType,
 	VaultConnectorType,
 	WalletConnectorType
-} from "@twin.org/engine-types";
-import { FederatedCatalogueFilterFactory } from "@twin.org/federated-catalogue-models";
+} from "@3sixty/engine-types";
+import { FederatedCatalogueFilterFactory } from "@3sixty/federated-catalogue-models";
 import {
 	PolicyArbiterFactory,
 	PolicyEnforcementProcessorFactory,
@@ -36,13 +39,19 @@ import {
 	PolicyInformationSourceFactory,
 	PolicyNegotiatorFactory,
 	PolicyRequesterFactory
-} from "@twin.org/rights-management-models";
-import { TrustGeneratorFactory, TrustVerifierFactory } from "@twin.org/trust-models";
-import { CI_ENV_VARS } from "./setupTestEnv.js";
+} from "@3sixty/rights-management-models";
+import { TrustGeneratorFactory, TrustVerifierFactory } from "@3sixty/trust-models";
+import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import { getEnvDefaults } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
-import { buildConfiguration, overrideModuleImport, run } from "../src/node.js";
+import {
+	buildConfiguration,
+	loadEnvironmentVariables,
+	overrideModuleImport,
+	processEnvironmentVariables,
+	run
+} from "../src/node.js";
 import { start } from "../src/start.js";
 import { initialiseLocales } from "../src/utils.js";
 
@@ -52,20 +61,66 @@ const TEST_NODE_ORG_ID =
 	"did:iota:testnet:0x7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b";
 const TEST_NODE_TENANT_ID = "4cfc10fd12d2a206f681ea9b01b306c0";
 
-const basePort = Math.floor(Math.random() * 1000);
-let port = 13000 + basePort;
+let port = 0;
+
+/**
+ * Wait for the web server to start accepting connections on the given port.
+ * @param serverPort The port the server should be listening on.
+ */
+async function waitForServer(serverPort: number): Promise<void> {
+	const expiry = Date.now() + 30000;
+	let lastError: unknown;
+
+	while (Date.now() < expiry) {
+		try {
+			await fetch(`http://localhost:${serverPort}/info`);
+			return;
+		} catch (err) {
+			lastError = err;
+			await new Promise(resolve => setTimeout(resolve, 100));
+		}
+	}
+
+	throw new Error(`The server did not start on port ${serverPort}`, { cause: lastError });
+}
+
+/**
+ * Load and process the env vars then build the configuration in the same way as the node.
+ * @param processEnv The process environment variables.
+ * @param nodeOptions The node options.
+ * @param serverInfo The server information.
+ * @returns The configuration and the env vars for the node.
+ */
+async function buildTestConfiguration(
+	processEnv: { [id: string]: string },
+	nodeOptions: INodeOptions,
+	serverInfo: IServerInfo
+): Promise<
+	Awaited<ReturnType<typeof buildConfiguration>> & {
+		nodeEnvVars: Awaited<ReturnType<typeof processEnvironmentVariables>>;
+	}
+> {
+	const nodeEnvVars = await processEnvironmentVariables(
+		loadEnvironmentVariables(processEnv, nodeOptions),
+		nodeOptions
+	);
+	return {
+		...(await buildConfiguration(nodeEnvVars, nodeOptions, serverInfo)),
+		nodeEnvVars
+	};
+}
 
 describe("node-core", () => {
 	beforeEach(async () => {
-		port++;
+		port = await getFreePort();
 
 		Factory.clearFactories();
 
-		await mkdir("./tests/.tmp", { recursive: true });
+		await mkdir("./tests/.tmp/index", { recursive: true });
 	});
 
 	afterEach(async () => {
-		await rm("./tests/.tmp", { recursive: true, force: true });
+		await rm("./tests/.tmp/index", { recursive: true, force: true });
 	});
 
 	test("Can fail to run the node with no config as default is for file storage and this requires a storageFileRoot", async () => {
@@ -92,7 +147,94 @@ describe("node-core", () => {
 		});
 		expect(result).toBeDefined();
 		expect(result?.shutdown).toBeInstanceOf(Function);
+		expect(NativeModules.getModule("node:crypto")).toBeDefined();
 		await result?.shutdown();
+	});
+
+	test("Can disable colour in the CLI display", async () => {
+		const colorSpy = vi.spyOn(CLIDisplay, "setColorEnabled");
+
+		try {
+			const result = await run({
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_DISABLE_COLOR: "true",
+					TWIN_PORT: port.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+				}
+			});
+			expect(colorSpy).toHaveBeenCalledWith(false);
+			await result?.shutdown();
+		} finally {
+			colorSpy.mockRestore();
+			CLIDisplay.setColorEnabled(true);
+		}
+	});
+
+	test("Can disable colour in the CLI display from an env file", async () => {
+		const envFile = "./tests/.tmp/index/.env.disable-color";
+		await writeFile(envFile, 'TWIN_DISABLE_COLOR="true"\n');
+		const colorSpy = vi.spyOn(CLIDisplay, "setColorEnabled");
+
+		try {
+			const result = await run({
+				localesDirectory: "./dist/locales/",
+				envFilenames: [envFile],
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_PORT: port.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+				}
+			});
+			expect(colorSpy).toHaveBeenCalledWith(false);
+			await result?.shutdown();
+		} finally {
+			colorSpy.mockRestore();
+			CLIDisplay.setColorEnabled(true);
+			// Loading the env file also populates process.env, so remove it for the following tests.
+			delete process.env.TWIN_DISABLE_COLOR;
+		}
+	});
+
+	test("Leaves the CLI display colour unchanged when disable colour is not set", async () => {
+		const colorSpy = vi.spyOn(CLIDisplay, "setColorEnabled");
+
+		try {
+			const result = await run({
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, {
+					nodeId: TEST_NODE_ID,
+					nodeOrganizationId: TEST_NODE_ORG_ID
+				}),
+				envVars: {
+					TWIN_SILENT: "true",
+					TWIN_PORT: port.toString(),
+					TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+					TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
+					TWIN_SCHEMA_MIGRATION_ENABLED: "false",
+					TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+				}
+			});
+			expect(colorSpy).not.toHaveBeenCalled();
+			await result?.shutdown();
+		} finally {
+			colorSpy.mockRestore();
+		}
 	});
 
 	test("Can run the node with config", async () => {
@@ -129,6 +271,7 @@ describe("node-core", () => {
 				TWIN_BLOB_STORAGE_ENABLE_ENCRYPTION: "true",
 				TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 				TWIN_MESSAGING_EMAIL_CONNECTOR: MessagingEmailConnectorType.EntityStorage,
+				TWIN_EMAIL_PROTOCOL_CONNECTOR: `${EmailProtocolConnectorType.Imap},${EmailProtocolConnectorType.Pop3},${EmailProtocolConnectorType.Gmail},${EmailProtocolConnectorType.Outlook}`,
 				TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 				TWIN_HEALTH_ENABLED: "true",
 				TWIN_SCHEMA_MIGRATION_ENABLED: "false",
@@ -324,7 +467,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -333,8 +476,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -424,6 +567,7 @@ describe("node-core", () => {
 			TWIN_FEDERATED_CATALOGUE_FILTERS: "filter-by-metadata",
 			TWIN_DATASPACE_ENABLED: "true",
 			TWIN_MESSAGING_EMAIL_CONNECTOR: MessagingEmailConnectorType.EntityStorage,
+			TWIN_EMAIL_PROTOCOL_CONNECTOR: `${EmailProtocolConnectorType.Imap},${EmailProtocolConnectorType.Pop3},${EmailProtocolConnectorType.Gmail},${EmailProtocolConnectorType.Outlook}`,
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			TWIN_HEALTH_ENABLED: "true",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
@@ -447,7 +591,7 @@ describe("node-core", () => {
 		overrideModuleImport(nodeOptions.executionDirectory ?? "", undefined);
 
 		// Use buildConfiguration to get the proper nodeEngineConfig structure
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(
 			{
 				...getEnvDefaults("TWIN_"),
 				...envVars
@@ -479,6 +623,8 @@ describe("node-core", () => {
 			"automation-service",
 			"messaging-admin-service",
 			"messaging-service",
+			"mail-storage-service",
+			"mailbox-service",
 			"blob-storage-service",
 			"identity-service",
 			"identity-resolver-service",
@@ -671,6 +817,16 @@ describe("node-core", () => {
 			"GET      /documents/:auditableItemGraphDocumentId/:revision",
 			"DELETE   /documents/:auditableItemGraphDocumentId/:revision",
 			"GET      /documents",
+			"GET      /mailbox/mail",
+			"GET      /mailbox/mail/:id",
+			"DELETE   /mailbox/mail/:id",
+			"GET      /mailbox/connectors/:connectorType/schema",
+			"GET      /mailbox/authcallback",
+			"POST     /mailbox",
+			"GET      /mailbox",
+			"GET      /mailbox/:id",
+			"PUT      /mailbox/:id",
+			"DELETE   /mailbox/:id",
 			"POST     /rights-management/policy/admin",
 			"PUT      /rights-management/policy/admin/:id",
 			"GET      /rights-management/policy/admin/:id",
@@ -800,7 +956,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(
 			{
 				...getEnvDefaults("TWIN_"),
 				...envVars
@@ -883,7 +1039,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -892,8 +1048,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -969,7 +1125,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -978,8 +1134,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -1052,7 +1208,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1061,8 +1217,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -1136,7 +1292,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1173,7 +1329,7 @@ describe("node-core", () => {
 			stateStorage: memoryStateStorage
 		};
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1209,7 +1365,7 @@ describe("node-core", () => {
 
 		const nodeOptions: INodeOptions = { envPrefix: "TWIN_", stateStorage: memoryStateStorage };
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1221,8 +1377,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait a second for the server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		const res = await fetch(`http://localhost:${port}/info`);
 		expect(await res.json()).toEqual({
@@ -1298,7 +1454,7 @@ describe("node-core", () => {
 				storageFileRoot: "./.local-data",
 				extensions: "http://example.com/insecure-extension.js"
 			});
-			const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 				name: "foo",
 				version: "0.0.0"
 			});
@@ -1309,7 +1465,7 @@ describe("node-core", () => {
 	test("should load multiple extensions in correct order", async () => {
 		// Write first extension
 		await writeFile(
-			"./tests/.tmp/first-extension.js",
+			"./tests/.tmp/index/first-extension.js",
 			`
 				export async function extensionInitialise() {
 					global.extensionCallOrder = global.extensionCallOrder || [];
@@ -1332,7 +1488,7 @@ describe("node-core", () => {
 
 		// Write second extension
 		await writeFile(
-			"./tests/.tmp/second-extension.js",
+			"./tests/.tmp/index/second-extension.js",
 			`
 				export async function extensionInitialise() {
 					global.extensionCallOrder = global.extensionCallOrder || [];
@@ -1360,7 +1516,8 @@ describe("node-core", () => {
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/first-extension.js,./tests/.tmp/second-extension.js"
+			TWIN_EXTENSIONS:
+				"./tests/.tmp/index/first-extension.js,./tests/.tmp/index/second-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1378,7 +1535,7 @@ describe("node-core", () => {
 		// Clear any previous call order
 		(global as typeof globalThis & { extensionCallOrder?: string[] }).extensionCallOrder = [];
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1387,8 +1544,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait for server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		// Verify extensions loaded
 		const res = await fetch(`http://localhost:${port}/info`);
@@ -1414,14 +1571,14 @@ describe("node-core", () => {
 		]);
 
 		// Cleanup
-		await rm("./tests/.tmp/first-extension.js", { force: true });
-		await rm("./tests/.tmp/second-extension.js", { force: true });
+		await rm("./tests/.tmp/index/first-extension.js", { force: true });
+		await rm("./tests/.tmp/index/second-extension.js", { force: true });
 	});
 
 	test("should execute all extension lifecycle hooks in correct sequence", async () => {
 		// Write extension that tracks all lifecycle hooks
 		await writeFile(
-			"./tests/.tmp/lifecycle-test.js",
+			"./tests/.tmp/index/lifecycle-test.js",
 			`
 				export async function extensionInitialise(config) {
 					global.lifecycleOrder = global.lifecycleOrder || [];
@@ -1452,7 +1609,7 @@ describe("node-core", () => {
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/lifecycle-test.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/index/lifecycle-test.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1470,7 +1627,7 @@ describe("node-core", () => {
 		// Clear previous lifecycle data
 		(global as typeof globalThis & { lifecycleOrder?: string[] }).lifecycleOrder = [];
 
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1479,8 +1636,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait for server
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		// Verify server is running
 		const res = await fetch(`http://localhost:${port}/info`);
@@ -1505,13 +1662,13 @@ describe("node-core", () => {
 		expect(server).toBeDefined();
 
 		// Cleanup
-		await rm("./tests/.tmp/lifecycle-test.js", { force: true });
+		await rm("./tests/.tmp/index/lifecycle-test.js", { force: true });
 	});
 
 	test("should handle extension initialization failure gracefully", async () => {
 		// Write extension that throws error
 		await writeFile(
-			"./tests/.tmp/failing-extension.js",
+			"./tests/.tmp/index/failing-extension.js",
 			`
 				export async function extensionInitialise() {
 					throw new Error("Extension initialization failed");
@@ -1525,7 +1682,7 @@ describe("node-core", () => {
 			TWIN_PORT: port.toString(),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/failing-extension.js"
+			TWIN_EXTENSIONS: "./tests/.tmp/index/failing-extension.js"
 		};
 
 		await initialiseLocales("./dist/locales/");
@@ -1542,7 +1699,7 @@ describe("node-core", () => {
 
 		// Extension failure should cause start to fail
 		await expect(async () => {
-			const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+			const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 				name: "foo",
 				version: "0.0.0"
 			});
@@ -1553,7 +1710,7 @@ describe("node-core", () => {
 	test("should use custom cache directory when configured", async () => {
 		// Write test extension
 		await writeFile(
-			"./tests/.tmp/cache-test.js",
+			"./tests/.tmp/index/cache-test.js",
 			`
 	export async function extensionInitialise() {
 		global.cacheTestCalled = true;
@@ -1561,7 +1718,7 @@ describe("node-core", () => {
 	`
 		);
 
-		const customCacheDir = "./tests/.tmp/custom-cache";
+		const customCacheDir = "./tests/.tmp/index/custom-cache";
 		const envVars = {
 			TWIN_DEBUG: "true",
 			TWIN_SILENT: "true",
@@ -1569,7 +1726,7 @@ describe("node-core", () => {
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
-			TWIN_EXTENSIONS: "./tests/.tmp/cache-test.js",
+			TWIN_EXTENSIONS: "./tests/.tmp/index/cache-test.js",
 			TWIN_EXTENSIONS_CACHE_DIRECTORY: customCacheDir
 		};
 
@@ -1593,7 +1750,7 @@ describe("node-core", () => {
 		overrideModuleImport(nodeOptions.executionDirectory ?? "");
 
 		// Use buildConfiguration to get the proper nodeEngineConfig structure
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const { nodeEngineConfig, nodeEnvVars } = await buildTestConfiguration(envVars, nodeOptions, {
 			name: "foo",
 			version: "0.0.0"
 		});
@@ -1602,8 +1759,8 @@ describe("node-core", () => {
 
 		expect(startResult).toBeDefined();
 
-		// Wait for server to start
-		await new Promise(resolve => setTimeout(resolve, 1500));
+		// Wait for the server to start
+		await waitForServer(port);
 
 		// Verify server is running
 		const res = await fetch(`http://localhost:${port}/info`);

@@ -46,6 +46,16 @@ export interface IEngineServerEnvironmentVariables {
 	publicOrigin?: string;
 
 	/**
+	 * The time in milliseconds Fastify waits for a plugin to load before failing, defaults to 30000.
+	 */
+	fastifyPluginTimeout?: string;
+
+	/**
+	 * The type of web server to use: fastify, hono, native, defaults to fastify.
+	 */
+	webServerType?: string;
+
+	/**
 	 * The type of auth admin processor to use on the API: entity-storage.
 	 */
 	authAdminProcessorType?: string;

@@ -1,7 +1,7 @@
 {
 	"openapi": "3.1.1",
 	"info": {
-		"title": "TWIN Node",
+		"title": "3Sixty Node",
 		"description": "REST API for TWIN - API Server.",
 		"version": "1.0.0",
 		"license": {
@@ -2294,7 +2294,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/DidDocument"
+									"$ref": "https://schema.3sixty.global/w3c-did/DidDocument"
 								},
 								"examples": {
 									"identityResolveResponseExample": {
@@ -2394,6 +2394,15 @@
 					{
 						"name": "removeKeys",
 						"description": "Also remove any associated private keys from the vault.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "removeDocumentKey",
+						"description": "Also remove the document key from the vault.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -2499,7 +2508,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/DidDocument"
+									"$ref": "https://schema.3sixty.global/w3c-did/DidDocument"
 								},
 								"examples": {
 									"identityCreateResponseExample": {
@@ -2629,7 +2638,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/DidDocumentVerificationMethod"
+									"$ref": "https://schema.3sixty.global/w3c-did/DidDocumentVerificationMethod"
 								},
 								"examples": {
 									"identityVerificationMethodCreateResponseExample": {
@@ -2870,7 +2879,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/DidService"
+									"$ref": "https://schema.3sixty.global/w3c-did/DidService"
 								},
 								"examples": {
 									"identityServiceCreateResponseExample": {
@@ -3430,7 +3439,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
+								"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiableCredential"
 							},
 							"examples": {
 								"identityVerifiableCredentialVerifyDocumentRequestExample": {
@@ -4053,7 +4062,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/w3c-did/DidVerifiablePresentation"
+								"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiablePresentation"
 							},
 							"examples": {
 								"identityVerifiablePresentationVerifyDocumentRequestExample": {
@@ -4386,7 +4395,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/w3c-did/Proof"
+									"$ref": "https://schema.3sixty.global/w3c-did/Proof"
 								},
 								"examples": {
 									"identityProofCreateResponseExample": {
@@ -6132,7 +6141,7 @@
 					"content": {
 						"text/plain": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/blob-storage/BlobStorageEmptyRequest"
+								"$ref": "https://schema.3sixty.global/blob-storage/BlobStorageEmptyRequest"
 							}
 						}
 					}
@@ -6276,22 +6285,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/blob-storage/BlobStorageEntryList"
+									"$ref": "https://schema.3sixty.global/blob-storage/BlobStorageEntryList"
 								},
 								"examples": {
 									"blobStorageListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/blob-storage/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/blob-storage/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "ItemList",
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/blob-storage/",
-														"https://schema.twindev.org/common/",
+														"https://schema.3sixty.global/blob-storage/",
+														"https://schema.3sixty.global/common/",
 														"https://schema.org"
 													],
 													"type": "BlobStorageEntry",
@@ -6315,22 +6324,22 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/blob-storage/BlobStorageEntryList"
+									"$ref": "https://schema.3sixty.global/blob-storage/BlobStorageEntryList"
 								},
 								"examples": {
 									"blobStorageListResponseJsonLdExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/blob-storage/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/blob-storage/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "ItemList",
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/blob-storage/",
-														"https://schema.twindev.org/common/",
+														"https://schema.3sixty.global/blob-storage/",
+														"https://schema.3sixty.global/common/",
 														"https://schema.org"
 													],
 													"type": "BlobStorageEntry",
@@ -6503,14 +6512,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/blob-storage/BlobStorageEntry"
+									"$ref": "https://schema.3sixty.global/blob-storage/BlobStorageEntry"
 								},
 								"examples": {
 									"blobStorageGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/blob-storage/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/blob-storage/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": "BlobStorageEntry",
@@ -6532,14 +6541,14 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/blob-storage/BlobStorageEntry"
+									"$ref": "https://schema.3sixty.global/blob-storage/BlobStorageEntry"
 								},
 								"examples": {
 									"blobStorageGetResponseJsonLdExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/blob-storage/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/blob-storage/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": "BlobStorageEntry",
@@ -9938,15 +9947,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/attestation/AttestationInformation"
+									"$ref": "https://schema.3sixty.global/attestation/AttestationInformation"
 								},
 								"examples": {
 									"attestationGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/attestation/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/attestation/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -9970,8 +9979,8 @@
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/attestation/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/attestation/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -9996,15 +10005,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/attestation/AttestationInformation"
+									"$ref": "https://schema.3sixty.global/attestation/AttestationInformation"
 								},
 								"examples": {
 									"attestationGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/attestation/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/attestation/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -10028,8 +10037,8 @@
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/attestation/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/attestation/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "Information",
 											"id": "attestation:iota:aW90YS1uZnQ6dHN0OjB4NzYyYjljNDllYTg2OWUwZWJkYTliYmZhNzY5Mzk0NDdhNDI4ZGNmMTc4YzVkMTVhYjQ0N2UyZDRmYmJiNGViMg==",
@@ -10476,15 +10485,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/immutable-proof/ImmutableProofCredential"
+									"$ref": "https://schema.3sixty.global/immutable-proof/ImmutableProofCredential"
 								},
 								"examples": {
 									"immutableProofGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://www.w3.org/2018/credentials/v1",
-												"https://schema.twindev.org/immutable-proof/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/immutable-proof/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"VerifiableCredential",
@@ -10510,15 +10519,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/immutable-proof/ImmutableProofCredential"
+									"$ref": "https://schema.3sixty.global/immutable-proof/ImmutableProofCredential"
 								},
 								"examples": {
 									"immutableProofJsonLdGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://www.w3.org/2018/credentials/v1",
-												"https://schema.twindev.org/immutable-proof/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/immutable-proof/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"VerifiableCredential",
@@ -10781,19 +10790,19 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/immutable-proof/ImmutableProofVerification"
+									"$ref": "https://schema.3sixty.global/immutable-proof/ImmutableProofVerification"
 								},
 								"examples": {
 									"immutableProofVerifyResponseExample": {
 										"value": {
-											"@context": "https://schema.twindev.org/immutable-proof/",
+											"@context": "https://schema.3sixty.global/immutable-proof/",
 											"type": "ImmutableProofVerification",
 											"verified": true
 										}
 									},
 									"immutableProofVerifyResponseFailExample": {
 										"value": {
-											"@context": "https://schema.twindev.org/immutable-proof/",
+											"@context": "https://schema.3sixty.global/immutable-proof/",
 											"type": "ImmutableProofVerification",
 											"verified": false,
 											"failure": "verificationFailure"
@@ -11755,14 +11764,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertexList"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertexList"
 								},
 								"examples": {
 									"DocumentManagementQueryResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/aig/"
+												"https://schema.3sixty.global/aig/"
 											],
 											"type": [
 												"ItemList",
@@ -11771,8 +11780,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/aig/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/aig/",
+														"https://schema.3sixty.global/common/"
 													],
 													"id": "aig:c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7",
 													"type": "AuditableItemGraphVertex",
@@ -11780,7 +11789,7 @@
 													"aliases": [
 														{
 															"@context": [
-																"https://schema.twindev.org/aig/"
+																"https://schema.3sixty.global/aig/"
 															],
 															"id": "test-id-0",
 															"type": "AuditableItemGraphAlias",
@@ -11789,13 +11798,13 @@
 													],
 													"resources": [
 														{
-															"@context": "https://schema.twindev.org/aig/",
+															"@context": "https://schema.3sixty.global/aig/",
 															"type": "AuditableItemGraphResource",
 															"dateCreated": "2024-08-22T04:13:20.000Z",
 															"resourceObject": {
 																"@context": [
-																	"https://schema.twindev.org/documents/",
-																	"https://schema.twindev.org/common/",
+																	"https://schema.3sixty.global/documents/",
+																	"https://schema.3sixty.global/common/",
 																	"https://schema.org"
 																],
 																"type": "Document",
@@ -12027,23 +12036,23 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/documents/DocumentList"
+									"$ref": "https://schema.3sixty.global/documents/DocumentList"
 								},
 								"examples": {
 									"DocumentManagementGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/documents/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/documents/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "ItemList",
 											"itemListElement": [
 												{
 													"@context": [
 														"https://schema.org",
-														"https://schema.twindev.org/documents/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/documents/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "Document",
 													"id": "2721000:0",
@@ -12069,23 +12078,23 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/documents/DocumentList"
+									"$ref": "https://schema.3sixty.global/documents/DocumentList"
 								},
 								"examples": {
 									"DocumentManagementGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/documents/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/documents/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "ItemList",
 											"itemListElement": [
 												{
 													"@context": [
 														"https://schema.org",
-														"https://schema.twindev.org/documents/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/documents/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "Document",
 													"id": "2721000:0",
@@ -12234,15 +12243,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/documents/Document"
+									"$ref": "https://schema.3sixty.global/documents/Document"
 								},
 								"examples": {
 									"DocumentManagementGetRevisionResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/documents/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/documents/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "Document",
 											"id": "2721000:0",
@@ -12266,15 +12275,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/documents/Document"
+									"$ref": "https://schema.3sixty.global/documents/Document"
 								},
 								"examples": {
 									"DocumentManagementGetRevisionResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/documents/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/documents/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "Document",
 											"id": "2721000:0",
@@ -12522,8 +12531,8 @@
 								"auditableItemGraphCreateRequestExample": {
 									"value": {
 										"@context": [
-											"https://schema.twindev.org/aig/",
-											"https://schema.twindev.org/common/"
+											"https://schema.3sixty.global/aig/",
+											"https://schema.3sixty.global/common/"
 										],
 										"type": "AuditableItemGraphVertex",
 										"annotationObject": {
@@ -12777,7 +12786,7 @@
 					},
 					{
 						"name": "limit",
-						"description": "Limit the number of entities to return.",
+						"description": "The maximum number of entities to return, a page can contain fewer so follow the cursor\nuntil it is absent to read them all.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -12805,15 +12814,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertexList"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertexList"
 								},
 								"examples": {
 									"auditableItemGraphListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -12822,8 +12831,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/aig/",
-														"https://schema.twindev.org/common/",
+														"https://schema.3sixty.global/aig/",
+														"https://schema.3sixty.global/common/",
 														"https://schema.org"
 													],
 													"type": "AuditableItemGraphVertex",
@@ -12832,8 +12841,8 @@
 													"aliases": [
 														{
 															"@context": [
-																"https://schema.twindev.org/aig/",
-																"https://schema.twindev.org/common/",
+																"https://schema.3sixty.global/aig/",
+																"https://schema.3sixty.global/common/",
 																"https://schema.org"
 															],
 															"type": "AuditableItemGraphAlias",
@@ -12849,15 +12858,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertexList"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertexList"
 								},
 								"examples": {
 									"auditableItemGraphJsonLdListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -12866,8 +12875,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/aig/",
-														"https://schema.twindev.org/common/",
+														"https://schema.3sixty.global/aig/",
+														"https://schema.3sixty.global/common/",
 														"https://schema.org"
 													],
 													"type": "AuditableItemGraphVertex",
@@ -12876,8 +12885,8 @@
 													"aliases": [
 														{
 															"@context": [
-																"https://schema.twindev.org/aig/",
-																"https://schema.twindev.org/common/",
+																"https://schema.3sixty.global/aig/",
+																"https://schema.3sixty.global/common/",
 																"https://schema.org"
 															],
 															"type": "AuditableItemGraphAlias",
@@ -13020,14 +13029,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertex"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertex"
 								},
 								"examples": {
 									"auditableItemGraphGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": "AuditableItemGraphVertex",
@@ -13042,8 +13051,8 @@
 											"aliases": [
 												{
 													"@context": [
-														"https://schema.twindev.org/aig/",
-														"https://schema.twindev.org/common/",
+														"https://schema.3sixty.global/aig/",
+														"https://schema.3sixty.global/common/",
 														"https://schema.org"
 													],
 													"type": "AuditableItemGraphAlias",
@@ -13057,14 +13066,14 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertex"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertex"
 								},
 								"examples": {
 									"auditableItemGraphJsonLdGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": "AuditableItemGraphVertex",
@@ -13079,8 +13088,8 @@
 											"aliases": [
 												{
 													"@context": [
-														"https://schema.twindev.org/aig/",
-														"https://schema.twindev.org/common/",
+														"https://schema.3sixty.global/aig/",
+														"https://schema.3sixty.global/common/",
 														"https://schema.org"
 													],
 													"type": "AuditableItemGraphAlias",
@@ -13197,8 +13206,8 @@
 								"auditableItemGraphUpdateRequestExample": {
 									"value": {
 										"@context": [
-											"https://schema.twindev.org/aig/",
-											"https://schema.twindev.org/common/"
+											"https://schema.3sixty.global/aig/",
+											"https://schema.3sixty.global/common/"
 										],
 										"type": "AuditableItemGraphVertex",
 										"annotationObject": {
@@ -13379,8 +13388,8 @@
 								"auditableItemGraphUpdatePartialRequestExample": {
 									"value": {
 										"@context": [
-											"https://schema.twindev.org/aig/",
-											"https://schema.twindev.org/common/"
+											"https://schema.3sixty.global/aig/",
+											"https://schema.3sixty.global/common/"
 										],
 										"edgePatches": {
 											"add": [
@@ -13515,14 +13524,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertex"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertex"
 								},
 								"examples": {
 									"auditableItemGraphVersionGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": "AuditableItemGraphVertex",
@@ -13654,15 +13663,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphVertexVersionList"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphVertexVersionList"
 								},
 								"examples": {
 									"auditableItemGraphVersionListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -13809,14 +13818,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphChangeset"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphChangeset"
 								},
 								"examples": {
 									"auditableItemGraphChangesetGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "AuditableItemGraphChangeset",
 											"id": "aig:1234567890",
@@ -13858,7 +13867,7 @@
 												}
 											],
 											"verification": {
-												"@context": "https://schema.twindev.org/immutable-proof/",
+												"@context": "https://schema.3sixty.global/immutable-proof/",
 												"type": "ImmutableProofVerification",
 												"verified": true
 											}
@@ -13868,14 +13877,14 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphChangeset"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphChangeset"
 								},
 								"examples": {
 									"auditableItemGraphChangesetJsonLdGetResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": "AuditableItemGraphChangeset",
@@ -13918,7 +13927,7 @@
 												}
 											],
 											"verification": {
-												"@context": "https://schema.twindev.org/immutable-proof/",
+												"@context": "https://schema.3sixty.global/immutable-proof/",
 												"type": "ImmutableProofVerification",
 												"verified": true
 											}
@@ -14064,15 +14073,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphChangesetList"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphChangesetList"
 								},
 								"examples": {
 									"auditableItemGraphChangesetListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -14120,7 +14129,7 @@
 														}
 													],
 													"verification": {
-														"@context": "https://schema.twindev.org/immutable-proof/",
+														"@context": "https://schema.3sixty.global/immutable-proof/",
 														"type": "ImmutableProofVerification",
 														"verified": true
 													}
@@ -14132,15 +14141,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/aig/AuditableItemGraphChangeset"
+									"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphChangeset"
 								},
 								"examples": {
 									"auditableItemGraphChangesetJsonLdGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/aig/",
-												"https://schema.twindev.org/common/",
+												"https://schema.3sixty.global/aig/",
+												"https://schema.3sixty.global/common/",
 												"https://schema.org"
 											],
 											"type": [
@@ -14189,7 +14198,7 @@
 														}
 													],
 													"verification": {
-														"@context": "https://schema.twindev.org/immutable-proof/",
+														"@context": "https://schema.3sixty.global/immutable-proof/",
 														"type": "ImmutableProofVerification",
 														"verified": true
 													}
@@ -14376,15 +14385,15 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/ais/AuditableItemStreamBase"
+								"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamBase"
 							},
 							"examples": {
 								"auditableItemStreamCreateRequestExample": {
 									"value": {
 										"@context": [
 											"https://schema.org",
-											"https://schema.twindev.org/ais/",
-											"https://schema.twindev.org/common/"
+											"https://schema.3sixty.global/ais/",
+											"https://schema.3sixty.global/common/"
 										],
 										"type": "AuditableItemStream",
 										"annotationObject": {
@@ -14568,15 +14577,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamList"
 								},
 								"examples": {
 									"auditableItemStreamListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -14586,8 +14595,8 @@
 												{
 													"@context": [
 														"https://schema.org",
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/ais/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "AuditableItemStream",
 													"id": "ais:1234567890",
@@ -14610,15 +14619,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamList"
 								},
 								"examples": {
 									"auditableItemStreamJsonLdListResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -14628,8 +14637,8 @@
 												{
 													"@context": [
 														"https://schema.org",
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/ais/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "AuditableItemStream",
 													"id": "ais:1234567890",
@@ -14836,15 +14845,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStream"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStream"
 								},
 								"examples": {
 									"auditableItemStreamGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "AuditableItemStream",
 											"id": "ais:1234567890",
@@ -14864,8 +14873,8 @@
 												"itemListElement": [
 													{
 														"@context": [
-															"https://schema.twindev.org/ais/",
-															"https://schema.twindev.org/common/"
+															"https://schema.3sixty.global/ais/",
+															"https://schema.3sixty.global/common/"
 														],
 														"type": "AuditableItemStreamEntry",
 														"id": "tst:1234567890",
@@ -14887,15 +14896,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStream"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStream"
 								},
 								"examples": {
 									"auditableItemStreamJsonLdGetResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "AuditableItemStream",
 											"id": "ais:1234567890",
@@ -14915,8 +14924,8 @@
 												"itemListElement": [
 													{
 														"@context": [
-															"https://schema.twindev.org/ais/",
-															"https://schema.twindev.org/common/"
+															"https://schema.3sixty.global/ais/",
+															"https://schema.3sixty.global/common/"
 														],
 														"type": "AuditableItemStreamEntry",
 														"id": "tst:1234567890",
@@ -15063,8 +15072,8 @@
 									"value": {
 										"@context": [
 											"https://schema.org",
-											"https://schema.twindev.org/ais/",
-											"https://schema.twindev.org/common/"
+											"https://schema.3sixty.global/ais/",
+											"https://schema.3sixty.global/common/"
 										],
 										"type": "AuditableItemStream",
 										"annotationObject": {
@@ -15593,15 +15602,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntryList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntryList"
 								},
 								"examples": {
 									"auditableItemStreamListEntriesResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -15610,8 +15619,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/ais/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "AuditableItemStreamEntry",
 													"id": "tst:1234567890",
@@ -15632,15 +15641,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntryList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntryList"
 								},
 								"examples": {
 									"auditableItemStreamJsonLdListEntriesResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -15649,8 +15658,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/ais/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "AuditableItemStreamEntry",
 													"id": "tst:1234567890",
@@ -15820,14 +15829,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntry"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntry"
 								},
 								"examples": {
 									"auditableItemStreamGetEntryResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "AuditableItemStreamEntry",
 											"id": "tst:1234567890",
@@ -15846,14 +15855,14 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntry"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntry"
 								},
 								"examples": {
 									"auditableItemStreamJsonLdGetEntryResponseExample": {
 										"value": {
 											"@context": [
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": "AuditableItemStreamEntry",
 											"id": "tst:1234567890",
@@ -16263,7 +16272,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+									"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 								},
 								"examples": {
 									"auditableItemStreamGetEntryObjectResponseExample": {
@@ -16442,15 +16451,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntryList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntryList"
 								},
 								"examples": {
 									"auditableItemStreamListEntriesNoStreamResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -16459,8 +16468,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/ais/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "AuditableItemStreamEntry",
 													"id": "tst:1234567890",
@@ -16481,15 +16490,15 @@
 							},
 							"application/ld+json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntryList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntryList"
 								},
 								"examples": {
 									"auditableItemStreamJsonLdListEntriesNoStreamResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -16498,8 +16507,8 @@
 											"itemListElement": [
 												{
 													"@context": [
-														"https://schema.twindev.org/ais/",
-														"https://schema.twindev.org/common/"
+														"https://schema.3sixty.global/ais/",
+														"https://schema.3sixty.global/common/"
 													],
 													"type": "AuditableItemStreamEntry",
 													"id": "tst:1234567890",
@@ -16694,15 +16703,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntryObjectList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntryObjectList"
 								},
 								"examples": {
 									"auditableItemStreamListEntryObjectsResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -16877,15 +16886,15 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/ais/AuditableItemStreamEntryObjectList"
+									"$ref": "https://schema.3sixty.global/ais/AuditableItemStreamEntryObjectList"
 								},
 								"examples": {
 									"auditableItemStreamListEntryObjectsNoStreamResponseExample": {
 										"value": {
 											"@context": [
 												"https://schema.org",
-												"https://schema.twindev.org/ais/",
-												"https://schema.twindev.org/common/"
+												"https://schema.3sixty.global/ais/",
+												"https://schema.3sixty.global/common/"
 											],
 											"type": [
 												"ItemList",
@@ -17139,7 +17148,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogRequestMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolCatalogRequestMessage"
 							},
 							"examples": {
 								"catalogRequestExample": {
@@ -17387,7 +17396,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolCatalogError"
 								}
 							}
 						}
@@ -17459,7 +17468,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dcat/DcatDataset"
+								"$ref": "https://schema.3sixty.global/dcat/DcatDataset"
 							},
 							"examples": {
 								"setDatasetRequestExample": {
@@ -17481,7 +17490,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolCatalogError"
 								}
 							}
 						}
@@ -17541,7 +17550,7 @@
 					"content": {
 						"application/ld+json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/w3c-activity-streams/ActivityStreamsActivity"
+								"$ref": "https://schema.3sixty.global/w3c-activity-streams/ActivityStreamsActivity"
 							},
 							"examples": {
 								"activityStreamNotifyRequestExample": {
@@ -17990,7 +17999,7 @@
 					"content": {
 						"application/ld+json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferRequestMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferRequestMessage"
 							},
 							"examples": {
 								"requestTransferRequestExample": {
@@ -18223,7 +18232,7 @@
 					"content": {
 						"application/ld+json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferStartMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferStartMessage"
 							},
 							"examples": {
 								"startTransferRequestExample": {
@@ -18337,7 +18346,7 @@
 					"content": {
 						"application/ld+json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferCompletionMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferCompletionMessage"
 							},
 							"examples": {
 								"completeTransferRequestExample": {
@@ -18459,7 +18468,7 @@
 					"content": {
 						"application/ld+json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferSuspensionMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferSuspensionMessage"
 							},
 							"examples": {
 								"suspendTransferRequestExample": {
@@ -18581,7 +18590,7 @@
 					"content": {
 						"application/ld+json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferTerminationMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferTerminationMessage"
 							},
 							"examples": {
 								"terminateTransferRequestExample": {
@@ -20360,7 +20369,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractRequestMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractRequestMessage"
 							},
 							"examples": {
 								"pnpNegotiationRequestExample": {
@@ -20473,7 +20482,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractRequestMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractRequestMessage"
 							},
 							"examples": {
 								"pnpNegotiationProviderRequestExample": {
@@ -20500,7 +20509,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								}
 							}
 						}
@@ -20593,7 +20602,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationEventMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationEventMessage"
 							},
 							"examples": {
 								"pnpNegotiationEventsRequestExample": {
@@ -20617,7 +20626,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								}
 							}
 						}
@@ -20710,7 +20719,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractAgreementVerificationMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractAgreementVerificationMessage"
 							},
 							"examples": {
 								"pnpNegotiationAgreementVerificationRequestExample": {
@@ -20733,7 +20742,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								}
 							}
 						}
@@ -20826,7 +20835,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationTerminationMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationTerminationMessage"
 							},
 							"examples": {
 								"pnpNegotiationTerminationRequestExample": {
@@ -20849,7 +20858,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								}
 							}
 						}
@@ -20931,7 +20940,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractOfferMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractOfferMessage"
 							},
 							"examples": {
 								"pnpNegotiationOfferRequestExample": {
@@ -20959,7 +20968,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								},
 								"examples": {
 									"pnpNegotiationOfferResponseExample": {
@@ -21044,7 +21053,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractOfferMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractOfferMessage"
 							},
 							"examples": {
 								"pnpNegotiationConsumerOfferRequestExample": {
@@ -21072,7 +21081,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								},
 								"examples": {
 									"pnpNegotiationConsumerOfferResponseExample": {
@@ -21177,7 +21186,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractAgreementMessage"
+								"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractAgreementMessage"
 							},
 							"examples": {
 								"pnpNegotiationAgreementRequestExample": {
@@ -21206,7 +21215,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+									"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 								}
 							}
 						}
@@ -21367,7 +21376,7 @@
 						"in": "query",
 						"required": false,
 						"schema": {
-							"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
+							"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
 						},
 						"example": "ACCEPTED"
 					},
@@ -21986,7 +21995,7 @@
 						"description": "The dataspace app this dataset belongs to. Matches the app's\nregistered name in `DataspaceAppFactory` (typically the app's URI)."
 					},
 					"dataset": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolDataset"
 					},
 					"transferIdleTimeoutMs": {
 						"type": "number",
@@ -22028,7 +22037,7 @@
 						"description": "The dataspace app this dataset belongs to. May change appId on\nupdate if the tenant wants to retarget the dataset."
 					},
 					"dataset": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolDataset"
 					},
 					"transferIdleTimeoutMs": {
 						"type": "number",
@@ -22045,7 +22054,7 @@
 				"type": "object",
 				"properties": {
 					"attestationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"namespace": {
 						"type": "string",
@@ -22215,14 +22224,14 @@
 						"type": "array",
 						"prefixItems": [
 							{
-								"const": "https://schema.twindev.org/aig/"
+								"const": "https://schema.3sixty.global/aig/"
 							},
 							{
-								"const": "https://schema.twindev.org/common/"
+								"const": "https://schema.3sixty.global/common/"
 							}
 						],
 						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdContextDefinitionElement"
 						},
 						"minItems": 2,
 						"description": "JSON-LD Context."
@@ -22236,29 +22245,29 @@
 						"description": "The identity of the organization which controls the vertex."
 					},
 					"auditMode": {
-						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAuditMode"
+						"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphAuditMode"
 					},
 					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"aliases": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAlias"
+							"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphAlias"
 						},
 						"description": "Alternative aliases that can be used to identify the vertex."
 					},
 					"resources": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphResource"
+							"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphResource"
 						},
 						"description": "The resources attached to the vertex."
 					},
 					"edges": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphEdge"
+							"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphEdge"
 						},
 						"description": "Edges connected to the vertex."
 					},
@@ -22296,14 +22305,14 @@
 						"type": "array",
 						"prefixItems": [
 							{
-								"const": "https://schema.twindev.org/aig/"
+								"const": "https://schema.3sixty.global/aig/"
 							},
 							{
-								"const": "https://schema.twindev.org/common/"
+								"const": "https://schema.3sixty.global/common/"
 							}
 						],
 						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdContextDefinitionElement"
 						},
 						"minItems": 2,
 						"description": "JSON-LD Context."
@@ -22313,10 +22322,10 @@
 						"description": "The identity of the organization which controls the vertex."
 					},
 					"auditMode": {
-						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAuditMode"
+						"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphAuditMode"
 					},
 					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"verified": {
 						"type": "boolean",
@@ -22331,13 +22340,13 @@
 						"description": "JSON-LD Type."
 					},
 					"aliasPatches": {
-						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphListPatch"
+						"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphListPatch"
 					},
 					"resourcePatches": {
-						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphListPatch"
+						"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphListPatch"
 					},
 					"edgePatches": {
-						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphListPatch"
+						"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphListPatch"
 					}
 				},
 				"required": [
@@ -22364,14 +22373,14 @@
 						"type": "array",
 						"prefixItems": [
 							{
-								"const": "https://schema.twindev.org/aig/"
+								"const": "https://schema.3sixty.global/aig/"
 							},
 							{
-								"const": "https://schema.twindev.org/common/"
+								"const": "https://schema.3sixty.global/common/"
 							}
 						],
 						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdContextDefinitionElement"
 						},
 						"minItems": 2,
 						"description": "JSON-LD Context."
@@ -22385,29 +22394,29 @@
 						"description": "The identity of the organization which controls the vertex."
 					},
 					"auditMode": {
-						"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAuditMode"
+						"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphAuditMode"
 					},
 					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"aliases": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphAlias"
+							"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphAlias"
 						},
 						"description": "Alternative aliases that can be used to identify the vertex."
 					},
 					"resources": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphResource"
+							"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphResource"
 						},
 						"description": "The resources attached to the vertex."
 					},
 					"edges": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/aig/AuditableItemGraphEdge"
+							"$ref": "https://schema.3sixty.global/aig/AuditableItemGraphEdge"
 						},
 						"description": "Edges connected to the vertex."
 					},
@@ -22429,7 +22438,7 @@
 				"type": "object",
 				"properties": {
 					"entryObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					}
 				},
 				"required": [
@@ -22441,7 +22450,7 @@
 				"type": "object",
 				"properties": {
 					"entryObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					}
 				},
 				"required": [
@@ -22460,14 +22469,14 @@
 								"const": "https://schema.org"
 							},
 							{
-								"const": "https://schema.twindev.org/ais/"
+								"const": "https://schema.3sixty.global/ais/"
 							},
 							{
-								"const": "https://schema.twindev.org/common/"
+								"const": "https://schema.3sixty.global/common/"
 							}
 						],
 						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdContextDefinitionElement"
 						},
 						"minItems": 3,
 						"description": "JSON-LD Context."
@@ -22477,7 +22486,7 @@
 						"description": "JSON-LD Type."
 					},
 					"annotationObject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					}
 				},
 				"required": [
@@ -22717,7 +22726,7 @@
 						"description": "The extension of the blob, will be detected if left undefined."
 					},
 					"metadata": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"disableEncryption": {
 						"type": "boolean",
@@ -22725,7 +22734,7 @@
 						"default": false
 					},
 					"compress": {
-						"$ref": "https://schema.twindev.org/blob-storage/BlobStorageCompressionType"
+						"$ref": "https://schema.3sixty.global/blob-storage/BlobStorageCompressionType"
 					},
 					"overrideVaultKeyId": {
 						"type": "string",
@@ -22754,7 +22763,7 @@
 						"description": "The extension of the blob, will be detected if left undefined."
 					},
 					"metadata": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					}
 				},
 				"description": "The body parameters."
@@ -22762,10 +22771,10 @@
 			"CatalogRequestResponse": {
 				"anyOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalog"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolCatalog"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolCatalogError"
 					}
 				],
 				"description": "The response payload containing the DS Protocol compliant catalog with participantId,\nor a CatalogError if no datasets are found (404).\nPer DS Protocol: Single participant returns flat catalog, multiple participants return nested catalogs."
@@ -22826,10 +22835,10 @@
 			"CompleteTransferResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferProcess"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferError"
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with state COMPLETED, or error."
@@ -22849,7 +22858,7 @@
 					"itemListElement": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 						},
 						"description": "The components of the Collection"
 					}
@@ -22970,10 +22979,10 @@
 			"DatasetGetResponse": {
 				"anyOf": [
 					{
-						"$ref": "https://schema.twindev.org/dcat/DcatDataset"
+						"$ref": "https://schema.3sixty.global/dcat/DcatDataset"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolCatalogError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolCatalogError"
 					}
 				],
 				"description": "The response payload containing the dataset or error."
@@ -22991,7 +23000,7 @@
 						"description": "The dataspace app this dataset belongs to."
 					},
 					"dataset": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolDataset"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolDataset"
 					},
 					"transferIdleTimeoutMs": {
 						"type": "number",
@@ -23019,7 +23028,7 @@
 				"type": "object",
 				"properties": {
 					"document": {
-						"$ref": "https://schema.twindev.org/documents/DocumentBase"
+						"$ref": "https://schema.3sixty.global/documents/DocumentBase"
 					},
 					"blob": {
 						"type": "string",
@@ -23028,7 +23037,7 @@
 					"auditableItemGraphEdges": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/documents/DocumentManagementEdgeEntry"
+							"$ref": "https://schema.3sixty.global/documents/DocumentManagementEdgeEntry"
 						},
 						"description": "The auditable item graph vertices to connect the document to."
 					},
@@ -23044,7 +23053,7 @@
 								"description": "Flag to add the document id as an alias to the aig vertex, defaults to true."
 							},
 							"aliasAnnotationObject": {
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+								"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 							}
 						},
 						"description": "Additional options for the create operation."
@@ -23068,10 +23077,10 @@
 								"description": "The format of the document id."
 							},
 							"documentCode": {
-								"$ref": "https://schema.twindev.org/unece/UneceDocumentCodeList"
+								"$ref": "https://schema.3sixty.global/unece/UneceDocumentCodeList"
 							},
 							"annotationObject": {
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+								"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 							}
 						}
 					},
@@ -23085,7 +23094,7 @@
 							"add": {
 								"type": "array",
 								"items": {
-									"$ref": "https://schema.twindev.org/documents/DocumentManagementEdgeEntry"
+									"$ref": "https://schema.3sixty.global/documents/DocumentManagementEdgeEntry"
 								},
 								"description": "Connections to add; each entry creates a back-edge on the connected vertex."
 							},
@@ -23111,7 +23120,7 @@
 								"description": "Set to true to add the document id as an alias on the aig vertex, or false to remove it. Omit to leave alias state unchanged."
 							},
 							"aliasAnnotationObject": {
-								"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+								"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 							}
 						},
 						"description": "Additional options for the update operation."
@@ -23167,7 +23176,7 @@
 					"jsonLdContext": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionElement"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdContextDefinitionElement"
 						},
 						"description": "The JSON-LD context to be applied over the query terms."
 					}
@@ -23179,10 +23188,10 @@
 			"GetTransferProcessResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferProcess"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferError"
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with current state, or error."
@@ -23316,10 +23325,10 @@
 				"type": "object",
 				"properties": {
 					"publicProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdDocument"
 					},
 					"privateProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdDocument"
 					}
 				},
 				"description": "The data for the request."
@@ -23328,10 +23337,10 @@
 				"type": "object",
 				"properties": {
 					"publicProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdDocument"
 					},
 					"privateProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdDocument"
 					}
 				},
 				"description": "The data for the request."
@@ -23383,10 +23392,10 @@
 				"type": "object",
 				"properties": {
 					"publicProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdDocument"
 					},
 					"privateProfile": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdDocument"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdDocument"
 					}
 				},
 				"description": "The data for the request."
@@ -23395,10 +23404,10 @@
 				"type": "object",
 				"properties": {
 					"proofType": {
-						"$ref": "https://schema.twindev.org/w3c-did/ProofTypes"
+						"$ref": "https://schema.3sixty.global/w3c-did/ProofTypes"
 					},
 					"document": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					}
 				},
 				"required": [
@@ -23411,10 +23420,10 @@
 				"type": "object",
 				"properties": {
 					"document": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"proof": {
-						"$ref": "https://schema.twindev.org/w3c-did/Proof"
+						"$ref": "https://schema.3sixty.global/w3c-did/Proof"
 					}
 				},
 				"required": [
@@ -23486,7 +23495,7 @@
 						"description": "The id of the credential."
 					},
 					"subject": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"revocationIndex": {
 						"type": "number",
@@ -23520,7 +23529,7 @@
 				"type": "object",
 				"properties": {
 					"verifiableCredential": {
-						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
+						"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiableCredential"
 					},
 					"jwt": {
 						"type": "string",
@@ -23541,7 +23550,7 @@
 						"description": "Has the credential been revoked."
 					},
 					"verifiableCredential": {
-						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
+						"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiableCredential"
 					}
 				},
 				"required": [
@@ -23557,7 +23566,7 @@
 						"description": "The id of the presentation."
 					},
 					"contexts": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdContextDefinitionRoot"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdContextDefinitionRoot"
 					},
 					"types": {
 						"anyOf": [
@@ -23581,7 +23590,7 @@
 									"type": "string"
 								},
 								{
-									"$ref": "https://schema.twindev.org/w3c-did/DidVerifiableCredential"
+									"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiableCredential"
 								}
 							]
 						},
@@ -23615,7 +23624,7 @@
 				"type": "object",
 				"properties": {
 					"verifiablePresentation": {
-						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiablePresentation"
+						"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiablePresentation"
 					},
 					"jwt": {
 						"type": "string",
@@ -23636,12 +23645,12 @@
 						"description": "Has the presentation been revoked."
 					},
 					"verifiablePresentation": {
-						"$ref": "https://schema.twindev.org/w3c-did/DidVerifiablePresentation"
+						"$ref": "https://schema.3sixty.global/w3c-did/DidVerifiablePresentation"
 					},
 					"issuers": {
 						"type": "array",
 						"items": {
-							"$ref": "https://schema.twindev.org/w3c-did/DidDocument"
+							"$ref": "https://schema.3sixty.global/w3c-did/DidDocument"
 						},
 						"description": "The issuers of the presentation."
 					}
@@ -23655,7 +23664,7 @@
 				"type": "object",
 				"properties": {
 					"verificationMethodType": {
-						"$ref": "https://schema.twindev.org/w3c-did/DidVerificationMethodType"
+						"$ref": "https://schema.3sixty.global/w3c-did/DidVerificationMethodType"
 					},
 					"verificationMethodId": {
 						"type": "string",
@@ -23671,7 +23680,7 @@
 				"type": "object",
 				"properties": {
 					"document": {
-						"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 					},
 					"options": {
 						"type": "object",
@@ -24142,10 +24151,10 @@
 			"PnpContractNegotiationResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiation"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiation"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationError"
 					}
 				],
 				"description": "The state of the policy or an error."
@@ -24175,7 +24184,7 @@
 						"description": "The expiration time for the policy negotiation if it's a manual process."
 					},
 					"state": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolContractNegotiationStateType"
 					},
 					"callbackAddress": {
 						"type": "string",
@@ -24190,10 +24199,10 @@
 						"description": "Organization identity."
 					},
 					"offer": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolOffer"
 					},
 					"agreement": {
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolAgreement"
 					},
 					"trustVerificationInfo": {
 						"$ref": "#/components/schemas/TrustVerificationInfo"
@@ -24284,10 +24293,10 @@
 			"RequestTransferResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferProcess"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferError"
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with state REQUESTED, or error."
@@ -24297,7 +24306,7 @@
 				"type": "object",
 				"allOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolAgreement"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolAgreement"
 					},
 					{
 						"$ref": "#/components/schemas/RightsManagementPolicyMetadata"
@@ -24312,7 +24321,7 @@
 				"type": "object",
 				"allOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolOffer"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolOffer"
 					},
 					{
 						"$ref": "#/components/schemas/RightsManagementPolicyMetadata"
@@ -24327,7 +24336,7 @@
 				"type": "object",
 				"allOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolPolicy"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolPolicy"
 					},
 					{
 						"$ref": "#/components/schemas/RightsManagementPolicyMetadata"
@@ -24358,7 +24367,7 @@
 					"trustData": {
 						"type": "object",
 						"additionalProperties": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 						},
 						"description": "Trust verification data captured at the beginning of the negotiation."
 					}
@@ -24369,7 +24378,7 @@
 				"type": "object",
 				"allOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolSet"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolSet"
 					},
 					{
 						"$ref": "#/components/schemas/RightsManagementPolicyMetadata"
@@ -24515,10 +24524,10 @@
 			"StartTransferResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferStartMessage"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferStartMessage"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferError"
 					}
 				],
 				"description": "Transfer Start Message (DSP compliant) with dataAddress for PULL transfers, or error."
@@ -24526,10 +24535,10 @@
 			"SuspendTransferResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferProcess"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferError"
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with state SUSPENDED, or error."
@@ -24718,10 +24727,10 @@
 			"TerminateTransferResponse": {
 				"oneOf": [
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferProcess"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferProcess"
 					},
 					{
-						"$ref": "https://schema.twindev.org/dataspace-protocol/DataspaceProtocolTransferError"
+						"$ref": "https://schema.3sixty.global/dataspace-protocol/DataspaceProtocolTransferError"
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with state TERMINATED, or error."
@@ -24737,7 +24746,7 @@
 					"data": {
 						"type": "object",
 						"additionalProperties": {
-							"$ref": "https://schema.twindev.org/json-ld/JsonLdNodeObject"
+							"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
 						},
 						"description": "Additional JSON-LD node objects associated with the verification."
 					}

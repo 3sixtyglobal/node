@@ -2,7 +2,7 @@
 	"group": "Health",
 	"steps": [
 		{
-			"description": "GET /health — waits at least 5s since server start",
+			"description": "GET /health - waits at least 5s since server start",
 			"method": "GET",
 			"path": "/health",
 			"auth": false,

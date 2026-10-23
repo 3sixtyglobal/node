@@ -18,7 +18,7 @@ import {
 
 /**
  * The shipped defaults (run-soak.mjs cfg): 2m warm-up discard, 10m minimum window,
- * 150 MB/hr breach limit — both signals must independently exceed it to breach.
+ * 150 MB/hr breach limit - both signals must independently exceed it to breach.
  */
 const SHIPPED_DEFAULTS: IMemoryVerdictOptions = {
 	warmupDiscardMs: 120_000,
@@ -52,7 +52,7 @@ describe("soak memory verdict", () => {
 		expect(verdict.verdict).toEqual("insufficient");
 	});
 
-	test("a genuine sustained leak breaches — the positive control no archived run provides", () => {
+	test("a genuine sustained leak breaches - the positive control no archived run provides", () => {
 		const verdict = evaluateMemory(generateLeakSeries(3, 300), SHIPPED_DEFAULTS);
 
 		expect(verdict.verdict).toEqual("breach");
@@ -60,7 +60,7 @@ describe("soak memory verdict", () => {
 
 	test("flat series across independent noise seeds all pass, including the one that flips the previous design", () => {
 		// Seed 20 is a genuinely flat series that false-breached under the tail-restricted
-		// design during Phase 2 candidate scoring — kept as a named regression case.
+		// design during Phase 2 candidate scoring - kept as a named regression case.
 		for (const seed of [1, 2, 20]) {
 			const verdict = evaluateMemory(generateFlatSeries(seed), SHIPPED_DEFAULTS);
 
@@ -68,14 +68,14 @@ describe("soak memory verdict", () => {
 		}
 	});
 
-	test("a rise that plateaus well before the run ends passes — settling is not a leak", () => {
+	test("a rise that plateaus well before the run ends passes - settling is not a leak", () => {
 		const verdict = evaluateMemory(generateWarmupOnlySeries(4), SHIPPED_DEFAULTS);
 
 		expect(verdict.verdict).toEqual("pass");
 	});
 });
 
-describe("soak memory verdict — auto-extend trigger", () => {
+describe("soak memory verdict - auto-extend trigger", () => {
 	const cases: { name: string; state: IExtendDecisionState; expected: boolean }[] = [
 		{
 			name: "breach, k6 passed, not yet extended, local run",
@@ -89,7 +89,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 			expected: true
 		},
 		{
-			name: "breach, but k6 also failed — extending would not help",
+			name: "breach, but k6 also failed - extending would not help",
 			state: {
 				verdict: "breach",
 				signals: { floorBreach: true, rawBreach: true },
@@ -100,7 +100,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 			expected: false
 		},
 		{
-			name: "breach, but already extended once — never extend twice",
+			name: "breach, but already extended once - never extend twice",
 			state: {
 				verdict: "breach",
 				signals: { floorBreach: true, rawBreach: true },
@@ -122,7 +122,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 			expected: false
 		},
 		{
-			name: "pass — nothing to disambiguate",
+			name: "pass - nothing to disambiguate",
 			state: {
 				verdict: "pass",
 				signals: { floorBreach: false, rawBreach: false },
@@ -135,7 +135,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 		{
 			// This is the case Finding 1 fixes: a genuine signal disagreement on an otherwise
 			// enforceable window must extend, the same as a breach does.
-			name: "informational from a genuine signal disagreement, k6 passed — must extend",
+			name: "informational from a genuine signal disagreement, k6 passed - must extend",
 			state: {
 				verdict: "informational",
 				signals: { floorBreach: false, rawBreach: true },
@@ -157,7 +157,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 			expected: false
 		},
 		{
-			name: "informational — the run declined to enforce (too little data, signals null)",
+			name: "informational - the run declined to enforce (too little data, signals null)",
 			state: {
 				verdict: "informational",
 				signals: null,
@@ -168,7 +168,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 			expected: false
 		},
 		{
-			name: "insufficient — too few samples to have a verdict at all",
+			name: "insufficient - too few samples to have a verdict at all",
 			state: {
 				verdict: "insufficient",
 				signals: null,
@@ -185,7 +185,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 	});
 
 	test("a slow-settling warm-up breaches at 30m but resolves to pass once extended to 60m", () => {
-		// Same seed, same underlying signal (verified elsewhere to share an identical prefix) —
+		// Same seed, same underlying signal (verified elsewhere to share an identical prefix) -
 		// the only difference is how long it was observed for. This is the real edge case Phase 3's
 		// whole-window estimator cannot resolve alone: a rise large enough, and slow enough, to
 		// still dominate a 30-minute average even though it has genuinely settled by minute 15.
@@ -196,7 +196,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 		expect(extended.verdict).toEqual("pass");
 	});
 
-	test("a genuine leak still breaches after the same extension — extending does not launder a real leak", () => {
+	test("a genuine leak still breaches after the same extension - extending does not launder a real leak", () => {
 		const initial = evaluateMemory(generateLeakSeries(42, 300, 181), SHIPPED_DEFAULTS);
 		const extended = evaluateMemory(generateLeakSeries(42, 300, 361), SHIPPED_DEFAULTS);
 
@@ -204,7 +204,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 		expect(extended.verdict).toEqual("breach");
 	});
 
-	test("a genuinely short window (12m) is informational with null signals — it never reaches the extend trigger", () => {
+	test("a genuinely short window (12m) is informational with null signals - it never reaches the extend trigger", () => {
 		const verdict = evaluateMemory(generateShortBorderlineSeries(1), SHIPPED_DEFAULTS);
 
 		expect(verdict.verdict).toEqual("informational");
@@ -220,7 +220,7 @@ describe("soak memory verdict — auto-extend trigger", () => {
 		expect(shouldExtendForDisambiguation(state)).toEqual(false);
 	});
 
-	test("a real signal disagreement (slow-settling, seed 1) is informational with non-null signals — must extend", () => {
+	test("a real signal disagreement (slow-settling, seed 1) is informational with non-null signals - must extend", () => {
 		// Found via a 200-seed sweep of generateSlowSettlingSeries: seed 1 lands informational
 		// with the two signals genuinely disagreeing, not from a short window. This is the exact
 		// case Finding 1 identified as silently exiting green with no extension attempted.

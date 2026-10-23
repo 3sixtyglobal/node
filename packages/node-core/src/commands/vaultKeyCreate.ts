@@ -1,10 +1,10 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { CLIDisplay, CLIUtils } from "@twin.org/cli-core";
-import { Converter, GeneralError, Guards, I18n, Is } from "@twin.org/core";
-import type { IEngineCore } from "@twin.org/engine-models";
-import { Did } from "@twin.org/identity-models";
-import { VaultConnectorFactory, VaultKeyType } from "@twin.org/vault-models";
+import { CLIDisplay, CLIUtils } from "@3sixty/cli-core";
+import { Converter, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import type { IEngineCore } from "@3sixty/engine-models";
+import { Did } from "@3sixty/identity-models";
+import { VaultConnectorFactory, VaultKeyType } from "@3sixty/vault-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -57,7 +57,7 @@ export function getCommandDefinitionVaultKeyCreate(commandDefinitions: {
 				description: I18n.formatMessage(
 					"node.cli.commands.vault-key-create.params.key-type.description"
 				),
-				options: ["Ed25519", "Secp256k1", "ChaCha20Poly1305"],
+				options: ["Ed25519", "ChaCha20Poly1305"],
 				defaultValue: "Ed25519",
 				required: false
 			},
@@ -148,11 +148,7 @@ export async function vaultKeyCreate(
 > {
 	Did.guard("vaultKeyCreate", "identity", params.identity);
 	Guards.stringValue("vaultKeyCreate", "key-id", params.keyId);
-	Guards.arrayOneOf("vaultKeyCreate", "key-type", params.keyType, [
-		"Ed25519",
-		"Secp256k1",
-		"ChaCha20Poly1305"
-	]);
+	Guards.arrayOneOf("vaultKeyCreate", "key-type", params.keyType, ["Ed25519", "ChaCha20Poly1305"]);
 
 	const defaultVaultConnectorType = engineCore.getRegisteredInstanceType("vaultConnector");
 	const vaultConnector = VaultConnectorFactory.get(defaultVaultConnectorType);

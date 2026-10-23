@@ -13,7 +13,7 @@ Four ready-to-use example files are provided in `apps/node/`. Copy the relevant 
 
 ## Extension Loading
 
-The TWIN Node supports loading extensions dynamically to extend its functionality. Extensions can be loaded from multiple sources using protocol-based syntax.
+The 3Sixty Node supports loading extensions dynamically to extend its functionality. Extensions can be loaded from multiple sources using protocol-based syntax.
 
 ### Extension Loading Syntax
 
@@ -37,13 +37,13 @@ Load extensions from npm packages. The package will be automatically downloaded 
 
 ```bash
 # Basic npm package
-TWIN_EXTENSIONS="npm:@twin.org/identity-management-service"
+TWIN_EXTENSIONS="npm:@3sixty/identity-management-service"
 
 # Scoped package
 TWIN_EXTENSIONS="npm:@org/custom-extension"
 ```
 
-**Note:** Version pinning (e.g., `npm:@twin.org/pkg@1.2.3`) is planned for a future release. Currently, the latest version is installed.
+**Note:** Version pinning (e.g., `npm:@3sixty/pkg@1.2.3`) is planned for a future release. Currently, the latest version is installed.
 
 #### HTTPS URL Extensions
 
@@ -67,7 +67,7 @@ Security features:
 Load multiple extensions from different sources:
 
 ```bash
-TWIN_EXTENSIONS="@twin.org/identity-management-service,npm:@twin.org/custom-service,./local-extension.mjs,https://example.com/remote.mjs"
+TWIN_EXTENSIONS="@3sixty/identity-management-service,npm:@3sixty/custom-service,./local-extension.mjs,https://example.com/remote.mjs"
 ```
 
 ### Extension Configuration Options
@@ -187,7 +187,7 @@ Downloaded extensions are stored in:
 <execution-directory>/<cache-directory>/extensions/
   ├── npm/                      # NPM packages
   │   └── node_modules/
-  │       └── @twin.org/...
+  │       └── @3sixty/...
   └── https/                    # HTTPS downloads
       └── <hashed-filename>.mjs
 ```

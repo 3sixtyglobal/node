@@ -10,6 +10,7 @@
 	"versioning": "prerelease",
 	"prerelease": true,
 	"prerelease-type": "next",
+	"last-release-sha": "ed4b8cc25d539e1052a49d44c16bd57df62f83ab",
 	"packages": {
 		"packages/node-core": {
 			"package-name": "node-core",

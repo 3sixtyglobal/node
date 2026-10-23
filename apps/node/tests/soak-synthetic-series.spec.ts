@@ -30,7 +30,7 @@ describe("soak synthetic series generator", () => {
 		const first = series[0].rssBytes;
 		const last = series[series.length - 1].rssBytes;
 
-		// No drift term is applied, so any difference is sawtooth phase + noise, not growth —
+		// No drift term is applied, so any difference is sawtooth phase + noise, not growth -
 		// bounded well under the amplitude (500 MB) used to build the fixture.
 		expect(Math.abs(last - first)).toBeLessThan(500_000_000);
 	});
@@ -64,7 +64,7 @@ describe("soak synthetic series generator", () => {
 		const late = generateWarmupLateSeries(5);
 
 		// Different plateau timing (480s vs 1200s) must produce different series, even from
-		// the same seed — otherwise the two fixtures would be testing the same thing twice.
+		// the same seed - otherwise the two fixtures would be testing the same thing twice.
 		expect(early).not.toEqual(late);
 	});
 
@@ -72,7 +72,7 @@ describe("soak synthetic series generator", () => {
 		const series = generateShortBorderlineSeries(1);
 		const windowMs = series[series.length - 1].t - series[0].t;
 
-		// 72 samples at the default 10s interval span ~11.8 minutes — under the harness's
+		// 72 samples at the default 10s interval span ~11.8 minutes - under the harness's
 		// default 10-minute minimum enforcement window once warm-up is discarded.
 		expect(windowMs).toBeLessThan(720_000);
 	});

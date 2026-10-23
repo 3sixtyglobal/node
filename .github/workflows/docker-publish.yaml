@@ -9,22 +9,24 @@ on:
         required: true
         type: choice
         options:
-          - '🚧 prerelease (next branch)' # For prereleases (e.g., 0.1.0-next.1)
-          - '🚀 production (main branch)' # For production releases (e.g., 1.0.0, 1.1.0, 1.1.1)
+          - '🌱 prerelease (next branch)' # For prereleases (e.g., 0.1.0-next.1)
+          - '🌳 production (main branch)' # For production releases (e.g., 1.0.0, 1.1.0, 1.1.1)
 
 concurrency:
-  group: twin-node-docker-publish
+  group: 3sixty-node-docker-publish
   cancel-in-progress: false
 
 env:
-  TWIN_DOCKER_USERNAME: ${{ secrets.TWIN_DOCKER_USERNAME }}
-  TWIN_DOCKER_REPO: twinfoundation/twin-node
+  ORG_REGISTRY: ghcr.io
+  ORG_IMAGE_NAME: 3sixty-node
 
 jobs:
   build-and-push:
-    runs-on:
-      labels: ${{ github.event.repository.private && 'self-hosted' || 'ubuntu-latest' }}
-      group: ${{ github.event.repository.private && 'twin' || 'default' }}
+    runs-on: ${{ github.event.repository.private && fromJSON('{"group":"3sixty","labels":"self-hosted"}') || 'ubuntu-latest' }}
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       # Set branch variable based on release type
       - name: Set target branch
@@ -67,41 +69,76 @@ jobs:
       - name: Determine Docker tags
         id: docker-tags
         run: |
-          VERSION_TAG="${{ env.TWIN_DOCKER_REPO }}:${{ steps.package-version.outputs.version }}"
+          # GHCR requires lowercase image names
+          OWNER="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          REPO="${{ env.ORG_REGISTRY }}/$OWNER/${{ env.ORG_IMAGE_NAME }}"
+          VERSION_TAG="$REPO:${{ steps.package-version.outputs.version }}"
           BRANCH="${{ steps.set-branch.outputs.branch }}"
 
           if [[ "$BRANCH" == "main" ]]; then
-            TAGS="$VERSION_TAG,${{ env.TWIN_DOCKER_REPO }}:latest"
+            TAGS="$VERSION_TAG,$REPO:latest"
             echo "Building from main branch - adding latest tag"
           else
-            TAGS="$VERSION_TAG,${{ env.TWIN_DOCKER_REPO }}:next"
+            TAGS="$VERSION_TAG,$REPO:next"
             echo "Building from next branch - adding next tag"
           fi
 
+          echo "repo=$REPO" >> "$GITHUB_OUTPUT"
           echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
           echo "Docker tags: $TAGS"
 
-      # Check whether the version tag already exists in Docker Hub
-      - name: Check existing Docker Hub version tag
+      # Determine the OCI labels, also applied as index annotations so GitHub Packages shows them for the multi-platform image
+      - name: Determine image metadata
+        id: image-metadata
+        run: |
+          LABELS=$(cat <<EOF
+          org.opencontainers.image.title=TWIN Node
+          org.opencontainers.image.description=$(jq -r '.description' apps/node/package.json)
+          org.opencontainers.image.version=${{ steps.package-version.outputs.version }}
+          org.opencontainers.image.revision=$(git rev-parse HEAD)
+          org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}/pkgs/container/${{ env.ORG_IMAGE_NAME }}
+          org.opencontainers.image.documentation=$(jq -r '.homepage' apps/node/package.json)
+          org.opencontainers.image.licenses=$(jq -r '.license' apps/node/package.json)
+          EOF
+          )
+
+          {
+            echo "labels<<LABELS_EOF"
+            echo "$LABELS"
+            echo "LABELS_EOF"
+            echo "annotations<<ANNOTATIONS_EOF"
+            echo "$LABELS" | sed 's/^/index:/'
+            echo "ANNOTATIONS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Image labels:"
+          echo "$LABELS"
+
+      # Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.ORG_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Check whether the version tag already exists in GitHub Container Registry
+      - name: Check existing GHCR version tag
         id: check-existing-tag
         run: |
-          REPO="${{ env.TWIN_DOCKER_REPO }}"
-          NAMESPACE="${REPO%%/*}"
-          IMAGE_NAME="${REPO##*/}"
-          VERSION="${{ steps.package-version.outputs.version }}"
-          TAG_URL="https://hub.docker.com/v2/repositories/$NAMESPACE/$IMAGE_NAME/tags/$VERSION"
+          IMAGE="${{ steps.docker-tags.outputs.repo }}:${{ steps.package-version.outputs.version }}"
 
-          HTTP_STATUS=$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" "$TAG_URL")
-
-          if [[ "$HTTP_STATUS" == "200" ]]; then
+          if OUTPUT=$(docker manifest inspect "$IMAGE" 2>&1); then
             echo "version_exists=true" >> $GITHUB_OUTPUT
-            echo "Version tag already exists: $REPO:$VERSION"
-          elif [[ "$HTTP_STATUS" == "404" ]]; then
+            echo "Version tag already exists: $IMAGE"
+          elif echo "$OUTPUT" | grep -qiE "manifest unknown|no such manifest|not found"; then
             echo "version_exists=false" >> $GITHUB_OUTPUT
-            echo "Version tag does not exist yet: $REPO:$VERSION"
+            echo "Version tag does not exist yet: $IMAGE"
           else
-            echo "Error: Docker Hub tag check failed with HTTP $HTTP_STATUS"
-            echo "Lookup URL: $TAG_URL"
+            echo "Error: GHCR tag check failed for $IMAGE"
+            echo "$OUTPUT"
             exit 1
           fi
 
@@ -110,34 +147,30 @@ jobs:
         if: steps.check-existing-tag.outputs.version_exists != 'true'
         uses: docker/setup-buildx-action@v4
 
-      # Log in to Docker Hub
-      - name: Log in to Docker Hub
-        if: steps.check-existing-tag.outputs.version_exists != 'true'
-        uses: docker/login-action@v4
-        with:
-          username: ${{ env.TWIN_DOCKER_USERNAME }}
-          password: ${{ secrets.TWIN_DOCKER_PASSWORD }}
-
       # Build and push the Docker image
       - name: Build and Push Docker image
         id: build-push
         if: steps.check-existing-tag.outputs.version_exists != 'true'
         uses: docker/build-push-action@v7
         with:
-          context: ./apps/node
+          context: .
           file: ./apps/node/deploy/dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.docker-tags.outputs.tags }}
+          labels: ${{ steps.image-metadata.outputs.labels }}
+          annotations: ${{ steps.image-metadata.outputs.annotations }}
+          # Skip the provenance attestation, it is listed as an unknown/unknown platform in GitHub Packages
+          provenance: false
 
       # Output publish summary
       - name: Publish Summary
         run: |
           VERSION="${{ steps.package-version.outputs.version }}"
           BRANCH="${{ steps.set-branch.outputs.branch }}"
-          IMAGE_NAME="twin-node"
-          # 'f' is percent-encoded (%66) so GitHub Actions does not redact the org name from the summary
-          REPO_BASE_URL="https://hub.docker.com/r/twin%66oundation/twin-node"
+          IMAGE_NAME="${{ env.ORG_IMAGE_NAME }}"
+          IMAGE_REPO="${{ steps.docker-tags.outputs.repo }}"
+          PACKAGE_URL="${{ github.server_url }}/${{ github.repository }}/pkgs/container/$IMAGE_NAME"
           VERSION_EXISTS="${{ steps.check-existing-tag.outputs.version_exists }}"
 
           if [[ "$VERSION_EXISTS" == "true" ]]; then
@@ -166,9 +199,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tags published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [$REPO_BASE_URL?tag=$VERSION]($REPO_BASE_URL?tag=$VERSION)" >> $GITHUB_STEP_SUMMARY
-          echo "- [$REPO_BASE_URL?tag=$CHANNEL_TAG]($REPO_BASE_URL?tag=$CHANNEL_TAG)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`$IMAGE_REPO:$VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`$IMAGE_REPO:$CHANNEL_TAG\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Repository" >> $GITHUB_STEP_SUMMARY
+          echo "### Package" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [Docker Hub: $IMAGE_NAME]($REPO_BASE_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "- [GitHub Packages: $IMAGE_NAME]($PACKAGE_URL)" >> $GITHUB_STEP_SUMMARY

@@ -68,6 +68,14 @@ The public origin URL for the API e.g. https://api.example.com:1234
 
 ***
 
+### fastifyPluginTimeout? {#fastifyplugintimeout}
+
+> `optional` **fastifyPluginTimeout?**: `string`
+
+The time in milliseconds Fastify waits for a plugin to load before failing, defaults to 30000.
+
+***
+
 ### authAdminProcessorType? {#authadminprocessortype}
 
 > `optional` **authAdminProcessorType?**: `string`
