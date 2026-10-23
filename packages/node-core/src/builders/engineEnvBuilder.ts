@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
 import path from "node:path";
-import { EnvHelper, Is, Mutex } from "@3sixty/core";
+import { EnvHelper, GeneralError, Is, Mutex } from "@3sixty/core";
 import type { IIotaConfig } from "@3sixty/dlt-iota";
 import {
 	EngineCloneMode,
@@ -15,6 +15,8 @@ import {
 	AttestationConnectorType,
 	AuditableItemGraphComponentType,
 	AuditableItemStreamComponentType,
+	AuthorizationComponentType,
+	AuthorizationConnectorType,
 	type AutomationActionConfig,
 	AutomationActionType,
 	AutomationComponentType,
@@ -109,9 +111,11 @@ import {
 } from "@3sixty/tracing-connector-opentelemetry";
 import { type ITracingFacadeConfig, TracingFacade } from "@3sixty/tracing-facades";
 import {
+	AUTHORIZATION_MODEL_ID,
 	CONTEXT_ID_HANDLER_FEATURE_DID,
 	CONTEXT_ID_HANDLER_FEATURE_TENANT,
 	COMPONENT_FACTORY_TYPE_NAME,
+	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS,
 	DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
 	DEFAULT_TRACING_FACADE_FACTORIES,
@@ -187,6 +191,7 @@ export async function buildEngineConfiguration(
 	await configureTelemetry(coreConfig, envVars);
 	await configureMetricsCollector(coreConfig, envVars);
 	await configureTracing(coreConfig, envVars);
+	await configureAuthorization(coreConfig, envVars);
 	await configureFacades(coreConfig, envVars);
 	await configureMessaging(coreConfig, envVars);
 	await configureMailbox(coreConfig, envVars);
@@ -970,6 +975,53 @@ async function configureTracing(
 	if (additionalConnectorCount > 0) {
 		coreConfig.types.tracingComponent ??= [];
 		coreConfig.types.tracingComponent.push({ type: TracingComponentType.Service });
+	}
+}
+
+/**
+ * Configures the authorization.
+ * @param coreConfig The core config.
+ * @param envVars The environment variables.
+ * @returns A promise that resolves when the authorization configuration has been applied.
+ */
+async function configureAuthorization(
+	coreConfig: IEngineConfig,
+	envVars: IEngineEnvironmentVariables
+): Promise<void> {
+	coreConfig.types.authorizationConnector ??= [];
+
+	if (envVars.authorizationConnector === AuthorizationConnectorType.EntityStorage) {
+		coreConfig.types.authorizationConnector.push({
+			type: AuthorizationConnectorType.EntityStorage
+		});
+	} else if (envVars.authorizationConnector === AuthorizationConnectorType.Casbin) {
+		coreConfig.types.authorizationConnector.push({
+			type: AuthorizationConnectorType.Casbin,
+			options: {
+				config: {
+					endpoint: envVars.casbinEndpoint ?? "",
+					clientId: envVars.casbinClientId ?? "",
+					clientSecret: envVars.casbinClientSecret ?? "",
+					timeoutMs: EnvHelper.envMs(envVars, "casbinTimeoutMs")
+				}
+			}
+		});
+	} else {
+		throw new GeneralError("node", "migrationAuthorizationComponent");
+	}
+
+	if (coreConfig.types.authorizationConnector.length > 0) {
+		coreConfig.types.authorizationComponent ??= [];
+
+		coreConfig.types.authorizationComponent.push({
+			type: AuthorizationComponentType.Service,
+			options: {
+				config: {
+					checkCacheCapacity: EnvHelper.envInteger(envVars, "authorizationCheckCacheCapacity"),
+					checkCacheTtiMs: EnvHelper.envMs(envVars, "authorizationCheckCacheTtiMs")
+				}
+			}
+		});
 	}
 }
 
@@ -1786,15 +1838,15 @@ async function configureIdentityProfile(
 			type: IdentityProfileComponentType.Service,
 			options: {
 				config: {
+					authorizationModelId: EnvHelper.envString(
+						envVars,
+						"authorizationModelId",
+						AUTHORIZATION_MODEL_ID
+					),
+					escalatedPrivilegeRole: DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 					selfUpdateDeniedProperties: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
 						envVars,
 						"identityProfileSelfUpdateDeniedProperties",
-						undefined,
-						undefined
-					),
-					adminScopes: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
-						envVars,
-						"identityProfileAdminScopes",
 						undefined,
 						undefined
 					)
@@ -2529,6 +2581,19 @@ export function isTracingEnabled(envVars: IEngineEnvironmentVariables): boolean 
 			t === TracingConnectorType.EntityStorage ||
 			t === TracingConnectorType.OpenTelemetry ||
 			t === TracingConnectorType.Console
+	);
+}
+
+/**
+ * Checks if the authorization subsystem is required.
+ * Returns true when any authorization connector is configured.
+ * @param envVars The environment variables.
+ * @returns True if authorization is enabled.
+ */
+export function isAuthorizationRequired(envVars: IEngineEnvironmentVariables): boolean {
+	return (
+		envVars.authorizationConnector === AuthorizationConnectorType.EntityStorage ||
+		envVars.authorizationConnector === AuthorizationConnectorType.Casbin
 	);
 }
 

@@ -19,11 +19,14 @@ const engineServerEnvironmentVariableKeysInternal: {
 	httpBodyLimits: true,
 	publicOrigin: true,
 	fastifyPluginTimeout: true,
+	webServerType: true,
 	// IEngineServerEnvironmentVariables - auth
 	authAdminProcessorType: true,
 	authProcessorType: true,
 	authSigningKeyId: true,
 	authApiKeyHeader: true,
+	authMinPasswordLength: true,
+	authMaxPasswordLength: true,
 	// IEngineServerEnvironmentVariables - routing
 	mimeTypeProcessors: true,
 	routeLoggingIncludeBody: true,

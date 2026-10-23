@@ -93,7 +93,9 @@ const cfg = {
 	tenantApiKey: process.env.SOAK_TENANT_API_KEY ?? '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d',
 	adminEmail: process.env.SOAK_ADMIN_EMAIL ?? 'admin@node',
 	adminPassword: process.env.SOAK_ADMIN_PASSWORD ?? 'Admin@Node12345!',
-	adminScope: process.env.SOAK_ADMIN_SCOPE ?? 'tenant-admin,user-admin'
+	adminRoles:
+		process.env.SOAK_ADMIN_ROLES ??
+		'tenant-admin,user-admin,devops,identity-admin,identity-profile-admin'
 };
 
 const OUT_DIR = path.join(__dirname, '.out');
@@ -412,7 +414,7 @@ async function bootstrap(nodeEnv) {
 		TWIN_FEATURES: 'admin-user',
 		TWIN_ADMIN_USER_NAME: cfg.adminEmail,
 		TWIN_ADMIN_USER_PASSWORD: cfg.adminPassword,
-		TWIN_ADMIN_USER_SCOPE: cfg.adminScope
+		TWIN_ADMIN_USER_ROLES: cfg.adminRoles
 	};
 
 	const code = await runToCompletion(['bootstrap-dev'], bootstrapEnv);

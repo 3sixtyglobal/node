@@ -4,10 +4,12 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@3sixty/api-auth-entity-storage-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
+import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -88,16 +90,36 @@ export async function userGet(
 	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
 		"authenticationAdminComponent"
 	);
+	const authorizationModelId = envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID;
 	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
 		defaultAuthenticationAdminComponentType
+	);
+	const defaultAuthorizationComponentType =
+		engineCore.getRegisteredInstanceType("authorizationComponent");
+	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
+		defaultAuthorizationComponentType
 	);
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-get.labels.retrieving"));
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
-	const user = await ContextIdStore.run(
+	const { user, roles } = await ContextIdStore.run(
 		{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
-		async () => authenticationAdminComponent.get(params.email ?? "")
+		async () => {
+			const foundUser = await authenticationAdminComponent.get(params.email ?? "");
+			let foundRoles: string[] | undefined;
+
+			if (Is.stringValue(foundUser.userIdentity)) {
+				foundRoles = await authorizationComponent.getRolesForSubject(
+					authorizationModelId,
+					foundUser.userIdentity
+				);
+			}
+			return {
+				user: foundUser,
+				roles: foundRoles
+			};
+		}
 	);
 
 	CLIDisplay.break();
@@ -113,8 +135,8 @@ export async function userGet(
 		1
 	);
 	CLIDisplay.value(
-		I18n.formatMessage("node.cli.commands.user-get.labels.scope"),
-		(user.scope ?? []).join(", "),
+		I18n.formatMessage("node.cli.commands.user-get.labels.roles"),
+		(roles ?? []).join(", "),
 		1
 	);
 	CLIDisplay.break();

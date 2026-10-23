@@ -76,6 +76,8 @@
 		"readyz",
 		"renderable",
 		"reqs",
+		"casbin",
+		"Casbin",
 		"sawtooth",
 		"scylladb",
 		"Segoe",

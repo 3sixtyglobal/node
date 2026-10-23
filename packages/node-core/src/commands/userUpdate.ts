@@ -4,13 +4,14 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@3sixty/api-auth-entity-storage-models";
-import { ScopeHelper } from "@3sixty/api-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
+import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -70,9 +71,9 @@ export function getCommandDefinitionUserUpdate(commandDefinitions: {
 				description: I18n.formatMessage("node.cli.commands.user-update.params.email.description")
 			},
 			{
-				key: "scope",
+				key: "roles",
 				type: "string",
-				description: I18n.formatMessage("node.cli.commands.user-update.params.scope.description"),
+				description: I18n.formatMessage("node.cli.commands.user-update.params.roles.description"),
 				required: false
 			},
 			{
@@ -113,7 +114,7 @@ export function getCommandDefinitionUserUpdate(commandDefinitions: {
  * @param params.organizationIdentity The organization DID for the user.
  * @param params.tenantId The tenant ID for the user.
  * @param params.email The email for the user.
- * @param params.scope The scope for the user.
+ * @param params.roles The roles for the user.
  * @param params.givenName The given name for the user.
  * @param params.familyName The family name for the user.
  * @returns The updated user details or undefined if skipped.
@@ -126,7 +127,7 @@ export async function userUpdate(
 		organizationIdentity?: string;
 		tenantId?: string;
 		email?: string;
-		scope?: string;
+		roles?: string;
 		givenName?: string;
 		familyName?: string;
 	}
@@ -135,7 +136,7 @@ export async function userUpdate(
 			did: string;
 			organizationDid: string;
 			email: string;
-			scope: string[];
+			roles: string[];
 			givenName: string;
 			familyName: string;
 	  }
@@ -144,6 +145,7 @@ export async function userUpdate(
 	const paramsEmail = params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
+	const authorizationModelId = envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID;
 
 	Guards.email("userUpdate", "email", paramsEmail);
 	if (Is.stringValue(paramsUserIdentity)) {
@@ -175,6 +177,11 @@ export async function userUpdate(
 	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
 		defaultAuthenticationAdminComponentType
 	);
+	const defaultAuthorizationComponentType =
+		engineCore.getRegisteredInstanceType("authorizationComponent");
+	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
+		defaultAuthorizationComponentType
+	);
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
 	const returnJson = await ContextIdStore.run(
@@ -185,14 +192,45 @@ export async function userUpdate(
 			const user: Partial<IAuthenticationUser> = {
 				email: paramsEmail,
 				userIdentity: paramsUserIdentity,
-				organizationIdentity: paramsOrganizationIdentity,
-				scope: ScopeHelper.toArray(params.scope)
+				organizationIdentity: paramsOrganizationIdentity
 			};
 
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update.labels.storingUser"));
 
 			const existingUser = await authenticationAdminComponent.get(paramsEmail);
 			await authenticationAdminComponent.update(user);
+
+			let currentRoles = await authorizationComponent.getRolesForSubject(
+				authorizationModelId,
+				existingUser.userIdentity
+			);
+
+			if (Is.stringValue(params.roles)) {
+				const roles = EnvHelper.commaSeparatedListToArray<string>(params.roles);
+				if (roles.length === 0) {
+					roles.push(DEFAULT_USER_ROLE);
+				}
+
+				const rolesToAdd = roles.filter(role => !currentRoles.includes(role));
+				const rolesToRemove = currentRoles.filter(role => !roles.includes(role));
+
+				for (const role of rolesToAdd) {
+					await authorizationComponent.addRoleForSubject(
+						authorizationModelId,
+						existingUser.userIdentity,
+						role
+					);
+				}
+				for (const role of rolesToRemove) {
+					await authorizationComponent.removeRoleForSubject(
+						authorizationModelId,
+						existingUser.userIdentity,
+						role
+					);
+				}
+
+				currentRoles = roles;
+			}
 
 			const name = `${params.givenName ?? ""} ${params.familyName ?? ""}`.trim();
 			const publicProfile: WithContext<Person> = {
@@ -223,9 +261,7 @@ export async function userUpdate(
 				did: params.userIdentity ?? existingUser.userIdentity,
 				organizationDid: params.organizationIdentity ?? existingUser.organizationIdentity,
 				email: paramsEmail,
-				scope: Is.stringValue(params.scope)
-					? ScopeHelper.toArray(params.scope)
-					: existingUser.scope,
+				roles: currentRoles,
 				givenName: params.givenName ?? "",
 				familyName: params.familyName ?? ""
 			};

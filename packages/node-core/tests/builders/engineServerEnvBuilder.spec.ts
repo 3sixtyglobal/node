@@ -4,8 +4,10 @@ import { ContextIdKeys } from "@3sixty/context";
 import {
 	AuthenticationComponentType,
 	RestRouteProcessorType,
-	SocketRouteProcessorType
+	SocketRouteProcessorType,
+	WebServerType
 } from "@3sixty/engine-server-types";
+import { AuthorizationConnectorType } from "@3sixty/engine-types";
 import { buildEngineServerConfiguration } from "../../src/builders/engineServerEnvBuilder.js";
 
 const SERVER_INFO = { name: "test", version: "0.0.0" };
@@ -45,7 +47,8 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			contextKeys,
 			{ types: {} },
@@ -57,6 +60,34 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 
 		expect(restTypes).toContain(RestRouteProcessorType.TenantOverride);
 		expect(socketTypes).toContain(SocketRouteProcessorType.TenantOverride);
+		expect(
+			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.TenantOverride)
+		).toMatchObject({ options: { config: { authorizationModelId: "system" } } });
+	});
+
+	test("passes the configured authorization model to TenantOverride processors", async () => {
+		const contextKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
+		const config = await buildEngineServerConfiguration(
+			{
+				...BASE_VARS,
+				tenantEnabled: "true",
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage,
+				authorizationModelId: "custom"
+			},
+			contextKeys,
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(
+			config.types.restRouteProcessor?.find(p => p.type === RestRouteProcessorType.TenantOverride)
+		).toMatchObject({ options: { config: { authorizationModelId: "custom" } } });
+		expect(
+			config.types.socketRouteProcessor?.find(
+				p => p.type === SocketRouteProcessorType.TenantOverride
+			)
+		).toMatchObject({ options: { config: { authorizationModelId: "custom" } } });
 	});
 
 	test("TenantOverride processor is registered after AuthHeader processor", async () => {
@@ -65,7 +96,8 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage
+				authProcessorType: AuthenticationComponentType.EntityStorage,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			contextKeys,
 			{ types: {} },
@@ -179,5 +211,46 @@ describe("buildEngineServerConfiguration - custom web config", () => {
 				SERVER_INFO
 			)
 		).rejects.toThrow("invalidEnvVarValue");
+	});
+});
+
+describe("buildEngineServerConfiguration - web server type", () => {
+	test("leaves the web server type unset by default", async () => {
+		const config = await buildEngineServerConfiguration(BASE_VARS, [], { types: {} }, SERVER_INFO);
+
+		expect(config.webServerType).toBeUndefined();
+	});
+
+	test("uses the web server type from the env var when set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, webServerType: WebServerType.Hono },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.webServerType).toBe(WebServerType.Hono);
+	});
+
+	test("uses the native web server type from the env var when set", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...BASE_VARS, webServerType: WebServerType.Native },
+			[],
+			{ types: {} },
+			SERVER_INFO
+		);
+
+		expect(config.webServerType).toBe(WebServerType.Native);
+	});
+
+	test("throws when the web server type is not supported", async () => {
+		await expect(
+			buildEngineServerConfiguration(
+				{ ...BASE_VARS, webServerType: "express" },
+				[],
+				{ types: {} },
+				SERVER_INFO
+			)
+		).rejects.toThrow();
 	});
 });

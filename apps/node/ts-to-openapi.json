@@ -13,6 +13,9 @@
 			"package": "@3sixty/api-auth-entity-storage-service"
 		},
 		{
+			"package": "@3sixty/api-auth-service"
+		},
+		{
 			"package": "@3sixty/identity-service"
 		},
 		{
@@ -64,13 +67,7 @@
 			]
 		},
 		{
-			"package": "@3sixty/document-management-service"
-		},
-		{
 			"package": "@3sixty/federated-catalogue-service"
-		},
-		{
-			"package": "@3sixty/dataspace-data-plane-service"
 		},
 		{
 			"package": "@3sixty/dataspace-data-plane-service"
@@ -80,6 +77,15 @@
 		},
 		{
 			"package": "@3sixty/rights-management-service"
+		},
+		{
+			"package": "@3sixty/tracing-service"
+		},
+		{
+			"package": "@3sixty/authorization-service"
+		},
+		{
+			"package": "@3sixty/api-tenant-processor"
 		}
 	],
 	"authMethods": ["jwtBearer"],

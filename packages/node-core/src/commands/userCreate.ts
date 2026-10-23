@@ -4,14 +4,15 @@ import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@3sixty/api-auth-entity-storage-models";
-import { ScopeHelper } from "@3sixty/api-models";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { CLIDisplay, CLIUtils } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
-import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
+import { Coerce, ComponentFactory, EnvHelper, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import { PasswordGenerator } from "@3sixty/crypto";
 import type { IEngineCore } from "@3sixty/engine-models";
 import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
+import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
@@ -77,9 +78,9 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
 				required: false
 			},
 			{
-				key: "scope",
+				key: "roles",
 				type: "string",
-				description: I18n.formatMessage("node.cli.commands.user-create.params.scope.description"),
+				description: I18n.formatMessage("node.cli.commands.user-create.params.roles.description"),
 				required: false
 			},
 			{
@@ -155,7 +156,7 @@ export function getCommandDefinitionUserCreate(commandDefinitions: {
  * @param params.tenantId The tenant ID for the user.
  * @param params.email The email for the user.
  * @param params.password The password for the user.
- * @param params.scope The scope for the user.
+ * @param params.roles The roles for the user.
  * @param params.givenName The given name for the user.
  * @param params.familyName The family name for the user.
  * @param params.overwriteMode The mode to use when a user with the same identity already exists.
@@ -173,7 +174,7 @@ export async function userCreate(
 		tenantId?: string;
 		email?: string;
 		password?: string;
-		scope?: string;
+		roles?: string;
 		givenName?: string;
 		familyName?: string;
 		overwriteMode?: "skip" | "overwrite" | "error";
@@ -187,7 +188,7 @@ export async function userCreate(
 			organizationDid: string;
 			email: string;
 			password: string;
-			scope: string[];
+			roles: string[];
 			givenName: string;
 			familyName: string;
 	  }
@@ -196,6 +197,11 @@ export async function userCreate(
 	const paramsEmail = params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
+	const authorizationModelId = EnvHelper.envString(
+		envVars,
+		"authorizationModelId",
+		AUTHORIZATION_MODEL_ID
+	);
 	Guards.email("userCreate", "email", paramsEmail);
 	Did.guard("userCreate", "user-identity", paramsUserIdentity);
 	Did.guard("userCreate", "organization-identity", paramsOrganizationIdentity);
@@ -222,8 +228,17 @@ export async function userCreate(
 	const authenticationAdminComponent = ComponentFactory.get<IAuthenticationAdminComponent>(
 		defaultAuthenticationAdminComponentType
 	);
+	const defaultAuthorizationComponentType =
+		engineCore.getRegisteredInstanceType("authorizationComponent");
+	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
+		defaultAuthorizationComponentType
+	);
 
 	let createUser = true;
+	const roles = EnvHelper.commaSeparatedListToArray<string>(params.roles);
+	if (roles.length === 0) {
+		roles.push(DEFAULT_USER_ROLE);
+	}
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
 	const returnJson = await ContextIdStore.run(
@@ -262,8 +277,7 @@ export async function userCreate(
 					email: paramsEmail,
 					password: params.password ?? PasswordGenerator.generate(16),
 					userIdentity: paramsUserIdentity,
-					organizationIdentity: paramsOrganizationIdentity,
-					scope: ScopeHelper.toArray(params.scope)
+					organizationIdentity: paramsOrganizationIdentity
 				};
 
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
@@ -271,14 +285,21 @@ export async function userCreate(
 				await ContextIdStore.run(
 					{
 						...currentContextIds,
-						[ContextIdKeys.Tenant]: params.tenantId,
-						scope: ScopeHelper.toString(user.scope)
+						[ContextIdKeys.Tenant]: params.tenantId
 					},
 					async () => {
 						if (existingUser) {
 							await authenticationAdminComponent.update(user);
 						} else {
 							await authenticationAdminComponent.create(user);
+						}
+
+						for (const role of roles) {
+							await authorizationComponent.addRoleForSubject(
+								authorizationModelId,
+								paramsUserIdentity,
+								role
+							);
 						}
 					}
 				);
@@ -319,7 +340,7 @@ export async function userCreate(
 					organizationDid: paramsOrganizationIdentity,
 					email: paramsEmail,
 					password: user.password,
-					scope: ScopeHelper.toArray(params.scope),
+					roles,
 					givenName: params.givenName ?? "",
 					familyName: params.familyName ?? ""
 				};
@@ -336,7 +357,7 @@ export async function userCreate(
 							`${params.outputEnvPrefix}ORGANIZATION_DID="${params.organizationIdentity}"`,
 							`${params.outputEnvPrefix}EMAIL="${paramsEmail}"`,
 							`${params.outputEnvPrefix}PASSWORD="${user.password}"`,
-							`${params.outputEnvPrefix}SCOPE="${params.scope ?? ""}"`,
+							`${params.outputEnvPrefix}ROLES="${params.roles ?? ""}"`,
 							`${params.outputEnvPrefix}GIVEN_NAME="${params.givenName ?? ""}"`,
 							`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`
 						],

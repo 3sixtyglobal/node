@@ -87,14 +87,14 @@
 			"capture": { "proofData": "body" }
 		},
 		{
-			"description": "GET /identity/:identity/verifiable-credential/revoke/1",
-			"method": "GET",
+			"description": "POST /identity/:identity/verifiable-credential/revoke/1",
+			"method": "POST",
 			"path": "/identity/{{testIdentity}}/verifiable-credential/revoke/1",
 			"expectedStatus": 204
 		},
 		{
-			"description": "GET /identity/:identity/verifiable-credential/unrevoke/1",
-			"method": "GET",
+			"description": "POST /identity/:identity/verifiable-credential/unrevoke/1",
+			"method": "POST",
 			"path": "/identity/{{testIdentity}}/verifiable-credential/unrevoke/1",
 			"expectedStatus": 204
 		},

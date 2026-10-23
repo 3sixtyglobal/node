@@ -185,6 +185,17 @@ const engineEnvironmentVariableKeysInternal: {
 	openTelemetryTracingTracerVersion: true,
 	openTelemetryTracingEndpoint: true,
 	openTelemetryTracingProcessor: true,
+	// authorization
+	authorizationConnector: true,
+	authorizationModelId: true,
+	casbinEndpoint: true,
+	casbinClientId: true,
+	casbinClientSecret: true,
+	casbinTimeoutMs: true,
+	authorizationCheckCacheCapacity: true,
+	authorizationCheckCacheTtiMs: true,
+	authorizationModel: true,
+	authorizationModelMode: true,
 	tracingSilentComponents: true,
 	// DLT / identity
 	faucetConnector: true,
@@ -202,7 +213,6 @@ const engineEnvironmentVariableKeysInternal: {
 	identityResolverConnector: true,
 	identityProfileConnector: true,
 	identityProfileSelfUpdateDeniedProperties: true,
-	identityProfileAdminScopes: true,
 	universalResolverEndpoint: true,
 	// IOTA
 	iotaFaucetEndpoint: true,

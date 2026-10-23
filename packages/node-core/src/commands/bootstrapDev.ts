@@ -6,6 +6,14 @@ import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
+import {
+	DEFAULT_DEVOPS_ROLE,
+	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+	DEFAULT_IDENTITY_ADMIN_ROLE,
+	DEFAULT_TENANT_ADMIN_ROLE,
+	DEFAULT_USER_ADMIN_ROLE,
+	DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE
+} from "../defaults.js";
 import { identityCreate } from "./identityCreate.js";
 import { identityVerificationMethodCreate } from "./identityVerificationMethodCreate.js";
 import { tenantCreate } from "./tenantCreate.js";
@@ -261,11 +269,24 @@ export async function bootstrapDev(
 					tenantId: tenant?.id,
 					email: envVars.adminUserName ?? `admin@${tenantEnabled ? "tenant" : "node"}`,
 					password: envVars.adminUserPassword,
-					scope:
-						envVars.adminUserScope ??
+					roles:
+						envVars.adminUserRoles ??
 						(tenantEnabled
-							? ["global-admin", "tenant-admin", "user-admin"]
-							: ["global-admin", "user-admin"]
+							? [
+									DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+									DEFAULT_TENANT_ADMIN_ROLE,
+									DEFAULT_USER_ADMIN_ROLE,
+									DEFAULT_IDENTITY_ADMIN_ROLE,
+									DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+									DEFAULT_DEVOPS_ROLE
+								]
+							: [
+									DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+									DEFAULT_USER_ADMIN_ROLE,
+									DEFAULT_IDENTITY_ADMIN_ROLE,
+									DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+									DEFAULT_DEVOPS_ROLE
+								]
 						).join(","),
 					givenName: tenantEnabled ? "Tenant" : "Node",
 					familyName: "Admin",

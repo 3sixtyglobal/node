@@ -805,6 +805,62 @@ export interface IEngineEnvironmentVariables {
 	openTelemetryTracingProcessor?: string;
 
 	/**
+	 * The type of authorization connector: entity-storage, casbin.
+	 */
+	authorizationConnector?: string;
+
+	/**
+	 * The model identifier to use for authorization.
+	 */
+	authorizationModelId?: string;
+
+	/**
+	 * The base URL of the Casbin server (e.g. "http://localhost:48000"), required when using the casbin authorization connector.
+	 */
+	casbinEndpoint?: string;
+
+	/**
+	 * The OAuth2 client ID for authenticating with the Casbin server, required when using the casbin authorization connector.
+	 */
+	casbinClientId?: string;
+
+	/**
+	 * The OAuth2 client secret for authenticating with the Casbin server, required when using the casbin authorization connector.
+	 */
+	casbinClientSecret?: string;
+
+	/**
+	 * The request timeout in milliseconds for the Casbin authorization connector.
+	 */
+	casbinTimeoutMs?: string;
+
+	/**
+	 * The maximum number of cached authorisation check results.
+	 */
+	authorizationCheckCacheCapacity?: string;
+
+	/**
+	 * The time-to-idle in milliseconds for cached authorisation check results.
+	 */
+	authorizationCheckCacheTtiMs?: string;
+
+	/**
+	 * Path to a JSON file containing the authorization model to seed at startup.
+	 * Use the @json: prefix to load the file, e.g. @json:./authorization-model.json.
+	 * The file must contain an object with policies and roleInheritances arrays.
+	 * Combined with or replaces the route-derived defaults depending on authorizationModelMode.
+	 */
+	authorizationModel?: string;
+
+	/**
+	 * Controls how authorizationModel is combined with route-derived policies at startup.
+	 * "merge" (default): authorizationModel is applied in addition to route-derived rules.
+	 * "replace": authorizationModel replaces route-derived rules entirely.
+	 * @default "merge"
+	 */
+	authorizationModelMode?: string;
+
+	/**
 	 * The type of faucet connector: entity-storage, iota.
 	 */
 	faucetConnector?: string;
@@ -931,15 +987,9 @@ export interface IEngineEnvironmentVariables {
 
 	/**
 	 * Comma separated list of public and private profile properties which can only be added, changed
-	 * or removed by callers with an admin scope. Defaults to none.
+	 * or removed by callers with escalated privilege. Defaults to none.
 	 */
 	identityProfileSelfUpdateDeniedProperties?: string;
-
-	/**
-	 * Comma separated list of scopes which allow the self update denied profile properties to be
-	 * modified, any one is sufficient. Defaults to user-admin, global-admin.
-	 */
-	identityProfileAdminScopes?: string;
 
 	/**
 	 * The identity verification method id to use with immutable proofs.

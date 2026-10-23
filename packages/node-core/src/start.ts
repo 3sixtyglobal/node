@@ -24,6 +24,7 @@ import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "./models/INodeEngineConfig.js";
 import type { INodeEngineState } from "./models/INodeEngineState.js";
 import type { INodeOptions } from "./models/INodeOptions.js";
+import { seedAuthorizationDefaults } from "./seeding.js";
 
 /**
  * Start the engine server.
@@ -132,6 +133,7 @@ export async function start(
 			// Start the server, which also starts the engine.
 			await server.start();
 
+			await seedAuthorizationDefaults(engine, server, envVars);
 			await finalizeMigrations(engine, envVars);
 
 			return {

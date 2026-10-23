@@ -14,7 +14,7 @@ interface IUserOutput {
 	organizationDid: string;
 	email: string;
 	password: string;
-	scope: string[];
+	roles: string[];
 	givenName: string;
 	familyName: string;
 }
@@ -46,7 +46,7 @@ describe.each(TENANT_MODES)("user-create in $mode mode", ({ mode, tenantEnabled 
 		await context.execute([
 			...userArgs("user@example.com"),
 			...context.tenantArgs(),
-			"--scope=tenant-admin,doo",
+			"--roles=tenant-admin,user-admin",
 			`--output-json=${context.dir}user.json`,
 			`--output-env=${context.dir}user.env`,
 			"--output-env-prefix=user"
@@ -58,16 +58,26 @@ describe.each(TENANT_MODES)("user-create in $mode mode", ({ mode, tenantEnabled 
 		expect(json?.organizationDid).toEqual(valueFromEnv(env?.[1]));
 		expect(json?.email).toEqual(valueFromEnv(env?.[2]));
 		expect(json?.password).toEqual(valueFromEnv(env?.[3]));
-		expect(json?.scope.join(",")).toEqual(valueFromEnv(env?.[4]));
+		expect(json?.roles.join(",")).toEqual(valueFromEnv(env?.[4]));
 		expect(json?.givenName).toEqual(valueFromEnv(env?.[5]));
 		expect(json?.familyName).toEqual(valueFromEnv(env?.[6]));
 
-		const users = await readStoreRecords<{ email: string; scope: string; partitionId: string }>(
+		const users = await readStoreRecords<{ email: string; partitionId: string }>(
 			context.dbDir,
 			"authentication-user"
 		);
 		const user = users.find(u => u.email === "user@example.com");
-		expect(user?.scope).toEqual("tenant-admin,doo");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			context.dbDir,
+			"authorization-role-assignment"
+		);
+		expect(
+			roleAssignments
+				.filter(r => r.subject === userIdentity)
+				.map(r => r.role)
+				.sort()
+		).toEqual(["tenant-admin", "user-admin"]);
 
 		const nodeIdParts = (context.state.nodeId ?? "").split(":");
 		const nodePartitionId = Converter.bytesToBase64Url(Converter.hexToBytes(nodeIdParts[2]));
@@ -99,14 +109,14 @@ describe.each(TENANT_MODES)("user-create in $mode mode", ({ mode, tenantEnabled 
 		await context.execute([
 			...userArgs("user@example.com"),
 			...context.tenantArgs(),
-			"--scope=tenant-admin",
+			"--roles=tenant-admin",
 			"--overwrite-mode=overwrite",
 			`--output-json=${context.dir}user-overwrite.json`
 		]);
 
 		const json = await CLIUtils.readJsonFile<IUserOutput>(`${context.dir}user-overwrite.json`);
 		expect(json?.email).toEqual("user@example.com");
-		expect(json?.scope).toEqual(["tenant-admin"]);
+		expect(json?.roles).toEqual(["tenant-admin"]);
 	});
 
 	test("throws when password is too short", async () => {

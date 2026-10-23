@@ -77,7 +77,7 @@ export async function orgUsersList(
 	params: {
 		orgDid?: string;
 	}
-): Promise<{ email: string; identity: string; scope: string }[]> {
+): Promise<{ email: string; identity: string }[]> {
 	const isMultiTenant = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	let effectiveOrgDid: string | undefined = params.orgDid;
 	if (!Is.stringValue(effectiveOrgDid) && !isMultiTenant) {
@@ -97,7 +97,7 @@ export async function orgUsersList(
 			nameofKebabCase<AuthenticationUser>()
 		);
 
-	const result: { email: string; identity: string; scope: string }[] = [];
+	const result: { email: string; identity: string }[] = [];
 
 	const platformComponentType = engineCore.getRegisteredInstanceType("platformComponent");
 	const platformComponent = ComponentFactory.get<IPlatformComponent>(platformComponentType);
@@ -112,15 +112,14 @@ export async function orgUsersList(
 					comparison: ComparisonOperator.Equals
 				},
 				undefined,
-				["email", "identity", "organization", "scope"],
+				["email", "identity", "organization"],
 				cursor
 			);
 			for (const user of page.entities) {
 				if (Is.stringValue(user.email)) {
 					result.push({
 						email: user.email,
-						identity: user.identity ?? "",
-						scope: user.scope ?? ""
+						identity: user.identity ?? ""
 					});
 					CLIDisplay.break();
 					CLIDisplay.value(
@@ -130,11 +129,6 @@ export async function orgUsersList(
 					CLIDisplay.value(
 						I18n.formatMessage("node.cli.commands.org-users-list.labels.identity"),
 						user.identity ?? "",
-						1
-					);
-					CLIDisplay.value(
-						I18n.formatMessage("node.cli.commands.org-users-list.labels.scope"),
-						user.scope ?? "",
 						1
 					);
 				}

@@ -224,14 +224,25 @@ describe("bootstrap-dev", () => {
 		// Verify admin user record contains expected values for multi-tenant mode
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 			identity: string;
 			organization: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@tenant");
-		expect(authUsers[0].scope).toBe("global-admin,tenant-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
+			"global-admin",
+			"identity-admin",
+			"identity-profile-admin",
+			"tenant-admin",
+			"user-admin"
+		]);
 
 		// Verify identity documents include the node DID
 		interface IdentityDocRecord {
@@ -276,12 +287,22 @@ describe("bootstrap-dev", () => {
 		// Verify admin user record contains expected values for single-tenant mode
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@node");
-		expect(authUsers[0].scope).toBe("global-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
+			"global-admin",
+			"identity-admin",
+			"identity-profile-admin",
+			"user-admin"
+		]);
 
 		// Verify identity documents contain both node and org DIDs stored in state
 		interface IdentityDocRecord {
@@ -423,12 +444,22 @@ describe("bootstrap-dev", () => {
 
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
-		expect(authUsers[0].scope).toBe("global-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
+			"global-admin",
+			"identity-admin",
+			"identity-profile-admin",
+			"user-admin"
+		]);
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };
@@ -473,12 +504,23 @@ describe("bootstrap-dev", () => {
 
 		interface AuthUserRecord {
 			email: string;
-			scope: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
-		expect(authUsers[0].scope).toBe("global-admin,tenant-admin,user-admin");
+
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
+			dbDir,
+			"authorization-role-assignment"
+		);
+		expect(roleAssignments.map(r => r.role).sort()).toEqual([
+			"devops",
+			"global-admin",
+			"identity-admin",
+			"identity-profile-admin",
+			"tenant-admin",
+			"user-admin"
+		]);
 
 		interface ProfileRecord {
 			privateProfile: { givenName: string; familyName: string; email: string };

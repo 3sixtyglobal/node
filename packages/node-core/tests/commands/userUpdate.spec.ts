@@ -15,17 +15,22 @@ describe.each(TENANT_MODES)("user-update in $mode mode", ({ mode, tenantEnabled 
 		await context.execute([
 			"user-update",
 			"--email=user@example.com",
-			"--scope=tenant-admin,doo",
+			"--roles=tenant-admin,user-admin",
 			"--given-name=Admin",
 			"--family-name=Node",
 			...context.tenantArgs()
 		]);
 
-		const users = await readStoreRecords<{ email: string; scope: string }>(
+		const roleAssignments = await readStoreRecords<{ subject: string; role: string }>(
 			context.dbDir,
-			"authentication-user"
+			"authorization-role-assignment"
 		);
-		expect(users.find(u => u.email === "user@example.com")?.scope).toEqual("tenant-admin,doo");
+		expect(
+			roleAssignments
+				.filter(r => r.subject === userIdentity)
+				.map(r => r.role)
+				.sort()
+		).toEqual(["tenant-admin", "user-admin"]);
 
 		const profiles = await readStoreRecords<{
 			identity: string;

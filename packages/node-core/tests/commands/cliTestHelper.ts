@@ -6,6 +6,7 @@ import { Factory } from "@3sixty/core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import { AuthenticationAdminComponentType } from "@3sixty/engine-server-types";
 import {
+	AuthorizationConnectorType,
 	EntityStorageConnectorType,
 	FaucetConnectorType,
 	IdentityConnectorType,
@@ -110,6 +111,7 @@ export async function executeCliCommand(
 				TWIN_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
 				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 				...options.envVars
 			}
 		},

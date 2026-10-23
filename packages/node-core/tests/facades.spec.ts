@@ -5,6 +5,7 @@ import { ComponentFactory, Factory } from "@3sixty/core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import { EngineCloneMode } from "@3sixty/engine-models";
 import {
+	AuthorizationConnectorType,
 	EntityStorageConnectorType,
 	FacadeType,
 	TracingComponentType,
@@ -13,12 +14,13 @@ import {
 import { TracingFacade, TracingFacadeAttributes } from "@3sixty/tracing-facades";
 import { type ISpan, SpanStatus, TracingConnectorFactory } from "@3sixty/tracing-models";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
-import { buildEngineConfiguration } from "../src/builders/engineEnvBuilder.js";
+import { buildEngineConfiguration as buildEngineConfigurationBase } from "../src/builders/engineEnvBuilder.js";
 import {
 	DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES,
 	DEFAULT_TRACING_FACADE_FACTORIES,
 	TRACING_FACADE_NAME
 } from "../src/defaults.js";
+import type { IEngineEnvironmentVariables } from "../src/models/IEngineEnvironmentVariables.js";
 import { run } from "../src/node.js";
 
 const TEST_NODE_ID = "did:iota:testnet:0x1234";
@@ -26,6 +28,20 @@ const TEST_ORG_ID =
 	"did:iota:testnet:0x7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b";
 const CHILD_SERVICE = "child-service";
 const PARENT_SERVICE = "parent-service";
+
+/**
+ * Builds the engine configuration with the required authorization connector set.
+ * @param envVars The environment variables.
+ * @returns The engine configuration.
+ */
+async function buildEngineConfiguration(
+	envVars: IEngineEnvironmentVariables
+): ReturnType<typeof buildEngineConfigurationBase> {
+	return buildEngineConfigurationBase({
+		authorizationConnector: AuthorizationConnectorType.EntityStorage,
+		...envVars
+	});
+}
 
 describe("buildEngineConfiguration - tracing facades", () => {
 	test("activates the facade on the default factories when the tracing facade is requested", async () => {
@@ -222,6 +238,7 @@ async function traceEndpointCalls(
 			TWIN_SILENT: "true",
 			TWIN_PORT: String(port),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_ENV_ALLOW_LIST: CI_ENV_VARS,
@@ -495,6 +512,7 @@ async function traceComponentCalls(
 			TWIN_SILENT: "true",
 			TWIN_PORT: String(await getFreePort()),
 			TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+			TWIN_AUTHORIZATION_CONNECTOR: "entity-storage",
 			TWIN_TRACING_CONNECTOR: TracingConnectorType.EntityStorage,
 			TWIN_FACADE: FacadeType.Tracing,
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",

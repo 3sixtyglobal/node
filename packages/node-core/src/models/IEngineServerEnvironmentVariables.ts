@@ -51,6 +51,11 @@ export interface IEngineServerEnvironmentVariables {
 	fastifyPluginTimeout?: string;
 
 	/**
+	 * The type of web server to use: fastify, hono, native, defaults to fastify.
+	 */
+	webServerType?: string;
+
+	/**
 	 * The type of auth admin processor to use on the API: entity-storage.
 	 */
 	authAdminProcessorType?: string;
@@ -69,6 +74,16 @@ export interface IEngineServerEnvironmentVariables {
 	 * The HTTP header name used to pass the API key on requests, defaults to x-api-key.
 	 */
 	authApiKeyHeader?: string;
+
+	/**
+	 * The minimum password length for new password validation.
+	 */
+	authMinPasswordLength?: string;
+
+	/**
+	 * The maximum password length for new password validation.
+	 */
+	authMaxPasswordLength?: string;
 
 	/**
 	 * Additional MIME type processors to include, comma separated.

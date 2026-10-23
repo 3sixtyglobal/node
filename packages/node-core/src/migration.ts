@@ -1,12 +1,18 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type {
+	AuthenticationUser,
+	AuthenticationUserV0
+} from "@3sixty/api-auth-entity-storage-service";
 import {
 	AuditableItemGraphVertexIndexHelper,
 	type AuditableItemGraphVertex,
 	type AuditableItemGraphVertexIndex,
 	type AuditableItemGraphVertexV1
 } from "@3sixty/auditable-item-graph-service";
-import { EnvHelper, GeneralError, StringHelper } from "@3sixty/core";
+import type { IAuthorizationComponent } from "@3sixty/authorization-models";
+import { ContextIdStore, type IContextIds } from "@3sixty/context";
+import { ComponentFactory, EnvHelper, GeneralError, Is, StringHelper } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
 import type { IEntitySchemaProperty } from "@3sixty/entity";
 import {
@@ -22,7 +28,19 @@ import {
 	type OdrlPolicyIndex,
 	type OdrlPolicyV0
 } from "@3sixty/rights-management-pap-service";
+import {
+	AUTHORIZATION_MODEL_ID,
+	DEFAULT_DEVOPS_ROLE,
+	DEFAULT_IDENTITY_ADMIN_ROLE,
+	DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE,
+	DEFAULT_TENANT_ADMIN_ROLE,
+	DEFAULT_USER_ADMIN_ROLE,
+	DEFAULT_USER_ROLE
+} from "./defaults.js";
 import type { IEnvironmentVariables } from "./models/IEnvironmentVariables.js";
+
+const migrateRoles: { identity: string; roles: string[]; contextIds: IContextIds | undefined }[] =
+	[];
 
 /**
  * Initialise schema migrations for the engine.
@@ -37,6 +55,7 @@ export function initialiseMigrations(
 		return;
 	}
 
+	migrationAuthenticationUserRoles();
 	migrationAigIndexes();
 	migrationPapIndexes();
 }
@@ -52,8 +71,78 @@ export async function finalizeMigrations(
 	engineCore: IEngineCore,
 	envVars: IEnvironmentVariables
 ): Promise<void> {
-	// This is currently a placeholder for any finalization logic that might be needed
-	// after all schema migrations have been processed.
+	if (Is.arrayValue(migrateRoles)) {
+		const authComponentType = engineCore.getRegisteredInstanceType("authorizationComponent");
+
+		const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(authComponentType);
+
+		const migrationModelId = EnvHelper.envString(
+			envVars,
+			"authorizationModelId",
+			AUTHORIZATION_MODEL_ID
+		);
+
+		for (const entry of migrateRoles) {
+			await ContextIdStore.run(entry.contextIds ?? {}, async () => {
+				for (const role of entry.roles) {
+					await authorizationComponent.addRoleForSubject(migrationModelId, entry.identity, role);
+				}
+			});
+		}
+		migrateRoles.length = 0;
+	}
+}
+
+/**
+ * Perform migrations for authentication user scopes to authorization roles.
+ */
+function migrationAuthenticationUserRoles(): void {
+	const migrationV0V1: ISchemaMigration<AuthenticationUserV0, AuthenticationUser> = {
+		removeEntityProperty: async (
+			entity: AuthenticationUserV0,
+			removedProperties: IEntitySchemaProperty<AuthenticationUserV0>[]
+		): Promise<void> => {
+			// If the scope property is not being removed, we don't need to do anything
+			if (removedProperties.find(prop => prop.property === "scope") === undefined) {
+				return;
+			}
+
+			let roles: string[] = [];
+			if (Is.stringValue(entity.scope)) {
+				roles = entity.scope
+					.split(",")
+					.map(role => role.trim().toLocaleLowerCase())
+					.filter(role => role.length > 0);
+			}
+			if (roles.length === 0) {
+				roles.push(DEFAULT_USER_ROLE);
+			}
+
+			// If the user has both tenant-admin and user-admin roles, we also add the new roles
+			// to provide access to everything they had before
+			if (roles.includes(DEFAULT_TENANT_ADMIN_ROLE) && roles.includes(DEFAULT_USER_ADMIN_ROLE)) {
+				roles.push(DEFAULT_DEVOPS_ROLE);
+				roles.push(DEFAULT_IDENTITY_ADMIN_ROLE);
+				roles.push(DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE);
+			}
+
+			// We need to store the old roles in here if a migration is performed
+			// they will be picked up by the start method of the AuthenticationService
+			// and used to populate the new roles table in the correct partition.
+			// The same identity can exist across multiple partitions so we accumulate
+			// entries as an array keyed by contextIds rather than by identity alone.
+			const contextIds: IContextIds | undefined = await ContextIdStore.getContextIds();
+			migrateRoles.push({
+				identity: entity.identity,
+				roles,
+				contextIds
+			});
+		}
+	};
+	SchemaMigrationFactory.register(
+		`${nameof<AuthenticationUser>()}_0_1`,
+		() => migrationV0V1 as ISchemaMigration
+	);
 }
 
 /**

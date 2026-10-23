@@ -14,11 +14,20 @@ import {
 	InformationComponentType,
 	type MimeTypeProcessorType,
 	RestRouteProcessorType,
-	SocketRouteProcessorType
+	SocketRouteProcessorType,
+	WebServerType
 } from "@3sixty/engine-server-types";
 import { TraceparentHelper } from "@3sixty/tracing-models";
-import { CONTEXT_ID_HANDLER_FEATURE_DID, CONTEXT_ID_HANDLER_FEATURE_TENANT } from "../defaults.js";
-import { isTelemetryEnabled, isTracingEnabled } from "./engineEnvBuilder.js";
+import {
+	AUTHORIZATION_MODEL_ID,
+	CONTEXT_ID_HANDLER_FEATURE_DID,
+	CONTEXT_ID_HANDLER_FEATURE_TENANT
+} from "../defaults.js";
+import {
+	isAuthorizationRequired,
+	isTelemetryEnabled,
+	isTracingEnabled
+} from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 
 /**
@@ -71,6 +80,7 @@ export async function buildEngineServerConfiguration(
 
 	const serverConfig: IEngineServerConfig = {
 		...coreEngineConfig,
+		webServerType: EnvHelper.envChoice(envVars, "webServerType", Object.values(WebServerType)),
 		web: webServerOptions,
 		types: {
 			...coreEngineConfig.types,
@@ -241,7 +251,9 @@ export async function buildEngineServerConfiguration(
 			type: AuthenticationComponentType.EntityStorage,
 			options: {
 				config: {
-					signingKeyName: envVars.authSigningKeyId
+					signingKeyName: envVars.authSigningKeyId,
+					minPasswordLength: EnvHelper.envInteger(envVars, "authMinPasswordLength"),
+					maxPasswordLength: EnvHelper.envInteger(envVars, "authMaxPasswordLength")
 				}
 			}
 		});
@@ -263,22 +275,60 @@ export async function buildEngineServerConfiguration(
 				}
 			}
 		});
-		if (tenantEnabled) {
+		if (isAuthorizationRequired(envVars)) {
 			serverConfig.types.restRouteProcessor.push({
-				type: RestRouteProcessorType.TenantOverride,
+				type: RestRouteProcessorType.Authorization,
 				options: {
-					config: {}
+					config: {
+						authorizationModelId: EnvHelper.envString(
+							envVars,
+							"authorizationModelId",
+							AUTHORIZATION_MODEL_ID
+						)
+					}
 				}
 			});
 			serverConfig.types.socketRouteProcessor.push({
-				type: SocketRouteProcessorType.TenantOverride,
+				type: SocketRouteProcessorType.Authorization,
 				options: {
-					config: {}
+					config: {
+						authorizationModelId: EnvHelper.envString(
+							envVars,
+							"authorizationModelId",
+							AUTHORIZATION_MODEL_ID
+						)
+					}
 				}
 			});
+
+			if (tenantEnabled) {
+				serverConfig.types.restRouteProcessor.push({
+					type: RestRouteProcessorType.TenantOverride,
+					options: {
+						config: {
+							authorizationModelId: EnvHelper.envString(
+								envVars,
+								"authorizationModelId",
+								AUTHORIZATION_MODEL_ID
+							)
+						}
+					}
+				});
+				serverConfig.types.socketRouteProcessor.push({
+					type: SocketRouteProcessorType.TenantOverride,
+					options: {
+						config: {
+							authorizationModelId: EnvHelper.envString(
+								envVars,
+								"authorizationModelId",
+								AUTHORIZATION_MODEL_ID
+							)
+						}
+					}
+				});
+			}
 		}
 	}
-
 	if (isTelemetryEnabled(envVars)) {
 		serverConfig.types.restRouteProcessor.push({
 			type: RestRouteProcessorType.Metrics,

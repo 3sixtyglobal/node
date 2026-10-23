@@ -11,6 +11,7 @@
 			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
+			"migrationAuthorizationComponent": "Authorization is now a required component, please add it to your configuration.",
 			"migrationIndexWriteFailed": "Failed to write the index entries for entity \"{id}\" during migration"
 		},
 		"bootstrapDev": {
@@ -533,12 +534,12 @@
 						"email": "Email",
 						"identity": "Identity",
 						"organization": "Organization",
-						"scope": "Scope"
+						"roles": "Roles"
 					}
 				},
 				"user-create": {
 					"description": "Create a user",
-					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"example": "user-create --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --email=\"bob@examples.com\" --password=\"pass1234\" --roles=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -558,8 +559,8 @@
 						"password": {
 							"description": "The password for the user."
 						},
-						"scope": {
-							"description": "List of scopes to associate with the user, comma separated."
+						"roles": {
+							"description": "List of roles to associate with the user, comma separated."
 						},
 						"given-name": {
 							"description": "The given name of the user."
@@ -596,7 +597,7 @@
 				},
 				"user-update": {
 					"description": "Update a user",
-					"example": "user-update --email=\"bob@examples.com\" --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --scope=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
+					"example": "user-update --email=\"bob@examples.com\" --user-identity=\"did:iota:....\" --organization-identity=\"did:iota:....\" --roles=\"tenant-admin\" --givenName=\"Bob\" --familyName=\"Smith\"",
 					"params": {
 						"env-prefix": {
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
@@ -613,8 +614,8 @@
 						"email": {
 							"description": "The email address of the user."
 						},
-						"scope": {
-							"description": "List of scopes to associate with the user, comma separated."
+						"roles": {
+							"description": "List of roles to associate with the user, comma separated."
 						},
 						"given-name": {
 							"description": "The given name of the user."
@@ -927,7 +928,6 @@
 						"listing": "Listing organization users",
 						"email": "Email",
 						"identity": "Identity",
-						"scope": "Scope",
 						"count": "Total users"
 					}
 				},

@@ -21,7 +21,7 @@ const bootstrapDevEnvironmentVariableKeysInternal: {
 	adminUserMnemonic: true,
 	adminUserName: true,
 	adminUserPassword: true,
-	adminUserScope: true
+	adminUserRoles: true
 };
 
 /**

@@ -10,17 +10,23 @@
 			"capture": { "profileUserDid": "body.id" }
 		},
 		{
-			"description": "POST /authentication/admin/users - create profile test user without admin scope",
+			"description": "POST /authentication/admin/users - create profile test user without escalated privilege",
 			"method": "POST",
 			"path": "/authentication/admin/users",
 			"body": {
 				"email": "profile-user@node",
 				"password": "Profile@Node12345!",
 				"userIdentity": "{{profileUserDid}}",
-				"organizationIdentity": "{{adminOrgIdentity}}",
-				"scope": ["read-only"]
+				"organizationIdentity": "{{adminOrgIdentity}}"
 			},
 			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user role",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{profileUserDid}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
 		},
 		{
 			"description": "POST /authentication/login - login as profile test user",
@@ -32,7 +38,7 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "POST /identity/profile - 401 setting denied property without admin scope",
+			"description": "POST /identity/profile - 401 setting denied property without escalated privilege",
 			"method": "POST",
 			"path": "/identity/profile",
 			"body": {
@@ -59,7 +65,7 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "PUT /identity/profile - 401 adding denied property without admin scope",
+			"description": "PUT /identity/profile - 401 adding denied property without escalated privilege",
 			"method": "PUT",
 			"path": "/identity/profile",
 			"body": {
@@ -105,7 +111,7 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "PUT /identity/profile - 401 changing denied property without admin scope",
+			"description": "PUT /identity/profile - 401 changing denied property without escalated privilege",
 			"method": "PUT",
 			"path": "/identity/profile",
 			"body": {

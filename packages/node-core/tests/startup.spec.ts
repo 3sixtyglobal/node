@@ -5,7 +5,7 @@ import { ContextIdStore } from "@3sixty/context";
 import { ComponentFactory, Factory } from "@3sixty/core";
 import { SchemaAliasHelper } from "@3sixty/data-core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
-import { EntityStorageConnectorType } from "@3sixty/engine-types";
+import { AuthorizationConnectorType, EntityStorageConnectorType } from "@3sixty/engine-types";
 import { entity, EntitySchemaFactory, EntitySchemaHelper, property } from "@3sixty/entity";
 import { MemoryEntityStorageConnector } from "@3sixty/entity-storage-connector-memory";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
@@ -45,6 +45,7 @@ const TEST_API_KEY_B = "d0000000000000000000000000000002";
 const BASE_ENV: { [id: string]: string } = {
 	TWIN_SILENT: "true",
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
+	TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 	TWIN_TENANT_ENABLED: "true",
 	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
 };
