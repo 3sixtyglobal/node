@@ -35,9 +35,22 @@ import {
 	TrustVerifierComponentType
 } from "@3sixty/engine-types";
 import { LogLevel } from "@3sixty/logging-models";
-import { buildEngineConfiguration } from "../../src/builders/engineEnvBuilder.js";
+import { buildEngineConfiguration as buildEngineConfigurationBase } from "../../src/builders/engineEnvBuilder.js";
 import { DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS } from "../../src/defaults.js";
 import type { IEngineEnvironmentVariables } from "../../src/models/IEngineEnvironmentVariables.js";
+
+const AUTH = { authorizationConnector: AuthorizationConnectorType.EntityStorage } as const;
+
+/**
+ * Builds the engine configuration with the required authorization connector set.
+ * @param envVars The environment variables.
+ * @returns The engine configuration.
+ */
+async function buildEngineConfiguration(
+	envVars: IEngineEnvironmentVariables
+): ReturnType<typeof buildEngineConfigurationBase> {
+	return buildEngineConfigurationBase({ ...AUTH, ...envVars });
+}
 
 describe("buildEngineConfiguration - silent", () => {
 	test("log level is left unset when silent is not enabled", async () => {
@@ -174,8 +187,6 @@ describe("buildEngineConfiguration - disableColor", () => {
 		expect(tracing?.options?.config?.disableColor).toBe(true);
 	});
 });
-
-const AUTH = { authorizationConnector: AuthorizationConnectorType.EntityStorage } as const;
 
 describe("buildEngineConfiguration - schemaMigrationEnabled", () => {
 	test("schema migration service is registered when schemaMigrationEnabled is unset (default true)", async () => {
@@ -1408,24 +1419,21 @@ describe("buildEngineConfiguration - identity profile", () => {
 		expect(identityProfileConfig(config)).toEqual({
 			authorizationModelId: "system",
 			escalatedPrivilegeRole: "global-admin",
-			selfUpdateDeniedProperties: undefined,
-			adminScopes: undefined
+			selfUpdateDeniedProperties: undefined
 		});
 	});
 
-	test("uses the authorization model, self update denied properties and admin scopes from the env vars", async () => {
+	test("uses the authorization model and self update denied properties from the env vars", async () => {
 		const config = await buildEngineConfiguration({
 			identityProfileConnector: IdentityProfileConnectorType.EntityStorage,
 			authorizationModelId: "custom",
-			identityProfileSelfUpdateDeniedProperties: "email, jobTitle",
-			identityProfileAdminScopes: "profile-admin"
+			identityProfileSelfUpdateDeniedProperties: "email, jobTitle"
 		});
 
 		expect(identityProfileConfig(config)).toEqual({
 			authorizationModelId: "custom",
 			escalatedPrivilegeRole: "global-admin",
-			selfUpdateDeniedProperties: ["email", "jobTitle"],
-			adminScopes: ["profile-admin"]
+			selfUpdateDeniedProperties: ["email", "jobTitle"]
 		});
 	});
 

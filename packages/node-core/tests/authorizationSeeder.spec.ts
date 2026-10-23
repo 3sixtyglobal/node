@@ -25,7 +25,11 @@ import {
 } from "../src/defaults.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
-import { buildConfiguration } from "../src/node.js";
+import {
+	buildConfiguration,
+	loadEnvironmentVariables,
+	processEnvironmentVariables
+} from "../src/node.js";
 import { start } from "../src/start.js";
 import { initialiseLocales } from "../src/utils.js";
 
@@ -60,7 +64,11 @@ describe("seedAuthorizationDefaults", () => {
 				nodeOrganizationId: TEST_NODE_ORG_ID
 			})
 		};
-		const { nodeEngineConfig, nodeEnvVars } = await buildConfiguration(envVars, nodeOptions, {
+		const nodeEnvVars = await processEnvironmentVariables(
+			loadEnvironmentVariables(envVars, nodeOptions),
+			nodeOptions
+		);
+		const { nodeEngineConfig } = await buildConfiguration(nodeEnvVars, nodeOptions, {
 			name: "test",
 			version: "0.0.0"
 		});

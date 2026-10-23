@@ -1849,12 +1849,6 @@ async function configureIdentityProfile(
 						"identityProfileSelfUpdateDeniedProperties",
 						undefined,
 						undefined
-					),
-					adminScopes: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
-						envVars,
-						"identityProfileAdminScopes",
-						undefined,
-						undefined
 					)
 				}
 			}

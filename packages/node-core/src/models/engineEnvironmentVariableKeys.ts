@@ -213,7 +213,6 @@ const engineEnvironmentVariableKeysInternal: {
 	identityResolverConnector: true,
 	identityProfileConnector: true,
 	identityProfileSelfUpdateDeniedProperties: true,
-	identityProfileAdminScopes: true,
 	universalResolverEndpoint: true,
 	// IOTA
 	iotaFaucetEndpoint: true,

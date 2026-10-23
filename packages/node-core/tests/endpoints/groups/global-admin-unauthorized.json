@@ -41,7 +41,7 @@
 			"description": "GET /authentication/admin/users/:email - rejected for user-only role",
 			"method": "GET",
 			"path": "/authentication/admin/users/{{adminEmail}}",
-			"expectedStatus": 401
+			"expectedStatus": 403
 		},
 		{
 			"description": "POST /aig?override-tenant - rejected without global-admin role",
