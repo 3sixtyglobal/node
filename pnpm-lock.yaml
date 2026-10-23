@@ -256,7 +256,7 @@ importers:
         version: 0.20.0-next.2(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@5.0.5)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0))
       '@3sixty/ts-to-openapi':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.5
       '@3sixty/validate-locales':
         specifier: next
         version: 0.20.0-next.2
@@ -1160,12 +1160,12 @@ packages:
     resolution: {integrity: sha512-6VngnwM4x6k4xlamkkThwIWv6H4wUauhgACVsCUl5YjTJ8vpAH5RDSmrzi38NFOnUb4q5VeAZe8tOCWbTVxYzw==}
     engines: {node: '>=24.0.0'}
 
-  '@3sixty/tools-core@0.20.0-next.4':
-    resolution: {integrity: sha512-M/NKlmAvQoOn/ailU8yhjjINjP4nEqR3YG0qiYauxhyMOwQJLqcfXoVCo4zzAURcBcb+SY3YuYR07dG3VAsqTg==}
+  '@3sixty/tools-core@0.20.0-next.5':
+    resolution: {integrity: sha512-bp0VmCpg1RPBSIgokKViUGbCb/dwqhPDvRw99lRfS/oYxrKXU2GtC2cVLx0GjD70LfcM63WTAZ6KMv4xdaApuQ==}
     engines: {node: '>=24.0.0'}
 
-  '@3sixty/tools-models@0.20.0-next.4':
-    resolution: {integrity: sha512-/Ehlhy4Hy5IArm9WJEMs8P42jFBuOwu3YSDiqKl3iAZulgcGrX9AHmIEWgx9nUuWNAZ8646sQwcIQdMNTcwsxQ==}
+  '@3sixty/tools-models@0.20.0-next.5':
+    resolution: {integrity: sha512-ZcmyuUf++4V22BZXrNEfY+uC2HNNInc5pHgsjDsIEgQn2Gq+Xu569TcFo+8zktKB2igZsHNFFCD4O9lc06Nziw==}
     engines: {node: '>=24.0.0'}
 
   '@3sixty/tracing-connector-console@0.20.0-next.1':
@@ -1216,8 +1216,8 @@ packages:
     resolution: {integrity: sha512-T8ZtX5CxsJDPy0GMPVFpAJ7BnQjjze09ll3J3px6QkhMvmucSEvNxB+vkWzp1p8Wv0xo3uI60ZyjtDOWASUg1w==}
     engines: {node: '>=24.0.0'}
 
-  '@3sixty/ts-to-openapi@0.20.0-next.4':
-    resolution: {integrity: sha512-vdo/d7mZn5/ysnS0Qq0GdBA26F943kBd3e73l9oe7la6WQ0PKr0sKSu/FfeJJHUvi5+Hlpno6kRvmI3ndR8DkA==}
+  '@3sixty/ts-to-openapi@0.20.0-next.5':
+    resolution: {integrity: sha512-yUyVA1m/RoClRjGyUEQqBFCvAhB3lc1CLbMsJgXorN8IxvC5ukPu/NxddFLC0PkSYKu5XhxXnecQ4HYHigexTg==}
     engines: {node: '>=24.0.0'}
     hasBin: true
 
@@ -7916,19 +7916,16 @@ snapshots:
       '@3sixty/telemetry-models': 0.20.0-next.1
       '@3sixty/web': 0.20.0-next.2
 
-  '@3sixty/tools-core@0.20.0-next.4':
+  '@3sixty/tools-core@0.20.0-next.5':
     dependencies:
       '@3sixty/core': 0.20.0-next.2
       '@3sixty/crypto': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.2
-      '@3sixty/tools-models': 0.20.0-next.4
+      '@3sixty/tools-models': 0.20.0-next.5
       glob: 13.0.6
       typescript: 6.0.3
 
-  '@3sixty/tools-models@0.20.0-next.4':
-    dependencies:
-      '@3sixty/core': 0.20.0-next.2
-      '@3sixty/nameof': 0.20.0-next.2
+  '@3sixty/tools-models@0.20.0-next.5': {}
 
   '@3sixty/tracing-connector-console@0.20.0-next.1':
     dependencies:
@@ -8045,16 +8042,15 @@ snapshots:
       '@3sixty/trust-models': 0.20.0-next.1
       '@3sixty/web': 0.20.0-next.2
 
-  '@3sixty/ts-to-openapi@0.20.0-next.4':
+  '@3sixty/ts-to-openapi@0.20.0-next.5':
     dependencies:
       '@3sixty/cli-core': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.2
-      '@3sixty/tools-core': 0.20.0-next.4
-      '@3sixty/tools-models': 0.20.0-next.4
+      '@3sixty/tools-core': 0.20.0-next.5
+      '@3sixty/tools-models': 0.20.0-next.5
       '@3sixty/web': 0.20.0-next.2
       commander: 15.0.0
-      glob: 13.0.6
 
   '@3sixty/validate-locales@0.20.0-next.2':
     dependencies:
