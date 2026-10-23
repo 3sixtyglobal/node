@@ -17,6 +17,7 @@
 ## Type Aliases
 
 - [IEnvironmentVariables](type-aliases/IEnvironmentVariables.md)
+- [AuthorizationModelMode](type-aliases/AuthorizationModelMode.md)
 - [CliCommandParamType](type-aliases/CliCommandParamType.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
@@ -30,14 +31,23 @@
 - [BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
 - [TRUST\_VERIFICATION\_METHOD\_ID](variables/TRUST_VERIFICATION_METHOD_ID.md)
 - [AUTH\_SIGNING\_KEY\_ID](variables/AUTH_SIGNING_KEY_ID.md)
+- [AUTHORIZATION\_MODEL\_ID](variables/AUTHORIZATION_MODEL_ID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_DID](variables/CONTEXT_ID_HANDLER_FEATURE_DID.md)
 - [CONTEXT\_ID\_HANDLER\_FEATURE\_TENANT](variables/CONTEXT_ID_HANDLER_FEATURE_TENANT.md)
+- [DEFAULT\_ESCALATED\_PRIVILEGE\_ROLE](variables/DEFAULT_ESCALATED_PRIVILEGE_ROLE.md)
+- [DEFAULT\_TENANT\_ADMIN\_ROLE](variables/DEFAULT_TENANT_ADMIN_ROLE.md)
+- [DEFAULT\_USER\_ADMIN\_ROLE](variables/DEFAULT_USER_ADMIN_ROLE.md)
+- [DEFAULT\_IDENTITY\_ADMIN\_ROLE](variables/DEFAULT_IDENTITY_ADMIN_ROLE.md)
+- [DEFAULT\_IDENTITY\_PROFILE\_ADMIN\_ROLE](variables/DEFAULT_IDENTITY_PROFILE_ADMIN_ROLE.md)
+- [DEFAULT\_DEVOPS\_ROLE](variables/DEFAULT_DEVOPS_ROLE.md)
+- [DEFAULT\_USER\_ROLE](variables/DEFAULT_USER_ROLE.md)
 - [DEFAULT\_HEALTH\_EXCLUDE\_CLONE\_COMPONENTS](variables/DEFAULT_HEALTH_EXCLUDE_CLONE_COMPONENTS.md)
 - [TRACING\_FACADE\_NAME](variables/TRACING_FACADE_NAME.md)
 - [COMPONENT\_FACTORY\_TYPE\_NAME](variables/COMPONENT_FACTORY_TYPE_NAME.md)
 - [DEFAULT\_TRACING\_FACADE\_FACTORIES](variables/DEFAULT_TRACING_FACADE_FACTORIES.md)
 - [DEFAULT\_TRACING\_FACADE\_COMPONENT\_EXCLUDE\_TYPES](variables/DEFAULT_TRACING_FACADE_COMPONENT_EXCLUDE_TYPES.md)
 - [DEFAULT\_SCHEMA\_ALIASES](variables/DEFAULT_SCHEMA_ALIASES.md)
+- [AuthorizationModelMode](variables/AuthorizationModelMode.md)
 
 ## Functions
 
@@ -51,6 +61,7 @@
 - [isAutomationRequired](functions/isAutomationRequired.md)
 - [isTelemetryEnabled](functions/isTelemetryEnabled.md)
 - [isTracingEnabled](functions/isTracingEnabled.md)
+- [isAuthorizationRequired](functions/isAuthorizationRequired.md)
 - [isMailboxEnabled](functions/isMailboxEnabled.md)
 - [buildEngineServerConfiguration](functions/buildEngineServerConfiguration.md)
 - [isAuthEntityStorageRequired](functions/isAuthEntityStorageRequired.md)
