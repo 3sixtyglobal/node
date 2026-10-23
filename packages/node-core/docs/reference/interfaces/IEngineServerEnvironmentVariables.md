@@ -76,6 +76,14 @@ The time in milliseconds Fastify waits for a plugin to load before failing, defa
 
 ***
 
+### webServerType? {#webservertype}
+
+> `optional` **webServerType?**: `string`
+
+The type of web server to use: fastify, hono, native, defaults to fastify.
+
+***
+
 ### authAdminProcessorType? {#authadminprocessortype}
 
 > `optional` **authAdminProcessorType?**: `string`
@@ -105,6 +113,22 @@ The id of the key in the vault to use for signing in auth operations.
 > `optional` **authApiKeyHeader?**: `string`
 
 The HTTP header name used to pass the API key on requests, defaults to x-api-key.
+
+***
+
+### authMinPasswordLength? {#authminpasswordlength}
+
+> `optional` **authMinPasswordLength?**: `string`
+
+The minimum password length for new password validation.
+
+***
+
+### authMaxPasswordLength? {#authmaxpasswordlength}
+
+> `optional` **authMaxPasswordLength?**: `string`
+
+The maximum password length for new password validation.
 
 ***
 

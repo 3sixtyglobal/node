@@ -1311,6 +1311,97 @@ The span processor: batch (default) or simple. Only used when TWIN_TRACING_CONNE
 
 ***
 
+### authorizationConnector? {#authorizationconnector}
+
+> `optional` **authorizationConnector?**: `string`
+
+The type of authorization connector: entity-storage, casbin.
+
+***
+
+### authorizationModelId? {#authorizationmodelid}
+
+> `optional` **authorizationModelId?**: `string`
+
+The model identifier to use for authorization.
+
+***
+
+### casbinEndpoint? {#casbinendpoint}
+
+> `optional` **casbinEndpoint?**: `string`
+
+The base URL of the Casbin server (e.g. "http://localhost:48000"), required when using the casbin authorization connector.
+
+***
+
+### casbinClientId? {#casbinclientid}
+
+> `optional` **casbinClientId?**: `string`
+
+The OAuth2 client ID for authenticating with the Casbin server, required when using the casbin authorization connector.
+
+***
+
+### casbinClientSecret? {#casbinclientsecret}
+
+> `optional` **casbinClientSecret?**: `string`
+
+The OAuth2 client secret for authenticating with the Casbin server, required when using the casbin authorization connector.
+
+***
+
+### casbinTimeoutMs? {#casbintimeoutms}
+
+> `optional` **casbinTimeoutMs?**: `string`
+
+The request timeout in milliseconds for the Casbin authorization connector.
+
+***
+
+### authorizationCheckCacheCapacity? {#authorizationcheckcachecapacity}
+
+> `optional` **authorizationCheckCacheCapacity?**: `string`
+
+The maximum number of cached authorisation check results.
+
+***
+
+### authorizationCheckCacheTtiMs? {#authorizationcheckcachettims}
+
+> `optional` **authorizationCheckCacheTtiMs?**: `string`
+
+The time-to-idle in milliseconds for cached authorisation check results.
+
+***
+
+### authorizationModel? {#authorizationmodel}
+
+> `optional` **authorizationModel?**: `string`
+
+Path to a JSON file containing the authorization model to seed at startup.
+Use the @json: prefix to load the file, e.g. @json:./authorization-model.json.
+The file must contain an object with policies and roleInheritances arrays.
+Combined with or replaces the route-derived defaults depending on authorizationModelMode.
+
+***
+
+### authorizationModelMode? {#authorizationmodelmode}
+
+> `optional` **authorizationModelMode?**: `string`
+
+Controls how authorizationModel is combined with route-derived policies at startup.
+"merge" (default): authorizationModel is applied in addition to route-derived rules.
+"replace": authorizationModel replaces route-derived rules entirely.
+
+#### Default
+
+```ts
+"merge"
+```
+
+***
+
 ### faucetConnector? {#faucetconnector}
 
 > `optional` **faucetConnector?**: `string`
@@ -1516,16 +1607,7 @@ The type of identity profile connector: entity-storage.
 > `optional` **identityProfileSelfUpdateDeniedProperties?**: `string`
 
 Comma separated list of public and private profile properties which can only be added, changed
-or removed by callers with an admin scope. Defaults to none.
-
-***
-
-### identityProfileAdminScopes? {#identityprofileadminscopes}
-
-> `optional` **identityProfileAdminScopes?**: `string`
-
-Comma separated list of scopes which allow the self update denied profile properties to be
-modified, any one is sufficient. Defaults to user-admin, global-admin.
+or removed by callers with escalated privilege. Defaults to none.
 
 ***
 
