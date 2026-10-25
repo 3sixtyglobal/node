@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile, rm } from "node:fs/promises";
 import { CLIUtils } from "@3sixty/cli-core";
@@ -44,9 +45,10 @@ export const UNKNOWN_DID =
 export const TENANT_ADMIN_NOT_REGISTERED = "tenantAdminComponentNotRegistered";
 
 /**
- * The root folder for command test output.
+ * The root folder for command test output, without a leading "./" as Bun on Windows fails to
+ * remove such paths recursively.
  */
-export const OUTPUT_TMP_DIR = "./tests/.tmp/commands/";
+export const OUTPUT_TMP_DIR = "tests/.tmp/commands/";
 
 /**
  * Extract the value from a line of an .env file.
