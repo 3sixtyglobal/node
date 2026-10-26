@@ -63,6 +63,13 @@ thresholds are breached.
 pnpm --dir apps/node run test:soak
 ```
 
+To compare runtimes and web servers, set `SOAK_RUNTIME` and `SOAK_WEB_SERVER_TYPE`. Both are
+recorded in `report.json` under `config`:
+
+```bash
+SOAK_RUNTIME=bun SOAK_WEB_SERVER_TYPE=hono pnpm --dir apps/node run test:soak
+```
+
 Phase 1 prints progress and exits 0 once the node is healthy. Server stdout/stderr is
 captured to `apps/node/soak/.out/server.log`; file storage lives under
 `apps/node/soak/.out/data` (both gitignored, recreated per run).
@@ -75,6 +82,8 @@ All knobs are `SOAK_*` for the harness; the node still uses `TWIN_*`. Defaults s
 | ------------------------------------------ | --------------------------------- | --------------------------------------------------------------------------- |
 | `SOAK_PORT`                                | `3210`                            | Port the spawned node binds to                                              |
 | `SOAK_PROFILE`                             | `file-local`                      | Selects `config/soak.<profile>.env`                                         |
+| `SOAK_RUNTIME`                             | _(orchestrator's runtime)_        | Runtime the node is spawned with, `node` or `bun`                           |
+| `SOAK_WEB_SERVER_TYPE`                     | _(node default, fastify)_         | Sets `TWIN_WEB_SERVER_TYPE`: `fastify`, `hono` or `native`                  |
 | `SOAK_TENANT_MODE`                         | `multi`                           | `multi` or `single`                                                         |
 | `SOAK_BOOT_TIMEOUT`                        | `120s`                            | Max wait for `/readyz` 200                                                  |
 | `SOAK_SKIP_BOOTSTRAP`                      | `false`                           | Reuse existing state instead of bootstrapping                               |

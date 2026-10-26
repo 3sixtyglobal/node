@@ -31,6 +31,8 @@ import { createRemoteMemorySampler } from './remote-memory-sampler.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_DIR = path.resolve(__dirname, '..');
 const ENTRY = path.join('src', 'index.js'); // relative to APP_DIR (the node's cwd)
+const RUNTIMES = ['node', 'bun'];
+const WEB_SERVER_TYPES = ['fastify', 'hono', 'native'];
 
 // ---------------------------------------------------------------------------
 // Config (env-driven, with defaults). See plan §9.
@@ -46,6 +48,10 @@ const cfg = {
 	// SOAK_BASE_URL points to an externally-deployed node (e.g. cloud CI runs).
 	skipServer: bool(process.env.SOAK_SKIP_SERVER, false),
 	skipLoad: bool(process.env.SOAK_SKIP_LOAD, false),
+	// Runtime the node is spawned with, defaulting to the one running this orchestrator.
+	runtime: process.env.SOAK_RUNTIME ?? (process.versions.bun ? 'bun' : 'node'),
+	// Web server implementation, unset leaves the node's own default (fastify) or the profile's.
+	webServerType: process.env.SOAK_WEB_SERVER_TYPE,
 	// Load (k6) parameters.
 	// 2m used to be enough to show a real (if unenforced) memory slope on the bare default
 	// invocation. Since the warm-up discard rose to 2m (see warmupDiscardMs below), a 2m run
@@ -127,9 +133,18 @@ async function main() {
 	// time-range deep-link once the dashboard grows one (see feat-262 implementation plan).
 	const startedIso = new Date().toISOString();
 
+	if (!RUNTIMES.includes(cfg.runtime)) {
+		throw new Error(`SOAK_RUNTIME must be one of ${RUNTIMES.join(', ')}, got "${cfg.runtime}"`);
+	}
+	if (cfg.webServerType !== undefined && !WEB_SERVER_TYPES.includes(cfg.webServerType)) {
+		throw new Error(
+			`SOAK_WEB_SERVER_TYPE must be one of ${WEB_SERVER_TYPES.join(', ')}, got "${cfg.webServerType}"`
+		);
+	}
+
 	log(
 		'info',
-		`Soak orchestrator — profile=${cfg.profile} tenantMode=${cfg.tenantMode} port=${cfg.port}`
+		`Soak orchestrator — profile=${cfg.profile} tenantMode=${cfg.tenantMode} port=${cfg.port} runtime=${cfg.runtime} webServerType=${cfg.webServerType ?? 'default'}`
 	);
 	log('info', `Output dir: ${OUT_DIR}`);
 
@@ -351,6 +366,10 @@ async function buildNodeEnv() {
 		TWIN_STRICT_ENV: cfg.strictEnv
 	};
 
+	if (cfg.webServerType !== undefined) {
+		env.TWIN_WEB_SERVER_TYPE = cfg.webServerType;
+	}
+
 	if (cfg.tenantMode === 'multi') {
 		env.TWIN_TENANT_ENABLED = 'true';
 		env.TWIN_TENANT_ID = cfg.tenantId;
@@ -429,7 +448,7 @@ async function startServer(nodeEnv) {
 	log('info', 'Starting node server...');
 	const logStream = createWriteStream(SERVER_LOG, { flags: 'a' });
 
-	serverChild = spawn(process.execPath, [ENTRY], {
+	serverChild = spawn(runtimeBin(), [ENTRY], {
 		cwd: APP_DIR,
 		env: { ...process.env, ...nodeEnv },
 		stdio: ['ignore', 'pipe', 'pipe']
@@ -445,11 +464,20 @@ async function startServer(nodeEnv) {
 	});
 }
 
+/**
+ * The executable for SOAK_RUNTIME: this process's own when it matches, so the exact running
+ * version is reused, otherwise the runtime's command on PATH.
+ */
+function runtimeBin() {
+	const current = process.versions.bun ? 'bun' : 'node';
+	return cfg.runtime === current ? process.execPath : cfg.runtime;
+}
+
 /** Run the node entry with extra args to completion, returning the exit code. */
 function runToCompletion(args, env) {
 	return new Promise((resolve, reject) => {
 		const logStream = createWriteStream(SERVER_LOG, { flags: 'a' });
-		const child = spawn(process.execPath, [ENTRY, ...args], {
+		const child = spawn(runtimeBin(), [ENTRY, ...args], {
 			cwd: APP_DIR,
 			env: { ...process.env, ...env },
 			stdio: ['ignore', 'pipe', 'pipe']
@@ -777,6 +805,8 @@ async function writeReport({
 		config: {
 			profile: cfg.profile,
 			tenantMode: cfg.tenantMode,
+			runtime: cfg.runtime,
+			webServerType: cfg.webServerType ?? 'default',
 			duration: cfg.duration,
 			vus: cfg.vus,
 			startedIso,

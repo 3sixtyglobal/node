@@ -1,4 +1,5 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
@@ -130,11 +131,12 @@ export async function start(
 		try {
 			initialiseMigrations(engine, envVars);
 
-			// Start the server, which also starts the engine.
-			await server.start();
-
-			await seedAuthorizationDefaults(engine, server, envVars);
-			await finalizeMigrations(engine, envVars);
+			// Start the server, which also starts the engine. The authorization model is seeded
+			// before the server listens, so no request is checked against a partial model.
+			await server.start(async () => {
+				await seedAuthorizationDefaults(engine, server, envVars);
+				await finalizeMigrations(engine, envVars);
+			});
 
 			return {
 				engine,

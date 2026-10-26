@@ -64,6 +64,16 @@ on:
         required: false
         type: string
         default: ''
+      runtime:
+        description: 'Runtime for a locally started node, node or bun, ignored by the cloud profile (blank = node)'
+        required: false
+        type: string
+        default: ''
+      web_server_type:
+        description: 'Web server for a locally started node, fastify, hono or native, ignored by the cloud profile (blank = node default)'
+        required: false
+        type: string
+        default: ''
       profile:
         description: 'Soak profile (cloud, iota-testnet, ...)'
         required: false
@@ -124,6 +134,11 @@ jobs:
             }
           done
 
+      # Only needed when the harness spawns the node under Bun.
+      - name: Setup Bun
+        if: ${{ inputs.runtime == 'bun' }}
+        uses: oven-sh/setup-bun@v2
+
       - name: Install k6
         uses: grafana/setup-k6-action@v1
 
@@ -157,6 +172,8 @@ jobs:
           INPUT_P99_MS: ${{ inputs.p99_ms }}
           INPUT_MEM_GROWTH_MB_PER_HR: ${{ inputs.mem_growth_mb_per_hr }}
           INPUT_DISABLED_GROUPS: ${{ inputs.disabled_groups }}
+          INPUT_RUNTIME: ${{ inputs.runtime }}
+          INPUT_WEB_SERVER_TYPE: ${{ inputs.web_server_type }}
           # SOAK_BASE_URL, SOAK_TENANT_API_KEY, SOAK_ADMIN_EMAIL, SOAK_ADMIN_PASSWORD,
           # and SOAK_SLACK_WEBHOOK_URL come from the ORG_SOAK_ENV_VARS blob loaded above.
           # Credentials stay in env (not CLI args) so they never appear in the process list.
@@ -175,6 +192,8 @@ jobs:
           [ -n "$INPUT_P99_MS" ] && export SOAK_P99_MS="$INPUT_P99_MS"
           [ -n "$INPUT_MEM_GROWTH_MB_PER_HR" ] && export SOAK_MEM_GROWTH_MB_PER_HR="$INPUT_MEM_GROWTH_MB_PER_HR"
           [ -n "$INPUT_DISABLED_GROUPS" ] && export SOAK_DISABLED_GROUPS="$INPUT_DISABLED_GROUPS"
+          [ -n "$INPUT_RUNTIME" ] && export SOAK_RUNTIME="$INPUT_RUNTIME"
+          [ -n "$INPUT_WEB_SERVER_TYPE" ] && export SOAK_WEB_SERVER_TYPE="$INPUT_WEB_SERVER_TYPE"
           pnpm --dir apps/node run test:soak
 
       - name: Upload soak artifacts
