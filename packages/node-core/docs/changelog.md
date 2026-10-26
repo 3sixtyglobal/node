@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0-next.3](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.2...node-core-v0.20.0-next.3) (2026-10-26)
+
+
+### Features
+
+* release to next [skip ci] ([#89](https://github.com/3sixtyglobal/node/issues/89)) ([8bf951e](https://github.com/3sixtyglobal/node/commit/8bf951eaf0c9ed132f7194f0a0e883ae267e911e))
+
 ## [0.20.0-next.2](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.1...node-core-v0.20.0-next.2) (2026-10-23)
 
 
