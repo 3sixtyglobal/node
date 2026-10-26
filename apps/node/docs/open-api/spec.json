@@ -1040,6 +1040,86 @@
 				}
 			}
 		},
+		"/authentication/policy": {
+			"get": {
+				"operationId": "authenticationPasswordPolicy",
+				"summary": "Get the password policy",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "A REST request with no input parameters.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NoContentRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Get the password policy.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PasswordOptions"
+								},
+								"examples": {
+									"passwordPolicyResponseExample": {
+										"summary": "The response for the password policy request.",
+										"value": {
+											"minPasswordLength": 15,
+											"maxPasswordLength": 128
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/authentication/admin/users": {
 			"post": {
 				"operationId": "authenticationAdminCreateUser",
@@ -1067,11 +1147,7 @@
 										"email": "user@example.com",
 										"password": "MyPassword123!",
 										"userIdentity": "did:example:123456789abcdefghi",
-										"organizationIdentity": "did:example:123456789abcdefghi",
-										"scope": [
-											"scope1",
-											"scope2"
-										]
+										"organizationIdentity": "did:example:123456789abcdefghi"
 									}
 								}
 							}
@@ -1180,11 +1256,7 @@
 									"summary": "The request to update an existing user.",
 									"value": {
 										"userIdentity": "did:example:123456789abcdefghi",
-										"organizationIdentity": "did:example:123456789abcdefghi",
-										"scope": [
-											"scope1",
-											"scope2"
-										]
+										"organizationIdentity": "did:example:123456789abcdefghi"
 									}
 								}
 							}
@@ -1292,11 +1364,7 @@
 										"value": {
 											"email": "user@example.com",
 											"userIdentity": "did:example:123456789abcdefghi",
-											"organizationIdentity": "did:example:123456789abcdefghi",
-											"scope": [
-												"scope1",
-												"scope2"
-											]
+											"organizationIdentity": "did:example:123456789abcdefghi"
 										}
 									}
 								}
@@ -1597,11 +1665,7 @@
 										"value": {
 											"email": "user@example.com",
 											"userIdentity": "did:example:123456789abcdefghi",
-											"organizationIdentity": "did:example:123456789abcdefghi",
-											"scope": [
-												"scope1",
-												"scope2"
-											]
+											"organizationIdentity": "did:example:123456789abcdefghi"
 										}
 									}
 								}
@@ -1780,6 +1844,101 @@
 				"tags": [
 					"Authentication Audit"
 				],
+				"parameters": [
+					{
+						"name": "actorId",
+						"description": "The actor identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "user@example.com"
+					},
+					{
+						"name": "organizationId",
+						"description": "The organisation identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "tenantId",
+						"description": "The tenant identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "nodeId",
+						"description": "The node identifier to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "event",
+						"description": "The event to filter by.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"$ref": "#/components/schemas/AuthAuditEvent"
+								},
+								{
+									"type": "string"
+								}
+							]
+						},
+						"example": "login-success"
+					},
+					{
+						"name": "startDate",
+						"description": "The inclusive start date for filtering, in ISO 8601 format.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2026-01-01T00:00:00.000Z"
+					},
+					{
+						"name": "endDate",
+						"description": "The inclusive end date for filtering, in ISO 8601 format.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "2026-01-31T23:59:59.999Z"
+					},
+					{
+						"name": "cursor",
+						"description": "The pagination cursor.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"description": "The maximum number of results to return.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "50"
+					}
+				],
 				"security": [
 					{
 						"jwtBearerAuthScheme": []
@@ -1885,7 +2044,7 @@
 				"parameters": [
 					{
 						"name": "id",
-						"description": "",
+						"description": "The audit entry id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -1993,7 +2152,7 @@
 				"parameters": [
 					{
 						"name": "id",
-						"description": "",
+						"description": "The audit entry id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -2101,7 +2260,7 @@
 				"parameters": [
 					{
 						"name": "id",
-						"description": "",
+						"description": "The audit entry id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -2415,6 +2574,13 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/IdentityCreateRequest"
+							},
+							"examples": {
+								"identityCreateSelfControlledRequestExample": {
+									"value": {
+										"selfControlled": true
+									}
+								}
 							}
 						}
 					}
@@ -3612,7 +3778,7 @@
 			}
 		},
 		"/identity/{identity}/verifiable-credential/revoke/{revocationIndex}": {
-			"get": {
+			"post": {
 				"operationId": "identityVerifiableCredentialRevoke",
 				"summary": "Revoke an identity verifiable credential",
 				"tags": [
@@ -3712,7 +3878,7 @@
 			}
 		},
 		"/identity/{identity}/verifiable-credential/unrevoke/{revocationIndex}": {
-			"get": {
+			"post": {
 				"operationId": "identityVerifiableCredentialUnrevoke",
 				"summary": "Unrevoke an identity verifiable credential",
 				"tags": [
@@ -5498,11 +5664,6 @@
 						"example": "role,email,name"
 					}
 				],
-				"security": [
-					{
-						"jwtBearerAuthScheme": []
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "Response to get an identity public profile.",
@@ -5547,24 +5708,6 @@
 											"properties": {
 												"foo": "bar"
 											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Error"
-								},
-								"examples": {
-									"exampleResponse": {
-										"value": {
-											"name": "UnauthorizedError",
-											"message": "errorMessage"
 										}
 									}
 								}
@@ -25527,13 +25670,6 @@
 					"organizationIdentity": {
 						"type": "string",
 						"description": "The users organization."
-					},
-					"scope": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The scope assigned to the user, comma separated."
 					}
 				}
 			},
@@ -26172,20 +26308,12 @@
 					"organizationIdentity": {
 						"type": "string",
 						"description": "The users organization."
-					},
-					"scope": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The scope assigned to the user, comma separated."
 					}
 				},
 				"required": [
 					"email",
 					"userIdentity",
-					"organizationIdentity",
-					"scope"
+					"organizationIdentity"
 				]
 			},
 			"AuthorizationAddRoleForSubjectRequest": {
@@ -27134,6 +27262,10 @@
 					"namespace": {
 						"type": "string",
 						"description": "The optional namespace to create the identity in."
+					},
+					"selfControlled": {
+						"type": "boolean",
+						"description": "Create the identity controlled by its own DID, defaults to false."
 					}
 				},
 				"description": "The data for the request."
@@ -27973,6 +28105,20 @@
 					"$ref": "#/components/schemas/RightsManagementPolicy"
 				},
 				"description": "The body of the response."
+			},
+			"PasswordOptions": {
+				"description": "Password length validation options.",
+				"type": "object",
+				"properties": {
+					"minPasswordLength": {
+						"type": "number",
+						"description": "The minimum password length for validation."
+					},
+					"maxPasswordLength": {
+						"type": "number",
+						"description": "The maximum password length for validation."
+					}
+				}
 			},
 			"PnapCreateRequest": {
 				"type": "object",
