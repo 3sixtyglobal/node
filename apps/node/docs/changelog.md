@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0-next.3](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.2...node-v0.20.0-next.3) (2026-10-26)
+
+
+### Features
+
+* release to next [skip ci] ([#89](https://github.com/3sixtyglobal/node/issues/89)) ([8bf951e](https://github.com/3sixtyglobal/node/commit/8bf951eaf0c9ed132f7194f0a0e883ae267e911e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @3sixty/node-core bumped from 0.20.0-next.2 to 0.20.0-next.3
+
 ## [0.20.0-next.2](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.1...node-v0.20.0-next.2) (2026-10-23)
 
 
