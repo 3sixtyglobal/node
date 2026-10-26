@@ -328,22 +328,22 @@ importers:
         version: 0.20.0-next.2(typescript@6.0.3)
       '@3sixty/engine':
         specifier: next
-        version: 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/engine-core':
         specifier: next
-        version: 0.20.0-next.3
+        version: 0.20.0-next.4
       '@3sixty/engine-models':
         specifier: next
-        version: 0.20.0-next.3
+        version: 0.20.0-next.4
       '@3sixty/engine-server':
         specifier: next
-        version: 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/engine-server-types':
         specifier: next
-        version: 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/engine-types':
         specifier: next
-        version: 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+        version: 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/entity':
         specifier: next
         version: 0.20.0-next.4
@@ -762,28 +762,28 @@ packages:
     resolution: {integrity: sha512-MjZFg8YnEFGcE/7efxeGm41sJDo6ShCDOpS9BaCDbpciFwg3CrEv/iEmqis5J3RBOQ6P7UFMg8ibm6AIaYj5dg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/engine-core@0.20.0-next.3':
-    resolution: {integrity: sha512-VEQ57B6pNLr9dqSKSC/715Et56eCAS6rdPOY1IIibsj23Wvm0E3zuYyDyPQT0QZTsudf7YbHyPRvirFlFLIEaA==}
+  '@3sixty/engine-core@0.20.0-next.4':
+    resolution: {integrity: sha512-EmaNkUu9x0iZVVFAxBx5+Mn4rXU6NBB/MR9+XKulSAjPzZ/TnJnMNIPeeLSXNvgWAEI5VF/2tShZJ4PmpglCXg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/engine-models@0.20.0-next.3':
-    resolution: {integrity: sha512-10XlpfwEyTj5EDC4nYuPQsbLDZRdpwz9u9GiXf9JHCZ7Lr61/iwx0s3PjfsmBNjhF7p/ICaSrm5mvB6cwICX9A==}
+  '@3sixty/engine-models@0.20.0-next.4':
+    resolution: {integrity: sha512-4sd2V7RVmbNkNEPshxJxIP0lQdArqQIv5j+qds5GeCkkcF4+3yVSTLD79tcurhYPcfbhzl02KbWM61dIjqs46g==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/engine-server-types@0.20.0-next.3':
-    resolution: {integrity: sha512-v06XYmVGXH8CA2ksq2oI8sYJKAkYnizek4OQ37QzHiDHPCv+b6Hruz2rjjLnQXYYYao9vbrAbqwiZYXJpituQA==}
+  '@3sixty/engine-server-types@0.20.0-next.4':
+    resolution: {integrity: sha512-WvkpWibGHwHGHNdkJ+jJzuQWva+oRk38koG6OV2zmDq3TJP1qPhPSZxNAZIEsGD9Ki3aUU5yXQivRSPyYdCJxg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/engine-server@0.20.0-next.3':
-    resolution: {integrity: sha512-R4ZkQpZOpdNWpEAkA9OohXDGE8ANignra4rgbO1D+S09q8dAJyuP/pk5om1FXOHoFuN5KKC2HM+DnA9kWOAeow==}
+  '@3sixty/engine-server@0.20.0-next.4':
+    resolution: {integrity: sha512-V4BCpzmdfXs1vxmY9qFZl3sgyuZ5eP8E33L1ybjEhSjFkuvxP3KY1DO2q8lLvlrag15cHeEDHXufTaqQxrHlXA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/engine-types@0.20.0-next.3':
-    resolution: {integrity: sha512-zXMV/1+HGRBbAlwSFhGr0S/cf0Y7HF7ahi9QpKVA1DbcdtFrBXcU7wPPdOOqzPA11K9zR6xMzkgfBp99QLtD6A==}
+  '@3sixty/engine-types@0.20.0-next.4':
+    resolution: {integrity: sha512-4GYWk19QjVkrRG6l4jx0qmU254uPeN7Bq2AiRQs/0BtBn3LBCIJIwh5Sb+k5MWGzRatA64msrjMwuX9uENSreg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/engine@0.20.0-next.3':
-    resolution: {integrity: sha512-DW3JkX1EcYuwIScb2ngfjIqjom4wJSImQONCF6i0W4a0q7KXZT6QvWk5LYZLRBmO6ETfsLZNYHqecL0CRXUhNQ==}
+  '@3sixty/engine@0.20.0-next.4':
+    resolution: {integrity: sha512-qjKiUDhj/Ks0zj5e16hKs6a76uernM62cfi0o9blJwj0rTJBaLyYNjeg2E+gHlxe6qNoX+kyCU6RErRUvSlL6w==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/entity-storage-connector-cosmosdb@0.20.0-next.2':
@@ -6535,12 +6535,12 @@ snapshots:
       '@3sixty/telemetry-models': 0.20.0-next.2
       '@3sixty/web': 0.20.0-next.4
 
-  '@3sixty/engine-core@0.20.0-next.3':
+  '@3sixty/engine-core@0.20.0-next.4':
     dependencies:
       '@3sixty/context': 0.20.0-next.4
       '@3sixty/core': 0.20.0-next.4
       '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/engine-models': 0.20.0-next.3
+      '@3sixty/engine-models': 0.20.0-next.4
       '@3sixty/entity': 0.20.0-next.4
       '@3sixty/logging-connector-console': 0.20.0-next.2
       '@3sixty/logging-models': 0.20.0-next.2
@@ -6548,7 +6548,7 @@ snapshots:
       '@3sixty/modules': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.4
 
-  '@3sixty/engine-models@0.20.0-next.3':
+  '@3sixty/engine-models@0.20.0-next.4':
     dependencies:
       '@3sixty/api-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.4
@@ -6556,7 +6556,7 @@ snapshots:
       '@3sixty/entity': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.4
 
-  '@3sixty/engine-server-types@0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@3sixty/engine-server-types@0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@3sixty/api-auth-entity-storage-rest-client': 0.20.0-next.2(supports-color@10.2.2)
       '@3sixty/api-auth-entity-storage-service': 0.20.0-next.2
@@ -6569,8 +6569,8 @@ snapshots:
       '@3sixty/authorization-service': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.4
       '@3sixty/core': 0.20.0-next.4
-      '@3sixty/engine-models': 0.20.0-next.3
-      '@3sixty/engine-types': 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+      '@3sixty/engine-models': 0.20.0-next.4
+      '@3sixty/engine-types': 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/nameof': 0.20.0-next.4
       '@3sixty/telemetry-processors': 0.20.0-next.2
       '@3sixty/tracing-processors': 0.20.0-next.2
@@ -6597,7 +6597,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@3sixty/engine-server@0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@3sixty/engine-server@0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@3sixty/api-models': 0.20.0-next.2
       '@3sixty/api-server-fastify': 0.20.0-next.2(supports-color@10.2.2)
@@ -6605,8 +6605,8 @@ snapshots:
       '@3sixty/api-server-native': 0.20.0-next.2(supports-color@10.2.2)
       '@3sixty/context': 0.20.0-next.4
       '@3sixty/core': 0.20.0-next.4
-      '@3sixty/engine-models': 0.20.0-next.3
-      '@3sixty/engine-server-types': 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+      '@3sixty/engine-models': 0.20.0-next.4
+      '@3sixty/engine-server-types': 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/modules': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.4
     transitivePeerDependencies:
@@ -6632,7 +6632,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@3sixty/engine-types@0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@3sixty/engine-types@0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@3sixty/api-models': 0.20.0-next.2
       '@3sixty/api-rest-client': 0.20.0-next.2(supports-color@10.2.2)
@@ -6682,7 +6682,7 @@ snapshots:
       '@3sixty/dlt-iota': 0.20.0-next.2(typescript@6.0.3)
       '@3sixty/document-management-rest-client': 0.20.0-next.2(supports-color@10.2.2)
       '@3sixty/document-management-service': 0.20.0-next.2
-      '@3sixty/engine-models': 0.20.0-next.3
+      '@3sixty/engine-models': 0.20.0-next.4
       '@3sixty/entity-storage-connector-cosmosdb': 0.20.0-next.2(supports-color@10.2.2)
       '@3sixty/entity-storage-connector-dynamodb': 0.20.0-next.2
       '@3sixty/entity-storage-connector-file': 0.20.0-next.2
@@ -6800,12 +6800,12 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@3sixty/engine@0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
+  '@3sixty/engine@0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@3sixty/core': 0.20.0-next.4
-      '@3sixty/engine-core': 0.20.0-next.3
-      '@3sixty/engine-models': 0.20.0-next.3
-      '@3sixty/engine-types': 0.20.0-next.3(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
+      '@3sixty/engine-core': 0.20.0-next.4
+      '@3sixty/engine-models': 0.20.0-next.4
+      '@3sixty/engine-types': 0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)
       '@3sixty/entity': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.4
     transitivePeerDependencies:
