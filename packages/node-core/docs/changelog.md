@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.20.0-next.4](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.3...node-core-v0.20.0-next.4) (2026-10-26)
+
+
+### Features
+
+* release to next [skip ci] ([#92](https://github.com/3sixtyglobal/node/issues/92)) ([6423180](https://github.com/3sixtyglobal/node/commit/6423180c3f96f98c1d6e13137163034b685677fe))
+
+
+### Bug Fixes
+
+* seed authorization before the server listens ([#91](https://github.com/3sixtyglobal/node/issues/91)) ([6198624](https://github.com/3sixtyglobal/node/commit/6198624b04a8156ba0266b051c5dd4c4e09e5e0c))
+
 ## [0.20.0-next.3](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.2...node-core-v0.20.0-next.3) (2026-10-26)
 
 
