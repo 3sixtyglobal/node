@@ -8,19 +8,35 @@
 			"apiKey": true,
 			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
 			"expectedStatus": 200,
-			"capture": { "authToken": "cookie:access_token", "organizationId": "jwt-claim:org" },
+			"capture": { "authToken": "cookie:access_token" },
 			"assert": { "body.expiry": "isDefined" }
 		},
 		{
-			"description": "GET /authentication/admin/users/:email - capture identities",
+			"description": "GET /authentication/admin/users/:email - capture the account id",
 			"method": "GET",
 			"path": "/authentication/admin/users/{{adminEmail}}",
 			"expectedStatus": 200,
+			"capture": { "adminAccountId": "body.accountId" },
+			"assert": { "body.accountId": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/account?type=identity - capture the identity",
+			"method": "GET",
+			"path": "/authentication/account?type=identity",
+			"expectedStatus": 200,
+			"capture": { "adminUserIdentity": "body.entities.0.data.id" },
+			"assert": { "body.entities.0.data.id": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/account?type=organization - capture the organization",
+			"method": "GET",
+			"path": "/authentication/account?type=organization",
+			"expectedStatus": 200,
 			"capture": {
-				"adminUserIdentity": "body.userIdentity",
-				"adminOrgIdentity": "body.organizationIdentity"
+				"adminOrgIdentity": "body.entities.0.data.identifier",
+				"organizationId": "body.entities.0.data.identifier"
 			},
-			"assert": { "body.userIdentity": "isDefined" }
+			"assert": { "body.entities.0.data.identifier": "isDefined" }
 		}
 	]
 }

@@ -1,6 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import path from "node:path";
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
@@ -11,6 +12,7 @@ import { EngineCoreFactory, type IEngineCore, type IEngineCoreConfig } from "@3s
 import { EngineServer } from "@3sixty/engine-server";
 import type { IEngineServerConfig } from "@3sixty/engine-server-types";
 import { BlobStorageConnectorType, EntityStorageConnectorType } from "@3sixty/engine-types";
+import { registerPartitionOrganizations } from "./accountData.js";
 import {
 	extensionsInitialiseEngine,
 	extensionsInitialiseEngineServer,
@@ -18,6 +20,7 @@ import {
 } from "./builders/extensionsBuilder.js";
 import { executeCommand } from "./cli.js";
 import { DEFAULT_SCHEMA_ALIASES } from "./defaults.js";
+import { seedMessagingTemplates } from "./messagingTemplates.js";
 import { finalizeMigrations, initialiseMigrations } from "./migration.js";
 import type { ICliCommand } from "./models/ICliCommand.js";
 import type { IEngineEnvironmentVariables } from "./models/IEngineEnvironmentVariables.js";
@@ -135,6 +138,16 @@ export async function start(
 			// before the server listens, so no request is checked against a partial model.
 			await server.start(async () => {
 				await seedAuthorizationDefaults(engine, server, envVars);
+				await seedMessagingTemplates(
+					engine,
+					Is.stringValue(envVars.messagingTemplatesDirectory)
+						? path.resolve(
+								nodeOptions?.executionDirectory ?? "",
+								envVars.messagingTemplatesDirectory
+							)
+						: nodeOptions?.messagingTemplatesDirectory
+				);
+				await registerPartitionOrganizations(engine, envVars);
 				await finalizeMigrations(engine, envVars);
 			});
 

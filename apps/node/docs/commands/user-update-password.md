@@ -20,9 +20,6 @@ The email address of the user to update.
 password: (string, optional)
 The new password. If not provided a random password will be generated.
 
-current-password: (string, optional)
-The current password, verified before the change when provided.
-
 tenant-id: (string, hex(32), optional)
 The tenant ID the user belongs to (multi-tenant mode only).
 
@@ -49,10 +46,10 @@ Generate a new password for a user and store it in an .env file:
 3sixty-node user-update-password --email="bob@example.com" --output-env="bob-password.env"
 ```
 
-Set a specific password in multi-tenant mode, verifying the current password first:
+Set a specific password in multi-tenant mode:
 
 ```shell
-3sixty-node user-update-password --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="bob@example.com" --current-password="..." --password="..."
+3sixty-node user-update-password --load-env="node-tenant.env" --tenant-id=!NODE_TENANT_ID --email="bob@example.com" --password="..."
 ```
 
 See the [usage guide](../usage.md) for running the node and the full list of commands.

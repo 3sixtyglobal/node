@@ -5,6 +5,7 @@ import type { IIotaConfig } from "@3sixty/dlt-iota";
 import { EngineCloneMode, EngineLogLevel } from "@3sixty/engine-models";
 import {
 	AuthorizationConnectorType,
+	BlobStorageConnectorType,
 	DataConverterConnectorType,
 	DataExtractorConnectorType,
 	DataProcessingComponentType,
@@ -1443,5 +1444,30 @@ describe("buildEngineConfiguration - identity profile", () => {
 		});
 
 		expect(config.types.identityProfileComponent).toBeUndefined();
+	});
+});
+
+describe("buildEngineConfiguration - gcp storage", () => {
+	test("uses the storage endpoint for the gcp blob storage connector", async () => {
+		const config = await buildEngineConfiguration({
+			blobStorageConnectorType: BlobStorageConnectorType.GcpStorage,
+			gcpStorageEndpoint: "http://storage:4443",
+			gcpFirestoreEndpoint: "http://firestore:8080"
+		});
+
+		expect(config.types.blobStorageConnector?.[0].options).toMatchObject({
+			config: { apiEndpoint: "http://storage:4443" }
+		});
+	});
+
+	test("falls back to the firestore endpoint for the gcp blob storage connector", async () => {
+		const config = await buildEngineConfiguration({
+			blobStorageConnectorType: BlobStorageConnectorType.GcpStorage,
+			gcpFirestoreEndpoint: "http://firestore:8080"
+		});
+
+		expect(config.types.blobStorageConnector?.[0].options).toMatchObject({
+			config: { apiEndpoint: "http://firestore:8080" }
+		});
 	});
 });

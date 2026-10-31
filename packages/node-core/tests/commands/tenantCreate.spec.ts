@@ -61,4 +61,34 @@ describe.each(TENANT_MODES)("tenant-create in $mode mode", ({ mode, tenantEnable
 			context.execute(["tenant-create", `--organization-id=${context.organizationId}`])
 		).rejects.toThrow("organizationIdAlreadyExists");
 	});
+
+	test.skipIf(!tenantEnabled)("creates a tenant with the given id and api key", async () => {
+		const organization = await context.createIdentity("organization-explicit");
+		await context.execute([
+			"tenant-create",
+			"--tenant-id=fedcba9876543210fedcba9876543210",
+			"--api-key=00112233445566778899aabbccddeeff",
+			`--organization-id=${organization.did}`
+		]);
+
+		const tenants = await readStoreRecords<{ id: string; apiKey: string; organizationId: string }>(
+			context.dbDir,
+			"tenant"
+		);
+		expect(tenants.find(t => t.id === "fedcba9876543210fedcba9876543210")).toMatchObject({
+			apiKey: "00112233445566778899aabbccddeeff",
+			organizationId: organization.did
+		});
+	});
+
+	test.skipIf(!tenantEnabled)("throws for a tenant id that is not 32 hex characters", async () => {
+		const organization = await context.createIdentity("organization-bad-id");
+		await expect(
+			context.execute([
+				"tenant-create",
+				"--tenant-id=not-hex",
+				`--organization-id=${organization.did}`
+			])
+		).rejects.toThrow();
+	});
 });

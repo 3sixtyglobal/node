@@ -40,12 +40,11 @@ describe.each(TENANT_MODES)("user-update-password in $mode mode", ({ mode, tenan
 		expect(await readPasswordHash()).not.toEqual(hashBefore);
 	});
 
-	test("generates a password and verifies the current password", async () => {
+	test("generates a password when none is provided", async () => {
 		const hashBefore = await readPasswordHash();
 		await context.execute([
 			"user-update-password",
 			"--email=user@example.com",
-			`--current-password=${NEW_PASSWORD}`,
 			`--output-json=${context.dir}password.json`,
 			`--output-env=${context.dir}password.env`,
 			"--output-env-prefix=user_",
@@ -61,18 +60,6 @@ describe.each(TENANT_MODES)("user-update-password in $mode mode", ({ mode, tenan
 		expect(json?.email).toEqual(valueFromEnv(env?.[0]));
 		expect(json?.password).toEqual(valueFromEnv(env?.[1]));
 		expect(await readPasswordHash()).not.toEqual(hashBefore);
-	});
-
-	test("throws when the current password is wrong", async () => {
-		await expect(
-			context.execute([
-				"user-update-password",
-				"--email=user@example.com",
-				`--password=${NEW_PASSWORD}`,
-				"--current-password=N0t!The-Current#Passw0rd",
-				...context.tenantArgs()
-			])
-		).rejects.toThrow("updatePasswordFailed");
 	});
 
 	test("throws when the password is too short", async () => {

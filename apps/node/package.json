@@ -66,7 +66,8 @@
 		"dist/locales",
 		"src/index.js",
 		"locales",
-		"docs"
+		"docs",
+		"templates"
 	],
 	"bin": {
 		"3sixty-node": "bin/index.js"

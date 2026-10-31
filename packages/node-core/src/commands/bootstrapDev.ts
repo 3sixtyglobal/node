@@ -1,6 +1,10 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IAuthenticationAdminComponent } from "@3sixty/api-auth-entity-storage-models";
+import type {
+	IAuthenticationAdminComponent,
+	IAuthenticationUser
+} from "@3sixty/api-auth-entity-storage-models";
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
@@ -23,6 +27,7 @@ import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
 import type { INodeEngineState } from "../models/INodeEngineState.js";
+import { normaliseEmail } from "../utils.js";
 
 const COMMAND_NAME = "bootstrap-dev";
 
@@ -240,24 +245,28 @@ export async function bootstrapDev(
 			{ [ContextIdKeys.Node]: nodeId, [ContextIdKeys.Tenant]: tenant?.id },
 			async () => {
 				const orgDid = await resolveOrganizationDid(engineCore, tenantEnabled, tenant?.id);
-				const effectiveAdminEmail =
-					envVars.adminUserName ?? `admin@${tenantEnabled ? "tenant" : "node"}`;
+				const effectiveAdminEmail = normaliseEmail(
+					envVars.adminUserName ?? `admin@${tenantEnabled ? "tenant" : "node"}`
+				);
 				const adminUser = await resolveDefaultAdminUser(engineCore, effectiveAdminEmail);
-				let userDid = adminUser?.userIdentity;
 
-				if (Is.empty(adminUser)) {
-					CLIDisplay.break();
-					CLIDisplay.section(
-						I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.adminIdentityCreate")
-					);
-					const result = await identityCreate(engineCore, envVars, {
-						identity: envVars.adminUserIdentity,
-						mnemonic: envVars.adminUserMnemonic,
-						controller: orgDid
-					});
-
-					userDid = result.did;
+				// The account no longer holds its identity, so a repeat bootstrap leaves an existing
+				// admin account, its identity and its roles as they are.
+				if (Is.notEmpty(adminUser)) {
+					CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.skipping"));
+					return;
 				}
+
+				CLIDisplay.break();
+				CLIDisplay.section(
+					I18n.formatMessage("node.cli.commands.bootstrap-dev.labels.adminIdentityCreate")
+				);
+				const result = await identityCreate(engineCore, envVars, {
+					identity: envVars.adminUserIdentity,
+					mnemonic: envVars.adminUserMnemonic,
+					controller: orgDid
+				});
+				const userDid = result.did;
 
 				CLIDisplay.break();
 				CLIDisplay.section(
@@ -401,7 +410,7 @@ async function resolveDefaultTenant(
 async function resolveDefaultAdminUser(
 	engineCore: IEngineCore<INodeEngineConfig, INodeEngineState>,
 	email: string
-): Promise<{ email: string; userIdentity: string; organizationIdentity: string } | undefined> {
+): Promise<IAuthenticationUser | undefined> {
 	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
 		"authenticationAdminComponent"
 	);

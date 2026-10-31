@@ -1,0 +1,155 @@
+{
+	"group": "Organization",
+	"steps": [
+		{
+			"description": "POST /authentication/organization - create an organization with a node controlled DID",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Endpoint Test Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "testOrganizationId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - the organization and its public profile",
+			"method": "GET",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 200,
+			"assert": { "body.identity": "isDefined", "body.publicProfile": "isDefined" },
+			"capture": { "testOrganizationIdentity": "body.identity" }
+		},
+		{
+			"description": "GET /authentication/admin/account - the public profile is owned by the DID",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{testOrganizationIdentity}}&type=public-profile",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.data.name": "Endpoint Test Ltd" },
+			"capture": { "testOrganizationProfileId": "body.entities.0.id" }
+		},
+		{
+			"description": "POST /authentication/admin/account - 422 adding a profile to an organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{testOrganizationIdentity}}",
+				"type": "public-profile",
+				"data": { "name": "Changed Ltd" }
+			},
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.organizationProfileManaged"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/account/:id - 422 changing the profile of an organization",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{testOrganizationProfileId}}",
+			"body": { "data": { "name": "Changed Ltd" } },
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.organizationProfileManaged"
+			}
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:id - 422 removing the profile of an organization",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{testOrganizationProfileId}}",
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.organizationProfileManaged"
+			}
+		},
+		{
+			"description": "PUT /authentication/organization/:id - add the private profile",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"body": {
+				"privateProfile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"email": "office@example.com"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/organization - the organizations",
+			"method": "GET",
+			"path": "/authentication/organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.id": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/organization/search - find the organization by the start of its name",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=endpoint%20TEST",
+			"expectedStatus": 200,
+			"assert": {
+				"body.entities.0.id": "{{testOrganizationId}}",
+				"body.entities.0.publicProfile.name": "Endpoint Test Ltd"
+			}
+		},
+		{
+			"description": "PUT /authentication/organization/:id - rename the organization",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"body": {
+				"publicProfile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Renamed Endpoint Ltd"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/organization/search - the search follows the new name",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=renamed%20endpoint",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.id": "{{testOrganizationId}}" }
+		},
+		{
+			"description": "GET /authentication/organization/search - 400 without a name",
+			"method": "GET",
+			"path": "/authentication/organization/search",
+			"expectedStatus": 400
+		},
+		{
+			"description": "GET /authentication/organization/search - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=endpoint",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - 409 while the creator is still a member",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 409
+		},
+		{
+			"description": "DELETE /authentication/account/organization/:organization - the creator leaves",
+			"method": "DELETE",
+			"path": "/authentication/account/organization/{{testOrganizationIdentity}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - remove the organization",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/organization/:id - 404 once removed",
+			"method": "GET",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 404
+		}
+	]
+}

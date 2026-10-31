@@ -1,17 +1,21 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import type { AccountData } from "@3sixty/api-auth-account-service";
 import type { AuthenticationUser } from "@3sixty/api-auth-entity-storage-service";
+import { AuthenticationAccountDataType } from "@3sixty/api-auth-models";
 import type { IPlatformComponent } from "@3sixty/api-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { Coerce, ComponentFactory, GeneralError, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
-import { ComparisonOperator } from "@3sixty/entity";
+import { ComparisonOperator, LogicalOperator } from "@3sixty/entity";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
 } from "@3sixty/entity-storage-models";
 import { Did } from "@3sixty/identity-models";
 import { nameofKebabCase } from "@3sixty/nameof";
+import { getAccountAdminComponent, getAccountDataDid } from "../accountData.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
@@ -92,10 +96,15 @@ export async function orgUsersList(
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.org-users-list.labels.listing"));
 
+	const accountDataStorage =
+		EntityStorageConnectorFactory.get<IEntityStorageConnector<AccountData>>(
+			nameofKebabCase<AccountData>()
+		);
 	const authUserStorage =
 		EntityStorageConnectorFactory.get<IEntityStorageConnector<AuthenticationUser>>(
 			nameofKebabCase<AuthenticationUser>()
 		);
+	const accountAdminComponent = getAccountAdminComponent(engineCore);
 
 	const result: { email: string; identity: string }[] = [];
 
@@ -103,38 +112,59 @@ export async function orgUsersList(
 	const platformComponent = ComponentFactory.get<IPlatformComponent>(platformComponentType);
 
 	await platformComponent.execute(async () => {
+		const accountIds = new Set<string>();
 		let cursor: string | undefined;
 		do {
-			const page = await authUserStorage.query(
+			const page = await accountDataStorage.query(
 				{
-					property: "organization",
-					value: effectiveOrgDid,
-					comparison: ComparisonOperator.Equals
+					conditions: [
+						{
+							property: "type",
+							value: AuthenticationAccountDataType.Organization,
+							comparison: ComparisonOperator.Equals
+						},
+						{
+							property: "organization",
+							value: effectiveOrgDid,
+							comparison: ComparisonOperator.Equals
+						}
+					],
+					logicalOperator: LogicalOperator.And
 				},
 				undefined,
-				["email", "identity", "organization"],
+				["accountId"],
 				cursor
 			);
-			for (const user of page.entities) {
-				if (Is.stringValue(user.email)) {
-					result.push({
-						email: user.email,
-						identity: user.identity ?? ""
-					});
-					CLIDisplay.break();
-					CLIDisplay.value(
-						I18n.formatMessage("node.cli.commands.org-users-list.labels.email"),
-						user.email
-					);
-					CLIDisplay.value(
-						I18n.formatMessage("node.cli.commands.org-users-list.labels.identity"),
-						user.identity ?? "",
-						1
-					);
+			for (const item of page.entities) {
+				if (Is.stringValue(item.accountId)) {
+					accountIds.add(item.accountId);
 				}
 			}
 			cursor = page.cursor;
 		} while (Is.stringValue(cursor));
+
+		for (const accountId of accountIds) {
+			const user = await authUserStorage.get(accountId);
+			if (Is.stringValue(user?.email)) {
+				const identity =
+					(await getAccountDataDid(
+						accountAdminComponent,
+						accountId,
+						AuthenticationAccountDataType.Identity
+					)) ?? "";
+				result.push({ email: user.email, identity });
+				CLIDisplay.break();
+				CLIDisplay.value(
+					I18n.formatMessage("node.cli.commands.org-users-list.labels.email"),
+					user.email
+				);
+				CLIDisplay.value(
+					I18n.formatMessage("node.cli.commands.org-users-list.labels.identity"),
+					identity,
+					1
+				);
+			}
+		}
 	});
 
 	CLIDisplay.break();

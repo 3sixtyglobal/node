@@ -1,4 +1,5 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
 import type { IServerInfo } from "@3sixty/api-models";
@@ -25,6 +26,7 @@ import type { INodeOptions } from "./models/INodeOptions.js";
 import { NODE_ENVIRONMENT_VARIABLE_KEYS } from "./models/nodeEnvironmentVariableKeys.js";
 import { start } from "./start.js";
 import {
+	directoryExists,
 	fileExists,
 	getExecutionDirectory,
 	getScriptDirectory,
@@ -141,6 +143,18 @@ export async function run(
 			}
 			if (Is.stringValue(nodeOptions.favIconFile)) {
 				CLIDisplay.value("Favicon File", nodeOptions.favIconFile);
+			}
+
+			if (Is.empty(nodeOptions?.messagingTemplatesDirectory)) {
+				const templatesDirectory = path.resolve(
+					path.join(nodeOptions.scriptDirectory ?? "", "templates")
+				);
+				if (await directoryExists(templatesDirectory)) {
+					nodeOptions.messagingTemplatesDirectory = templatesDirectory;
+				}
+			}
+			if (Is.stringValue(nodeOptions.messagingTemplatesDirectory)) {
+				CLIDisplay.value("Messaging Templates Directory", nodeOptions.messagingTemplatesDirectory);
 			}
 		}
 

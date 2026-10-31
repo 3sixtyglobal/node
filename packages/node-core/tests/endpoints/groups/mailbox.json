@@ -1,0 +1,123 @@
+{
+	"group": "Mailbox",
+	"steps": [
+		{
+			"description": "GET /mailbox - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/mailbox",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /mailbox/connectors/:connectorType/schema - the IMAP settings",
+			"method": "GET",
+			"path": "/mailbox/connectors/imap/schema",
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /mailbox - create a disabled IMAP mailbox, which does not connect",
+			"method": "POST",
+			"path": "/mailbox",
+			"body": {
+				"name": "Endpoint Mailbox",
+				"connectorType": "imap",
+				"enabled": false,
+				"config": {
+					"host": "127.0.0.1",
+					"port": 1,
+					"secure": false,
+					"username": "endpoint",
+					"password": "Endpoint@Mailbox123",
+					"folders": ["INBOX"],
+					"pollingIntervalMinutes": 60
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "mailboxId": "location-last-segment" }
+		},
+		{
+			"description": "GET /mailbox - the mailboxes",
+			"method": "GET",
+			"path": "/mailbox",
+			"expectedStatus": 200,
+			"assert": { "body.mailboxes.0.id": "isDefined" }
+		},
+		{
+			"description": "GET /mailbox/:id - the mailbox",
+			"method": "GET",
+			"path": "/mailbox/{{mailboxId}}",
+			"expectedStatus": 200,
+			"assert": { "body.name": "Endpoint Mailbox", "body.config.host": "127.0.0.1" }
+		},
+		{
+			"description": "PUT /mailbox/:id - rename the mailbox",
+			"method": "PUT",
+			"path": "/mailbox/{{mailboxId}}",
+			"body": {
+				"id": "{{mailboxId}}",
+				"name": "Renamed Mailbox",
+				"connectorType": "imap",
+				"enabled": false,
+				"config": {
+					"host": "127.0.0.1",
+					"port": 1,
+					"secure": false,
+					"username": "endpoint",
+					"folders": ["INBOX"],
+					"pollingIntervalMinutes": 60
+				}
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /mailbox/:id - the new name",
+			"method": "GET",
+			"path": "/mailbox/{{mailboxId}}",
+			"expectedStatus": 200,
+			"assert": { "body.name": "Renamed Mailbox" }
+		},
+		{
+			"description": "GET /mailbox/mail - the stored mail of the mailbox since a time",
+			"method": "GET",
+			"path": "/mailbox/mail?since=2026-01-01T00%3A00%3A00.000Z&mailboxId={{mailboxId}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /mailbox/mail - 400 without the time to list from",
+			"method": "GET",
+			"path": "/mailbox/mail",
+			"expectedStatus": 400
+		},
+		{
+			"description": "GET /mailbox/mail/:id - 404 for unknown mail",
+			"method": "GET",
+			"path": "/mailbox/mail/{{fakeId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "DELETE /mailbox/mail/:id - 404 for unknown mail",
+			"method": "DELETE",
+			"path": "/mailbox/mail/{{fakeId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /mailbox/authcallback - 400 without the provider's answer",
+			"method": "GET",
+			"path": "/mailbox/authcallback",
+			"expectedStatus": 400,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "DELETE /mailbox/:id - remove the mailbox",
+			"method": "DELETE",
+			"path": "/mailbox/{{mailboxId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /mailbox/:id - 404 once removed",
+			"method": "GET",
+			"path": "/mailbox/{{mailboxId}}",
+			"expectedStatus": 404
+		}
+	]
+}

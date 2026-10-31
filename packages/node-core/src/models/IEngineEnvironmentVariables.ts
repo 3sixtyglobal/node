@@ -1,4 +1,5 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 
 /**
@@ -604,6 +605,12 @@ export interface IEngineEnvironmentVariables {
 	 * The type of messaging email connector: entity-storage, aws, smtp.
 	 */
 	messagingEmailConnector?: string;
+
+	/**
+	 * The directory of the messaging templates stored for each tenant that does not have them, as
+	 * &lt;template-id&gt;.html or &lt;template-id&gt;.&lt;locale&gt;.html files, overrides the node option.
+	 */
+	messagingTemplatesDirectory?: string;
 
 	/**
 	 * SMTP server hostname or IP address.

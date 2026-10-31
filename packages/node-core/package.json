@@ -31,8 +31,10 @@
 		"dist:no-test": "pnpm run clean && pnpm run merge-locales && concurrently -g -n build,locales,types \"pnpm run build\" \"pnpm run validate-locales\" \"pnpm run test:build\""
 	},
 	"dependencies": {
+		"@3sixty/api-auth-account-service": "next",
 		"@3sixty/api-auth-entity-storage-models": "next",
 		"@3sixty/api-auth-entity-storage-service": "next",
+		"@3sixty/api-auth-models": "next",
 		"@3sixty/api-models": "next",
 		"@3sixty/api-tenant-processor": "next",
 		"@3sixty/auditable-item-graph-service": "next",
@@ -57,6 +59,8 @@
 		"@3sixty/identity-models": "next",
 		"@3sixty/logging-connector-opentelemetry": "next",
 		"@3sixty/logging-models": "next",
+		"@3sixty/messaging-models": "next",
+		"@3sixty/messaging-service": "next",
 		"@3sixty/modules": "next",
 		"@3sixty/nameof": "next",
 		"@3sixty/rights-management-pap-service": "next",

@@ -4,7 +4,7 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
-import { ComponentFactory, Factory } from "@3sixty/core";
+import { ComponentFactory, Factory, type IComponent, Is } from "@3sixty/core";
 import { DataspaceAppFactory } from "@3sixty/dataspace-models";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
@@ -23,6 +23,7 @@ import {
 	IdentityProfileConnectorType,
 	IdentityResolverConnectorType,
 	LoggingConnectorType,
+	MessagingEmailConnectorType,
 	NftConnectorType,
 	NotarizationConnectorType,
 	TelemetryConnectorType,
@@ -30,8 +31,12 @@ import {
 	VaultConnectorType,
 	WalletConnectorType
 } from "@3sixty/engine-types";
+import {
+	EntityStorageConnectorFactory,
+	type IEntityStorageConnector
+} from "@3sixty/entity-storage-models";
 import type { ITrustComponent } from "@3sixty/trust-models";
-import { loadAndRunGroups } from "./endpoints/runner.js";
+import { loadAndRunGroups, runGroup, type RunnerContext } from "./endpoints/runner.js";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import {
 	DEFAULT_DEVOPS_ROLE,
@@ -48,6 +53,7 @@ const TEST_PORT_ST = await getFreePort();
 const TEST_PORT_SO = await getFreePort();
 const TEST_PORT_FC = await getFreePort();
 const TEST_PORT_GA = await getFreePort();
+const TEST_PORT_EM = await getFreePort();
 const TEST_TENANT_API_KEY = "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d";
 const TEST_TENANT_ID = "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
 const TEST_GA_TENANT_API_KEY = "aabb1122ccdd3344eeff5566aabb7788";
@@ -63,6 +69,7 @@ const OUTPUT_TMP_DIR_ST = "./tests/.tmp/endpoints-st/";
 const OUTPUT_TMP_DIR_SO = "./tests/.tmp/endpoints-so/";
 const OUTPUT_TMP_DIR_FC = "./tests/.tmp/endpoints-fc/";
 const OUTPUT_TMP_DIR_GA = "./tests/.tmp/endpoints-ga/";
+const OUTPUT_TMP_DIR_EM = "./tests/.tmp/endpoints-em/";
 
 const TEST_DATASPACE_APP_ID = "https://twin.example.org/test-app";
 const TEST_TRANSFER_CONSUMER_PID = "urn:uuid:consumer-pid-endpoint-001";
@@ -100,6 +107,7 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_DATA_EXTRACTOR_CONNECTORS: "json-path",
 	TWIN_DOCUMENT_MANAGEMENT_ENABLED: "true",
 	TWIN_AUTOMATION_ACTION_TYPES: "fetch",
+	TWIN_EMAIL_PROTOCOL_CONNECTOR: "imap",
 	TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 	TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
 	TWIN_DATASPACE_ENABLED: "true",
@@ -482,6 +490,517 @@ describe("node-core", () => {
 		} finally {
 			await serverResult?.shutdown();
 			await rm(OUTPUT_TMP_DIR_ST, { recursive: true, force: true });
+		}
+	});
+
+	test("Can sign up with e-mail verification and reset a forgotten password", async () => {
+		const emailEnvVars: { [id: string]: string } = {
+			...SHARED_ENV_VARS,
+			TWIN_TENANT_ENABLED: "false",
+			TWIN_PORT: TEST_PORT_EM.toString(),
+			TWIN_STORAGE_FILE_ROOT: `${OUTPUT_TMP_DIR_EM}db`,
+			TWIN_MESSAGING_EMAIL_CONNECTOR: MessagingEmailConnectorType.EntityStorage,
+			TWIN_MESSAGING_TEMPLATES_DIRECTORY: "../../apps/node/templates",
+			TWIN_AUTH_EMAIL_SENDER: "no-reply@example.org",
+			TWIN_AUTH_SELF_REGISTRATION_ENABLED: "true",
+			TWIN_AUTH_REGISTRATION_VERIFICATION_URL: "https://app.example.org/verify",
+			TWIN_AUTH_PASSWORD_RESET_ENABLED: "true",
+			TWIN_AUTH_PASSWORD_RESET_URL: "https://app.example.org/reset",
+			TWIN_CORS_ORIGINS: "https://app.example.org",
+			TWIN_ORIGIN_CHECK_ENABLED: "true",
+			// Short, so a session can be let age past it.
+			TWIN_AUTH_RECENT_SIGN_IN_SECONDS: "2"
+		};
+
+		await rm(OUTPUT_TMP_DIR_EM, { recursive: true, force: true });
+		Factory.clearFactories();
+
+		const bootstrapState: INodeEngineState = {};
+		await run(
+			{
+				localesDirectory: "./dist/locales/",
+				stateStorage: new MemoryStateStorage(false, bootstrapState),
+				disableProcessExitOnFailure: true,
+				envVars: emailEnvVars
+			},
+			["node", "index.js", "bootstrap-dev"]
+		);
+		Factory.clearFactories();
+
+		const serverResult = await run({
+			localesDirectory: "./dist/locales/",
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: bootstrapState.nodeId,
+				nodeOrganizationId: bootstrapState.nodeOrganizationId
+			}),
+			envVars: emailEnvVars
+		});
+		expect(serverResult?.engine).toBeDefined();
+
+		// The e-mails are queued after the response and sent by a task that runs every minute, so the
+		// queue is run here rather than waiting for the task.
+		const authenticationComponent = ComponentFactory.get<IComponent>(
+			serverResult?.engine.getRegisteredInstanceType("authenticationComponent") ?? ""
+		) as IComponent & { runDeferredJobs: () => Promise<void> };
+		const linkToken = async (
+			recipient: string,
+			linkUrl: string,
+			after: number
+		): Promise<string> => {
+			const emails =
+				EntityStorageConnectorFactory.get<
+					IEntityStorageConnector<{ recipients: string[]; message: string; ts: number }>
+				>("email-entry");
+			for (let attempt = 0; attempt < 50; attempt++) {
+				await authenticationComponent.runDeferredJobs();
+				const { entities } = await ContextIdStore.run(
+					serverResult?.engine.getContextIds() ?? {},
+					async () => emails.query()
+				);
+				const email = entities.find(
+					e =>
+						(e.recipients ?? []).includes(recipient) &&
+						(e.ts ?? 0) > after &&
+						(e.message ?? "").includes(linkUrl)
+				);
+				const token = /token=([\w-]+)/.exec(email?.message ?? "")?.[1];
+				if (Is.stringValue(token)) {
+					return token;
+				}
+				await new Promise(resolve => setTimeout(resolve, 100));
+			}
+			throw new Error(`No link was sent to ${recipient}`);
+		};
+
+		const ctx: RunnerContext = {
+			baseUrl: `http://localhost:${TEST_PORT_EM}`,
+			apiKeyQuery: "",
+			authToken: "",
+			isSingleTenant: true,
+			appendOrgParam: false,
+			vars: {
+				email: "sign-up@example.org",
+				password: "SignUp@Node12345!",
+				newPassword: "Reset@Node123456!"
+			},
+			serverStartTime: Date.now()
+		};
+
+		try {
+			const signUpTime = Date.now() - 1;
+			await runGroup(
+				{
+					group: "Authentication - sign up",
+					steps: [
+						{
+							description: "POST /authentication/register - accepted, the address must be verified",
+							method: "POST",
+							path: "/authentication/register",
+							body: { email: "{{email}}", password: "{{password}}", givenName: "Sign" },
+							expectedStatus: 202
+						}
+					]
+				},
+				ctx
+			);
+
+			// The account is stored with the e-mail, after the response.
+			ctx.vars.verifyToken = await linkToken(
+				"sign-up@example.org",
+				"https://app.example.org/verify",
+				signUpTime
+			);
+			await runGroup(
+				{
+					group: "Authentication - unverified sign up",
+					steps: [
+						{
+							description: "POST /authentication/login - 401 accountNotVerified with the password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "{{email}}", password: "{{password}}" },
+							expectedStatus: 401,
+							assert: { "body.message": "entityStorageAuthenticationService.accountNotVerified" }
+						},
+						{
+							description: "POST /authentication/login - 401 loginFailed with a wrong password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "{{email}}", password: "{{newPassword}}" },
+							expectedStatus: 401,
+							assert: { "body.message": "entityStorageAuthenticationService.loginFailed" }
+						},
+						{
+							description: "POST /authentication/register/verify - 401 for an unknown token",
+							method: "POST",
+							path: "/authentication/register/verify",
+							body: { token: "not-a-token" },
+							expectedStatus: 401
+						}
+					]
+				},
+				ctx
+			);
+
+			await runGroup(
+				{
+					group: "Authentication - verify the sign up",
+					steps: [
+						{
+							description: "POST /authentication/register/verify - verify the sign up",
+							method: "POST",
+							path: "/authentication/register/verify",
+							body: { token: "{{verifyToken}}" },
+							expectedStatus: 204
+						},
+						{
+							description: "POST /authentication/register/verify - 401 as the link is used once",
+							method: "POST",
+							path: "/authentication/register/verify",
+							body: { token: "{{verifyToken}}" },
+							expectedStatus: 401
+						},
+						{
+							description: "POST /authentication/login - the verified account signs in",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "{{email}}", password: "{{password}}" },
+							expectedStatus: 200,
+							capture: { authToken: "cookie:access_token" }
+						},
+						{
+							description: "GET /authentication/me - the signed in account",
+							method: "GET",
+							path: "/authentication/me",
+							expectedStatus: 200,
+							assert: { "body.email": "{{email}}" }
+						}
+					]
+				},
+				ctx
+			);
+
+			const forgotTime = Date.now() - 1;
+			await runGroup(
+				{
+					group: "Authentication - forgotten password",
+					steps: [
+						{
+							description: "POST /authentication/password/forgot - accepted for an unknown address",
+							method: "POST",
+							path: "/authentication/password/forgot",
+							body: { email: "unknown@example.org" },
+							expectedStatus: 204
+						},
+						{
+							description: "POST /authentication/password/forgot - send a reset link",
+							method: "POST",
+							path: "/authentication/password/forgot",
+							body: { email: "{{email}}" },
+							expectedStatus: 204
+						}
+					]
+				},
+				ctx
+			);
+
+			ctx.vars.resetToken = await linkToken(
+				"sign-up@example.org",
+				"https://app.example.org/reset",
+				forgotTime
+			);
+			await runGroup(
+				{
+					group: "Authentication - reset the password",
+					steps: [
+						{
+							description: "POST /authentication/password/reset - 401 for an unknown token",
+							method: "POST",
+							path: "/authentication/password/reset",
+							body: { token: "not-a-token", newPassword: "{{newPassword}}" },
+							expectedStatus: 401
+						},
+						{
+							description: "POST /authentication/password/reset - set a new password",
+							method: "POST",
+							path: "/authentication/password/reset",
+							body: { token: "{{resetToken}}", newPassword: "{{newPassword}}" },
+							expectedStatus: 204
+						},
+						{
+							description: "POST /authentication/login - 401 with the old password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "{{email}}", password: "{{password}}" },
+							expectedStatus: 401
+						},
+						{
+							description: "POST /authentication/login - sign in with the new password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "{{email}}", password: "{{newPassword}}" },
+							expectedStatus: 200,
+							capture: { authToken: "cookie:access_token" }
+						},
+						{
+							description: "POST /authentication/password/reset - 401 as the link is used once",
+							method: "POST",
+							path: "/authentication/password/reset",
+							body: { token: "{{resetToken}}", newPassword: "{{password}}" },
+							expectedStatus: 401
+						}
+					]
+				},
+				ctx
+			);
+
+			// With the origin check on, a cookie authenticated change is only accepted from an allowed origin.
+			await runGroup(
+				{
+					group: "Authentication - origin check",
+					steps: [
+						{
+							description: "POST /authentication/account - 403 from an origin that is not allowed",
+							method: "POST",
+							path: "/authentication/account",
+							headers: { origin: "https://attacker.example.org" },
+							body: { type: "public-profile", data: { name: "Changed" } },
+							expectedStatus: 403,
+							assert: { "body.message": "originCheckProcessor.originNotAllowed" }
+						},
+						{
+							description: "POST /authentication/account - accepted from an allowed origin",
+							method: "POST",
+							path: "/authentication/account",
+							headers: { origin: "https://app.example.org" },
+							body: { type: "public-profile", data: { name: "Changed" } },
+							expectedStatus: 201
+						}
+					]
+				},
+				ctx
+			);
+
+			// A second sign up for an address waiting to be verified replaces the first, so whoever signed
+			// up first with someone else's address cannot keep their password.
+			const firstSignUpTime = Date.now() - 1;
+			await runGroup(
+				{
+					group: "Authentication - sign up for someone else's address",
+					steps: [
+						{
+							description: "POST /authentication/register - a sign up with the first password",
+							method: "POST",
+							path: "/authentication/register",
+							body: { email: "taken@example.org", password: "{{password}}" },
+							expectedStatus: 202
+						}
+					]
+				},
+				ctx
+			);
+			ctx.vars.firstVerifyToken = await linkToken(
+				"taken@example.org",
+				"https://app.example.org/verify",
+				firstSignUpTime
+			);
+			const secondSignUpTime = Date.now() - 1;
+			await runGroup(
+				{
+					group: "Authentication - sign up again for the address",
+					steps: [
+						{
+							description: "POST /authentication/register - a sign up with another password",
+							method: "POST",
+							path: "/authentication/register",
+							body: { email: "taken@example.org", password: "{{newPassword}}" },
+							expectedStatus: 202
+						}
+					]
+				},
+				ctx
+			);
+			ctx.vars.secondVerifyToken = await linkToken(
+				"taken@example.org",
+				"https://app.example.org/verify",
+				secondSignUpTime
+			);
+			await runGroup(
+				{
+					group: "Authentication - only the latest sign up is verified",
+					steps: [
+						{
+							description: "POST /authentication/register/verify - 401 for the earlier link",
+							method: "POST",
+							path: "/authentication/register/verify",
+							body: { token: "{{firstVerifyToken}}" },
+							expectedStatus: 401
+						},
+						{
+							description: "POST /authentication/register/verify - verify the latest sign up",
+							method: "POST",
+							path: "/authentication/register/verify",
+							body: { token: "{{secondVerifyToken}}" },
+							expectedStatus: 204
+						},
+						{
+							description: "POST /authentication/login - 401 with the first password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "taken@example.org", password: "{{password}}" },
+							expectedStatus: 401
+						},
+						{
+							description: "POST /authentication/login - sign in with the latest password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "taken@example.org", password: "{{newPassword}}" },
+							expectedStatus: 200
+						}
+					]
+				},
+				ctx
+			);
+
+			// A reset link is sent to the address, so following it also verifies an unverified account.
+			const unverifiedSignUpTime = Date.now() - 1;
+			await runGroup(
+				{
+					group: "Authentication - sign up without verifying",
+					steps: [
+						{
+							description: "POST /authentication/register - a sign up that is never verified",
+							method: "POST",
+							path: "/authentication/register",
+							body: { email: "unverified@example.org", password: "{{password}}" },
+							expectedStatus: 202
+						}
+					]
+				},
+				ctx
+			);
+			ctx.vars.unverifiedToken = await linkToken(
+				"unverified@example.org",
+				"https://app.example.org/verify",
+				unverifiedSignUpTime
+			);
+			const unverifiedForgotTime = Date.now() - 1;
+			await runGroup(
+				{
+					group: "Authentication - forgotten password before verifying",
+					steps: [
+						{
+							description:
+								"POST /authentication/password/forgot - send a reset link to the unverified account",
+							method: "POST",
+							path: "/authentication/password/forgot",
+							body: { email: "unverified@example.org" },
+							expectedStatus: 204
+						}
+					]
+				},
+				ctx
+			);
+			ctx.vars.unverifiedResetToken = await linkToken(
+				"unverified@example.org",
+				"https://app.example.org/reset",
+				unverifiedForgotTime
+			);
+			await runGroup(
+				{
+					group: "Authentication - the reset verifies the account",
+					steps: [
+						{
+							description: "POST /authentication/password/reset - set a new password",
+							method: "POST",
+							path: "/authentication/password/reset",
+							body: { token: "{{unverifiedResetToken}}", newPassword: "{{newPassword}}" },
+							expectedStatus: 204
+						},
+						{
+							description:
+								"POST /authentication/register/verify - 401 as the account is already verified",
+							method: "POST",
+							path: "/authentication/register/verify",
+							body: { token: "{{unverifiedToken}}" },
+							expectedStatus: 401
+						},
+						{
+							description:
+								"POST /authentication/login - the account signs in with the new password",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "unverified@example.org", password: "{{newPassword}}" },
+							expectedStatus: 200
+						}
+					]
+				},
+				ctx
+			);
+
+			// Deleting the account needs a session that started recently, two seconds on this node.
+			await runGroup(
+				{
+					group: "Authentication - recent sign in",
+					steps: [
+						{
+							description: "POST /authentication/login - sign in",
+							method: "POST",
+							path: "/authentication/login",
+							headers: { origin: "https://app.example.org" },
+							body: { email: "{{email}}", password: "{{newPassword}}" },
+							expectedStatus: 200,
+							capture: { authToken: "cookie:access_token" }
+						},
+						{
+							description: "DELETE /authentication/me - 401 once the session is no longer recent",
+							method: "DELETE",
+							path: "/authentication/me",
+							headers: { origin: "https://app.example.org" },
+							delayMs: 3500,
+							expectedStatus: 401,
+							assert: {
+								"body.message": "recentSignInHelper.recentSignInRequired",
+								"body.properties.maxAgeSeconds": 2
+							}
+						},
+						{
+							description: "GET /authentication/me - the session itself is still valid",
+							method: "GET",
+							path: "/authentication/me",
+							expectedStatus: 200,
+							assert: { "body.email": "{{email}}" }
+						},
+						{
+							description: "POST /authentication/login - sign in again",
+							method: "POST",
+							path: "/authentication/login",
+							headers: { origin: "https://app.example.org" },
+							body: { email: "{{email}}", password: "{{newPassword}}" },
+							expectedStatus: 200,
+							capture: { authToken: "cookie:access_token" }
+						},
+						{
+							description: "DELETE /authentication/me - deleted after signing in again",
+							method: "DELETE",
+							path: "/authentication/me",
+							headers: { origin: "https://app.example.org" },
+							expectedStatus: 204
+						},
+						{
+							description: "POST /authentication/login - 401 once the account is deleted",
+							method: "POST",
+							path: "/authentication/login",
+							body: { email: "{{email}}", password: "{{newPassword}}" },
+							expectedStatus: 401
+						}
+					]
+				},
+				ctx
+			);
+		} finally {
+			await serverResult?.shutdown();
+			await rm(OUTPUT_TMP_DIR_EM, { recursive: true, force: true });
 		}
 	});
 

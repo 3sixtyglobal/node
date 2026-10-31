@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import { CLIDisplay } from "@3sixty/cli-core";
@@ -99,7 +100,7 @@ describe("bootstrap-dev", () => {
 		const tenantsAfterFirst = await readStoreRecords(dbDir, "tenant");
 		const authUsersAfterFirst = await readStoreRecords(dbDir, "authentication-user");
 		const identityDocsAfterFirst = await readStoreRecords(dbDir, "identity-document");
-		const identityProfilesAfterFirst = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfilesAfterFirst = await readStoreRecords(dbDir, "account-data");
 
 		const stateAfterSecond = await runBootstrap(stateAfterFirst);
 		expect(stateAfterSecond.nodeId).toEqual(stateAfterFirst.nodeId);
@@ -107,7 +108,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenantsAfterFirst);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsersAfterFirst);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocsAfterFirst);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfilesAfterFirst);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfilesAfterFirst);
 
 		const stateAfterThird = await runBootstrap(stateAfterSecond);
 		expect(stateAfterThird.nodeId).toEqual(stateAfterFirst.nodeId);
@@ -115,7 +116,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenantsAfterFirst);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsersAfterFirst);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocsAfterFirst);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfilesAfterFirst);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfilesAfterFirst);
 	});
 
 	test("bootstrap-dev is idempotent in single-tenant mode with wallet and admin-user features", async () => {
@@ -136,7 +137,7 @@ describe("bootstrap-dev", () => {
 		const tenantsAfterFirst = await readStoreRecords(dbDir, "tenant");
 		const authUsersAfterFirst = await readStoreRecords(dbDir, "authentication-user");
 		const identityDocsAfterFirst = await readStoreRecords(dbDir, "identity-document");
-		const identityProfilesAfterFirst = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfilesAfterFirst = await readStoreRecords(dbDir, "account-data");
 
 		const stateAfterSecond = await runBootstrap(stateAfterFirst);
 		expect(stateAfterSecond.nodeId).toEqual(stateAfterFirst.nodeId);
@@ -144,7 +145,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenantsAfterFirst);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsersAfterFirst);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocsAfterFirst);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfilesAfterFirst);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfilesAfterFirst);
 
 		const stateAfterThird = await runBootstrap(stateAfterSecond);
 		expect(stateAfterThird.nodeId).toEqual(stateAfterFirst.nodeId);
@@ -152,7 +153,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenantsAfterFirst);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsersAfterFirst);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocsAfterFirst);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfilesAfterFirst);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfilesAfterFirst);
 	});
 
 	test("bootstrap-dev is idempotent in single-tenant mode with wallet feature only", async () => {
@@ -224,8 +225,7 @@ describe("bootstrap-dev", () => {
 		// Verify admin user record contains expected values for multi-tenant mode
 		interface AuthUserRecord {
 			email: string;
-			identity: string;
-			organization: string;
+			accountId: string;
 		}
 		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
@@ -250,7 +250,7 @@ describe("bootstrap-dev", () => {
 		}
 		const identityDocs = await readStoreRecords<IdentityDocRecord>(dbDir, "identity-document");
 		expect(identityDocs.some(doc => doc.id === stateAfterFirst.nodeId)).toBe(true);
-		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfiles = await readStoreRecords(dbDir, "account-data");
 
 		// Second run: no explicit tenant env vars - lookup by label must find the existing tenant
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -263,7 +263,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenants);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev single-tenant: admin user config propagates to DB and is retained on re-run without env vars", async () => {
@@ -313,17 +313,16 @@ describe("bootstrap-dev", () => {
 		expect(identityDocs.some(doc => doc.id === stateAfterFirst.nodeOrganizationId)).toBe(true);
 
 		// Verify identity profile reflects single-tenant defaults
-		interface IdentityProfileRecord {
-			privateProfile: { givenName: string; familyName: string; email: string };
+		interface AccountDataRecord {
+			type: string;
+			data: { givenName: string; familyName: string; email: string };
 		}
-		const identityProfiles = await readStoreRecords<IdentityProfileRecord>(
-			dbDir,
-			"identity-profile"
-		);
-		expect(identityProfiles).toHaveLength(1);
-		expect(identityProfiles[0].privateProfile.givenName).toBe("Node");
-		expect(identityProfiles[0].privateProfile.familyName).toBe("Admin");
-		expect(identityProfiles[0].privateProfile.email).toBe("admin@node");
+		const identityProfiles = await readStoreRecords<AccountDataRecord>(dbDir, "account-data");
+		const privateProfiles = identityProfiles.filter(d => d.type === "private-profile");
+		expect(privateProfiles).toHaveLength(1);
+		expect(privateProfiles[0].data.givenName).toBe("Node");
+		expect(privateProfiles[0].data.familyName).toBe("Admin");
+		expect(privateProfiles[0].data.email).toBe("admin@node");
 
 		// Second run: same config, no extra env vars
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -337,7 +336,7 @@ describe("bootstrap-dev", () => {
 		// All DB records must be byte-for-byte identical - nothing recreated or mutated
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev single-tenant: explicit node and org mnemonics are accepted and retained on re-run without mnemonics", async () => {
@@ -366,7 +365,7 @@ describe("bootstrap-dev", () => {
 			true
 		);
 		const authUsers = await readStoreRecords(dbDir, "authentication-user");
-		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfiles = await readStoreRecords(dbDir, "account-data");
 
 		// Run 2: no mnemonics - vault already holds them, identities already exist
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -378,7 +377,7 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterSecond.nodeOrganizationId).toEqual(stateAfterFirst.nodeOrganizationId);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev multi-tenant: explicit node and org mnemonics are accepted and retained on re-run without mnemonics", async () => {
@@ -408,7 +407,7 @@ describe("bootstrap-dev", () => {
 		expect(tenants).toHaveLength(1);
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 		const authUsers = await readStoreRecords(dbDir, "authentication-user");
-		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfiles = await readStoreRecords(dbDir, "account-data");
 
 		// Run 2: no mnemonics - vault already holds them, tenant and identities already exist
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -419,7 +418,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenants);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev single-tenant: custom admin user name and password propagate to DB and are retained on re-run without password", async () => {
@@ -462,12 +461,14 @@ describe("bootstrap-dev", () => {
 		]);
 
 		interface ProfileRecord {
-			privateProfile: { givenName: string; familyName: string; email: string };
+			type: string;
+			data: { givenName: string; familyName: string; email: string };
 		}
-		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "identity-profile");
-		expect(identityProfiles).toHaveLength(1);
-		expect(identityProfiles[0].privateProfile.givenName).toBe("Node");
-		expect(identityProfiles[0].privateProfile.email).toBe("admin@acme.com");
+		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "account-data");
+		const privateProfiles = identityProfiles.filter(d => d.type === "private-profile");
+		expect(privateProfiles).toHaveLength(1);
+		expect(privateProfiles[0].data.givenName).toBe("Node");
+		expect(privateProfiles[0].data.email).toBe("admin@acme.com");
 
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 
@@ -482,7 +483,7 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterSecond.nodeOrganizationId).toEqual(stateAfterFirst.nodeOrganizationId);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev multi-tenant: custom admin user name and password propagate to DB and are retained on re-run without password", async () => {
@@ -523,12 +524,14 @@ describe("bootstrap-dev", () => {
 		]);
 
 		interface ProfileRecord {
-			privateProfile: { givenName: string; familyName: string; email: string };
+			type: string;
+			data: { givenName: string; familyName: string; email: string };
 		}
-		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "identity-profile");
-		expect(identityProfiles).toHaveLength(1);
-		expect(identityProfiles[0].privateProfile.givenName).toBe("Tenant");
-		expect(identityProfiles[0].privateProfile.email).toBe("admin@acme.com");
+		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "account-data");
+		const privateProfiles = identityProfiles.filter(d => d.type === "private-profile");
+		expect(privateProfiles).toHaveLength(1);
+		expect(privateProfiles[0].data.givenName).toBe("Tenant");
+		expect(privateProfiles[0].data.email).toBe("admin@acme.com");
 
 		const tenantsAfterFirst = await readStoreRecords(dbDir, "tenant");
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
@@ -542,7 +545,7 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenantsAfterFirst);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev single-tenant: explicit admin user mnemonic is accepted and retained on re-run without mnemonic", async () => {
@@ -573,7 +576,7 @@ describe("bootstrap-dev", () => {
 
 		// Snapshot DB state after run 1
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
-		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfiles = await readStoreRecords(dbDir, "account-data");
 
 		// Run 2: no mnemonic - admin user found by email, identity creation skipped
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -585,7 +588,7 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterSecond.nodeOrganizationId).toEqual(stateAfterFirst.nodeOrganizationId);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 
 	test("bootstrap-dev multi-tenant: explicit admin user mnemonic is accepted and retained on re-run without mnemonic", async () => {
@@ -616,7 +619,7 @@ describe("bootstrap-dev", () => {
 		// Snapshot DB state after run 1
 		const tenants = await readStoreRecords(dbDir, "tenant");
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
-		const identityProfiles = await readStoreRecords(dbDir, "identity-profile");
+		const identityProfiles = await readStoreRecords(dbDir, "account-data");
 
 		// Run 2: no mnemonic - admin user found by email, identity creation skipped
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -627,6 +630,6 @@ describe("bootstrap-dev", () => {
 		expect(await readStoreRecords(dbDir, "tenant")).toEqual(tenants);
 		expect(await readStoreRecords(dbDir, "authentication-user")).toEqual(authUsers);
 		expect(await readStoreRecords(dbDir, "identity-document")).toEqual(identityDocs);
-		expect(await readStoreRecords(dbDir, "identity-profile")).toEqual(identityProfiles);
+		expect(await readStoreRecords(dbDir, "account-data")).toEqual(identityProfiles);
 	});
 });

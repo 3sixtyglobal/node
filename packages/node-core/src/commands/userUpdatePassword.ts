@@ -8,6 +8,7 @@ import { PasswordGenerator } from "@3sixty/crypto";
 import type { IEngineCore } from "@3sixty/engine-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { normaliseEmail } from "../utils.js";
 
 const COMMAND_NAME = "user-update-password";
 
@@ -46,14 +47,6 @@ export function getCommandDefinitionUserUpdatePassword(commandDefinitions: {
 				type: "string",
 				description: I18n.formatMessage(
 					"node.cli.commands.user-update-password.params.password.description"
-				),
-				required: false
-			},
-			{
-				key: "current-password",
-				type: "string",
-				description: I18n.formatMessage(
-					"node.cli.commands.user-update-password.params.current-password.description"
 				),
 				required: false
 			},
@@ -110,7 +103,6 @@ export function getCommandDefinitionUserUpdatePassword(commandDefinitions: {
  * @param params The parameters for the command.
  * @param params.email The email address of the user to update.
  * @param params.password The new password, a random one is generated if not provided.
- * @param params.currentPassword The current password, verified before the change when provided.
  * @param params.tenantId The tenant ID for the user (multi-tenant mode only).
  * @param params.outputJson The output .json file to store the command output.
  * @param params.outputEnv The output .env file to store the command output.
@@ -123,14 +115,13 @@ export async function userUpdatePassword(
 	params: {
 		email?: string;
 		password?: string;
-		currentPassword?: string;
 		tenantId?: string;
 		outputJson?: string;
 		outputEnv?: string;
 		outputEnvPrefix?: string;
 	}
 ): Promise<{ email: string; password: string }> {
-	const paramsEmail = params.email;
+	const paramsEmail = Is.stringValue(params.email) ? normaliseEmail(params.email) : params.email;
 	Guards.email("userUpdatePassword", "email", paramsEmail);
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
@@ -156,11 +147,7 @@ export async function userUpdatePassword(
 		{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
 		async () => {
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update-password.labels.updating"));
-			await authenticationAdminComponent.updatePassword(
-				paramsEmail,
-				newPassword,
-				params.currentPassword
-			);
+			await authenticationAdminComponent.updatePassword(paramsEmail, newPassword);
 		}
 	);
 

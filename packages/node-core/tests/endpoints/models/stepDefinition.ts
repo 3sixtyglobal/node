@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 
 /**
@@ -62,8 +63,8 @@ export interface StepDefinition {
 
 	/**
 	 * Assert values after capture.
-	 * Key: "body.<dot.path>" | "body" | "text"
-	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | literal
+	 * Key: "body.<dot.path>" | "body" | "text" | "header.<name>"
+	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | "contains:<text>" | literal
 	 */
 	assert?: { [key: string]: unknown };
 

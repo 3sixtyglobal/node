@@ -1,19 +1,28 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
-import type {
-	IAuthenticationAdminComponent,
-	IAuthenticationUser
-} from "@3sixty/api-auth-entity-storage-models";
+import type { IAuthenticationAdminComponent } from "@3sixty/api-auth-entity-storage-models";
+import {
+	AuthenticationAccountDataType,
+	AuthenticationAccountHelper
+} from "@3sixty/api-auth-models";
 import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, EnvHelper, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
-import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
+import { Did } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
+import {
+	getAccountAdminComponent,
+	getAccountDataDid,
+	joinOrganization,
+	setAccountData
+} from "../accountData.js";
 import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { normaliseEmail } from "../utils.js";
 
 const COMMAND_NAME = "user-update";
 
@@ -133,6 +142,7 @@ export async function userUpdate(
 	}
 ): Promise<
 	| {
+			accountId: string;
 			did: string;
 			organizationDid: string;
 			email: string;
@@ -142,7 +152,7 @@ export async function userUpdate(
 	  }
 	| undefined
 > {
-	const paramsEmail = params.email;
+	const paramsEmail = Is.stringValue(params.email) ? normaliseEmail(params.email) : params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
 	const authorizationModelId = envVars.authorizationModelId ?? AUTHORIZATION_MODEL_ID;
@@ -164,12 +174,7 @@ export async function userUpdate(
 		throw new GeneralError("userUpdate", "tenantIdRequired");
 	}
 
-	const defaultIdentityProfileConnectorType = engineCore.getRegisteredInstanceType(
-		"identityProfileConnector"
-	);
-	const identityProfileConnector = IdentityProfileConnectorFactory.get(
-		defaultIdentityProfileConnectorType
-	);
+	const accountAdminComponent = getAccountAdminComponent(engineCore);
 
 	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
 		"authenticationAdminComponent"
@@ -189,20 +194,45 @@ export async function userUpdate(
 		async () => {
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update.labels.updating"));
 
-			const user: Partial<IAuthenticationUser> = {
-				email: paramsEmail,
-				userIdentity: paramsUserIdentity,
-				organizationIdentity: paramsOrganizationIdentity
-			};
-
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update.labels.storingUser"));
 
-			const existingUser = await authenticationAdminComponent.get(paramsEmail);
-			await authenticationAdminComponent.update(user);
+			const account = await authenticationAdminComponent.get(paramsEmail);
 
+			if (Is.stringValue(paramsUserIdentity)) {
+				await setAccountData(
+					accountAdminComponent,
+					account.accountId,
+					AuthenticationAccountDataType.Identity,
+					AuthenticationAccountHelper.createIdentityData(paramsUserIdentity)
+				);
+			}
+			if (Is.stringValue(paramsOrganizationIdentity)) {
+				// The user joins the organization directly, with a membership credential issued to its identity.
+				await joinOrganization(engineCore, envVars, account.accountId, paramsOrganizationIdentity);
+			}
+
+			const identity =
+				paramsUserIdentity ??
+				(await getAccountDataDid(
+					accountAdminComponent,
+					account.accountId,
+					AuthenticationAccountDataType.Identity
+				));
+			if (!Is.stringValue(identity)) {
+				throw new GeneralError("userUpdate", "identityNotFound", { email: paramsEmail });
+			}
+			const organization =
+				paramsOrganizationIdentity ??
+				(await getAccountDataDid(
+					accountAdminComponent,
+					account.accountId,
+					AuthenticationAccountDataType.Organization
+				));
+
+			// Roles are held by the account id.
 			let currentRoles = await authorizationComponent.getRolesForSubject(
 				authorizationModelId,
-				existingUser.userIdentity
+				account.accountId
 			);
 
 			if (Is.stringValue(params.roles)) {
@@ -217,14 +247,14 @@ export async function userUpdate(
 				for (const role of rolesToAdd) {
 					await authorizationComponent.addRoleForSubject(
 						authorizationModelId,
-						existingUser.userIdentity,
+						account.accountId,
 						role
 					);
 				}
 				for (const role of rolesToRemove) {
 					await authorizationComponent.removeRoleForSubject(
 						authorizationModelId,
-						existingUser.userIdentity,
+						account.accountId,
 						role
 					);
 				}
@@ -247,9 +277,16 @@ export async function userUpdate(
 			};
 
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update.labels.storingProfile"));
-			await identityProfileConnector.update(
-				existingUser.userIdentity,
-				publicProfile,
+			await setAccountData(
+				accountAdminComponent,
+				account.accountId,
+				AuthenticationAccountDataType.PublicProfile,
+				publicProfile
+			);
+			await setAccountData(
+				accountAdminComponent,
+				account.accountId,
+				AuthenticationAccountDataType.PrivateProfile,
 				privateProfile
 			);
 
@@ -258,8 +295,9 @@ export async function userUpdate(
 			CLIDisplay.break();
 
 			const json = {
-				did: params.userIdentity ?? existingUser.userIdentity,
-				organizationDid: params.organizationIdentity ?? existingUser.organizationIdentity,
+				accountId: account.accountId,
+				did: identity,
+				organizationDid: organization ?? "",
 				email: paramsEmail,
 				roles: currentRoles,
 				givenName: params.givenName ?? "",

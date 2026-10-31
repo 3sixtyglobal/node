@@ -9,71 +9,145 @@
 			"assert": { "body.email": "isDefined" }
 		},
 		{
-			"description": "GET /authentication/admin/users/identity/:identity",
+			"description": "GET /authentication/admin/account - the identity of the admin account",
 			"method": "GET",
-			"path": "/authentication/admin/users/identity/{{adminUserIdentity}}",
-			"expectedStatus": 200
+			"path": "/authentication/admin/account?accountId={{adminAccountId}}&type=identity",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.data.id": "isDefined" }
 		},
 		{
 			"description": "POST /authentication/admin/users - 400 missing email",
 			"method": "POST",
 			"path": "/authentication/admin/users",
-			"body": {
-				"password": "{{testUserPassword}}",
-				"userIdentity": "{{testIdentity}}",
-				"organizationIdentity": "{{adminOrgIdentity}}",
-				"scope": ["read-only"]
-			},
+			"body": { "password": "{{testUserPassword}}" },
 			"expectedStatus": 400
 		},
 		{
 			"description": "POST /authentication/admin/users - 400 missing password",
 			"method": "POST",
 			"path": "/authentication/admin/users",
-			"body": {
-				"email": "{{testUserEmail}}",
-				"userIdentity": "{{testIdentity}}",
-				"organizationIdentity": "{{adminOrgIdentity}}",
-				"scope": ["read-only"]
-			},
+			"body": { "email": "{{testUserEmail}}" },
 			"expectedStatus": 400
 		},
 		{
 			"description": "POST /authentication/admin/users - create test user",
 			"method": "POST",
 			"path": "/authentication/admin/users",
-			"body": {
-				"email": "{{testUserEmail}}",
-				"password": "{{testUserPassword}}",
-				"userIdentity": "{{testIdentity}}",
-				"organizationIdentity": "{{adminOrgIdentity}}",
-				"scope": ["read-only"]
-			},
+			"body": { "email": "{{testUserEmail}}", "password": "{{testUserPassword}}" },
 			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/admin/users - 409 e-mail address in use",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "{{testUserEmail}}", "password": "{{testUserPassword}}" },
+			"expectedStatus": 409
 		},
 		{
 			"description": "GET /authentication/admin/users/:testUserEmail",
 			"method": "GET",
 			"path": "/authentication/admin/users/{{testUserEmail}}",
-			"expectedStatus": 200
+			"expectedStatus": 200,
+			"capture": { "testAccountId": "body.accountId" }
 		},
 		{
-			"description": "GET /authentication/admin/users/identity/:testIdentity",
-			"method": "GET",
-			"path": "/authentication/admin/users/identity/{{testIdentity}}",
-			"expectedStatus": 200
-		},
-		{
-			"description": "PUT /authentication/admin/users/:testUserEmail - update",
-			"method": "PUT",
-			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"description": "POST /identity/:identity/verification-method - add a method to prove ownership of the DID",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/verification-method",
 			"body": {
-				"email": "{{testUserEmail}}",
-				"userIdentity": "{{testIdentity}}",
-				"organizationIdentity": "{{adminOrgIdentity}}",
-				"scope": ["read-only", "write"]
+				"verificationMethodType": "assertionMethod",
+				"verificationMethodId": "account-binding"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/:identity/proof/:vmId - prove the DID is bound to the account",
+			"method": "POST",
+			"path": "/identity/{{testIdentity}}/proof/account-binding",
+			"body": {
+				"proofType": "DataIntegrityProof",
+				"document": {
+					"@context": "https://schema.org",
+					"@type": "AuthorizeAction",
+					"agent": "{{testIdentity}}",
+					"recipient": "{{testAccountId}}"
+				}
+			},
+			"expectedStatus": 200,
+			"capture": { "testIdentityProof": "body" }
+		},
+		{
+			"description": "POST /authentication/admin/account - store the identity of the test account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{testAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{testIdentity}}" },
+				"isDefault": true,
+				"proof": "{{testIdentityProof}}"
+			},
+			"expectedStatus": 201,
+			"capture": { "testIdentityItemId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/admin/account/:id - the identity of the test account",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{testIdentityItemId}}",
+			"expectedStatus": 200,
+			"assert": { "body.data.id": "{{testIdentity}}" }
+		},
+		{
+			"description": "PUT /authentication/admin/account/:id - 422 for an identity that is a DID string",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{testIdentityItemId}}",
+			"body": { "data": "{{testIdentity}}" },
+			"expectedStatus": 422,
+			"assert": { "body.message": "accountDataHelper.identityDataInvalid" }
+		},
+		{
+			"description": "PUT /authentication/admin/account/:id - update the identity of the test account",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{testIdentityItemId}}",
+			"body": {
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{testIdentity}}" },
+				"isDefault": true
 			},
 			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/users/identity/:identity - the user holding the identity",
+			"method": "GET",
+			"path": "/authentication/admin/users/identity/{{testIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.accountId": "{{testAccountId}}", "body.email": "{{testUserEmail}}" }
+		},
+		{
+			"description": "GET /authentication/admin/users/identity/:identity - 404 for an identity no user holds",
+			"method": "GET",
+			"path": "/authentication/admin/users/identity/did:entity-storage:0x0000000000000000000000000000000000000000000000000000000000000001",
+			"expectedStatus": 404
+		},
+		{
+			"description": "PUT /authentication/admin/users/:email - set the organization of the test user",
+			"method": "PUT",
+			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"body": { "organizationIdentity": "{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - the organization of the test user is set",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"expectedStatus": 200,
+			"assert": { "body.organizationIdentity": "{{adminOrgIdentity}}" }
+		},
+		{
+			"description": "PUT /authentication/admin/users/:email - 404 for an unknown user",
+			"method": "PUT",
+			"path": "/authentication/admin/users/missing-user%40node",
+			"body": { "organizationIdentity": "{{adminOrgIdentity}}" },
+			"expectedStatus": 404
 		},
 		{
 			"description": "PUT /authentication/admin/users/:testUserEmail/password",
@@ -83,16 +157,56 @@
 			"expectedStatus": 204
 		},
 		{
+			"description": "GET /authentication/admin/users - find the test user by its e-mail address",
+			"method": "GET",
+			"path": "/authentication/admin/users?email={{testUserEmail}}&exactEmail=true",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.accountId": "{{testAccountId}}" }
+		},
+		{
+			"description": "POST /authentication/admin/users/:testUserEmail/disable - disable the test user",
+			"method": "POST",
+			"path": "/authentication/admin/users/{{testUserEmail}}/disable",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/users/:testUserEmail - the test user is disabled",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{testUserEmail}}",
+			"expectedStatus": 200,
+			"assert": { "body.dateDisabled": "isDefined" }
+		},
+		{
+			"description": "POST /authentication/login - 401 for the disabled test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{testUserEmail}}", "password": "NewTestUser@678901!" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/admin/users/:testUserEmail/enable - enable the test user",
+			"method": "POST",
+			"path": "/authentication/admin/users/{{testUserEmail}}/enable",
+			"expectedStatus": 204
+		},
+		{
 			"description": "DELETE /authentication/admin/users/:testUserEmail",
 			"method": "DELETE",
 			"path": "/authentication/admin/users/{{testUserEmail}}",
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /identity/:testIdentity - cleanup test identity",
+			"description": "GET /authentication/admin/account/:id - 404 as removing the user removes its account data",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{testIdentityItemId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "DELETE /identity/:identity - 404 as removing the user already removed its node held identity",
 			"method": "DELETE",
 			"path": "/identity/{{testIdentity}}",
-			"expectedStatus": 204
+			"expectedStatus": 404
 		}
 	]
 }

@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -297,9 +298,18 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 				actual = responseJson;
 			} else if (spec === "text") {
 				actual = responseText;
+			} else if (spec.startsWith("header.")) {
+				actual = res.headers.get(spec.slice(7)) ?? undefined;
 			}
 
-			if (expected === "isDefined") {
+			if (Is.string(expected) && expected.startsWith("contains:")) {
+				const text = expected.slice(9);
+				if (!Is.string(actual) || !actual.includes(text)) {
+					throw new Error(
+						`[${step.description}] Assert ${spec}: expected to contain '${text}', got '${String(actual)}'`
+					);
+				}
+			} else if (expected === "isDefined") {
 				if (actual === undefined || actual === null) {
 					throw new Error(
 						`[${step.description}] Assert ${spec} should be defined, got ${JSON.stringify(actual)}`

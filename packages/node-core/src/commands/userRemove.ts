@@ -1,22 +1,14 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IAuthenticationAdminComponent } from "@3sixty/api-auth-entity-storage-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
-import {
-	BaseError,
-	Coerce,
-	ComponentFactory,
-	GeneralError,
-	Guards,
-	I18n,
-	Is,
-	NotFoundError
-} from "@3sixty/core";
+import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
-import { IdentityProfileConnectorFactory } from "@3sixty/identity-models";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { normaliseEmail } from "../utils.js";
 
 const COMMAND_NAME = "user-remove";
 
@@ -85,7 +77,7 @@ export async function userRemove(
 		tenantId?: string;
 	}
 ): Promise<void> {
-	const paramsEmail = params.email;
+	const paramsEmail = Is.stringValue(params.email) ? normaliseEmail(params.email) : params.email;
 	Guards.email("userRemove", "email", paramsEmail);
 	const tenantEnabled = Coerce.boolean(envVars.tenantEnabled) ?? false;
 	if (Is.stringValue(params.tenantId)) {
@@ -96,13 +88,6 @@ export async function userRemove(
 	} else if (tenantEnabled) {
 		throw new GeneralError("userRemove", "tenantIdRequired");
 	}
-
-	const defaultIdentityProfileConnectorType = engineCore.getRegisteredInstanceType(
-		"identityProfileConnector"
-	);
-	const identityProfileConnector = IdentityProfileConnectorFactory.get(
-		defaultIdentityProfileConnectorType
-	);
 
 	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
 		"authenticationAdminComponent"
@@ -117,19 +102,8 @@ export async function userRemove(
 		async () => {
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-remove.labels.removingUser"));
 
-			const existingUser = await authenticationAdminComponent.get(paramsEmail);
+			// Removing the user also removes the data stored for its account.
 			await authenticationAdminComponent.remove(paramsEmail);
-
-			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-remove.labels.removingProfile"));
-			try {
-				await identityProfileConnector.remove(existingUser.userIdentity);
-			} catch (error) {
-				// Users created outside the CLI may not have a profile, which is not a failure
-				if (!BaseError.someErrorName(error, NotFoundError.CLASS_NAME)) {
-					throw error;
-				}
-				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-remove.labels.noProfile"));
-			}
 
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-remove.labels.userRemoved"));
 		}

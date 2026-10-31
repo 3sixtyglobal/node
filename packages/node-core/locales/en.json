@@ -12,7 +12,19 @@
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",
 			"cliEnvVarMissing": "Environment variable \"{envVar}\" does not exist",
 			"migrationAuthorizationComponent": "Authorization is now a required component, please add it to your configuration.",
-			"migrationIndexWriteFailed": "Failed to write the index entries for entity \"{id}\" during migration"
+			"migrationIndexWriteFailed": "Failed to write the index entries for entity \"{id}\" during migration",
+			"authProviderUnknown": "The authentication provider \"{authProvider}\" is not known, use entity-storage, google or microsoft",
+			"authProviderConfigMissing": "The client id and secret, and the tenant for microsoft, must be set to enable the \"{authProvider}\" authentication provider",
+			"authOAuthAuthorizationRequired": "Authorization must be enabled to use an OAuth authentication provider, as it creates an account for anyone the provider signs in",
+			"authSelfRegistrationAuthorizationRequired": "Authorization must be enabled to let people sign up for an account",
+			"authOAuthRedirectMissing": "The OAuth success and failure redirect addresses must be set when an OAuth authentication provider is enabled",
+			"authPasswordResetConfigMissing": "The password reset address and e-mail sender must be set when password reset is enabled",
+			"authRegistrationVerificationConfigMissing": "The sign up verification address and an e-mail sender must be set when self sign up is enabled with verification",
+			"authEmailMessagingMissing": "An e-mail messaging connector must be configured when password reset or sign up verification is enabled",
+			"messagingTemplateTitleMissing": "The messaging template \"{file}\" must have a title element",
+			"authProviderAllowListMissing": "The \"{authProvider}\" authentication provider needs allowed domains or tenants when open registration is turned off",
+			"migrationAccountDataMissing": "The account data storage must be configured to migrate the identity and organization of each account.",
+			"migrationIdentityComponentMissing": "The identity component must be configured to issue the organization membership credentials of migrated accounts."
 		},
 		"bootstrapDev": {
 			"noFeaturesEnabled": "No features are enabled, at least one feature must be enabled.",
@@ -53,7 +65,8 @@
 		},
 		"userUpdate": {
 			"tenantIdRequired": "The tenant ID is required when multi-tenancy is enabled.",
-			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled."
+			"tenantIdNotAllowed": "The tenant ID can only be provided when multi-tenancy is enabled.",
+			"identityNotFound": "The user \"{email}\" has no identity, provide one with --user-identity."
 		},
 		"orgUsersList": {
 			"orgDidRequired": "The organization DID is required in multi-tenant mode. Provide --org-did or switch to single-tenant mode."
@@ -120,7 +133,13 @@
 			"unknownEnvVars": "Unknown environment variable properties [{keys}], they will be ignored. Check for typos in variable names, for custom variables use the {prefix}ENV_ALLOW_LIST.",
 			"deprecatedEnvVar": "The environment variable \"{key}\" is deprecated and no longer has any effect, please use {replacements} instead. This variable will be removed in a future release.",
 			"deprecatedEnvVarNoReplacement": "The environment variable \"{key}\" is deprecated and no longer has any effect. This variable will be removed in a future release.",
-			"nativeModuleUnavailable": "The native module \"{specifier}\" could not be loaded, the pure JavaScript implementation will be used instead: {error}"
+			"nativeModuleUnavailable": "The native module \"{specifier}\" could not be loaded, the pure JavaScript implementation will be used instead: {error}",
+			"identityProfileDeprecated": "The identity profile is deprecated, profiles are now stored as account data through the authentication account component.",
+			"migrationIdentityShared": "The user \"{email}\" shares the identity \"{identity}\" with another account, so it is migrated without an identity but keeps the roles of the identity.",
+			"migrationCredentialSkipped": "The user \"{email}\" has no identity, so no membership credential is issued for the organization \"{organization}\".",
+			"migrationCredentialFailed": "Issuing the membership credential of the organization \"{organization}\" for the user \"{email}\" failed and will be retried on the next start: {error}",
+			"migrationEmailCollision": "The user \"{email}\" has the same e-mail address as \"{existingEmail}\" apart from case, so it is migrated disabled with its original e-mail address for an admin to resolve.",
+			"migrationRecordFailed": "Completing the migration of \"{subject}\" failed and will be retried on the next start: {error}"
 		}
 	},
 	"node": {
@@ -533,8 +552,9 @@
 						"retrieving": "Retrieving user",
 						"email": "Email",
 						"identity": "Identity",
-						"organization": "Organization",
-						"roles": "Roles"
+						"roles": "Roles",
+						"accountId": "Account ID",
+						"organization": "Organization"
 					}
 				},
 				"user-create": {
@@ -592,7 +612,8 @@
 						"skipping": "The user with ID already exists, skipping creation",
 						"overwriting": "Overwriting existing user with ID",
 						"email": "Email",
-						"password": "Password"
+						"password": "Password",
+						"accountId": "Account ID"
 					}
 				},
 				"user-update": {
@@ -603,7 +624,7 @@
 							"description": "Prefix to use for standard .env files e.g. TWIN_."
 						},
 						"user-identity": {
-							"description": "The DID to associate the user with."
+							"description": "The DID to associate the user with, the stored identity is used when omitted."
 						},
 						"organization-identity": {
 							"description": "The organization DID to associate the user with."
@@ -977,7 +998,7 @@
 					}
 				},
 				"user-remove": {
-					"description": "Remove a user and their identity profile",
+					"description": "Remove a user and the data stored for its account",
 					"example": "user-remove --email=\"user@example.com\" --tenant-id=\"0011..aabb\"",
 					"params": {
 						"env-prefix": {
@@ -995,8 +1016,6 @@
 					},
 					"labels": {
 						"removingUser": "Removing user",
-						"removingProfile": "Removing identity profile",
-						"noProfile": "No identity profile found for user",
 						"userRemoved": "Removed user"
 					}
 				},
@@ -1012,9 +1031,6 @@
 						},
 						"password": {
 							"description": "The new password. If not provided a random password will be generated."
-						},
-						"current-password": {
-							"description": "The current password, verified before the change when provided."
 						},
 						"tenant-id": {
 							"description": "The tenant ID the user belongs to (multi-tenant mode only)."

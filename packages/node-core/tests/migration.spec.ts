@@ -1,29 +1,44 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import { type AccountData, AccountDataHelper } from "@3sixty/api-auth-account-service";
+import {
+	AuthenticationAccountHelper,
+	AuthenticationProviderFactory
+} from "@3sixty/api-auth-models";
 import type {
 	AuditableItemGraphVertexIndex,
 	AuditableItemGraphVertexV1
 } from "@3sixty/auditable-item-graph-service";
 import { initSchema as initSchemaAuditableItemGraph } from "@3sixty/auditable-item-graph-service";
 import { ContextIdStore } from "@3sixty/context";
-import { BaseError, Factory } from "@3sixty/core";
+import { BaseError, ComponentFactory, Converter, Factory, Is, RandomHelper } from "@3sixty/core";
+import { PasswordGenerator, Sha256 } from "@3sixty/crypto";
 import { MemoryStateStorage } from "@3sixty/engine-core";
-import { AuthenticationAdminComponentType } from "@3sixty/engine-server-types";
+import {
+	AuthenticationAdminComponentType,
+	AuthenticationComponentType
+} from "@3sixty/engine-server-types";
 import {
 	AuthorizationConnectorType,
 	BackgroundTaskComponentType,
 	EntityStorageComponentType,
 	EntityStorageConnectorType,
+	IdentityConnectorType,
+	IdentityProfileConnectorType,
 	LoggingComponentType,
 	LoggingConnectorType,
-	SchemaVersionMigrationComponentType
+	SchemaVersionMigrationComponentType,
+	VaultConnectorType
 } from "@3sixty/engine-types";
 import type { IEntitySchemaProperty } from "@3sixty/entity";
 import {
+	ComparisonOperator,
 	entity,
 	EntitySchemaFactory,
 	EntitySchemaHelper,
 	EntitySchemaPropertyType,
+	LogicalOperator,
 	property
 } from "@3sixty/entity";
 import { MemoryEntityStorageConnector } from "@3sixty/entity-storage-connector-memory";
@@ -31,10 +46,12 @@ import {
 	EntityStorageConnectorFactory,
 	SchemaMigrationFactory
 } from "@3sixty/entity-storage-models";
+import type { IIdentityComponent } from "@3sixty/identity-models";
 import type { ILogEntry } from "@3sixty/logging-models";
 import type { OdrlPolicyIndex, OdrlPolicyV0 } from "@3sixty/rights-management-pap-service";
 import { initSchema as initSchemaPolicyAdministrationPoint } from "@3sixty/rights-management-pap-service";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
+import { finalizeMigrations } from "../src/migration.js";
 import type { INodeOptions } from "../src/models/INodeOptions.js";
 import { run } from "../src/node.js";
 
@@ -121,6 +138,12 @@ const BASE_ENV: { [id: string]: string } = {
 	TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.Memory,
 	TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
 	TWIN_ENV_ALLOW_LIST: CI_ENV_VARS
+};
+
+// The account and organization services issue membership credentials with the identity component.
+const IDENTITY_ENV: { [id: string]: string } = {
+	TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
+	TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage
 };
 
 const MULTI_TENANT_BASE_ENV: { [id: string]: string } = {
@@ -1437,6 +1460,7 @@ describe("migration - scope to roles", () => {
 
 			const AUTH_ENV: { [id: string]: string } = {
 				...BASE_ENV,
+				...IDENTITY_ENV,
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage
 			};
@@ -1486,6 +1510,8 @@ describe("migration - scope to roles", () => {
 				partitionContextIds: ["node"],
 				config: { storageKey: "authentication-user" }
 			});
+			// Clear rows left by earlier tests, the memory connector keeps them when the primary key changes.
+			await seedConnector.teardown();
 			await seedConnector.setBatch([
 				{
 					email: "user1@test.com",
@@ -1535,20 +1561,77 @@ describe("migration - scope to roles", () => {
 					}
 				});
 
-				// AuthenticationUser schema version must have advanced to 1.
+				// AuthenticationUser schema version must have advanced through 1 to 2.
 				const versionConnector = EntityStorageConnectorFactory.get("schema-version");
 				const { entities: versionRecords } = await versionConnector.query();
 				const migrationRecord = (versionRecords ?? []).find(
 					r => (r as { schemaName: string }).schemaName === "AuthenticationUser"
 				) as { version: number } | undefined;
-				expect(migrationRecord?.version).toBe(1);
+				expect(migrationRecord?.version).toBe(2);
 
-				// Migrated users must not carry the scope field.
+				// Migrated users must not carry the scope field, and become password accounts
+				// keyed by a new account id with the identity and organization moved out.
 				const userConnector = EntityStorageConnectorFactory.get("authentication-user");
-				const { entities: users } = await userConnector.query();
+				const { entities: allUsers } = await userConnector.query();
+				// The memory connector migrates in place, so when the primary key changes the v1 rows,
+				// keyed by e-mail, are left beside the migrated rows keyed by account id.
+				const users = (allUsers ?? []).filter(u =>
+					Is.stringValue((u as { accountId?: string }).accountId)
+				);
 				expect(users).toHaveLength(3);
-				for (const user of users ?? []) {
-					expect((user as { scope?: unknown }).scope).toBeUndefined();
+				for (const user of users as {
+					email: string;
+					accountId?: string;
+					authProviderId?: string;
+					providerAccountId?: string;
+					identity?: unknown;
+					organization?: unknown;
+					scope?: unknown;
+				}[]) {
+					expect(user.scope).toBeUndefined();
+					expect(user.accountId).toEqual(expect.any(String));
+					expect(user.authProviderId).toBe("entity-storage");
+					expect(user.providerAccountId).toBe(user.email);
+					expect(user.identity).toBeUndefined();
+					expect(user.organization).toBeUndefined();
+				}
+				expect(new Set(users.map(u => (u as { accountId: string }).accountId)).size).toBe(3);
+
+				// The identity and organization of each account must have moved to account data, the
+				// identity under the id derived from its DID so a repeated run replaces it.
+				const accountDataConnector = EntityStorageConnectorFactory.get("account-data");
+				for (const user of users as { email: string; accountId: string }[]) {
+					const did = `did:twin:${user.email.split("@")[0]}`;
+					await expect(
+						accountDataConnector.get(AccountDataHelper.identityId(did))
+					).resolves.toMatchObject({
+						accountId: user.accountId,
+						type: "identity",
+						data: { "@context": "https://www.w3.org/ns/did/v1", id: did },
+						isDefault: true
+					});
+					const { entities: organizations } = await accountDataConnector.query({
+						conditions: [
+							{
+								property: "accountId",
+								value: user.accountId,
+								comparison: ComparisonOperator.Equals
+							},
+							{ property: "type", value: "organization", comparison: ComparisonOperator.Equals }
+						],
+						logicalOperator: LogicalOperator.And
+					});
+					expect(organizations).toMatchObject([
+						{
+							data: {
+								"@context": "https://schema.org",
+								"@type": "Organization",
+								identifier: TEST_NODE_ORG_ID
+							},
+							organization: TEST_NODE_ORG_ID,
+							isDefault: true
+						}
+					]);
 				}
 
 				// Authorization role assignments must have been created for every scope entry.
@@ -1564,13 +1647,22 @@ describe("migration - scope to roles", () => {
 					role: string;
 				}[];
 
+				// Roles are held by the account id the identity now belongs to.
+				const accountIds: { [identity: string]: string } = {};
+				for (const did of ["did:twin:user1", "did:twin:user2", "did:twin:user3"]) {
+					const identityItem = (await accountDataConnector.get(
+						AccountDataHelper.identityId(did)
+					)) as { accountId: string } | undefined;
+					accountIds[did] = identityItem?.accountId ?? "";
+				}
 				const findAssignment = (
 					identity: string,
 					role: string
 				): { id: string; modelId: string; subject: string; role: string } | undefined =>
-					rows.find(r => r.subject === identity && r.role === role);
+					rows.find(r => r.subject === accountIds[identity] && r.role === role);
 
 				expect(rows).toHaveLength(4);
+				expect(rows.some(r => r.subject.startsWith("did:"))).toBe(false);
 				expect(findAssignment("did:twin:user1", "global-admin")).toBeDefined();
 				expect(findAssignment("did:twin:user1", "user-admin")).toBeDefined();
 				expect(findAssignment("did:twin:user2", "tenant-admin")).toBeDefined();
@@ -1591,6 +1683,7 @@ describe("migration - scope to roles", () => {
 
 			const AUTH_ENV: { [id: string]: string } = {
 				...BASE_ENV,
+				...IDENTITY_ENV,
 				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage
 			};
@@ -1647,6 +1740,8 @@ describe("migration - scope to roles", () => {
 				partitionContextIds: ["node"],
 				config: { storageKey: "authentication-user" }
 			});
+			// Clear rows left by earlier tests, the memory connector keeps them when the primary key changes.
+			await seedConnector.teardown();
 			await seedConnector.setBatch([
 				{
 					email: "combo@test.com",
@@ -1687,6 +1782,13 @@ describe("migration - scope to roles", () => {
 					role: string;
 				}[];
 
+				// Roles are held by the account id the identity now belongs to.
+				const identityItem = (await EntityStorageConnectorFactory.get("account-data").get(
+					AccountDataHelper.identityId("did:twin:combo")
+				)) as { accountId: string } | undefined;
+				const comboAccountId = identityItem?.accountId;
+				expect(comboAccountId).toEqual(expect.any(String));
+
 				// tenant-admin + user-admin → 2 original + 3 promoted = 5 total
 				expect(rows).toHaveLength(5);
 				for (const role of [
@@ -1697,7 +1799,7 @@ describe("migration - scope to roles", () => {
 					"identity-profile-admin"
 				]) {
 					expect(
-						rows.some(r => r.subject === "did:twin:combo" && r.role === role),
+						rows.some(r => r.subject === comboAccountId && r.role === role),
 						`expected role "${role}"`
 					).toBe(true);
 				}
@@ -1735,6 +1837,7 @@ describe("migration - scope to roles multi-tenant", () => {
 
 		const AUTH_MT_ENV: { [id: string]: string } = {
 			...MULTI_TENANT_BASE_ENV,
+			...IDENTITY_ENV,
 			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
 			TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage
 		};
@@ -1765,6 +1868,22 @@ describe("migration - scope to roles multi-tenant", () => {
 		if (svRecord) {
 			await svConnector.set({ ...svRecord, version: 0 });
 		}
+
+		// Register both tenants, the pending migration work is completed per registered tenant.
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const tenantConnector = EntityStorageConnectorFactory.get("tenant");
+			const now = new Date().toISOString();
+			for (const id of [TEST_TENANT_ID_A, TEST_TENANT_ID_B]) {
+				await tenantConnector.set({
+					id,
+					apiKey: id,
+					label: `Tenant ${id.slice(0, 1)}`,
+					organizationId: TEST_NODE_ORG_ID,
+					dateCreated: now,
+					dateModified: now
+				});
+			}
+		});
 
 		// Seed one user per tenant using its own partition context so the migration
 		// handler captures the correct contextIds for each and replays them into the
@@ -1848,7 +1967,7 @@ describe("migration - scope to roles multi-tenant", () => {
 			const migrationRecord = (versionRecords ?? []).find(
 				r => (r as { schemaName: string }).schemaName === "AuthenticationUser"
 			) as { version: number } | undefined;
-			expect(migrationRecord?.version).toBe(1);
+			expect(migrationRecord?.version).toBe(2);
 
 			// Tenant A: user must have global-admin role, isolated to tenant A's partition.
 			const roleConnector = EntityStorageConnectorFactory.get("authorization-role-assignment");
@@ -1862,8 +1981,16 @@ describe("migration - scope to roles multi-tenant", () => {
 				subject: string;
 				role: string;
 			}[];
+			// Roles are held by the account id the identity now belongs to, in the same partition.
+			const accountData = EntityStorageConnectorFactory.get("account-data");
+			const accountIdFor = async (tenant: string, did: string): Promise<string | undefined> =>
+				ContextIdStore.run({ node: TEST_NODE_ID, tenant }, async () => {
+					const item = (await accountData.get(AccountDataHelper.identityId(did))) as
+						{ accountId: string } | undefined;
+					return item?.accountId;
+				});
 			expect(rowsA).toHaveLength(1);
-			expect(rowsA[0].subject).toBe("did:twin:userA");
+			expect(rowsA[0].subject).toBe(await accountIdFor(TEST_TENANT_ID_A, "did:twin:userA"));
 			expect(rowsA[0].role).toBe("global-admin");
 			expect(rowsA[0].modelId).toBe("system");
 
@@ -1879,9 +2006,921 @@ describe("migration - scope to roles multi-tenant", () => {
 				role: string;
 			}[];
 			expect(rowsB).toHaveLength(1);
-			expect(rowsB[0].subject).toBe("did:twin:userB");
+			expect(rowsB[0].subject).toBe(await accountIdFor(TEST_TENANT_ID_B, "did:twin:userB"));
 			expect(rowsB[0].role).toBe("tenant-admin");
 			expect(rowsB[0].modelId).toBe("system");
+		} finally {
+			await run2?.shutdown();
+		}
+	});
+});
+
+describe("migration - accounts", () => {
+	interface UserV1 {
+		email: string;
+		password: string;
+		salt: string;
+		identity: string;
+		organization: string;
+	}
+	interface Row {
+		id: string;
+		accountId: string;
+		type: string;
+		data: unknown;
+	}
+
+	const AUTH_ENV: { [id: string]: string } = {
+		...BASE_ENV,
+		...IDENTITY_ENV,
+		TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+		TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage
+	};
+
+	const nodeOptions = (port: number, extraEnv: { [id: string]: string } = {}): INodeOptions => ({
+		localesDirectory: LOCALES_DIR,
+		stateStorage: new MemoryStateStorage(false, {
+			nodeId: TEST_NODE_ID,
+			nodeOrganizationId: TEST_NODE_ORG_ID
+		}),
+		disableProcessExitOnFailure: true,
+		envVars: { ...AUTH_ENV, ...extraEnv, TWIN_PORT: String(port) },
+		extendConfig: async (unusedEnvVars, config) => {
+			config.types.schemaVersionMigrationComponent = [
+				{ type: SchemaVersionMigrationComponentType.Service }
+			];
+			config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+		}
+	});
+
+	const recordId = (kind: string, key: string): string =>
+		`migration-${kind}-${Converter.bytesToHex(Sha256.sum256(Converter.utf8ToBytes(key)))}`;
+
+	const membershipCredential = (
+		organization: string
+	): Awaited<
+		ReturnType<IIdentityComponent["verifiableCredentialCreate"]>
+	>["verifiableCredential"] => ({
+		"@context": ["https://www.w3.org/2018/credentials/v1", "https://schema.org"],
+		type: ["VerifiableCredential", "OrganizationMembershipCredential"],
+		issuer: organization,
+		credentialSubject: { id: "did:twin:member", memberOf: { id: organization } },
+		proof: {
+			type: "DataIntegrityProof",
+			cryptosuite: "eddsa-jcs-2022",
+			created: "2026-01-12T09:05:23.123Z",
+			verificationMethod: `${organization}#trust-assertion`,
+			proofPurpose: "assertionMethod",
+			proofValue: "z-signature"
+		}
+	});
+
+	// Starts a node, back-dates AuthenticationUser to v1 and seeds the v1 users, the role
+	// assignments and any account data, ready for the next start to migrate them.
+	const prepare = async (
+		users: UserV1[],
+		roles: { subject: string; role: string; modelId?: string }[],
+		accountData: Row[],
+		extraEnv: { [id: string]: string } = {},
+		identityProfiles: {
+			identity: string;
+			publicProfile?: unknown;
+			privateProfile?: unknown;
+		}[] = [],
+		policies: { modelId: string; subject: string; object: string; action: string }[] = []
+	): Promise<void> => {
+		const run1 = await run(nodeOptions(await getFreePort(), extraEnv));
+
+		for (const profile of identityProfiles) {
+			await EntityStorageConnectorFactory.get("identity-profile").set(profile);
+		}
+
+		const svConnector =
+			EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<{ schemaName: string; version: number }>
+			>("schema-version");
+		const svRecord = (await svConnector.getStore()).find(
+			r => r.schemaName === "AuthenticationUser"
+		);
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 1 });
+		}
+
+		const roleConnector = EntityStorageConnectorFactory.get("authorization-role-assignment");
+		for (const { subject, role, modelId } of roles) {
+			await roleConnector.set({
+				id: `${modelId ?? "system"}|${subject}|${role}`,
+				modelId: modelId ?? "system",
+				subject,
+				role
+			});
+		}
+
+		const policyConnector = EntityStorageConnectorFactory.get("authorization-policy");
+		for (const policy of policies) {
+			await policyConnector.set({
+				id: `${policy.modelId}|${policy.subject}|${policy.object}|${policy.action}`,
+				...policy
+			});
+		}
+
+		const accountDataConnector =
+			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<AccountData>>("account-data");
+		// Clear the work left by earlier tests, the memory store is shared between nodes.
+		await accountDataConnector.teardown();
+		const now = new Date().toISOString();
+		for (const row of accountData) {
+			await accountDataConnector.set({
+				...row,
+				isDefault: true,
+				dateCreated: now,
+				dateModified: now
+			});
+		}
+
+		const seedConnector = new MemoryEntityStorageConnector<UserV1>({
+			entitySchema: "AuthenticationUserV1",
+			partitionContextIds: ["node"],
+			config: { storageKey: "authentication-user" }
+		});
+		// Clear rows left by earlier tests, the memory connector keeps them when the primary key changes.
+		await seedConnector.teardown();
+		await seedConnector.setBatch(users);
+
+		await run1?.shutdown();
+	};
+
+	const migratedUsers = async (): Promise<{ email: string; accountId: string }[]> => {
+		const { entities } = await EntityStorageConnectorFactory.get("authentication-user").query();
+		return (entities ?? []).filter(u =>
+			Is.stringValue((u as { accountId?: string }).accountId)
+		) as { email: string; accountId: string }[];
+	};
+
+	const accountRows = async (accountId: string, type: string): Promise<Row[]> => {
+		const { entities } = await EntityStorageConnectorFactory.get("account-data").query({
+			conditions: [
+				{ property: "accountId", value: accountId, comparison: ComparisonOperator.Equals },
+				{ property: "type", value: type, comparison: ComparisonOperator.Equals }
+			],
+			logicalOperator: LogicalOperator.And
+		});
+		return (entities ?? []) as Row[];
+	};
+
+	const rolesOf = async (subject: string, modelId: string = "system"): Promise<string[]> => {
+		// Filtered by subject, as the rules seeded for the routes fill the first page.
+		const { entities } = await EntityStorageConnectorFactory.get(
+			"authorization-role-assignment"
+		).query({ property: "subject", value: subject, comparison: ComparisonOperator.Equals });
+		return ((entities ?? []) as { subject: string; role: string; modelId: string }[])
+			.filter(r => r.subject === subject && r.modelId === modelId)
+			.map(r => r.role)
+			.sort();
+	};
+
+	const policiesOf = async (subject: string): Promise<string[]> => {
+		const { entities } = await EntityStorageConnectorFactory.get("authorization-policy").query({
+			property: "subject",
+			value: subject,
+			comparison: ComparisonOperator.Equals
+		});
+		return (
+			(entities ?? []) as { subject: string; modelId: string; object: string; action: string }[]
+		)
+			.filter(p => p.subject === subject)
+			.map(p => `${p.modelId}|${p.object}|${p.action}`)
+			.sort();
+	};
+
+	beforeAll(async () => {
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0 ? { node: TEST_NODE_ID } : ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		Factory.clearFactories();
+	});
+
+	test("Gives users sharing an identity their own accounts, each with the roles of the identity", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			await prepare(
+				[
+					{
+						email: "shared-a@test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:shared",
+						organization: TEST_NODE_ORG_ID
+					},
+					{
+						email: "shared-b@test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:shared",
+						organization: TEST_NODE_ORG_ID
+					}
+				],
+				[
+					{ subject: "did:twin:shared", role: "tenant-admin" },
+					{ subject: "did:twin:shared", role: "user" }
+				],
+				[]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+
+				const users = (await migratedUsers()).filter(u => u.email.startsWith("shared-"));
+				expect(users).toHaveLength(2);
+				expect(users[0].accountId).not.toBe(users[1].accountId);
+
+				// Only one account holds the DID, the other is migrated without an identity.
+				const accountData = EntityStorageConnectorFactory.get("account-data");
+				const holder = (await accountData.get(AccountDataHelper.identityId("did:twin:shared"))) as
+					Row | undefined;
+				expect(users.map(u => u.accountId)).toContain(holder?.accountId);
+				const other = users.find(u => u.accountId !== holder?.accountId);
+				expect(await accountRows(other?.accountId ?? "", "identity")).toHaveLength(0);
+
+				// Both keep the organization, and both are given the roles the DID held.
+				for (const user of users) {
+					expect(await accountRows(user.accountId, "organization")).toMatchObject([
+						{ data: AuthenticationAccountHelper.createOrganizationData(TEST_NODE_ORG_ID) }
+					]);
+					expect(await rolesOf(user.accountId)).toEqual(["tenant-admin", "user"]);
+				}
+				expect(await rolesOf("did:twin:shared")).toEqual([]);
+
+				// The role move is complete, so its record is removed.
+				await expect(accountData.get(recordId("identity", "did:twin:shared"))).resolves.toBe(
+					undefined
+				);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Moves the role assignments and policies of an identity in every model to its account", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			await prepare(
+				[
+					{
+						email: "rules@test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:rules",
+						organization: ""
+					}
+				],
+				[
+					{ subject: "did:twin:rules", role: "user" },
+					{ subject: "did:twin:rules", role: "auditor", modelId: "custom" },
+					{ subject: "did:twin:other", role: "user" }
+				],
+				[],
+				{},
+				[],
+				[
+					{ modelId: "system", subject: "did:twin:rules", object: "reports", action: "read" },
+					{ modelId: "custom", subject: "did:twin:rules", object: "ledger", action: "write" },
+					{ modelId: "system", subject: "did:twin:other", object: "reports", action: "read" }
+				]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+
+				const user = (await migratedUsers()).find(u => u.email === "rules@test.com");
+				const accountId = user?.accountId ?? "";
+				expect(Is.stringValue(accountId)).toBe(true);
+
+				expect(await rolesOf(accountId)).toEqual(["user"]);
+				expect(await rolesOf(accountId, "custom")).toEqual(["auditor"]);
+				expect(await policiesOf(accountId)).toEqual(["custom|ledger|write", "system|reports|read"]);
+
+				// The rules of the DID are removed once every account has them.
+				expect(await rolesOf("did:twin:rules")).toEqual([]);
+				expect(await rolesOf("did:twin:rules", "custom")).toEqual([]);
+				expect(await policiesOf("did:twin:rules")).toEqual([]);
+
+				// A DID that was not held by a migrated user keeps its rules.
+				expect(await rolesOf("did:twin:other")).toEqual(["user"]);
+				expect(await policiesOf("did:twin:other")).toEqual(["system|reports|read"]);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Keeps the account id of an e-mail address migrated by an interrupted run", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			// An interrupted run stored the record of the user and its identity, but the old rows
+			// were not replaced.
+			await prepare(
+				[
+					{
+						email: "rerun@test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:rerun",
+						organization: ""
+					}
+				],
+				[],
+				[
+					{
+						id: recordId("account", "rerun@test.com"),
+						accountId: "migration",
+						type: "migration",
+						data: { kind: "account", email: "rerun@test.com", accountId: "rerun-account" }
+					},
+					{
+						id: AccountDataHelper.identityId("did:twin:rerun"),
+						accountId: "rerun-account",
+						type: "identity",
+						data: "did:twin:rerun"
+					}
+				]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+
+				const user = (await migratedUsers()).find(u => u.email === "rerun@test.com");
+				expect(user?.accountId).toBe("rerun-account");
+				// The identity the interrupted run stored as a DID string is written again as an object.
+				expect(await accountRows("rerun-account", "identity")).toMatchObject([
+					{ data: AuthenticationAccountHelper.createIdentityData("did:twin:rerun") }
+				]);
+
+				// Nothing is left to do for the user, so its record is removed.
+				const accountData = EntityStorageConnectorFactory.get("account-data");
+				await expect(accountData.get(recordId("account", "rerun@test.com"))).resolves.toBe(
+					undefined
+				);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Stores e-mail addresses in lower case and disables a later user that differs only by case", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			await prepare(
+				[
+					{
+						email: "Upper@Test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "",
+						organization: ""
+					},
+					{
+						email: "upper@TEST.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "",
+						organization: ""
+					}
+				],
+				[],
+				[]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+
+				const users = (
+					(await migratedUsers()) as {
+						email: string;
+						accountId: string;
+						providerAccountId?: string;
+						dateDisabled?: string;
+					}[]
+				).filter(u => u.email.toLowerCase() === "upper@test.com");
+				expect(users).toHaveLength(2);
+				expect(users[0].accountId).not.toBe(users[1].accountId);
+
+				const kept = users.filter(u => !Is.stringValue(u.dateDisabled));
+				expect(kept).toHaveLength(1);
+				expect(kept[0].email).toBe("upper@test.com");
+				expect(kept[0].providerAccountId).toBe("upper@test.com");
+
+				const disabled = users.filter(u => Is.stringValue(u.dateDisabled));
+				expect(disabled).toHaveLength(1);
+				expect(["Upper@Test.com", "upper@TEST.com"]).toContain(disabled[0].email);
+				expect(disabled[0].providerAccountId).toBe(disabled[0].email);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Keeps the account id of a mixed case e-mail address migrated by an interrupted run", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			// A previous run keyed the record by the e-mail address as stored.
+			await prepare(
+				[
+					{
+						email: "Rerun-Case@Test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "",
+						organization: ""
+					}
+				],
+				[],
+				[
+					{
+						id: recordId("account", "Rerun-Case@Test.com"),
+						accountId: "migration",
+						type: "migration",
+						data: {
+							kind: "account",
+							email: "Rerun-Case@Test.com",
+							accountId: "rerun-case-account"
+						}
+					}
+				]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+
+				const user = (await migratedUsers()).find(u => u.accountId === "rerun-case-account");
+				expect(user?.email).toBe("rerun-case@test.com");
+
+				// The record is moved to the normalised key and removed once complete.
+				const accountData = EntityStorageConnectorFactory.get("account-data");
+				await expect(accountData.get(recordId("account", "Rerun-Case@Test.com"))).resolves.toBe(
+					undefined
+				);
+				await expect(accountData.get(recordId("account", "rerun-case@test.com"))).resolves.toBe(
+					undefined
+				);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Keeps the pending work of a migrated account until the membership credential is issued", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			await prepare(
+				[
+					{
+						email: "member@test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:member",
+						organization: TEST_NODE_ORG_ID
+					}
+				],
+				[{ subject: "did:twin:member", role: "user" }],
+				[]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+
+				const user = (await migratedUsers()).find(u => u.email === "member@test.com");
+				const accountId = user?.accountId ?? "";
+				expect(await rolesOf(accountId)).toEqual(["user"]);
+
+				// The organization has no trust verification method in this node, so no credential is
+				// issued and the work is kept for the next start.
+				const accountData = EntityStorageConnectorFactory.get("account-data");
+				expect(await accountRows(accountId, "vc")).toHaveLength(0);
+				await expect(
+					accountData.get(recordId("account", "member@test.com"))
+				).resolves.toMatchObject({
+					data: { kind: "account", accountId, organization: TEST_NODE_ORG_ID }
+				});
+
+				// Once the organization can sign, the next start issues the credential and removes
+				// the record.
+				const identityComponent = ComponentFactory.get<IIdentityComponent>(
+					run2?.engine.getRegisteredInstanceType("identityComponent") ?? ""
+				);
+				const create = vi.spyOn(identityComponent, "verifiableCredentialCreate").mockResolvedValue({
+					verifiableCredential: membershipCredential(TEST_NODE_ORG_ID),
+					jwt: "unused.credential.jwt"
+				});
+				if (run2) {
+					await finalizeMigrations(run2.engine, {});
+				}
+
+				expect(create).toHaveBeenCalledTimes(1);
+				expect(create.mock.calls[0][0]).toBe(`${TEST_NODE_ORG_ID}#trust-assertion`);
+				expect(create.mock.calls[0][2]).toMatchObject({
+					id: "did:twin:member",
+					memberOf: { id: TEST_NODE_ORG_ID }
+				});
+				// The JSON credential with its proof is stored, not the JWT.
+				expect(await accountRows(accountId, "vc")).toMatchObject([
+					{ data: membershipCredential(TEST_NODE_ORG_ID) }
+				]);
+				await expect(accountData.get(recordId("account", "member@test.com"))).resolves.toBe(
+					undefined
+				);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Registers the organizations of migrated users and the node organization once, with their identity profiles", async () => {
+		const profileEnv = {
+			TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage
+		};
+		const publicProfile = {
+			"@context": "https://schema.org",
+			"@type": "Organization",
+			name: "Migrated Ltd"
+		};
+		const privateProfile = {
+			"@context": "https://schema.org",
+			"@type": "Organization",
+			email: "office@migrated.example"
+		};
+
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			await prepare(
+				[
+					{
+						email: "org-member@test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:org-member",
+						organization: "did:twin:migrated-org"
+					}
+				],
+				[],
+				[],
+				profileEnv,
+				[{ identity: "did:twin:migrated-org", publicProfile, privateProfile }]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort(), profileEnv));
+
+				const organizations = EntityStorageConnectorFactory.get("organization");
+				const registered = async (
+					identity: string
+				): Promise<{ id: string; identity: string; searchName: string }[]> => {
+					const { entities } = await organizations.query({
+						property: "identity",
+						value: identity,
+						comparison: ComparisonOperator.Equals
+					});
+					return (entities ?? []) as { id: string; identity: string; searchName: string }[];
+				};
+
+				const migrated = await registered("did:twin:migrated-org");
+				expect(migrated).toHaveLength(1);
+				expect(await registered(TEST_NODE_ORG_ID)).toHaveLength(1);
+
+				// The identity profile of the organization is copied to the profiles owned by its DID.
+				expect(await accountRows(migrated[0].identity, "public-profile")).toMatchObject([
+					{ data: publicProfile }
+				]);
+				expect(await accountRows(migrated[0].identity, "private-profile")).toMatchObject([
+					{ data: privateProfile }
+				]);
+				expect(migrated[0].searchName).toBe(publicProfile.name.toLowerCase());
+
+				// The work is complete, so its record is removed.
+				const accountData = EntityStorageConnectorFactory.get("account-data");
+				await expect(
+					accountData.get(recordId("organization", "did:twin:migrated-org"))
+				).resolves.toBe(undefined);
+
+				// Another run finds the organizations by their DID and adds nothing.
+				if (run2) {
+					await finalizeMigrations(run2.engine, {});
+				}
+				expect(await registered("did:twin:migrated-org")).toHaveLength(1);
+				expect(await registered(TEST_NODE_ORG_ID)).toHaveLength(1);
+				expect(await accountRows(migrated[0].identity, "public-profile")).toHaveLength(1);
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Moves the identity profile of a user to its account and upgrades its legacy password hash at sign in", async () => {
+		const authEnv = {
+			TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
+			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage
+		};
+		const password = "Legacy@Password123!";
+		const salt = RandomHelper.generate(16);
+		const publicProfile = { "@context": "https://schema.org", "@type": "Person", name: "Legacy" };
+		const privateProfile = {
+			"@context": "https://schema.org",
+			"@type": "Person",
+			email: "legacy@test.com"
+		};
+
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			// The hash stored by earlier versions, Blake2b with no algorithm recorded.
+			await prepare(
+				[
+					{
+						email: "Legacy@Test.com",
+						password: await PasswordGenerator.hashPassword(Converter.utf8ToBytes(password), salt),
+						salt: Converter.bytesToBase64(salt),
+						identity: "did:twin:legacy",
+						organization: ""
+					}
+				],
+				[],
+				[],
+				authEnv,
+				[{ identity: "did:twin:legacy", publicProfile, privateProfile }]
+			);
+
+			let run2;
+			try {
+				run2 = await run(nodeOptions(await getFreePort(), authEnv));
+
+				const user = (
+					(await migratedUsers()) as {
+						email: string;
+						accountId: string;
+						passwordAlgorithm?: string;
+					}[]
+				).find(u => u.email === "legacy@test.com");
+				expect(user?.passwordAlgorithm).toBeUndefined();
+				const accountId = user?.accountId ?? "";
+
+				expect(await accountRows(accountId, "public-profile")).toMatchObject([
+					{ data: publicProfile }
+				]);
+				expect(await accountRows(accountId, "private-profile")).toMatchObject([
+					{ data: privateProfile }
+				]);
+
+				// The legacy hash signs in, by the address in any case, and is replaced on the way.
+				const provider = AuthenticationProviderFactory.get("entity-storage");
+				await expect(
+					provider.authenticate({ email: "LEGACY@test.com", password: "Wrong@Password123!" })
+				).rejects.toThrow("loginFailed");
+				await expect(
+					provider.authenticate({ email: "LEGACY@test.com", password })
+				).resolves.toMatchObject({ email: "legacy@test.com" });
+
+				const upgraded = (await EntityStorageConnectorFactory.get("authentication-user").get(
+					accountId
+				)) as { passwordAlgorithm?: string; password: string } | undefined;
+				expect(upgraded?.passwordAlgorithm).toBe("argon2id");
+				await expect(
+					provider.authenticate({ email: "legacy@test.com", password })
+				).resolves.toMatchObject({ email: "legacy@test.com" });
+			} finally {
+				await run2?.shutdown();
+			}
+		});
+	});
+
+	test("Leaves the migrated accounts unchanged when the node starts again", async () => {
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			await prepare(
+				[
+					{
+						email: "Again@Test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: "did:twin:again",
+						organization: TEST_NODE_ORG_ID
+					}
+				],
+				[{ subject: "did:twin:again", role: "tenant-admin" }],
+				[]
+			);
+
+			const snapshot = async (): Promise<unknown> => {
+				const user = (await migratedUsers()).find(u => u.email === "again@test.com");
+				const accountId = user?.accountId ?? "";
+				const { entities } = await EntityStorageConnectorFactory.get("account-data").query({
+					property: "accountId",
+					value: accountId,
+					comparison: ComparisonOperator.Equals
+				});
+				return {
+					users: (await migratedUsers()).filter(u => u.email === "again@test.com").length,
+					accountId,
+					items: ((entities ?? []) as Row[])
+						.map(
+							item =>
+								`${item.type}|${
+									AuthenticationAccountHelper.getIdentity(item.data) ??
+									AuthenticationAccountHelper.getOrganization(item.data)
+								}`
+						)
+						.sort(),
+					roles: await rolesOf(accountId),
+					didRoles: await rolesOf("did:twin:again")
+				};
+			};
+
+			let run2;
+			let first;
+			try {
+				run2 = await run(nodeOptions(await getFreePort()));
+				first = await snapshot();
+				expect(first).toMatchObject({
+					users: 1,
+					roles: ["tenant-admin"],
+					didRoles: [],
+					items: ["identity|did:twin:again", `organization|${TEST_NODE_ORG_ID}`]
+				});
+			} finally {
+				await run2?.shutdown();
+			}
+
+			let run3;
+			try {
+				run3 = await run(nodeOptions(await getFreePort()));
+				expect(await snapshot()).toEqual(first);
+			} finally {
+				await run3?.shutdown();
+			}
+		});
+	});
+});
+
+describe("migration - accounts multi-tenant", () => {
+	beforeAll(async () => {
+		const storage = await ContextIdStore.getStorage();
+		const realGetStore = storage.getStore.bind(storage);
+		vi.spyOn(storage, "getStore").mockImplementation(() => {
+			const ctx = realGetStore();
+			return !ctx || Object.keys(ctx).length === 0
+				? { node: TEST_NODE_ID, tenant: TEST_TENANT_ID_A }
+				: ctx;
+		});
+	});
+
+	afterAll(() => {
+		vi.restoreAllMocks();
+	});
+
+	beforeEach(() => {
+		Factory.clearFactories();
+	});
+
+	test("Migrates the users of each tenant to accounts in the partition of the tenant", async () => {
+		const TENANT_ORGS: { [tenant: string]: string } = {
+			[TEST_TENANT_ID_A]: "did:twin:org-a",
+			[TEST_TENANT_ID_B]: "did:twin:org-b"
+		};
+		const env = {
+			...MULTI_TENANT_BASE_ENV,
+			...IDENTITY_ENV,
+			TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage
+		};
+		const options = (port: number): INodeOptions => ({
+			localesDirectory: LOCALES_DIR,
+			stateStorage: new MemoryStateStorage(false, {
+				nodeId: TEST_NODE_ID,
+				nodeOrganizationId: TEST_NODE_ORG_ID
+			}),
+			disableProcessExitOnFailure: true,
+			envVars: { ...env, TWIN_PORT: String(port) },
+			extendConfig: async (unusedEnvVars, config) => {
+				config.types.schemaVersionMigrationComponent = [
+					{ type: SchemaVersionMigrationComponentType.Service }
+				];
+				config.types.backgroundTaskComponent = [{ type: BackgroundTaskComponentType.Service }];
+			}
+		});
+
+		const run1 = await run(options(await getFreePort()));
+		const svConnector =
+			EntityStorageConnectorFactory.get<
+				MemoryEntityStorageConnector<{ schemaName: string; version: number }>
+			>("schema-version");
+		const svRecord = (await svConnector.getStore()).find(
+			r => r.schemaName === "AuthenticationUser"
+		);
+		if (svRecord) {
+			await svConnector.set({ ...svRecord, version: 1 });
+		}
+
+		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
+			const tenantConnector = EntityStorageConnectorFactory.get("tenant");
+			const now = new Date().toISOString();
+			for (const id of [TEST_TENANT_ID_A, TEST_TENANT_ID_B]) {
+				await tenantConnector.set({
+					id,
+					apiKey: id,
+					label: `Tenant ${id.slice(0, 1)}`,
+					organizationId: TENANT_ORGS[id],
+					dateCreated: now,
+					dateModified: now
+				});
+			}
+		});
+
+		for (const tenant of [TEST_TENANT_ID_A, TEST_TENANT_ID_B]) {
+			await ContextIdStore.run({ node: TEST_NODE_ID, tenant }, async () => {
+				const seed = new MemoryEntityStorageConnector<{
+					email: string;
+					password: string;
+					salt: string;
+					identity: string;
+					organization: string;
+				}>({
+					entitySchema: "AuthenticationUserV1",
+					partitionContextIds: ["node", "tenant"],
+					config: { storageKey: "authentication-user" }
+				});
+				// Both tenants have a user with the same e-mail address, which is no collision.
+				await seed.setBatch([
+					{
+						email: "Member@Test.com",
+						password: "hashed",
+						salt: "salt",
+						identity: `did:twin:member-${tenant.slice(0, 1)}`,
+						organization: TENANT_ORGS[tenant]
+					}
+				]);
+				await EntityStorageConnectorFactory.get("authorization-role-assignment").set({
+					id: `system|did:twin:member-${tenant.slice(0, 1)}|user`,
+					modelId: "system",
+					subject: `did:twin:member-${tenant.slice(0, 1)}`,
+					role: "user"
+				});
+			});
+		}
+
+		await run1?.shutdown();
+
+		let run2;
+		try {
+			run2 = await run(options(await getFreePort()));
+
+			for (const tenant of [TEST_TENANT_ID_A, TEST_TENANT_ID_B]) {
+				await ContextIdStore.run({ node: TEST_NODE_ID, tenant }, async () => {
+					const { entities: users } =
+						await EntityStorageConnectorFactory.get("authentication-user").query();
+					const migrated = (
+						users as { email: string; accountId?: string; dateDisabled?: string }[]
+					).filter(u => Is.stringValue(u.accountId));
+					expect(migrated).toHaveLength(1);
+					expect(migrated[0]).toMatchObject({ email: "member@test.com" });
+					expect(migrated[0].dateDisabled).toBeUndefined();
+					const accountId = migrated[0].accountId ?? "";
+
+					const accountData = EntityStorageConnectorFactory.get("account-data");
+					await expect(
+						accountData.get(AccountDataHelper.identityId(`did:twin:member-${tenant.slice(0, 1)}`))
+					).resolves.toMatchObject({ accountId });
+					const { entities: organizations } = await accountData.query({
+						conditions: [
+							{ property: "accountId", value: accountId, comparison: ComparisonOperator.Equals },
+							{ property: "type", value: "organization", comparison: ComparisonOperator.Equals }
+						],
+						logicalOperator: LogicalOperator.And
+					});
+					expect(organizations).toMatchObject([
+						{ data: AuthenticationAccountHelper.createOrganizationData(TENANT_ORGS[tenant]) }
+					]);
+
+					const { entities: roles } = await EntityStorageConnectorFactory.get(
+						"authorization-role-assignment"
+					).query({ property: "subject", value: accountId, comparison: ComparisonOperator.Equals });
+					expect((roles as { role: string }[]).map(r => r.role)).toEqual(["user"]);
+
+					// The organization of the tenant is registered in its partition.
+					const { entities: registered } = await EntityStorageConnectorFactory.get(
+						"organization"
+					).query({
+						property: "identity",
+						value: TENANT_ORGS[tenant],
+						comparison: ComparisonOperator.Equals
+					});
+					expect(registered).toHaveLength(1);
+				});
+			}
 		} finally {
 			await run2?.shutdown();
 		}
