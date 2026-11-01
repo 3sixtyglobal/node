@@ -2,6 +2,7 @@
 // Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { ContextIdKeys } from "@3sixty/context";
+import type { IEngineCoreConfig } from "@3sixty/engine-models";
 import {
 	AuthenticationComponentType,
 	AuthenticationProviderType,
@@ -17,17 +18,35 @@ import { buildEngineServerConfiguration } from "../../src/builders/engineServerE
 
 const SERVER_INFO = { name: "test", version: "0.0.0" };
 const BASE_VARS = { port: "3000" };
+// Entity storage authentication needs authorization, and the addresses and sender of its e-mails.
+const ENTITY_STORAGE_AUTH_VARS = {
+	authProcessorType: AuthenticationComponentType.EntityStorage,
+	authorizationConnector: AuthorizationConnectorType.EntityStorage,
+	authPasswordResetUrl: "https://app.example.com/reset",
+	authRegistrationVerificationUrl: "https://app.example.com/verify",
+	authEmailSender: "no-reply@example.com"
+};
+
+/**
+ * Create a core configuration with an e-mail connector, which entity storage authentication needs.
+ * @returns The core configuration.
+ */
+function emailCoreConfig(): IEngineCoreConfig {
+	return {
+		types: { messagingEmailConnector: [{ type: MessagingEmailConnectorType.EntityStorage }] }
+	};
+}
 
 describe("buildEngineServerConfiguration - auth header processors", () => {
 	test("mutex timeout default seeds the auth header token cache timeout", async () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...BASE_VARS,
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				mutexTimeoutDefault: "60000"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -46,9 +65,9 @@ describe("buildEngineServerConfiguration - auth header processors", () => {
 
 	test("leaves the cookie SameSite to the processor default when not set", async () => {
 		const config = await buildEngineServerConfiguration(
-			{ ...BASE_VARS, authProcessorType: AuthenticationComponentType.EntityStorage },
+			{ ...BASE_VARS, ...ENTITY_STORAGE_AUTH_VARS },
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -62,11 +81,11 @@ describe("buildEngineServerConfiguration - auth header processors", () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...BASE_VARS,
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				authCookieSameSite: "None"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -85,11 +104,11 @@ describe("buildEngineServerConfiguration - auth header processors", () => {
 			buildEngineServerConfiguration(
 				{
 					...BASE_VARS,
-					authProcessorType: AuthenticationComponentType.EntityStorage,
+					...ENTITY_STORAGE_AUTH_VARS,
 					authCookieSameSite: "Sometimes"
 				},
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow();
@@ -101,12 +120,12 @@ describe("buildEngineServerConfiguration - web security", () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...BASE_VARS,
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				corsOrigins: "https://app.example.com,https://admin.example.com",
 				originCheckEnabled: "true"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -134,9 +153,9 @@ describe("buildEngineServerConfiguration - web security", () => {
 	test("does not register the origin check by default or when disabled", async () => {
 		for (const vars of [{}, { originCheckEnabled: "false" }]) {
 			const config = await buildEngineServerConfiguration(
-				{ ...BASE_VARS, authProcessorType: AuthenticationComponentType.EntityStorage, ...vars },
+				{ ...BASE_VARS, ...ENTITY_STORAGE_AUTH_VARS, ...vars },
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			);
 			expect(
@@ -170,11 +189,11 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			contextKeys,
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -194,12 +213,12 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				authorizationConnector: AuthorizationConnectorType.EntityStorage,
 				authorizationModelId: "custom"
 			},
 			contextKeys,
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -219,11 +238,11 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			contextKeys,
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -240,11 +259,11 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -270,11 +289,11 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 			{
 				...BASE_VARS,
 				tenantEnabled: "true",
-				authProcessorType: AuthenticationComponentType.EntityStorage,
+				...ENTITY_STORAGE_AUTH_VARS,
 				authorizationConnector: AuthorizationConnectorType.EntityStorage
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -301,9 +320,9 @@ describe("buildEngineServerConfiguration - TenantOverride processors", () => {
 	test("does not register TenantOverride processors when tenant mode is disabled", async () => {
 		const contextKeys: { key: string; requiredHandlerFeatures: string[] }[] = [];
 		const config = await buildEngineServerConfiguration(
-			{ ...BASE_VARS, authProcessorType: AuthenticationComponentType.EntityStorage },
+			{ ...BASE_VARS, ...ENTITY_STORAGE_AUTH_VARS },
 			contextKeys,
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -337,10 +356,10 @@ describe("buildEngineServerConfiguration - auth context keys", () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...BASE_VARS,
-				authProcessorType: AuthenticationComponentType.EntityStorage
+				...ENTITY_STORAGE_AUTH_VARS
 			},
 			contextKeys,
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -470,7 +489,7 @@ describe("buildEngineServerConfiguration - web server type", () => {
 describe("buildEngineServerConfiguration - authentication providers", () => {
 	const AUTH_VARS = {
 		...BASE_VARS,
-		authProcessorType: AuthenticationComponentType.EntityStorage
+		...ENTITY_STORAGE_AUTH_VARS
 	};
 	const OAUTH_VARS = {
 		...AUTH_VARS,
@@ -478,32 +497,37 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		authOAuthSuccessRedirectUrl: "https://app.example.com/",
 		authOAuthFailureRedirectUrl: "https://app.example.com/login"
 	};
-	const EMAIL_CORE_CONFIG = {
-		types: { messagingEmailConnector: [{ type: MessagingEmailConnectorType.EntityStorage }] }
-	};
 
-	test("throws when e-mail links are enabled without an e-mail connector", async () => {
-		for (const vars of [
-			{
-				authPasswordResetEnabled: "true",
-				authPasswordResetUrl: "https://app.example.com/reset",
-				authEmailSender: "no-reply@example.com"
-			},
-			{
-				authorizationConnector: AuthorizationConnectorType.EntityStorage,
-				authSelfRegistrationEnabled: "true",
-				authRegistrationVerificationUrl: "https://app.example.com/verify",
-				authEmailSender: "no-reply@example.com"
-			}
+	test("throws without an e-mail connector", async () => {
+		await expect(
+			buildEngineServerConfiguration(AUTH_VARS, [], { types: {} }, SERVER_INFO)
+		).rejects.toThrow("authEmailMessagingMissing");
+	});
+
+	test("throws without the reset address, verification address or e-mail sender", async () => {
+		for (const missing of [
+			"authPasswordResetUrl",
+			"authRegistrationVerificationUrl",
+			"authEmailSender"
 		]) {
 			await expect(
-				buildEngineServerConfiguration({ ...AUTH_VARS, ...vars }, [], { types: {} }, SERVER_INFO)
-			).rejects.toThrow("authEmailMessagingMissing");
+				buildEngineServerConfiguration(
+					{ ...AUTH_VARS, [missing]: undefined },
+					[],
+					emailCoreConfig(),
+					SERVER_INFO
+				)
+			).rejects.toThrow("authEmailConfigMissing");
 		}
 	});
 
 	test("enables the entity storage provider by default and no OAuth service", async () => {
-		const config = await buildEngineServerConfiguration(AUTH_VARS, [], { types: {} }, SERVER_INFO);
+		const config = await buildEngineServerConfiguration(
+			AUTH_VARS,
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
 
 		expect(config.types.authenticationProvider).toEqual([
 			{
@@ -529,7 +553,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authMicrosoftAllowedTenants: "tenant-1"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -592,7 +616,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authMicrosoftPersonalPasswordChangeUrl: "https://ms.example.com/personal-password"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -620,7 +644,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authMicrosoftTenant: "common"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -646,7 +670,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authGoogleAllowedDomains: "example.com"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -660,7 +684,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 			buildEngineServerConfiguration(
 				{ ...AUTH_VARS, authProviders: "entity-storage,github" },
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authProviderUnknown");
@@ -671,7 +695,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 			buildEngineServerConfiguration(
 				{ ...AUTH_VARS, authProviders: "google" },
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authProviderConfigMissing");
@@ -690,7 +714,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 					authMicrosoftAllowedTenants: "tenant-1"
 				},
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authOAuthRedirectMissing");
@@ -706,7 +730,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 					authMicrosoftClientSecret: "ms-secret"
 				},
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authProviderConfigMissing");
@@ -724,49 +748,39 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 					authGoogleAllowedDomains: "example.com"
 				},
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authOAuthAuthorizationRequired");
 	});
 
-	test("leaves self sign up off by default and gives new accounts the user role", async () => {
-		const config = await buildEngineServerConfiguration(AUTH_VARS, [], { types: {} }, SERVER_INFO);
-
-		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
-			config: { selfRegistrationEnabled: false, authorizationModelId: "system" }
-		});
-	});
-
-	test("enables self sign up with the configured roles when authorization is enabled", async () => {
+	test("uses the system authorization model by default", async () => {
 		const config = await buildEngineServerConfiguration(
-			{
-				...AUTH_VARS,
-				authorizationConnector: AuthorizationConnectorType.EntityStorage,
-				authSelfRegistrationEnabled: "true",
-				authDefaultRoles: "user,trader",
-				authRegistrationVerificationUrl: "https://app.example.com/verify",
-				authEmailSender: "no-reply@example.com"
-			},
+			AUTH_VARS,
 			[],
-			EMAIL_CORE_CONFIG,
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
 		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
-			config: { selfRegistrationEnabled: true, defaultRoles: ["user", "trader"] }
+			config: { authorizationModelId: "system" }
 		});
 	});
 
-	test("throws when self sign up is enabled without authorization", async () => {
-		await expect(
-			buildEngineServerConfiguration(
-				{ ...AUTH_VARS, authSelfRegistrationEnabled: "true" },
-				[],
-				{ types: {} },
-				SERVER_INFO
-			)
-		).rejects.toThrow("authSelfRegistrationAuthorizationRequired");
+	test("passes the configured default roles to the authentication component", async () => {
+		const config = await buildEngineServerConfiguration(
+			{
+				...AUTH_VARS,
+				authDefaultRoles: "user,trader"
+			},
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
+
+		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
+			config: { defaultRoles: ["user", "trader"] }
+		});
 	});
 
 	test("passes the identity proof window and trust verification method to the account components", async () => {
@@ -778,7 +792,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authIdentityProofMaxAgeSeconds: "120"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -803,7 +817,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authRecentSignInSeconds: "90"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -818,51 +832,30 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		});
 	});
 
-	test("leaves password reset off by default", async () => {
-		const config = await buildEngineServerConfiguration(AUTH_VARS, [], { types: {} }, SERVER_INFO);
-
-		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
-			config: { passwordResetEnabled: false }
-		});
-	});
-
 	test("passes the password reset settings to the authentication component", async () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...AUTH_VARS,
-				authPasswordResetEnabled: "true",
 				authPasswordResetUrl: "https://app.example.com/reset",
 				authEmailSender: "no-reply@example.com",
 				authPasswordResetEmailTemplateId: "reset-template",
-				authPasswordResetEmailLocale: "de",
+				authEmailLocale: "de",
 				authPasswordResetExpiryMinutes: "15"
 			},
 			[],
-			EMAIL_CORE_CONFIG,
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
 		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
 			config: {
-				passwordResetEnabled: true,
 				passwordResetUrl: "https://app.example.com/reset",
 				emailSender: "no-reply@example.com",
 				passwordResetEmailTemplateId: "reset-template",
-				passwordResetEmailLocale: "de",
+				emailLocale: "de",
 				passwordResetExpiryMinutes: 15
 			}
 		});
-	});
-
-	test("throws when password reset is enabled without its address or sender", async () => {
-		await expect(
-			buildEngineServerConfiguration(
-				{ ...AUTH_VARS, authPasswordResetEnabled: "true" },
-				[],
-				{ types: {} },
-				SERVER_INFO
-			)
-		).rejects.toThrow("authPasswordResetConfigMissing");
 	});
 
 	test("registers the organization component with the trust verification method", async () => {
@@ -875,7 +868,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authIdentityProofMaxAgeSeconds: "600"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -906,7 +899,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 					authGoogleClientSecret: "google-secret"
 				},
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authProviderAllowListMissing");
@@ -924,7 +917,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 					authMicrosoftTenant: "common"
 				},
 				[],
-				{ types: {} },
+				emailCoreConfig(),
 				SERVER_INFO
 			)
 		).rejects.toThrow("authProviderAllowListMissing");
@@ -941,7 +934,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authProviderOpenRegistration: "false"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -962,7 +955,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authMicrosoftTenant: "common"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -972,65 +965,27 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		]);
 	});
 
-	test("throws when self sign up is verified without the verification address or sender", async () => {
-		await expect(
-			buildEngineServerConfiguration(
-				{
-					...AUTH_VARS,
-					authorizationConnector: AuthorizationConnectorType.EntityStorage,
-					authSelfRegistrationEnabled: "true"
-				},
-				[],
-				{ types: {} },
-				SERVER_INFO
-			)
-		).rejects.toThrow("authRegistrationVerificationConfigMissing");
-	});
-
-	test("allows self sign up without verification settings when verification is disabled", async () => {
-		const config = await buildEngineServerConfiguration(
-			{
-				...AUTH_VARS,
-				authorizationConnector: AuthorizationConnectorType.EntityStorage,
-				authSelfRegistrationEnabled: "true",
-				authRegistrationVerificationEnabled: "false"
-			},
-			[],
-			{ types: {} },
-			SERVER_INFO
-		);
-
-		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
-			config: { selfRegistrationEnabled: true, registrationVerificationEnabled: false }
-		});
-	});
-
 	test("passes the sign up verification settings to the authentication component", async () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...AUTH_VARS,
-				authorizationConnector: AuthorizationConnectorType.EntityStorage,
-				authSelfRegistrationEnabled: "true",
 				authRegistrationVerificationUrl: "https://app.example.com/verify",
 				authEmailSender: "verify@example.com",
 				authRegistrationVerificationEmailTemplateId: "verify-template",
 				authRegistrationExistsEmailTemplateId: "exists-template",
-				authRegistrationVerificationEmailLocale: "de",
 				authRegistrationVerificationExpiryMinutes: "60"
 			},
 			[],
-			EMAIL_CORE_CONFIG,
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
 		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
 			config: {
-				registrationVerificationEnabled: true,
 				registrationVerificationUrl: "https://app.example.com/verify",
 				emailSender: "verify@example.com",
 				registrationVerificationEmailTemplateId: "verify-template",
 				registrationExistsEmailTemplateId: "exists-template",
-				registrationVerificationEmailLocale: "de",
 				registrationVerificationExpiryMinutes: 60
 			}
 		});
@@ -1040,14 +995,10 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		const config = await buildEngineServerConfiguration(
 			{
 				...AUTH_VARS,
-				authorizationConnector: AuthorizationConnectorType.EntityStorage,
-				authSelfRegistrationEnabled: "true",
-				authRegistrationVerificationUrl: "https://app.example.com/verify",
-				authEmailSender: "no-reply@example.com",
 				authEmailCompanyName: "Example Ltd"
 			},
 			[],
-			EMAIL_CORE_CONFIG,
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -1065,13 +1016,12 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				...AUTH_VARS,
 				authMaxSessionMinutes: "120",
 				authLoginRateLimitPerClient: "true",
-				authProviderSignUpEnabled: "false",
 				authPasswordHashIterations: "3",
 				authPasswordHashMemoryKib: "65536",
 				authPasswordHashParallelism: "2"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -1080,7 +1030,6 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 			config: {
 				maxSessionMinutes: 120,
 				loginRateLimitPerClient: true,
-				providerSignUpEnabled: false,
 				passwordHashOptions,
 				escalatedPrivilegeRole: "global-admin"
 			}
@@ -1093,16 +1042,17 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		]);
 	});
 
-	test("enables provider sign up and sign up verification, without client address limits, by default", async () => {
-		const config = await buildEngineServerConfiguration(AUTH_VARS, [], { types: {} }, SERVER_INFO);
+	test("does not rate limit by client address by default", async () => {
+		const config = await buildEngineServerConfiguration(
+			AUTH_VARS,
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
 
 		const options = config.types.authenticationComponent?.[0].options;
 		expect(options).toMatchObject({
-			config: {
-				providerSignUpEnabled: true,
-				registrationVerificationEnabled: true,
-				clientAddressRateLimitEnabled: false
-			}
+			config: { clientAddressRateLimitEnabled: false }
 		});
 		expect(options).not.toHaveProperty("config.passwordChangeRequiresCurrentPassword");
 	});
@@ -1111,7 +1061,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		const config = await buildEngineServerConfiguration(
 			{ ...AUTH_VARS, trustedProxies: "10.0.0.0/8" },
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 
@@ -1129,7 +1079,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				authPasswordHashMemoryKib: "32768"
 			},
 			[],
-			{ types: {} },
+			emailCoreConfig(),
 			SERVER_INFO
 		);
 

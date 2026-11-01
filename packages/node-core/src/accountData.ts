@@ -49,6 +49,7 @@ export async function joinOrganization(
 		EntityStorageConnectorFactory.get<IEntityStorageConnector<AccountData>>(
 			nameofKebabCase<AccountData>()
 		),
+		EntityStorageConnectorFactory.get<IEntityStorageConnector<Organization>>("organization"),
 		ComponentFactory.get<IIdentityComponent>(
 			engineCore.getRegisteredInstanceType("identityComponent")
 		),
@@ -71,9 +72,10 @@ export async function registerPartitionOrganizations(
 	engineCore: IEngineCore,
 	envVars: IEnvironmentVariables
 ): Promise<void> {
-	const organizationStorage = EntityStorageConnectorFactory.getIfExists<
-		IEntityStorageConnector<Organization>
-	>(OrganizationHelper.DEFAULT_ENTITY_STORAGE_TYPE);
+	const organizationStorage =
+		EntityStorageConnectorFactory.getIfExists<IEntityStorageConnector<Organization>>(
+			"organization"
+		);
 	if (Is.empty(organizationStorage)) {
 		return;
 	}

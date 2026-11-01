@@ -4,7 +4,12 @@
 import { rm } from "node:fs/promises";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { Factory } from "@3sixty/core";
-import { executeCliCommand, OUTPUT_TMP_DIR, readStoreRecords } from "./cliTestHelper.js";
+import {
+	executeCliCommand,
+	OUTPUT_TMP_DIR,
+	readStoreRecords,
+	startCliNode
+} from "./cliTestHelper.js";
 import type { INodeEngineState } from "../../src/models/INodeEngineState.js";
 
 const BOOTSTRAP_DIR = `${OUTPUT_TMP_DIR}bootstrap-dev/`;
@@ -56,6 +61,35 @@ describe("bootstrap-dev", () => {
 			}
 		);
 	});
+
+	test.each([
+		{ mode: "single-tenant", tenantEnabled: false },
+		{ mode: "multi-tenant", tenantEnabled: true }
+	])(
+		"bootstrap-dev $mode: records the schema versions so the node starts on the storage it wrote",
+		async ({ mode, tenantEnabled }) => {
+			const dbDir = `${BOOTSTRAP_DIR}bootstrap-then-start-${mode}/db`;
+			await rm(dbDir, { recursive: true, force: true });
+
+			const state = await executeCliCommand(["bootstrap-dev"], {
+				state: {},
+				dbDir,
+				tenantEnabled,
+				envVars: { TWIN_FEATURES: "wallet,admin-user" }
+			});
+
+			const versions = await readStoreRecords<{ schemaName: string; version: number }>(
+				dbDir,
+				"schema-version"
+			);
+			expect(versions.find(v => v.schemaName === "AuthenticationUser")?.version).toBeGreaterThan(0);
+
+			Factory.clearFactories();
+			const node = await startCliNode({ state, dbDir, tenantEnabled });
+			expect(node).toBeDefined();
+			await node?.shutdown();
+		}
+	);
 
 	test("bootstrap-legacy alias resolves to bootstrap-dev and emits a deprecation warning", async () => {
 		const aliasDir = `${BOOTSTRAP_DIR}bootstrap-alias/`;

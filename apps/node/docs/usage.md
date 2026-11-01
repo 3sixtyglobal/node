@@ -107,14 +107,13 @@ Key environment variables that control how the node server handles authenticatio
 | `TWIN_AUTH_MAX_SESSION_MINUTES`         | unlimited      | Longest a session can be kept alive by refreshing its token.                          |
 | `TWIN_AUTH_RECENT_SIGN_IN_SECONDS`      | `300`          | How recently a session must have started to remove an account or export an identity.  |
 | `TWIN_AUTH_LOGIN_RATE_LIMIT_PER_CLIENT` | `false`        | Limit logins per client address as well as per e-mail address.                        |
-| `TWIN_AUTH_PROVIDER_SIGN_UP_ENABLED`    | `true`         | Create the account on the first login through an OAuth provider.                      |
 | `TWIN_CORS_WILDCARD_CREDENTIALS`        | `true`         | Reflect any origin with credentials when the CORS origins include `*`.                |
 | `TWIN_TRUSTED_PROXIES`                  | none           | Proxies trusted to set the client IP headers, otherwise the socket address is used.   |
 | `TWIN_ORIGIN_CHECK_ENABLED`             | `false`        | Reject cookie authenticated changes and sockets from other origins than API and CORS. |
 
 The authentication rate limits only use client addresses, including the per client login limits, when `TWIN_TRUSTED_PROXIES` is set, as otherwise the address may be a proxy shared by every client. The limits per e-mail address always apply. Changing your own password always needs the current password.
 
-Password reset and sign up verification send links by e-mail, so the node refuses to start when either is enabled without an e-mail messaging connector, a sender and the page address.
+Password reset and sign up verification send links by e-mail, so entity storage authentication refuses to start without an e-mail messaging connector, `TWIN_AUTH_EMAIL_SENDER`, `TWIN_AUTH_PASSWORD_RESET_URL` and `TWIN_AUTH_REGISTRATION_VERIFICATION_URL`. People sign up for a password account when `entity-storage` is in `TWIN_AUTH_PROVIDERS`, and an OAuth provider creates the account on the first login.
 
 ## Messaging Templates
 
@@ -122,7 +121,7 @@ When messaging is configured, the node stores the templates from its `templates`
 
 Each template is an HTML file named `<template-id>.html` for the default locale, `en`, or `<template-id>.<locale>.html` for a locale specific version, such as `password-reset.de.html`. The `title` element becomes the e-mail subject, and `{{name}}` placeholders are filled when the e-mail is sent.
 
-Every template is given `companyName` from `TWIN_AUTH_EMAIL_COMPANY_NAME`, empty when not set, and links the shared e-mail style sheet, which shows the logo in the `.logo` element. The e-mails are sent from `TWIN_AUTH_EMAIL_SENDER`.
+Every template is given `companyName` from `TWIN_AUTH_EMAIL_COMPANY_NAME`, empty when not set, and links the shared e-mail style sheet, which shows the logo in the `.logo` element. The e-mails are sent from `TWIN_AUTH_EMAIL_SENDER` in `TWIN_AUTH_EMAIL_LOCALE`, `en` by default.
 
 | Template              | Values                                  | Sent when                                             |
 | --------------------- | --------------------------------------- | ----------------------------------------------------- |

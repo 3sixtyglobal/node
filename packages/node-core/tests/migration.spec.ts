@@ -2628,7 +2628,13 @@ describe("migration - accounts", () => {
 	test("Moves the identity profile of a user to its account and upgrades its legacy password hash at sign in", async () => {
 		const authEnv = {
 			TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
-			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage
+			TWIN_AUTH_PROCESSOR_TYPE: AuthenticationComponentType.EntityStorage,
+			// Entity storage authentication sends the password reset and sign up e-mails.
+			TWIN_MESSAGING_EMAIL_CONNECTOR: "entity-storage",
+			TWIN_MESSAGING_TEMPLATES_DIRECTORY: "../../apps/node/templates",
+			TWIN_AUTH_EMAIL_SENDER: "no-reply@example.org",
+			TWIN_AUTH_REGISTRATION_VERIFICATION_URL: "https://app.example.org/verify",
+			TWIN_AUTH_PASSWORD_RESET_URL: "https://app.example.org/reset"
 		};
 		const password = "Legacy@Password123!";
 		const salt = RandomHelper.generate(16);

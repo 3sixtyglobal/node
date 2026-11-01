@@ -340,44 +340,16 @@ export async function buildEngineServerConfiguration(
 			requiredHandlerFeatures: [CONTEXT_ID_HANDLER_FEATURE_DID]
 		});
 
-		// Self sign up creates accounts anyone can reach, so it needs authorization to limit them.
-		const selfRegistrationEnabled = EnvHelper.envBoolean(
-			envVars,
-			"authSelfRegistrationEnabled",
-			false
-		);
-		if (selfRegistrationEnabled && !isAuthorizationRequired(envVars)) {
-			throw new GeneralError("node", "authSelfRegistrationAuthorizationRequired");
-		}
-
-		const passwordResetEnabled = EnvHelper.envBoolean(envVars, "authPasswordResetEnabled", false);
+		// Reset and verification links are sent by e-mail, so their addresses, a sender and an e-mail
+		// connector must be configured.
 		if (
-			passwordResetEnabled &&
-			(!Is.stringValue(envVars.authPasswordResetUrl) || !Is.stringValue(envVars.authEmailSender))
+			!Is.stringValue(envVars.authPasswordResetUrl) ||
+			!Is.stringValue(envVars.authRegistrationVerificationUrl) ||
+			!Is.stringValue(envVars.authEmailSender)
 		) {
-			throw new GeneralError("node", "authPasswordResetConfigMissing");
+			throw new GeneralError("node", "authEmailConfigMissing");
 		}
-
-		// A sign up is verified by a link sent by e-mail unless verification is turned off.
-		const registrationVerificationEnabled = EnvHelper.envBoolean(
-			envVars,
-			"authRegistrationVerificationEnabled",
-			true
-		);
-		if (
-			selfRegistrationEnabled &&
-			registrationVerificationEnabled &&
-			(!Is.stringValue(envVars.authRegistrationVerificationUrl) ||
-				!Is.stringValue(envVars.authEmailSender))
-		) {
-			throw new GeneralError("node", "authRegistrationVerificationConfigMissing");
-		}
-
-		// Reset and verification links are sent by e-mail, so an e-mail connector must be configured.
-		if (
-			(passwordResetEnabled || (selfRegistrationEnabled && registrationVerificationEnabled)) &&
-			!Is.arrayValue(serverConfig.types.messagingEmailConnector)
-		) {
+		if (!Is.arrayValue(serverConfig.types.messagingEmailConnector)) {
 			throw new GeneralError("node", "authEmailMessagingMissing");
 		}
 
@@ -389,20 +361,16 @@ export async function buildEngineServerConfiguration(
 					signingKeyName: envVars.authSigningKeyId,
 					minPasswordLength: EnvHelper.envInteger(envVars, "authMinPasswordLength"),
 					maxPasswordLength: EnvHelper.envInteger(envVars, "authMaxPasswordLength"),
-					selfRegistrationEnabled,
 					emailSender: envVars.authEmailSender,
 					emailCompanyName: envVars.authEmailCompanyName,
-					passwordResetEnabled,
+					emailLocale: envVars.authEmailLocale,
 					passwordResetUrl: envVars.authPasswordResetUrl,
 					passwordResetExpiryMinutes: EnvHelper.envInteger(
 						envVars,
 						"authPasswordResetExpiryMinutes"
 					),
 					passwordResetEmailTemplateId: envVars.authPasswordResetEmailTemplateId,
-					passwordResetEmailLocale: envVars.authPasswordResetEmailLocale,
 					passwordHashOptions,
-					providerSignUpEnabled: EnvHelper.envBoolean(envVars, "authProviderSignUpEnabled", true),
-					registrationVerificationEnabled,
 					registrationVerificationUrl: envVars.authRegistrationVerificationUrl,
 					registrationVerificationExpiryMinutes: EnvHelper.envInteger(
 						envVars,
@@ -411,7 +379,6 @@ export async function buildEngineServerConfiguration(
 					registrationVerificationEmailTemplateId:
 						envVars.authRegistrationVerificationEmailTemplateId,
 					registrationExistsEmailTemplateId: envVars.authRegistrationExistsEmailTemplateId,
-					registrationVerificationEmailLocale: envVars.authRegistrationVerificationEmailLocale,
 					maxSessionMinutes: EnvHelper.envInteger(envVars, "authMaxSessionMinutes"),
 					loginRateLimitPerClient: EnvHelper.envBoolean(
 						envVars,

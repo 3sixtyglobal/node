@@ -240,6 +240,7 @@ async function finalizePartition(
 				} else {
 					done = await finalizeAccountRecord(
 						accountDataStorage,
+						organizationStorage,
 						authorizationComponent,
 						identityComponent,
 						modelId,
@@ -340,6 +341,7 @@ async function registerOrganization(
  * Assign the v0 roles of a migrated user to its account and issue the membership credential of its
  * organization. A credential that cannot be issued is logged and left for the next start.
  * @param accountDataStorage The account data storage.
+ * @param organizationStorage The organization storage, if configured.
  * @param authorizationComponent The authorization component.
  * @param identityComponent The identity component, if configured.
  * @param modelId The authorization model id.
@@ -350,6 +352,7 @@ async function registerOrganization(
  */
 async function finalizeAccountRecord(
 	accountDataStorage: IEntityStorageConnector<AccountData>,
+	organizationStorage: IEntityStorageConnector<Organization> | undefined,
 	authorizationComponent: IAuthorizationComponent,
 	identityComponent: IIdentityComponent | undefined,
 	modelId: string,
@@ -369,8 +372,12 @@ async function finalizeAccountRecord(
 			if (Is.empty(identityComponent)) {
 				throw new GeneralError("node", "migrationIdentityComponentMissing");
 			}
+			if (Is.empty(organizationStorage)) {
+				throw new GeneralError("node", "migrationOrganizationStorageMissing");
+			}
 			await OrganizationMembershipHelper.join(
 				accountDataStorage,
+				organizationStorage,
 				identityComponent,
 				verificationMethodId,
 				record.accountId,

@@ -403,6 +403,21 @@
 			"expectedStatus": 403
 		},
 		{
+			"description": "GET /tenants - 403 for a plain user",
+			"method": "GET",
+			"path": "/tenants",
+			"expectedStatus": 403,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /tenants - 403 for a plain user",
+			"method": "POST",
+			"path": "/tenants",
+			"body": { "label": "Denied", "organizationId": "did:example:denied-tenant" },
+			"expectedStatus": 403,
+			"skipIfOrgParamOmitted": true
+		},
+		{
 			"description": "POST /authorization/system/subject/{{permUserAccountId}}/role - 403 for a plain user",
 			"method": "POST",
 			"path": "/authorization/system/subject/{{permUserAccountId}}/role",
@@ -438,6 +453,13 @@
 			"path": "/authentication/admin/users?email=perm-user%40node&exactEmail=true",
 			"expectedStatus": 200,
 			"assert": { "body.entities.0.accountId": "{{permUserAccountId}}" }
+		},
+		{
+			"description": "GET /tenants - 403 for a user-admin without tenant-admin",
+			"method": "GET",
+			"path": "/tenants",
+			"expectedStatus": 403,
+			"skipIfOrgParamOmitted": true
 		},
 		{
 			"description": "POST /authorization/system/subject/:subject/role - 401 changing its own roles",

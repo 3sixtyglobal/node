@@ -16,15 +16,14 @@
 			"authProviderUnknown": "The authentication provider \"{authProvider}\" is not known, use entity-storage, google or microsoft",
 			"authProviderConfigMissing": "The client id and secret, and the tenant for microsoft, must be set to enable the \"{authProvider}\" authentication provider",
 			"authOAuthAuthorizationRequired": "Authorization must be enabled to use an OAuth authentication provider, as it creates an account for anyone the provider signs in",
-			"authSelfRegistrationAuthorizationRequired": "Authorization must be enabled to let people sign up for an account",
 			"authOAuthRedirectMissing": "The OAuth success and failure redirect addresses must be set when an OAuth authentication provider is enabled",
-			"authPasswordResetConfigMissing": "The password reset address and e-mail sender must be set when password reset is enabled",
-			"authRegistrationVerificationConfigMissing": "The sign up verification address and an e-mail sender must be set when self sign up is enabled with verification",
-			"authEmailMessagingMissing": "An e-mail messaging connector must be configured when password reset or sign up verification is enabled",
+			"authEmailConfigMissing": "The password reset address, the sign up verification address and the e-mail sender must be set for entity storage authentication",
+			"authEmailMessagingMissing": "An e-mail messaging connector must be configured for entity storage authentication, to send the password reset and sign up e-mails",
 			"messagingTemplateTitleMissing": "The messaging template \"{file}\" must have a title element",
 			"authProviderAllowListMissing": "The \"{authProvider}\" authentication provider needs allowed domains or tenants when open registration is turned off",
 			"migrationAccountDataMissing": "The account data storage must be configured to migrate the identity and organization of each account.",
-			"migrationIdentityComponentMissing": "The identity component must be configured to issue the organization membership credentials of migrated accounts."
+			"migrationIdentityComponentMissing": "The identity component must be configured to issue the organization membership credentials of migrated accounts.",
+			"migrationOrganizationStorageMissing": "The organization storage must be configured to issue the organization membership credentials of migrated accounts."
 		},
 		"bootstrapDev": {
 			"noFeaturesEnabled": "No features are enabled, at least one feature must be enabled.",

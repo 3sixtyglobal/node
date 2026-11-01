@@ -93,33 +93,72 @@ export async function executeCliCommand(
 		envVars?: { [key: string]: string };
 	}
 ): Promise<INodeEngineState> {
-	const port = await getFreePort();
 	await run(
 		{
 			localesDirectory: "./dist/locales/",
 			stateStorage: new MemoryStateStorage(false, options.state),
 			disableProcessExitOnFailure: true,
-			envVars: {
-				TWIN_ENV_ALLOW_LIST: CI_ENV_VARS,
-				TWIN_SILENT: "true",
-				TWIN_TENANT_ENABLED: options.tenantEnabled ? "true" : "false",
-				TWIN_PORT: port.toString(),
-				TWIN_STORAGE_FILE_ROOT: options.dbDir,
-				TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
-				TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
-				TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
-				TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
-				TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
-				TWIN_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
-				TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
-				TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
-				TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
-				...options.envVars
-			}
+			envVars: await buildCliEnvVars(options)
 		},
 		["node", "index.js", ...args]
 	);
 	return options.state;
+}
+
+/**
+ * Start the node server against the file storage the commands use.
+ * @param options The options for the server.
+ * @param options.state The node state.
+ * @param options.dbDir The storage root folder.
+ * @param options.tenantEnabled Whether multi-tenancy is enabled.
+ * @param options.envVars Additional environment variables.
+ * @returns The running node.
+ */
+export async function startCliNode(options: {
+	state: INodeEngineState;
+	dbDir: string;
+	tenantEnabled: boolean;
+	envVars?: { [key: string]: string };
+}): Promise<Awaited<ReturnType<typeof run>>> {
+	return run({
+		localesDirectory: "./dist/locales/",
+		stateStorage: new MemoryStateStorage(false, options.state),
+		disableProcessExitOnFailure: true,
+		envVars: await buildCliEnvVars(options)
+	});
+}
+
+/**
+ * Build the environment variables the commands run with.
+ * @param options The options for the execution.
+ * @param options.dbDir The storage root folder.
+ * @param options.tenantEnabled Whether multi-tenancy is enabled.
+ * @param options.envVars Additional environment variables.
+ * @returns The environment variables.
+ */
+async function buildCliEnvVars(options: {
+	dbDir: string;
+	tenantEnabled: boolean;
+	envVars?: { [key: string]: string };
+}): Promise<{ [key: string]: string }> {
+	const port = await getFreePort();
+	return {
+		TWIN_ENV_ALLOW_LIST: CI_ENV_VARS,
+		TWIN_SILENT: "true",
+		TWIN_TENANT_ENABLED: options.tenantEnabled ? "true" : "false",
+		TWIN_PORT: port.toString(),
+		TWIN_STORAGE_FILE_ROOT: options.dbDir,
+		TWIN_ENTITY_STORAGE_CONNECTOR_TYPE: EntityStorageConnectorType.File,
+		TWIN_VAULT_CONNECTOR: VaultConnectorType.EntityStorage,
+		TWIN_IDENTITY_CONNECTOR: IdentityConnectorType.EntityStorage,
+		TWIN_IDENTITY_RESOLVER_CONNECTOR: IdentityResolverConnectorType.EntityStorage,
+		TWIN_IDENTITY_PROFILE_CONNECTOR: IdentityProfileConnectorType.EntityStorage,
+		TWIN_FAUCET_CONNECTOR: FaucetConnectorType.EntityStorage,
+		TWIN_WALLET_CONNECTOR: WalletConnectorType.EntityStorage,
+		TWIN_AUTH_ADMIN_PROCESSOR_TYPE: AuthenticationAdminComponentType.EntityStorage,
+		TWIN_AUTHORIZATION_CONNECTOR: AuthorizationConnectorType.EntityStorage,
+		...options.envVars
+	};
 }
 
 /**

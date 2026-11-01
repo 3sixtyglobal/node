@@ -128,12 +128,13 @@ export async function start(
 	// can clone it to spawn new instances.
 	EngineCoreFactory.register("engine", () => engine);
 
+	// Commands migrate the storage too, so they register the migrations as the server does.
+	initialiseMigrations(engine, envVars);
+
 	if (Is.objectValue(cliCommand)) {
 		await executeCommand(engine, envVars, cliCommand);
 	} else {
 		try {
-			initialiseMigrations(engine, envVars);
-
 			// Start the server, which also starts the engine. The authorization model is seeded
 			// before the server listens, so no request is checked against a partial model.
 			await server.start(async () => {

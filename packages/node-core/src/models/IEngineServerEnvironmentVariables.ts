@@ -195,12 +195,6 @@ export interface IEngineServerEnvironmentVariables {
 	authOAuthFailureRedirectUrl?: string;
 
 	/**
-	 * Whether people may sign up for a password account themselves, requires authorization.
-	 * @default false
-	 */
-	authSelfRegistrationEnabled?: string;
-
-	/**
 	 * The roles given to accounts created by a provider login or a sign up, comma separated.
 	 * @default user
 	 */
@@ -220,7 +214,7 @@ export interface IEngineServerEnvironmentVariables {
 	authRecentSignInSeconds?: string;
 
 	/**
-	 * The sender of the password reset and sign up e-mails, required when either is enabled.
+	 * The sender of the password reset and sign up e-mails, required with entity storage authentication.
 	 */
 	authEmailSender?: string;
 
@@ -230,15 +224,14 @@ export interface IEngineServerEnvironmentVariables {
 	authEmailCompanyName?: string;
 
 	/**
-	 * Whether forgotten passwords can be reset with a link sent by e-mail, needs an e-mail messaging
-	 * connector.
-	 * @default false
+	 * The locale of the password reset and sign up e-mails.
+	 * @default en
 	 */
-	authPasswordResetEnabled?: string;
+	authEmailLocale?: string;
 
 	/**
 	 * The address of the page that resets the password, the token is added as the token query
-	 * parameter, required when password reset is enabled.
+	 * parameter, required with entity storage authentication.
 	 */
 	authPasswordResetUrl?: string;
 
@@ -254,12 +247,6 @@ export interface IEngineServerEnvironmentVariables {
 	 * @default password-reset
 	 */
 	authPasswordResetEmailTemplateId?: string;
-
-	/**
-	 * The locale of the password reset e-mail.
-	 * @default en
-	 */
-	authPasswordResetEmailLocale?: string;
 
 	/**
 	 * The role given to the first member of an organization created through the organization endpoints.
@@ -286,23 +273,8 @@ export interface IEngineServerEnvironmentVariables {
 	authPasswordHashParallelism?: string;
 
 	/**
-	 * Whether the first login through an authentication provider, such as Google or Microsoft,
-	 * creates the account. When false, only accounts that already exist can sign in with a provider.
-	 * @default true
-	 */
-	authProviderSignUpEnabled?: string;
-
-	/**
-	 * Whether a sign up must be verified with a link sent by e-mail before the account can sign in,
-	 * the sign up then returns 202 Accepted and needs an e-mail messaging connector. Set to false to
-	 * sign in straight away.
-	 * @default true
-	 */
-	authRegistrationVerificationEnabled?: string;
-
-	/**
 	 * The address of the page that verifies a sign up, the token is added as the token query
-	 * parameter, required when self sign up and verification are enabled.
+	 * parameter, required with entity storage authentication.
 	 */
 	authRegistrationVerificationUrl?: string;
 
@@ -325,11 +297,6 @@ export interface IEngineServerEnvironmentVariables {
 	 * @default registration-exists
 	 */
 	authRegistrationExistsEmailTemplateId?: string;
-
-	/**
-	 * The locale of the sign up e-mails, defaults to the password reset locale.
-	 */
-	authRegistrationVerificationEmailLocale?: string;
 
 	/**
 	 * The longest a session can be kept alive by refreshing its token, in minutes, unlimited when not set.

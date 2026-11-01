@@ -2,7 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdStore } from "@3sixty/context";
-import { Coerce, EnvHelper, GeneralError, I18n, Is, StringHelper } from "@3sixty/core";
+import {
+	Coerce,
+	ComponentFactory,
+	EnvHelper,
+	GeneralError,
+	I18n,
+	type IComponent,
+	Is,
+	StringHelper
+} from "@3sixty/core";
+import { EngineCore } from "@3sixty/engine-core";
 import type { IEngineCore } from "@3sixty/engine-models";
 import * as dotenv from "dotenv";
 import { getCommandDefinitionBootstrapDev } from "./commands/bootstrapDev.js";
@@ -231,6 +241,18 @@ export async function executeCommand(
 	try {
 		if (requiresEngineStarted) {
 			await engineCore.start(true);
+
+			// Commands do not start the components, so the schema version service is started on its
+			// own, bringing the storage to the current schema versions and recording them before the
+			// command writes to it. Otherwise the next start reads the data written as version 0.
+			const schemaVersionType = engineCore.getRegisteredInstanceTypeOptional(
+				"schemaVersionMigrationComponent"
+			);
+			if (Is.stringValue(schemaVersionType)) {
+				await ComponentFactory.get<IComponent>(schemaVersionType).start?.(
+					EngineCore.LOGGING_COMPONENT_TYPE_NAME
+				);
+			}
 		}
 
 		CLIDisplay.value(
