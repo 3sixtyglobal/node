@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0-next.5](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.4...node-core-v0.20.0-next.5) (2026-11-02)
+
+
+### Features
+
+* account data, OAuth sign in and messaging templates ([#94](https://github.com/3sixtyglobal/node/issues/94)) ([543eaa2](https://github.com/3sixtyglobal/node/commit/543eaa2e057818cb2208805c3cc1a42a0202087e))
+
 ## [0.20.0-next.4](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.3...node-core-v0.20.0-next.4) (2026-10-26)
 
 
