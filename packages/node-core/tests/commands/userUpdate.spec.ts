@@ -47,9 +47,7 @@ describe.each(TENANT_MODES)("user-update in $mode mode", ({ mode, tenantEnabled 
 			isDefault: boolean;
 			data: { givenName: string; familyName: string };
 		}>(context.dbDir, "account-data");
-		const profiles = accountData.filter(
-			d => d.accountId === accountId && d.type === "private-profile"
-		);
+		const profiles = accountData.filter(d => d.accountId === accountId && d.type === "profile");
 		expect(profiles).toHaveLength(1);
 		expect(profiles[0].isDefault).toEqual(true);
 		expect(profiles[0].data.givenName).toEqual("Admin");

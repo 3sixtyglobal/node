@@ -1,5 +1,5 @@
 {
-	"group": "Global Admin - Protected from user-admins",
+	"group": "Global Admin - Protected from scoped user-admins",
 	"steps": [
 		{
 			"description": "POST /authentication/admin/users - create ga-user-admin@node",
@@ -30,6 +30,20 @@
 			"expectedStatus": 204
 		},
 		{
+			"description": "POST /authorization/system/subject/:subject/role - make ga-user-admin@node an org admin of the organization of the global-admin",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{gaUserAdminAccountId}}/role",
+			"body": { "role": "org-admin:{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/admin/users - create ga-outsider@node, a user in no organization",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "ga-outsider@node", "password": "GaOutsider@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
 			"description": "POST /authentication/login - login as a user-admin without global-admin",
 			"method": "POST",
 			"path": "/authentication/login",
@@ -39,10 +53,29 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "GET /authentication/admin/users/:email - a user-admin can read the global-admin",
+			"description": "GET /authentication/admin/users/:email - a scoped user-admin reads the global-admin, a member of its organization",
 			"method": "GET",
 			"path": "/authentication/admin/users/{{adminEmail}}",
 			"expectedStatus": 200
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - 404 for a scoped user-admin reading a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users/ga-outsider%40node",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/admin/users/:email/disable - 404 for a scoped user-admin disabling a user outside its organizations",
+			"method": "POST",
+			"path": "/authentication/admin/users/ga-outsider%40node/disable",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/admin/account/managed - a scoped user-admin manages only the members of its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/account/managed",
+			"expectedStatus": 200,
+			"assert": { "body.accountIds": "isDefined" }
 		},
 		{
 			"description": "GET /authentication/admin/account - capture the identity item of the global-admin",
@@ -141,6 +174,18 @@
 			"expectedStatus": 200,
 			"apiKey": true,
 			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - the global-admin reads a user in no organization",
+			"method": "GET",
+			"path": "/authentication/admin/users/ga-outsider%40node",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user in no organization",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/ga-outsider%40node",
+			"expectedStatus": 204
 		},
 		{
 			"description": "DELETE /authentication/admin/users - remove the user-admin",

@@ -30,6 +30,7 @@ import {
 	CONTEXT_ID_HANDLER_FEATURE_DID,
 	CONTEXT_ID_HANDLER_FEATURE_TENANT,
 	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+	DEFAULT_TENANT_ADMIN_ROLE,
 	DEFAULT_USER_ADMIN_ROLE
 } from "../defaults.js";
 import {
@@ -291,7 +292,12 @@ export async function buildEngineServerConfiguration(
 					),
 					escalatedPrivilegeRole: DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 					authorizationModelId,
-					recentSignInSeconds
+					recentSignInSeconds,
+					// A global-admin may always grant these, even before any account holds them.
+					assignableRoles:
+						(Coerce.boolean(envVars.tenantEnabled) ?? false)
+							? [DEFAULT_USER_ADMIN_ROLE, DEFAULT_TENANT_ADMIN_ROLE]
+							: [DEFAULT_USER_ADMIN_ROLE]
 				}
 			}
 		});

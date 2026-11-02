@@ -15,7 +15,7 @@
 			"method": "POST",
 			"path": "/authentication/organization",
 			"body": {
-				"publicProfile": {
+				"profile": {
 					"@context": "https://schema.org",
 					"@type": "Organization",
 					"name": "Portability Test Ltd"
@@ -87,7 +87,7 @@
 			"method": "POST",
 			"path": "/authentication/account",
 			"body": {
-				"type": "public-profile",
+				"type": "profile",
 				"data": { "@context": "https://schema.org", "@type": "Person", "name": "Original User" },
 				"isDefault": true
 			},
@@ -185,7 +185,7 @@
 				"body.type": "account-profile",
 				"body.version": 1,
 				"body.items.length": 1,
-				"body.items.0.type": "public-profile",
+				"body.items.0.type": "profile",
 				"body.items.0.data.name": "Original User",
 				"body.items.0.isDefault": true
 			}
@@ -199,7 +199,7 @@
 				"version": 1,
 				"items": [
 					{
-						"type": "public-profile",
+						"type": "profile",
 						"data": {
 							"@context": "https://schema.org",
 							"@type": "Person",
@@ -222,9 +222,9 @@
 			}
 		},
 		{
-			"description": "GET /authentication/account?type=public-profile - the imported profile replaced the original",
+			"description": "GET /authentication/account?type=profile - the imported profile replaced the original",
 			"method": "GET",
-			"path": "/authentication/account?type=public-profile",
+			"path": "/authentication/account?type=profile",
 			"expectedStatus": 200,
 			"assert": { "body.entities.length": 1, "body.entities.0.data.name": "Imported User" }
 		},
@@ -280,9 +280,9 @@
 			"assert": { "body.message": "accountProfileHelper.profileTypeNotAllowed" }
 		},
 		{
-			"description": "GET /authentication/account?type=public-profile - a refused import changes nothing",
+			"description": "GET /authentication/account?type=profile - a refused import changes nothing",
 			"method": "GET",
-			"path": "/authentication/account?type=public-profile",
+			"path": "/authentication/account?type=profile",
 			"expectedStatus": 200,
 			"assert": { "body.entities.length": 1, "body.entities.0.data.name": "Imported User" }
 		},
@@ -553,12 +553,6 @@
 			"description": "DELETE /authentication/admin/organization-request/account/:accountId - remove the requests of the account",
 			"method": "DELETE",
 			"path": "/authentication/admin/organization-request/account/{{portAccountId}}",
-			"expectedStatus": 204
-		},
-		{
-			"description": "DELETE /authentication/account/organization/:organization - the creator leaves the organization",
-			"method": "DELETE",
-			"path": "/authentication/account/organization/{{portOrgIdentity}}",
 			"expectedStatus": 204
 		},
 		{

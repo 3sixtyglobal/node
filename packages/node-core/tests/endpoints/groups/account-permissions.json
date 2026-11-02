@@ -51,7 +51,7 @@
 			"path": "/authentication/admin/account",
 			"body": {
 				"accountId": "{{adminAccountId}}",
-				"type": "public-profile",
+				"type": "profile",
 				"data": { "name": "Anonymous" }
 			},
 			"expectedStatus": 401,
@@ -158,18 +158,18 @@
 			"expectedStatus": 501
 		},
 		{
-			"description": "POST /authentication/password/forgot - 403 when password reset is not enabled",
+			"description": "POST /authentication/password/forgot - 204 as password reset is on while the password provider is registered",
 			"method": "POST",
 			"path": "/authentication/password/forgot",
 			"body": { "email": "{{adminEmail}}" },
-			"expectedStatus": 403
+			"expectedStatus": 204
 		},
 		{
-			"description": "POST /authentication/password/reset - 403 when password reset is not enabled",
+			"description": "POST /authentication/password/reset - 401 for an unknown token",
 			"method": "POST",
 			"path": "/authentication/password/reset",
 			"body": { "token": "not-a-token", "newPassword": "Reset@Node12345!" },
-			"expectedStatus": 403
+			"expectedStatus": 401
 		},
 		{
 			"description": "POST /authentication/admin/users - create perm-user@node",
@@ -242,11 +242,146 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "POST /authorization/system/subject/:subject/role - 401 a user-admin cannot grant itself global-admin",
+			"description": "POST /authorization/system/subject/:subject/role - a global-admin can grant roles, its own included",
 			"method": "POST",
 			"path": "/authorization/system/subject/{{adminAccountId}}/role",
 			"body": { "role": "global-admin" },
-			"expectedStatus": 401
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/account/roles/assignable - a global-admin may grant global-admin, tenant-admin and user-admin",
+			"method": "GET",
+			"path": "/authentication/admin/account/roles/assignable",
+			"expectedStatus": 200,
+			"assert": { "body.roles": "isDefined" }
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - a global-admin grants tenant-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/tenant-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/account/:accountId/roles - the account holds tenant-admin",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles",
+			"expectedStatus": 200,
+			"assert": { "body.roles.1": "tenant-admin" }
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:accountId/roles/:role - a global-admin revokes tenant-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/tenant-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:accountId/roles/:role - 409 revoking global-admin from its last holder",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{adminAccountId}}/roles/global-admin",
+			"expectedStatus": 409,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.lastEscalatedRoleHolder"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 422 for an org admin role",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/org-admin:{{adminOrgIdentity}}",
+			"expectedStatus": 422
+		},
+		{
+			"description": "POST /authentication/admin/users - create perm-outsider@node, a user in no organization",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "perm-outsider@node", "password": "PermOutsider@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id of perm-outsider@node",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-outsider%40node",
+			"expectedStatus": 200,
+			"capture": { "permOutsiderAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authentication/organization - create the permissions organization, the global-admin is its member",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Permissions Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "permOrgId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - capture the DID of the permissions organization",
+			"method": "GET",
+			"path": "/authentication/organization/{{permOrgId}}",
+			"expectedStatus": 200,
+			"capture": { "permOrgIdentity": "body.identity" }
+		},
+		{
+			"description": "POST /authentication/admin/account - add permUserAccountId to the permissions organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permUserAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{permOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/admin/account - add permAdminAccountId to the permissions organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permAdminAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{permOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/admin/account - add permNoIdAccountId to the permissions organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permNoIdAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{permOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - make perm-admin@node an org admin of the permissions organization",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "org-admin:{{permOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - make perm-admin@node an org admin of the organization of the tenant",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "org-admin:{{adminOrgIdentity}}" },
+			"expectedStatus": 204
 		},
 		{
 			"description": "POST /authentication/login - login as the plain user",
@@ -318,7 +453,7 @@
 			"description": "PUT /authentication/organization/{{adminOrgIdentity}} - 403 for a plain user",
 			"method": "PUT",
 			"path": "/authentication/organization/{{adminOrgIdentity}}",
-			"body": { "publicProfile": { "name": "Changed" } },
+			"body": { "profile": { "name": "Changed" } },
 			"expectedStatus": 403
 		},
 		{
@@ -442,17 +577,83 @@
 			"capture": { "permAdminDid": "body.identity" }
 		},
 		{
-			"description": "GET /authentication/admin/users/:email - a user-admin can read any user",
+			"description": "GET /authentication/admin/users/:email - a scoped user-admin reads a member of its organizations",
 			"method": "GET",
 			"path": "/authentication/admin/users/{{adminEmail}}",
 			"expectedStatus": 200
 		},
 		{
-			"description": "GET /authentication/admin/users - a user-admin can find a user by e-mail",
+			"description": "GET /authentication/admin/users - a scoped user-admin finds a member by e-mail",
 			"method": "GET",
 			"path": "/authentication/admin/users?email=perm-user%40node&exactEmail=true",
 			"expectedStatus": 200,
 			"assert": { "body.entities.0.accountId": "{{permUserAccountId}}" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - 404 for a scoped user-admin reading a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-outsider%40node",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/admin/users - a scoped user-admin does not find a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users?email=perm-outsider%40node&exactEmail=true",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "GET /authentication/admin/account/roles/assignable - a scoped user-admin may grant the roles it holds",
+			"method": "GET",
+			"path": "/authentication/admin/account/roles/assignable",
+			"expectedStatus": 200,
+			"assert": { "body.roles.0": "user", "body.roles.1": "user-admin" }
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - a scoped user-admin makes a member a user-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/user-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:accountId/roles/:role - a scoped user-admin revokes user-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/user-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 403 for a scoped user-admin granting tenant-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/tenant-admin",
+			"expectedStatus": 403,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.roleNotAssignable"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 403 for a scoped user-admin granting global-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/global-admin",
+			"expectedStatus": 403
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 403 for a scoped user-admin changing its own roles",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permAdminAccountId}}/roles/user",
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/admin/account/:accountId/roles - 404 for a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{permOutsiderAccountId}}/roles",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/organization - a scoped user-admin lists only its organizations",
+			"method": "GET",
+			"path": "/authentication/organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 2 }
 		},
 		{
 			"description": "GET /tenants - 403 for a user-admin without tenant-admin",
@@ -627,7 +828,7 @@
 			"method": "GET",
 			"path": "/authentication/admin/account?accountId={{permAdminAccountId}}&type=organization",
 			"expectedStatus": 200,
-			"assert": { "body.entities.0.data.identifier": "{{adminOrgIdentity}}" }
+			"assert": { "body.entities.1.data.identifier": "{{adminOrgIdentity}}" }
 		},
 		{
 			"description": "DELETE /authentication/admin/users - remove the plain user",
@@ -645,6 +846,18 @@
 			"description": "DELETE /authentication/admin/users - remove the user without an identity",
 			"method": "DELETE",
 			"path": "/authentication/admin/users/perm-noid%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user in no organization",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/perm-outsider%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - the global-admin, its only member left, removes the permissions organization",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{permOrgId}}",
 			"expectedStatus": 204
 		}
 	]

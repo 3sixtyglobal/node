@@ -40,6 +40,7 @@ import { loadAndRunGroups, runGroup, type RunnerContext } from "./endpoints/runn
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import {
 	DEFAULT_DEVOPS_ROLE,
+	DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 	DEFAULT_IDENTITY_ADMIN_ROLE,
 	DEFAULT_TENANT_ADMIN_ROLE,
 	DEFAULT_USER_ADMIN_ROLE,
@@ -203,6 +204,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 						DEFAULT_TENANT_ADMIN_ROLE,
 						DEFAULT_USER_ADMIN_ROLE,
 						DEFAULT_IDENTITY_ADMIN_ROLE,
@@ -286,6 +288,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 						DEFAULT_TENANT_ADMIN_ROLE,
 						DEFAULT_USER_ADMIN_ROLE,
 						DEFAULT_IDENTITY_ADMIN_ROLE,
@@ -413,6 +416,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 						DEFAULT_TENANT_ADMIN_ROLE,
 						DEFAULT_USER_ADMIN_ROLE,
 						DEFAULT_IDENTITY_ADMIN_ROLE,
@@ -769,7 +773,7 @@ describe("node-core", () => {
 							method: "POST",
 							path: "/authentication/account",
 							headers: { origin: "https://attacker.example.org" },
-							body: { type: "public-profile", data: { name: "Changed" } },
+							body: { type: "profile", data: { name: "Changed" } },
 							expectedStatus: 403,
 							assert: { "body.message": "originCheckProcessor.originNotAllowed" }
 						},
@@ -778,7 +782,7 @@ describe("node-core", () => {
 							method: "POST",
 							path: "/authentication/account",
 							headers: { origin: "https://app.example.org" },
-							body: { type: "public-profile", data: { name: "Changed" } },
+							body: { type: "profile", data: { name: "Changed" } },
 							expectedStatus: 201
 						}
 					]
@@ -1125,6 +1129,7 @@ describe("node-core", () => {
 					TWIN_ADMIN_USER_NAME: TEST_ADMIN_EMAIL,
 					TWIN_ADMIN_USER_PASSWORD: TEST_ADMIN_PASSWORD,
 					TWIN_ADMIN_USER_ROLES: [
+						DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 						DEFAULT_TENANT_ADMIN_ROLE,
 						DEFAULT_USER_ADMIN_ROLE,
 						DEFAULT_IDENTITY_ADMIN_ROLE,

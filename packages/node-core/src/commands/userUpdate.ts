@@ -263,14 +263,10 @@ export async function userUpdate(
 			}
 
 			const name = `${params.givenName ?? ""} ${params.familyName ?? ""}`.trim();
-			const publicProfile: WithContext<Person> = {
+			const profile: WithContext<Person> = {
 				"@context": "https://schema.org",
 				"@type": "Person",
-				name: name.length > 0 ? name : undefined
-			};
-			const privateProfile: WithContext<Person> = {
-				"@context": "https://schema.org",
-				"@type": "Person",
+				name: name.length > 0 ? name : undefined,
 				givenName: params.givenName,
 				familyName: params.familyName,
 				email: paramsEmail
@@ -280,14 +276,8 @@ export async function userUpdate(
 			await setAccountData(
 				accountAdminComponent,
 				account.accountId,
-				AuthenticationAccountDataType.PublicProfile,
-				publicProfile
-			);
-			await setAccountData(
-				accountAdminComponent,
-				account.accountId,
-				AuthenticationAccountDataType.PrivateProfile,
-				privateProfile
+				AuthenticationAccountDataType.Profile,
+				profile
 			);
 
 			CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-update.labels.userUpdated"));

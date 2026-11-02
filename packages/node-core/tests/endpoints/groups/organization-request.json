@@ -241,7 +241,7 @@
 			"method": "POST",
 			"path": "/authentication/organization",
 			"body": {
-				"publicProfile": {
+				"profile": {
 					"@context": "https://schema.org",
 					"@type": "Organization",
 					"name": "Removed Request Ltd"
@@ -256,12 +256,6 @@
 			"path": "/authentication/organization/{{removedOrgId}}",
 			"expectedStatus": 200,
 			"capture": { "removedOrgIdentity": "body.identity" }
-		},
-		{
-			"description": "DELETE /authentication/account/organization/:organization - the creator leaves",
-			"method": "DELETE",
-			"path": "/authentication/account/organization/{{removedOrgIdentity}}",
-			"expectedStatus": 204
 		},
 		{
 			"description": "POST /authentication/login - login as organization test user",
@@ -289,7 +283,7 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "DELETE /authentication/organization/:id - remove the organization with a request pending",
+			"description": "DELETE /authentication/organization/:id - the creator, its only member and org admin, removes the organization with a request pending",
 			"method": "DELETE",
 			"path": "/authentication/organization/{{removedOrgId}}",
 			"expectedStatus": 204
@@ -304,14 +298,14 @@
 			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
-			"description": "GET /authentication/account/organization/request - removing the organization rejected the request",
+			"description": "GET /authentication/account/organization/request - removing the organization removed the request, the earlier answer is the status again",
 			"method": "GET",
 			"path": "/authentication/account/organization/request",
 			"expectedStatus": 200,
 			"assert": {
 				"body.request.status": "rejected",
-				"body.request.organization": "{{removedOrgIdentity}}",
-				"body.request.reason": "organizationRequest.reason.organizationRemoved"
+				"body.request.organization": "{{adminOrgIdentity}}",
+				"body.request.reason": "organizationRequest.reason.notAMember"
 			}
 		},
 		{

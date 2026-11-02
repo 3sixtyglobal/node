@@ -2557,7 +2557,8 @@ describe("migration - accounts", () => {
 		const privateProfile = {
 			"@context": "https://schema.org",
 			"@type": "Organization",
-			email: "office@migrated.example"
+			email: "office@migrated.example",
+			taxPin: "GB123"
 		};
 
 		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
@@ -2597,13 +2598,26 @@ describe("migration - accounts", () => {
 				expect(migrated).toHaveLength(1);
 				expect(await registered(TEST_NODE_ORG_ID)).toHaveLength(1);
 
-				// The identity profile of the organization is copied to the profiles owned by its DID.
-				expect(await accountRows(migrated[0].identity, "public-profile")).toMatchObject([
-					{ data: publicProfile }
+				// The identity profile of the organization is merged into the profile owned by its DID, and
+				// its supply chain properties are kept apart, only for admins.
+				expect(await accountRows(migrated[0].identity, "profile")).toMatchObject([
+					{
+						data: {
+							"@context": "https://schema.org",
+							"@type": "Organization",
+							name: "Migrated Ltd",
+							email: "office@migrated.example"
+						}
+					}
 				]);
-				expect(await accountRows(migrated[0].identity, "private-profile")).toMatchObject([
-					{ data: privateProfile }
+				expect(await accountRows(migrated[0].identity, "supply-chain")).toMatchObject([
+					{
+						data: { "@context": "https://schema.org", "@type": "Organization", taxPin: "GB123" },
+						adminOnly: true
+					}
 				]);
+				expect(await accountRows(migrated[0].identity, "public-profile")).toHaveLength(0);
+				expect(await accountRows(migrated[0].identity, "private-profile")).toHaveLength(0);
 				expect(migrated[0].searchName).toBe(publicProfile.name.toLowerCase());
 
 				// The work is complete, so its record is removed.
@@ -2618,7 +2632,8 @@ describe("migration - accounts", () => {
 				}
 				expect(await registered("did:twin:migrated-org")).toHaveLength(1);
 				expect(await registered(TEST_NODE_ORG_ID)).toHaveLength(1);
-				expect(await accountRows(migrated[0].identity, "public-profile")).toHaveLength(1);
+				expect(await accountRows(migrated[0].identity, "profile")).toHaveLength(1);
+				expect(await accountRows(migrated[0].identity, "supply-chain")).toHaveLength(1);
 			} finally {
 				await run2?.shutdown();
 			}
@@ -2638,11 +2653,18 @@ describe("migration - accounts", () => {
 		};
 		const password = "Legacy@Password123!";
 		const salt = RandomHelper.generate(16);
-		const publicProfile = { "@context": "https://schema.org", "@type": "Person", name: "Legacy" };
+		const publicProfile = {
+			"@context": "https://schema.org",
+			"@type": "Person",
+			name: "Legacy",
+			roles: ["buyer"]
+		};
 		const privateProfile = {
 			"@context": "https://schema.org",
 			"@type": "Person",
-			email: "legacy@test.com"
+			email: "legacy@test.com",
+			roles: ["seller"],
+			spatial: "GB"
 		};
 
 		await ContextIdStore.run({ node: TEST_NODE_ID }, async () => {
@@ -2677,11 +2699,28 @@ describe("migration - accounts", () => {
 				expect(user?.passwordAlgorithm).toBeUndefined();
 				const accountId = user?.accountId ?? "";
 
-				expect(await accountRows(accountId, "public-profile")).toMatchObject([
-					{ data: publicProfile }
+				// The public and private profiles are merged, and the supply chain properties, the private
+				// value winning, move to an item only admins may see.
+				expect(await accountRows(accountId, "profile")).toEqual([
+					expect.objectContaining({
+						data: {
+							"@context": "https://schema.org",
+							"@type": "Person",
+							name: "Legacy",
+							email: "legacy@test.com"
+						}
+					})
 				]);
-				expect(await accountRows(accountId, "private-profile")).toMatchObject([
-					{ data: privateProfile }
+				expect(await accountRows(accountId, "supply-chain")).toEqual([
+					expect.objectContaining({
+						data: {
+							"@context": "https://schema.org",
+							"@type": "Person",
+							roles: ["seller"],
+							spatial: "GB"
+						},
+						adminOnly: true
+					})
 				]);
 
 				// The legacy hash signs in, by the address in any case, and is replaced on the way.

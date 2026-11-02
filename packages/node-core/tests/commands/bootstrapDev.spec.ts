@@ -352,11 +352,11 @@ describe("bootstrap-dev", () => {
 			data: { givenName: string; familyName: string; email: string };
 		}
 		const identityProfiles = await readStoreRecords<AccountDataRecord>(dbDir, "account-data");
-		const privateProfiles = identityProfiles.filter(d => d.type === "private-profile");
-		expect(privateProfiles).toHaveLength(1);
-		expect(privateProfiles[0].data.givenName).toBe("Node");
-		expect(privateProfiles[0].data.familyName).toBe("Admin");
-		expect(privateProfiles[0].data.email).toBe("admin@node");
+		const profiles = identityProfiles.filter(d => d.type === "profile");
+		expect(profiles).toHaveLength(1);
+		expect(profiles[0].data.givenName).toBe("Node");
+		expect(profiles[0].data.familyName).toBe("Admin");
+		expect(profiles[0].data.email).toBe("admin@node");
 
 		// Second run: same config, no extra env vars
 		const stateAfterSecond = await executeBootstrap(["bootstrap-dev"], stateAfterFirst, {
@@ -499,10 +499,10 @@ describe("bootstrap-dev", () => {
 			data: { givenName: string; familyName: string; email: string };
 		}
 		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "account-data");
-		const privateProfiles = identityProfiles.filter(d => d.type === "private-profile");
-		expect(privateProfiles).toHaveLength(1);
-		expect(privateProfiles[0].data.givenName).toBe("Node");
-		expect(privateProfiles[0].data.email).toBe("admin@acme.com");
+		const profiles = identityProfiles.filter(d => d.type === "profile");
+		expect(profiles).toHaveLength(1);
+		expect(profiles[0].data.givenName).toBe("Node");
+		expect(profiles[0].data.email).toBe("admin@acme.com");
 
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 
@@ -562,10 +562,10 @@ describe("bootstrap-dev", () => {
 			data: { givenName: string; familyName: string; email: string };
 		}
 		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "account-data");
-		const privateProfiles = identityProfiles.filter(d => d.type === "private-profile");
-		expect(privateProfiles).toHaveLength(1);
-		expect(privateProfiles[0].data.givenName).toBe("Tenant");
-		expect(privateProfiles[0].data.email).toBe("admin@acme.com");
+		const profiles = identityProfiles.filter(d => d.type === "profile");
+		expect(profiles).toHaveLength(1);
+		expect(profiles[0].data.givenName).toBe("Tenant");
+		expect(profiles[0].data.email).toBe("admin@acme.com");
 
 		const tenantsAfterFirst = await readStoreRecords(dbDir, "tenant");
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");

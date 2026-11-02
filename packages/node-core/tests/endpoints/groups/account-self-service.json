@@ -2,20 +2,20 @@
 	"group": "Account Data - Self Service",
 	"steps": [
 		{
-			"description": "POST /authentication/register - 403 when self sign up is not enabled",
+			"description": "POST /authentication/register - 202 as sign up is open while the password provider is registered",
 			"method": "POST",
 			"path": "/authentication/register",
 			"auth": false,
 			"body": { "email": "self-signup@node", "password": "Self@Signup12345!" },
-			"expectedStatus": 403
+			"expectedStatus": 202
 		},
 		{
-			"description": "POST /authentication/register/verify - 403 when self sign up is not enabled",
+			"description": "POST /authentication/register/verify - 401 for an unknown token",
 			"method": "POST",
 			"path": "/authentication/register/verify",
 			"auth": false,
 			"body": { "token": "not-a-token" },
-			"expectedStatus": 403
+			"expectedStatus": 401
 		},
 		{
 			"description": "GET /identity/profile/:identity/public - the identity profile routes are deprecated",
@@ -186,7 +186,7 @@
 			"method": "POST",
 			"path": "/authentication/account",
 			"body": {
-				"type": "public-profile",
+				"type": "profile",
 				"data": { "@context": "https://schema.org", "@type": "Person", "name": "Profile User" },
 				"isDefault": true
 			},
@@ -194,9 +194,9 @@
 			"capture": { "profileItemId": "location-last-segment" }
 		},
 		{
-			"description": "GET /authentication/account?type=public-profile - read its own public profile",
+			"description": "GET /authentication/account?type=profile - read its own public profile",
 			"method": "GET",
-			"path": "/authentication/account?type=public-profile",
+			"path": "/authentication/account?type=profile",
 			"expectedStatus": 200,
 			"assert": { "body.entities.0.data.name": "Profile User" }
 		},
@@ -205,7 +205,7 @@
 			"method": "GET",
 			"path": "/authentication/account/{{profileItemId}}",
 			"expectedStatus": 200,
-			"assert": { "body.type": "public-profile", "body.accountId": "{{profileAccountId}}" }
+			"assert": { "body.type": "profile", "body.accountId": "{{profileAccountId}}" }
 		},
 		{
 			"description": "PUT /authentication/account/:id - update its own public profile item",

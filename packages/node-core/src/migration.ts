@@ -85,6 +85,17 @@ const MIGRATION_ACCOUNT_DATA_TYPE = "migration";
 const MIGRATION_ACCOUNT_ID = "migration";
 
 /**
+ * The account data type, only admins may see, that the supply chain properties of a legacy identity
+ * profile move to.
+ */
+const SUPPLY_CHAIN_ACCOUNT_DATA_TYPE = "supply-chain";
+
+/**
+ * The properties of a legacy identity profile that move to the supply chain account data.
+ */
+const SUPPLY_CHAIN_PROPERTIES: string[] = ["roles", "spatial", "taxPin"];
+
+/**
  * The entity storage of the authorization connector holding rules keyed by subject, used to find
  * the models a DID has rules in.
  */
@@ -287,7 +298,7 @@ function migrationRecordSubject(
 }
 
 /**
- * Register an organization by its DID, copy its identity profile to the profiles of the
+ * Register an organization by its DID, copy its identity profile to the profile of the
  * organization when it has none, and store the name it is searched by. The organization is found by
  * its DID, so a repeated run adds nothing.
  * @param organizationStorage The organization storage.
@@ -310,31 +321,74 @@ async function registerOrganization(
 		return;
 	}
 
-	const profiles: [string, unknown][] = [
-		[AuthenticationAccountDataType.PublicProfile, profile.publicProfile],
-		[AuthenticationAccountDataType.PrivateProfile, profile.privateProfile]
+	const { merged, supplyChain } = splitLegacyProfile(profile);
+	const items: [string, unknown, boolean][] = [
+		[AuthenticationAccountDataType.Profile, merged, false],
+		[SUPPLY_CHAIN_ACCOUNT_DATA_TYPE, supplyChain, true]
 	];
-	for (const [type, data] of profiles) {
+	for (const [type, data, adminOnly] of items) {
 		if (
 			Is.object(data) &&
 			!Is.object(await AccountDataHelper.getDefault(accountDataStorage, identity, type))
 		) {
-			await AccountDataHelper.create(accountDataStorage, identity, type, data, true);
+			await AccountDataHelper.create(accountDataStorage, identity, type, data, true, undefined, {
+				adminOnly
+			});
 		}
 	}
 
 	if (!Is.stringValue(organization.searchName)) {
-		const publicProfile = await AccountDataHelper.getDefault(
+		const stored = await AccountDataHelper.getDefault(
 			accountDataStorage,
 			identity,
-			AuthenticationAccountDataType.PublicProfile
+			AuthenticationAccountDataType.Profile
 		);
-		await OrganizationHelper.storeSearchName(
-			organizationStorage,
-			organization,
-			publicProfile?.data
-		);
+		await OrganizationHelper.storeSearchName(organizationStorage, organization, stored?.data);
 	}
+}
+
+/**
+ * Merge the public and private profiles of a legacy identity profile into one profile, the public
+ * properties first and the private ones winning a clash, and take the supply chain properties out
+ * into their own value, the private value winning a clash.
+ * @param profile The legacy identity profile.
+ * @param profile.publicProfile The profile shown to others.
+ * @param profile.privateProfile The profile kept private.
+ * @returns The merged profile and the supply chain value, each undefined when there is nothing in it.
+ */
+export function splitLegacyProfile(profile: {
+	publicProfile?: unknown;
+	privateProfile?: unknown;
+}): { merged?: { [key: string]: unknown }; supplyChain?: { [key: string]: unknown } } {
+	const sources = [profile.publicProfile, profile.privateProfile].filter(source =>
+		Is.object<{ [key: string]: unknown }>(source)
+	) as { [key: string]: unknown }[];
+	if (sources.length === 0) {
+		return {};
+	}
+	const merged: { [key: string]: unknown } = {};
+	const supplyChain: { [key: string]: unknown } = {};
+	let hasSupplyChain = false;
+	for (const source of sources) {
+		for (const [key, value] of Object.entries(source)) {
+			if (SUPPLY_CHAIN_PROPERTIES.includes(key)) {
+				if (!Is.undefined(value)) {
+					supplyChain[key] = value;
+					hasSupplyChain = true;
+				}
+			} else {
+				merged[key] = value;
+			}
+			if ((key === "@context" || key === "@type") && !Is.undefined(value)) {
+				supplyChain[key] = value;
+			}
+		}
+	}
+	const hasProfileData = Object.keys(merged).some(key => key !== "@context" && key !== "@type");
+	return {
+		merged: hasProfileData ? merged : undefined,
+		supplyChain: hasSupplyChain ? supplyChain : undefined
+	};
 }
 
 /**
@@ -641,7 +695,9 @@ async function addIdentityRecord(identity: string, accountId: string): Promise<v
 }
 
 /**
- * Store the organization and identity profile of a migrated account as account data. Every write
+ * Store the organization and identity profile of a migrated account as account data, the public and
+ * private profiles merged into one profile, and the supply chain properties in an item only admins
+ * may see. Every write
  * replaces the item a previous interrupted run wrote, so the migration can run again. The old
  * identity profile is left in place, its routes are no longer served.
  * @param accountId The account id.
@@ -659,29 +715,33 @@ async function migrateAccountData(
 			nameofKebabCase<IdentityProfile>()
 		);
 
-	const items: [string, unknown][] = [
+	const items: [string, unknown, boolean][] = [
 		[
 			AuthenticationAccountDataType.Organization,
 			Is.stringValue(organization)
 				? AuthenticationAccountHelper.createOrganizationData(organization)
-				: undefined
+				: undefined,
+			false
 		]
 	];
 	const profile = Is.stringValue(identity) ? await profileStorage?.get(identity) : undefined;
 	if (Is.object<IdentityProfile>(profile)) {
-		items.push([AuthenticationAccountDataType.PublicProfile, profile.publicProfile]);
-		items.push([AuthenticationAccountDataType.PrivateProfile, profile.privateProfile]);
+		const { merged, supplyChain } = splitLegacyProfile(profile);
+		items.push([AuthenticationAccountDataType.Profile, merged, false]);
+		items.push([SUPPLY_CHAIN_ACCOUNT_DATA_TYPE, supplyChain, true]);
 	}
 
 	const values = items.filter(
 		([, data]) => !Is.empty(data) && !(Is.string(data) && data.length === 0)
 	);
-	for (const [type, data] of values) {
+	for (const [type, data, adminOnly] of values) {
 		const existing = await AccountDataHelper.getDefault(accountDataStorage, accountId, type);
 		if (Is.object(existing)) {
-			await AccountDataHelper.update(accountDataStorage, existing.id, data, true);
+			await AccountDataHelper.updateItem(accountDataStorage, existing, data, true, adminOnly);
 		} else {
-			await AccountDataHelper.create(accountDataStorage, accountId, type, data, true);
+			await AccountDataHelper.create(accountDataStorage, accountId, type, data, true, undefined, {
+				adminOnly
+			});
 		}
 	}
 }

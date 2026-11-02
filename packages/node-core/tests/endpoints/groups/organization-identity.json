@@ -15,7 +15,7 @@
 			"method": "POST",
 			"path": "/authentication/organization",
 			"body": {
-				"publicProfile": {
+				"profile": {
 					"@context": "https://schema.org",
 					"@type": "Organization",
 					"name": "Export Test Ltd"
@@ -63,12 +63,6 @@
 			"expectedStatus": 404
 		},
 		{
-			"description": "DELETE /authentication/account/organization/:organization - the creator leaves",
-			"method": "DELETE",
-			"path": "/authentication/account/organization/{{exportOrgIdentity}}",
-			"expectedStatus": 204
-		},
-		{
 			"description": "DELETE /authentication/organization/:id - remove the organization and its keys",
 			"method": "DELETE",
 			"path": "/authentication/organization/{{exportOrgId}}",
@@ -87,7 +81,7 @@
 			"body": {
 				"identity": "{{exportOrgIdentity}}",
 				"identityImport": "{{exportOrgIdentityExport}}",
-				"publicProfile": {
+				"profile": {
 					"@context": "https://schema.org",
 					"@type": "Organization",
 					"name": "Export Test Ltd"
@@ -114,7 +108,7 @@
 			"path": "/authentication/organization",
 			"body": {
 				"identityImport": "{{exportOrgIdentityExport}}",
-				"publicProfile": {
+				"profile": {
 					"@context": "https://schema.org",
 					"@type": "Organization",
 					"name": "Export Test Ltd"
@@ -130,7 +124,7 @@
 			"expectedStatus": 200,
 			"assert": {
 				"body.identity": "{{exportOrgIdentity}}",
-				"body.publicProfile.name": "Export Test Ltd"
+				"body.profile.name": "Export Test Ltd"
 			}
 		},
 		{
@@ -153,19 +147,13 @@
 			"path": "/authentication/organization",
 			"body": {
 				"identityImport": "{{exportOrgIdentityExport}}",
-				"publicProfile": {
+				"profile": {
 					"@context": "https://schema.org",
 					"@type": "Organization",
 					"name": "Export Test Ltd"
 				}
 			},
 			"expectedStatus": 409
-		},
-		{
-			"description": "DELETE /authentication/account/organization/:organization - the creator leaves",
-			"method": "DELETE",
-			"path": "/authentication/account/organization/{{exportOrgIdentity}}",
-			"expectedStatus": 204
 		},
 		{
 			"description": "DELETE /authentication/organization/:id - remove the recreated organization",

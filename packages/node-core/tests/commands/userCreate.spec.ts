@@ -185,8 +185,8 @@ describe.each(TENANT_MODES)("user-create in $mode mode", ({ mode, tenantEnabled 
 			data: { name?: string; givenName?: string; familyName?: string; email?: string };
 		}>(context.dbDir, "account-data");
 		const items = accountData.filter(item => item.accountId === json?.accountId);
-		expect(items.find(item => item.type === "public-profile")?.data.name).toBe("Ada Lovelace");
-		expect(items.find(item => item.type === "private-profile")?.data).toMatchObject({
+		expect(items.find(item => item.type === "profile")?.data).toMatchObject({
+			name: "Ada Lovelace",
 			givenName: "Ada",
 			familyName: "Lovelace",
 			email: "named@example.com"
