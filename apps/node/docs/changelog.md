@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0-next.5](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.4...node-v0.20.0-next.5) (2026-11-02)
+
+
+### Features
+
+* account data, OAuth sign in and messaging templates ([#94](https://github.com/3sixtyglobal/node/issues/94)) ([543eaa2](https://github.com/3sixtyglobal/node/commit/543eaa2e057818cb2208805c3cc1a42a0202087e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @3sixty/node-core bumped from 0.20.0-next.4 to 0.20.0-next.5
+
 ## [0.20.0-next.4](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.3...node-v0.20.0-next.4) (2026-10-26)
 
 
