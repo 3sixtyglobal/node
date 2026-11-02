@@ -1,0 +1,427 @@
+{
+	"group": "Organization Request",
+	"steps": [
+		{
+			"description": "POST /identity - create identity for organization test user",
+			"method": "POST",
+			"path": "/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "orgUserDid": "body.id" }
+		},
+		{
+			"description": "POST /authentication/admin/users - create organization test user",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "org-user@node", "password": "OrgUser@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id",
+			"method": "GET",
+			"path": "/authentication/admin/users/org-user%40node",
+			"expectedStatus": 200,
+			"capture": { "orgUserAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /identity/:identity/verification-method - add a method to prove ownership of the DID",
+			"method": "POST",
+			"path": "/identity/{{orgUserDid}}/verification-method",
+			"body": {
+				"verificationMethodType": "assertionMethod",
+				"verificationMethodId": "account-binding"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/:identity/proof/:vmId - prove the DID is bound to the account",
+			"method": "POST",
+			"path": "/identity/{{orgUserDid}}/proof/account-binding",
+			"body": {
+				"proofType": "DataIntegrityProof",
+				"document": {
+					"@context": "https://schema.org",
+					"@type": "AuthorizeAction",
+					"agent": "{{orgUserDid}}",
+					"recipient": "{{orgUserAccountId}}"
+				}
+			},
+			"expectedStatus": 200,
+			"capture": { "orgUserIdentityProof": "body" }
+		},
+		{
+			"description": "POST /authentication/admin/account - store the identity of the account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{orgUserAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{orgUserDid}}" },
+				"proof": "{{orgUserIdentityProof}}"
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user role to the account",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{orgUserAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as organization test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "org-user@node", "password": "OrgUser@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/account/organization - ask to join the organization",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/account/organization - 409 asking again while pending",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{adminOrgIdentity}}" },
+			"expectedStatus": 409
+		},
+		{
+			"description": "GET /authentication/account/organization - no rejection while pending",
+			"method": "GET",
+			"path": "/authentication/account/organization",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /authentication/account/organization/request - the request is pending",
+			"method": "GET",
+			"path": "/authentication/account/organization/request",
+			"expectedStatus": 200,
+			"assert": {
+				"body.requests.0.status": "pending",
+				"body.requests.0.organization": "{{adminOrgIdentity}}"
+			}
+		},
+		{
+			"description": "POST /authentication/login - login as admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request - find the pending request",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request?status=pending",
+			"expectedStatus": 200,
+			"capture": { "orgRequestId": "body.entities.0.id" },
+			"assert": { "body.entities.0.accountId": "{{orgUserAccountId}}" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/count - count the pending requests of the organization",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/count?status=pending&filterOrganization={{adminOrgIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.count": 1, "body.capped": false }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/count - none for another organization",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/count?status=pending&filterOrganization=did%3Aexample%3Aanother-organization",
+			"expectedStatus": 200,
+			"assert": { "body.count": 0, "body.capped": false }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request?filterOrganization - filter by the organization",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request?status=pending&filterOrganization={{adminOrgIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.id": "{{orgRequestId}}" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request?filterOrganization - another organization, which the tenant processor leaves alone",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request?status=pending&filterOrganization=did%3Aexample%3Aanother-organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/:id/reject - reject the request",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/{{orgRequestId}}/reject",
+			"body": { "reason": "organizationRequest.reason.notAMember" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/:id - the request is rejected",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/{{orgRequestId}}",
+			"expectedStatus": 200,
+			"assert": { "body.status": "rejected", "body.accountId": "{{orgUserAccountId}}" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/:id - 404 for an unknown request",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/00000000-0000-7000-8000-000000000000",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/login - login as organization test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "org-user@node", "password": "OrgUser@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/account/organization - 422 the request was rejected",
+			"method": "GET",
+			"path": "/authentication/account/organization",
+			"expectedStatus": 422
+		},
+		{
+			"description": "GET /authentication/account/organization/request - the request was rejected with a reason",
+			"method": "GET",
+			"path": "/authentication/account/organization/request",
+			"expectedStatus": 200,
+			"assert": {
+				"body.requests.0.status": "rejected",
+				"body.requests.0.reason": "organizationRequest.reason.notAMember"
+			}
+		},
+		{
+			"description": "POST /authentication/account/organization - ask to join again, to cancel it",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/account/organization/request/:organization - cancel the pending request",
+			"method": "DELETE",
+			"path": "/authentication/account/organization/request/{{adminOrgIdentity}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/account/organization/request - the earlier rejection is the status again",
+			"method": "GET",
+			"path": "/authentication/account/organization/request",
+			"expectedStatus": 200,
+			"assert": {
+				"body.requests.0.status": "rejected",
+				"body.requests.0.reason": "organizationRequest.reason.notAMember"
+			}
+		},
+		{
+			"description": "DELETE /authentication/account/organization/request/:organization - 404 when no request is pending",
+			"method": "DELETE",
+			"path": "/authentication/account/organization/request/{{adminOrgIdentity}}",
+			"expectedStatus": 404,
+			"assert": { "body.message": "organizationRequestHelper.organizationRequestNotFound" }
+		},
+		{
+			"description": "POST /authentication/login - login as admin, to create an organization to remove",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/organization - create an organization that will be removed",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Removed Request Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "removedOrgId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - capture the DID of the organization",
+			"method": "GET",
+			"path": "/authentication/organization/{{removedOrgId}}",
+			"expectedStatus": 200,
+			"capture": { "removedOrgIdentity": "body.identity" }
+		},
+		{
+			"description": "POST /authentication/login - login as organization test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "org-user@node", "password": "OrgUser@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/account/organization - ask to join the organization that will be removed",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{removedOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as admin, to remove the organization",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - the creator, its only member and org admin, removes the organization with a request pending",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{removedOrgId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as organization test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "org-user@node", "password": "OrgUser@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/account/organization/request - removing the organization removed the request, the earlier answer is the status again",
+			"method": "GET",
+			"path": "/authentication/account/organization/request",
+			"expectedStatus": 200,
+			"assert": {
+				"body.requests.0.status": "rejected",
+				"body.requests.0.organization": "{{adminOrgIdentity}}",
+				"body.requests.0.reason": "organizationRequest.reason.notAMember"
+			}
+		},
+		{
+			"description": "POST /authentication/account/organization - ask to join again",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request - find the new pending request",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request?status=pending",
+			"expectedStatus": 200,
+			"capture": { "orgRequestId": "body.entities.0.id" }
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/:id/accept - accept the request",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/{{orgRequestId}}/accept",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/:id - the request is accepted",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/{{orgRequestId}}",
+			"expectedStatus": 200,
+			"assert": { "body.status": "accepted" }
+		},
+		{
+			"description": "GET /authentication/admin/account - the membership credential was stored as JSON with its proof",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{orgUserAccountId}}&type=vc",
+			"expectedStatus": 200,
+			"assert": {
+				"body.entities.0.data.issuer": "{{adminOrgIdentity}}",
+				"body.entities.0.data.credentialSubject.id": "{{orgUserDid}}",
+				"body.entities.0.data.proof.type": "DataIntegrityProof"
+			}
+		},
+		{
+			"description": "POST /authentication/login - login as organization test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "org-user@node", "password": "OrgUser@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/account/organization - the account has joined",
+			"method": "GET",
+			"path": "/authentication/account/organization",
+			"expectedStatus": 200,
+			"assert": { "body.organization": "{{adminOrgIdentity}}" }
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "DELETE /authentication/admin/organization-request/account/:accountId - remove the requests of the account",
+			"method": "DELETE",
+			"path": "/authentication/admin/organization-request/account/{{orgUserAccountId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/:id - 404 once the requests are removed",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/{{orgRequestId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "DELETE /authentication/admin/users/:email - 403 for the admin's own account",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 403,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAdminService.removeSelfNotPermitted"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/users/:email/password - 403 resetting the admin's own password",
+			"method": "PUT",
+			"path": "/authentication/admin/users/{{adminEmail}}/password",
+			"body": { "newPassword": "Another@Admin12345!" },
+			"expectedStatus": 403,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAdminService.resetSelfPasswordNotPermitted"
+			}
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove organization test user",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/org-user%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /identity/:identity - 404 as removing the user already removed its node held identity",
+			"method": "DELETE",
+			"path": "/identity/{{orgUserDid}}",
+			"expectedStatus": 404
+		}
+	]
+}

@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import {
 	readStoreRecords,
@@ -13,11 +14,19 @@ describe.each(TENANT_MODES)("org-users-list in $mode mode", ({ mode, tenantEnabl
 	test("returns users for the given org", async () => {
 		await context.execute(["org-users-list", `--org-did=${context.organizationId}`]);
 
-		const users = await readStoreRecords<{ organization: string }>(
-			context.dbDir,
-			"authentication-user"
-		);
-		expect(users.filter(u => u.organization === context.organizationId).length).toEqual(1);
+		const organizations = await readStoreRecords<{
+			type: string;
+			organization?: string;
+			data: { identifier?: string };
+		}>(context.dbDir, "account-data");
+		expect(
+			organizations.filter(
+				d =>
+					d.type === "organization" &&
+					d.organization === context.organizationId &&
+					d.data.identifier === context.organizationId
+			).length
+		).toEqual(1);
 	});
 
 	test("returns empty list for org with no users", async () => {

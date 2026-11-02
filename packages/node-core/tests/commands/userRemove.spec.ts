@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { writeFile } from "node:fs/promises";
 import { readStoreRecords, setupCliTestContext, TENANT_MODES } from "./cliTestHelper.js";
@@ -6,33 +7,46 @@ import { readStoreRecords, setupCliTestContext, TENANT_MODES } from "./cliTestHe
 describe.each(TENANT_MODES)("user-remove in $mode mode", ({ mode, tenantEnabled }) => {
 	const context = setupCliTestContext("user-remove", mode, tenantEnabled);
 
-	test("removes the user and their profile", async () => {
-		const user = await context.createUser("user@example.com");
+	/**
+	 * Find the account id of a user.
+	 * @param email The email address of the user.
+	 * @returns The account id.
+	 */
+	async function accountIdOf(email: string): Promise<string | undefined> {
+		const users = await readStoreRecords<{ email: string; accountId: string }>(
+			context.dbDir,
+			"authentication-user"
+		);
+		return users.find(u => u.email === email)?.accountId;
+	}
+
+	test("removes the user and their account data", async () => {
+		await context.createUser("user@example.com");
+		const accountId = await accountIdOf("user@example.com");
+		const before = await readStoreRecords<{ accountId: string }>(context.dbDir, "account-data");
+		expect(before.filter(d => d.accountId === accountId).length).toBeGreaterThan(0);
 
 		await context.execute(["user-remove", "--email=user@example.com", ...context.tenantArgs()]);
 
 		const users = await readStoreRecords<{ email: string }>(context.dbDir, "authentication-user");
 		expect(users.some(u => u.email === "user@example.com")).toEqual(false);
-		const profiles = await readStoreRecords<{ identity: string }>(
-			context.dbDir,
-			"identity-profile"
-		);
-		expect(profiles.some(p => p.identity === user.did)).toEqual(false);
+		const after = await readStoreRecords<{ accountId: string }>(context.dbDir, "account-data");
+		expect(after.some(d => d.accountId === accountId)).toEqual(false);
 	});
 
-	test("removes a user that has no profile", async () => {
-		const user = await context.createUser("no-profile@example.com");
+	test("removes a user that has no account data", async () => {
+		await context.createUser("no-profile@example.com");
+		const accountId = await accountIdOf("no-profile@example.com");
 
-		// Users created outside the CLI may not have a profile
-		const profilesPath = `${context.dbDir}/identity-profile/store.json`;
-		const profiles = await readStoreRecords<{ identity: string }>(
+		// Users created outside the CLI may not have any account data
+		const accountData = await readStoreRecords<{ accountId: string }>(
 			context.dbDir,
-			"identity-profile"
+			"account-data"
 		);
 		await writeFile(
-			profilesPath,
+			`${context.dbDir}/account-data/store.json`,
 			JSON.stringify(
-				profiles.filter(p => p.identity !== user.did),
+				accountData.filter(d => d.accountId !== accountId),
 				undefined,
 				"\t"
 			)
@@ -46,6 +60,19 @@ describe.each(TENANT_MODES)("user-remove in $mode mode", ({ mode, tenantEnabled 
 
 		const users = await readStoreRecords<{ email: string }>(context.dbDir, "authentication-user");
 		expect(users.some(u => u.email === "no-profile@example.com")).toEqual(false);
+	});
+
+	test("removes the user when the e-mail address is given in another case", async () => {
+		await context.createUser("mixed-case@example.com");
+
+		await context.execute([
+			"user-remove",
+			"--email=Mixed-Case@Example.com",
+			...context.tenantArgs()
+		]);
+
+		const users = await readStoreRecords<{ email: string }>(context.dbDir, "authentication-user");
+		expect(users.some(u => u.email === "mixed-case@example.com")).toEqual(false);
 	});
 
 	test("throws when the user does not exist", async () => {

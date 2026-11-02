@@ -1,5 +1,11 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+
+/**
+ * Default locale of a messaging template file named without a locale.
+ */
+export const DEFAULT_MESSAGING_TEMPLATE_LOCALE = "en";
 
 /**
  * Default verification method fragment ID for attestation.

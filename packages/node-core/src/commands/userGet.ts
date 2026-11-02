@@ -1,17 +1,21 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import type {
 	IAuthenticationAdminComponent,
 	IAuthenticationUser
 } from "@3sixty/api-auth-entity-storage-models";
+import { AuthenticationAccountDataType } from "@3sixty/api-auth-models";
 import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { CLIDisplay } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
+import { getAccountAdminComponent, getAccountDataDid } from "../accountData.js";
 import { AUTHORIZATION_MODEL_ID } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { normaliseEmail } from "../utils.js";
 
 const COMMAND_NAME = "user-get";
 
@@ -99,24 +103,34 @@ export async function userGet(
 	const authorizationComponent = ComponentFactory.get<IAuthorizationComponent>(
 		defaultAuthorizationComponentType
 	);
+	const accountAdminComponent = getAccountAdminComponent(engineCore);
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-get.labels.retrieving"));
 
 	const currentContextIds = (await ContextIdStore.getContextIds()) ?? {};
-	const { user, roles } = await ContextIdStore.run(
+	const { user, identity, organization, roles } = await ContextIdStore.run(
 		{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
 		async () => {
-			const foundUser = await authenticationAdminComponent.get(params.email ?? "");
-			let foundRoles: string[] | undefined;
-
-			if (Is.stringValue(foundUser.userIdentity)) {
-				foundRoles = await authorizationComponent.getRolesForSubject(
-					authorizationModelId,
-					foundUser.userIdentity
-				);
-			}
+			const foundUser = await authenticationAdminComponent.get(normaliseEmail(params.email ?? ""));
+			const foundIdentity = await getAccountDataDid(
+				accountAdminComponent,
+				foundUser.accountId,
+				AuthenticationAccountDataType.Identity
+			);
+			const foundOrganization = await getAccountDataDid(
+				accountAdminComponent,
+				foundUser.accountId,
+				AuthenticationAccountDataType.Organization
+			);
+			// Roles are held by the account id.
+			const foundRoles = await authorizationComponent.getRolesForSubject(
+				authorizationModelId,
+				foundUser.accountId
+			);
 			return {
 				user: foundUser,
+				identity: foundIdentity,
+				organization: foundOrganization,
 				roles: foundRoles
 			};
 		}
@@ -125,13 +139,18 @@ export async function userGet(
 	CLIDisplay.break();
 	CLIDisplay.value(I18n.formatMessage("node.cli.commands.user-get.labels.email"), user.email);
 	CLIDisplay.value(
+		I18n.formatMessage("node.cli.commands.user-get.labels.accountId"),
+		user.accountId,
+		1
+	);
+	CLIDisplay.value(
 		I18n.formatMessage("node.cli.commands.user-get.labels.identity"),
-		user.userIdentity ?? "",
+		identity ?? "",
 		1
 	);
 	CLIDisplay.value(
 		I18n.formatMessage("node.cli.commands.user-get.labels.organization"),
-		user.organizationIdentity ?? "",
+		organization ?? "",
 		1
 	);
 	CLIDisplay.value(

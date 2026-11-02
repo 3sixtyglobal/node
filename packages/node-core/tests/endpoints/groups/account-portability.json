@@ -1,0 +1,565 @@
+{
+	"group": "Account Data - Portability",
+	"steps": [
+		{
+			"description": "POST /authentication/login - admin session for the set up",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/organization - create an organization for the portability test user to join",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Portability Test Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "portOrgId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - capture the DID of the organization",
+			"method": "GET",
+			"path": "/authentication/organization/{{portOrgId}}",
+			"expectedStatus": 200,
+			"capture": { "portOrgIdentity": "body.identity" }
+		},
+		{
+			"description": "POST /authentication/admin/users - create the portability test user",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "portable-user@node", "password": "Portable@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id",
+			"method": "GET",
+			"path": "/authentication/admin/users/portable-user%40node",
+			"expectedStatus": 200,
+			"capture": { "portAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user role to the account",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{portAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as the portability test user, a recent sign in",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "portable-user@node", "password": "Portable@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/account/identity/export - 404 without an identity",
+			"method": "POST",
+			"path": "/authentication/account/identity/export",
+			"expectedStatus": 404,
+			"assert": { "body.message": "entityStorageAuthenticationAccountService.identityNotFound" }
+		},
+		{
+			"description": "DELETE /authentication/account/identity - 404 without an identity",
+			"method": "DELETE",
+			"path": "/authentication/account/identity",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/account/identity - create a self-controlled identity",
+			"method": "POST",
+			"path": "/authentication/account/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "portUserDid": "body.identity" }
+		},
+		{
+			"description": "POST /authentication/account - store a public profile to be replaced",
+			"method": "POST",
+			"path": "/authentication/account",
+			"body": {
+				"type": "profile",
+				"data": { "@context": "https://schema.org", "@type": "Person", "name": "Original User" },
+				"isDefault": true
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/login - login as admin, to export and import for the user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/account/:accountId/export - an admin exports the user's account data",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{portAccountId}}/export",
+			"expectedStatus": 200,
+			"capture": { "portAdminProfileExport": "body" },
+			"assert": {
+				"header.cache-control": "no-store",
+				"body.type": "account-profile",
+				"body.items.0.data.name": "Original User"
+			}
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/identity/export - an admin exports the user's identity",
+			"method": "POST",
+			"path": "/authentication/admin/account/{{portAccountId}}/identity/export",
+			"expectedStatus": 200,
+			"capture": { "portAdminIdentityExport": "body" },
+			"assert": {
+				"header.cache-control": "no-store",
+				"body.type": "account-identity",
+				"body.identity.document.id": "{{portUserDid}}",
+				"body.identity.keys.0.privateKey": "isDefined"
+			}
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/identity/import - 422 for a profile file, checked first",
+			"method": "POST",
+			"path": "/authentication/admin/account/{{portAccountId}}/identity/import",
+			"body": "{{portAdminProfileExport}}",
+			"expectedStatus": 422,
+			"assert": { "body.message": "exportFileHelper.fileTypeMismatch" }
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/import - 422 for an identity file, checked first",
+			"method": "POST",
+			"path": "/authentication/admin/account/{{portAccountId}}/import",
+			"body": "{{portAdminIdentityExport}}",
+			"expectedStatus": 422,
+			"assert": { "body.message": "exportFileHelper.fileTypeMismatch" }
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/identity/import - 409 while the user has an identity",
+			"method": "POST",
+			"path": "/authentication/admin/account/{{portAccountId}}/identity/import",
+			"body": "{{portAdminIdentityExport}}",
+			"expectedStatus": 409,
+			"assert": { "body.message": "accountDataHelper.identityAlreadyAssigned" }
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/identity - 409 creating an identity while the user has one",
+			"method": "POST",
+			"path": "/authentication/admin/account/{{portAccountId}}/identity",
+			"expectedStatus": 409,
+			"assert": { "body.message": "accountDataHelper.identityAlreadyAssigned" }
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/import - an admin imports the user's account data unchanged",
+			"method": "POST",
+			"path": "/authentication/admin/account/{{portAccountId}}/import",
+			"body": "{{portAdminProfileExport}}",
+			"expectedStatus": 200,
+			"assert": { "body.itemsImported": 1, "body.itemsRemoved": 1 }
+		},
+		{
+			"description": "POST /authentication/login - login as the portability test user again",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "portable-user@node", "password": "Portable@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/account/export - the account data without the identity",
+			"method": "GET",
+			"path": "/authentication/account/export",
+			"expectedStatus": 200,
+			"assert": {
+				"header.cache-control": "no-store",
+				"body.type": "account-profile",
+				"body.version": 1,
+				"body.items.length": 1,
+				"body.items.0.type": "profile",
+				"body.items.0.data.name": "Original User",
+				"body.items.0.isDefault": true
+			}
+		},
+		{
+			"description": "POST /authentication/account/import - replace the account data",
+			"method": "POST",
+			"path": "/authentication/account/import",
+			"body": {
+				"type": "account-profile",
+				"version": 1,
+				"items": [
+					{
+						"type": "profile",
+						"data": {
+							"@context": "https://schema.org",
+							"@type": "Person",
+							"name": "Imported User"
+						},
+						"isDefault": true
+					},
+					{
+						"type": "preferences",
+						"data": { "theme": "dark" },
+						"isDefault": true
+					}
+				]
+			},
+			"expectedStatus": 200,
+			"assert": {
+				"body.itemsImported": 2,
+				"body.itemsRemoved": 1,
+				"body.skippedTypes.length": 0
+			}
+		},
+		{
+			"description": "GET /authentication/account?type=profile - the imported profile replaced the original",
+			"method": "GET",
+			"path": "/authentication/account?type=profile",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 1, "body.entities.0.data.name": "Imported User" }
+		},
+		{
+			"description": "GET /authentication/account?type=preferences - the imported item of a new type",
+			"method": "GET",
+			"path": "/authentication/account?type=preferences",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 1, "body.entities.0.data.theme": "dark" }
+		},
+		{
+			"description": "GET /authentication/account?type=identity - the import left the identity",
+			"method": "GET",
+			"path": "/authentication/account?type=identity",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.data.id": "{{portUserDid}}" }
+		},
+		{
+			"description": "POST /authentication/account/import - 422 for an unsupported version",
+			"method": "POST",
+			"path": "/authentication/account/import",
+			"body": { "type": "account-profile", "version": 2, "items": [] },
+			"expectedStatus": 422,
+			"assert": { "body.message": "exportFileHelper.fileVersionUnsupported" }
+		},
+		{
+			"description": "POST /authentication/account/import - 422 for an identity export, checked before anything else",
+			"method": "POST",
+			"path": "/authentication/account/import",
+			"body": { "type": "account-identity", "version": 1, "items": [] },
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "exportFileHelper.fileTypeMismatch",
+				"body.properties.expected": "account-profile",
+				"body.properties.actual": "account-identity"
+			}
+		},
+		{
+			"description": "POST /authentication/account/import - 422 for a type that moves with the identity",
+			"method": "POST",
+			"path": "/authentication/account/import",
+			"body": {
+				"type": "account-profile",
+				"version": 1,
+				"items": [
+					{
+						"type": "identity",
+						"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{adminUserIdentity}}" }
+					}
+				]
+			},
+			"expectedStatus": 422,
+			"assert": { "body.message": "accountProfileHelper.profileTypeNotAllowed" }
+		},
+		{
+			"description": "GET /authentication/account?type=profile - a refused import changes nothing",
+			"method": "GET",
+			"path": "/authentication/account?type=profile",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 1, "body.entities.0.data.name": "Imported User" }
+		},
+		{
+			"description": "POST /authentication/account/organization - ask to join the organization",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{portOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request - find the request to join the organization",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request?status=pending",
+			"appendOrgParam": false,
+			"expectedStatus": 200,
+			"capture": { "portRequestId": "body.entities.0.id" },
+			"assert": {
+				"body.entities.0.accountId": "{{portAccountId}}",
+				"body.entities.0.organization": "{{portOrgIdentity}}"
+			}
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/:id/accept - accept the request",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/{{portRequestId}}/accept",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as the portability test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "portable-user@node", "password": "Portable@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/account/organization - the account has joined",
+			"method": "GET",
+			"path": "/authentication/account/organization",
+			"expectedStatus": 200,
+			"assert": { "body.organization": "{{portOrgIdentity}}" }
+		},
+		{
+			"description": "GET /authentication/account/export - the organization is not exported with the account data",
+			"method": "GET",
+			"path": "/authentication/account/export",
+			"expectedStatus": 200,
+			"assert": { "body.items.length": 2 }
+		},
+		{
+			"description": "DELETE /authentication/account/organization/:organization - leave the organization",
+			"method": "DELETE",
+			"path": "/authentication/account/organization/{{portOrgIdentity}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/account?type=organization - the membership is gone",
+			"method": "GET",
+			"path": "/authentication/account?type=organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "DELETE /authentication/account/organization/:organization - 404 leaving again",
+			"method": "DELETE",
+			"path": "/authentication/account/organization/{{portOrgIdentity}}",
+			"expectedStatus": 404,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountService.organizationNotJoined"
+			}
+		},
+		{
+			"description": "POST /authentication/account/identity/export - export the identity with its keys",
+			"method": "POST",
+			"path": "/authentication/account/identity/export",
+			"expectedStatus": 200,
+			"capture": {
+				"portIdentityExport": "body",
+				"portExportDocument": "body.identity.document",
+				"portExportSignature": "body.identity.documentSignature",
+				"portExportKeys": "body.identity.keys"
+			},
+			"assert": {
+				"header.cache-control": "no-store",
+				"body.type": "account-identity",
+				"body.version": 1,
+				"body.identity.version": 1,
+				"body.identity.selfControlled": true,
+				"body.identity.document.id": "{{portUserDid}}",
+				"body.identity.keys.0.privateKey": "isDefined"
+			}
+		},
+		{
+			"description": "POST /authentication/account/identity/import - 409 while an identity is bound",
+			"method": "POST",
+			"path": "/authentication/account/identity/import",
+			"body": "{{portIdentityExport}}",
+			"expectedStatus": 409
+		},
+		{
+			"description": "POST /authentication/account/identity/import - 422 for a profile export, checked before replacing anything",
+			"method": "POST",
+			"path": "/authentication/account/identity/import",
+			"body": { "type": "account-profile", "version": 1, "items": [] },
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "exportFileHelper.fileTypeMismatch",
+				"body.properties.expected": "account-identity"
+			}
+		},
+		{
+			"description": "DELETE /authentication/account/identity - remove the identity",
+			"method": "DELETE",
+			"path": "/authentication/account/identity",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/account?type=identity - the identity is unbound",
+			"method": "GET",
+			"path": "/authentication/account?type=identity",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "GET /identity/:identity - 404 as the node held identity was removed",
+			"method": "GET",
+			"path": "/identity/{{portUserDid}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/account/identity/export - 404 once the identity is removed",
+			"method": "POST",
+			"path": "/authentication/account/identity/export",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/account/identity/import - 422 for an export with an unsupported version",
+			"method": "POST",
+			"path": "/authentication/account/identity/import",
+			"body": {
+				"type": "account-identity",
+				"version": 1,
+				"identity": {
+					"version": 2,
+					"namespace": "entity-storage",
+					"selfControlled": true,
+					"document": "{{portExportDocument}}",
+					"documentSignature": "{{portExportSignature}}",
+					"keys": "{{portExportKeys}}"
+				}
+			},
+			"expectedStatus": 422
+		},
+		{
+			"description": "POST /authentication/account/identity/import - 422 for an export that is not self-controlled",
+			"method": "POST",
+			"path": "/authentication/account/identity/import",
+			"body": {
+				"type": "account-identity",
+				"version": 1,
+				"identity": {
+					"version": 1,
+					"namespace": "entity-storage",
+					"selfControlled": false,
+					"document": "{{portExportDocument}}",
+					"documentSignature": "{{portExportSignature}}",
+					"keys": "{{portExportKeys}}"
+				}
+			},
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountService.identityNotSelfControlled"
+			}
+		},
+		{
+			"description": "GET /authentication/account?type=identity - a refused import binds nothing",
+			"method": "GET",
+			"path": "/authentication/account?type=identity",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "POST /authentication/account/identity/import - import the exported identity",
+			"method": "POST",
+			"path": "/authentication/account/identity/import",
+			"body": "{{portIdentityExport}}",
+			"expectedStatus": 200,
+			"assert": { "body.identity": "{{portUserDid}}" }
+		},
+		{
+			"description": "GET /authentication/me - the account has the same identity again",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 200,
+			"assert": { "body.identity": "{{portUserDid}}" }
+		},
+		{
+			"description": "POST /authentication/account/identity/export - the node holds the keys of the imported identity",
+			"method": "POST",
+			"path": "/authentication/account/identity/export",
+			"expectedStatus": 200,
+			"assert": {
+				"body.identity.document.id": "{{portUserDid}}",
+				"body.identity.keys.0.privateKey": "isDefined"
+			}
+		},
+		{
+			"description": "DELETE /authentication/me - the account removes itself and is signed out",
+			"method": "DELETE",
+			"path": "/authentication/me",
+			"expectedStatus": 204,
+			"assert": { "header.set-cookie": "contains:access_token=;" }
+		},
+		{
+			"description": "GET /authentication/me - 401 for the session of the removed account",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/account/export - 401 for the session of the removed account",
+			"method": "GET",
+			"path": "/authentication/account/export",
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/login - 401 once the account is removed",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "portable-user@node", "password": "Portable@Node12345!" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "DELETE /identity/:identity - 404 as removing the account already removed its identity",
+			"method": "DELETE",
+			"path": "/identity/{{portUserDid}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/admin/account - removing the account removed its account data",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{portAccountId}}",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "DELETE /authentication/admin/organization-request/account/:accountId - remove the requests of the account",
+			"method": "DELETE",
+			"path": "/authentication/admin/organization-request/account/{{portAccountId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - remove the organization",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{portOrgId}}",
+			"expectedStatus": 204
+		}
+	]
+}

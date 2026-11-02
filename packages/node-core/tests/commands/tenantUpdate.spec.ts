@@ -28,4 +28,29 @@ describe.each(TENANT_MODES)("tenant-update in $mode mode", ({ mode, tenantEnable
 			expect(tenant?.publicOrigin).toEqual("https://api.updated.com:5678");
 		}
 	});
+
+	test.skipIf(!tenantEnabled)("updates the api key and organization of the tenant", async () => {
+		const organization = await context.createIdentity("organization-updated");
+		await context.execute([
+			"tenant-update",
+			`--tenant-id=${context.tenantId}`,
+			"--api-key=ffeeddccbbaa99887766554433221100",
+			`--organization-id=${organization.did}`
+		]);
+
+		const tenants = await readStoreRecords<{ id: string; apiKey: string; organizationId: string }>(
+			context.dbDir,
+			"tenant"
+		);
+		expect(tenants.find(t => t.id === context.tenantId)).toMatchObject({
+			apiKey: "ffeeddccbbaa99887766554433221100",
+			organizationId: organization.did
+		});
+	});
+
+	test.skipIf(!tenantEnabled)("throws for an unknown tenant", async () => {
+		await expect(
+			context.execute(["tenant-update", `--tenant-id=${UNKNOWN_TENANT_ID}`, "--label=missing"])
+		).rejects.toThrow();
+	});
 });

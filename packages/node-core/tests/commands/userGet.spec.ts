@@ -9,14 +9,15 @@ describe.each(TENANT_MODES)("user-get in $mode mode", ({ mode, tenantEnabled }) 
 		await context.createUser("user@example.com");
 	});
 
-	test("returns the user", async () => {
+	test("returns the user, found by its e-mail address in any case", async () => {
 		await context.execute(["user-get", "--email=user@example.com", ...context.tenantArgs()]);
+		await context.execute(["user-get", "--email=USER@Example.com", ...context.tenantArgs()]);
 	});
 
 	test("throws when the user does not exist", async () => {
 		await expect(
 			context.execute(["user-get", "--email=missing@example.com", ...context.tenantArgs()])
-		).rejects.toThrow();
+		).rejects.toThrow("getUserFailed");
 	});
 
 	test("rejects the tenant ID when it does not match the mode", async () => {

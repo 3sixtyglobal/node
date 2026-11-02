@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IEngineEnvironmentVariables } from "./IEngineEnvironmentVariables.js";
 
@@ -140,6 +141,7 @@ const engineEnvironmentVariableKeysInternal: {
 	emailProtocolConnector: true,
 	// messaging
 	messagingEmailConnector: true,
+	messagingTemplatesDirectory: true,
 	messagingSmsConnector: true,
 	messagingPushNotificationConnector: true,
 	smtpHost: true,

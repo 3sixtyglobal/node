@@ -13,18 +13,32 @@
 			"description": "POST /authentication/admin/users - create user without global-admin role",
 			"method": "POST",
 			"path": "/authentication/admin/users",
+			"body": { "email": "regular-user@node", "password": "Regular@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id",
+			"method": "GET",
+			"path": "/authentication/admin/users/regular-user%40node",
+			"expectedStatus": 200,
+			"capture": { "regularAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authentication/admin/account - store the identity of the account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
 			"body": {
-				"email": "regular-user@node",
-				"password": "Regular@Node12345!",
-				"userIdentity": "{{regularUserDid}}",
-				"organizationIdentity": "{{adminOrgIdentity}}"
+				"accountId": "{{regularAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{regularUserDid}}" },
+				"isDefault": true
 			},
 			"expectedStatus": 201
 		},
 		{
-			"description": "POST /authorization/system/subject/:subject/role - assign tenant-admin role",
+			"description": "POST /authorization/system/subject/:subject/role - assign tenant-admin role to the account",
 			"method": "POST",
-			"path": "/authorization/system/subject/{{regularUserDid}}/role",
+			"path": "/authorization/system/subject/{{regularAccountId}}/role",
 			"body": { "role": "tenant-admin" },
 			"expectedStatus": 204
 		},
@@ -60,7 +74,7 @@
 			"apiKey": true,
 			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
 			"expectedStatus": 200,
-			"capture": { "authToken": "cookie:access_token", "organizationId": "jwt-claim:org" }
+			"capture": { "authToken": "cookie:access_token" }
 		},
 		{
 			"description": "DELETE /authentication/admin/users - remove regular test user",
@@ -69,10 +83,10 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /identity/:regularUserDid - remove regular user identity",
+			"description": "DELETE /identity/:identity - 404 as removing the user already removed its node held identity",
 			"method": "DELETE",
 			"path": "/identity/{{regularUserDid}}",
-			"expectedStatus": 204
+			"expectedStatus": 404
 		}
 	]
 }

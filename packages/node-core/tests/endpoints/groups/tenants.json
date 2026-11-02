@@ -1,0 +1,109 @@
+{
+	"group": "Tenants",
+	"steps": [
+		{
+			"description": "GET /tenants - the tenants, including the bootstrapped one",
+			"method": "GET",
+			"path": "/tenants",
+			"expectedStatus": 200,
+			"assert": { "body.0.id": "isDefined", "body.0.apiKey": "isDefined" },
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /tenants - create a tenant with a given api key",
+			"method": "POST",
+			"path": "/tenants",
+			"body": {
+				"label": "Endpoint Tenant",
+				"apiKey": "e1e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6",
+				"organizationId": "did:example:endpoint-tenant",
+				"publicOrigin": "https://endpoint-tenant.example.com:4321/ignored/path"
+			},
+			"expectedStatus": 201,
+			"capture": { "testTenantId": "location-last-segment" },
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "GET /tenants/:id - the created tenant, its public origin reduced to scheme, host and port",
+			"method": "GET",
+			"path": "/tenants/{{testTenantId}}",
+			"expectedStatus": 200,
+			"assert": {
+				"body.id": "{{testTenantId}}",
+				"body.label": "Endpoint Tenant",
+				"body.apiKey": "e1e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6",
+				"body.organizationId": "did:example:endpoint-tenant",
+				"body.publicOrigin": "https://endpoint-tenant.example.com:4321"
+			},
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "GET /tenants/api-key/:apiKey - the tenant by its api key",
+			"method": "GET",
+			"path": "/tenants/api-key/e1e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6",
+			"expectedStatus": 200,
+			"assert": { "body.id": "{{testTenantId}}" },
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /tenants - 400 for an empty tenant",
+			"method": "POST",
+			"path": "/tenants",
+			"body": {},
+			"expectedStatus": 400,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /tenants - 409 for an organization that already has a tenant",
+			"method": "POST",
+			"path": "/tenants",
+			"body": { "label": "Duplicate", "organizationId": "did:example:endpoint-tenant" },
+			"expectedStatus": 409,
+			"assert": { "body.message": "tenantAdminService.organizationIdAlreadyExists" },
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "PUT /tenants/:id - rename the tenant and move it to another organization",
+			"method": "PUT",
+			"path": "/tenants/{{testTenantId}}",
+			"body": { "label": "Renamed Tenant", "organizationId": "did:example:endpoint-tenant-2" },
+			"expectedStatus": 204,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "GET /tenants/:id - the update kept the api key and the previous organization",
+			"method": "GET",
+			"path": "/tenants/{{testTenantId}}",
+			"expectedStatus": 200,
+			"assert": {
+				"body.label": "Renamed Tenant",
+				"body.apiKey": "e1e2e3e4e5e6e7e8e9e0e1e2e3e4e5e6",
+				"body.organizationId": "did:example:endpoint-tenant-2",
+				"body.organizationIdLegacy.0": "did:example:endpoint-tenant"
+			},
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "PUT /tenants/:id - 404 for a tenant that does not exist",
+			"method": "PUT",
+			"path": "/tenants/ffffffffffffffffffffffffffffffff",
+			"body": { "organizationId": "did:example:endpoint-tenant-3" },
+			"expectedStatus": 404,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "DELETE /tenants/:id - remove the tenant",
+			"method": "DELETE",
+			"path": "/tenants/{{testTenantId}}",
+			"expectedStatus": 204,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "GET /tenants/:id - 404 once removed",
+			"method": "GET",
+			"path": "/tenants/{{testTenantId}}",
+			"expectedStatus": 404,
+			"skipIfOrgParamOmitted": true
+		}
+	]
+}

@@ -139,54 +139,6 @@
 			"expectedStatus": 200
 		},
 		{
-			"description": "DELETE /identity/profile - remove before recreating",
-			"method": "DELETE",
-			"path": "/identity/profile",
-			"expectedStatus": 204
-		},
-		{
-			"description": "POST /identity/profile",
-			"method": "POST",
-			"path": "/identity/profile",
-			"body": {
-				"publicProfile": {
-					"@context": "https://schema.org",
-					"@type": "Person",
-					"name": "Admin User"
-				}
-			},
-			"expectedStatus": 204
-		},
-		{
-			"description": "GET /identity/profile",
-			"method": "GET",
-			"path": "/identity/profile",
-			"expectedStatus": 200
-		},
-		{
-			"description": "GET /identity/profile/:identity/public",
-			"method": "GET",
-			"path": "/identity/profile/{{adminUserIdentity}}/public",
-			"expectedStatus": 200
-		},
-		{
-			"description": "PUT /identity/profile",
-			"method": "PUT",
-			"path": "/identity/profile",
-			"body": {
-				"@context": "https://schema.org",
-				"@type": "Person",
-				"name": "Updated Admin Name"
-			},
-			"expectedStatus": 204
-		},
-		{
-			"description": "GET /identity/profile/query",
-			"method": "GET",
-			"path": "/identity/profile/query",
-			"expectedStatus": 200
-		},
-		{
 			"description": "DELETE /identity/:identity/alias/:alias",
 			"method": "DELETE",
 			"path": "/identity/{{testIdentity}}/alias/{{aliasId}}",

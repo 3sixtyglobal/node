@@ -1,20 +1,28 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import type {
 	IAuthenticationAdminComponent,
-	IAuthenticationUser
+	IAuthenticationUser,
+	IAuthenticationUserCreate
 } from "@3sixty/api-auth-entity-storage-models";
+import {
+	AuthenticationAccountDataType,
+	AuthenticationAccountHelper
+} from "@3sixty/api-auth-models";
 import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { CLIDisplay, CLIUtils } from "@3sixty/cli-core";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { Coerce, ComponentFactory, EnvHelper, GeneralError, Guards, I18n, Is } from "@3sixty/core";
 import { PasswordGenerator } from "@3sixty/crypto";
 import type { IEngineCore } from "@3sixty/engine-models";
-import { Did, IdentityProfileConnectorFactory } from "@3sixty/identity-models";
+import { Did } from "@3sixty/identity-models";
 import type { Person, WithContext } from "schema-dts";
+import { getAccountAdminComponent, joinOrganization } from "../accountData.js";
 import { AUTHORIZATION_MODEL_ID, DEFAULT_USER_ROLE } from "../defaults.js";
 import type { ICliCommandDefinition } from "../models/ICliCommandDefinition.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
+import { normaliseEmail } from "../utils.js";
 
 const COMMAND_NAME = "user-create";
 
@@ -184,6 +192,7 @@ export async function userCreate(
 	}
 ): Promise<
 	| {
+			accountId: string;
 			did: string;
 			organizationDid: string;
 			email: string;
@@ -194,7 +203,7 @@ export async function userCreate(
 	  }
 	| undefined
 > {
-	const paramsEmail = params.email;
+	const paramsEmail = Is.stringValue(params.email) ? normaliseEmail(params.email) : params.email;
 	const paramsUserIdentity = params.userIdentity;
 	const paramsOrganizationIdentity = params.organizationIdentity;
 	const authorizationModelId = EnvHelper.envString(
@@ -215,12 +224,7 @@ export async function userCreate(
 		throw new GeneralError("userCreate", "tenantIdRequired");
 	}
 
-	const defaultIdentityProfileConnectorType = engineCore.getRegisteredInstanceType(
-		"identityProfileConnector"
-	);
-	const identityProfileConnector = IdentityProfileConnectorFactory.get(
-		defaultIdentityProfileConnectorType
-	);
+	const accountAdminComponent = getAccountAdminComponent(engineCore);
 
 	const defaultAuthenticationAdminComponentType = engineCore.getRegisteredInstanceType(
 		"authenticationAdminComponent"
@@ -257,15 +261,8 @@ export async function userCreate(
 					CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.skipping"));
 				} else if (params.overwriteMode === "overwrite") {
 					CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.overwriting"));
-					const userToRemove = existingUser;
-					await ContextIdStore.run(
-						{ ...currentContextIds, [ContextIdKeys.Tenant]: params.tenantId },
-						async () => {
-							await authenticationAdminComponent.remove(userToRemove.email);
-						}
-					);
-					await identityProfileConnector.remove(userToRemove.userIdentity);
-					existingUser = undefined;
+					// Removing the user also removes the data stored for its account.
+					await authenticationAdminComponent.remove(existingUser.email);
 				}
 			}
 
@@ -273,55 +270,73 @@ export async function userCreate(
 			if (createUser) {
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.creating"));
 
-				const user: IAuthenticationUser & { password: string } = {
+				const user: IAuthenticationUserCreate = {
 					email: paramsEmail,
-					password: params.password ?? PasswordGenerator.generate(16),
-					userIdentity: paramsUserIdentity,
-					organizationIdentity: paramsOrganizationIdentity
+					password: params.password ?? PasswordGenerator.generate(16)
 				};
 
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingUser"));
 
-				await ContextIdStore.run(
+				const account = await ContextIdStore.run(
 					{
 						...currentContextIds,
 						[ContextIdKeys.Tenant]: params.tenantId
 					},
 					async () => {
-						if (existingUser) {
-							await authenticationAdminComponent.update(user);
-						} else {
-							await authenticationAdminComponent.create(user);
-						}
-
-						for (const role of roles) {
-							await authorizationComponent.addRoleForSubject(
-								authorizationModelId,
-								paramsUserIdentity,
-								role
-							);
-						}
+						await authenticationAdminComponent.create(user);
+						return authenticationAdminComponent.get(paramsEmail);
 					}
 				);
 
 				const name = `${params.givenName ?? ""} ${params.familyName ?? ""}`.trim();
-				const publicProfile: WithContext<Person> = {
+				const profile: WithContext<Person> = {
 					"@context": "https://schema.org",
 					"@type": "Person",
-					name: name.length > 0 ? name : undefined
-				};
-				const privateProfile: WithContext<Person> = {
-					"@context": "https://schema.org",
-					"@type": "Person",
+					name: name.length > 0 ? name : undefined,
 					givenName: params.givenName,
 					familyName: params.familyName,
 					email: paramsEmail
 				};
 
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.storingProfile"));
-				await identityProfileConnector.create(paramsUserIdentity, publicProfile, privateProfile);
+				const accountData: [string, unknown][] = [
+					[
+						AuthenticationAccountDataType.Identity,
+						AuthenticationAccountHelper.createIdentityData(paramsUserIdentity)
+					],
+					[AuthenticationAccountDataType.Profile, profile]
+				];
+				for (const [type, data] of accountData) {
+					await accountAdminComponent.create(account.accountId, type, data, true);
+				}
+
+				// The user joins the organization directly, with a membership credential issued to its identity.
+				await joinOrganization(engineCore, envVars, account.accountId, paramsOrganizationIdentity);
+
+				// Roles are held by the account id. The CLI has no caller account, so it is not limited by
+				// the roles of the account it changes.
+				await ContextIdStore.run(
+					{
+						...currentContextIds,
+						[ContextIdKeys.Tenant]: params.tenantId
+					},
+					async () => {
+						for (const role of roles) {
+							await authorizationComponent.addRoleForSubject(
+								authorizationModelId,
+								account.accountId,
+								role
+							);
+						}
+					}
+				);
 
 				CLIDisplay.task(I18n.formatMessage("node.cli.commands.user-create.labels.userCreated"));
+
+				CLIDisplay.value(
+					I18n.formatMessage("node.cli.commands.user-create.labels.accountId"),
+					account.accountId
+				);
 
 				CLIDisplay.value(
 					I18n.formatMessage("node.cli.commands.user-create.labels.email"),
@@ -336,6 +351,7 @@ export async function userCreate(
 				CLIDisplay.break();
 
 				json = {
+					accountId: account.accountId,
 					did: paramsUserIdentity,
 					organizationDid: paramsOrganizationIdentity,
 					email: paramsEmail,
@@ -359,7 +375,8 @@ export async function userCreate(
 							`${params.outputEnvPrefix}PASSWORD="${user.password}"`,
 							`${params.outputEnvPrefix}ROLES="${params.roles ?? ""}"`,
 							`${params.outputEnvPrefix}GIVEN_NAME="${params.givenName ?? ""}"`,
-							`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`
+							`${params.outputEnvPrefix}FAMILY_NAME="${params.familyName ?? ""}"`,
+							`${params.outputEnvPrefix}ACCOUNT_ID="${account.accountId}"`
 						],
 						false
 					);

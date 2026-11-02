@@ -1,0 +1,171 @@
+{
+	"group": "Organization - Identity Export",
+	"steps": [
+		{
+			"description": "POST /authentication/login - admin session, a recent sign in",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/organization - create an organization with a node controlled DID",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Export Test Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "exportOrgId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - capture the DID of the organization",
+			"method": "GET",
+			"path": "/authentication/organization/{{exportOrgId}}",
+			"expectedStatus": 200,
+			"capture": { "exportOrgIdentity": "body.identity" }
+		},
+		{
+			"description": "POST /authentication/organization/:id/export - export the identity of the organization",
+			"method": "POST",
+			"path": "/authentication/organization/{{exportOrgId}}/export",
+			"expectedStatus": 200,
+			"capture": { "exportOrgIdentityExport": "body" },
+			"assert": {
+				"header.cache-control": "no-store",
+				"body.type": "organization-identity",
+				"body.version": 1,
+				"body.identity.version": 1,
+				"body.identity.document.id": "{{exportOrgIdentity}}",
+				"body.identity.keys.0.privateKey": "isDefined",
+				"body.nextRevocationIndex": 1
+			}
+		},
+		{
+			"description": "POST /authentication/organization/:id/export - 403 for the organization of the node or tenant",
+			"method": "POST",
+			"path": "/authentication/organization/{{adminOrgIdentity}}/export",
+			"expectedStatus": 403,
+			"assert": {
+				"body.message": "entityStorageOrganizationService.nodeIdentityExportNotPermitted"
+			}
+		},
+		{
+			"description": "POST /authentication/organization/:id/export - 404 for an unknown organization",
+			"method": "POST",
+			"path": "/authentication/organization/{{fakeId}}/export",
+			"expectedStatus": 404
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - remove the organization and its keys",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{exportOrgId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /identity/:identity - 404 as the DID of the organization was removed",
+			"method": "GET",
+			"path": "/identity/{{exportOrgIdentity}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/organization - 422 for an identity export with an identity",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"identity": "{{exportOrgIdentity}}",
+				"identityImport": "{{exportOrgIdentityExport}}",
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Export Test Ltd"
+				}
+			},
+			"expectedStatus": 422,
+			"assert": { "body.message": "entityStorageOrganizationService.identityImportExclusive" }
+		},
+		{
+			"description": "POST /authentication/organization - 422 for an account identity export, checked before anything else",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": { "identityImport": { "type": "account-identity", "version": 1 } },
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "exportFileHelper.fileTypeMismatch",
+				"body.properties.expected": "organization-identity",
+				"body.properties.actual": "account-identity"
+			}
+		},
+		{
+			"description": "POST /authentication/organization - recreate the organization from the identity export",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"identityImport": "{{exportOrgIdentityExport}}",
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Export Test Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "importOrgId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - the recreated organization has the same DID",
+			"method": "GET",
+			"path": "/authentication/organization/{{importOrgId}}",
+			"expectedStatus": 200,
+			"assert": {
+				"body.identity": "{{exportOrgIdentity}}",
+				"body.profile.name": "Export Test Ltd"
+			}
+		},
+		{
+			"description": "GET /identity/:identity - the imported DID resolves",
+			"method": "GET",
+			"path": "/identity/{{exportOrgIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.id": "{{exportOrgIdentity}}" }
+		},
+		{
+			"description": "POST /authentication/organization/:id/export - the revocation index carried on from the export",
+			"method": "POST",
+			"path": "/authentication/organization/{{importOrgId}}/export",
+			"expectedStatus": 200,
+			"assert": { "body.nextRevocationIndex": 2 }
+		},
+		{
+			"description": "POST /authentication/organization - 409 importing the DID again",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"identityImport": "{{exportOrgIdentityExport}}",
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Export Test Ltd"
+				}
+			},
+			"expectedStatus": 409
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - remove the recreated organization",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{importOrgId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/organization/:id - 404 once removed",
+			"method": "GET",
+			"path": "/authentication/organization/{{importOrgId}}",
+			"expectedStatus": 404
+		}
+	]
+}

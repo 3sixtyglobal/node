@@ -1,0 +1,197 @@
+{
+	"group": "Global Admin - Protected from scoped user-admins",
+	"steps": [
+		{
+			"description": "POST /authentication/admin/users - create ga-user-admin@node",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "ga-user-admin@node", "password": "GaUserAdmin@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id of ga-user-admin@node",
+			"method": "GET",
+			"path": "/authentication/admin/users/ga-user-admin%40node",
+			"expectedStatus": 200,
+			"capture": { "gaUserAdminAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user to ga-user-admin@node",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{gaUserAdminAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user-admin to ga-user-admin@node",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{gaUserAdminAccountId}}/role",
+			"body": { "role": "user-admin" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - make ga-user-admin@node an org admin of the organization of the global-admin",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{gaUserAdminAccountId}}/role",
+			"body": { "role": "org-admin:{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/admin/users - create ga-outsider@node, a user in no organization",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "ga-outsider@node", "password": "GaOutsider@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/login - login as a user-admin without global-admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "ga-user-admin@node", "password": "GaUserAdmin@Node12345!" },
+			"expectedStatus": 200,
+			"apiKey": true,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - a scoped user-admin reads the global-admin, a member of its organization",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - 404 for a scoped user-admin reading a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users/ga-outsider%40node",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /authentication/admin/users/:email/disable - 404 for a scoped user-admin disabling a user outside its organizations",
+			"method": "POST",
+			"path": "/authentication/admin/users/ga-outsider%40node/disable",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/admin/account/managed - a scoped user-admin manages only the members of its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/account/managed",
+			"expectedStatus": 200,
+			"assert": { "body.accountIds": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/admin/account - capture the identity item of the global-admin",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{adminAccountId}}&type=identity",
+			"expectedStatus": 200,
+			"capture": { "gaAdminIdentityItemId": "body.entities.0.id" }
+		},
+		{
+			"description": "PUT /authentication/admin/users/{{adminEmail}}/password - 403 for a user-admin acting on the global-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/users/{{adminEmail}}/password",
+			"body": { "newPassword": "Taken@Over12345!" },
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/users/{{adminEmail}}/disable - 403 for a user-admin acting on the global-admin",
+			"method": "POST",
+			"path": "/authentication/admin/users/{{adminEmail}}/disable",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/users/{{adminEmail}}/enable - 403 for a user-admin acting on the global-admin",
+			"method": "POST",
+			"path": "/authentication/admin/users/{{adminEmail}}/enable",
+			"expectedStatus": 403
+		},
+		{
+			"description": "DELETE /authentication/admin/users/{{adminEmail}} - 403 for a user-admin acting on the global-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "DELETE /authentication/admin/account/{{gaAdminIdentityItemId}} - 403 for a user-admin acting on the global-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{gaAdminIdentityItemId}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "PUT /authentication/admin/account/{{gaAdminIdentityItemId}} - 403 for a user-admin acting on the global-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{gaAdminIdentityItemId}}",
+			"body": {
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{adminUserIdentity}}" }
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/account - 403 for a user-admin acting on the global-admin",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{adminAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{adminOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "DELETE /authentication/admin/organization-request/account/{{adminAccountId}} - 403 for a user-admin acting on the global-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/organization-request/account/{{adminAccountId}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authorization/system/subject/{{gaUserAdminAccountId}}/role - 401 for a user-admin acting on the global-admin",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{gaUserAdminAccountId}}/role",
+			"body": { "role": "global-admin" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authorization/system/subject/{{adminAccountId}}/role/global-admin - 401 for a user-admin acting on the global-admin",
+			"method": "DELETE",
+			"path": "/authorization/system/subject/{{adminAccountId}}/role/global-admin",
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/login - the global-admin can still sign in with its password",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"apiKey": true
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"apiKey": true,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - the global-admin reads a user in no organization",
+			"method": "GET",
+			"path": "/authentication/admin/users/ga-outsider%40node",
+			"expectedStatus": 200
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user in no organization",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/ga-outsider%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/ga-user-admin%40node",
+			"expectedStatus": 204
+		}
+	]
+}

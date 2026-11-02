@@ -1,0 +1,864 @@
+{
+	"group": "Account Permissions",
+	"steps": [
+		{
+			"description": "GET /authentication/me - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/account - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/account",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "POST /authentication/account/identity - 401 for an anonymous caller",
+			"method": "POST",
+			"path": "/authentication/account/identity",
+			"body": {},
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "POST /authentication/account/organization - 401 for an anonymous caller",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{adminOrgIdentity}}" },
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/account/organization/request - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/account/organization/request",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/admin/account - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/admin/account",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "POST /authentication/admin/account - 401 for an anonymous caller",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{adminAccountId}}",
+				"type": "profile",
+				"data": { "name": "Anonymous" }
+			},
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/admin/organization-request - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/organization - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/organization",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/organization/{{adminOrgIdentity}} - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/organization/{{adminOrgIdentity}}",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "POST /authentication/organization - 401 for an anonymous caller",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {},
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/admin/users/{{adminEmail}} - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "POST /authentication/admin/users/{{adminEmail}}/disable - 401 for an anonymous caller",
+			"method": "POST",
+			"path": "/authentication/admin/users/{{adminEmail}}/disable",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /identity/profile - 501 as the identity profile routes are deprecated",
+			"method": "GET",
+			"path": "/identity/profile",
+			"expectedStatus": 501
+		},
+		{
+			"description": "PUT /identity/profile - 501 as the identity profile routes are deprecated",
+			"method": "PUT",
+			"path": "/identity/profile",
+			"body": { "publicProfile": { "name": "Admin" } },
+			"expectedStatus": 501
+		},
+		{
+			"description": "GET /identity/profile/query - 501 as the identity profile routes are deprecated",
+			"method": "GET",
+			"path": "/identity/profile/query",
+			"expectedStatus": 501
+		},
+		{
+			"description": "DELETE /identity/profile/:userIdentity - 501 as the identity profile routes are deprecated",
+			"method": "DELETE",
+			"path": "/identity/profile/{{adminUserIdentity}}",
+			"expectedStatus": 501
+		},
+		{
+			"description": "POST /identity/profile - 501 as the identity profile routes are deprecated",
+			"method": "POST",
+			"path": "/identity/profile",
+			"body": { "publicProfile": { "name": "Admin" } },
+			"expectedStatus": 501
+		},
+		{
+			"description": "GET /identity/profile/:userIdentity - 501 as the identity profile routes are deprecated",
+			"method": "GET",
+			"path": "/identity/profile/{{adminUserIdentity}}",
+			"expectedStatus": 501
+		},
+		{
+			"description": "PUT /identity/profile/:userIdentity - 501 as the identity profile routes are deprecated",
+			"method": "PUT",
+			"path": "/identity/profile/{{adminUserIdentity}}",
+			"body": { "publicProfile": { "name": "Admin" } },
+			"expectedStatus": 501
+		},
+		{
+			"description": "DELETE /identity/profile - 501 as the identity profile routes are deprecated",
+			"method": "DELETE",
+			"path": "/identity/profile",
+			"expectedStatus": 501
+		},
+		{
+			"description": "GET /identity/profile/admin/query - 501 as the identity profile routes are deprecated",
+			"method": "GET",
+			"path": "/identity/profile/admin/query",
+			"expectedStatus": 501
+		},
+		{
+			"description": "POST /authentication/password/forgot - 204 as password reset is on while the password provider is registered",
+			"method": "POST",
+			"path": "/authentication/password/forgot",
+			"body": { "email": "{{adminEmail}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/password/reset - 401 for an unknown token",
+			"method": "POST",
+			"path": "/authentication/password/reset",
+			"body": { "token": "not-a-token", "newPassword": "Reset@Node12345!" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/admin/users - create perm-user@node",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "perm-user@node", "password": "PermUser@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id of perm-user@node",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-user%40node",
+			"expectedStatus": 200,
+			"capture": { "permUserAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user to perm-user@node",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permUserAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/admin/users - create perm-admin@node",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "perm-admin@node", "password": "PermAdmin@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id of perm-admin@node",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-admin%40node",
+			"expectedStatus": 200,
+			"capture": { "permAdminAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user to perm-admin@node",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user-admin to perm-admin@node",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "user-admin" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/admin/users - create perm-noid@node",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "perm-noid@node", "password": "PermNoId@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id of perm-noid@node",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-noid%40node",
+			"expectedStatus": 200,
+			"capture": { "permNoIdAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user to perm-noid@node",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permNoIdAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - a global-admin can grant roles, its own included",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{adminAccountId}}/role",
+			"body": { "role": "global-admin" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/account/roles/assignable - a global-admin may grant global-admin, tenant-admin and user-admin",
+			"method": "GET",
+			"path": "/authentication/admin/account/roles/assignable",
+			"expectedStatus": 200,
+			"assert": { "body.roles": "isDefined" }
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - a global-admin grants tenant-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/tenant-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/account/:accountId/roles - the account holds tenant-admin",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles",
+			"expectedStatus": 200,
+			"assert": { "body.roles.1": "tenant-admin" }
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:accountId/roles/:role - a global-admin revokes tenant-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/tenant-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:accountId/roles/:role - 409 revoking global-admin from its last holder",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{adminAccountId}}/roles/global-admin",
+			"expectedStatus": 409,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.lastEscalatedRoleHolder"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 422 for an org admin role",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/org-admin:{{adminOrgIdentity}}",
+			"expectedStatus": 422
+		},
+		{
+			"description": "POST /authentication/admin/users - create perm-outsider@node, a user in no organization",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "perm-outsider@node", "password": "PermOutsider@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id of perm-outsider@node",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-outsider%40node",
+			"expectedStatus": 200,
+			"capture": { "permOutsiderAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authentication/organization - create the permissions organization, the global-admin is its member",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Permissions Ltd"
+				}
+			},
+			"expectedStatus": 201,
+			"capture": { "permOrgId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - capture the DID of the permissions organization",
+			"method": "GET",
+			"path": "/authentication/organization/{{permOrgId}}",
+			"expectedStatus": 200,
+			"capture": { "permOrgIdentity": "body.identity" }
+		},
+		{
+			"description": "POST /authentication/admin/account - add permUserAccountId to the permissions organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permUserAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{permOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/admin/account - add permAdminAccountId to the permissions organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permAdminAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{permOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/admin/account - add permNoIdAccountId to the permissions organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permNoIdAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{permOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - make perm-admin@node an org admin of the permissions organization",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "org-admin:{{permOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - make perm-admin@node an org admin of the organization of the tenant",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "org-admin:{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as the plain user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "perm-user@node", "password": "PermUser@Node12345!" },
+			"expectedStatus": 200,
+			"apiKey": true,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/account/identity - adopt a new self-controlled identity",
+			"method": "POST",
+			"path": "/authentication/account/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "permUserDid": "body.identity" }
+		},
+		{
+			"description": "GET /authentication/me - the signed in plain user",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 200,
+			"assert": { "body.accountId": "{{permUserAccountId}}" }
+		},
+		{
+			"description": "POST /authentication/account - 403 storing a node migration record",
+			"method": "POST",
+			"path": "/authentication/account",
+			"body": {
+				"type": "migration",
+				"data": {
+					"kind": "account",
+					"email": "perm-user@node",
+					"accountId": "{{permUserAccountId}}",
+					"roles": ["global-admin"]
+				}
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/organization/:id - a signed in user can read an organization",
+			"method": "GET",
+			"path": "/authentication/organization/{{adminOrgIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.identity": "{{adminOrgIdentity}}" }
+		},
+		{
+			"description": "GET /authentication/organization/search - a signed in user can search the organizations",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=zz-no-match",
+			"expectedStatus": 200,
+			"assert": { "body.entities": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/organization - 403 for a plain user",
+			"method": "GET",
+			"path": "/authentication/organization",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/organization - 403 for a plain user",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {},
+			"expectedStatus": 403
+		},
+		{
+			"description": "PUT /authentication/organization/{{adminOrgIdentity}} - 403 for a plain user",
+			"method": "PUT",
+			"path": "/authentication/organization/{{adminOrgIdentity}}",
+			"body": { "profile": { "name": "Changed" } },
+			"expectedStatus": 403
+		},
+		{
+			"description": "DELETE /authentication/organization/{{adminOrgIdentity}} - 403 for a plain user",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{adminOrgIdentity}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/admin/account - 403 for a plain user",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{adminAccountId}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/account - 403 for a plain user",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permUserAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{adminOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/account - 403 for a plain user",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permNoIdAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{permUserDid}}" }
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/admin/organization-request - 403 for a plain user",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/not-a-request/accept - 403 for a plain user",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/not-a-request/accept",
+			"expectedStatus": 403
+		},
+		{
+			"description": "DELETE /authentication/admin/organization-request/account/{{adminAccountId}} - 403 for a plain user",
+			"method": "DELETE",
+			"path": "/authentication/admin/organization-request/account/{{adminAccountId}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/admin/users - 403 for a plain user",
+			"method": "GET",
+			"path": "/authentication/admin/users",
+			"expectedStatus": 403
+		},
+		{
+			"description": "PUT /authentication/admin/users/{{adminEmail}}/password - 403 for a plain user",
+			"method": "PUT",
+			"path": "/authentication/admin/users/{{adminEmail}}/password",
+			"body": { "newPassword": "Taken@Over12345!" },
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/users/{{adminEmail}}/disable - 403 for a plain user",
+			"method": "POST",
+			"path": "/authentication/admin/users/{{adminEmail}}/disable",
+			"expectedStatus": 403
+		},
+		{
+			"description": "DELETE /authentication/admin/users/{{adminEmail}} - 403 for a plain user",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /tenants - 403 for a plain user",
+			"method": "GET",
+			"path": "/tenants",
+			"expectedStatus": 403,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /tenants - 403 for a plain user",
+			"method": "POST",
+			"path": "/tenants",
+			"body": { "label": "Denied", "organizationId": "did:example:denied-tenant" },
+			"expectedStatus": 403,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /authorization/system/subject/{{permUserAccountId}}/role - 403 for a plain user",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permUserAccountId}}/role",
+			"body": { "role": "user-admin" },
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/login - login as the user-admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "perm-admin@node", "password": "PermAdmin@Node12345!" },
+			"expectedStatus": 200,
+			"apiKey": true,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/account/identity - adopt a new self-controlled identity",
+			"method": "POST",
+			"path": "/authentication/account/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "permAdminDid": "body.identity" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - a scoped user-admin reads a member of its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users/{{adminEmail}}",
+			"expectedStatus": 200
+		},
+		{
+			"description": "GET /authentication/admin/users - a scoped user-admin finds a member by e-mail",
+			"method": "GET",
+			"path": "/authentication/admin/users?email=perm-user%40node&exactEmail=true",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.accountId": "{{permUserAccountId}}" }
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - 404 for a scoped user-admin reading a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users/perm-outsider%40node",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/admin/users - a scoped user-admin does not find a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/users?email=perm-outsider%40node&exactEmail=true",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "GET /authentication/admin/account/roles/assignable - a scoped user-admin may grant only the assignable roles it holds",
+			"method": "GET",
+			"path": "/authentication/admin/account/roles/assignable",
+			"expectedStatus": 200,
+			"assert": { "body.roles.0": "user-admin", "body.roles.length": 1 }
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - a scoped user-admin makes a member a user-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/user-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:accountId/roles/:role - a scoped user-admin revokes user-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/user-admin",
+			"expectedStatus": 204
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 403 for a scoped user-admin granting tenant-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/tenant-admin",
+			"expectedStatus": 403,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.roleNotAssignable"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 403 for a scoped user-admin granting global-admin",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permNoIdAccountId}}/roles/global-admin",
+			"expectedStatus": 403
+		},
+		{
+			"description": "PUT /authentication/admin/account/:accountId/roles/:role - 403 for a scoped user-admin changing its own roles",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{permAdminAccountId}}/roles/user",
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/admin/account/:accountId/roles - 404 for a user outside its organizations",
+			"method": "GET",
+			"path": "/authentication/admin/account/{{permOutsiderAccountId}}/roles",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/organization - a scoped user-admin lists only its organizations",
+			"method": "GET",
+			"path": "/authentication/organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 2 }
+		},
+		{
+			"description": "GET /tenants - 403 for a user-admin without tenant-admin",
+			"method": "GET",
+			"path": "/tenants",
+			"expectedStatus": 403,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - 401 changing its own roles",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permAdminAccountId}}/role",
+			"body": { "role": "tenant-admin" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - 401 granting global-admin",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{permUserAccountId}}/role",
+			"body": { "role": "global-admin" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/admin/account - 403 setting the organization of its own account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permAdminAccountId}}",
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{adminOrgIdentity}}"
+				}
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "GET /authentication/admin/account - capture the identity item of its own account",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{permAdminAccountId}}&type=identity",
+			"expectedStatus": 200,
+			"capture": { "permAdminIdentityItemId": "body.entities.0.id" }
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:id - 403 removing the identity of its own account",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{permAdminIdentityItemId}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/account - 409 binding the DID of another account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permNoIdAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{permUserDid}}" }
+			},
+			"expectedStatus": 409
+		},
+		{
+			"description": "POST /authentication/admin/account - 409 binding the DID of the organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permNoIdAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{adminOrgIdentity}}" }
+			},
+			"expectedStatus": 409
+		},
+		{
+			"description": "POST /authentication/admin/account - 401 binding an unbound DID without a proof",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{permNoIdAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "did:example:unbound-identity" }
+			},
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/admin/account - 403 writing a node migration record",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "migration",
+				"type": "migration",
+				"data": {
+					"kind": "account",
+					"email": "perm-admin@node",
+					"accountId": "{{permAdminAccountId}}",
+					"roles": ["global-admin"]
+				}
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/users/:email/disable - 403 disabling itself",
+			"method": "POST",
+			"path": "/authentication/admin/users/perm-admin%40node/disable",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/account/organization - ask to join the organization",
+			"method": "POST",
+			"path": "/authentication/account/organization",
+			"body": { "organization": "{{adminOrgIdentity}}" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/organization-request - find its own pending request",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request?status=pending",
+			"expectedStatus": 200,
+			"capture": { "permAdminRequestId": "body.entities.0.id" },
+			"assert": { "body.entities.0.accountId": "{{permAdminAccountId}}" }
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/:id/accept - 403 accepting its own request",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/{{permAdminRequestId}}/accept",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/admin/users/:email/disable - a user-admin can disable another user",
+			"method": "POST",
+			"path": "/authentication/admin/users/perm-user%40node/disable",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - 401 for the disabled plain user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "perm-user@node", "password": "PermUser@Node12345!" },
+			"expectedStatus": 401,
+			"apiKey": true
+		},
+		{
+			"description": "POST /authentication/admin/users/:email/enable - a user-admin can enable another user",
+			"method": "POST",
+			"path": "/authentication/admin/users/perm-user%40node/enable",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - the enabled plain user can sign in",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "perm-user@node", "password": "PermUser@Node12345!" },
+			"expectedStatus": 200,
+			"apiKey": true
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"apiKey": true,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/:id/accept - another admin accepts the request",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/{{permAdminRequestId}}/accept",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/admin/account - the user-admin has joined the organization",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{permAdminAccountId}}&type=organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.1.data.identifier": "{{adminOrgIdentity}}" }
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the plain user",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/perm-user%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/perm-admin%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user without an identity",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/perm-noid%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user in no organization",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/perm-outsider%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - the global-admin, its only member left, removes the permissions organization",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{permOrgId}}",
+			"expectedStatus": 204
+		}
+	]
+}

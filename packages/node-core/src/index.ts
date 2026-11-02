@@ -1,10 +1,12 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 export * from "./builders/engineEnvBuilder.js";
 export * from "./builders/engineServerEnvBuilder.js";
 export * from "./builders/extensionsBuilder.js";
 export * from "./cli.js";
 export * from "./defaults.js";
+export * from "./messagingTemplates.js";
 export * from "./models/authorizationModelMode.js";
 export * from "./models/cliCommandParamType.js";
 export * from "./models/IBootstrapDevEnvironmentVariables.js";
@@ -17,6 +19,7 @@ export * from "./models/IEngineServerEnvironmentVariables.js";
 export * from "./models/IEnvironmentVariables.js";
 export * from "./models/INodeEngineConfig.js";
 export * from "./models/INodeEngineState.js";
+export * from "./models/IMessagingTemplate.js";
 export * from "./models/INodeEnvironmentVariables.js";
 export * from "./models/INodeOptions.js";
 export * from "./models/nodeExtensionInitialiseEngineMethod.js";

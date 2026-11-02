@@ -1,298 +1,210 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import { type AccountData, initSchema } from "@3sixty/api-auth-account-service";
 import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { ContextIdStore } from "@3sixty/context";
-import { ComponentFactory, GeneralError } from "@3sixty/core";
+import { ComponentFactory, Factory, GeneralError } from "@3sixty/core";
 import type { IEngineCore } from "@3sixty/engine-models";
 import type { IEntitySchemaProperty } from "@3sixty/entity";
-import type { ISchemaMigration } from "@3sixty/entity-storage-models";
-import { SchemaMigrationFactory } from "@3sixty/entity-storage-models";
+import { MemoryEntityStorageConnector } from "@3sixty/entity-storage-connector-memory";
+import {
+	EntityStorageConnectorFactory,
+	SchemaMigrationFactory,
+	type ISchemaMigration
+} from "@3sixty/entity-storage-models";
 import { AUTHORIZATION_MODEL_ID } from "../src/defaults.js";
 import { finalizeMigrations, initialiseMigrations } from "../src/migration.js";
 
 const MIGRATION_KEY = "AuthenticationUser_0_1";
 const AUTH_COMPONENT_TYPE = "test-authorization-component";
+const SCOPE_PROP = [{ property: "scope" } as unknown as IEntitySchemaProperty];
 
 type RemoveEntityPropertyFn = NonNullable<ISchemaMigration["removeEntityProperty"]>;
 
-const SCOPE_PROP = [{ property: "scope" } as unknown as IEntitySchemaProperty];
+describe("migration of v0 user scopes to roles", () => {
+	let accountData: MemoryEntityStorageConnector<AccountData>;
+	let addRoleForSubject: ReturnType<typeof vi.fn>;
+	let engineCore: IEngineCore;
+	let removeEntityProperty: RemoveEntityPropertyFn;
 
-describe("initialiseMigrations", () => {
-	let callRemoveEntityProperty: RemoveEntityPropertyFn;
-	let mockEngineCore: IEngineCore;
-	let mockAddRoleForSubject: ReturnType<typeof vi.fn>;
-	let getRegisteredInstanceTypeOptional: ReturnType<typeof vi.fn>;
+	/**
+	 * Run the v0 to v1 migration for a user in the node partition.
+	 * @param email The e-mail address of the user.
+	 * @param scope The scope of the user.
+	 * @param removed The properties being removed.
+	 */
+	async function migrateUser(
+		email: string,
+		scope: string,
+		removed: IEntitySchemaProperty[] = SCOPE_PROP
+	): Promise<void> {
+		await ContextIdStore.run({ node: "test-node" }, async () =>
+			removeEntityProperty({ email, identity: `did:twin:${email}`, scope }, removed)
+		);
+	}
 
-	beforeAll(() => {
-		getRegisteredInstanceTypeOptional = vi.fn().mockReturnValue(AUTH_COMPONENT_TYPE);
-		mockEngineCore = {
-			getRegisteredInstanceTypeOptional,
+	/**
+	 * Get the roles assigned to each subject.
+	 * @returns The roles by subject.
+	 */
+	function assignedRoles(): { [subject: string]: string[] } {
+		const roles: { [subject: string]: string[] } = {};
+		for (const [, subject, role] of addRoleForSubject.mock.calls as [string, string, string][]) {
+			roles[subject] = [...(roles[subject] ?? []), role].sort();
+		}
+		return roles;
+	}
+
+	beforeEach(() => {
+		Factory.clearFactories();
+		initSchema();
+		accountData = new MemoryEntityStorageConnector<AccountData>({
+			entitySchema: "AccountData",
+			config: { storageKey: "account-data" }
+		});
+		EntityStorageConnectorFactory.register("account-data", () => accountData);
+
+		addRoleForSubject = vi.fn().mockResolvedValue(undefined);
+		ComponentFactory.register(
+			AUTH_COMPONENT_TYPE,
+			() => ({ addRoleForSubject }) as unknown as IAuthorizationComponent
+		);
+		engineCore = {
+			getContextIds: () => ({ node: "test-node" }),
+			getRegisteredInstanceTypeOptional: vi.fn().mockReturnValue(undefined),
 			getRegisteredInstanceType: vi.fn().mockReturnValue(AUTH_COMPONENT_TYPE)
 		} as unknown as IEngineCore;
 
-		mockAddRoleForSubject = vi.fn().mockResolvedValue(undefined);
-		ComponentFactory.register(
-			AUTH_COMPONENT_TYPE,
-			() =>
-				({
-					addRoleForSubject: mockAddRoleForSubject
-				}) as unknown as IAuthorizationComponent
-		);
-
-		initialiseMigrations(mockEngineCore, {});
+		initialiseMigrations(engineCore, {});
 		const migration = SchemaMigrationFactory.get(MIGRATION_KEY);
-		const { removeEntityProperty } = migration;
-		if (!removeEntityProperty) {
+		if (!migration.removeEntityProperty) {
 			throw new Error("removeEntityProperty not registered on migration");
 		}
-		callRemoveEntityProperty = removeEntityProperty;
+		removeEntityProperty = migration.removeEntityProperty;
 	});
 
-	afterAll(() => {
-		try {
-			SchemaMigrationFactory.unregister(MIGRATION_KEY);
-		} catch {
-			// Ignore if already removed.
-		}
-		try {
-			ComponentFactory.unregister(AUTH_COMPONENT_TYPE);
-		} catch {
-			// Ignore if already removed.
-		}
-	});
-
-	afterEach(async () => {
-		// Drain any queued roles accumulated during the test to prevent cross-test pollution.
-		await finalizeMigrations(mockEngineCore, {});
-		mockAddRoleForSubject.mockClear();
-	});
-
-	test("registers the AuthenticationUser_0_1 migration with SchemaMigrationFactory", () => {
-		expect(typeof callRemoveEntityProperty).toBe("function");
-	});
-
-	test("removeEntityProperty is a no-op when scope is not in removedProperties", async () => {
-		await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "admin" }, []);
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).not.toHaveBeenCalled();
-	});
-
-	test("removeEntityProperty is a no-op when removedProperties contains other fields but not scope", async () => {
-		await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "admin" }, [
-			{ property: "password" } as unknown as IEntitySchemaProperty
-		]);
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).not.toHaveBeenCalled();
-	});
-
-	test("initialiseMigrations is a no-op when schema migration is disabled", () => {
+	test("does not register the migrations when schema migration is disabled", () => {
 		SchemaMigrationFactory.clear();
-		initialiseMigrations(mockEngineCore, { schemaMigrationEnabled: "false" });
+		initialiseMigrations(engineCore, { schemaMigrationEnabled: "false" });
 		expect(SchemaMigrationFactory.names()).toHaveLength(0);
 	});
 
-	test("removeEntityProperty splits comma-separated scope into individual roles", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty(
-				{ identity: "did:twin:user1", scope: "global-admin,user-admin" },
-				SCOPE_PROP
-			);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(2);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"global-admin"
-		);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"user-admin"
-		);
+	test("does nothing when the scope is not being removed", async () => {
+		await migrateUser("user1@test.com", "admin", []);
+		await migrateUser("user1@test.com", "admin", [
+			{ property: "password" } as unknown as IEntitySchemaProperty
+		]);
+		await finalizeMigrations(engineCore, {});
+
+		expect(addRoleForSubject).not.toHaveBeenCalled();
+		expect(await accountData.getStore()).toHaveLength(0);
 	});
 
-	test("removeEntityProperty trims whitespace and lowercases roles", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty(
-				{ identity: "did:twin:user1", scope: " ADMIN , User " },
-				SCOPE_PROP
-			);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(2);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"admin"
-		);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"user"
+	test("assigns each role of the scope to the account of the user, not its DID", async () => {
+		await migrateUser("user1@test.com", "global-admin,user-admin");
+		await finalizeMigrations(engineCore, {});
+
+		const roles = assignedRoles();
+		expect(Object.values(roles)).toEqual([["global-admin", "user-admin"]]);
+		expect(Object.keys(roles)[0]).not.toContain("did:");
+		expect(addRoleForSubject.mock.calls.every(call => call[0] === AUTHORIZATION_MODEL_ID)).toBe(
+			true
 		);
 	});
 
-	test("removeEntityProperty falls back to user role when scope is an empty string", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "" }, SCOPE_PROP);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(1);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"user"
-		);
+	test("trims and lower cases the roles", async () => {
+		await migrateUser("user1@test.com", " ADMIN , User ");
+		await finalizeMigrations(engineCore, {});
+
+		expect(Object.values(assignedRoles())).toEqual([["admin", "user"]]);
 	});
 
-	test("removeEntityProperty falls back to user role when scope contains only whitespace", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "  ,  " }, SCOPE_PROP);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(1);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"user"
-		);
-	});
-});
+	test.each(["", "  ,  "])("falls back to the user role for the scope '%s'", async scope => {
+		await migrateUser("user1@test.com", scope);
+		await finalizeMigrations(engineCore, {});
 
-describe("finalizeMigrations", () => {
-	let callRemoveEntityProperty: RemoveEntityPropertyFn;
-	let mockEngineCore: IEngineCore;
-	let mockAddRoleForSubject: ReturnType<typeof vi.fn>;
-
-	beforeAll(() => {
-		mockAddRoleForSubject = vi.fn().mockResolvedValue(undefined);
-		ComponentFactory.register(
-			`${AUTH_COMPONENT_TYPE}-finalize`,
-			() =>
-				({
-					addRoleForSubject: mockAddRoleForSubject
-				}) as unknown as IAuthorizationComponent
-		);
-
-		const getRegisteredInstanceTypeOptional = vi
-			.fn()
-			.mockReturnValue(`${AUTH_COMPONENT_TYPE}-finalize`);
-		mockEngineCore = {
-			getRegisteredInstanceTypeOptional,
-			getRegisteredInstanceType: vi.fn().mockReturnValue(`${AUTH_COMPONENT_TYPE}-finalize`)
-		} as unknown as IEngineCore;
-
-		initialiseMigrations(mockEngineCore, {});
-		const migration = SchemaMigrationFactory.get(MIGRATION_KEY);
-		const { removeEntityProperty } = migration;
-		if (!removeEntityProperty) {
-			throw new Error("removeEntityProperty not registered on migration");
-		}
-		callRemoveEntityProperty = removeEntityProperty;
+		expect(Object.values(assignedRoles())).toEqual([["user"]]);
 	});
 
-	afterAll(() => {
-		try {
-			SchemaMigrationFactory.unregister(MIGRATION_KEY);
-		} catch {
-			// Ignore if already removed.
-		}
-		try {
-			ComponentFactory.unregister(`${AUTH_COMPONENT_TYPE}-finalize`);
-		} catch {
-			// Ignore if already removed.
-		}
+	test("adds the devops and identity admin roles to a tenant and user admin", async () => {
+		await migrateUser("user1@test.com", "tenant-admin,user-admin");
+		await finalizeMigrations(engineCore, {});
+
+		expect(Object.values(assignedRoles())).toEqual([
+			["devops", "identity-admin", "identity-profile-admin", "tenant-admin", "user-admin"]
+		]);
 	});
 
-	afterEach(async () => {
-		// Drain any leftover queued roles.
-		await finalizeMigrations(mockEngineCore, {});
-		mockAddRoleForSubject.mockClear();
+	test("gives each user its own account", async () => {
+		await migrateUser("user1@test.com", "global-admin");
+		await migrateUser("user2@test.com", "tenant-admin");
+		await finalizeMigrations(engineCore, {});
+
+		expect(Object.values(assignedRoles()).sort()).toEqual([["global-admin"], ["tenant-admin"]]);
 	});
 
-	test("throws when roles are queued but no authorization component is registered", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "admin" }, SCOPE_PROP);
-		});
-		const engineCoreNoAuth: IEngineCore = {
-			getRegisteredInstanceTypeOptional: vi.fn().mockReturnValue(undefined),
+	test("keeps the account id when the migration runs again for the same user", async () => {
+		await migrateUser("User1@Test.com", "admin");
+		await migrateUser("User1@Test.com", "admin");
+		await finalizeMigrations(engineCore, {});
+
+		expect(Object.keys(assignedRoles())).toHaveLength(1);
+	});
+
+	test("gives users whose e-mail addresses differ only by case their own accounts", async () => {
+		await migrateUser("User1@Test.com", "admin");
+		await migrateUser("user1@test.com", "user");
+		await finalizeMigrations(engineCore, {});
+
+		expect(Object.values(assignedRoles()).sort()).toEqual([["admin"], ["user"]]);
+	});
+
+	test("uses the authorization model id from the environment", async () => {
+		await migrateUser("user1@test.com", "admin");
+		await finalizeMigrations(engineCore, { authorizationModelId: "custom-model" });
+
+		expect(addRoleForSubject).toHaveBeenCalledWith("custom-model", expect.any(String), "admin");
+	});
+
+	test("removes the completed work so a second run assigns nothing", async () => {
+		await migrateUser("user1@test.com", "admin");
+		await finalizeMigrations(engineCore, {});
+		expect(addRoleForSubject).toHaveBeenCalledTimes(1);
+		expect(await accountData.getStore()).toHaveLength(0);
+
+		addRoleForSubject.mockClear();
+		await finalizeMigrations(engineCore, {});
+		expect(addRoleForSubject).not.toHaveBeenCalled();
+	});
+
+	test("fails and keeps the work when no authorization component is registered", async () => {
+		await migrateUser("user1@test.com", "admin");
+		const noAuthorization = {
+			...engineCore,
 			getRegisteredInstanceType: vi.fn().mockImplementation(() => {
 				throw new GeneralError("node", "componentNotFound");
 			})
 		} as unknown as IEngineCore;
-		await expect(finalizeMigrations(engineCoreNoAuth, {})).rejects.toBeInstanceOf(GeneralError);
+
+		await expect(finalizeMigrations(noAuthorization, {})).rejects.toBeInstanceOf(GeneralError);
+		expect(await accountData.getStore()).toHaveLength(1);
 	});
 
-	test("is a no-op when no roles have been queued", async () => {
-		// migrateRoles is empty - drained by afterEach from the previous test.
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).not.toHaveBeenCalled();
+	test("does nothing without the account data storage or when schema migration is disabled", async () => {
+		await migrateUser("user1@test.com", "admin");
+		await finalizeMigrations(engineCore, { schemaMigrationEnabled: "false" });
+		EntityStorageConnectorFactory.unregister("account-data");
+		await finalizeMigrations(engineCore, {});
+
+		expect(addRoleForSubject).not.toHaveBeenCalled();
 	});
 
-	test("calls addRoleForSubject for every queued role", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty(
-				{ identity: "did:twin:user1", scope: "admin,user" },
-				SCOPE_PROP
-			);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(2);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"admin"
+	test("fails when the account data storage is missing while migrating", async () => {
+		EntityStorageConnectorFactory.unregister("account-data");
+
+		await expect(migrateUser("user1@test.com", "admin")).rejects.toThrow(
+			"migrationAccountDataMissing"
 		);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"user"
-		);
-	});
-
-	test("processes roles for multiple identities", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty(
-				{ identity: "did:twin:user1", scope: "global-admin" },
-				SCOPE_PROP
-			);
-			await callRemoveEntityProperty(
-				{ identity: "did:twin:user2", scope: "tenant-admin" },
-				SCOPE_PROP
-			);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(2);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user1",
-			"global-admin"
-		);
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith(
-			AUTHORIZATION_MODEL_ID,
-			"did:twin:user2",
-			"tenant-admin"
-		);
-	});
-
-	test("uses the authorizationModelId env var when provided", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "admin" }, SCOPE_PROP);
-		});
-		await finalizeMigrations(mockEngineCore, { authorizationModelId: "custom-model" });
-		expect(mockAddRoleForSubject).toHaveBeenCalledWith("custom-model", "did:twin:user1", "admin");
-	});
-
-	test("drains the queue so a second call is a no-op", async () => {
-		await ContextIdStore.run({ node: "test-node" }, async () => {
-			await callRemoveEntityProperty({ identity: "did:twin:user1", scope: "admin" }, SCOPE_PROP);
-		});
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).toHaveBeenCalledTimes(1);
-
-		mockAddRoleForSubject.mockClear();
-		await finalizeMigrations(mockEngineCore, {});
-		expect(mockAddRoleForSubject).not.toHaveBeenCalled();
 	});
 });

@@ -2,11 +2,41 @@
 	"group": "Authentication Operations",
 	"steps": [
 		{
-			"description": "PUT /authentication/password",
+			"description": "PUT /authentication/password - 403 wrong current password",
+			"method": "PUT",
+			"path": "/authentication/password",
+			"body": { "currentPassword": "Wrong@Password123456!", "newPassword": "NewPassword@123456!" },
+			"expectedStatus": 403,
+			"assert": { "body.message": "passwordHelper.currentPasswordMismatch" }
+		},
+		{
+			"description": "GET /authentication/me - the session still works after a wrong current password",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 200,
+			"assert": { "body.email": "{{adminEmail}}" }
+		},
+		{
+			"description": "GET /authentication/oauth/:provider/start - 404 for an unknown provider",
+			"method": "GET",
+			"path": "/authentication/oauth/unknown-provider/start",
+			"expectedStatus": 404,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "PUT /authentication/password - new token for the current session",
 			"method": "PUT",
 			"path": "/authentication/password",
 			"body": { "currentPassword": "{{adminPassword}}", "newPassword": "NewPassword@123456!" },
-			"expectedStatus": 204
+			"expectedStatus": 200,
+			"assert": { "body.expiry": "isDefined" },
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "GET /authentication/me - the current session continues",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 200
 		},
 		{
 			"description": "POST /authentication/login - re-login with new password",

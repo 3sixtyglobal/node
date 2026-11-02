@@ -1,0 +1,1068 @@
+{
+	"group": "Anonymous",
+	"steps": [
+		{
+			"description": "DELETE /aig/:id/proof - refused without a session",
+			"method": "DELETE",
+			"path": "/aig/fake/proof",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /ais/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/ais/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /ais/:id/entries/:entryId - refused without a session",
+			"method": "DELETE",
+			"path": "/ais/fake/entries/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /ais/:id/proof - refused without a session",
+			"method": "DELETE",
+			"path": "/ais/fake/proof",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /attestation/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/attestation/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authentication/account/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/authentication/account/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authentication/audit/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/authentication/audit/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authentication/me - refused without a session",
+			"method": "DELETE",
+			"path": "/authentication/me",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authorization/:modelId/role/:role/inherit/:inheritsFrom - refused without a session",
+			"method": "DELETE",
+			"path": "/authorization/fake/role/fake/inherit/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authorization/:modelId/subject/:subject/roles - refused without a session",
+			"method": "DELETE",
+			"path": "/authorization/fake/subject/fake/roles",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /automation/:actionId - refused without a session",
+			"method": "DELETE",
+			"path": "/automation/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /blob - refused without a session",
+			"method": "DELETE",
+			"path": "/blob",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /blob/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/blob/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /catalog/datasets/:datasetId - refused without a session",
+			"method": "DELETE",
+			"path": "/catalog/datasets/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /data-processing/rule-group/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/data-processing/rule-group/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /documents/:auditableItemGraphDocumentId/:revision - refused without a session",
+			"method": "DELETE",
+			"path": "/documents/fake/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /identity/:identity/alias/:alias - refused without a session",
+			"method": "DELETE",
+			"path": "/identity/fake/alias/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /identity/:identity/service/:serviceId - refused without a session",
+			"method": "DELETE",
+			"path": "/identity/fake/service/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /identity/:identity/verification-method/:verificationMethodId - refused without a session",
+			"method": "DELETE",
+			"path": "/identity/fake/verification-method/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /immutable-proof/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/immutable-proof/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /immutable-proof/:id/notarization - refused without a session",
+			"method": "DELETE",
+			"path": "/immutable-proof/fake/notarization",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /mailbox/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/mailbox/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /nft/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/nft/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /notarization/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/notarization/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /rights-management/negotiations/admin/:policyId - refused without a session",
+			"method": "DELETE",
+			"path": "/rights-management/negotiations/admin/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /rights-management/policy/admin/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/rights-management/policy/admin/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /telemetry/metric/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/telemetry/metric/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /aig - refused without a session",
+			"method": "GET",
+			"path": "/aig",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /aig/:id/changesets - refused without a session",
+			"method": "GET",
+			"path": "/aig/fake/changesets",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /aig/:id/changesets/:changesetId - refused without a session",
+			"method": "GET",
+			"path": "/aig/fake/changesets/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /aig/:id/versions - refused without a session",
+			"method": "GET",
+			"path": "/aig/fake/versions",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /aig/:id/versions/:version - refused without a session",
+			"method": "GET",
+			"path": "/aig/fake/versions/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais - refused without a session",
+			"method": "GET",
+			"path": "/ais",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais/:id/entries - refused without a session",
+			"method": "GET",
+			"path": "/ais/fake/entries",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais/:id/entries/:entryId - refused without a session",
+			"method": "GET",
+			"path": "/ais/fake/entries/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais/:id/entries/:entryId/object - refused without a session",
+			"method": "GET",
+			"path": "/ais/fake/entries/fake/object",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais/:id/entries/objects - refused without a session",
+			"method": "GET",
+			"path": "/ais/fake/entries/objects",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais/entries - refused without a session",
+			"method": "GET",
+			"path": "/ais/entries",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /ais/entries/objects - refused without a session",
+			"method": "GET",
+			"path": "/ais/entries/objects",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/admin/account/:accountId/export - refused without a session",
+			"method": "GET",
+			"path": "/authentication/admin/account/fake/export",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/admin/organization-request/count - refused without a session",
+			"method": "GET",
+			"path": "/authentication/admin/organization-request/count",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/audit - refused without a session",
+			"method": "GET",
+			"path": "/authentication/audit",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/policy - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/policy",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/policy/:subject - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/policy/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/role/:role/children - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/role/fake/children",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/role/:role/parents - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/role/fake/parents",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/role/:role/subjects - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/role/fake/subjects",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/roles - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/roles",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/subject/:subject/role/:role - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/subject/fake/role/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authorization/:modelId/subject/:subject/roles - refused without a session",
+			"method": "GET",
+			"path": "/authorization/fake/subject/fake/roles",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /automation - refused without a session",
+			"method": "GET",
+			"path": "/automation",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /blob - refused without a session",
+			"method": "GET",
+			"path": "/blob",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /blob/:id/content - refused without a session",
+			"method": "GET",
+			"path": "/blob/fake/content",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /data-processing/rule-group - refused without a session",
+			"method": "GET",
+			"path": "/data-processing/rule-group",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /data-processing/rule-group/:id - refused without a session",
+			"method": "GET",
+			"path": "/data-processing/rule-group/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /dataspace/app-datasets - refused without a session",
+			"method": "GET",
+			"path": "/dataspace/app-datasets",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /documents - refused without a session",
+			"method": "GET",
+			"path": "/documents",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /documents/:auditableItemGraphDocumentId/:revision - refused without a session",
+			"method": "GET",
+			"path": "/documents/fake/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /identity/verifiable-credential/verify - refused without a session",
+			"method": "GET",
+			"path": "/identity/verifiable-credential/verify",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /identity/verifiable-presentation/verify - refused without a session",
+			"method": "GET",
+			"path": "/identity/verifiable-presentation/verify",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /immutable-proof/:id/verify - refused without a session",
+			"method": "GET",
+			"path": "/immutable-proof/fake/verify",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /logging - refused without a session",
+			"method": "GET",
+			"path": "/logging",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /mailbox/connectors/:connectorType/schema - refused without a session",
+			"method": "GET",
+			"path": "/mailbox/connectors/fake/schema",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /rights-management/negotiations/:id - refused without a trusted caller's complete message",
+			"method": "GET",
+			"path": "/rights-management/negotiations/fake",
+			"anonymous": true,
+			"expectedStatus": 400
+		},
+		{
+			"description": "GET /rights-management/negotiations/admin - refused without a session",
+			"method": "GET",
+			"path": "/rights-management/negotiations/admin",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /rights-management/policy/admin - refused without a session",
+			"method": "GET",
+			"path": "/rights-management/policy/admin",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /rights-management/policy/admin/agreement/:id - refused without a session",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/agreement/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /rights-management/policy/admin/offer/:id - refused without a session",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/offer/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /rights-management/policy/admin/set/:id - refused without a session",
+			"method": "GET",
+			"path": "/rights-management/policy/admin/set/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /telemetry/metric - refused without a session",
+			"method": "GET",
+			"path": "/telemetry/metric",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /telemetry/metric/:id - refused without a session",
+			"method": "GET",
+			"path": "/telemetry/metric/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /telemetry/metric/:id/value - refused without a session",
+			"method": "GET",
+			"path": "/telemetry/metric/fake/value",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /telemetry/metric/:id/value/:valueId - refused without a session",
+			"method": "GET",
+			"path": "/telemetry/metric/fake/value/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /tracing - refused without a session",
+			"method": "GET",
+			"path": "/tracing",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /tracing/trace/:traceId - refused without a session",
+			"method": "GET",
+			"path": "/tracing/trace/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "PATCH /aig/:id - refused without a session",
+			"method": "PATCH",
+			"path": "/aig/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PATCH /documents/:auditableItemGraphDocumentId - refused without a session",
+			"method": "PATCH",
+			"path": "/documents/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/admin/account/:accountId/identity/export - refused without a session",
+			"method": "POST",
+			"path": "/authentication/admin/account/fake/identity/export",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/admin/organization-request/:id/reject - refused without a session",
+			"method": "POST",
+			"path": "/authentication/admin/organization-request/fake/reject",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/password/forgot - public, refuses an incomplete request",
+			"method": "POST",
+			"path": "/authentication/password/forgot",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/refresh - refused without a session",
+			"method": "POST",
+			"path": "/authentication/refresh",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/register - public, refuses an incomplete request",
+			"method": "POST",
+			"path": "/authentication/register",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /authorization/:modelId - refused without a session",
+			"method": "POST",
+			"path": "/authorization/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authorization/:modelId/policy/remove - refused without a session",
+			"method": "POST",
+			"path": "/authorization/fake/policy/remove",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authorization/:modelId/role/:role/inherit - refused without a session",
+			"method": "POST",
+			"path": "/authorization/fake/role/fake/inherit",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authorization/:modelId/roles/has - refused without a session",
+			"method": "POST",
+			"path": "/authorization/fake/roles/has",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /automation/trigger/:trigger - refused without a session",
+			"method": "POST",
+			"path": "/automation/trigger/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /catalog/datasets - refused without a session",
+			"method": "POST",
+			"path": "/catalog/datasets",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /data-processing/convert - refused without a session",
+			"method": "POST",
+			"path": "/data-processing/convert",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /data-processing/extract - refused without a session",
+			"method": "POST",
+			"path": "/data-processing/extract",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity - refused without a session",
+			"method": "POST",
+			"path": "/identity",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/alias - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/alias",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/proof/:verificationMethodId - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/proof/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/service - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/service",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/verifiable-credential/:verificationMethodId - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/verifiable-credential/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/verifiable-credential/revoke/:revocationIndex - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/verifiable-credential/revoke/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/verifiable-credential/unrevoke/:revocationIndex - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/verifiable-credential/unrevoke/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/verifiable-presentation/:verificationMethodId - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/verifiable-presentation/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/:identity/verification-method - refused without a session",
+			"method": "POST",
+			"path": "/identity/fake/verification-method",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/proof/verify - refused without a session",
+			"method": "POST",
+			"path": "/identity/proof/verify",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/verifiable-credential/verify/document - refused without a session",
+			"method": "POST",
+			"path": "/identity/verifiable-credential/verify/document",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /identity/verifiable-presentation/verify/document - refused without a session",
+			"method": "POST",
+			"path": "/identity/verifiable-presentation/verify/document",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /logging - refused without a session",
+			"method": "POST",
+			"path": "/logging",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /mailbox - refused without a session",
+			"method": "POST",
+			"path": "/mailbox",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /nft/:id/transfer - refused without a session",
+			"method": "POST",
+			"path": "/nft/fake/transfer",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /notarization/:id/transfer - refused without a session",
+			"method": "POST",
+			"path": "/notarization/fake/transfer",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/agreement - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/fake/agreement",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/agreement/verification - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/fake/agreement/verification",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/events - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/fake/events",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/offers - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/fake/offers",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/request - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/fake/request",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/:id/termination - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/fake/termination",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/admin - refused without a session",
+			"method": "POST",
+			"path": "/rights-management/negotiations/admin",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/negotiations/offers - refused without a trusted caller's complete message",
+			"method": "POST",
+			"path": "/rights-management/negotiations/offers",
+			"anonymous": true,
+			"expectedStatus": 400,
+			"body": {}
+		},
+		{
+			"description": "POST /rights-management/policy/admin - refused without a session",
+			"method": "POST",
+			"path": "/rights-management/policy/admin",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /aig/:id - refused without a session",
+			"method": "PUT",
+			"path": "/aig/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /ais/:id - refused without a session",
+			"method": "PUT",
+			"path": "/ais/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /ais/:id/close - refused without a session",
+			"method": "PUT",
+			"path": "/ais/fake/close",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /ais/:id/entries/:entryId - refused without a session",
+			"method": "PUT",
+			"path": "/ais/fake/entries/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /attestation/:id/transfer - refused without a session",
+			"method": "PUT",
+			"path": "/attestation/fake/transfer",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /authentication/account/:id - refused without a session",
+			"method": "PUT",
+			"path": "/authentication/account/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /authentication/audit/:id - refused without a session",
+			"method": "PUT",
+			"path": "/authentication/audit/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /blob/:id - refused without a session",
+			"method": "PUT",
+			"path": "/blob/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /data-processing/rule-group/:id - refused without a session",
+			"method": "PUT",
+			"path": "/data-processing/rule-group/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /mailbox/:id - refused without a session",
+			"method": "PUT",
+			"path": "/mailbox/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /nft/:id - refused without a session",
+			"method": "PUT",
+			"path": "/nft/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /notarization/:id - refused without a session",
+			"method": "PUT",
+			"path": "/notarization/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /rights-management/negotiations/admin/:policyId - refused without a session",
+			"method": "PUT",
+			"path": "/rights-management/negotiations/admin/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /rights-management/policy/admin/:id - refused without a session",
+			"method": "PUT",
+			"path": "/rights-management/policy/admin/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /telemetry/metric/:id - refused without a session",
+			"method": "PUT",
+			"path": "/telemetry/metric/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "PUT /tracing/:spanId - refused without a session",
+			"method": "PUT",
+			"path": "/tracing/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/admin/users/:email/enable - refused without a session",
+			"method": "POST",
+			"path": "/authentication/admin/users/fake/enable",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "POST /authentication/account/organization/create - refused without a session",
+			"method": "POST",
+			"path": "/authentication/account/organization/create",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"body": {}
+		},
+		{
+			"description": "GET /authentication/account/public/account/:accountId - refused without a session",
+			"method": "GET",
+			"path": "/authentication/account/public/account/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/admin/account/managed - refused without a session",
+			"method": "GET",
+			"path": "/authentication/admin/account/managed",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/admin/account/roles/assignable - refused without a session",
+			"method": "GET",
+			"path": "/authentication/admin/account/roles/assignable",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /authentication/organization/:id/member - refused without a session",
+			"method": "GET",
+			"path": "/authentication/organization/fake/member",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "DELETE /authentication/organization/:id/admin/:accountId - refused without a session",
+			"method": "DELETE",
+			"path": "/authentication/organization/fake/admin/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /tenants/api-key/:apiKey - refused without a session",
+			"method": "GET",
+			"path": "/tenants/api-key/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "GET /tenants/public-origin/:publicOrigin - refused without a session",
+			"method": "GET",
+			"path": "/tenants/public-origin/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "GET /tenants/organization/:organizationId - refused without a session",
+			"method": "GET",
+			"path": "/tenants/organization/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "DELETE /tenants/:id - refused without a session",
+			"method": "DELETE",
+			"path": "/tenants/fake",
+			"anonymous": true,
+			"expectedStatus": 401,
+			"skipIfOrgParamOmitted": true
+		},
+		{
+			"description": "DELETE /authorization/:modelId/subject/:subject/role/:role - refused without a session",
+			"method": "DELETE",
+			"path": "/authorization/fake/subject/fake/role/fake",
+			"anonymous": true,
+			"expectedStatus": 401
+		}
+	]
+}

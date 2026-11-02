@@ -1,0 +1,228 @@
+{
+	"group": "Organization",
+	"steps": [
+		{
+			"description": "POST /authentication/organization - create an organization with a node controlled DID",
+			"method": "POST",
+			"path": "/authentication/organization",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Endpoint Test Ltd"
+				},
+				"publicData": ["profile.name"]
+			},
+			"expectedStatus": 201,
+			"capture": { "testOrganizationId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/organization/:id - the organization, its profile and that the creator is its org admin",
+			"method": "GET",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 200,
+			"assert": {
+				"body.identity": "isDefined",
+				"body.profile.name": "Endpoint Test Ltd",
+				"body.publicData.0": "profile.name",
+				"body.isAdmin": true
+			},
+			"capture": { "testOrganizationIdentity": "body.identity" }
+		},
+		{
+			"description": "GET /authentication/admin/account - the profile is owned by the DID",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{testOrganizationIdentity}}&type=profile",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.data.name": "Endpoint Test Ltd" },
+			"capture": { "testOrganizationProfileId": "body.entities.0.id" }
+		},
+		{
+			"description": "POST /authentication/admin/account - 422 adding a profile to an organization",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{testOrganizationIdentity}}",
+				"type": "profile",
+				"data": { "name": "Changed Ltd" }
+			},
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.organizationProfileManaged"
+			}
+		},
+		{
+			"description": "PUT /authentication/admin/account/:id - 422 changing the profile of an organization",
+			"method": "PUT",
+			"path": "/authentication/admin/account/{{testOrganizationProfileId}}",
+			"body": { "data": { "name": "Changed Ltd" } },
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.organizationProfileManaged"
+			}
+		},
+		{
+			"description": "DELETE /authentication/admin/account/:id - 422 removing the profile of an organization",
+			"method": "DELETE",
+			"path": "/authentication/admin/account/{{testOrganizationProfileId}}",
+			"expectedStatus": 422,
+			"assert": {
+				"body.message": "entityStorageAuthenticationAccountAdminService.organizationProfileManaged"
+			}
+		},
+		{
+			"description": "PUT /authentication/organization/:id - change the profile, logo and public data",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Endpoint Test Ltd",
+					"email": "office@example.com",
+					"address": {
+						"@type": "PostalAddress",
+						"streetAddress": "1 High Street",
+						"addressLocality": "London"
+					}
+				},
+				"logo": {
+					"@context": "https://schema.org",
+					"@type": "ImageObject",
+					"encodingFormat": "image/png",
+					"contentUrl": "data:image/png;base64,iVBORw0KGgo="
+				},
+				"publicData": ["profile.name", "profile.address.addressLocality", "logo"]
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "PUT /authentication/organization/:id - 422 for a logo that is not a png, jpeg or svg",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"body": {
+				"logo": {
+					"@context": "https://schema.org",
+					"@type": "ImageObject",
+					"encodingFormat": "image/gif",
+					"contentUrl": "data:image/gif;base64,R0lGOD=="
+				}
+			},
+			"expectedStatus": 422,
+			"assert": { "body.message": "accountDataHelper.logoInvalid" }
+		},
+		{
+			"description": "PUT /authentication/organization/:id - 422 for public data that is not a list of paths",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"body": { "publicData": ["Not A Path"] },
+			"expectedStatus": 422,
+			"assert": { "body.message": "publicDataHelper.publicDataInvalid" }
+		},
+		{
+			"description": "GET /authentication/account/public/identity/:identity - the public data without a sign in",
+			"method": "GET",
+			"path": "/authentication/account/public/identity/{{testOrganizationIdentity}}",
+			"expectedStatus": 200,
+			"headers": { "cookie": "none=0" },
+			"assert": {
+				"body.0.name": "Endpoint Test Ltd",
+				"body.0.address.addressLocality": "London",
+				"body.0.address.@type": "PostalAddress",
+				"body.0.identifier": "{{testOrganizationIdentity}}",
+				"body.1.@type": "ImageObject"
+			}
+		},
+		{
+			"description": "GET /authentication/account/public/account/:accountId - the public data by the organization id",
+			"method": "GET",
+			"path": "/authentication/account/public/account/{{testOrganizationId}}",
+			"expectedStatus": 200,
+			"assert": { "body.0.name": "Endpoint Test Ltd" }
+		},
+		{
+			"description": "GET /authentication/account/public/identity/:identity - 404 for a DID no one holds",
+			"method": "GET",
+			"path": "/authentication/account/public/identity/did:example:nobody",
+			"expectedStatus": 404,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "GET /authentication/organization/:id/member - the creator is a member and org admin",
+			"method": "GET",
+			"path": "/authentication/organization/{{testOrganizationId}}/member",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.isAdmin": true }
+		},
+		{
+			"description": "PUT /authentication/organization/:id/admin/:accountId - 404 for an account that is not a member",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}/admin/not-a-member",
+			"expectedStatus": 404,
+			"assert": { "body.message": "entityStorageOrganizationService.organizationMemberNotFound" }
+		},
+		{
+			"description": "GET /authentication/organization - the organizations",
+			"method": "GET",
+			"path": "/authentication/organization",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.id": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/organization/search - find the organization by the start of its name",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=endpoint%20TEST",
+			"expectedStatus": 200,
+			"assert": {
+				"body.entities.0.id": "{{testOrganizationId}}",
+				"body.entities.0.public.0.name": "Endpoint Test Ltd",
+				"body.entities.0.public.0.address.addressLocality": "London"
+			}
+		},
+		{
+			"description": "PUT /authentication/organization/:id - rename the organization",
+			"method": "PUT",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"body": {
+				"profile": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"name": "Renamed Endpoint Ltd"
+				}
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/organization/search - the search follows the new name",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=renamed%20endpoint",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.id": "{{testOrganizationId}}" }
+		},
+		{
+			"description": "GET /authentication/organization/search - 400 without a name",
+			"method": "GET",
+			"path": "/authentication/organization/search",
+			"expectedStatus": 400
+		},
+		{
+			"description": "GET /authentication/organization/search - 401 for an anonymous caller",
+			"method": "GET",
+			"path": "/authentication/organization/search?name=endpoint",
+			"expectedStatus": 401,
+			"headers": { "cookie": "none=0" }
+		},
+		{
+			"description": "DELETE /authentication/organization/:id - the creator, its org admin and only member, removes it",
+			"method": "DELETE",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/organization/:id - 404 once removed",
+			"method": "GET",
+			"path": "/authentication/organization/{{testOrganizationId}}",
+			"expectedStatus": 404
+		}
+	]
+}

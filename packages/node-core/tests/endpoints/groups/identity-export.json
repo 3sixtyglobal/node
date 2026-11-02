@@ -1,0 +1,134 @@
+{
+	"group": "Identity - Export and Import",
+	"steps": [
+		{
+			"description": "POST /authentication/login - admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /identity - create an identity controlled by the organization",
+			"method": "POST",
+			"path": "/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "keysIdentity": "body.id" }
+		},
+		{
+			"description": "POST /identity/:identity/export - export the identity with its keys",
+			"method": "POST",
+			"path": "/identity/{{keysIdentity}}/export",
+			"expectedStatus": 200,
+			"capture": { "keysIdentityExport": "body" },
+			"assert": {
+				"header.cache-control": "no-store",
+				"body.version": 1,
+				"body.selfControlled": false,
+				"body.document.id": "{{keysIdentity}}",
+				"body.keys.0.privateKey": "isDefined"
+			}
+		},
+		{
+			"description": "POST /identity/import - 409 while the node holds the identity",
+			"method": "POST",
+			"path": "/identity/import",
+			"body": "{{keysIdentityExport}}",
+			"expectedStatus": 409
+		},
+		{
+			"description": "DELETE /identity/:identity - remove the identity with its keys",
+			"method": "DELETE",
+			"path": "/identity/{{keysIdentity}}?removeKeys=true&removeDocumentKey=true",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /identity/:identity - 404 once removed",
+			"method": "GET",
+			"path": "/identity/{{keysIdentity}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "POST /identity/import - import the exported identity",
+			"method": "POST",
+			"path": "/identity/import",
+			"body": "{{keysIdentityExport}}",
+			"expectedStatus": 200,
+			"assert": { "body.id": "{{keysIdentity}}" }
+		},
+		{
+			"description": "GET /identity/:identity - the imported identity resolves",
+			"method": "GET",
+			"path": "/identity/{{keysIdentity}}",
+			"expectedStatus": 200,
+			"assert": { "body.id": "{{keysIdentity}}" }
+		},
+		{
+			"description": "POST /authentication/admin/users - create a user without identity-admin",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "keys-user@node", "password": "KeysUser@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id",
+			"method": "GET",
+			"path": "/authentication/admin/users/keys-user%40node",
+			"expectedStatus": 200,
+			"capture": { "keysUserAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user role to the account",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{keysUserAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as the user without identity-admin",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "keys-user@node", "password": "KeysUser@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "POST /identity/:identity/export - 403 without identity:keys",
+			"method": "POST",
+			"path": "/identity/{{keysIdentity}}/export",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /identity/import - 403 without identity:keys",
+			"method": "POST",
+			"path": "/identity/import",
+			"body": "{{keysIdentityExport}}",
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "DELETE /authentication/admin/users - remove the user without identity-admin",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/keys-user%40node",
+			"expectedStatus": 204
+		},
+		{
+			"description": "DELETE /identity/:identity - remove the imported identity with its keys",
+			"method": "DELETE",
+			"path": "/identity/{{keysIdentity}}?removeKeys=true&removeDocumentKey=true",
+			"expectedStatus": 204
+		}
+	]
+}

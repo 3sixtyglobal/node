@@ -47,6 +47,15 @@ export function getExecutionDirectory(): string {
 }
 
 /**
+ * Normalise an e-mail address, trimmed and in lower case, as the authentication services store it.
+ * @param email The e-mail address.
+ * @returns The normalised e-mail address.
+ */
+export function normaliseEmail(email: string): string {
+	return email.trim().toLowerCase();
+}
+
+/**
  * Get the directory where the script is located.
  * @param args The command line arguments.
  * @returns The directory containing the entry-point script, or the current working directory if not determinable.

@@ -1,0 +1,304 @@
+{
+	"group": "Account Data - Self Service",
+	"steps": [
+		{
+			"description": "POST /authentication/register - 202 as sign up is open while the password provider is registered",
+			"method": "POST",
+			"path": "/authentication/register",
+			"auth": false,
+			"body": { "email": "self-signup@node", "password": "Self@Signup12345!" },
+			"expectedStatus": 202
+		},
+		{
+			"description": "POST /authentication/register/verify - 401 for an unknown token",
+			"method": "POST",
+			"path": "/authentication/register/verify",
+			"auth": false,
+			"body": { "token": "not-a-token" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "GET /identity/profile/:identity/public - the identity profile routes are deprecated",
+			"method": "GET",
+			"path": "/identity/profile/{{adminUserIdentity}}/public",
+			"auth": false,
+			"expectedStatus": 501,
+			"assert": { "body.properties.replacement": "/authentication/account" }
+		},
+		{
+			"description": "POST /identity - create identity for account test user",
+			"method": "POST",
+			"path": "/identity",
+			"body": {},
+			"expectedStatus": 200,
+			"capture": { "profileUserDid": "body.id" }
+		},
+		{
+			"description": "POST /authentication/admin/users - create account test user without escalated privilege",
+			"method": "POST",
+			"path": "/authentication/admin/users",
+			"body": { "email": "profile-user@node", "password": "Profile@Node12345!" },
+			"expectedStatus": 201
+		},
+		{
+			"description": "GET /authentication/admin/users/:email - capture the account id",
+			"method": "GET",
+			"path": "/authentication/admin/users/profile-user%40node",
+			"expectedStatus": 200,
+			"capture": { "profileAccountId": "body.accountId" }
+		},
+		{
+			"description": "POST /identity/:identity/verification-method - add a method to prove ownership of the DID",
+			"method": "POST",
+			"path": "/identity/{{profileUserDid}}/verification-method",
+			"body": {
+				"verificationMethodType": "assertionMethod",
+				"verificationMethodId": "account-binding"
+			},
+			"expectedStatus": 200
+		},
+		{
+			"description": "POST /identity/:identity/proof/:vmId - prove the DID is bound to the account",
+			"method": "POST",
+			"path": "/identity/{{profileUserDid}}/proof/account-binding",
+			"body": {
+				"proofType": "DataIntegrityProof",
+				"document": {
+					"@context": "https://schema.org",
+					"@type": "AuthorizeAction",
+					"agent": "{{profileUserDid}}",
+					"recipient": "{{profileAccountId}}"
+				}
+			},
+			"expectedStatus": 200,
+			"capture": { "profileIdentityProof": "body" }
+		},
+		{
+			"description": "POST /authentication/admin/account - store the identity of the account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{profileAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{profileUserDid}}" },
+				"proof": "{{profileIdentityProof}}"
+			},
+			"expectedStatus": 201
+		},
+		{
+			"description": "POST /authentication/admin/account - 409 storing a second identity for the account",
+			"method": "POST",
+			"path": "/authentication/admin/account",
+			"body": {
+				"accountId": "{{profileAccountId}}",
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{adminUserIdentity}}" }
+			},
+			"expectedStatus": 409
+		},
+		{
+			"description": "POST /authorization/system/subject/:subject/role - assign user role to the account",
+			"method": "POST",
+			"path": "/authorization/system/subject/{{profileAccountId}}/role",
+			"body": { "role": "user" },
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - login as account test user",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "profile-user@node", "password": "Profile@Node12345!" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" },
+			"assert": { "body.accountId": "{{profileAccountId}}" }
+		},
+		{
+			"description": "GET /authentication/me - the signed in account with its identity",
+			"method": "GET",
+			"path": "/authentication/me",
+			"expectedStatus": 200,
+			"assert": {
+				"body.accountId": "{{profileAccountId}}",
+				"body.authProviderId": "entity-storage",
+				"body.identity": "{{profileUserDid}}"
+			}
+		},
+		{
+			"description": "POST /authentication/account/identity - 400 without a JSON body",
+			"method": "POST",
+			"path": "/authentication/account/identity",
+			"expectedStatus": 400
+		},
+		{
+			"description": "POST /authentication/account - 403 setting its own identity",
+			"method": "POST",
+			"path": "/authentication/account",
+			"body": {
+				"type": "identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{adminUserIdentity}}" },
+				"isDefault": true
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/account - 403 setting its own organization",
+			"method": "POST",
+			"path": "/authentication/account",
+			"body": {
+				"type": "organization",
+				"data": {
+					"@context": "https://schema.org",
+					"@type": "Organization",
+					"identifier": "{{adminOrgIdentity}}"
+				},
+				"isDefault": true
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/account - 403 setting a type that normalises to identity",
+			"method": "POST",
+			"path": "/authentication/account",
+			"body": {
+				"type": "Identity",
+				"data": { "@context": "https://www.w3.org/ns/did/v1", "id": "{{adminUserIdentity}}" },
+				"isDefault": true
+			},
+			"expectedStatus": 403
+		},
+		{
+			"description": "POST /authentication/account/identity - 409 adopting a second identity",
+			"method": "POST",
+			"path": "/authentication/account/identity",
+			"body": {},
+			"expectedStatus": 409
+		},
+		{
+			"description": "GET /authentication/account?type=identity - the identity is unchanged",
+			"method": "GET",
+			"path": "/authentication/account?type=identity",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.data.id": "{{profileUserDid}}" }
+		},
+		{
+			"description": "POST /authentication/account - store its own public profile",
+			"method": "POST",
+			"path": "/authentication/account",
+			"body": {
+				"type": "profile",
+				"data": { "@context": "https://schema.org", "@type": "Person", "name": "Profile User" },
+				"isDefault": true
+			},
+			"expectedStatus": 201,
+			"capture": { "profileItemId": "location-last-segment" }
+		},
+		{
+			"description": "GET /authentication/account?type=profile - read its own public profile",
+			"method": "GET",
+			"path": "/authentication/account?type=profile",
+			"expectedStatus": 200,
+			"assert": { "body.entities.0.data.name": "Profile User" }
+		},
+		{
+			"description": "GET /authentication/account/:id - read its own public profile item",
+			"method": "GET",
+			"path": "/authentication/account/{{profileItemId}}",
+			"expectedStatus": 200,
+			"assert": { "body.type": "profile", "body.accountId": "{{profileAccountId}}" }
+		},
+		{
+			"description": "PUT /authentication/account/:id - update its own public profile item",
+			"method": "PUT",
+			"path": "/authentication/account/{{profileItemId}}",
+			"body": {
+				"data": { "@context": "https://schema.org", "@type": "Person", "name": "Renamed User" },
+				"isDefault": true
+			},
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/account/:id - the public profile item is updated",
+			"method": "GET",
+			"path": "/authentication/account/{{profileItemId}}",
+			"expectedStatus": 200,
+			"assert": { "body.data.name": "Renamed User" }
+		},
+		{
+			"description": "DELETE /authentication/account/:id - remove its own public profile item",
+			"method": "DELETE",
+			"path": "/authentication/account/{{profileItemId}}",
+			"expectedStatus": 204
+		},
+		{
+			"description": "GET /authentication/account/:id - 404 once removed",
+			"method": "GET",
+			"path": "/authentication/account/{{profileItemId}}",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/policy - the password policy",
+			"method": "GET",
+			"path": "/authentication/policy",
+			"expectedStatus": 200,
+			"assert": { "body.minPasswordLength": "isDefined" }
+		},
+		{
+			"description": "GET /authentication/providers - the authentication providers",
+			"method": "GET",
+			"path": "/authentication/providers",
+			"expectedStatus": 200,
+			"assert": { "body.providers.0.authProviderId": "entity-storage" }
+		},
+		{
+			"description": "POST /authentication/login/:authProviderId - 401 as password accounts use the login route",
+			"method": "POST",
+			"path": "/authentication/login/entity-storage",
+			"body": { "nonce": "endpoint-test-nonce", "code": "not-a-code" },
+			"expectedStatus": 401,
+			"assert": { "body.message": "entityStorageAuthenticationService.usePasswordLogin" }
+		},
+		{
+			"description": "DELETE /authentication/me - the account removes itself",
+			"method": "DELETE",
+			"path": "/authentication/me",
+			"expectedStatus": 204
+		},
+		{
+			"description": "POST /authentication/login - 401 once the account is removed",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "profile-user@node", "password": "Profile@Node12345!" },
+			"expectedStatus": 401
+		},
+		{
+			"description": "POST /authentication/login - restore admin session",
+			"method": "POST",
+			"path": "/authentication/login",
+			"apiKey": true,
+			"body": { "email": "{{adminEmail}}", "password": "{{adminPassword}}" },
+			"expectedStatus": 200,
+			"capture": { "authToken": "cookie:access_token" }
+		},
+		{
+			"description": "DELETE /authentication/admin/users - 404 as the account removed itself",
+			"method": "DELETE",
+			"path": "/authentication/admin/users/profile-user%40node",
+			"expectedStatus": 404
+		},
+		{
+			"description": "GET /authentication/admin/account - removing the account removed its account data",
+			"method": "GET",
+			"path": "/authentication/admin/account?accountId={{profileAccountId}}",
+			"expectedStatus": 200,
+			"assert": { "body.entities.length": 0 }
+		},
+		{
+			"description": "DELETE /identity/:identity - 404 as removing the account already removed its node held identity",
+			"method": "DELETE",
+			"path": "/identity/{{profileUserDid}}",
+			"expectedStatus": 404
+		}
+	]
+}

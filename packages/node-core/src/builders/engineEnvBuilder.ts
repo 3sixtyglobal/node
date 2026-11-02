@@ -1,8 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
 import path from "node:path";
-import { EnvHelper, GeneralError, Is, Mutex } from "@3sixty/core";
+import { CLIDisplay } from "@3sixty/cli-core";
+import { EnvHelper, GeneralError, I18n, Is, Mutex } from "@3sixty/core";
 import type { IIotaConfig } from "@3sixty/dlt-iota";
 import {
 	EngineCloneMode,
@@ -503,7 +505,8 @@ async function configureBlobStorage(
 						projectId: envVars.gcpStorageProjectId ?? "",
 						credentials: envVars.gcpStorageCredentials ?? "",
 						bucketName: envVars.gcpStorageBucketName ?? "",
-						apiEndpoint: envVars.gcpFirestoreEndpoint
+						// The Firestore endpoint was used here before, so it is kept as a fallback.
+						apiEndpoint: envVars.gcpStorageEndpoint ?? envVars.gcpFirestoreEndpoint
 					},
 					storagePrefix: envVars.blobStoragePrefix
 				}
@@ -1827,6 +1830,7 @@ async function configureIdentityProfile(
 	>(envVars, "identityProfileConnector", Object.values(IdentityProfileConnectorType));
 
 	if (identityProfileConnectorType === IdentityProfileConnectorType.EntityStorage) {
+		CLIDisplay.warning(I18n.formatMessage("warn.node.identityProfileDeprecated"));
 		coreConfig.types.identityProfileConnector.push({
 			type: IdentityProfileConnectorType.EntityStorage
 		});

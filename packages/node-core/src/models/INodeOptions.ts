@@ -1,4 +1,5 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import type { IEngineCore, IEngineServer, IEngineStateStorage } from "@3sixty/engine-models";
 import type { IEngineConfig } from "@3sixty/engine-types";
@@ -72,6 +73,12 @@ export interface INodeOptions {
 	 * The path to the favicon, defaults to static/favicon.png.
 	 */
 	favIconFile?: string;
+
+	/**
+	 * The directory of the messaging templates stored for each tenant that does not have them,
+	 * defaults to templates when it exists.
+	 */
+	messagingTemplatesDirectory?: string;
 
 	/**
 	 * Method to extend the engine environment variables with any additional custom configuration.

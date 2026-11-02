@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 
 /**
@@ -26,6 +27,12 @@ export interface StepDefinition {
 	 * organization DID (from the JWT access_token org claim) for tenant resolution.
 	 */
 	apiKey?: boolean;
+
+	/**
+	 * Default false - set to true to send the request without the session cookie, to check
+	 * that a route refuses a caller that is not signed in.
+	 */
+	anonymous?: boolean;
 
 	/**
 	 * Additional request headers.
@@ -62,8 +69,8 @@ export interface StepDefinition {
 
 	/**
 	 * Assert values after capture.
-	 * Key: "body.<dot.path>" | "body" | "text"
-	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | literal
+	 * Key: "body.<dot.path>" | "body" | "text" | "header.<name>"
+	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | "contains:<text>" | literal
 	 */
 	assert?: { [key: string]: unknown };
 
