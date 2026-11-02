@@ -103,8 +103,8 @@
 			"path": "/authentication/account/organization/request",
 			"expectedStatus": 200,
 			"assert": {
-				"body.request.status": "pending",
-				"body.request.organization": "{{adminOrgIdentity}}"
+				"body.requests.0.status": "pending",
+				"body.requests.0.organization": "{{adminOrgIdentity}}"
 			}
 		},
 		{
@@ -193,8 +193,8 @@
 			"path": "/authentication/account/organization/request",
 			"expectedStatus": 200,
 			"assert": {
-				"body.request.status": "rejected",
-				"body.request.reason": "organizationRequest.reason.notAMember"
+				"body.requests.0.status": "rejected",
+				"body.requests.0.reason": "organizationRequest.reason.notAMember"
 			}
 		},
 		{
@@ -205,9 +205,9 @@
 			"expectedStatus": 204
 		},
 		{
-			"description": "DELETE /authentication/account/organization/request - cancel the pending request",
+			"description": "DELETE /authentication/account/organization/request/:organization - cancel the pending request",
 			"method": "DELETE",
-			"path": "/authentication/account/organization/request",
+			"path": "/authentication/account/organization/request/{{adminOrgIdentity}}",
 			"expectedStatus": 204
 		},
 		{
@@ -216,14 +216,14 @@
 			"path": "/authentication/account/organization/request",
 			"expectedStatus": 200,
 			"assert": {
-				"body.request.status": "rejected",
-				"body.request.reason": "organizationRequest.reason.notAMember"
+				"body.requests.0.status": "rejected",
+				"body.requests.0.reason": "organizationRequest.reason.notAMember"
 			}
 		},
 		{
-			"description": "DELETE /authentication/account/organization/request - 404 when no request is pending",
+			"description": "DELETE /authentication/account/organization/request/:organization - 404 when no request is pending",
 			"method": "DELETE",
-			"path": "/authentication/account/organization/request",
+			"path": "/authentication/account/organization/request/{{adminOrgIdentity}}",
 			"expectedStatus": 404,
 			"assert": { "body.message": "organizationRequestHelper.organizationRequestNotFound" }
 		},
@@ -303,9 +303,9 @@
 			"path": "/authentication/account/organization/request",
 			"expectedStatus": 200,
 			"assert": {
-				"body.request.status": "rejected",
-				"body.request.organization": "{{adminOrgIdentity}}",
-				"body.request.reason": "organizationRequest.reason.notAMember"
+				"body.requests.0.status": "rejected",
+				"body.requests.0.organization": "{{adminOrgIdentity}}",
+				"body.requests.0.reason": "organizationRequest.reason.notAMember"
 			}
 		},
 		{

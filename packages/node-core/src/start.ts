@@ -12,7 +12,7 @@ import { EngineCoreFactory, type IEngineCore, type IEngineCoreConfig } from "@3s
 import { EngineServer } from "@3sixty/engine-server";
 import type { IEngineServerConfig } from "@3sixty/engine-server-types";
 import { BlobStorageConnectorType, EntityStorageConnectorType } from "@3sixty/engine-types";
-import { registerPartitionOrganizations } from "./accountData.js";
+import { registerAccountDataVerifiers, registerPartitionOrganizations } from "./accountData.js";
 import {
 	extensionsInitialiseEngine,
 	extensionsInitialiseEngineServer,
@@ -104,6 +104,9 @@ export async function start(
 	});
 
 	configureContextIdKeys(engine, availableContextIdKeys);
+
+	// Registered before the engine is extended, so an extension can add or replace a verifier.
+	registerAccountDataVerifiers();
 
 	// Construct the server with the engine.
 	const server = new EngineServer({ engineCore: engine });

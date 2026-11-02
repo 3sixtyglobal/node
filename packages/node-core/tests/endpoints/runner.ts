@@ -5,9 +5,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { Converter, Is } from "@3sixty/core";
 export type { GroupDefinition } from "./models/groupDefinition.js";
+export type { ProbedStep } from "./models/probedStep.js";
 export type { RunnerContext } from "./models/runnerContext.js";
 export type { StepDefinition } from "./models/stepDefinition.js";
 import type { GroupDefinition } from "./models/groupDefinition.js";
+import type { ProbedStep } from "./models/probedStep.js";
 import type { RunnerContext } from "./models/runnerContext.js";
 import type { StepDefinition } from "./models/stepDefinition.js";
 
@@ -173,7 +175,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 	}
 	// Always send the JWT cookie when one is available so the server can extract the
 	// tenant ID from it on every route, including those marked skipAuth:true.
-	if (ctx.authToken) {
+	if (ctx.authToken && step.anonymous !== true) {
 		headers.cookie = `access_token=${ctx.authToken}`;
 	}
 	if (step.headers) {
@@ -195,6 +197,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 	}
 
 	const res = await fetch(urlStr, fetchOptions);
+	ctx.probed?.push({ method: step.method, path: step.path.split("?")[0], status: res.status });
 
 	// Parse response body - skip for 204 No Content; otherwise prefer JSON when the
 	// content-type indicates it, falling back to plain text.
@@ -330,4 +333,61 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 			}
 		}
 	}
+}
+
+/**
+ * Finds the routes the steps did not reach with a success response, and those they did not
+ * reach with a failure response. A step reaches the most specific route whose path matches
+ * its own, a {{varName}} token or any value matching a :param segment.
+ * @param routes The routes the server built.
+ * @param probed The requests the steps sent.
+ * @param withoutFailure Routes that have no failure response to probe, such as public status
+ * routes, as "METHOD /path".
+ * @returns The routes, as "METHOD /path", never reached, never reached with a success and never
+ * reached with a failure.
+ */
+export function findUnprobedRoutes(
+	routes: { method: string; path: string }[],
+	probed: ProbedStep[],
+	withoutFailure: string[]
+): { unreached: string[]; noSuccess: string[]; noFailure: string[] } {
+	const statuses = new Map<string, number[]>();
+	for (const step of probed) {
+		const stepParts = step.path.split("/").filter(part => part.length > 0);
+		let best: string | undefined;
+		let bestLiterals = -1;
+		for (const route of routes) {
+			const routeParts = route.path.split("/").filter(part => part.length > 0);
+			const matches =
+				route.method.toUpperCase() === step.method.toUpperCase() &&
+				routeParts.length === stepParts.length &&
+				routeParts.every((part, i) => part.startsWith(":") || part === stepParts[i]);
+			const literals = routeParts.filter(part => !part.startsWith(":")).length;
+			if (matches && literals > bestLiterals) {
+				bestLiterals = literals;
+				best = `${route.method.toUpperCase()} ${route.path}`;
+			}
+		}
+		if (best) {
+			statuses.set(best, [...(statuses.get(best) ?? []), step.status]);
+		}
+	}
+
+	const unreached: string[] = [];
+	const noSuccess: string[] = [];
+	const noFailure: string[] = [];
+	for (const route of routes) {
+		const key = `${route.method.toUpperCase()} ${route.path}`;
+		const reached = statuses.get(key) ?? [];
+		if (reached.length === 0) {
+			unreached.push(key);
+		}
+		if (!reached.some(status => status < 400)) {
+			noSuccess.push(key);
+		}
+		if (!withoutFailure.includes(key) && !reached.some(status => status >= 400)) {
+			noFailure.push(key);
+		}
+	}
+	return { unreached, noSuccess, noFailure };
 }

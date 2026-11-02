@@ -603,11 +603,11 @@
 			"assert": { "body.entities.length": 0 }
 		},
 		{
-			"description": "GET /authentication/admin/account/roles/assignable - a scoped user-admin may grant the roles it holds",
+			"description": "GET /authentication/admin/account/roles/assignable - a scoped user-admin may grant only the assignable roles it holds",
 			"method": "GET",
 			"path": "/authentication/admin/account/roles/assignable",
 			"expectedStatus": 200,
-			"assert": { "body.roles.0": "user", "body.roles.1": "user-admin" }
+			"assert": { "body.roles.0": "user-admin", "body.roles.length": 1 }
 		},
 		{
 			"description": "PUT /authentication/admin/account/:accountId/roles/:role - a scoped user-admin makes a member a user-admin",

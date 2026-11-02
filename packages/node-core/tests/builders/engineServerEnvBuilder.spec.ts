@@ -804,7 +804,9 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				verificationMethodId: "trust-assertion",
 				identityProofMaxAgeSeconds: 120,
 				escalatedPrivilegeRole: "global-admin",
-				authorizationModelId: "system"
+				authorizationModelId: "system",
+				assignableRoles: ["user-admin"],
+				recentSignInSeconds: undefined
 			}
 		});
 	});

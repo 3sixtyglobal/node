@@ -29,6 +29,12 @@ export interface StepDefinition {
 	apiKey?: boolean;
 
 	/**
+	 * Default false - set to true to send the request without the session cookie, to check
+	 * that a route refuses a caller that is not signed in.
+	 */
+	anonymous?: boolean;
+
+	/**
 	 * Additional request headers.
 	 * Header values support {{varName}} interpolation.
 	 */

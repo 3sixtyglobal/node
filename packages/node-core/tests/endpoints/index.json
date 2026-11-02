@@ -35,6 +35,7 @@
 	"dataspace-app-datasets",
 	"dataspace-transfers",
 	"dataspace-data-plane",
+	"anonymous",
 	"health",
 	"logout"
 ]

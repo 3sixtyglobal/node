@@ -1,5 +1,6 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { ProbedStep } from "./probedStep.js";
 
 /**
  * Shared mutable state threaded through every step in a test run.
@@ -49,4 +50,10 @@ export interface RunnerContext {
 	 * (e.g. verifying that a missing org param produces a particular error) do not apply.
 	 */
 	isSingleTenant?: boolean;
+
+	/**
+	 * When given, each request a step sends is recorded here, so a test can check that every
+	 * route was reached with both a success and a failure response.
+	 */
+	probed?: ProbedStep[];
 }

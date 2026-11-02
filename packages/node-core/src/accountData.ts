@@ -2,11 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0.
 import {
 	type AccountData,
+	AvatarAccountDataVerifier,
+	IdentityAccountDataVerifier,
+	LogoAccountDataVerifier,
 	type Organization,
+	OrganizationAccountDataVerifier,
 	OrganizationHelper,
-	OrganizationMembershipHelper
+	OrganizationMembershipHelper,
+	PublicDataAccountDataVerifier,
+	VerifiableCredentialAccountDataVerifier
 } from "@3sixty/api-auth-account-service";
 import {
+	AccountDataValidationFactory,
 	AuthenticationAccountDataType,
 	AuthenticationAccountHelper,
 	type IAuthenticationAccountAdminComponent,
@@ -228,4 +235,36 @@ export async function setAccountData(
 	} else {
 		await accountAdmin.create(accountId, type, data, true);
 	}
+}
+
+/**
+ * Register the verifiers of the account data types with a meaning to the node, so every item of
+ * those types is checked before it is stored, and a type with no verifier only has to be a JSON
+ * object. An extension can register a verifier of its own for another type, or replace one of these.
+ */
+export function registerAccountDataVerifiers(): void {
+	AccountDataValidationFactory.register(
+		AuthenticationAccountDataType.Identity,
+		() => new IdentityAccountDataVerifier()
+	);
+	AccountDataValidationFactory.register(
+		AuthenticationAccountDataType.Organization,
+		() => new OrganizationAccountDataVerifier()
+	);
+	AccountDataValidationFactory.register(
+		AuthenticationAccountDataType.VerifiableCredential,
+		() => new VerifiableCredentialAccountDataVerifier()
+	);
+	AccountDataValidationFactory.register(
+		AuthenticationAccountDataType.PublicData,
+		() => new PublicDataAccountDataVerifier()
+	);
+	AccountDataValidationFactory.register(
+		AuthenticationAccountDataType.Logo,
+		() => new LogoAccountDataVerifier()
+	);
+	AccountDataValidationFactory.register(
+		AuthenticationAccountDataType.Avatar,
+		() => new AvatarAccountDataVerifier()
+	);
 }

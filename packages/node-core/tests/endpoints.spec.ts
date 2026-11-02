@@ -36,7 +36,13 @@ import {
 	type IEntityStorageConnector
 } from "@3sixty/entity-storage-models";
 import type { ITrustComponent } from "@3sixty/trust-models";
-import { loadAndRunGroups, runGroup, type RunnerContext } from "./endpoints/runner.js";
+import {
+	findUnprobedRoutes,
+	loadAndRunGroups,
+	runGroup,
+	type ProbedStep,
+	type RunnerContext
+} from "./endpoints/runner.js";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import {
 	DEFAULT_DEVOPS_ROLE,
@@ -357,8 +363,10 @@ describe("node-core", () => {
 		// Phase 3: Exercise endpoints as a client, using the test definitions in tests/endpoints.
 		// The rights-negotiations-agreement group runs the full DSP negotiation flow to create
 		// a real ODRL Agreement and captures its ID into dataspaceAgreementId for the transfer tests.
+		const probed: ProbedStep[] = [];
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/index.json"), {
+				probed,
 				baseUrl: `http://localhost:${TEST_PORT}`,
 				apiKeyQuery: `x-api-key=${TEST_TENANT_API_KEY}`,
 				authToken: "",
@@ -384,6 +392,63 @@ describe("node-core", () => {
 					baseUrl: `http://localhost:${TEST_PORT}`
 				},
 				serverStartTime
+			});
+
+			// Every route the node serves is reached with a success and a failure response, apart
+			// from the public status routes, which have no failure to probe.
+			expect(
+				findUnprobedRoutes(serverResult?.server?.getRestRoutes() ?? [], probed, [
+					"GET /",
+					"GET /favicon.ico",
+					"GET /.well-known/dspace-version",
+					"GET /health",
+					"GET /info",
+					"GET /livez",
+					"GET /readyz",
+					"GET /spec",
+					"GET /authentication/policy",
+					"GET /authentication/providers",
+					"POST /authentication/logout"
+				])
+			).toEqual({
+				unreached: [],
+				// The routes only reached with a failure here: the deprecated identity profile routes,
+				// which always refuse, those another test reaches with a success, such as signing up,
+				// and those that need data this run does not create. A new route must not join them.
+				noSuccess: [
+					"GET /favicon.ico",
+					"POST /authentication/login/:authProviderId",
+					"POST /authentication/register/verify",
+					"POST /authentication/password/reset",
+					"POST /authentication/account/organization/create",
+					"POST /authentication/admin/account/:accountId/identity",
+					"POST /authentication/admin/account/:accountId/identity/import",
+					"GET /authentication/admin/account/managed",
+					"DELETE /authentication/admin/account/:id",
+					"PUT /authentication/organization/:id/admin/:accountId",
+					"DELETE /authentication/organization/:id/admin/:accountId",
+					"GET /tenants/organization/:organizationId",
+					"GET /tenants/public-origin/:publicOrigin",
+					"POST /identity/profile",
+					"GET /identity/profile",
+					"GET /identity/profile/:userIdentity",
+					"GET /identity/profile/:identity/public",
+					"PUT /identity/profile",
+					"PUT /identity/profile/:userIdentity",
+					"DELETE /identity/profile",
+					"DELETE /identity/profile/:userIdentity",
+					"GET /identity/profile/query",
+					"GET /identity/profile/admin/query",
+					"GET /mailbox/mail/:id",
+					"DELETE /mailbox/mail/:id",
+					"GET /mailbox/authcallback",
+					"POST /catalog/request",
+					"POST /dataspace/transfers/:pid/suspend",
+					"POST /dataspace/transfers/:pid/terminate",
+					"POST /dataspace/inbox",
+					"GET /dataspace/activity-logs/:id"
+				],
+				noFailure: []
 			});
 		} finally {
 			await serverResult?.shutdown();
