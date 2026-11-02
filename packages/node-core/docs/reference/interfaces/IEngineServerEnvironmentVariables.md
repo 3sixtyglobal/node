@@ -28,6 +28,34 @@ The CORS origins to allow, defaults to *.
 
 ***
 
+### corsWildcardCredentials? {#corswildcardcredentials}
+
+> `optional` **corsWildcardCredentials?**: `string`
+
+Reflect any origin with credentials when the CORS origins include *, defaults to true. Set to
+false so credentials are only allowed for listed origins.
+
+***
+
+### trustedProxies? {#trustedproxies}
+
+> `optional` **trustedProxies?**: `string`
+
+Comma separated IP addresses or CIDR ranges of the proxies trusted to set X-Forwarded-For and
+X-Real-IP, * trusts any proxy. Defaults to none, so the client IP is the socket address. The
+authentication rate limits only use client addresses when it is set.
+
+***
+
+### originCheckEnabled? {#origincheckenabled}
+
+> `optional` **originCheckEnabled?**: `string`
+
+Reject cookie authenticated state changing requests, and socket connections, from origins other than
+the API, its public origin and the listed CORS origins, defaults to false.
+
+***
+
 ### httpMethods? {#httpmethods}
 
 > `optional` **httpMethods?**: `string`
@@ -129,6 +157,453 @@ The minimum password length for new password validation.
 > `optional` **authMaxPasswordLength?**: `string`
 
 The maximum password length for new password validation.
+
+***
+
+### authProviders? {#authproviders}
+
+> `optional` **authProviders?**: `string`
+
+The authentication providers to enable, comma separated: entity-storage, google, microsoft.
+
+#### Default
+
+```ts
+entity-storage
+```
+
+***
+
+### authGoogleClientId? {#authgoogleclientid}
+
+> `optional` **authGoogleClientId?**: `string`
+
+The client id registered with Google, required when the google provider is enabled.
+
+***
+
+### authGoogleClientSecret? {#authgoogleclientsecret}
+
+> `optional` **authGoogleClientSecret?**: `string`
+
+The client secret registered with Google, required when the google provider is enabled.
+
+***
+
+### authGoogleAllowedDomains? {#authgooglealloweddomains}
+
+> `optional` **authGoogleAllowedDomains?**: `string`
+
+The domains Google accounts may sign in from, comma separated, any domain when not set.
+
+***
+
+### authGoogleProfileEditUrl? {#authgoogleprofileediturl}
+
+> `optional` **authGoogleProfileEditUrl?**: `string`
+
+The address where Google accounts edit their profile.
+
+#### Default
+
+```ts
+https://myaccount.google.com/personal-info
+```
+
+***
+
+### authGooglePasswordChangeUrl? {#authgooglepasswordchangeurl}
+
+> `optional` **authGooglePasswordChangeUrl?**: `string`
+
+The address where Google accounts change their password.
+
+#### Default
+
+```ts
+https://myaccount.google.com/signinoptions/password
+```
+
+***
+
+### authMicrosoftClientId? {#authmicrosoftclientid}
+
+> `optional` **authMicrosoftClientId?**: `string`
+
+The client id registered with Microsoft, required when the microsoft provider is enabled.
+
+***
+
+### authMicrosoftClientSecret? {#authmicrosoftclientsecret}
+
+> `optional` **authMicrosoftClientSecret?**: `string`
+
+The client secret registered with Microsoft, required when the microsoft provider is enabled.
+
+***
+
+### authMicrosoftTenant? {#authmicrosofttenant}
+
+> `optional` **authMicrosoftTenant?**: `string`
+
+The Microsoft tenant accounts sign in from, a tenant id or one of common, organizations or
+consumers, required when the microsoft provider is enabled.
+
+***
+
+### authMicrosoftAllowedTenants? {#authmicrosoftallowedtenants}
+
+> `optional` **authMicrosoftAllowedTenants?**: `string`
+
+The Microsoft tenant ids accounts may sign in from, comma separated, any tenant when not set.
+The e-mail addresses of accounts from these tenants are trusted without the xms_edov claim.
+
+***
+
+### authMicrosoftProfileEditUrl? {#authmicrosoftprofileediturl}
+
+> `optional` **authMicrosoftProfileEditUrl?**: `string`
+
+The address where Microsoft work accounts edit their profile.
+
+#### Default
+
+```ts
+https://myaccount.microsoft.com/
+```
+
+***
+
+### authMicrosoftPasswordChangeUrl? {#authmicrosoftpasswordchangeurl}
+
+> `optional` **authMicrosoftPasswordChangeUrl?**: `string`
+
+The address where Microsoft work accounts change their password.
+
+#### Default
+
+```ts
+https://mysignins.microsoft.com/security-info/password/change
+```
+
+***
+
+### authMicrosoftPersonalProfileEditUrl? {#authmicrosoftpersonalprofileediturl}
+
+> `optional` **authMicrosoftPersonalProfileEditUrl?**: `string`
+
+The address where personal Microsoft accounts, from the consumer tenant, edit their profile.
+
+#### Default
+
+```ts
+https://account.microsoft.com/profile
+```
+
+***
+
+### authMicrosoftPersonalPasswordChangeUrl? {#authmicrosoftpersonalpasswordchangeurl}
+
+> `optional` **authMicrosoftPersonalPasswordChangeUrl?**: `string`
+
+The address where personal Microsoft accounts, from the consumer tenant, change their password.
+
+#### Default
+
+```ts
+https://account.live.com/password/Change
+```
+
+***
+
+### authOAuthSuccessRedirectUrl? {#authoauthsuccessredirecturl}
+
+> `optional` **authOAuthSuccessRedirectUrl?**: `string`
+
+The address to send the browser to after a successful OAuth sign in, required when an OAuth provider is enabled.
+
+***
+
+### authOAuthFailureRedirectUrl? {#authoauthfailureredirecturl}
+
+> `optional` **authOAuthFailureRedirectUrl?**: `string`
+
+The address to send the browser to when an OAuth sign in fails, required when an OAuth provider is enabled.
+
+***
+
+### authDefaultRoles? {#authdefaultroles}
+
+> `optional` **authDefaultRoles?**: `string`
+
+The roles given to accounts created by a provider login or a sign up, comma separated.
+
+#### Default
+
+```ts
+user
+```
+
+***
+
+### authIdentityProofMaxAgeSeconds? {#authidentityproofmaxageseconds}
+
+> `optional` **authIdentityProofMaxAgeSeconds?**: `string`
+
+How long a proof that a DID is owned may be used for when binding it to an account, in seconds.
+
+#### Default
+
+```ts
+300
+```
+
+***
+
+### authRecentSignInSeconds? {#authrecentsigninseconds}
+
+> `optional` **authRecentSignInSeconds?**: `string`
+
+How long ago a session may have started for sensitive operations, such as removing an account
+or exporting an identity, in seconds.
+
+#### Default
+
+```ts
+300
+```
+
+***
+
+### authEmailSender? {#authemailsender}
+
+> `optional` **authEmailSender?**: `string`
+
+The sender of the password reset and sign up e-mails, required with entity storage authentication.
+
+***
+
+### authEmailCompanyName? {#authemailcompanyname}
+
+> `optional` **authEmailCompanyName?**: `string`
+
+The company name shown in the authentication e-mails, given to the templates as companyName.
+
+***
+
+### authEmailLocale? {#authemaillocale}
+
+> `optional` **authEmailLocale?**: `string`
+
+The locale of the password reset and sign up e-mails.
+
+#### Default
+
+```ts
+en
+```
+
+***
+
+### authPasswordResetUrl? {#authpasswordreseturl}
+
+> `optional` **authPasswordResetUrl?**: `string`
+
+The address of the page that resets the password, the token is added as the token query
+parameter, required with entity storage authentication.
+
+***
+
+### authPasswordResetExpiryMinutes? {#authpasswordresetexpiryminutes}
+
+> `optional` **authPasswordResetExpiryMinutes?**: `string`
+
+How long a password reset link can be used for, in minutes.
+
+#### Default
+
+```ts
+30
+```
+
+***
+
+### authPasswordResetEmailTemplateId? {#authpasswordresetemailtemplateid}
+
+> `optional` **authPasswordResetEmailTemplateId?**: `string`
+
+The messaging template of the password reset e-mail, given the resetUrl, expires and
+expiryMinutes values.
+
+#### Default
+
+```ts
+password-reset
+```
+
+***
+
+### authOrganizationMemberAdminRole? {#authorganizationmemberadminrole}
+
+> `optional` **authOrganizationMemberAdminRole?**: `string`
+
+The role given to the first member of an organization created through the organization endpoints.
+
+#### Default
+
+```ts
+user-admin
+```
+
+***
+
+### authPasswordHashIterations? {#authpasswordhashiterations}
+
+> `optional` **authPasswordHashIterations?**: `string`
+
+The Argon2id iterations used to hash new passwords.
+
+#### Default
+
+```ts
+2
+```
+
+***
+
+### authPasswordHashMemoryKib? {#authpasswordhashmemorykib}
+
+> `optional` **authPasswordHashMemoryKib?**: `string`
+
+The Argon2id memory used to hash new passwords, in KiB.
+
+#### Default
+
+```ts
+19456
+```
+
+***
+
+### authPasswordHashParallelism? {#authpasswordhashparallelism}
+
+> `optional` **authPasswordHashParallelism?**: `string`
+
+The Argon2id parallelism used to hash new passwords.
+
+#### Default
+
+```ts
+1
+```
+
+***
+
+### authRegistrationVerificationUrl? {#authregistrationverificationurl}
+
+> `optional` **authRegistrationVerificationUrl?**: `string`
+
+The address of the page that verifies a sign up, the token is added as the token query
+parameter, required with entity storage authentication.
+
+***
+
+### authRegistrationVerificationExpiryMinutes? {#authregistrationverificationexpiryminutes}
+
+> `optional` **authRegistrationVerificationExpiryMinutes?**: `string`
+
+How long a sign up verification link can be used for, in minutes.
+
+#### Default
+
+```ts
+1440
+```
+
+***
+
+### authRegistrationVerificationEmailTemplateId? {#authregistrationverificationemailtemplateid}
+
+> `optional` **authRegistrationVerificationEmailTemplateId?**: `string`
+
+The messaging template of the sign up verification e-mail, given the verifyUrl, expires and
+expiryMinutes values.
+
+#### Default
+
+```ts
+registration-verify
+```
+
+***
+
+### authRegistrationExistsEmailTemplateId? {#authregistrationexistsemailtemplateid}
+
+> `optional` **authRegistrationExistsEmailTemplateId?**: `string`
+
+The messaging template of the e-mail sent when a sign up uses an e-mail address that already
+has an account.
+
+#### Default
+
+```ts
+registration-exists
+```
+
+***
+
+### authMaxSessionMinutes? {#authmaxsessionminutes}
+
+> `optional` **authMaxSessionMinutes?**: `string`
+
+The longest a session can be kept alive by refreshing its token, in minutes, unlimited when not set.
+
+***
+
+### authLoginRateLimitPerClient? {#authloginratelimitperclient}
+
+> `optional` **authLoginRateLimitPerClient?**: `string`
+
+Limit logins per client address and per e-mail address with the client, so an attacker cannot
+lock an account out for everyone. Otherwise logins are limited per e-mail address only. Client
+addresses are only used when trustedProxies is set.
+
+#### Default
+
+```ts
+false
+```
+
+***
+
+### authCookieSameSite? {#authcookiesamesite}
+
+> `optional` **authCookieSameSite?**: `string`
+
+The SameSite attribute of the session cookie: Strict, Lax or None, the cookie is always Secure.
+Lax or Strict limit the cookie to requests from the same site.
+
+#### Default
+
+```ts
+None
+```
+
+***
+
+### authProviderOpenRegistration? {#authprovideropenregistration}
+
+> `optional` **authProviderOpenRegistration?**: `string`
+
+Allow Google without allowed domains, or a multi tenant Microsoft sign in without allowed
+tenants, so anyone with an account at the provider can sign up. Set to false to require the
+allow lists.
+
+#### Default
+
+```ts
+true
+```
 
 ***
 
