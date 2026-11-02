@@ -9,6 +9,7 @@
 - [ICliCommandDefinitionParam](interfaces/ICliCommandDefinitionParam.md)
 - [IEngineEnvironmentVariables](interfaces/IEngineEnvironmentVariables.md)
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
+- [IMessagingTemplate](interfaces/IMessagingTemplate.md)
 - [INodeEngineConfig](interfaces/INodeEngineConfig.md)
 - [INodeEngineState](interfaces/INodeEngineState.md)
 - [INodeEnvironmentVariables](interfaces/INodeEnvironmentVariables.md)
@@ -26,6 +27,7 @@
 
 ## Variables
 
+- [DEFAULT\_MESSAGING\_TEMPLATE\_LOCALE](variables/DEFAULT_MESSAGING_TEMPLATE_LOCALE.md)
 - [ATTESTATION\_VERIFICATION\_METHOD\_ID](variables/ATTESTATION_VERIFICATION_METHOD_ID.md)
 - [IMMUTABLE\_PROOF\_VERIFICATION\_METHOD\_ID](variables/IMMUTABLE_PROOF_VERIFICATION_METHOD_ID.md)
 - [BLOB\_STORAGE\_ENCRYPTION\_KEY\_ID](variables/BLOB_STORAGE_ENCRYPTION_KEY_ID.md)
@@ -76,6 +78,8 @@
 - [substituteEnvOptions](functions/substituteEnvOptions.md)
 - [registerCommands](functions/registerCommands.md)
 - [getEnvDefaults](functions/getEnvDefaults.md)
+- [loadMessagingTemplates](functions/loadMessagingTemplates.md)
+- [seedMessagingTemplates](functions/seedMessagingTemplates.md)
 - [run](functions/run.md)
 - [loadEnvironmentVariables](functions/loadEnvironmentVariables.md)
 - [processEnvironmentVariables](functions/processEnvironmentVariables.md)
@@ -85,6 +89,7 @@
 - [initialiseLocales](functions/initialiseLocales.md)
 - [initialiseNativeModules](functions/initialiseNativeModules.md)
 - [getExecutionDirectory](functions/getExecutionDirectory.md)
+- [normaliseEmail](functions/normaliseEmail.md)
 - [getScriptDirectory](functions/getScriptDirectory.md)
 - [fileExists](functions/fileExists.md)
 - [directoryExists](functions/directoryExists.md)

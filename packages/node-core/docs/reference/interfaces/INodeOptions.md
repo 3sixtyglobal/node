@@ -113,6 +113,15 @@ The path to the favicon, defaults to static/favicon.png.
 
 ***
 
+### messagingTemplatesDirectory? {#messagingtemplatesdirectory}
+
+> `optional` **messagingTemplatesDirectory?**: `string`
+
+The directory of the messaging templates stored for each tenant that does not have them,
+defaults to templates when it exists.
+
+***
+
 ### extendEnvVars? {#extendenvvars}
 
 > `optional` **extendEnvVars?**: (`envVars`) => `Promise`\<`void`\>

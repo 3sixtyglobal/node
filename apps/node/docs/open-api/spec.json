@@ -420,7 +420,7 @@
 						"content": {
 							"text/plain": {
 								"schema": {
-									"$ref": "#/components/schemas/ServerLivezResponse"
+									"$ref": "#/components/schemas/LivenessStatus"
 								},
 								"examples": {
 									"livezResponseOK": {
@@ -672,7 +672,11 @@
 									"loginResponseExample": {
 										"summary": "The response for the login request.",
 										"value": {
-											"expiry": 1722514341067
+											"accountId": "01a17afb-e05f-7939-83f2-d4f04c4bdf2e",
+											"expiry": 1722514341067,
+											"roles": [
+												"user"
+											]
 										}
 									}
 								}
@@ -712,6 +716,595 @@
 										"value": {
 											"name": "UnauthorizedError",
 											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/login/{authProviderId}": {
+			"post": {
+				"operationId": "authenticationLoginWithProvider",
+				"summary": "Login to the server through an authentication provider",
+				"tags": [
+					"Authentication"
+				],
+				"parameters": [
+					{
+						"name": "authProviderId",
+						"description": "The authentication provider id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "google"
+					}
+				],
+				"requestBody": {
+					"description": "Login through an authentication provider.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginWithProviderRequest"
+							},
+							"examples": {
+								"loginWithProviderRequestExample": {
+									"summary": "The request to login through an authentication provider.",
+									"value": {
+										"code": "4/0AbCdEf",
+										"codeVerifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+										"redirectUri": "https://example.com/authentication/oauth/google/callback",
+										"nonce": "n-0S6_WzA2Mj"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Response from a login on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/register": {
+			"post": {
+				"operationId": "authenticationRegister",
+				"summary": "Sign up for a password account, accepted whether or not the address is taken, with a verification link sent by e-mail",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "Sign up for a password account.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthenticationRegistration"
+							},
+							"examples": {
+								"registerRequestExample": {
+									"summary": "The request to sign up for a password account.",
+									"value": {
+										"email": "user@example.com",
+										"password": "MyPassword123!",
+										"givenName": "Jane",
+										"familyName": "Doe"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"202": {
+						"description": "The rest request ended in accepted response.",
+						"content": {
+							"text/plain": {
+								"schema": {
+									"$ref": "#/components/schemas/AcceptedResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The operation that you tried to perform is not possible, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "ForbiddenError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "The request resulted in too many requests, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "TooManyRequestsError",
+											"message": "errorMessage",
+											"properties": {
+												"requestCount": 5,
+												"nextRequestTime": "2024-06-01T12:00:00Z"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/register/verify": {
+			"post": {
+				"operationId": "authenticationRegisterVerify",
+				"summary": "Verify the e-mail address of a sign up with the token from the verification link",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "Verify the e-mail address of a self sign up.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RegisterVerifyRequest"
+							},
+							"examples": {
+								"registerVerifyRequestExample": {
+									"summary": "The request to verify a sign up.",
+									"value": {
+										"token": "3q2-7wYc0Q1h4k9pXg2rT8vN5mL6bJ1aZ0yW4uE7sD8"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "The request resulted in too many requests, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "TooManyRequestsError",
+											"message": "errorMessage",
+											"properties": {
+												"requestCount": 5,
+												"nextRequestTime": "2024-06-01T12:00:00Z"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/me": {
+			"get": {
+				"operationId": "authenticationMe",
+				"summary": "Get the signed in account",
+				"tags": [
+					"Authentication"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "A REST request with no input parameters.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NoContentRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The signed in account.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthenticationAccountSummary"
+								},
+								"examples": {
+									"meResponseExample": {
+										"summary": "The signed in account.",
+										"value": {
+											"accountId": "01a17afb-e05f-7939-83f2-d4f04c4bdf2e",
+											"email": "user@example.com",
+											"authProviderId": "google",
+											"profileReadOnly": true,
+											"profileEditUrl": "https://myaccount.google.com/personal-info",
+											"passwordChangeUrl": "https://myaccount.google.com/signinoptions/password",
+											"identity": "did:example:123456789abcdefghi",
+											"organization": "did:example:organization",
+											"roles": [
+												"user"
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "authenticationRemoveAccount",
+				"summary": "Remove the signed in account with its identity and sign out, needs a recent sign in",
+				"tags": [
+					"Authentication"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "A REST request with no input parameters.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NoContentRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
 										}
 									}
 								}
@@ -947,7 +1540,7 @@
 		"/authentication/password": {
 			"put": {
 				"operationId": "authenticationUpdatePassword",
-				"summary": "Update the current user's password",
+				"summary": "Update the current user's password, ending the other sessions and returning a new token for the current one",
 				"tags": [
 					"Authentication"
 				],
@@ -969,6 +1562,250 @@
 									"summary": "The request to update the current user's password.",
 									"value": {
 										"currentPassword": "MyNewPassword123!",
+										"newPassword": "MyNewPassword123!"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Response from updating the current user's password, with the new token for the current session.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UpdatePasswordResponse"
+								},
+								"examples": {
+									"updatePasswordResponseExample": {
+										"summary": "The response for the update password request.",
+										"value": {
+											"token": "eyJhbGciOiJIU...sw5c",
+											"expiry": 1722514341067
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The operation that you tried to perform is not possible, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "ForbiddenError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "The request resulted in too many requests, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "TooManyRequestsError",
+											"message": "errorMessage",
+											"properties": {
+												"requestCount": 5,
+												"nextRequestTime": "2024-06-01T12:00:00Z"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/password/forgot": {
+			"post": {
+				"operationId": "authenticationPasswordForgot",
+				"summary": "Send a link to reset a forgotten password, the response is the same whether or not the account exists",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "Ask for a link to reset a forgotten password.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PasswordForgotRequest"
+							},
+							"examples": {
+								"passwordForgotRequestExample": {
+									"summary": "The request for a link to reset a forgotten password.",
+									"value": {
+										"email": "user@example.com"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "The request resulted in too many requests, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "TooManyRequestsError",
+											"message": "errorMessage",
+											"properties": {
+												"requestCount": 5,
+												"nextRequestTime": "2024-06-01T12:00:00Z"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/password/reset": {
+			"post": {
+				"operationId": "authenticationPasswordReset",
+				"summary": "Reset a forgotten password with the token from the reset link",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "Reset a forgotten password with the token from the reset link.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PasswordResetRequest"
+							},
+							"examples": {
+								"passwordResetRequestExample": {
+									"summary": "The request to reset a forgotten password.",
+									"value": {
+										"token": "3q2-7wYc0Q1h4k9pXg2rT8vN5mL6bJ1aZ0yW4uE7sD8",
 										"newPassword": "MyNewPassword123!"
 									}
 								}
@@ -1013,6 +1850,28 @@
 										"value": {
 											"name": "UnauthorizedError",
 											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "The request resulted in too many requests, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "TooManyRequestsError",
+											"message": "errorMessage",
+											"properties": {
+												"requestCount": 5,
+												"nextRequestTime": "2024-06-01T12:00:00Z"
+											}
 										}
 									}
 								}
@@ -1120,6 +1979,100 @@
 				}
 			}
 		},
+		"/authentication/providers": {
+			"get": {
+				"operationId": "authenticationProviders",
+				"summary": "Get the enabled authentication providers",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "A REST request with no input parameters.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NoContentRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The authentication providers enabled on the server.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProvidersResponse"
+								},
+								"examples": {
+									"providersResponseExample": {
+										"summary": "The response for the providers request.",
+										"value": {
+											"providers": [
+												{
+													"authProviderId": "entity-storage",
+													"signInMethod": "password",
+													"passwordChange": "api",
+													"profileReadOnly": false
+												},
+												{
+													"authProviderId": "google",
+													"signInMethod": "redirect",
+													"passwordChange": "external",
+													"passwordChangeUrl": "https://myaccount.google.com/signinoptions/password",
+													"profileReadOnly": true,
+													"profileEditUrl": "https://myaccount.google.com/personal-info"
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/authentication/admin/users": {
 			"post": {
 				"operationId": "authenticationAdminCreateUser",
@@ -1138,16 +2091,14 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/AdminUserCreateRequest"
+								"$ref": "#/components/schemas/AuthenticationUserCreate"
 							},
 							"examples": {
 								"createUserRequestExample": {
 									"summary": "The request to create a new user.",
 									"value": {
 										"email": "user@example.com",
-										"password": "MyPassword123!",
-										"userIdentity": "did:example:123456789abcdefghi",
-										"organizationIdentity": "did:example:123456789abcdefghi"
+										"password": "MyPassword123!"
 									}
 								}
 							}
@@ -1155,8 +2106,176 @@
 					}
 				},
 				"responses": {
-					"204": {
-						"description": "The rest request ended in success with no data."
+					"201": {
+						"description": "The rest request ended in created response."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "The request resulted in a conflicting operation, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "ConflictError",
+											"message": "errorMessage",
+											"properties": {
+												"conflicts": [
+													"1"
+												]
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "authenticationAdminQueryUsers",
+				"summary": "Query the users",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The start of the e-mail address of the users to return.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "user@"
+					},
+					{
+						"name": "exactEmail",
+						"description": "True to match the e-mail address exactly rather than as a prefix.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "authProviderId",
+						"description": "The authentication provider of the users to return.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "entity-storage"
+					},
+					{
+						"name": "cursor",
+						"description": "The pagination cursor.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "limit",
+						"description": "The maximum number of results to return.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The users found by an admin query.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AdminUserQueryResponse"
+								},
+								"examples": {
+									"queryUsersResponseExample": {
+										"summary": "The users found.",
+										"value": {
+											"entities": [
+												{
+													"email": "user@example.com",
+													"accountId": "6f1c2c0e-4b7a-4f0e-9c1a-2d3e4f5a6b7c",
+													"authProviderId": "entity-storage",
+													"dateCreated": "2026-01-12T09:05:23.123Z"
+												}
+											]
+										}
+									}
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -1228,7 +2347,7 @@
 				"parameters": [
 					{
 						"name": "email",
-						"description": "The user email.",
+						"description": "The user email, or the account id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -1335,7 +2454,7 @@
 				"parameters": [
 					{
 						"name": "email",
-						"description": "The user email.",
+						"description": "The user email, or the account id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -1363,8 +2482,7 @@
 										"summary": "The response to get an existing user.",
 										"value": {
 											"email": "user@example.com",
-											"userIdentity": "did:example:123456789abcdefghi",
-											"organizationIdentity": "did:example:123456789abcdefghi"
+											"accountId": "6f1c2c0e-4b7a-4f0e-9c1a-2d3e4f5a6b7c"
 										}
 									}
 								}
@@ -1439,7 +2557,7 @@
 				"parameters": [
 					{
 						"name": "email",
-						"description": "The user email.",
+						"description": "The user email, or the account id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -1528,7 +2646,7 @@
 				"parameters": [
 					{
 						"name": "email",
-						"description": "The user email.",
+						"description": "The user email, or the account id.",
 						"in": "path",
 						"required": true,
 						"schema": {
@@ -1562,6 +2680,205 @@
 						}
 					}
 				},
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The operation that you tried to perform is not possible, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "ForbiddenError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/admin/users/{email}/disable": {
+			"post": {
+				"operationId": "authenticationAdminDisableUser",
+				"summary": "Disable a user so it cannot sign in",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The user email, or the account id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "user@example.com"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/admin/users/{email}/enable": {
+			"post": {
+				"operationId": "authenticationAdminEnableUser",
+				"summary": "Enable a disabled user",
+				"tags": [
+					"Authentication Admin"
+				],
+				"parameters": [
+					{
+						"name": "email",
+						"description": "The user email, or the account id.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "user@example.com"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
 				"responses": {
 					"204": {
 						"description": "The rest request ended in success with no data."
@@ -1660,12 +2977,13 @@
 									"$ref": "#/components/schemas/AuthenticationUser"
 								},
 								"examples": {
-									"getUserResponseExample": {
-										"summary": "The response to get an existing user.",
+									"getUserByIdentityResponseExample": {
+										"summary": "The response to get an existing user by identity.",
 										"value": {
 											"email": "user@example.com",
+											"accountId": "6f1c2c0e-4b7a-4f0e-9c1a-2d3e4f5a6b7c",
 											"userIdentity": "did:example:123456789abcdefghi",
-											"organizationIdentity": "did:example:123456789abcdefghi"
+											"organizationIdentity": "did:example:987654321abcdefghi"
 										}
 									}
 								}
@@ -2484,6 +3802,15 @@
 						"schema": {
 							"type": "string"
 						}
+					},
+					{
+						"name": "retainDocument",
+						"description": "Keep a document published on a ledger, only removing what this node holds for it,\nso it can be imported again.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"security": [
@@ -2603,6 +3930,310 @@
 													"id": "did:iota:tst:0xe3088ba9aa8c28e1d139708a14e8c0fdff11ee8223baac4aa5bcf3321e4bfc6a#revocation",
 													"type": "RevocationBitmap2022",
 													"serviceEndpoint": "data:application/octet-stream;base64,eJyzMmAAAwABr"
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/identity/{identity}/export": {
+			"post": {
+				"operationId": "identityExport",
+				"summary": "Export an identity including its private keys",
+				"tags": [
+					"Identity"
+				],
+				"parameters": [
+					{
+						"name": "identity",
+						"description": "The identity to export.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Response to exporting an identity.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IdentityExport"
+								},
+								"examples": {
+									"identityExportResponseExample": {
+										"value": {
+											"version": 1,
+											"namespace": "entity-storage",
+											"selfControlled": false,
+											"document": {
+												"@context": "https://www.w3.org/ns/did/v1",
+												"id": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a",
+												"assertionMethod": [
+													{
+														"id": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a#my-assertion",
+														"controller": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a",
+														"type": "JsonWebKey2020",
+														"publicKeyJwk": {
+															"kty": "OKP",
+															"alg": "EdDSA",
+															"kid": "f_fj3rGsZFSYvnS_xv5MgyIBlExq-lgDciu0YQ--S3s",
+															"crv": "Ed25519",
+															"x": "SFm32z7y9C17olpaTeocG25WV2CNTUl5MhM679Z4bok"
+														}
+													}
+												]
+											},
+											"documentSignature": "EXAMPLE-SIGNATURE-BASE64",
+											"keys": [
+												{
+													"id": "did",
+													"type": "Ed25519",
+													"privateKey": "EXAMPLE-PRIVATE-KEY-BASE64",
+													"publicKey": "EXAMPLE-PUBLIC-KEY-BASE64"
+												},
+												{
+													"id": "my-assertion",
+													"type": "Ed25519",
+													"privateKey": "EXAMPLE-PRIVATE-KEY-BASE64",
+													"publicKey": "SFm32z7y9C17olpaTeocG25WV2CNTUl5MhM679Z4bok="
+												}
+											]
+										}
+									}
+								}
+							}
+						},
+						"headers": {
+							"cache-control": {
+								"schema": {
+									"type": "string"
+								},
+								"description": "e.g. no-store"
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/identity/import": {
+			"post": {
+				"operationId": "identityImport",
+				"summary": "Import an identity including its private keys",
+				"tags": [
+					"Identity"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"requestBody": {
+					"description": "Request to import an identity.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/IdentityExport"
+							},
+							"examples": {
+								"identityImportRequestExample": {
+									"value": {
+										"version": 1,
+										"namespace": "entity-storage",
+										"selfControlled": false,
+										"document": {
+											"@context": "https://www.w3.org/ns/did/v1",
+											"id": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a",
+											"assertionMethod": [
+												{
+													"id": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a#my-assertion",
+													"controller": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a",
+													"type": "JsonWebKey2020",
+													"publicKeyJwk": {
+														"kty": "OKP",
+														"alg": "EdDSA",
+														"kid": "f_fj3rGsZFSYvnS_xv5MgyIBlExq-lgDciu0YQ--S3s",
+														"crv": "Ed25519",
+														"x": "SFm32z7y9C17olpaTeocG25WV2CNTUl5MhM679Z4bok"
+													}
+												}
+											]
+										},
+										"documentSignature": "EXAMPLE-SIGNATURE-BASE64",
+										"keys": [
+											{
+												"id": "did",
+												"type": "Ed25519",
+												"privateKey": "EXAMPLE-PRIVATE-KEY-BASE64",
+												"publicKey": "EXAMPLE-PUBLIC-KEY-BASE64"
+											},
+											{
+												"id": "my-assertion",
+												"type": "Ed25519",
+												"privateKey": "EXAMPLE-PRIVATE-KEY-BASE64",
+												"publicKey": "SFm32z7y9C17olpaTeocG25WV2CNTUl5MhM679Z4bok="
+											}
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Response to importing an identity.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "https://schema.3sixty.global/w3c-did/DidDocument"
+								},
+								"examples": {
+									"identityImportResponseExample": {
+										"value": {
+											"@context": "https://www.w3.org/ns/did/v1",
+											"id": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a",
+											"assertionMethod": [
+												{
+													"id": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a#my-assertion",
+													"controller": "did:entity-storage:0xda2df3ebc91ee0d5229d6532ffd0f4426952a94f34988b0ca906694dfd366a6a",
+													"type": "JsonWebKey2020",
+													"publicKeyJwk": {
+														"kty": "OKP",
+														"alg": "EdDSA",
+														"kid": "f_fj3rGsZFSYvnS_xv5MgyIBlExq-lgDciu0YQ--S3s",
+														"crv": "Ed25519",
+														"x": "SFm32z7y9C17olpaTeocG25WV2CNTUl5MhM679Z4bok"
+													}
 												}
 											]
 										}
@@ -24878,7 +26509,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/TenantCreateRequest"
+								"$ref": "#/components/schemas/TenantCreate"
 							},
 							"examples": {
 								"tenantCreateRequestExample": {
@@ -25184,7 +26815,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/TenantUpdateRequest"
+								"$ref": "#/components/schemas/TenantUpdate"
 							},
 							"examples": {
 								"tenantUpdateRequestExample": {
@@ -25373,6 +27004,126 @@
 				}
 			}
 		},
+		"/tenants/organization/{organizationId}": {
+			"get": {
+				"operationId": "tenantGetByOrganizationId",
+				"summary": "Get the tenant by organization id",
+				"tags": [
+					"Tenants"
+				],
+				"parameters": [
+					{
+						"name": "organizationId",
+						"description": "The organization id of the tenant to get.",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"style": "simple",
+						"example": "org-1"
+					},
+					{
+						"name": "includeLegacy",
+						"description": "Whether to also search the legacy organization ids, defaults to false.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "true"
+					}
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The tenant get response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Tenant"
+								},
+								"examples": {
+									"tenantGetByOrganizationIdResponse": {
+										"summary": "The response for the get tenant by organization id request.",
+										"value": {
+											"id": "2a39d6e62d98aa5372432f2e5d2208d4",
+											"apiKey": "ad7a5b0b816ca314b69c813ae1368232",
+											"label": "node",
+											"dateCreated": "2026-01-19T03:59:35.742Z",
+											"dateModified": "2026-01-19T03:59:35.742Z",
+											"publicOrigin": "https://example.com:4321",
+											"organizationId": "org-1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/tenants/public-origin/{publicOrigin}": {
 			"get": {
 				"operationId": "tenantGetByPublicOrigin",
@@ -25483,6 +27234,7 @@
 	},
 	"components": {
 		"schemas": {
+			"AcceptedResponse": {},
 			"ActivityLogDetails": {
 				"description": "The details related to the processing of an Activity",
 				"type": "object",
@@ -25625,22 +27377,25 @@
 					}
 				]
 			},
-			"AdminUserCreateRequest": {
+			"AdminUserQueryResponse": {
 				"type": "object",
 				"properties": {
-					"password": {
-						"type": "string"
+					"entities": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuthenticationUser"
+						},
+						"description": "The returned users."
+					},
+					"cursor": {
+						"type": "string",
+						"description": "The cursor to retrieve the next page, if any."
 					}
 				},
 				"required": [
-					"password"
+					"entities"
 				],
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/AuthenticationUser"
-					}
-				],
-				"description": "The body of the request."
+				"description": "The response body."
 			},
 			"AdminUserUpdatePasswordRequest": {
 				"type": "object",
@@ -25648,10 +27403,6 @@
 					"newPassword": {
 						"type": "string",
 						"description": "The new password for the user."
-					},
-					"currentPassword": {
-						"type": "string",
-						"description": "The current password for the user."
 					}
 				},
 				"required": [
@@ -25665,11 +27416,11 @@
 				"properties": {
 					"userIdentity": {
 						"type": "string",
-						"description": "The user identity."
+						"description": "The identity DID of the account, given when getting or updating a single user."
 					},
 					"organizationIdentity": {
 						"type": "string",
-						"description": "The users organization."
+						"description": "The organization DID of the account, given when getting or updating a single user."
 					}
 				}
 			},
@@ -25800,12 +27551,9 @@
 						"type": "string",
 						"description": "The tenant identifier associated with the audit entry, if applicable."
 					},
-					"ipAddressHashes": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The hashed IP addresses of the client."
+					"ipAddressHash": {
+						"type": "string",
+						"description": "The hashed IP address of the client."
 					},
 					"userAgent": {
 						"type": "string",
@@ -25874,12 +27622,9 @@
 						"type": "string",
 						"description": "The tenant identifier associated with the audit entry, if applicable."
 					},
-					"ipAddressHashes": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The hashed IP addresses of the client."
+					"ipAddressHash": {
+						"type": "string",
+						"description": "The hashed IP address of the client."
 					},
 					"userAgent": {
 						"type": "string",
@@ -26229,6 +27974,58 @@
 					}
 				]
 			},
+			"AuthenticationAccountSummary": {
+				"description": "The signed in account.",
+				"type": "object",
+				"properties": {
+					"accountId": {
+						"type": "string",
+						"description": "The account that is signed in, the token subject."
+					},
+					"email": {
+						"type": "string",
+						"description": "The e-mail address of the account."
+					},
+					"authProviderId": {
+						"type": "string",
+						"description": "The authentication provider the account signs in with."
+					},
+					"profileReadOnly": {
+						"type": "boolean",
+						"description": "True when the authentication provider owns the profile, so it can only be edited with that provider."
+					},
+					"profileEditUrl": {
+						"type": "string",
+						"description": "The address where the profile can be edited, when the authentication provider owns it."
+					},
+					"passwordChangeUrl": {
+						"type": "string",
+						"description": "The address where the password is changed, when the authentication provider manages it."
+					},
+					"identity": {
+						"type": "string",
+						"description": "The DID of the account, when it has one."
+					},
+					"organization": {
+						"type": "string",
+						"description": "The organization DID of the account, when it has one."
+					},
+					"roles": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The roles the account holds."
+					}
+				},
+				"required": [
+					"accountId",
+					"email",
+					"authProviderId",
+					"profileReadOnly",
+					"roles"
+				]
+			},
 			"AuthenticationAuditEntry": {
 				"description": "Contract definition for authentication audit entry.",
 				"type": "object",
@@ -26268,12 +28065,9 @@
 						"type": "string",
 						"description": "The tenant identifier associated with the audit entry, if applicable."
 					},
-					"ipAddressHashes": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The hashed IP addresses of the client."
+					"ipAddressHash": {
+						"type": "string",
+						"description": "The hashed IP address of the client."
 					},
 					"userAgent": {
 						"type": "string",
@@ -26293,6 +28087,95 @@
 					"dateCreated"
 				]
 			},
+			"AuthenticationProviderCapabilities": {
+				"description": "What an authentication provider supports, so a client knows how to present it.",
+				"type": "object",
+				"properties": {
+					"signInMethod": {
+						"anyOf": [
+							{
+								"const": "password"
+							},
+							{
+								"const": "redirect"
+							}
+						],
+						"description": "How people sign in, password for an e-mail and password form, redirect to send the browser to the provider."
+					},
+					"passwordChange": {
+						"anyOf": [
+							{
+								"const": "api"
+							},
+							{
+								"const": "external"
+							}
+						],
+						"description": "How passwords are changed, api through the password endpoint, external with the provider."
+					},
+					"passwordChangeUrl": {
+						"type": "string",
+						"description": "The address where the password is changed, when it is changed with the provider."
+					},
+					"profileReadOnly": {
+						"type": "boolean",
+						"description": "True when the provider owns the profile, so it can only be edited with the provider."
+					},
+					"profileEditUrl": {
+						"type": "string",
+						"description": "The address where the profile can be edited, when the provider owns it."
+					}
+				},
+				"required": [
+					"signInMethod",
+					"passwordChange",
+					"profileReadOnly"
+				]
+			},
+			"AuthenticationProviderDetails": {
+				"description": "An enabled authentication provider and what it supports.",
+				"type": "object",
+				"properties": {
+					"authProviderId": {
+						"type": "string",
+						"description": "The authentication provider id, as registered with the authentication provider factory."
+					}
+				},
+				"required": [
+					"authProviderId"
+				],
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/AuthenticationProviderCapabilities"
+					}
+				]
+			},
+			"AuthenticationRegistration": {
+				"description": "Fields accepted when a person signs up for a password account.",
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The e-mail address of the account."
+					},
+					"password": {
+						"type": "string",
+						"description": "The password for the account."
+					},
+					"givenName": {
+						"type": "string",
+						"description": "The given name, stored in the profile of the account."
+					},
+					"familyName": {
+						"type": "string",
+						"description": "The family name, stored in the profile of the account."
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				]
+			},
 			"AuthenticationUser": {
 				"description": "Contract definition for authentication user.",
 				"type": "object",
@@ -26301,19 +28184,68 @@
 						"type": "string",
 						"description": "The user e-mail address."
 					},
+					"accountId": {
+						"type": "string",
+						"description": "Stable identifier of the account. This is the token subject."
+					},
+					"authProviderId": {
+						"type": "string",
+						"description": "The authentication provider the account signs in with."
+					},
+					"dateCreated": {
+						"type": "string",
+						"description": "When the account was created, in ISO date format."
+					},
+					"dateLastLogin": {
+						"type": "string",
+						"description": "When the account last logged in, in ISO date format."
+					},
+					"dateDisabled": {
+						"type": "string",
+						"description": "When the account was disabled, in ISO date format, a disabled account cannot sign in."
+					},
+					"disabled": {
+						"type": "boolean",
+						"description": "True when the account is disabled and cannot sign in."
+					},
+					"verified": {
+						"type": "boolean",
+						"description": "False until the e-mail address of a self sign up is verified, absent means verified."
+					},
 					"userIdentity": {
 						"type": "string",
-						"description": "The user identity."
+						"description": "The identity DID of the account, given when getting or updating a single user."
 					},
 					"organizationIdentity": {
 						"type": "string",
-						"description": "The users organization."
+						"description": "The organization DID of the account, given when getting or updating a single user."
 					}
 				},
 				"required": [
 					"email",
-					"userIdentity",
-					"organizationIdentity"
+					"accountId"
+				]
+			},
+			"AuthenticationUserCreate": {
+				"description": "Fields accepted when an admin creates a user. The service allocates the account id.",
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user e-mail address."
+					},
+					"password": {
+						"type": "string",
+						"description": "Password for the new account."
+					},
+					"disabled": {
+						"type": "boolean",
+						"description": "True to create the account disabled."
+					}
+				},
+				"required": [
+					"email",
+					"password"
 				]
 			},
 			"AuthorizationAddRoleForSubjectRequest": {
@@ -27270,6 +29202,96 @@
 				},
 				"description": "The data for the request."
 			},
+			"IdentityExport": {
+				"description": "Everything needed to recreate an identity on another node, including private key material.",
+				"type": "object",
+				"properties": {
+					"version": {
+						"type": "number",
+						"description": "The version of the export format."
+					},
+					"namespace": {
+						"type": "string",
+						"description": "The namespace of the connector which holds the identity, e.g. entity-storage or iota."
+					},
+					"selfControlled": {
+						"type": "boolean",
+						"description": "Is the identity controlled by its own DID."
+					},
+					"document": {
+						"$ref": "https://schema.3sixty.global/w3c-did/DidDocument"
+					},
+					"documentSignature": {
+						"type": "string",
+						"description": "The signature of the canonical document made with the document key in base64 format,\nonly for connectors which sign their stored documents."
+					},
+					"keys": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/IdentityExportKey"
+						},
+						"description": "The private keys for the identity."
+					},
+					"account": {
+						"$ref": "#/components/schemas/IdentityExportAccount"
+					}
+				},
+				"required": [
+					"version",
+					"namespace",
+					"selfControlled",
+					"document",
+					"keys"
+				]
+			},
+			"IdentityExportAccount": {
+				"description": "The wallet account secrets of a self-controlled identity held in an identity export.",
+				"type": "object",
+				"properties": {
+					"mnemonic": {
+						"type": "string",
+						"description": "The mnemonic for the account."
+					},
+					"seed": {
+						"type": "string",
+						"description": "The seed derived from the mnemonic in base64 format."
+					}
+				},
+				"required": [
+					"mnemonic"
+				]
+			},
+			"IdentityExportKey": {
+				"description": "A private key held in an identity export.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The name of the key relative to the DID, the verification method fragment or \"did\" for the document key."
+					},
+					"type": {
+						"$ref": "#/components/schemas/IdentityExportKeyType"
+					},
+					"privateKey": {
+						"type": "string",
+						"description": "The private key in base64 format."
+					},
+					"publicKey": {
+						"type": "string",
+						"description": "The public key in base64 format."
+					}
+				},
+				"required": [
+					"id",
+					"type",
+					"privateKey",
+					"publicKey"
+				]
+			},
+			"IdentityExportKeyType": {
+				"description": "Ed25519 signing key.",
+				"const": "Ed25519"
+			},
 			"IdentityProfileAdminListResponse": {
 				"type": "object",
 				"properties": {
@@ -27496,6 +29518,13 @@
 							"type": "string"
 						},
 						"description": "Additional fields to include in the JWT payload when creating the verifiable credential in jwt format."
+					},
+					"types": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The types of the credential after VerifiableCredential, such as\nOrganizationMembershipCredential, only VerifiableCredential when omitted."
 					}
 				},
 				"required": [
@@ -27676,6 +29705,19 @@
 				],
 				"description": "The parameters from the body."
 			},
+			"LivenessStatus": {
+				"description": "The liveness status of the server.",
+				"anyOf": [
+					{
+						"const": "alive",
+						"description": "The server is running."
+					},
+					{
+						"const": "dead",
+						"description": "The server is not running."
+					}
+				]
+			},
 			"LogEntry": {
 				"description": "Interface describing a log entry.",
 				"type": "object",
@@ -27776,15 +29818,48 @@
 			"LoginResponse": {
 				"type": "object",
 				"properties": {
+					"accountId": {
+						"type": "string",
+						"description": "The account that signed in, the token subject."
+					},
 					"expiry": {
 						"type": "number",
 						"description": "The expiry time of the token."
+					},
+					"profile": {
+						"$ref": "https://schema.3sixty.global/json-ld/JsonLdNodeObject"
+					},
+					"profileReadOnly": {
+						"type": "boolean",
+						"description": "True when the authentication provider owns the profile, so it can only be edited with that provider."
+					},
+					"profileEditUrl": {
+						"type": "string",
+						"description": "The address where the profile can be edited, when the authentication provider owns it."
+					},
+					"passwordChangeUrl": {
+						"type": "string",
+						"description": "The address where the password is changed, when the authentication provider manages it."
+					},
+					"roles": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The roles the account holds."
 					}
 				},
 				"required": [
-					"expiry"
+					"accountId",
+					"expiry",
+					"roles"
 				],
 				"description": "The login response details."
+			},
+			"LoginWithProviderRequest": {
+				"type": "object",
+				"additionalProperties": {},
+				"description": "The provider specific credentials."
 			},
 			"LogoutRequest": {
 				"type": "object",
@@ -28106,6 +30181,19 @@
 				},
 				"description": "The body of the response."
 			},
+			"PasswordForgotRequest": {
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The e-mail address of the account."
+					}
+				},
+				"required": [
+					"email"
+				],
+				"description": "The body of the request."
+			},
 			"PasswordOptions": {
 				"description": "Password length validation options.",
 				"type": "object",
@@ -28119,6 +30207,24 @@
 						"description": "The maximum password length for validation."
 					}
 				}
+			},
+			"PasswordResetRequest": {
+				"type": "object",
+				"properties": {
+					"token": {
+						"type": "string",
+						"description": "The token from the reset link."
+					},
+					"newPassword": {
+						"type": "string",
+						"description": "The new password for the account."
+					}
+				},
+				"required": [
+					"token",
+					"newPassword"
+				],
+				"description": "The body of the request."
 			},
 			"PnapCreateRequest": {
 				"type": "object",
@@ -28259,6 +30365,22 @@
 					"organizationIdentity"
 				]
 			},
+			"ProvidersResponse": {
+				"type": "object",
+				"properties": {
+					"providers": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/AuthenticationProviderDetails"
+						},
+						"description": "The providers and what each supports, in the order they were registered."
+					}
+				},
+				"required": [
+					"providers"
+				],
+				"description": "The response details."
+			},
 			"RefreshTokenRequest": {
 				"type": "object",
 				"properties": {
@@ -28281,6 +30403,19 @@
 					"expiry"
 				],
 				"description": "The refresh token details."
+			},
+			"RegisterVerifyRequest": {
+				"type": "object",
+				"properties": {
+					"token": {
+						"type": "string",
+						"description": "The token from the verification link."
+					}
+				},
+				"required": [
+					"token"
+				],
+				"description": "The body of the request."
 			},
 			"RequestTransferResponse": {
 				"oneOf": [
@@ -28474,17 +30609,6 @@
 					"name",
 					"version"
 				]
-			},
-			"ServerLivezResponse": {
-				"anyOf": [
-					{
-						"const": "alive"
-					},
-					{
-						"const": "dead"
-					}
-				],
-				"description": "The livez information for the server."
 			},
 			"ServerReadyzResponse": {
 				"anyOf": [
@@ -28959,42 +31083,50 @@
 					"organizationId"
 				]
 			},
-			"TenantCreateRequest": {
+			"TenantCreate": {
+				"description": "The details of a tenant to create.",
 				"type": "object",
 				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The unique identifier for the tenant, generated when not provided."
+					},
 					"apiKey": {
 						"type": "string",
-						"description": "The api key for the tenant."
-					},
-					"label": {
-						"type": "string",
-						"description": "The label of the tenant."
-					},
-					"publicOrigin": {
-						"type": "string",
-						"description": "The public origin available to the public for accessing the API."
-					},
-					"organizationId": {
-						"type": "string",
-						"description": "The organization id for the tenant."
-					},
-					"organizationIdLegacy": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "Optional list of organization aliases that can are used for legacy lookups."
-					},
-					"id": {
-						"type": "string"
+						"description": "The API key of the tenant, generated when not provided."
 					}
 				},
-				"required": [
-					"apiKey",
-					"label",
-					"organizationId"
-				],
-				"description": "The tenant to create."
+				"allOf": [
+					{
+						"description": "Model defining the tenant.",
+						"type": "object",
+						"properties": {
+							"label": {
+								"type": "string",
+								"description": "The label of the tenant."
+							},
+							"publicOrigin": {
+								"type": "string",
+								"description": "The public origin available to the public for accessing the API."
+							},
+							"organizationId": {
+								"type": "string",
+								"description": "The organization id for the tenant."
+							},
+							"organizationIdLegacy": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								},
+								"description": "Optional list of organization aliases that can are used for legacy lookups."
+							}
+						},
+						"required": [
+							"label",
+							"organizationId"
+						]
+					}
+				]
 			},
 			"TenantListResponse": {
 				"type": "array",
@@ -29003,38 +31135,45 @@
 				},
 				"description": "The list of tenants."
 			},
-			"TenantUpdateRequest": {
-				"description": "The tenant to update.",
+			"TenantUpdate": {
+				"description": "The details of a tenant to update.",
 				"type": "object",
 				"properties": {
-					"apiKey": {
+					"id": {
 						"type": "string",
-						"description": "The api key for the tenant."
-					},
-					"label": {
-						"type": "string",
-						"description": "The label of the tenant."
-					},
-					"publicOrigin": {
-						"type": "string",
-						"description": "The public origin available to the public for accessing the API."
-					},
-					"organizationId": {
-						"type": "string",
-						"description": "The organization id for the tenant."
-					},
-					"organizationIdLegacy": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "Optional list of organization aliases that can are used for legacy lookups."
+						"description": "The unique identifier of the tenant to update."
 					}
 				},
-				"required": [
-					"apiKey",
-					"label",
-					"organizationId"
+				"allOf": [
+					{
+						"description": "Model defining the tenant.",
+						"type": "object",
+						"properties": {
+							"apiKey": {
+								"type": "string",
+								"description": "The api key for the tenant."
+							},
+							"label": {
+								"type": "string",
+								"description": "The label of the tenant."
+							},
+							"publicOrigin": {
+								"type": "string",
+								"description": "The public origin available to the public for accessing the API."
+							},
+							"organizationId": {
+								"type": "string",
+								"description": "The organization id for the tenant."
+							},
+							"organizationIdLegacy": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								},
+								"description": "Optional list of organization aliases that can are used for legacy lookups."
+							}
+						}
+					}
 				]
 			},
 			"TerminateTransferResponse": {
@@ -29137,6 +31276,23 @@
 					"newPassword"
 				],
 				"description": "The body of the request."
+			},
+			"UpdatePasswordResponse": {
+				"type": "object",
+				"properties": {
+					"token": {
+						"type": "string",
+						"description": "The new token, when the request was not authenticated by cookie."
+					},
+					"expiry": {
+						"type": "number",
+						"description": "The expiry time of the token."
+					}
+				},
+				"required": [
+					"expiry"
+				],
+				"description": "The new token details."
 			},
 			"VerifyDepth": {
 				"description": "How deep to verify the signatures.",

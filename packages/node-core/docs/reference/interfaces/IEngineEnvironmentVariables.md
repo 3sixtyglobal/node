@@ -977,6 +977,15 @@ The type of messaging email connector: entity-storage, aws, smtp.
 
 ***
 
+### messagingTemplatesDirectory? {#messagingtemplatesdirectory}
+
+> `optional` **messagingTemplatesDirectory?**: `string`
+
+The directory of the messaging templates stored for each tenant that does not have them, as
+&lt;template-id&gt;.html or &lt;template-id&gt;.&lt;locale&gt;.html files, overrides the node option.
+
+***
+
 ### smtpHost? {#smtphost}
 
 > `optional` **smtpHost?**: `string`
