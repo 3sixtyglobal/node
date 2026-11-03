@@ -4,7 +4,7 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 import type { ITenantAdminComponent } from "@3sixty/api-models";
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
-import { ComponentFactory, Factory, type IComponent, Is } from "@3sixty/core";
+import { ComponentFactory, DurationConstants, Factory, Is } from "@3sixty/core";
 import { DataspaceAppFactory } from "@3sixty/dataspace-models";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
@@ -583,7 +583,10 @@ describe("node-core", () => {
 			TWIN_CORS_ORIGINS: "https://app.example.org",
 			TWIN_ORIGIN_CHECK_ENABLED: "true",
 			// Short, so a session can be let age past it.
-			TWIN_AUTH_RECENT_SIGN_IN_SECONDS: "2"
+			TWIN_AUTH_RECENT_SIGN_IN_SECONDS: "2",
+			// Deliver the queued e-mails every second rather than every minute.
+			TWIN_AUTH_DELIVERY_INTERVAL_SECONDS: "1",
+			TWIN_TASK_SCHEDULER_INTERVAL: DurationConstants.MsPerSecond.toString()
 		};
 
 		await rm(OUTPUT_TMP_DIR_EM, { recursive: true, force: true });
@@ -611,11 +614,6 @@ describe("node-core", () => {
 		});
 		expect(serverResult?.engine).toBeDefined();
 
-		// The e-mails are queued after the response and sent by a task that runs every minute, so the
-		// queue is run here rather than waiting for the task.
-		const authenticationComponent = ComponentFactory.get<IComponent>(
-			serverResult?.engine.getRegisteredInstanceType("authenticationComponent") ?? ""
-		) as IComponent & { runDeferredJobs: () => Promise<void> };
 		const linkToken = async (
 			recipient: string,
 			linkUrl: string,
@@ -626,7 +624,6 @@ describe("node-core", () => {
 					IEntityStorageConnector<{ recipients: string[]; message: string; ts: number }>
 				>("email-entry");
 			for (let attempt = 0; attempt < 50; attempt++) {
-				await authenticationComponent.runDeferredJobs();
 				const { entities } = await ContextIdStore.run(
 					serverResult?.engine.getContextIds() ?? {},
 					async () => emails.query()

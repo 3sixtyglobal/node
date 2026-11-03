@@ -399,7 +399,8 @@ export async function buildEngineServerConfiguration(
 					),
 					escalatedPrivilegeRole: DEFAULT_ESCALATED_PRIVILEGE_ROLE,
 					authorizationModelId,
-					recentSignInSeconds
+					recentSignInSeconds,
+					deliveryIntervalSeconds: EnvHelper.envInteger(envVars, "authDeliveryIntervalSeconds")
 				}
 			}
 		});

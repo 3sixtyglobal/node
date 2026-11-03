@@ -50,6 +50,7 @@ const engineServerEnvironmentVariableKeysInternal: {
 	authDefaultRoles: true,
 	authIdentityProofMaxAgeSeconds: true,
 	authRecentSignInSeconds: true,
+	authDeliveryIntervalSeconds: true,
 	authEmailSender: true,
 	authEmailCompanyName: true,
 	authEmailLocale: true,

@@ -2280,7 +2280,12 @@ async function configureTaskScheduler(
 	if (isTaskSchedulerRequired(envVars)) {
 		coreConfig.types.taskSchedulerComponent ??= [];
 		coreConfig.types.taskSchedulerComponent.push({
-			type: TaskSchedulerComponentType.Service
+			type: TaskSchedulerComponentType.Service,
+			options: {
+				config: {
+					intervalMs: EnvHelper.envMs(envVars, "taskSchedulerInterval")
+				}
+			}
 		});
 	}
 }
