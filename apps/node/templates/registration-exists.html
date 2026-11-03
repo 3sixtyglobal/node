@@ -2,19 +2,30 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>You already have a {{companyName}} account</title>
 		<link rel="stylesheet" href="https://assets.3sixty.global/email/style.css" type="text/css" />
 	</head>
 	<body>
-		<div class="logo" role="img" aria-label="{{companyName}}"></div>
-		<p>
-			Someone tried to sign up to {{companyName}} with this e-mail address, but it already has an
-			account.
-		</p>
-		<p>
-			If this was you, sign in with your existing account, or reset your password if you have
-			forgotten it. If it was not you, you can ignore this e-mail.
-		</p>
-		<p>{{companyName}}</p>
+		<div class="container">
+			<img
+				class="logo"
+				src="https://assets.3sixty.global/images/favicon.png"
+				alt="{{companyName}}"
+				width="48"
+				height="48"
+			/>
+			<h1>You already have an account</h1>
+			<p>Hello,</p>
+			<p>
+				Someone tried to sign up to {{companyName}} with this e-mail address, but you already have
+				an account.
+			</p>
+			<p>
+				If it was you, just sign in, or reset your password if you've forgotten it. If it wasn't
+				you, you can ignore this e-mail.
+			</p>
+			<p class="signature">The {{companyName}} team</p>
+		</div>
 	</body>
 </html>

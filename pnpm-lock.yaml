@@ -286,22 +286,22 @@ importers:
     dependencies:
       '@3sixty/api-auth-account-service':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.6
       '@3sixty/api-auth-entity-storage-models':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.6
       '@3sixty/api-auth-entity-storage-service':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.6
       '@3sixty/api-auth-models':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.6
       '@3sixty/api-models':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/api-tenant-processor':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/auditable-item-graph-service':
         specifier: next
         version: 0.20.0-next.2
@@ -322,10 +322,10 @@ importers:
         version: 0.20.0-next.10
       '@3sixty/data-core':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.5
       '@3sixty/data-json-ld':
         specifier: next
-        version: 0.20.0-next.4
+        version: 0.20.0-next.5
       '@3sixty/dlt-account':
         specifier: next
         version: 0.20.0-next.3
@@ -355,7 +355,7 @@ importers:
         version: 0.20.0-next.10
       '@3sixty/entity-storage-models':
         specifier: next
-        version: 0.20.0-next.3
+        version: 0.20.0-next.4
       '@3sixty/identity-connector-entity-storage':
         specifier: next
         version: 0.20.0-next.4
@@ -370,10 +370,10 @@ importers:
         version: 0.20.0-next.2
       '@3sixty/messaging-models':
         specifier: next
-        version: 0.20.0-next.3
+        version: 0.20.0-next.4
       '@3sixty/messaging-service':
         specifier: next
-        version: 0.20.0-next.3
+        version: 0.20.0-next.4
       '@3sixty/modules':
         specifier: next
         version: 0.20.0-next.10
@@ -425,7 +425,7 @@ importers:
         version: 0.20.0-next.2
       '@3sixty/entity-storage-connector-memory':
         specifier: next
-        version: 0.20.0-next.3
+        version: 0.20.0-next.4
       '@3sixty/federated-catalogue-models':
         specifier: next
         version: 0.20.0-next.2
@@ -494,92 +494,92 @@ packages:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0 || ^6.0.0
 
-  '@3sixty/api-auth-account-rest-client@0.20.0-next.4':
-    resolution: {integrity: sha512-QCAxT0vF2BXfERfYH0HIWk7vnG0GoyX5MIz/3sd47J9DdzVS2DCO2cBpg6Ys9fj0jUIEB1oe3uSOc6bIgGhdgQ==}
+  '@3sixty/api-auth-account-rest-client@0.20.0-next.6':
+    resolution: {integrity: sha512-vkPiY4rVzlb0cAt/M5XjbZzSXtuPeWuRXDBdqvwsLNqHowzw4v3Gr1PPn/rZw+3l/9O+PaOHvpBoguU8IknuZQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-account-service@0.20.0-next.4':
-    resolution: {integrity: sha512-F7hAuxhtKqdP3vlsfJGw7v5qADrf5FQsjSOZkoBN/tae3XuEqMkEbsncgxqX/+HL2nD8ikdUd0Kvwduxsjvdjw==}
+  '@3sixty/api-auth-account-service@0.20.0-next.6':
+    resolution: {integrity: sha512-Nh2qkzOr8kNOGEB9Z1jqm8K5IywkCKv4Z6tSHptfIOJaqwBgFuMgEfIWdQLY7nO+xK14LjXdSH+ZzJ3cdIPFNw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.4':
-    resolution: {integrity: sha512-X/CvpU+retsLKEj1hT725c+b/zfxhysS/7lqD/xU8q39p2P9eSh/EBRqrQb44XoBBeXNlveNYmz1XlnHWH1qSg==}
+  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.6':
+    resolution: {integrity: sha512-GcXWvZsrmKUVrKmQHw2AbH/Ox5FcIsUbiARj/puC04uwcUkwU8Ew6U3VpvBl1b03EyezG/qYyf/bKCkKX4AXiA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-entity-storage-models@0.20.0-next.4':
-    resolution: {integrity: sha512-jUeA9ZzOAHl/8qrRgR9DIbEsZ++SX00UnWgHiKVKy98yBzZwfxnisO0rFNx0CcLkzn+x+ISTz2e3skraTUCcPA==}
+  '@3sixty/api-auth-entity-storage-models@0.20.0-next.6':
+    resolution: {integrity: sha512-ga0T300kvzfXR2pTdyJDhuxuzOWl9lR/o1+aE6Gh1x6WTMDvs48P3dyFlEz05L3AopqVAEY45gf510o3W8gdzA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.4':
-    resolution: {integrity: sha512-ozQibh+zoU/3sLFi4kLfDC9dLP31yBkKPLC4JVrPUb0eNedTd2LtEzdnnisWmYI4yGx8tmREkb3RnxVenccErg==}
+  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.6':
+    resolution: {integrity: sha512-EA8vpqPSGGYXNoyXbg/y+BB9gJnEhxmVK9RkM84ckkEBxH9w+Je6UYhK/K3oIUp2H61Rp2fHx7uFGXP0bgC4ZA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-entity-storage-service@0.20.0-next.4':
-    resolution: {integrity: sha512-m2Z85fHisNMHKf8Dm+3Caqp/UxQ/KZSnRI9qANIC1G8Qk8hG0C+RvrohI3TMALHEgPO+8nANP9ntuWs4qo3k7w==}
+  '@3sixty/api-auth-entity-storage-service@0.20.0-next.6':
+    resolution: {integrity: sha512-3vzjLf0dC8V7hpU7t4qHMAkA5mvYyEqC4zJwsmnRTqUVKxfX0DzVTwZjdNL0dEpSsCx9CQQNL/paf0yrxaLGdA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-models@0.20.0-next.4':
-    resolution: {integrity: sha512-9PYLHhG8pcehGY//5qMHC6RdSVffXs15RN1sZvVyf1p8kup047o5gUPCdw2JEYtCv4mP5WVDnrmBYxDQeFpX3g==}
+  '@3sixty/api-auth-models@0.20.0-next.6':
+    resolution: {integrity: sha512-EP/M8mHwsCumlpWnOxB3zdKguZf4Cza7Wf+D3KrDB1oUrgawYDRSPxJBGE1qdI4nh+KvX0by6cmJWsmcVbLguQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.4':
-    resolution: {integrity: sha512-g9/EzylHqCMOI2OF9/op+aq2Ez6Kf+/7jpzhk7/DV0pLgDyc7sqLKTbdM8usS9iMxtgxJ+38OeJUGsg/aYQ4Lg==}
+  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.6':
+    resolution: {integrity: sha512-R2OI5pV/xqvicsORGKFfj5d+ZQR9J4UfKbUDkyVxE4pszrJ22k/C2d9IzQpcUPGM3i3aH3yXD07e5rMBRqiR8w==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.4':
-    resolution: {integrity: sha512-0xFCPiGEvpnmAkc2Ty6uPTKJdjzhAa6ELtcg2inDZBBrvtGHyXRAGhl17QrxEIUoApAPHE2zyh7/R+kFO+6HGA==}
+  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.6':
+    resolution: {integrity: sha512-IalayJc4UyssKc3umbEW17YESO4cNAm7HbGhGalb5PKFU9BRZZjBKeoCzDqYzvQR2IPbb/ZaOhCMR00/00t9Ww==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-models@0.20.0-next.4':
-    resolution: {integrity: sha512-m7yJMixDejmY1tbaz9zw2yigZFSxJNL8FFJ0XamRwXYwgVT6NUuPhTOVyYYQyLUi9S8DQwq42GVGclHVXXozVQ==}
+  '@3sixty/api-auth-oauth-models@0.20.0-next.6':
+    resolution: {integrity: sha512-f7QmQXlhgvD/NcNmSOFOrznHFQoxiJBvRBTX2nHJ9rxhs7z78iDIkS80JDBPG8/8Ps1B84mrE1h/4C9oNuFF+w==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-service@0.20.0-next.4':
-    resolution: {integrity: sha512-35cU5ZLPwEN7SvKUaH+0GUMcnxiNL0K4nUVAg0co4orxy1jroyVioZd/w862mTi82s4r0/8yjwS9GUGj/vJzRQ==}
+  '@3sixty/api-auth-oauth-service@0.20.0-next.6':
+    resolution: {integrity: sha512-3L81b1XgyErPbFc57yuenNcmSIsJMwxhOxlW216HJeHhDRBzeKLiL/kWgizrXOWq1OplxcIt7BImTR7qqoBhFw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-service@0.20.0-next.4':
-    resolution: {integrity: sha512-1H6/ODC5F3V/VxHlqyP4oGx4UQwxX0MWSGwnDdjkpaubAW0x2egYQrIVMNbUaIfgDoZPxIPTaKk9a8KLwu/CDA==}
+  '@3sixty/api-auth-service@0.20.0-next.6':
+    resolution: {integrity: sha512-ZljO9eteNsYfT64+smv4pUtRdJtS23dp5Rs8dzt6aVz14aTZsdCnTjt+QTx9jftNOxOG9RyfWlorx6E+Fq2GYg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-core-server@0.20.0-next.8':
-    resolution: {integrity: sha512-/0P2D4bOspnXtO6OYAPd99VFBYNmCNKPD+jGjOU1DTjbi+kvJNP58EyH2X6I2KuKwnrrcdpX9+wPHFJ+fEWN7g==}
+  '@3sixty/api-core-server@0.20.0-next.9':
+    resolution: {integrity: sha512-4DFAfi7+PRilzyEIdcKB92Zd/6q8tVQMdZ5Vvr+G+3N9p+ga4lXuqbtwPa69/Oy4SQOd27/dZwA1XDoV4eBsPQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-core@0.20.0-next.8':
-    resolution: {integrity: sha512-HCB2zwE9r0ir+MmNX1Nb6Uvfr1oZ6yn8VN4kcYF388c8bC+ki3lpV7KfcbUyYTDmqIH76wISAl7S9EsqoVOCNw==}
+  '@3sixty/api-core@0.20.0-next.9':
+    resolution: {integrity: sha512-vZuxgkSkJyW3k+2iszIghQ1R9pjigdZFNGBYApCVmLaKuld6kjZjiGFGrXjSRdhtgpeCnU9sXVvuI1I6ui44SQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-models@0.20.0-next.8':
-    resolution: {integrity: sha512-MgQpjmegLQHM8TSizm9USIcIZXYVDRf2N754sr8oIEMy1YiobERlRrdWFeokmMO0xpN50019j0Yvs3N3sva54A==}
+  '@3sixty/api-models@0.20.0-next.9':
+    resolution: {integrity: sha512-XosWbERqQEphfNu5JjU7Vo5Nst0JANoLfSFNKcPrLILwemzFCgLhq72JzSXVwgPZyuQcP+W8XK8QTnqdzvcarg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-processors@0.20.0-next.8':
-    resolution: {integrity: sha512-1Bv6hC+nZ4DlT0dckEGD/F9XlikLMg/7a1lrxITJ/1A2dGJReR4QTxmGfeEA7kJI5jCXGe7E8Zqe+bzd6Nve6A==}
+  '@3sixty/api-processors@0.20.0-next.9':
+    resolution: {integrity: sha512-YHW+gBL60zPv4NFyNY8w4B+h+xTSOnoUtib0OFRIBWduPCcHxqk+MU32eepQh1r2PUKMXXxaYmSJu0NqRnbghg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-rest-client@0.20.0-next.8':
-    resolution: {integrity: sha512-xkQuxj0AOqqYzGQYsg76sJyeSS1QhgzCgHAhlAUBpXqL28HQUaTY6bdojjY2O7o63sQII9X3eUuD0xnA2s7uUw==}
+  '@3sixty/api-rest-client@0.20.0-next.9':
+    resolution: {integrity: sha512-mgzVDYd9tfs7shb+8qiaF3wp/M35NnNz0tVV6MC4s3x0Xs4c+TOAA1zXKxROPXk60hFy9rJS0q6GABBPcpm+IQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-server-fastify@0.20.0-next.8':
-    resolution: {integrity: sha512-8MRyM/S9ps91BbHyLMkQzbtwSJVJP2KCHOKnkfceOF0x4kZgd9tbROesYZQ6ILF56XEG5qYZ4wH79D93aML9Aw==}
+  '@3sixty/api-server-fastify@0.20.0-next.9':
+    resolution: {integrity: sha512-DePZ0k6depeP43FWuoPwiaKFZ80K2NzHpBqmRX3MI8t7b1z11KWxt35Hdb1w2UGbwgcwMSDWaYV8IC4ZXPJXVg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-server-hono@0.20.0-next.8':
-    resolution: {integrity: sha512-ILZQUnsT0jGCUE1qUgGw3O09hd06NcjW6/FMJVO98K3spStHgoaz56hzB5zT9Fd9uqvob/UAYJV8w5gkTnpM3Q==}
+  '@3sixty/api-server-hono@0.20.0-next.9':
+    resolution: {integrity: sha512-WLaVwtMcBZ4Xv5V6E+2iLiUjwT1wjRCWjIUSgVY21PvTTlA5M7EbRlNauksxUgJtLzotKN1go5QTs+dhmBzahQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-server-native@0.20.0-next.8':
-    resolution: {integrity: sha512-oTvExkhQpJ7HJY5m8in8qPOdiGZKGFligjlKQl62PlkNZouOZ6RdB1koeignsv3G7/PkmPWLa5VJkV8O5JN+AA==}
+  '@3sixty/api-server-native@0.20.0-next.9':
+    resolution: {integrity: sha512-uQsL23vqVz/BzDgXDAh69Cctqqt8Q6kJy7Wq2vhfPZjhC709kbxERR0MyWDu8ndFTbyvGGLYMi4fXyv0YjhiJQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-service@0.20.0-next.8':
-    resolution: {integrity: sha512-+PVLz/FLACTnuGAWrl0nyyD1tUQe4cXt4N6Q0pNnftkVmUMzBW3kJ2f1D52fu/6t0nSGENpuUVgF+ULMuNgEAw==}
+  '@3sixty/api-service@0.20.0-next.9':
+    resolution: {integrity: sha512-wiBLKe0hafD+9IMjH6lVr+AQAIUBv1yDwl/Seute5L1+5U1oNKU+Xat+YK2F2y7lumJLwEaSeXjmTo+1W4sI9w==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-tenant-processor@0.20.0-next.8':
-    resolution: {integrity: sha512-UDzYxlSwNJD/MzuPSJMNhTmOeE88pTFJ7nb+TdwJ+gsdhXYkWv4lYJY7etRsiuKfWRbuqKwDFzwzfL7JN0Em1Q==}
+  '@3sixty/api-tenant-processor@0.20.0-next.9':
+    resolution: {integrity: sha512-JW5Hze25iucHeD2ZgQ+wXsZr72AUeqIVyvgFBcyqijAk1FiKTqkk7YHxPGBOXPCpLzA0xd+mWcSD9KXgGyN77g==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/attestation-connector-nft@0.20.0-next.2':
@@ -722,16 +722,16 @@ packages:
     resolution: {integrity: sha512-IYMUwAK6j4iIm7Kcp6TC1EtktwdXRPiFccHSXX4wqOzs+BUAHcnW6vIHVAE/KKLR2+K1pb5HWhqErSdPHkF/xw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/data-core@0.20.0-next.4':
-    resolution: {integrity: sha512-pXwWiwg6puOdrVAJoA/ZEN0JeOYKP9kzog75cjgPsBf391sRYdDwpS6eYXuE+uOkaxv9dOPsBvSONoIZjhq5hQ==}
+  '@3sixty/data-core@0.20.0-next.5':
+    resolution: {integrity: sha512-v5rxtqxmsm0d5BaTpPyE5x06K1Zlq1Id4UleWRogEdB7ek2L+L7xGsoPze5OWwMPE2+/lZRGg2GZIAEUomolFw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/data-json-ld@0.20.0-next.4':
-    resolution: {integrity: sha512-xUQU4EhlkIShuv59KuZfm2yMgRIBHWO6kc+grENZmZTt41rL0sAnhGy8fxsqRWW6DYmpsPZ5exmqUVHKoNtySA==}
+  '@3sixty/data-json-ld@0.20.0-next.5':
+    resolution: {integrity: sha512-wawpAkLBSv5pbcSruieHVsf40mz6hAr7iMs87KRnwHVGMnPwTcfikaifMitRQ9j1kHTX1wzR/cG3uL1Aa+YkQw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/data-json-path@0.20.0-next.4':
-    resolution: {integrity: sha512-rbkGULPBizKGW6mqlVbzYWsz5kKGBcsN31FOaxpYuy7OWedYFuL8Dnjp5F/ECMcUsbXwmGTC5OySy22T1jalnA==}
+  '@3sixty/data-json-path@0.20.0-next.5':
+    resolution: {integrity: sha512-l9dM7OqCmzMPQwtXsEM6Oyd2jEK99X/P44FCb8Vt7aB/8K95jX8PLZ4MXRim86fQG39fRoizLhJCBb3gDmOB3g==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/data-processing-converters@0.20.0-next.2':
@@ -826,52 +826,52 @@ packages:
     resolution: {integrity: sha512-jRxrvo7kv2cQTvp2FAciZidIFDlG0Cc9mvyFOOncwE0M1AsMOEN732G0wcdXfzYtF0kkMMIyK0xAdBuGBGWJ1g==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-cosmosdb@0.20.0-next.3':
-    resolution: {integrity: sha512-5bY8K/N+IZdcn9J7oogeqGlA9E1aKlciuZxR1wE178ey89ze8FJuotow9ax75lyp/tG6J9hLa8AdUPUUKXmrIw==}
+  '@3sixty/entity-storage-connector-cosmosdb@0.20.0-next.4':
+    resolution: {integrity: sha512-JMxUgXjWAkqDDsyme2KFHntIjKj6I7Bg5zvdHZLIpphAWFHWYGh5nPmqx7DOFqCLC48MlwGH/sxBwy5QaEUQcw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-dynamodb@0.20.0-next.3':
-    resolution: {integrity: sha512-UqdNIjCc9bwMUaKGjMpbxI3W7YVwM0d7gC3LsExceIl2Y/aZWhf6Cx+QwPmCUA/T626be4N+yGe9JPUS1WlJnA==}
+  '@3sixty/entity-storage-connector-dynamodb@0.20.0-next.4':
+    resolution: {integrity: sha512-swbU1A2znRm+d2belajP60BWOD0tAi6bU4OvThD6Q7TYsT0jK1owFM4MrUfV0Gre6GFvdxBoMo6fQ/JFc0vMNQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-file@0.20.0-next.3':
-    resolution: {integrity: sha512-fybhkr2Xbwv4BkEsCp7/N8sCcwP5WEXNRB+8oIJujRqZ44MqY573lGLMbeIWqkGFBhXDL5UAtlJFXYfx+iz9wA==}
+  '@3sixty/entity-storage-connector-file@0.20.0-next.4':
+    resolution: {integrity: sha512-WGARO48utKijVpg2Blv7lzsx1wjvrR1X6zWGUT5OWaztoS3CJXK54brkXmSJBMNQVv5tABpUCx3iO0VFj/eJSg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-gcp-firestore@0.20.0-next.3':
-    resolution: {integrity: sha512-M2teMbW4qdiiKQluKDgfxqXwbnVhsjNhXEIYK/FhTPqUqCqHBv8nG3HlmfvhwEZALB/jTg0iLMqm3+yXXUlmjA==}
+  '@3sixty/entity-storage-connector-gcp-firestore@0.20.0-next.4':
+    resolution: {integrity: sha512-82cr8WxPb9zehiskicuQYkTib1Tk0V4RD3ty6LIFH8k9bbGxrXgnsuXFf1sYORNfkpOF/N1JVQ1OuqbZ/8O+qw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-memory@0.20.0-next.3':
-    resolution: {integrity: sha512-BrvJSu+D3wSG9DtijEqu3Z2Bn80AngeZs4u5JNS5PboA7hgn2A8XAYkh8X46GokNyWbsy7Iu0U2insGQ6a6wfw==}
+  '@3sixty/entity-storage-connector-memory@0.20.0-next.4':
+    resolution: {integrity: sha512-ckszpd7T45Ea1KdglxDaK03V7Z4Rs8D98yYT4KaqcY/Gf3VOzoFTXi273iBMcqdVDZFxMKsSm3o1SLsw3+LDvA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-mongodb@0.20.0-next.3':
-    resolution: {integrity: sha512-MqHjgFyZQWpRvdGk6sMZ+xpWKnG6SZ6pkcP/8HMIIotnfvUv62311RW7cAi1/rIQ+FUcd8Jjw8IqH2WfyDjdtg==}
+  '@3sixty/entity-storage-connector-mongodb@0.20.0-next.4':
+    resolution: {integrity: sha512-3aw9SEkDVCfg60fWYdQyjNqBYwdHdfRVdTztMq13CjUKE4rbYFETGiB/+wIT3cJ3pHvTZBAedlgw4e5OgsYfOQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-mysql@0.20.0-next.3':
-    resolution: {integrity: sha512-RGDH/TSTn7KovH5LSjLX4R3Z6WQloumvqRbUmtzEh33Zoi8h6GbuMhvYr01gFnjxoW4VKQzBdSxHSRP+tx06Ew==}
+  '@3sixty/entity-storage-connector-mysql@0.20.0-next.4':
+    resolution: {integrity: sha512-Zv9Vxw2ohSDE9+rg5/MTMMn5YZTBYAO5Pogi4NODu03xCAnuNAXppgNrZuYbHVXH69NVx+a3bO6c5SH0/XpX+w==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-postgresql@0.20.0-next.3':
-    resolution: {integrity: sha512-cJR1QcxlhyOKrLqPCtLgcodm3mDd+Rh2iskhblbzR+TpLMTiRHQ4+c8zQP8GFhpYnkA52oC+f1nFdsBLH0tDOQ==}
+  '@3sixty/entity-storage-connector-postgresql@0.20.0-next.4':
+    resolution: {integrity: sha512-SAcwUfsFfEURRDioGsJBWz6F8Dg4I+mlsKgDQ2kd8kWRos+uUl5bHh9M73YGTpbnFIOVYyUoS71TpK0oXyiZfA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-connector-scylladb@0.20.0-next.3':
-    resolution: {integrity: sha512-4il0L/KDS62dGyXyrCqer1Baq5gnSezV0dN9OMNMbP2NJMThhXupAbHJDolqJhDBhc4tTuLuIUMneYADJq3gnQ==}
+  '@3sixty/entity-storage-connector-scylladb@0.20.0-next.4':
+    resolution: {integrity: sha512-YUUqLFu7RmbpsRl/AURKFx6vtTfTA+vHOGabrUSxjT2XXGbTQeFfhOtC5s4ryt8Y12bfXdqMJ6eKtya+K8KByQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-models@0.20.0-next.3':
-    resolution: {integrity: sha512-6bPWSIQ/99SPgyMQ2/OtFH2U+EFfCc+lkP+23+tMJVz25kIKQCtrtpgvyavLZr7mcbDQUMgmgoDhXQpPao26/Q==}
+  '@3sixty/entity-storage-models@0.20.0-next.4':
+    resolution: {integrity: sha512-rnKDqH03K9Vh+3rEImcwDBt+S79v1PFaDDokTnehUCKRMHeMqSPTKbL/vIrGr/74DhJ4WAPLuRcTQCf2BeyC2Q==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-rest-client@0.20.0-next.3':
-    resolution: {integrity: sha512-mP9yceggknpAKBBGzXNNXFxKGmCGMrxwX353tVQE4hhUyhV+DdKI17/5UeUQQD9/agP+/Pt1qGaD4wkQL9OhXQ==}
+  '@3sixty/entity-storage-rest-client@0.20.0-next.4':
+    resolution: {integrity: sha512-qkghZuYxxFDLDiDXFKFsIAt5Vj42yijldr2xN/La2gJKcJnsS5YKVN6xZDHu9nLRgNamNIU9Cg9bYV0oRlOSuw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/entity-storage-service@0.20.0-next.3':
-    resolution: {integrity: sha512-MvuNlmOsbku5ITwVShtG9JGybuo5yCjJEG2DiDkRJKHTQ2ZLXL9kcBQWX8KjYNyOiwqysXUm9XeDbIotdx8WEw==}
+  '@3sixty/entity-storage-service@0.20.0-next.4':
+    resolution: {integrity: sha512-0j5DCzL2x0vVBzPb5tb3qwy+NrBfoAwS/O8oTKJyEN89kiaViMIEG2yCXTpShfGHECYizPFkeXZ+Yl6Lv4qu2g==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/entity@0.20.0-next.10':
@@ -982,32 +982,32 @@ packages:
     resolution: {integrity: sha512-rMktM/SZl5x9n5MwQ8aq5CR+udpfLrG7Ep6rif74hVWi9TgYDx/+6ph5xup0WoXc27fiys3+eCBcbej9EhQM+g==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-connector-gmail@0.20.0-next.3':
-    resolution: {integrity: sha512-aLpIuJ80rFlf0/FHHdazOUQps7ms9Zc1PQ9TsLX7N6Ac7K37c6Ew9aDLWF6LqdL4MiHeZqbSKW6Tmodsx4NKEQ==}
+  '@3sixty/mailbox-connector-gmail@0.20.0-next.4':
+    resolution: {integrity: sha512-kqwWp9Ewk8tjyNAsXCmQLxy1FtjAP8eQ9NhhaqQLS3CnX2xzJJ8dEGft9G9rlKilCvs9DteNfGn+kT2CFj/Tgw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-connector-imap@0.20.0-next.3':
-    resolution: {integrity: sha512-JCjoKmXCj+g6pj9gSx9V9BFfmyJKrysO8w58X7ejSsS2RofPIovQxjft0cT+QmFHVymNtD84PTmBP6b+3h2vQA==}
+  '@3sixty/mailbox-connector-imap@0.20.0-next.4':
+    resolution: {integrity: sha512-3Pk+0n5c90miYdp4WtF6TmT41AEWz599aQGJ9yzA7fHOKcVdcw/TYXbpEO6QJm5RVM4SEKwUmhCRU3OYw0amew==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-connector-outlook@0.20.0-next.3':
-    resolution: {integrity: sha512-JbNNX8eJzCxLg++C1VCL68GZo1o0Y/L6CUHxoGXAh6M4ndB8PY2yOdb5O2I5T/qU+KeVT353D6NpD92Lihb4Mw==}
+  '@3sixty/mailbox-connector-outlook@0.20.0-next.4':
+    resolution: {integrity: sha512-SDZR44HLpd6cQBd+iS8YCW5LG4wgcyVuBGA/OOc5Bw/7bCFQUwa9GIhK5svsqPBJ4XEN3Rba5Vgf3ruozP4SDA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-connector-pop3@0.20.0-next.3':
-    resolution: {integrity: sha512-/E12bk2Sl92RX8uVvED8RWeH03kEr6UT9nWnmxKmB5piJnwL0dI5VU9XO8Bu4QYSuzdLS3Cb2jhd5hg3+jbGZA==}
+  '@3sixty/mailbox-connector-pop3@0.20.0-next.4':
+    resolution: {integrity: sha512-5VjvRKhY85lp4735gsgo2En3Zf2pJzjEhWy8wJ85bOYpcJyW/UBGMR0jYlBIw0dV6Oma0pUj3Pudhk+EMFm1vg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-models@0.20.0-next.3':
-    resolution: {integrity: sha512-QPtHsOc0kpi1w8leRLV2sWbluatWHSuoWgL+IlB7JCZUzwfSnKx9Rik/WPNJ4Y3/2ocALbWX+EOcJrIUKqOhCw==}
+  '@3sixty/mailbox-models@0.20.0-next.4':
+    resolution: {integrity: sha512-0+sCmj0hh9jClMQYlsHgw4HyipcLmep5v97WTmFw5RlM3HwHB6i/em6nmHXmiQZ/U5K0Iyf7VHXqXjVc1HZ5dw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-rest-client@0.20.0-next.3':
-    resolution: {integrity: sha512-VX6bCmvbktyRsI1r9v4ZfLO0GBR9KywNuKVIyz3oxMVkzwaC5iEglc5S/KLnItaqn6vug3yeq6cPArh+dX6DJg==}
+  '@3sixty/mailbox-rest-client@0.20.0-next.4':
+    resolution: {integrity: sha512-hEPnvp+UR+fYdD1LfcYa067ZFupV/da5bBkIHEAgb3mlUGiji0ALbxT306dyBRW9SSn7dcL52ah7EsphqPFkGQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/mailbox-service@0.20.0-next.3':
-    resolution: {integrity: sha512-jukdML2KRs0l5ReYgDhO134QO03Z5nxJ6uIv6nNRU2M7qcusrZTVmoTXTD64xxI7iFSs25r8Dmf6aE42zuvZOw==}
+  '@3sixty/mailbox-service@0.20.0-next.4':
+    resolution: {integrity: sha512-IrE7zbTwabVGUcCgdUlWYXxeuArS6urIKP6BcOD6DDaq0lYCVRajXVRzt+bcXhcw0EACbeORaPKJ0FRW1/c1Yg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/merge-locales@0.20.0-next.10':
@@ -1015,24 +1015,24 @@ packages:
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
     hasBin: true
 
-  '@3sixty/messaging-connector-aws@0.20.0-next.3':
-    resolution: {integrity: sha512-gU5oBLANwrdFf8d2OQAhqaonnKqa/3tS29eyoxgxYwbxNAuPwoU9fKmKgrA0hqG3xb3x1QBkIXLLWNyWFoGFrg==}
+  '@3sixty/messaging-connector-aws@0.20.0-next.4':
+    resolution: {integrity: sha512-GtSrEYSlJSEep7S34hGbe/GfwUwhZxWYuabxnLEvQjc6W1/st/1thqIKQkGitWHy9gSzTYqKFTQqc6upYpZSow==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/messaging-connector-entity-storage@0.20.0-next.3':
-    resolution: {integrity: sha512-kuSYsWijHCoNMMFRUzThwzeJoA04/I17F0Hir9akJW2njpgm4niOHnfSB3Z+LL3VzMkhzeZVgGvTcd4gI5xAyA==}
+  '@3sixty/messaging-connector-entity-storage@0.20.0-next.4':
+    resolution: {integrity: sha512-6u8c84o6ln21X8jC12XktVuOzrNCI6RQdZn4xYPckRrkSItQ06iuxYWWvYEn6KfCS8euh46FX2/bEOfTUVkj4w==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/messaging-connector-smtp@0.20.0-next.3':
-    resolution: {integrity: sha512-IV3fgwyXy0SjSaDZX2XOftHBoRzUsHjDOjnundwpNyI9rfvrJW3BfZwTRkw4mUrFSv28363RAj/4lUIf8MWtcA==}
+  '@3sixty/messaging-connector-smtp@0.20.0-next.4':
+    resolution: {integrity: sha512-n1kULZ4IjUM/wRPGDgDTkYfawcwXFs9lfL6Vz4fcGAsPANQMVJN8JVVob0Zo2EZquk62CHKBLwOnj0XudOOWmQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/messaging-models@0.20.0-next.3':
-    resolution: {integrity: sha512-3E0fUknb/WMFCwgpZ+GgHJZupwgcaCam9QoBVJuVGRoKv9Y0/3NcBoraDBqQNM1+opU6E810Su4VkKg+cK1FfA==}
+  '@3sixty/messaging-models@0.20.0-next.4':
+    resolution: {integrity: sha512-jb4VFm2Y1OhSBnubGDVgpH6XXtEMaaaDVkCI6C+XJBaycdTqY50Uv0IYb8Fk/VyjqjhPcImDXxAGDYSSH6E8DQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/messaging-service@0.20.0-next.3':
-    resolution: {integrity: sha512-FlQSjC0f4+DRvlsFTnA6CJd4vRhlgPUtHpFsLvDuQ/ZusmOobLyAVXO6QsATdwHLEHetMRiN2XWmf7fYX42m/Q==}
+  '@3sixty/messaging-service@0.20.0-next.4':
+    resolution: {integrity: sha512-A9wqhNQEStO7qZix6nLm5+FflGY6k8fBFoY46mha8xhojQzfFgx3mWAxvm6K7OP277FQdxu30CB5Msw/26M8CQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/modules@0.20.0-next.10':
@@ -1298,74 +1298,110 @@ packages:
     resolution: {integrity: sha512-H8BiG/2DnfwydVxD1uDPLa1s1sfhRnVTbD2OwzfTr3WlJzgbIzICDXxBTlTMjbWNNCe4VS9X55fco+JI34L9kw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-dynamodb@3.1153.0':
-    resolution: {integrity: sha512-VLltvPCGtzBIskdvOY6MDkCM5igTCAY4KUpFTFh/ak1DuvrJ8R9H0hiSfPBj8meqyJkc+dzc2oACVnwT9JMjvg==}
+  '@aws-sdk/client-dynamodb@3.1161.0':
+    resolution: {integrity: sha512-Z7F2Yh0YXEG516FXfXZE4iqe2Pg6PG1M8Ejzu+K4o0tj5Hv4u5+AaO6fxPpIeFz5VI/O+z6wJMFMnX4t+1hbnw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/client-s3@3.1153.0':
     resolution: {integrity: sha512-h0VScQZPfBApg1Qi4AedsOUSMZ7m758kZIg0JO0B5HtwSzQhB7Tgh6h1JoGEXELgrWADPusYMpMBDmrRAEx2yw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-ses@3.1153.0':
-    resolution: {integrity: sha512-znAL7AX9JJN9QRRziqmdtAQnO9qB4w97xcJHxuWoDIiUexbeAesxQ3kafw/KHFKE84LUlUaJf5EcRpDBhM2aeQ==}
+  '@aws-sdk/client-ses@3.1161.0':
+    resolution: {integrity: sha512-iPhoYYS05iszW41WLxaloJt0iIxYwpmvsK34OVj4Uowm2Uxid/ia/1tl/+w9WzCQyvB9UW09K/HZ5ZXXNJJc6g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-sns@3.1153.0':
-    resolution: {integrity: sha512-QZpScoOcw4/DZhF5EB/emNkaii7FpL353yf/9CvFdQ5+ubAniHaQkcjGnwvKAbNF3EWf9aOQxBQjFr9m+woekw==}
+  '@aws-sdk/client-sns@3.1161.0':
+    resolution: {integrity: sha512-ZvLlpkzhjkv1Ud4L1BJTcMBkh3o9rnZ/BSW7NGLYZiBNGOkH+0c6m5pQRA8sAVqT2p9YDI+Ekx7C2GZxe37ohw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/core@3.978.4':
     resolution: {integrity: sha512-JvGp6y9sPX8FSs2K/EmFMZcUfdkHxqGE45+oxwGC75OIh50j2e4cbx7zcR3BwNs2DSGqJdBja5h6Vy89iIDmRQ==}
     engines: {node: '>=20.0.0'}
 
+  '@aws-sdk/core@3.979.1':
+    resolution: {integrity: sha512-ayOlV1VhLNMiq8PW9ZkVobG4gkldnUoHjG69yy2b8j+VYFlhz/uAL7ZdYQAoQ+eShtGUdNDnnG5rxDg6yUJrOg==}
+    engines: {node: '>=20.0.0'}
+
   '@aws-sdk/credential-provider-env@3.972.75':
     resolution: {integrity: sha512-nc8Epg98PcYoKNx0VFlwtmZSCP+tuJ1FLWqpslET/gp4h/WYuULSJqtxppM6ywKKDdzNJPvLD7ceRfmxm3Qdxw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-env@3.972.80':
+    resolution: {integrity: sha512-uO5TiSvb6j1w9RTe5z28OaOmsrOxVQUPaC5+wZl50RfOXcrYD/KgnS8I9lfyGXc7sGbkCopK6VnhNIAoLqfewQ==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-http@3.972.77':
     resolution: {integrity: sha512-KkYFdIQwuw9IOHfEzK78slxmVWuhcm1w6YgE3V3WVxAeRRj9q5J9jlwzpY/oszWxd4SD96FTFkDdRGBdMFF2Mw==}
     engines: {node: '>=20.0.0'}
 
+  '@aws-sdk/credential-provider-http@3.972.82':
+    resolution: {integrity: sha512-vQzlDHlC24Yz42p+rT4NBoP/5VdetkBoujbOLq9h6QYWC8THuZSPYnXIR9OP3XcOrdMgPBBipOrdssfxnIiWUg==}
+    engines: {node: '>=20.0.0'}
+
   '@aws-sdk/credential-provider-ini@3.973.20':
     resolution: {integrity: sha512-OSl2R/0zLkoeKEIy6oP2tu/bsSdY+DGgro2eOffMD2CcP8POv7rS14FY5Jzc5bjnqB1G9wv/aM1akHC2mdlhZw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-ini@3.973.25':
+    resolution: {integrity: sha512-b5xl71uCRdWsu7P1VeGpiGuCf6zfYETsSNOv8AmYVTrsgbvTJRXdmmOPVfxkvGGVNsiKkGctClQW3jAn0SZLug==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-login@3.972.82':
     resolution: {integrity: sha512-8jyDPtf1WPxeQ/5xlNpyxAD6P7YKwkYeNk8B2vFEDwkPWDvb7c3tQJG5/jbNWbF2yTMIH9tDTueBkdfovYIAPw==}
     engines: {node: '>=20.0.0'}
 
+  '@aws-sdk/credential-provider-login@3.972.87':
+    resolution: {integrity: sha512-C4ZFmcwM+Zj14Z8huVUk54Gv4uzT1ZdzG9cY3Gdh8FePakq7Bss1OFsgZjAhWFOkFOGpBvFBeu0OWjWf8HNKRQ==}
+    engines: {node: '>=20.0.0'}
+
   '@aws-sdk/credential-provider-node@3.972.87':
     resolution: {integrity: sha512-TKj2C0x4IMPSSOAlmeryX8fCPvvPS2pFJz2ikV9IGqyh6Ehsg4leMalCTVfV2rvMTrlGAe7X7nK0HZ3P0KZR9g==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-node@3.972.92':
+    resolution: {integrity: sha512-jC3zmOo7Qxlk+oBivvSsS1Ph7sFGm0QfuhqDGbqgRXi4cxUYMG+dWtBwS2XYYXgc8TIVXJiwgQ65sbNpbYupTA==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-process@3.972.75':
     resolution: {integrity: sha512-ZNm8T/HJNhpS8MikDVAsym8QyUSUuOUGiCkmI3TTya7G6xhOgfRLd2iK91HhQQyvRM36eo6Xm845hHVyfToA2w==}
     engines: {node: '>=20.0.0'}
 
+  '@aws-sdk/credential-provider-process@3.972.80':
+    resolution: {integrity: sha512-xqfixO5aclje7tbQJDias+iNND5wp/3QZixCdZcVQpgWPTZ0V5DfTW9A804A5Z7ezu7sH3WRO+vzUjtiJBA8yg==}
+    engines: {node: '>=20.0.0'}
+
   '@aws-sdk/credential-provider-sso@3.973.19':
     resolution: {integrity: sha512-qHGDAGesyWtRw3BapyFkYSUzVNrC1CWPS6+S2lf/MLMEkWB2gR3Bl6imVHy1nhImXKS+gcuUDzbu39BnsHJc1Q==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-sso@3.973.24':
+    resolution: {integrity: sha512-nlg3BKG03Cgzvv/dMnhxvDJPhAhQSpaN0RUdwgU7ziwkasoev7iI8el8Xy4Rd5sqzgaDUbV269fOXck5SargqA==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-web-identity@3.972.81':
     resolution: {integrity: sha512-nHkgkMIC6NHgqfI6UAQq5cCS4bUkNxkT+r9fXCq/X4IKfX/DHGZ8UM3T4b78OXpWK5OlzEzN4kxwyax0W/MUCA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/dynamodb-codec@3.973.49':
-    resolution: {integrity: sha512-COdyvnU3RLx1MxBCjdUmWIm9+3gvgfOP4vjBL2HZts0ntnwoiKEzsIIs8YR2tRX1xba9N0u+7RpJzJsqUP0Q4A==}
+  '@aws-sdk/credential-provider-web-identity@3.972.86':
+    resolution: {integrity: sha512-zKTyLJBEyfQBVlYqT6Jt+mYV4r8kGbWM7dn6v4Y4MRARizhYafjDXP/iMu76UMRhToSPNmIKX1XAb24gtpBFIA==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/dynamodb-codec@3.973.54':
+    resolution: {integrity: sha512-+Z4tyUabT/ATvXw7Bpo2j8Sh5ot5XqhvJYwNqHaKEib1KIgrVByZKSw7ndeAMOHjMAhygZnH09N9D1ygD/uTRg==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/endpoint-cache@3.972.11':
     resolution: {integrity: sha512-8q1ICxcDjHId3bBryuu/j+1L9y5/3uQnwzLDt5j2ElcjZSoWmFtymdJy7OjLrluSMe0Z4mq5bcH4fxBXvlEHfw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/lib-dynamodb@3.1153.0':
-    resolution: {integrity: sha512-sKfv+zV5dLg7MgBOHWBSdF/lmEfK/SOkmOS/nbYy2ocA5FOx6p+v0STz38pCpVaWKRHxrNbJNjk1yWXLB2d88g==}
+  '@aws-sdk/lib-dynamodb@3.1161.0':
+    resolution: {integrity: sha512-7BBhAGJHc5bbw8PenvVg2GN0L6JkNGrnZI0JBm7nQ8fCiGgwmA0c+jWrJkQtI+1R65MTpuFLAVU1qq0wsPsXaw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@aws-sdk/client-dynamodb': ^3.1153.0
+      '@aws-sdk/client-dynamodb': ^3.1161.0
 
-  '@aws-sdk/middleware-endpoint-discovery@3.972.33':
-    resolution: {integrity: sha512-0ed2hDcj2bAQviyydVAWtu63Bl2R0fsvQgw3SK+X9ei7EpFegUdhpdRW/N7cJZIl4YPJXhMnmaq32wDcvUtacA==}
+  '@aws-sdk/middleware-endpoint-discovery@3.972.37':
+    resolution: {integrity: sha512-+KAK020JY95Q7Swwo5b9pl9S11VPuNLqecCW5bzkksWiU5pmI85lAloOD4qlIKIA/P8FlrRJ60XJ6+lnDQK/DQ==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/middleware-sdk-s3@3.972.80':
@@ -1376,16 +1412,32 @@ packages:
     resolution: {integrity: sha512-zjqIqzTYLRKhT7TPJDUreK9vG9PjhmnfLCaTaqArkRT7j+Ogl0tuXB7MpSd8rlRfRT+xTOeyNFWaOfyNcf51hg==}
     engines: {node: '>=20.0.0'}
 
+  '@aws-sdk/nested-clients@3.997.54':
+    resolution: {integrity: sha512-/OczlavsS7U5sOodRO10Ug4R/AKFVZiXTstKipWe68EfjPkmdDFNXNl9FCJyXWkg1DG6RBm3qAuVB8FNW9O8KQ==}
+    engines: {node: '>=20.0.0'}
+
   '@aws-sdk/signature-v4-multi-region@3.996.48':
     resolution: {integrity: sha512-cFDXfEbXaGwbnpvR/DyqfxfjxpjXVRVthQLgkwvcfDS5u3+8G9WSj1X1Ag/pTRg/QOeOno1Tq3ycEdrKsCUcOA==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/signature-v4-multi-region@3.996.51':
+    resolution: {integrity: sha512-+aHvUugVBuMPXxgkPfWnTMyGdE/yWS8GHi5+qQ37HowS0YqzrbuaDLznj+Dtmtu5jgCdqz36gXmujOToUhNNWw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/token-providers@3.1153.0':
     resolution: {integrity: sha512-6bKJ2OfLboxhzeJ3hBDeB8L6emCYf9DfdrjBAharLrY42J1RV/6jA6G8jvfNghzID8Yb40BdSY7jQMtWx9Ot0Q==}
     engines: {node: '>=20.0.0'}
 
+  '@aws-sdk/token-providers@3.1161.0':
+    resolution: {integrity: sha512-ypbXSofNcSHwf/KA40bFCXJb0MLaAKrfT7sot4dFaA+2lsuXNah4zLRJIAU7Qmvs9PFJ6rnY0bZFEC+mE7attA==}
+    engines: {node: '>=20.0.0'}
+
   '@aws-sdk/types@3.974.6':
     resolution: {integrity: sha512-v/clNZzZnDxGyvpHMOGpJKVXFAExJzUNAAjaWGdcx8QAcXLGwTaOkw33p5SHAi0YAioK32xB3hWwOekRVfmfKg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/types@3.975.0':
+    resolution: {integrity: sha512-WQlhs6juByzWOzj5fwxOx0mPJaEqMcG/sDpl3Id61B3XhKE63xY+0QWcnG+sWR/sCfprmreyUo1lM7IKZmHMzw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/util-dynamodb@3.996.9':
@@ -1396,6 +1448,10 @@ packages:
 
   '@aws-sdk/xml-builder@3.972.41':
     resolution: {integrity: sha512-ctjVSyCMegrWfXlx6VqzSBFI6UqmQ5ZlnfMhdLIiWmhoH8UAQxSCP5N3OpG7X3k4LnS7ou74C4mt20+bfTW2aQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/xml-builder@3.972.42':
+    resolution: {integrity: sha512-smX8/gNP8Kjq+CWTBMZQLQ912vOQjiWExzwzvMO+eujPB5RY8IbtF0AGdUUXHKN7KoDWK9dIcuW0WG269kiP6w==}
     engines: {node: '>=20.0.0'}
 
   '@aws/lambda-invoke-store@0.3.0':
@@ -1465,12 +1521,12 @@ packages:
     resolution: {integrity: sha512-rbAE25KUfjU/s3XHUdJgceoCP5dEOpMx85J04kF+QMdta73XkuG9JGHHinch+XIoKpBdqljin+KqURpJriSzLA==}
     engines: {node: '>=22.0.0'}
 
-  '@azure/msal-common@16.14.2':
-    resolution: {integrity: sha512-HOBR0Gfo39TMrkxNG8k6cfjRkrRjXZc3JQs3ebMWQc9S4cihuknMYra3sgmzbZB752oQBqBN9+WF7c826p2vIQ==}
+  '@azure/msal-common@16.15.0':
+    resolution: {integrity: sha512-lwdLb1B9Q5nEhPLVIKe78XH5wFMN15fCiDkY7ylPDSWZuWcD93G3jpJajrKhO3CQld8SLKz0sHiOi24mxdvtsg==}
     engines: {node: '>=0.8.0'}
 
-  '@azure/msal-node@7.1.0':
-    resolution: {integrity: sha512-s1O6hSY/C/dmqykTmmeHY6GhSkDuY8N1gxyhuLyaCwbY7N+UBvU2Wu4flas7+NxZiAPcXNPVpgt3n/HP/5yL+w==}
+  '@azure/msal-node@7.1.2':
+    resolution: {integrity: sha512-52hKQLGpEQzwNufIXG1SPVU+wQ3RIe7Rp2+g+VdAmZojCAZ6yCdGEffzQEQ6RnBZGBEs40nl14rWBmfJpCoHsg==}
     engines: {node: '>=20'}
 
   '@azure/storage-blob@12.34.0':
@@ -1928,8 +1984,8 @@ packages:
   '@fastify/ajv-compiler@4.0.7':
     resolution: {integrity: sha512-VP0yIfwlc1ohj733keYDqyHm1VWeP9VQxYomunhr90jkC4aNNibbkrRiaNgPgqj1ORxUenILR4qzA/ppYBNAtQ==}
 
-  '@fastify/compress@9.2.2':
-    resolution: {integrity: sha512-FF1CSw1ED4f2lZmYDXmpHgDJLj752JBr7Tdv6Z5SYkZmbvwzlagWwKvF3OGWPzbL7pRFgoki6rNyh/yu8tb92w==}
+  '@fastify/compress@9.3.0':
+    resolution: {integrity: sha512-vvm+933zsfsnw7nKsy2GWyix54k7aq3j+9EkwfH6ncngt+DUt5tgVQ/uH07/JrbOWXt1mjADjZ5MbKKwu1xhmA==}
 
   '@fastify/cors@11.3.1':
     resolution: {integrity: sha512-gZXNzd6FLHzOIfvoK4+Az3Wko2V6Y0MIsLxpyo4AEYl7a9q1JBPwPaxLea4nkr++8FCiJiPpYYo6E02uZW0dqw==}
@@ -1972,8 +2028,8 @@ packages:
     resolution: {integrity: sha512-wfHJPZmLqzpy6FN6U+7HkkP/AKhGsbHSpEy/qL2TyI3/pKRAvpamQxZ2qvps5hMRgAjfuHCim+oeJj9RveCaqg==}
     engines: {node: '>=18'}
 
-  '@google-cloud/firestore@9.3.1':
-    resolution: {integrity: sha512-ofGTiSpfXrHrrS3KaDOmsupSzCHr4WVl1+s6Ke0F8rPBRyb/OuZSC8u1NjCKtt/fO7A1GvqASQGhdAwVsnGpQA==}
+  '@google-cloud/firestore@9.4.0':
+    resolution: {integrity: sha512-4tVhdRFepX5w+fRfl3H6D2+gaGQjmMiA9l+OwIwInfAkCi8iacfRx4jS9SmSfpQNlXequ55DfzFopwyFnIIJ9w==}
     engines: {node: '>=22'}
 
   '@google-cloud/paginator@7.2.0':
@@ -2026,11 +2082,11 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hono/node-server@2.1.3':
-    resolution: {integrity: sha512-TA//nWMqPhbfdfneACk6t5a9eqbS9lABEPyKn0/xZTah3H3U2XaVg85rJFl0/Fyit0I552YDHgXGVSf3GwqbUw==}
+  '@hono/node-server@2.1.5':
+    resolution: {integrity: sha512-MgP/I06GdvsilDspMk/qmRzpk8LOUStP6jFAbSRi40W09DhoyUn+Mj7eyKICPqeYKybOjVFLVIAQzvu1bfIa7Q==}
     engines: {node: '>=20'}
     peerDependencies:
-      hono: ^4
+      hono: ^4 || ^5.0.0-0
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -2531,6 +2587,10 @@ packages:
     engines: {node: '>=18.0.0'}
     deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
+  '@smithy/core@3.38.1':
+    resolution: {integrity: sha512-U/mB2XiwTLaf+NSgLSWwJfptsMT/H8aBi0aTAA/E5e2/TagFeGCqAyhKGG0w0A9IWTkm4qYEmLoD/HB6aYfnRA==}
+    engines: {node: '>=18.0.0'}
+
   '@smithy/credential-provider-imds@4.5.2':
     resolution: {integrity: sha512-A9uSdn72ozbRUSit0eib0TW7nXuNPlaeM0zcGkJ+nE6tFcSDbnmtwoxbTCFBukVQcszDAyvsd7+rTduPTXpygg==}
     engines: {node: '>=18.0.0'}
@@ -2543,8 +2603,16 @@ packages:
     resolution: {integrity: sha512-ThMkboGeONWXAelq9FvGsuJC4rOi+qyC4/zhUF58xYpxUg5sQKx2VXZYJmtNjr4dSuBJ1HeJXETQILCz3wOHvw==}
     engines: {node: '>=18.0.0'}
 
+  '@smithy/node-http-handler@4.14.1':
+    resolution: {integrity: sha512-/T6E1jzCL0fErS9uq8JqES/5yYQQ4ppVmmYHwXw2nlov8KFzLb+3QqHR5iAun1BsuAB50IPxZliV8YMgghLwhA==}
+    engines: {node: '>=18.0.0'}
+
   '@smithy/signature-v4@5.7.4':
     resolution: {integrity: sha512-tHy0K0VtqNd5Y7Y41h0a0Lhh0L1GzC08dTWg0F7vRJWFtTENg7IZikf3wQkanYIRdb7ngoIPMTmqgUi401fEeQ==}
+    engines: {node: '>=18.0.0'}
+
+  '@smithy/signature-v4@5.7.5':
+    resolution: {integrity: sha512-WPjdr5oWOk1LArpI4pavu+fSo+/evi0Re1olxGvqwuZopd4gYR1UGCi+Soyn/IjmafqbWs+ZC+3AKxJS3ZpwUg==}
     engines: {node: '>=18.0.0'}
 
   '@smithy/types@4.19.0':
@@ -3015,8 +3083,8 @@ packages:
     resolution: {integrity: sha512-/5NV/vDALVFDXgLmfsy9TRCBlKwO2LNBFzpzvb9iIj+jR+eSc6DLYYvVOdivT/jm7MtU6TebYuRmzEOI7w40UA==}
     engines: {node: '>=10.0.0'}
 
-  '@zone-eu/mailsplit@5.4.27':
-    resolution: {integrity: sha512-9008ddFqqKk7lMF2S1sLU7ExfJZP9zPw5tkZy24EVt45Ryme2x85f/5vJZZqQ+vCJkKcCY78dJ5yuEVG3ZrVZA==}
+  '@zone-eu/mailsplit@5.4.29':
+    resolution: {integrity: sha512-CCUNycmUjrV5M0wNf23waWAt9eOHczhjLbUQS7k0FNJvR0py9VSqHFt+tSl/D0+XI73VLG0U+PwYtq9R0zsm9Q==}
     engines: {node: '>=20.0.0'}
 
   abort-controller@3.0.0:
@@ -3150,10 +3218,6 @@ packages:
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
-
-  base64id@2.0.0:
-    resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
-    engines: {node: ^4.5.0 || >= 5.9}
 
   baseline-browser-mapping@2.11.30:
     resolution: {integrity: sha512-YJs6Pz17RMNv8HoyKREtCY38E3BV1nPkWVmIb+XN1uHC1Vqt3KZCH/uJH9ZKRoiKb/icZ6tvehyee6RZNbFfRA==}
@@ -3988,6 +4052,10 @@ packages:
     resolution: {integrity: sha512-mQS0R2Ev/DKkzuWSYtDeq15uhDeaWuT2qzLYqJ41LmooxVKHmn5ut3pc6dlHY6wfHW/D7FBmOYjAtkjaD1A7qA==}
     engines: {node: '>=22'}
 
+  google-auth-library@11.3.2:
+    resolution: {integrity: sha512-rbm+5boOZzFvDFg2tvCGkgHtG+RrmDqCDi6voK+ILpoCDqGxxc5pcMH6WZzCQXGNqQqZcYJl5WNvb159rkriuA==}
+    engines: {node: '>=22'}
+
   google-gax@5.0.8:
     resolution: {integrity: sha512-M4vpZcXQIC1gqIVGQ7eaU3jXQA6zecStyTXu514TYfThlgSurYJOxHZo9fzU6hAgwPWvuEynAVHWyaIk80VeEA==}
     engines: {node: '>=18'}
@@ -4008,8 +4076,8 @@ packages:
     resolution: {integrity: sha512-wtv/e7JYgmtpIPcSez2EFD/Wx49DPsRX2rj15D7hTwc7tDsP82dcwoX/I4+zE38mu6S9PcghizzzADLf+ZMunA==}
     engines: {node: '>=22'}
 
-  googleapis@186.0.0:
-    resolution: {integrity: sha512-ljnYwbM1IX6xM0q5tQHqAtnFdHBC9rPa5jidpoQB7wRiqBYOs5hOQPUPidF454tNLO5LCwB06EvkPg/93E1OJw==}
+  googleapis@189.0.0:
+    resolution: {integrity: sha512-TmFQmaLNcY/aaGNC9wZW9GvPueWB/fdNmt6eNFLKo5nrAxod4OAnvQNRxZuGO8iKObie5g3iLJloHQ8iiiIlvA==}
     engines: {node: '>=22.0.0'}
 
   gopd@1.2.0:
@@ -4067,8 +4135,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.13.13:
-    resolution: {integrity: sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA==}
+  hono@4.13.16:
+    resolution: {integrity: sha512-AOLOEhvrV+iH92xXCnFr/5+3KjPKcI3xP63XJtX5spAnkznPdHijlIsUTpi7/9EhWqrTCekw5c5zh1K+YsVw7A==}
     engines: {node: '>=16.9.0'}
 
   hookified@1.15.1:
@@ -4117,8 +4185,8 @@ packages:
     resolution: {integrity: sha512-2E8Q6rh+1RRSq/YdaGsNfXsEZy9FVqv6BSSrkmZJP7BnaoPnRfKL+YaofPvP+5rzdk144qSm6i4+hvPgUcbV4Q==}
     engines: {node: '>= 4'}
 
-  imapflow@2.5.8:
-    resolution: {integrity: sha512-uFnRQVgpBWP1KV2pqGxjvcMejc6x6eskqoaGbOLNIr5Xt5lp6DYrUgk2NaEgtpSNMMxCZeN1GHJNd4nUmc4Cpw==}
+  imapflow@2.10.0:
+    resolution: {integrity: sha512-J4YH1eHwemE00xaCT2vn30s+81iJi+C4OHQEoO6/hptA/z75nGdP1isU3oDfMaiheHD240LIhMMJcMMCJ5RDYA==}
     engines: {node: '>=20.0.0'}
 
   import-fresh@3.3.1:
@@ -4161,6 +4229,9 @@ packages:
   ipaddr.js@2.5.0:
     resolution: {integrity: sha512-aq+t5NAc+cS6rZQQVWC2x98CPqGtKKTMDd4Gaodv0wShnItdKg/51djkGJ1hqH+Oy0ivDftCbSLCQob8zso01w==}
     engines: {node: '>= 10'}
+
+  iregexp-check@0.1.2:
+    resolution: {integrity: sha512-RCcV2SFO5JKh+DdmWiY7yVyiZzzk6XZiHEJvTKbzVs8Z0u404gnoSqDtFqg6C5qJBEG4QseWBQz9zhI68zskEQ==}
 
   is-alphabetical@2.0.1:
     resolution: {integrity: sha512-FWyyY60MeTNyeSRpkM2Iry0G9hpr7/9kD40mD/cGQEuilcZYS4okz8SN2Q6rLCJ8gbCt6fN+rC+6tMGS99LaxQ==}
@@ -4281,8 +4352,8 @@ packages:
   json-bigint@1.0.0:
     resolution: {integrity: sha512-SiPv/8VpZuWbvLSMtTDU8hEfrZWg/mH/nV/b4o0CYbSxu1UIQPLdwKOCIyLQX+VIPO5vrLX3i8qtqFyhdPSUSQ==}
 
-  json-p3@2.3.1:
-    resolution: {integrity: sha512-Eer/htMvlUiaTe7CJPOGtIUEtvxL3ZQarcXNQ0pupIPuLtCZs/TLL1nDnpytYn62ASOilWJkRSPe6mbn41FcgQ==}
+  json-p3@3.0.2:
+    resolution: {integrity: sha512-v/VibozM0WYk1OZeSyUZkiF2LIt++TKJ+j1rd3XuJHeNHLYwUFFAJZmXbj9RHNCN6glWeIcazT38ZSGzcz2+fw==}
 
   json-parse-even-better-errors@2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}
@@ -4354,8 +4425,8 @@ packages:
     resolution: {integrity: sha512-Nyh3H90B3gRtrcxIe56Ayy7635J0jmh6AbxbQgQae8wrSPQMH5wFqJChiMTB13yKG512L3YspbA5DzumhFTITA==}
     engines: {node: '>=20.0.0'}
 
-  libmime@5.5.2:
-    resolution: {integrity: sha512-Byw3CchK4eSqbgzpttsUoC4hx2VPP+hnveAuYAYZNipEc+0WlDFjVb1ISNscjq/idvyDP/Xjg8mnBcdgbsgvzg==}
+  libmime@5.6.3:
+    resolution: {integrity: sha512-cuTUW/Jybvh5O4/U9p61gyutHOjDtZyGQYuY99+bfnaFwqcDf2Nb+R6hMHY6DDen2H9wLKQSMpofWUgn2TI5JQ==}
     engines: {node: '>=20.0.0'}
 
   libqp@3.0.1:
@@ -4714,8 +4785,8 @@ packages:
     resolution: {integrity: sha512-ZoS07RoFqpKYQwAk59qmrx8+jJHNHU30UjlU96QktiGn1ltvDr+vCznLX5DiUBLEpMAHatHNWV1nM/74ul66kA==}
     engines: {node: '>=20.19.0'}
 
-  mongodb@7.7.0:
-    resolution: {integrity: sha512-XG1xXEqyouAV8GCb3PuRaujofeXKpAJAPvXYWZgHl6Dz4QHSJ1nRLl0+GpqaLTwKvC0RFE9truOur34RNFY1nw==}
+  mongodb@7.8.0:
+    resolution: {integrity: sha512-p2NKagbQ41+daACG/ZSvhTzeAo+DoEyWE9Cmpf/SyP3pTC43+X0mwKE/44PpKtCxp5wOxnXz+t2pXEZRSkt9Yg==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       '@aws-sdk/credential-providers': ^3.806.0
@@ -4808,8 +4879,8 @@ packages:
     resolution: {integrity: sha512-5qr2okC4ItAI0hG5SaV0HoYMpnM/Y6+Oqr7AmPYy/2uEoGvS+GbSKLeRxSS1uAdu59yz0ouzcuXievSgg///WA==}
     engines: {node: '>=18'}
 
-  nodemailer@10.1.7:
-    resolution: {integrity: sha512-OQa6FDln5fLttmqSbjDiRYvFDOFNrBqfiOwHPlEbURil3b+vPB1v8xpi+Sp46drzNDlsTnNsS502vthmz56r4w==}
+  nodemailer@10.3.1:
+    resolution: {integrity: sha512-uF0AFsJC07Y1vdW7p580DKAnh7rAO+4UPSSB3mDCPNDufoiaOebV6JmrzpxB14OjEEEiBsNdYoM2Y+fN8M7BBA==}
     engines: {node: '>=20.0.0'}
 
   nodemon@3.1.14:
@@ -4965,17 +5036,17 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
-  postal-mime@4.0.11:
-    resolution: {integrity: sha512-T0zAqYnuSB8s+zL9WdiGj/2DeWeObEjqrcw2LWq+hgwpCSbLt7xujsFXn6Kgr1wsLl8DJh+v+lG9GQSQfMcUyA==}
+  postal-mime@4.2.0:
+    resolution: {integrity: sha512-QG5Rh8wY/zjwFF1lKWcBbwWcAWR5jWodmMPL4gMik43XDLebtWoAAPyG0lrE2kYYZ5IHTASrepGuGO0YIwNKAg==}
     engines: {node: '>=20'}
 
   postcss@8.5.31:
     resolution: {integrity: sha512-YUbWYCgErwnMAVkjUnYa+KlMBzGpHwiIt/DE7f0G33AuX2LH9UcTk6KgWxd3zRU+pN3u/C+Xl3EnMLM4Hea7Sg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postgres@3.4.9:
-    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
-    engines: {node: '>=12'}
+  postgres@4.0.0:
+    resolution: {integrity: sha512-kBh8qXtcvvIAc00DftQyOxz7M/3Zxww1tRMXZPLzipNXXl5PIzHml+9zB3Mrge2U8ldc0WF1ZdLp1iYQi7Kh3A==}
+    engines: {node: '>=20'}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -5276,10 +5347,6 @@ packages:
   socket.io-parser@4.2.7:
     resolution: {integrity: sha512-IH/iSeO9T6gz1KkFleGDWkG9N3dl4jXVYUtMhIqH10Md0ttMer8nUNWiP1DKuNrybD2xBrixLJdCC9J6ECoYkg==}
     engines: {node: '>=10.0.0'}
-
-  socket.io@4.8.3:
-    resolution: {integrity: sha512-2Dd78bqzzjE6KPkD5fHZmDAKRNe3J15q+YHDrIsy9WEkqttc7GY+kT9OBLSMaPbQaEd0x1BjcmtMtXkfpc+T5A==}
-    engines: {node: '>=10.2.0'}
 
   socket.io@4.8.4:
     resolution: {integrity: sha512-9ZV9zg8vN8hO3Y25DhR7nUkJ1VDnBhq5O/JrXhFT9s6+F0gqytSASTHVfCFc2mJXaTfARroErplXlzFWwETZqQ==}
@@ -5835,13 +5902,13 @@ snapshots:
       graphql: 16.14.2
       typescript: 6.0.3
 
-  '@3sixty/api-auth-account-rest-client@0.20.0-next.4(supports-color@10.2.2)':
+  '@3sixty/api-auth-account-rest-client@0.20.0-next.6(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-w3c-did': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
@@ -5850,16 +5917,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-auth-account-service@0.20.0-next.4':
+  '@3sixty/api-auth-account-service@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -5867,29 +5934,29 @@ snapshots:
       '@3sixty/standards-w3c-did': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.4':
+  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.4
-      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.4
-      '@3sixty/api-auth-models': 0.20.0-next.4
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.6
+      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.6
+      '@3sixty/api-auth-models': 0.20.0-next.6
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/api-auth-entity-storage-models@0.20.0-next.4':
+  '@3sixty/api-auth-entity-storage-models@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.4
+      '@3sixty/api-auth-models': 0.20.0-next.6
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.4(supports-color@10.2.2)':
+  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.6(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.4
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.6
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -5898,29 +5965,29 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-auth-entity-storage-service@0.20.0-next.4':
+  '@3sixty/api-auth-entity-storage-service@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.4
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.6
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/messaging-models': 0.20.0-next.3
+      '@3sixty/messaging-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/vault-models': 0.20.0-next.2
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-auth-models@0.20.0-next.4':
+  '@3sixty/api-auth-models@0.20.0-next.6':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-schema-org': 0.20.0-next.3
@@ -5928,40 +5995,40 @@ snapshots:
       '@3sixty/web': 0.20.0-next.10
       schema-dts: 2.1.0
 
-  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.4':
+  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.4
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.6
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.4':
+  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.4
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.6
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/api-auth-oauth-models@0.20.0-next.4':
+  '@3sixty/api-auth-oauth-models@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.4
-      '@3sixty/api-auth-models': 0.20.0-next.4
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.6
+      '@3sixty/api-auth-models': 0.20.0-next.6
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-schema-org': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
       schema-dts: 2.1.0
 
-  '@3sixty/api-auth-oauth-service@0.20.0-next.4':
+  '@3sixty/api-auth-oauth-service@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.4
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.4
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.6
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.6
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
@@ -5970,33 +6037,33 @@ snapshots:
       '@3sixty/vault-models': 0.20.0-next.2
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-auth-service@0.20.0-next.4':
+  '@3sixty/api-auth-service@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-core-server@0.20.0-next.8':
+  '@3sixty/api-core-server@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
-      '@3sixty/api-processors': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
+      '@3sixty/api-processors': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-core@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-core@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -6006,7 +6073,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-models@0.20.0-next.8':
+  '@3sixty/api-models@0.20.0-next.9':
     dependencies:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6014,34 +6081,34 @@ snapshots:
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-processors@0.20.0-next.8':
+  '@3sixty/api-processors@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-rest-client@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-rest-client@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/nameof': 0.20.0-next.10
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-server-fastify@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-server-fastify@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core-server': 0.20.0-next.8
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core-server': 0.20.0-next.9
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
-      '@fastify/compress': 9.2.2
+      '@fastify/compress': 9.3.0
       '@fastify/cors': 11.3.1
       fastify: 5.12.7
       fastify-plugin: 6.0.1
@@ -6051,57 +6118,57 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-server-hono@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-server-hono@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core-server': 0.20.0-next.8
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core-server': 0.20.0-next.9
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
-      '@hono/node-server': 2.1.3(hono@4.13.13)
-      hono: 4.13.13
-      socket.io: 4.8.3(supports-color@10.2.2)
+      '@hono/node-server': 2.1.5(hono@4.13.16)
+      hono: 4.13.16
+      socket.io: 4.8.4(supports-color@10.2.2)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-server-native@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-server-native@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core-server': 0.20.0-next.8
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core-server': 0.20.0-next.9
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
       find-my-way: 9.10.0
-      socket.io: 4.8.3(supports-color@10.2.2)
+      socket.io: 4.8.4(supports-color@10.2.2)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-service@0.20.0-next.8':
+  '@3sixty/api-service@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/modules': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/api-tenant-processor@0.20.0-next.8':
+  '@3sixty/api-tenant-processor@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
@@ -6109,7 +6176,7 @@ snapshots:
     dependencies:
       '@3sixty/attestation-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/nft-models': 0.20.0-next.2
@@ -6119,19 +6186,19 @@ snapshots:
   '@3sixty/attestation-models@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/standards-schema-org': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
 
   '@3sixty/attestation-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/attestation-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
     transitivePeerDependencies:
@@ -6141,11 +6208,11 @@ snapshots:
 
   '@3sixty/attestation-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/attestation-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-schema-org': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
@@ -6154,8 +6221,8 @@ snapshots:
   '@3sixty/auditable-item-graph-models@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/immutable-proof-models': 0.20.0-next.2
       '@3sixty/standards-schema-org': 0.20.0-next.3
@@ -6164,8 +6231,8 @@ snapshots:
 
   '@3sixty/auditable-item-graph-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/auditable-item-graph-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
@@ -6178,15 +6245,15 @@ snapshots:
 
   '@3sixty/auditable-item-graph-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/auditable-item-graph-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/event-bus-models': 0.20.0-next.2
       '@3sixty/immutable-proof-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6197,8 +6264,8 @@ snapshots:
   '@3sixty/auditable-item-stream-models@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/immutable-proof-models': 0.20.0-next.2
       '@3sixty/standards-schema-org': 0.20.0-next.3
@@ -6207,11 +6274,11 @@ snapshots:
 
   '@3sixty/auditable-item-stream-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/auditable-item-stream-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -6222,14 +6289,14 @@ snapshots:
 
   '@3sixty/auditable-item-stream-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/auditable-item-stream-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/event-bus-models': 0.20.0-next.2
       '@3sixty/immutable-proof-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6252,7 +6319,7 @@ snapshots:
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
 
   '@3sixty/authorization-models@0.20.0-next.3':
@@ -6262,8 +6329,8 @@ snapshots:
 
   '@3sixty/authorization-rest-client@0.20.0-next.3(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -6275,7 +6342,7 @@ snapshots:
 
   '@3sixty/authorization-service@0.20.0-next.3':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6286,7 +6353,7 @@ snapshots:
 
   '@3sixty/automation-actions@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/automation-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
@@ -6299,8 +6366,8 @@ snapshots:
 
   '@3sixty/automation-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/automation-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -6312,12 +6379,12 @@ snapshots:
 
   '@3sixty/automation-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/automation-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -6332,25 +6399,25 @@ snapshots:
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
   '@3sixty/background-task-service@0.20.0-next.3':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/modules': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
 
   '@3sixty/blob-storage-connector-aws-s3@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6361,7 +6428,7 @@ snapshots:
 
   '@3sixty/blob-storage-connector-azure@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6374,7 +6441,7 @@ snapshots:
 
   '@3sixty/blob-storage-connector-file@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6384,7 +6451,7 @@ snapshots:
 
   '@3sixty/blob-storage-connector-gcp@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6399,7 +6466,7 @@ snapshots:
 
   '@3sixty/blob-storage-connector-ipfs@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6410,7 +6477,7 @@ snapshots:
 
   '@3sixty/blob-storage-connector-memory@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6421,8 +6488,8 @@ snapshots:
   '@3sixty/blob-storage-models@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/standards-schema-org': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
@@ -6430,10 +6497,10 @@ snapshots:
 
   '@3sixty/blob-storage-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -6444,14 +6511,14 @@ snapshots:
 
   '@3sixty/blob-storage-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-schema-org': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
@@ -6488,7 +6555,7 @@ snapshots:
       '@scure/bip39': 2.4.0
       micro-key-producer: 0.10.2
 
-  '@3sixty/data-core@0.20.0-next.4':
+  '@3sixty/data-core@0.20.0-next.5':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
@@ -6498,20 +6565,20 @@ snapshots:
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
 
-  '@3sixty/data-json-ld@0.20.0-next.4':
+  '@3sixty/data-json-ld@0.20.0-next.5':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
       '@types/jsonld': 1.5.15
       jsonld: 9.0.0
 
-  '@3sixty/data-json-path@0.20.0-next.4':
+  '@3sixty/data-json-path@0.20.0-next.5':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
-      json-p3: 2.3.1
+      json-p3: 3.0.2
 
   '@3sixty/data-processing-converters@0.20.0-next.2':
     dependencies:
@@ -6524,7 +6591,7 @@ snapshots:
   '@3sixty/data-processing-extractors@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-path': 0.20.0-next.4
+      '@3sixty/data-json-path': 0.20.0-next.5
       '@3sixty/data-processing-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
@@ -6534,8 +6601,8 @@ snapshots:
 
   '@3sixty/data-processing-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/data-processing-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6547,11 +6614,11 @@ snapshots:
 
   '@3sixty/data-processing-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/data-processing-models': 0.20.0-next.2
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
@@ -6569,8 +6636,8 @@ snapshots:
 
   '@3sixty/dataspace-control-plane-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/dataspace-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6583,14 +6650,14 @@ snapshots:
 
   '@3sixty/dataspace-control-plane-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/dataspace-models': 0.20.0-next.2
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/federated-catalogue-models': 0.20.0-next.2
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6604,10 +6671,10 @@ snapshots:
 
   '@3sixty/dataspace-data-plane-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-w3c-activity-streams': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
@@ -6618,17 +6685,17 @@ snapshots:
 
   '@3sixty/dataspace-data-plane-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/dataspace-app-runner': 0.20.0-next.2
       '@3sixty/dataspace-models': 0.20.0-next.2
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/modules': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -6643,10 +6710,10 @@ snapshots:
 
   '@3sixty/dataspace-data-plane-socket-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/dataspace-models': 0.20.0-next.2
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6660,8 +6727,8 @@ snapshots:
     dependencies:
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/rights-management-models': 0.20.0-next.3
       '@3sixty/standards-dataspace-protocol': 0.20.0-next.3
@@ -6701,8 +6768,8 @@ snapshots:
       '@3sixty/auditable-item-graph-models': 0.20.0-next.2
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/standards-schema-org': 0.20.0-next.3
       '@3sixty/standards-unece': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
@@ -6710,11 +6777,11 @@ snapshots:
 
   '@3sixty/document-management-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/auditable-item-graph-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
     transitivePeerDependencies:
@@ -6724,14 +6791,14 @@ snapshots:
 
   '@3sixty/document-management-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/attestation-models': 0.20.0-next.2
       '@3sixty/auditable-item-graph-models': 0.20.0-next.2
       '@3sixty/blob-storage-models': 0.20.0-next.2
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/data-processing-models': 0.20.0-next.2
       '@3sixty/document-management-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -6744,7 +6811,7 @@ snapshots:
     dependencies:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
       '@3sixty/engine-models': 0.20.0-next.6
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/logging-connector-console': 0.20.0-next.2
@@ -6755,7 +6822,7 @@ snapshots:
 
   '@3sixty/engine-models@0.20.0-next.6':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
@@ -6763,21 +6830,21 @@ snapshots:
 
   '@3sixty/engine-server-types@0.20.0-next.6(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@3sixty/api-auth-account-rest-client': 0.20.0-next.4(supports-color@10.2.2)
-      '@3sixty/api-auth-account-service': 0.20.0-next.4
-      '@3sixty/api-auth-connector-entity-storage': 0.20.0-next.4
-      '@3sixty/api-auth-entity-storage-rest-client': 0.20.0-next.4(supports-color@10.2.2)
-      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.4
-      '@3sixty/api-auth-models': 0.20.0-next.4
-      '@3sixty/api-auth-oauth-connector-google': 0.20.0-next.4
-      '@3sixty/api-auth-oauth-connector-microsoft': 0.20.0-next.4
-      '@3sixty/api-auth-oauth-service': 0.20.0-next.4
-      '@3sixty/api-auth-service': 0.20.0-next.4
-      '@3sixty/api-models': 0.20.0-next.8
-      '@3sixty/api-processors': 0.20.0-next.8
-      '@3sixty/api-rest-client': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-service': 0.20.0-next.8
-      '@3sixty/api-tenant-processor': 0.20.0-next.8
+      '@3sixty/api-auth-account-rest-client': 0.20.0-next.6(supports-color@10.2.2)
+      '@3sixty/api-auth-account-service': 0.20.0-next.6
+      '@3sixty/api-auth-connector-entity-storage': 0.20.0-next.6
+      '@3sixty/api-auth-entity-storage-rest-client': 0.20.0-next.6(supports-color@10.2.2)
+      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.6
+      '@3sixty/api-auth-models': 0.20.0-next.6
+      '@3sixty/api-auth-oauth-connector-google': 0.20.0-next.6
+      '@3sixty/api-auth-oauth-connector-microsoft': 0.20.0-next.6
+      '@3sixty/api-auth-oauth-service': 0.20.0-next.6
+      '@3sixty/api-auth-service': 0.20.0-next.6
+      '@3sixty/api-models': 0.20.0-next.9
+      '@3sixty/api-processors': 0.20.0-next.9
+      '@3sixty/api-rest-client': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-service': 0.20.0-next.9
+      '@3sixty/api-tenant-processor': 0.20.0-next.9
       '@3sixty/authorization-service': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -6811,10 +6878,10 @@ snapshots:
 
   '@3sixty/engine-server@0.20.0-next.6(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
-      '@3sixty/api-server-fastify': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-server-hono': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-server-native': 0.20.0-next.8(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
+      '@3sixty/api-server-fastify': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-server-hono': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-server-native': 0.20.0-next.9(supports-color@10.2.2)
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/engine-models': 0.20.0-next.6
@@ -6846,10 +6913,10 @@ snapshots:
 
   '@3sixty/engine-types@0.20.0-next.6(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
-      '@3sixty/api-rest-client': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-service': 0.20.0-next.8
-      '@3sixty/api-tenant-processor': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
+      '@3sixty/api-rest-client': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-service': 0.20.0-next.9
+      '@3sixty/api-tenant-processor': 0.20.0-next.9
       '@3sixty/attestation-connector-nft': 0.20.0-next.2
       '@3sixty/attestation-models': 0.20.0-next.2
       '@3sixty/attestation-rest-client': 0.20.0-next.2(supports-color@10.2.2)
@@ -6895,18 +6962,18 @@ snapshots:
       '@3sixty/document-management-rest-client': 0.20.0-next.2(supports-color@10.2.2)
       '@3sixty/document-management-service': 0.20.0-next.2
       '@3sixty/engine-models': 0.20.0-next.6
-      '@3sixty/entity-storage-connector-cosmosdb': 0.20.0-next.3(supports-color@10.2.2)
-      '@3sixty/entity-storage-connector-dynamodb': 0.20.0-next.3
-      '@3sixty/entity-storage-connector-file': 0.20.0-next.3
-      '@3sixty/entity-storage-connector-gcp-firestore': 0.20.0-next.3(supports-color@10.2.2)
-      '@3sixty/entity-storage-connector-memory': 0.20.0-next.3
-      '@3sixty/entity-storage-connector-mongodb': 0.20.0-next.3(socks@2.8.10)
-      '@3sixty/entity-storage-connector-mysql': 0.20.0-next.3(@types/node@26.6.6)
-      '@3sixty/entity-storage-connector-postgresql': 0.20.0-next.3
-      '@3sixty/entity-storage-connector-scylladb': 0.20.0-next.3
-      '@3sixty/entity-storage-models': 0.20.0-next.3
-      '@3sixty/entity-storage-rest-client': 0.20.0-next.3(supports-color@10.2.2)
-      '@3sixty/entity-storage-service': 0.20.0-next.3
+      '@3sixty/entity-storage-connector-cosmosdb': 0.20.0-next.4(supports-color@10.2.2)
+      '@3sixty/entity-storage-connector-dynamodb': 0.20.0-next.4
+      '@3sixty/entity-storage-connector-file': 0.20.0-next.4
+      '@3sixty/entity-storage-connector-gcp-firestore': 0.20.0-next.4(supports-color@10.2.2)
+      '@3sixty/entity-storage-connector-memory': 0.20.0-next.4
+      '@3sixty/entity-storage-connector-mongodb': 0.20.0-next.4(socks@2.8.10)
+      '@3sixty/entity-storage-connector-mysql': 0.20.0-next.4(@types/node@26.6.6)
+      '@3sixty/entity-storage-connector-postgresql': 0.20.0-next.4
+      '@3sixty/entity-storage-connector-scylladb': 0.20.0-next.4
+      '@3sixty/entity-storage-models': 0.20.0-next.4
+      '@3sixty/entity-storage-rest-client': 0.20.0-next.4(supports-color@10.2.2)
+      '@3sixty/entity-storage-service': 0.20.0-next.4
       '@3sixty/event-bus-connector-local': 0.20.0-next.2
       '@3sixty/event-bus-models': 0.20.0-next.2
       '@3sixty/event-bus-service': 0.20.0-next.2
@@ -6931,18 +6998,18 @@ snapshots:
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/logging-rest-client': 0.20.0-next.2(supports-color@10.2.2)
       '@3sixty/logging-service': 0.20.0-next.2
-      '@3sixty/mailbox-connector-gmail': 0.20.0-next.3(supports-color@10.2.2)
-      '@3sixty/mailbox-connector-imap': 0.20.0-next.3
-      '@3sixty/mailbox-connector-outlook': 0.20.0-next.3(buffer@6.0.3)
-      '@3sixty/mailbox-connector-pop3': 0.20.0-next.3
-      '@3sixty/mailbox-models': 0.20.0-next.3
-      '@3sixty/mailbox-rest-client': 0.20.0-next.3(supports-color@10.2.2)
-      '@3sixty/mailbox-service': 0.20.0-next.3
-      '@3sixty/messaging-connector-aws': 0.20.0-next.3
-      '@3sixty/messaging-connector-entity-storage': 0.20.0-next.3
-      '@3sixty/messaging-connector-smtp': 0.20.0-next.3
-      '@3sixty/messaging-models': 0.20.0-next.3
-      '@3sixty/messaging-service': 0.20.0-next.3
+      '@3sixty/mailbox-connector-gmail': 0.20.0-next.4(supports-color@10.2.2)
+      '@3sixty/mailbox-connector-imap': 0.20.0-next.4
+      '@3sixty/mailbox-connector-outlook': 0.20.0-next.4(buffer@6.0.3)
+      '@3sixty/mailbox-connector-pop3': 0.20.0-next.4
+      '@3sixty/mailbox-models': 0.20.0-next.4
+      '@3sixty/mailbox-rest-client': 0.20.0-next.4(supports-color@10.2.2)
+      '@3sixty/mailbox-service': 0.20.0-next.4
+      '@3sixty/messaging-connector-aws': 0.20.0-next.4
+      '@3sixty/messaging-connector-entity-storage': 0.20.0-next.4
+      '@3sixty/messaging-connector-smtp': 0.20.0-next.4
+      '@3sixty/messaging-models': 0.20.0-next.4
+      '@3sixty/messaging-service': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/nft-connector-entity-storage': 0.20.0-next.2
       '@3sixty/nft-connector-iota': 0.20.0-next.2(typescript@6.0.3)
@@ -7043,76 +7110,76 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@3sixty/entity-storage-connector-cosmosdb@0.20.0-next.3(supports-color@10.2.2)':
+  '@3sixty/entity-storage-connector-cosmosdb@0.20.0-next.4(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@azure/cosmos': 4.10.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@3sixty/entity-storage-connector-dynamodb@0.20.0-next.3':
+  '@3sixty/entity-storage-connector-dynamodb@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
-      '@aws-sdk/client-dynamodb': 3.1153.0
-      '@aws-sdk/lib-dynamodb': 3.1153.0(@aws-sdk/client-dynamodb@3.1153.0)
-      '@aws-sdk/util-dynamodb': 3.996.9(@aws-sdk/client-dynamodb@3.1153.0)
+      '@aws-sdk/client-dynamodb': 3.1161.0
+      '@aws-sdk/lib-dynamodb': 3.1161.0(@aws-sdk/client-dynamodb@3.1161.0)
+      '@aws-sdk/util-dynamodb': 3.996.9(@aws-sdk/client-dynamodb@3.1161.0)
 
-  '@3sixty/entity-storage-connector-file@0.20.0-next.3':
+  '@3sixty/entity-storage-connector-file@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/entity-storage-connector-gcp-firestore@0.20.0-next.3(supports-color@10.2.2)':
+  '@3sixty/entity-storage-connector-gcp-firestore@0.20.0-next.4(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
-      '@google-cloud/firestore': 9.3.1(supports-color@10.2.2)
-      google-auth-library: 11.3.1(supports-color@10.2.2)
+      '@google-cloud/firestore': 9.4.0(supports-color@10.2.2)
+      google-auth-library: 11.3.2(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@3sixty/entity-storage-connector-memory@0.20.0-next.3':
+  '@3sixty/entity-storage-connector-memory@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/entity-storage-connector-mongodb@0.20.0-next.3(socks@2.8.10)':
+  '@3sixty/entity-storage-connector-mongodb@0.20.0-next.4(socks@2.8.10)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
-      mongodb: 7.7.0(socks@2.8.10)
+      mongodb: 7.8.0(socks@2.8.10)
     transitivePeerDependencies:
       - '@aws-sdk/credential-providers'
       - '@mongodb-js/zstd'
@@ -7122,42 +7189,42 @@ snapshots:
       - snappy
       - socks
 
-  '@3sixty/entity-storage-connector-mysql@0.20.0-next.3(@types/node@26.6.6)':
+  '@3sixty/entity-storage-connector-mysql@0.20.0-next.4(@types/node@26.6.6)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       mysql2: 3.24.6(@types/node@26.6.6)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@3sixty/entity-storage-connector-postgresql@0.20.0-next.3':
+  '@3sixty/entity-storage-connector-postgresql@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
-      postgres: 3.4.9
+      postgres: 4.0.0
 
-  '@3sixty/entity-storage-connector-scylladb@0.20.0-next.3':
+  '@3sixty/entity-storage-connector-scylladb@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       cassandra-driver: 4.10.0
 
-  '@3sixty/entity-storage-models@0.20.0-next.3':
+  '@3sixty/entity-storage-models@0.20.0-next.4':
     dependencies:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
@@ -7166,13 +7233,13 @@ snapshots:
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/entity-storage-rest-client@0.20.0-next.3(supports-color@10.2.2)':
+  '@3sixty/entity-storage-rest-client@0.20.0-next.4(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
     transitivePeerDependencies:
@@ -7180,13 +7247,13 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/entity-storage-service@0.20.0-next.3':
+  '@3sixty/entity-storage-service@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -7211,15 +7278,15 @@ snapshots:
 
   '@3sixty/event-bus-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/event-bus-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
   '@3sixty/event-bus-socket-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/event-bus-models': 0.20.0-next.2
       '@3sixty/logging-models': 0.20.0-next.2
@@ -7233,7 +7300,7 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/federated-catalogue-models': 0.20.0-next.2
       '@3sixty/federated-catalogue-service': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -7251,8 +7318,8 @@ snapshots:
 
   '@3sixty/federated-catalogue-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/federated-catalogue-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -7266,13 +7333,13 @@ snapshots:
 
   '@3sixty/federated-catalogue-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/federated-catalogue-models': 0.20.0-next.2
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -7289,9 +7356,9 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -7301,10 +7368,10 @@ snapshots:
 
   '@3sixty/identity-connector-iota@0.20.0-next.4(@iota/iota-sdk@1.15.0(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/dlt-account': 0.20.0-next.3
       '@3sixty/dlt-iota': 0.20.0-next.3(typescript@6.0.3)
       '@3sixty/identity-models': 0.20.0-next.4
@@ -7324,7 +7391,7 @@ snapshots:
 
   '@3sixty/identity-connector-universal@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
@@ -7335,7 +7402,7 @@ snapshots:
     dependencies:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-w3c-did': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
@@ -7343,10 +7410,10 @@ snapshots:
 
   '@3sixty/identity-rest-client@0.20.0-next.4(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-w3c-did': 0.20.0-next.3
@@ -7358,11 +7425,11 @@ snapshots:
 
   '@3sixty/identity-service@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/dlt-account': 0.20.0-next.3
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
@@ -7374,18 +7441,18 @@ snapshots:
   '@3sixty/immutable-proof-models@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/standards-w3c-did': 0.20.0-next.3
       '@3sixty/telemetry-models': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
 
   '@3sixty/immutable-proof-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/immutable-proof-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -7396,14 +7463,14 @@ snapshots:
 
   '@3sixty/immutable-proof-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/event-bus-models': 0.20.0-next.2
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/immutable-proof-models': 0.20.0-next.2
@@ -7419,7 +7486,7 @@ snapshots:
     dependencies:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/immutable-proof-models': 0.20.0-next.2
       '@3sixty/logging-models': 0.20.0-next.2
@@ -7444,11 +7511,11 @@ snapshots:
 
   '@3sixty/logging-connector-entity-storage@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
 
@@ -7481,8 +7548,8 @@ snapshots:
 
   '@3sixty/logging-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -7494,44 +7561,44 @@ snapshots:
 
   '@3sixty/logging-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
-  '@3sixty/mailbox-connector-gmail@0.20.0-next.3(supports-color@10.2.2)':
+  '@3sixty/mailbox-connector-gmail@0.20.0-next.4(supports-color@10.2.2)':
     dependencies:
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/mailbox-models': 0.20.0-next.3
+      '@3sixty/mailbox-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
-      googleapis: 186.0.0(supports-color@10.2.2)
+      googleapis: 189.0.0(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@3sixty/mailbox-connector-imap@0.20.0-next.3':
+  '@3sixty/mailbox-connector-imap@0.20.0-next.4':
     dependencies:
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/mailbox-models': 0.20.0-next.3
+      '@3sixty/mailbox-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
-      imapflow: 2.5.8
+      imapflow: 2.10.0
 
-  '@3sixty/mailbox-connector-outlook@0.20.0-next.3(buffer@6.0.3)':
+  '@3sixty/mailbox-connector-outlook@0.20.0-next.4(buffer@6.0.3)':
     dependencies:
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/mailbox-models': 0.20.0-next.3
+      '@3sixty/mailbox-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
-      '@azure/msal-node': 7.1.0
+      '@azure/msal-node': 7.1.2
       '@microsoft/microsoft-graph-client': 3.0.7(buffer@6.0.3)
     transitivePeerDependencies:
       - '@azure/identity'
@@ -7539,30 +7606,30 @@ snapshots:
       - buffer
       - stream-browserify
 
-  '@3sixty/mailbox-connector-pop3@0.20.0-next.3':
+  '@3sixty/mailbox-connector-pop3@0.20.0-next.4':
     dependencies:
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/mailbox-models': 0.20.0-next.3
+      '@3sixty/mailbox-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       node-pop3: 0.15.3
 
-  '@3sixty/mailbox-models@0.20.0-next.3':
+  '@3sixty/mailbox-models@0.20.0-next.4':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/telemetry-models': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.10
-      postal-mime: 4.0.11
+      postal-mime: 4.2.0
 
-  '@3sixty/mailbox-rest-client@0.20.0-next.3(supports-color@10.2.2)':
+  '@3sixty/mailbox-rest-client@0.20.0-next.4(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/mailbox-models': 0.20.0-next.3
+      '@3sixty/mailbox-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
     transitivePeerDependencies:
@@ -7570,16 +7637,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/mailbox-service@0.20.0-next.3':
+  '@3sixty/mailbox-service@0.20.0-next.4':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/mailbox-models': 0.20.0-next.3
+      '@3sixty/mailbox-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/telemetry-models': 0.20.0-next.3
       '@3sixty/vault-models': 0.20.0-next.2
@@ -7591,44 +7658,44 @@ snapshots:
       '@3sixty/core': 0.20.0-next.10
       commander: 15.0.0
 
-  '@3sixty/messaging-connector-aws@0.20.0-next.3':
+  '@3sixty/messaging-connector-aws@0.20.0-next.4':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/messaging-models': 0.20.0-next.3
+      '@3sixty/messaging-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
-      '@aws-sdk/client-ses': 3.1153.0
-      '@aws-sdk/client-sns': 3.1153.0
+      '@aws-sdk/client-ses': 3.1161.0
+      '@aws-sdk/client-sns': 3.1161.0
 
-  '@3sixty/messaging-connector-entity-storage@0.20.0-next.3':
+  '@3sixty/messaging-connector-entity-storage@0.20.0-next.4':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/messaging-models': 0.20.0-next.3
+      '@3sixty/messaging-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
 
-  '@3sixty/messaging-connector-smtp@0.20.0-next.3':
+  '@3sixty/messaging-connector-smtp@0.20.0-next.4':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/messaging-models': 0.20.0-next.3
+      '@3sixty/messaging-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
-      nodemailer: 10.1.7
+      nodemailer: 10.3.1
 
-  '@3sixty/messaging-models@0.20.0-next.3':
+  '@3sixty/messaging-models@0.20.0-next.4':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
 
-  '@3sixty/messaging-service@0.20.0-next.3':
+  '@3sixty/messaging-service@0.20.0-next.4':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
-      '@3sixty/messaging-models': 0.20.0-next.3
+      '@3sixty/messaging-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
@@ -7669,7 +7736,7 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/nft-models': 0.20.0-next.2
 
@@ -7695,8 +7762,8 @@ snapshots:
 
   '@3sixty/nft-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -7707,7 +7774,7 @@ snapshots:
 
   '@3sixty/nft-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -7719,7 +7786,7 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/notarization-models': 0.20.0-next.2
@@ -7748,8 +7815,8 @@ snapshots:
 
   '@3sixty/notarization-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
@@ -7760,7 +7827,7 @@ snapshots:
 
   '@3sixty/notarization-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -7771,7 +7838,7 @@ snapshots:
   '@3sixty/rights-management-models@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-dataspace-protocol': 0.20.0-next.3
@@ -7783,9 +7850,9 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/rights-management-models': 0.20.0-next.3
@@ -7795,7 +7862,7 @@ snapshots:
   '@3sixty/rights-management-pdp-service@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/rights-management-models': 0.20.0-next.3
@@ -7805,7 +7872,7 @@ snapshots:
   '@3sixty/rights-management-pep-service@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/rights-management-models': 0.20.0-next.3
@@ -7824,8 +7891,8 @@ snapshots:
     dependencies:
       '@3sixty/automation-models': 0.20.0-next.2
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
-      '@3sixty/data-json-path': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
+      '@3sixty/data-json-path': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -7842,12 +7909,12 @@ snapshots:
 
   '@3sixty/rights-management-pnp-service@0.20.0-next.3':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/background-task-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/rights-management-models': 0.20.0-next.3
@@ -7865,10 +7932,10 @@ snapshots:
 
   '@3sixty/rights-management-rest-client@0.20.0-next.3(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/rights-management-models': 0.20.0-next.3
@@ -7881,7 +7948,7 @@ snapshots:
 
   '@3sixty/rights-management-service@0.20.0-next.3':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
@@ -7894,8 +7961,8 @@ snapshots:
   '@3sixty/standards-dataspace-protocol@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/standards-dublin-core': 0.20.0-next.3
       '@3sixty/standards-foaf': 0.20.0-next.3
@@ -7904,41 +7971,41 @@ snapshots:
 
   '@3sixty/standards-dublin-core@0.20.0-next.3':
     dependencies:
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
 
   '@3sixty/standards-foaf@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
 
   '@3sixty/standards-schema-org@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       schema-dts: 2.1.0
 
   '@3sixty/standards-unece@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
 
   '@3sixty/standards-w3c-activity-streams@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
 
   '@3sixty/standards-w3c-dcat@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/standards-dublin-core': 0.20.0-next.3
       '@3sixty/standards-foaf': 0.20.0-next.3
       '@3sixty/standards-w3c-odrl': 0.20.0-next.3
@@ -7947,16 +8014,16 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/web': 0.20.0-next.10
 
   '@3sixty/standards-w3c-odrl@0.20.0-next.3':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-core': 0.20.0-next.4
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-core': 0.20.0-next.5
+      '@3sixty/data-json-ld': 0.20.0-next.5
 
   '@3sixty/telemetry-connector-entity-storage@0.20.0-next.3':
     dependencies:
@@ -7964,7 +8031,7 @@ snapshots:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/modules': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -7974,7 +8041,7 @@ snapshots:
     dependencies:
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/telemetry-connector-entity-storage': 0.20.0-next.3
@@ -7992,7 +8059,7 @@ snapshots:
 
   '@3sixty/telemetry-processors@0.20.0-next.3':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
@@ -8007,8 +8074,8 @@ snapshots:
 
   '@3sixty/telemetry-rest-client@0.20.0-next.3(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/telemetry-models': 0.20.0-next.3
@@ -8020,7 +8087,7 @@ snapshots:
 
   '@3sixty/telemetry-service@0.20.0-next.3':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
@@ -8047,11 +8114,11 @@ snapshots:
 
   '@3sixty/tracing-connector-entity-storage@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/tracing-models': 0.20.0-next.2
@@ -8086,7 +8153,7 @@ snapshots:
 
   '@3sixty/tracing-processors@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
@@ -8096,8 +8163,8 @@ snapshots:
 
   '@3sixty/tracing-rest-client@0.20.0-next.2(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-core': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-core': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/tracing-models': 0.20.0-next.2
@@ -8109,7 +8176,7 @@ snapshots:
 
   '@3sixty/tracing-service@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
       '@3sixty/nameof': 0.20.0-next.10
@@ -8119,7 +8186,7 @@ snapshots:
   '@3sixty/trust-generators@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.10
@@ -8128,7 +8195,7 @@ snapshots:
   '@3sixty/trust-models@0.20.0-next.2':
     dependencies:
       '@3sixty/core': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/nameof': 0.20.0-next.10
 
   '@3sixty/trust-service@0.20.0-next.2':
@@ -8142,7 +8209,7 @@ snapshots:
     dependencies:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
-      '@3sixty/data-json-ld': 0.20.0-next.4
+      '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/identity-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/trust-models': 0.20.0-next.2
@@ -8173,13 +8240,13 @@ snapshots:
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/vault-models': 0.20.0-next.2
 
   '@3sixty/vault-connector-hashicorp@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/logging-models': 0.20.0-next.2
@@ -8195,20 +8262,20 @@ snapshots:
 
   '@3sixty/wallet-connector-entity-storage@0.20.0-next.2':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/crypto': 0.20.0-next.10
       '@3sixty/dlt-account': 0.20.0-next.3
       '@3sixty/entity': 0.20.0-next.10
-      '@3sixty/entity-storage-models': 0.20.0-next.3
+      '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.10
       '@3sixty/vault-models': 0.20.0-next.2
       '@3sixty/wallet-models': 0.20.0-next.2
 
   '@3sixty/wallet-connector-iota@0.20.0-next.2(typescript@6.0.3)':
     dependencies:
-      '@3sixty/api-models': 0.20.0-next.8
+      '@3sixty/api-models': 0.20.0-next.9
       '@3sixty/context': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.10
       '@3sixty/dlt-account': 0.20.0-next.3
@@ -8241,16 +8308,16 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
-  '@aws-sdk/client-dynamodb@3.1153.0':
+  '@aws-sdk/client-dynamodb@3.1161.0':
     dependencies:
-      '@aws-sdk/core': 3.978.4
-      '@aws-sdk/credential-provider-node': 3.972.87
-      '@aws-sdk/dynamodb-codec': 3.973.49
-      '@aws-sdk/middleware-endpoint-discovery': 3.972.33
-      '@aws-sdk/types': 3.974.6
-      '@smithy/core': 3.36.0
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/credential-provider-node': 3.972.92
+      '@aws-sdk/dynamodb-codec': 3.973.54
+      '@aws-sdk/middleware-endpoint-discovery': 3.972.37
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/fetch-http-handler': 5.8.0
-      '@smithy/node-http-handler': 4.12.1
+      '@smithy/node-http-handler': 4.14.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8268,25 +8335,25 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
-  '@aws-sdk/client-ses@3.1153.0':
+  '@aws-sdk/client-ses@3.1161.0':
     dependencies:
-      '@aws-sdk/core': 3.978.4
-      '@aws-sdk/credential-provider-node': 3.972.87
-      '@aws-sdk/types': 3.974.6
-      '@smithy/core': 3.36.0
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/credential-provider-node': 3.972.92
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/fetch-http-handler': 5.8.0
-      '@smithy/node-http-handler': 4.12.1
+      '@smithy/node-http-handler': 4.14.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
-  '@aws-sdk/client-sns@3.1153.0':
+  '@aws-sdk/client-sns@3.1161.0':
     dependencies:
-      '@aws-sdk/core': 3.978.4
-      '@aws-sdk/credential-provider-node': 3.972.87
-      '@aws-sdk/types': 3.974.6
-      '@smithy/core': 3.36.0
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/credential-provider-node': 3.972.92
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/fetch-http-handler': 5.8.0
-      '@smithy/node-http-handler': 4.12.1
+      '@smithy/node-http-handler': 4.14.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8301,11 +8368,30 @@ snapshots:
       bowser: 2.14.1
       tslib: 2.8.1
 
+  '@aws-sdk/core@3.979.1':
+    dependencies:
+      '@aws-sdk/types': 3.975.0
+      '@aws-sdk/xml-builder': 3.972.42
+      '@aws/lambda-invoke-store': 0.3.0
+      '@smithy/core': 3.38.1
+      '@smithy/signature-v4': 5.7.5
+      '@smithy/types': 4.19.0
+      bowser: 2.14.1
+      tslib: 2.8.1
+
   '@aws-sdk/credential-provider-env@3.972.75':
     dependencies:
       '@aws-sdk/core': 3.978.4
       '@aws-sdk/types': 3.974.6
       '@smithy/core': 3.36.0
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-env@3.972.80':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8316,6 +8402,16 @@ snapshots:
       '@smithy/core': 3.36.0
       '@smithy/fetch-http-handler': 5.8.0
       '@smithy/node-http-handler': 4.12.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-http@3.972.82':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/fetch-http-handler': 5.8.0
+      '@smithy/node-http-handler': 4.14.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8335,12 +8431,37 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@aws-sdk/credential-provider-ini@3.973.25':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/credential-provider-env': 3.972.80
+      '@aws-sdk/credential-provider-http': 3.972.82
+      '@aws-sdk/credential-provider-login': 3.972.87
+      '@aws-sdk/credential-provider-process': 3.972.80
+      '@aws-sdk/credential-provider-sso': 3.973.24
+      '@aws-sdk/credential-provider-web-identity': 3.972.86
+      '@aws-sdk/nested-clients': 3.997.54
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/credential-provider-imds': 4.5.2
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@aws-sdk/credential-provider-login@3.972.82':
     dependencies:
       '@aws-sdk/core': 3.978.4
       '@aws-sdk/nested-clients': 3.997.49
       '@aws-sdk/types': 3.974.6
       '@smithy/core': 3.36.0
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-login@3.972.87':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/nested-clients': 3.997.54
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8358,11 +8479,33 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@aws-sdk/credential-provider-node@3.972.92':
+    dependencies:
+      '@aws-sdk/credential-provider-env': 3.972.80
+      '@aws-sdk/credential-provider-http': 3.972.82
+      '@aws-sdk/credential-provider-ini': 3.973.25
+      '@aws-sdk/credential-provider-process': 3.972.80
+      '@aws-sdk/credential-provider-sso': 3.973.24
+      '@aws-sdk/credential-provider-web-identity': 3.972.86
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/credential-provider-imds': 4.5.2
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@aws-sdk/credential-provider-process@3.972.75':
     dependencies:
       '@aws-sdk/core': 3.978.4
       '@aws-sdk/types': 3.974.6
       '@smithy/core': 3.36.0
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-process@3.972.80':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8376,6 +8519,16 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@aws-sdk/credential-provider-sso@3.973.24':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/nested-clients': 3.997.54
+      '@aws-sdk/token-providers': 3.1161.0
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@aws-sdk/credential-provider-web-identity@3.972.81':
     dependencies:
       '@aws-sdk/core': 3.978.4
@@ -8385,10 +8538,19 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
-  '@aws-sdk/dynamodb-codec@3.973.49':
+  '@aws-sdk/credential-provider-web-identity@3.972.86':
     dependencies:
-      '@aws-sdk/core': 3.978.4
-      '@smithy/core': 3.36.0
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/nested-clients': 3.997.54
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/dynamodb-codec@3.973.54':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8397,20 +8559,20 @@ snapshots:
       mnemonist: 0.38.3
       tslib: 2.8.1
 
-  '@aws-sdk/lib-dynamodb@3.1153.0(@aws-sdk/client-dynamodb@3.1153.0)':
+  '@aws-sdk/lib-dynamodb@3.1161.0(@aws-sdk/client-dynamodb@3.1161.0)':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1153.0
-      '@aws-sdk/core': 3.978.4
-      '@aws-sdk/util-dynamodb': 3.996.9(@aws-sdk/client-dynamodb@3.1153.0)
-      '@smithy/core': 3.36.0
+      '@aws-sdk/client-dynamodb': 3.1161.0
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/util-dynamodb': 3.996.9(@aws-sdk/client-dynamodb@3.1161.0)
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-endpoint-discovery@3.972.33':
+  '@aws-sdk/middleware-endpoint-discovery@3.972.37':
     dependencies:
       '@aws-sdk/endpoint-cache': 3.972.11
-      '@aws-sdk/types': 3.974.6
-      '@smithy/core': 3.36.0
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8434,10 +8596,28 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@aws-sdk/nested-clients@3.997.54':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/signature-v4-multi-region': 3.996.51
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/fetch-http-handler': 5.8.0
+      '@smithy/node-http-handler': 4.14.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@aws-sdk/signature-v4-multi-region@3.996.48':
     dependencies:
       '@aws-sdk/types': 3.974.6
       '@smithy/signature-v4': 5.7.4
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/signature-v4-multi-region@3.996.51':
+    dependencies:
+      '@aws-sdk/types': 3.975.0
+      '@smithy/signature-v4': 5.7.5
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -8450,17 +8630,36 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@aws-sdk/token-providers@3.1161.0':
+    dependencies:
+      '@aws-sdk/core': 3.979.1
+      '@aws-sdk/nested-clients': 3.997.54
+      '@aws-sdk/types': 3.975.0
+      '@smithy/core': 3.38.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@aws-sdk/types@3.974.6':
     dependencies:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
-  '@aws-sdk/util-dynamodb@3.996.9(@aws-sdk/client-dynamodb@3.1153.0)':
+  '@aws-sdk/types@3.975.0':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1153.0
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/util-dynamodb@3.996.9(@aws-sdk/client-dynamodb@3.1161.0)':
+    dependencies:
+      '@aws-sdk/client-dynamodb': 3.1161.0
       tslib: 2.8.1
 
   '@aws-sdk/xml-builder@3.972.41':
+    dependencies:
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@aws-sdk/xml-builder@3.972.42':
     dependencies:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
@@ -8602,11 +8801,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/msal-common@16.14.2': {}
+  '@azure/msal-common@16.15.0': {}
 
-  '@azure/msal-node@7.1.0':
+  '@azure/msal-node@7.1.2':
     dependencies:
-      '@azure/msal-common': 16.14.2
+      '@azure/msal-common': 16.15.0
       jsonwebtoken: 9.0.3
 
   '@azure/storage-blob@12.34.0(supports-color@10.2.2)':
@@ -9137,7 +9336,7 @@ snapshots:
       ajv-formats: 3.0.1(ajv@8.20.0)
       fast-uri: 4.2.3
 
-  '@fastify/compress@9.2.2':
+  '@fastify/compress@9.3.0':
     dependencies:
       '@fastify/accept-negotiator': 2.1.1
       fastify-plugin: 6.0.1
@@ -9194,7 +9393,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google-cloud/firestore@9.3.1(supports-color@10.2.2)':
+  '@google-cloud/firestore@9.4.0(supports-color@10.2.2)':
     dependencies:
       '@google-cloud/firestore-api': 0.2.0(supports-color@10.2.2)
       '@opentelemetry/api': 1.9.1
@@ -9261,9 +9460,9 @@ snapshots:
       protobufjs: 7.6.6
       yargs: 17.7.3
 
-  '@hono/node-server@2.1.3(hono@4.13.13)':
+  '@hono/node-server@2.1.5(hono@4.13.16)':
     dependencies:
-      hono: 4.13.13
+      hono: 4.13.16
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -9729,6 +9928,11 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@smithy/core@3.38.1':
+    dependencies:
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@smithy/credential-provider-imds@4.5.2':
     dependencies:
       '@smithy/core': 3.36.0
@@ -9747,9 +9951,21 @@ snapshots:
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
+  '@smithy/node-http-handler@4.14.1':
+    dependencies:
+      '@smithy/core': 3.38.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@smithy/signature-v4@5.7.4':
     dependencies:
       '@smithy/core': 3.36.0
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
+  '@smithy/signature-v4@5.7.5':
+    dependencies:
+      '@smithy/core': 3.38.1
       '@smithy/types': 4.19.0
       tslib: 2.8.1
 
@@ -10156,10 +10372,10 @@ snapshots:
 
   '@xmldom/xmldom@0.8.15': {}
 
-  '@zone-eu/mailsplit@5.4.27':
+  '@zone-eu/mailsplit@5.4.29':
     dependencies:
       libbase64: 1.4.1
-      libmime: 5.5.2
+      libmime: 5.6.3
       libqp: 3.0.1
 
   abort-controller@3.0.0:
@@ -10269,8 +10485,6 @@ snapshots:
   base64-arraybuffer@1.0.2: {}
 
   base64-js@1.5.1: {}
-
-  base64id@2.0.0: {}
 
   baseline-browser-mapping@2.11.30: {}
 
@@ -11261,6 +11475,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  google-auth-library@11.3.2(supports-color@10.2.2):
+    dependencies:
+      base64-js: 1.5.1
+      ecdsa-sig-formatter: 1.0.11
+      gaxios: 8.3.1(supports-color@10.2.2)
+      gcp-metadata: 9.2.1(supports-color@10.2.2)
+      google-logging-utils: 2.1.0
+      jws: 4.0.1
+    transitivePeerDependencies:
+      - supports-color
+
   google-gax@5.0.8(supports-color@10.2.2):
     dependencies:
       '@grpc/grpc-js': 1.14.6
@@ -11308,7 +11533,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  googleapis@186.0.0(supports-color@10.2.2):
+  googleapis@189.0.0(supports-color@10.2.2):
     dependencies:
       google-auth-library: 11.3.1(supports-color@10.2.2)
       googleapis-common: 9.3.1(supports-color@10.2.2)
@@ -11369,7 +11594,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.13.13: {}
+  hono@4.13.16: {}
 
   hookified@1.15.1: {}
 
@@ -11414,13 +11639,13 @@ snapshots:
 
   ignore@7.0.13: {}
 
-  imapflow@2.5.8:
+  imapflow@2.10.0:
     dependencies:
-      '@zone-eu/mailsplit': 5.4.27
+      '@zone-eu/mailsplit': 5.4.29
       encoding-japanese: 2.4.0
       iconv-lite: 0.7.3
       libbase64: 1.4.1
-      libmime: 5.5.2
+      libmime: 5.6.3
       libqp: 3.0.1
       pino: 10.3.1
       socks: 2.8.10
@@ -11452,6 +11677,8 @@ snapshots:
   ip-address@10.7.4: {}
 
   ipaddr.js@2.5.0: {}
+
+  iregexp-check@0.1.2: {}
 
   is-alphabetical@2.0.1: {}
 
@@ -11542,7 +11769,9 @@ snapshots:
     dependencies:
       bignumber.js: 9.3.1
 
-  json-p3@2.3.1: {}
+  json-p3@3.0.2:
+    dependencies:
+      iregexp-check: 0.1.2
 
   json-parse-even-better-errors@2.3.1: {}
 
@@ -11620,7 +11849,7 @@ snapshots:
 
   libbase64@1.4.1: {}
 
-  libmime@5.5.2:
+  libmime@5.6.3:
     dependencies:
       encoding-japanese: 2.4.0
       iconv-lite: 0.7.3
@@ -12087,7 +12316,7 @@ snapshots:
       '@types/whatwg-url': 13.0.0
       whatwg-url: 14.2.0
 
-  mongodb@7.7.0(socks@2.8.10):
+  mongodb@7.8.0(socks@2.8.10):
     dependencies:
       '@mongodb-js/saslprep': 1.6.1
       bson: 7.3.3
@@ -12145,7 +12374,7 @@ snapshots:
 
   node-releases@2.0.59: {}
 
-  nodemailer@10.1.7: {}
+  nodemailer@10.3.1: {}
 
   nodemon@3.1.14:
     dependencies:
@@ -12322,7 +12551,7 @@ snapshots:
 
   pluralize@8.0.0: {}
 
-  postal-mime@4.0.11: {}
+  postal-mime@4.2.0: {}
 
   postcss@8.5.31:
     dependencies:
@@ -12330,7 +12559,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.2
 
-  postgres@3.4.9: {}
+  postgres@4.0.0: {}
 
   prelude-ls@1.2.1: {}
 
@@ -12662,20 +12891,6 @@ snapshots:
       debug: 4.4.3(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
-
-  socket.io@4.8.3(supports-color@10.2.2):
-    dependencies:
-      accepts: 1.3.8
-      base64id: 2.0.0
-      cors: 2.8.6
-      debug: 4.4.3(supports-color@10.2.2)
-      engine.io: 6.6.11(supports-color@10.2.2)
-      socket.io-adapter: 2.5.8(supports-color@10.2.2)
-      socket.io-parser: 4.2.7(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
 
   socket.io@4.8.4(supports-color@10.2.2):
     dependencies:
