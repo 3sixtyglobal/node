@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0-next.7](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.6...node-v0.20.0-next.7) (2026-11-03)
+
+
+### Features
+
+* friendlier e-mail templates in the language of the request ([#101](https://github.com/3sixtyglobal/node/issues/101)) ([d795761](https://github.com/3sixtyglobal/node/commit/d795761bf20af9d2731ca31ff6b2795134656671))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @3sixty/node-core bumped from 0.20.0-next.6 to 0.20.0-next.7
+
 ## [0.20.0-next.6](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.5...node-v0.20.0-next.6) (2026-11-03)
 
 

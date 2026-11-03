@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0-next.7](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.6...node-core-v0.20.0-next.7) (2026-11-03)
+
+
+### Miscellaneous Chores
+
+* **node-core:** Synchronize repo versions
+
 ## [0.20.0-next.6](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.5...node-core-v0.20.0-next.6) (2026-11-03)
 
 
