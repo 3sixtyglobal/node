@@ -375,6 +375,20 @@ or exporting an identity, in seconds.
 
 ***
 
+### authDeliveryIntervalSeconds? {#authdeliveryintervalseconds}
+
+> `optional` **authDeliveryIntervalSeconds?**: `string`
+
+How often the queued password reset and sign up e-mails are delivered, in seconds.
+
+#### Default
+
+```ts
+60
+```
+
+***
+
 ### authEmailSender? {#authemailsender}
 
 > `optional` **authEmailSender?**: `string`

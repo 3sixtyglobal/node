@@ -2304,6 +2304,14 @@ The maximum dispatches of a background task attempt before it is failed as inter
 
 ***
 
+### taskSchedulerInterval? {#taskschedulerinterval}
+
+> `optional` **taskSchedulerInterval?**: `string`
+
+The interval in milliseconds at which the task scheduler checks for scheduled tasks that are due, defaults to 60000.
+
+***
+
 ### automationActionTypes? {#automationactiontypes}
 
 > `optional` **automationActionTypes?**: `string`
