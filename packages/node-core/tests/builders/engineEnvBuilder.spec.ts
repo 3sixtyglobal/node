@@ -1,6 +1,7 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { cpus } from "node:os";
+import { DurationConstants } from "@3sixty/core";
 import type { IIotaConfig } from "@3sixty/dlt-iota";
 import { EngineCloneMode, EngineLogLevel } from "@3sixty/engine-models";
 import {
@@ -233,6 +234,21 @@ describe("buildEngineConfiguration - task scheduler requirement", () => {
 				expect.objectContaining({ type: TaskSchedulerComponentType.Service })
 			])
 		);
+	});
+
+	test("task scheduler checks at the configured interval", async () => {
+		const config = await buildEngineConfiguration({
+			...AUTH,
+			auditableItemGraphEnabled: "true",
+			taskSchedulerInterval: DurationConstants.MsPerSecond.toString()
+		});
+
+		expect(config.types.taskSchedulerComponent).toEqual([
+			{
+				type: TaskSchedulerComponentType.Service,
+				options: { config: { intervalMs: DurationConstants.MsPerSecond } }
+			}
+		]);
 	});
 
 	test("task scheduler is registered when only emailProtocolConnector is set", async () => {

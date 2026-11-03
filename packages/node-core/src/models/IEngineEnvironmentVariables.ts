@@ -1391,6 +1391,11 @@ export interface IEngineEnvironmentVariables {
 	backgroundTaskMaxDispatchCount?: string;
 
 	/**
+	 * The interval in milliseconds at which the task scheduler checks for scheduled tasks that are due, defaults to 60000.
+	 */
+	taskSchedulerInterval?: string;
+
+	/**
 	 * The type of the automation action to create, comma separate for more than one connector.
 	 * values: fetch
 	 */

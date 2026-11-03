@@ -310,6 +310,7 @@ const engineEnvironmentVariableKeysInternal: {
 	backgroundTaskCleanupInterval: true,
 	backgroundTaskWorkerShutdownTimeout: true,
 	backgroundTaskMaxDispatchCount: true,
+	taskSchedulerInterval: true,
 	// automation / mutex
 	automationActionTypes: true,
 	mutexTimeoutDefault: true

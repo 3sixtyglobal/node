@@ -214,6 +214,12 @@ export interface IEngineServerEnvironmentVariables {
 	authRecentSignInSeconds?: string;
 
 	/**
+	 * How often the queued password reset and sign up e-mails are delivered, in seconds.
+	 * @default 60
+	 */
+	authDeliveryIntervalSeconds?: string;
+
+	/**
 	 * The sender of the password reset and sign up e-mails, required with entity storage authentication.
 	 */
 	authEmailSender?: string;

@@ -834,6 +834,19 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		});
 	});
 
+	test("passes the e-mail delivery interval to the authentication component", async () => {
+		const config = await buildEngineServerConfiguration(
+			{ ...AUTH_VARS, authDeliveryIntervalSeconds: "1" },
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
+
+		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
+			config: { deliveryIntervalSeconds: 1 }
+		});
+	});
+
 	test("passes the password reset settings to the authentication component", async () => {
 		const config = await buildEngineServerConfiguration(
 			{
