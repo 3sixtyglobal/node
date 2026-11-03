@@ -119,15 +119,17 @@ Password reset and sign up verification send links by e-mail, so entity storage 
 
 When messaging is configured, the node stores the templates from its `templates` folder in every tenant that does not have them yet when it starts, and in each tenant created later. Templates already stored, including ones changed through the messaging admin, are left as they are. Set `TWIN_MESSAGING_TEMPLATES_DIRECTORY` to use another folder.
 
-Each template is an HTML file named `<template-id>.html` for the default locale, `en`, or `<template-id>.<locale>.html` for a locale specific version, such as `password-reset.de.html`. The `title` element becomes the e-mail subject, and `{{name}}` placeholders are filled when the e-mail is sent.
+Each template is an HTML file named `<template-id>.html` for the default locale, `en`, or `<template-id>.<locale>.html` for a locale specific version, such as `password-reset.de.html`. The `title` element becomes the e-mail subject, and `{{name}}` placeholders are filled when the e-mail is sent. A placeholder can name a format, written in the locale of the template used: `{{expires:dateTime}}` writes an ISO date as a date and time in UTC, such as `Wednesday, November 4, 2026 at 05:44 UTC`, and `{{expiryMinutes:minutes}}` writes a number of minutes as a duration, such as `24 hours` or `1 hour, 30 minutes`.
 
-Every template is given `companyName` from `TWIN_AUTH_EMAIL_COMPANY_NAME`, empty when not set, and links the shared e-mail style sheet, which shows the logo in the `.logo` element. The e-mails are sent from `TWIN_AUTH_EMAIL_SENDER` in `TWIN_AUTH_EMAIL_LOCALE`, `en` by default.
+Every template is given `companyName` from `TWIN_AUTH_EMAIL_COMPANY_NAME`, empty when not set, and links the shared e-mail style sheet, `https://assets.3sixty.global/email/style.css`, which styles the `.container`, `.logo`, `.button`, `.note` and `.signature` classes the templates use. The logo is an `img` of `https://assets.3sixty.global/images/favicon.png`, so it shows in mail clients that drop the style sheet. The e-mails are sent from `TWIN_AUTH_EMAIL_SENDER` in the language the browser prefers most, from the `Accept-Language` header of the sign up or password reset request, or in `TWIN_AUTH_EMAIL_LOCALE`, `en` by default, when it sends none. A browser preferring `de-CH` is sent `password-reset.de-CH.html` when the node has it, then `password-reset.de.html`, then the template for the default locale.
 
 | Template              | Values                                  | Sent when                                             |
 | --------------------- | --------------------------------------- | ----------------------------------------------------- |
 | `password-reset`      | `resetUrl`, `expires`, `expiryMinutes`  | A password reset link is requested.                   |
 | `registration-verify` | `verifyUrl`, `expires`, `expiryMinutes` | A sign up needs its e-mail address verified.          |
 | `registration-exists` | none                                    | A sign up uses an e-mail address that has an account. |
+
+`expires` is when the link expires, in ISO format, and `expiryMinutes` how long it works, in minutes. The templates write them with the `dateTime` and `minutes` formats.
 
 ## Bootstrap step-by-step
 
