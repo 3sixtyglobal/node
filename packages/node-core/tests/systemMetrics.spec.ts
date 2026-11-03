@@ -1,7 +1,7 @@
 // Copyright 2026 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
-import { ComponentFactory, Factory } from "@3sixty/core";
+import { ComponentFactory, DurationConstants, Factory } from "@3sixty/core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import { AuthorizationConnectorType, EntityStorageConnectorType } from "@3sixty/engine-types";
 import type { ITelemetryComponent } from "@3sixty/telemetry-models";
@@ -61,7 +61,7 @@ describe("System metrics E2E", () => {
 		if (telemetryType) {
 			telemetry = ComponentFactory.get<ITelemetryComponent>(telemetryType);
 		}
-	}, 60_000);
+	}, DurationConstants.MsPerMinute);
 
 	afterAll(async () => {
 		await shutdown?.();

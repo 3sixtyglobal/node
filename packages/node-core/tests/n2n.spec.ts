@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { ComponentFactory, Factory } from "@3sixty/core";
+import { ComponentFactory, DurationConstants, Factory } from "@3sixty/core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthorizationConnectorType,
@@ -91,383 +91,393 @@ const PROXY_ENV: { [id: string]: string } = {
 };
 
 describe("node-core n2n", () => {
-	test("Documents federated catalogue proxy behaviour when the caller identity does not exist on the remote node", async () => {
-		await rm(TMP_N2N, { recursive: true, force: true });
+	test(
+		"Documents federated catalogue proxy behaviour when the caller identity does not exist on the remote node",
+		async () => {
+			await rm(TMP_N2N, { recursive: true, force: true });
 
-		Factory.clearFactories();
+			Factory.clearFactories();
 
-		const catalogueState: INodeEngineState = {};
-		const catalogueStorage = new MemoryStateStorage(false, catalogueState);
-		await run(
-			{
+			const catalogueState: INodeEngineState = {};
+			const catalogueStorage = new MemoryStateStorage(false, catalogueState);
+			await run(
+				{
+					localesDirectory: "./dist/locales/",
+					stateStorage: catalogueStorage,
+					disableProcessExitOnFailure: true,
+					envVars: {
+						...CATALOGUE_ENV,
+						TWIN_PORT: CATALOGUE_PORT.toString(),
+						TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB,
+						TWIN_FEATURES: "node-identity"
+					}
+				},
+				["node", "index.js", "bootstrap-dev"]
+			);
+
+			const catalogueServer = await run({
 				localesDirectory: "./dist/locales/",
 				stateStorage: catalogueStorage,
-				disableProcessExitOnFailure: true,
 				envVars: {
 					...CATALOGUE_ENV,
 					TWIN_PORT: CATALOGUE_PORT.toString(),
-					TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB,
-					TWIN_FEATURES: "node-identity"
+					TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB
 				}
-			},
-			["node", "index.js", "bootstrap-dev"]
-		);
+			});
 
-		const catalogueServer = await run({
-			localesDirectory: "./dist/locales/",
-			stateStorage: catalogueStorage,
-			envVars: {
-				...CATALOGUE_ENV,
-				TWIN_PORT: CATALOGUE_PORT.toString(),
-				TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB
-			}
-		});
+			const catalogueTrustComponentType =
+				catalogueServer?.engine.getRegisteredInstanceType("trustComponent");
+			const catalogueTrustComponent = ComponentFactory.get<ITrustComponent>(
+				catalogueTrustComponentType ?? ""
+			);
+			const catalogueTrustToken = await catalogueTrustComponent.generate(
+				catalogueState.nodeOrganizationId ?? "",
+				undefined,
+				{ subject: {} }
+			);
 
-		const catalogueTrustComponentType =
-			catalogueServer?.engine.getRegisteredInstanceType("trustComponent");
-		const catalogueTrustComponent = ComponentFactory.get<ITrustComponent>(
-			catalogueTrustComponentType ?? ""
-		);
-		const catalogueTrustToken = await catalogueTrustComponent.generate(
-			catalogueState.nodeOrganizationId ?? "",
-			undefined,
-			{ subject: {} }
-		);
-
-		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
-			method: "POST",
-			headers: {
-				"content-type": "application/json",
-				authorization: `Bearer ${String(catalogueTrustToken)}`
-			},
-			body: JSON.stringify({
-				"@context": {
-					dcat: "http://www.w3.org/ns/dcat#",
-					dcterms: "http://purl.org/dc/terms/",
-					odrl: "http://www.w3.org/ns/odrl/2/"
+			const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+					authorization: `Bearer ${String(catalogueTrustToken)}`
 				},
-				"@id": TEST_FEDCAT_DATASET_ID,
-				"@type": "dcat:Dataset",
-				"dcterms:title": "N2N Test Dataset",
-				"dcterms:publisher": catalogueState.nodeId ?? "",
-				"odrl:hasPolicy": [
-					{
-						"@context": "http://www.w3.org/ns/odrl.jsonld",
-						"@type": "Offer",
-						uid: "urn:uuid:n2n-test-offer-001",
-						assigner: catalogueState.nodeId ?? "",
-						permission: [{ action: "use" }]
-					}
-				],
-				"dcat:distribution": [
-					{
-						"@type": "dcat:Distribution",
-						"dcterms:format": "HttpData-PULL",
-						"dcat:accessService": "https://example.com/n2n-data-access"
-					}
-				]
-			})
-		});
-		expect(seedRes.status).toBe(201);
+				body: JSON.stringify({
+					"@context": {
+						dcat: "http://www.w3.org/ns/dcat#",
+						dcterms: "http://purl.org/dc/terms/",
+						odrl: "http://www.w3.org/ns/odrl/2/"
+					},
+					"@id": TEST_FEDCAT_DATASET_ID,
+					"@type": "dcat:Dataset",
+					"dcterms:title": "N2N Test Dataset",
+					"dcterms:publisher": catalogueState.nodeId ?? "",
+					"odrl:hasPolicy": [
+						{
+							"@context": "http://www.w3.org/ns/odrl.jsonld",
+							"@type": "Offer",
+							uid: "urn:uuid:n2n-test-offer-001",
+							assigner: catalogueState.nodeId ?? "",
+							permission: [{ action: "use" }]
+						}
+					],
+					"dcat:distribution": [
+						{
+							"@type": "dcat:Distribution",
+							"dcterms:format": "HttpData-PULL",
+							"dcat:accessService": "https://example.com/n2n-data-access"
+						}
+					]
+				})
+			});
+			expect(seedRes.status).toBe(201);
 
-		EntityStorageConnectorFactory.clear();
-		VaultConnectorFactory.clear();
-		IdentityConnectorFactory.clear();
-		IdentityResolverConnectorFactory.clear();
+			EntityStorageConnectorFactory.clear();
+			VaultConnectorFactory.clear();
+			IdentityConnectorFactory.clear();
+			IdentityResolverConnectorFactory.clear();
 
-		const proxyRemoteEndpoint = `http://localhost:${CATALOGUE_PORT}`;
-		const proxyState: INodeEngineState = {};
-		const proxyStorage = new MemoryStateStorage(false, proxyState);
-		await run(
-			{
+			const proxyRemoteEndpoint = `http://localhost:${CATALOGUE_PORT}`;
+			const proxyState: INodeEngineState = {};
+			const proxyStorage = new MemoryStateStorage(false, proxyState);
+			await run(
+				{
+					localesDirectory: "./dist/locales/",
+					stateStorage: proxyStorage,
+					disableProcessExitOnFailure: true,
+					envVars: {
+						...PROXY_ENV,
+						TWIN_PORT: PROXY_PORT.toString(),
+						TWIN_STORAGE_FILE_ROOT: PROXY_DB,
+						TWIN_FEATURES: "node-identity",
+						TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
+					}
+				},
+				["node", "index.js", "bootstrap-dev"]
+			);
+
+			const proxyServer = await run({
 				localesDirectory: "./dist/locales/",
 				stateStorage: proxyStorage,
-				disableProcessExitOnFailure: true,
 				envVars: {
 					...PROXY_ENV,
 					TWIN_PORT: PROXY_PORT.toString(),
 					TWIN_STORAGE_FILE_ROOT: PROXY_DB,
-					TWIN_FEATURES: "node-identity",
 					TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
 				}
-			},
-			["node", "index.js", "bootstrap-dev"]
-		);
-
-		const proxyServer = await run({
-			localesDirectory: "./dist/locales/",
-			stateStorage: proxyStorage,
-			envVars: {
-				...PROXY_ENV,
-				TWIN_PORT: PROXY_PORT.toString(),
-				TWIN_STORAGE_FILE_ROOT: PROXY_DB,
-				TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
-			}
-		});
-
-		const proxyTrustComponentType = proxyServer?.engine.getRegisteredInstanceType("trustComponent");
-		const proxyTrustComponent = ComponentFactory.get<ITrustComponent>(
-			proxyTrustComponentType ?? ""
-		);
-		const proxyTrustToken = await proxyTrustComponent.generate(
-			proxyState.nodeOrganizationId ?? "",
-			undefined,
-			{ subject: {} }
-		);
-
-		const catalogueIdentityStore = await readIdentityStore(CATALOGUE_DB);
-		expect(catalogueIdentityStore.some(entry => entry.id === proxyState.nodeOrganizationId)).toBe(
-			false
-		);
-
-		try {
-			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
-				method: "POST",
-				headers: {
-					"content-type": "application/json",
-					authorization: `Bearer ${String(proxyTrustToken)}`
-				},
-				body: JSON.stringify({
-					"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
-					"@type": "CatalogRequestMessage"
-				})
 			});
 
-			// With mandatory trust verification, the remote catalogue cannot verify the
-			// proxy's trust token (proxy DID not in catalogue's identity store), so it
-			// returns a CatalogError rather than datasets.
-			expect(requestRes.status).toBe(200);
-
-			const requestBody = (await requestRes.json()) as {
-				"@type"?: string;
-				dataset?: unknown[];
-			};
-			expect(Array.isArray(requestBody.dataset) && requestBody.dataset.length > 0).toBe(false);
-
-			const getRes = await fetch(
-				`http://localhost:${PROXY_PORT}/catalog/datasets/${TEST_FEDCAT_DATASET_ID}`,
-				{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
+			const proxyTrustComponentType =
+				proxyServer?.engine.getRegisteredInstanceType("trustComponent");
+			const proxyTrustComponent = ComponentFactory.get<ITrustComponent>(
+				proxyTrustComponentType ?? ""
 			);
-			expect(getRes.status).toBe(200);
-			const datasetBody = (await getRes.json()) as { "@id"?: string };
-			expect(datasetBody["@id"]).toBe(TEST_FEDCAT_DATASET_ID);
-		} finally {
-			await proxyServer?.shutdown();
-			await catalogueServer?.shutdown();
+			const proxyTrustToken = await proxyTrustComponent.generate(
+				proxyState.nodeOrganizationId ?? "",
+				undefined,
+				{ subject: {} }
+			);
+
+			const catalogueIdentityStore = await readIdentityStore(CATALOGUE_DB);
+			expect(catalogueIdentityStore.some(entry => entry.id === proxyState.nodeOrganizationId)).toBe(
+				false
+			);
+
+			try {
+				const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+						authorization: `Bearer ${String(proxyTrustToken)}`
+					},
+					body: JSON.stringify({
+						"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+						"@type": "CatalogRequestMessage"
+					})
+				});
+
+				// With mandatory trust verification, the remote catalogue cannot verify the
+				// proxy's trust token (proxy DID not in catalogue's identity store), so it
+				// returns a CatalogError rather than datasets.
+				expect(requestRes.status).toBe(200);
+
+				const requestBody = (await requestRes.json()) as {
+					"@type"?: string;
+					dataset?: unknown[];
+				};
+				expect(Array.isArray(requestBody.dataset) && requestBody.dataset.length > 0).toBe(false);
+
+				const getRes = await fetch(
+					`http://localhost:${PROXY_PORT}/catalog/datasets/${TEST_FEDCAT_DATASET_ID}`,
+					{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
+				);
+				expect(getRes.status).toBe(200);
+				const datasetBody = (await getRes.json()) as { "@id"?: string };
+				expect(datasetBody["@id"]).toBe(TEST_FEDCAT_DATASET_ID);
+			} finally {
+				await proxyServer?.shutdown();
+				await catalogueServer?.shutdown();
+				await rm(TMP_N2N, { recursive: true, force: true });
+			}
+		},
+		5 * DurationConstants.MsPerMinute
+	);
+
+	test(
+		"Can verify federated catalogue remote endpoint communication between two nodes",
+		async () => {
 			await rm(TMP_N2N, { recursive: true, force: true });
-		}
-	}, 300000);
 
-	test("Can verify federated catalogue remote endpoint communication between two nodes", async () => {
-		await rm(TMP_N2N, { recursive: true, force: true });
+			Factory.clearFactories();
 
-		Factory.clearFactories();
+			// Each node requires two run() calls: bootstrap then server start.
+			// Bootstrap writes the node's DID and vault keys to disk and stores the
+			// nodeId in the MemoryStateStorage. The server start reads that nodeId
+			// back automatically. The two steps cannot be merged because nodeId is
+			// only known after bootstrap.
 
-		// Each node requires two run() calls: bootstrap then server start.
-		// Bootstrap writes the node's DID and vault keys to disk and stores the
-		// nodeId in the MemoryStateStorage. The server start reads that nodeId
-		// back automatically. The two steps cannot be merged because nodeId is
-		// only known after bootstrap.
+			// Catalogue node: hosts the federated catalogue service
+			const catalogueState: INodeEngineState = {};
+			const catalogueStorage = new MemoryStateStorage(false, catalogueState);
+			await run(
+				{
+					localesDirectory: "./dist/locales/",
+					stateStorage: catalogueStorage,
+					disableProcessExitOnFailure: true,
+					envVars: {
+						...CATALOGUE_ENV,
+						TWIN_PORT: CATALOGUE_PORT.toString(),
+						TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB,
+						TWIN_FEATURES: "node-identity"
+					}
+				},
+				["node", "index.js", "bootstrap-dev"]
+			);
 
-		// Catalogue node: hosts the federated catalogue service
-		const catalogueState: INodeEngineState = {};
-		const catalogueStorage = new MemoryStateStorage(false, catalogueState);
-		await run(
-			{
+			const catalogueServer = await run({
 				localesDirectory: "./dist/locales/",
 				stateStorage: catalogueStorage,
-				disableProcessExitOnFailure: true,
 				envVars: {
 					...CATALOGUE_ENV,
 					TWIN_PORT: CATALOGUE_PORT.toString(),
-					TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB,
-					TWIN_FEATURES: "node-identity"
+					TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB
 				}
-			},
-			["node", "index.js", "bootstrap-dev"]
-		);
+			});
+			expect(catalogueServer?.engine).toBeDefined();
 
-		const catalogueServer = await run({
-			localesDirectory: "./dist/locales/",
-			stateStorage: catalogueStorage,
-			envVars: {
-				...CATALOGUE_ENV,
-				TWIN_PORT: CATALOGUE_PORT.toString(),
-				TWIN_STORAGE_FILE_ROOT: CATALOGUE_DB
-			}
-		});
-		expect(catalogueServer?.engine).toBeDefined();
+			const catalogueNodeId = catalogueState.nodeId;
+			expect(catalogueNodeId).toBeDefined();
 
-		const catalogueNodeId = catalogueState.nodeId;
-		expect(catalogueNodeId).toBeDefined();
+			// Generate a catalogue trust token to seed the dataset directly.
+			const catalogueTrustComponentType =
+				catalogueServer?.engine.getRegisteredInstanceType("trustComponent");
+			const catalogueTrustComponent = ComponentFactory.get<ITrustComponent>(
+				catalogueTrustComponentType ?? ""
+			);
+			const catalogueTrustToken = await catalogueTrustComponent.generate(
+				catalogueState.nodeOrganizationId ?? "",
+				undefined,
+				{ subject: {} }
+			);
 
-		// Generate a catalogue trust token to seed the dataset directly.
-		const catalogueTrustComponentType =
-			catalogueServer?.engine.getRegisteredInstanceType("trustComponent");
-		const catalogueTrustComponent = ComponentFactory.get<ITrustComponent>(
-			catalogueTrustComponentType ?? ""
-		);
-		const catalogueTrustToken = await catalogueTrustComponent.generate(
-			catalogueState.nodeOrganizationId ?? "",
-			undefined,
-			{ subject: {} }
-		);
-
-		// Seed a dataset into the catalogue node via HTTP.
-		const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
-			method: "POST",
-			headers: {
-				"content-type": "application/json",
-				authorization: `Bearer ${String(catalogueTrustToken)}`
-			},
-			body: JSON.stringify({
-				"@context": {
-					dcat: "http://www.w3.org/ns/dcat#",
-					dcterms: "http://purl.org/dc/terms/",
-					odrl: "http://www.w3.org/ns/odrl/2/"
+			// Seed a dataset into the catalogue node via HTTP.
+			const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+					authorization: `Bearer ${String(catalogueTrustToken)}`
 				},
-				"@id": TEST_FEDCAT_DATASET_ID,
-				"@type": "dcat:Dataset",
-				"dcterms:title": "N2N Test Dataset",
-				"dcterms:publisher": catalogueNodeId ?? "",
-				"odrl:hasPolicy": [
-					{
-						"@context": "http://www.w3.org/ns/odrl.jsonld",
-						"@type": "Offer",
-						uid: "urn:uuid:n2n-test-offer-001",
-						assigner: catalogueNodeId ?? "",
-						permission: [{ action: "use" }]
-					}
-				],
-				"dcat:distribution": [
-					{
-						"@type": "dcat:Distribution",
-						"dcterms:format": "HttpData-PULL",
-						"dcat:accessService": "https://example.com/n2n-data-access"
-					}
-				]
-			})
-		});
-		expect(seedRes.status).toBe(201);
+				body: JSON.stringify({
+					"@context": {
+						dcat: "http://www.w3.org/ns/dcat#",
+						dcterms: "http://purl.org/dc/terms/",
+						odrl: "http://www.w3.org/ns/odrl/2/"
+					},
+					"@id": TEST_FEDCAT_DATASET_ID,
+					"@type": "dcat:Dataset",
+					"dcterms:title": "N2N Test Dataset",
+					"dcterms:publisher": catalogueNodeId ?? "",
+					"odrl:hasPolicy": [
+						{
+							"@context": "http://www.w3.org/ns/odrl.jsonld",
+							"@type": "Offer",
+							uid: "urn:uuid:n2n-test-offer-001",
+							assigner: catalogueNodeId ?? "",
+							permission: [{ action: "use" }]
+						}
+					],
+					"dcat:distribution": [
+						{
+							"@type": "dcat:Distribution",
+							"dcterms:format": "HttpData-PULL",
+							"dcat:accessService": "https://example.com/n2n-data-access"
+						}
+					]
+				})
+			});
+			expect(seedRes.status).toBe(201);
 
-		// Proxy node: proxies fedcat requests to the catalogue node
-		// Clear only the low-level connector factories (entity-storage, vault,
-		// identity) so the proxy bootstrap can register its own connectors
-		// pointing to PROXY_DB. ComponentFactory and route-processor factories
-		// are intentionally kept so the already-running catalogue server
-		// continues serving requests (its route handlers call
-		// ComponentFactory.get(...) at request time).
-		EntityStorageConnectorFactory.clear();
-		VaultConnectorFactory.clear();
-		IdentityConnectorFactory.clear();
-		IdentityResolverConnectorFactory.clear();
+			// Proxy node: proxies fedcat requests to the catalogue node
+			// Clear only the low-level connector factories (entity-storage, vault,
+			// identity) so the proxy bootstrap can register its own connectors
+			// pointing to PROXY_DB. ComponentFactory and route-processor factories
+			// are intentionally kept so the already-running catalogue server
+			// continues serving requests (its route handlers call
+			// ComponentFactory.get(...) at request time).
+			EntityStorageConnectorFactory.clear();
+			VaultConnectorFactory.clear();
+			IdentityConnectorFactory.clear();
+			IdentityResolverConnectorFactory.clear();
 
-		// TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT in the bootstrap env makes
-		// isTrustRequired()=true so the proxy's DID gets a trust verification
-		// method key. The endpoint is the base URL - BaseRestClient appends
-		// "/catalog" automatically.
-		const proxyRemoteEndpoint = `http://localhost:${CATALOGUE_PORT}`;
-		const proxyState: INodeEngineState = {};
-		const proxyStorage = new MemoryStateStorage(false, proxyState);
-		await run(
-			{
+			// TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT in the bootstrap env makes
+			// isTrustRequired()=true so the proxy's DID gets a trust verification
+			// method key. The endpoint is the base URL - BaseRestClient appends
+			// "/catalog" automatically.
+			const proxyRemoteEndpoint = `http://localhost:${CATALOGUE_PORT}`;
+			const proxyState: INodeEngineState = {};
+			const proxyStorage = new MemoryStateStorage(false, proxyState);
+			await run(
+				{
+					localesDirectory: "./dist/locales/",
+					stateStorage: proxyStorage,
+					disableProcessExitOnFailure: true,
+					envVars: {
+						...PROXY_ENV,
+						TWIN_PORT: PROXY_PORT.toString(),
+						TWIN_STORAGE_FILE_ROOT: PROXY_DB,
+						TWIN_FEATURES: "node-identity",
+						TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
+					}
+				},
+				["node", "index.js", "bootstrap-dev"]
+			);
+
+			const proxyNodeId = proxyState.nodeId;
+			expect(proxyNodeId).toBeDefined();
+
+			// Copy the proxy's DID document into the catalogue's entity storage so
+			// the catalogue's identity resolver can find it when verifying the proxy's
+			// trust token. FileEntityStorageConnector reads store.json from disk on
+			// every lookup, so the update is visible immediately without restarting.
+			const proxyOrgId = proxyState.nodeOrganizationId;
+			expect(proxyOrgId).toBeDefined();
+			const proxyIdentityStore = await readIdentityStore(PROXY_DB);
+			const proxyDidEntry = proxyIdentityStore.find(e => e.id === proxyOrgId);
+			expect(proxyDidEntry).toBeDefined();
+			if (!proxyDidEntry) {
+				throw new Error("Proxy org DID entry not found in identity store");
+			}
+
+			const catalogueIdentityStore = await readIdentityStore(CATALOGUE_DB);
+			catalogueIdentityStore.push(proxyDidEntry);
+			await writeIdentityStore(CATALOGUE_DB, catalogueIdentityStore);
+
+			const proxyServer = await run({
 				localesDirectory: "./dist/locales/",
 				stateStorage: proxyStorage,
-				disableProcessExitOnFailure: true,
 				envVars: {
 					...PROXY_ENV,
 					TWIN_PORT: PROXY_PORT.toString(),
 					TWIN_STORAGE_FILE_ROOT: PROXY_DB,
-					TWIN_FEATURES: "node-identity",
 					TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
 				}
-			},
-			["node", "index.js", "bootstrap-dev"]
-		);
-
-		const proxyNodeId = proxyState.nodeId;
-		expect(proxyNodeId).toBeDefined();
-
-		// Copy the proxy's DID document into the catalogue's entity storage so
-		// the catalogue's identity resolver can find it when verifying the proxy's
-		// trust token. FileEntityStorageConnector reads store.json from disk on
-		// every lookup, so the update is visible immediately without restarting.
-		const proxyOrgId = proxyState.nodeOrganizationId;
-		expect(proxyOrgId).toBeDefined();
-		const proxyIdentityStore = await readIdentityStore(PROXY_DB);
-		const proxyDidEntry = proxyIdentityStore.find(e => e.id === proxyOrgId);
-		expect(proxyDidEntry).toBeDefined();
-		if (!proxyDidEntry) {
-			throw new Error("Proxy org DID entry not found in identity store");
-		}
-
-		const catalogueIdentityStore = await readIdentityStore(CATALOGUE_DB);
-		catalogueIdentityStore.push(proxyDidEntry);
-		await writeIdentityStore(CATALOGUE_DB, catalogueIdentityStore);
-
-		const proxyServer = await run({
-			localesDirectory: "./dist/locales/",
-			stateStorage: proxyStorage,
-			envVars: {
-				...PROXY_ENV,
-				TWIN_PORT: PROXY_PORT.toString(),
-				TWIN_STORAGE_FILE_ROOT: PROXY_DB,
-				TWIN_FEDERATED_CATALOGUE_REMOTE_ENDPOINT: proxyRemoteEndpoint
-			}
-		});
-		expect(proxyServer?.engine).toBeDefined();
-
-		// Generate a trust token from the proxy's own identity.
-		const proxyTrustComponentType = proxyServer?.engine.getRegisteredInstanceType("trustComponent");
-		const proxyTrustComponent = ComponentFactory.get<ITrustComponent>(
-			proxyTrustComponentType ?? ""
-		);
-		const proxyTrustToken = await proxyTrustComponent.generate(proxyOrgId ?? "", undefined, {
-			subject: {}
-		});
-
-		// Verify proxy: requests to proxy node are forwarded to catalogue ────
-		// The proxy passes the trust token to the catalogue, which verifies the
-		// proxy's identity using the DID document now present in its entity storage.
-		try {
-			const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
-				method: "POST",
-				headers: {
-					"content-type": "application/json",
-					authorization: `Bearer ${String(proxyTrustToken)}`
-				},
-				body: JSON.stringify({
-					"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
-					"@type": "CatalogRequestMessage"
-				})
 			});
-			expect(requestRes.status).toBe(200);
-			const catalogBody = (await requestRes.json()) as {
-				dataset?: unknown[];
-				catalog?: { dataset?: unknown[] }[];
-			};
-			// Datasets published by the catalogue node appear in nested catalog entries
-			// (DS Protocol: own datasets go in root dataset[], other participants' go in catalog[])
-			const rootDatasets = Array.isArray(catalogBody.dataset) ? catalogBody.dataset.length : 0;
-			const nestedDatasets = Array.isArray(catalogBody.catalog)
-				? catalogBody.catalog.reduce(
-						(n, c) => n + (Array.isArray(c.dataset) ? c.dataset.length : 0),
-						0
-					)
-				: 0;
-			expect(rootDatasets + nestedDatasets > 0).toBe(true);
+			expect(proxyServer?.engine).toBeDefined();
 
-			const getRes = await fetch(
-				`http://localhost:${PROXY_PORT}/catalog/datasets/${TEST_FEDCAT_DATASET_ID}`,
-				{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
+			// Generate a trust token from the proxy's own identity.
+			const proxyTrustComponentType =
+				proxyServer?.engine.getRegisteredInstanceType("trustComponent");
+			const proxyTrustComponent = ComponentFactory.get<ITrustComponent>(
+				proxyTrustComponentType ?? ""
 			);
-			expect(getRes.status).toBe(200);
-			const datasetBody = (await getRes.json()) as { "@id"?: string };
-			expect(datasetBody["@id"]).toBe(TEST_FEDCAT_DATASET_ID);
-		} finally {
-			await proxyServer?.shutdown();
-			await catalogueServer?.shutdown();
-			await rm(TMP_N2N, { recursive: true, force: true });
-		}
-	}, 120000);
+			const proxyTrustToken = await proxyTrustComponent.generate(proxyOrgId ?? "", undefined, {
+				subject: {}
+			});
+
+			// Verify proxy: requests to proxy node are forwarded to catalogue ────
+			// The proxy passes the trust token to the catalogue, which verifies the
+			// proxy's identity using the DID document now present in its entity storage.
+			try {
+				const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+						authorization: `Bearer ${String(proxyTrustToken)}`
+					},
+					body: JSON.stringify({
+						"@context": ["https://w3id.org/dspace/2025/1/context.jsonld"],
+						"@type": "CatalogRequestMessage"
+					})
+				});
+				expect(requestRes.status).toBe(200);
+				const catalogBody = (await requestRes.json()) as {
+					dataset?: unknown[];
+					catalog?: { dataset?: unknown[] }[];
+				};
+				// Datasets published by the catalogue node appear in nested catalog entries
+				// (DS Protocol: own datasets go in root dataset[], other participants' go in catalog[])
+				const rootDatasets = Array.isArray(catalogBody.dataset) ? catalogBody.dataset.length : 0;
+				const nestedDatasets = Array.isArray(catalogBody.catalog)
+					? catalogBody.catalog.reduce(
+							(n, c) => n + (Array.isArray(c.dataset) ? c.dataset.length : 0),
+							0
+						)
+					: 0;
+				expect(rootDatasets + nestedDatasets > 0).toBe(true);
+
+				const getRes = await fetch(
+					`http://localhost:${PROXY_PORT}/catalog/datasets/${TEST_FEDCAT_DATASET_ID}`,
+					{ headers: { authorization: `Bearer ${String(proxyTrustToken)}` } }
+				);
+				expect(getRes.status).toBe(200);
+				const datasetBody = (await getRes.json()) as { "@id"?: string };
+				expect(datasetBody["@id"]).toBe(TEST_FEDCAT_DATASET_ID);
+			} finally {
+				await proxyServer?.shutdown();
+				await catalogueServer?.shutdown();
+				await rm(TMP_N2N, { recursive: true, force: true });
+			}
+		},
+		2 * DurationConstants.MsPerMinute
+	);
 });

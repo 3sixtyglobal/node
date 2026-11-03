@@ -4,7 +4,7 @@
 import { cpus } from "node:os";
 import path from "node:path";
 import { CLIDisplay } from "@3sixty/cli-core";
-import { EnvHelper, GeneralError, I18n, Is, Mutex } from "@3sixty/core";
+import { DurationConstants, EnvHelper, GeneralError, I18n, Is, Mutex } from "@3sixty/core";
 import type { IIotaConfig } from "@3sixty/dlt-iota";
 import {
 	EngineCloneMode,
@@ -1192,7 +1192,11 @@ async function configureHealth(
 						envVars,
 						"healthApplicationInterval"
 					),
-					initialInterval: EnvHelper.envSecToMs(envVars, "healthStartupInterval", 30000),
+					initialInterval: EnvHelper.envSecToMs(
+						envVars,
+						"healthStartupInterval",
+						30 * DurationConstants.MsPerSecond
+					),
 					excludeCloneComponents: EnvHelper.envListToArray<IEngineEnvironmentVariables, string>(
 						envVars,
 						"healthExcludeCloneComponents",

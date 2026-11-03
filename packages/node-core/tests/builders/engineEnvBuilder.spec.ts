@@ -327,7 +327,7 @@ describe("buildEngineConfiguration - immutable proof task options", () => {
 
 		expect(proofConfig.taskRetryInterval).toBe(7000);
 		expect(proofConfig.taskFailureRetainFor).toBe(180_000);
-		expect(proofConfig.taskWorkerIdleTimeout).toBe(120_000);
+		expect(proofConfig.taskWorkerIdleTimeout).toBe(2 * DurationConstants.MsPerMinute);
 	});
 
 	test("passes the retain forever and never shut down sentinels through unchanged", async () => {
@@ -429,7 +429,7 @@ describe("buildEngineConfiguration - dataspace provider idle transfer policy", (
 			providerTransferPolicySweepIntervalMs?: number;
 		};
 
-		expect(dataspaceConfig.providerTransferIdleTimeoutMs).toBe(120000);
+		expect(dataspaceConfig.providerTransferIdleTimeoutMs).toBe(2 * DurationConstants.MsPerMinute);
 		expect(dataspaceConfig.providerTransferPolicySweepIntervalMs).toBe(15000);
 	});
 
@@ -472,7 +472,7 @@ describe("buildEngineConfiguration - dataspace terminal transfer retention", () 
 	};
 
 	test("retention is wired in seconds and converted to milliseconds", async () => {
-		expect(await getRetention("86400")).toBe(86400000);
+		expect(await getRetention("86400")).toBe(DurationConstants.MsPerDay);
 	});
 
 	test("retention of -1 is passed through unchanged", async () => {
@@ -554,8 +554,8 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 		const fileMutexTimeoutMs = (fileConnector?.options as { config?: { mutexTimeoutMs?: number } })
 			?.config?.mutexTimeoutMs;
 
-		expect(memoryMutexTimeoutMs).toBe(60000);
-		expect(fileMutexTimeoutMs).toBe(60000);
+		expect(memoryMutexTimeoutMs).toBe(DurationConstants.MsPerMinute);
+		expect(fileMutexTimeoutMs).toBe(DurationConstants.MsPerMinute);
 	});
 
 	test("component mutex timeout overrides the mutex timeout default", async () => {
@@ -597,19 +597,19 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 
 		expect(
 			getConfig(config.types.loggingConnector, LoggingConnectorType.File)?.mutexTimeoutMs
-		).toBe(60000);
+		).toBe(DurationConstants.MsPerMinute);
 		expect(
 			getConfig(config.types.tenantAdminComponent, TenantAdminComponentType.Service)
 				?.tenantCacheMutexTimeoutMs
-		).toBe(60000);
+		).toBe(DurationConstants.MsPerMinute);
 		expect(
 			getConfig(config.types.identityConnector, IdentityConnectorType.EntityStorage)
 				?.didResolutionCacheMutexTimeoutMs
-		).toBe(60000);
+		).toBe(DurationConstants.MsPerMinute);
 		expect(
 			getConfig(config.types.identityResolverConnector, IdentityResolverConnectorType.EntityStorage)
 				?.didResolutionCacheMutexTimeoutMs
-		).toBe(60000);
+		).toBe(DurationConstants.MsPerMinute);
 	});
 
 	test("mutex timeout default seeds the jwt verifiable credential verifier cache timeout", async () => {
@@ -626,7 +626,7 @@ describe("buildEngineConfiguration - entity storage shared mutex timeout", () =>
 		expect(
 			(verifier?.options as { config?: { verificationCacheMutexTimeoutMs?: number } })?.config
 				?.verificationCacheMutexTimeoutMs
-		).toBe(60000);
+		).toBe(DurationConstants.MsPerMinute);
 	});
 });
 
@@ -655,7 +655,12 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 		});
 
 		const pool = connectorPool(config, EntityStorageConnectorType.PostgreSql);
-		expect(pool).toMatchObject({ max: 20, idleTimeout: 60, connectTimeout: 15, maxLifetime: 3600 });
+		expect(pool).toMatchObject({
+			max: 20,
+			idleTimeout: 60,
+			connectTimeout: 15,
+			maxLifetime: DurationConstants.SecondsPerHour
+		});
 	});
 
 	test("postgresql pool fields are undefined when pool env vars are not set", async () => {
@@ -695,7 +700,7 @@ describe("buildEngineConfiguration - entity storage pool options", () => {
 		expect(pool).toMatchObject({
 			connectionLimit: 25,
 			maxIdle: 5,
-			idleTimeout: 30000,
+			idleTimeout: 30 * DurationConstants.MsPerSecond,
 			enableKeepAlive: false,
 			waitForConnections: true,
 			queueLimit: 100

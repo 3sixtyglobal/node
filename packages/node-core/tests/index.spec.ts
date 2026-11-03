@@ -4,7 +4,7 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import type { IServerInfo } from "@3sixty/api-models";
 import { AutomationActionFactory } from "@3sixty/automation-models";
 import { CLIDisplay } from "@3sixty/cli-core";
-import { ComponentFactory, Factory, NativeModules } from "@3sixty/core";
+import { ComponentFactory, DurationConstants, Factory, NativeModules } from "@3sixty/core";
 import { DataspaceAppFactory } from "@3sixty/dataspace-models";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
@@ -68,7 +68,8 @@ let port = 0;
  * @param serverPort The port the server should be listening on.
  */
 async function waitForServer(serverPort: number): Promise<void> {
-	const expiry = Date.now() + 30000;
+	const thirtySecondsMs = 30 * DurationConstants.MsPerSecond;
+	const expiry = Date.now() + thirtySecondsMs;
 	let lastError: unknown;
 
 	while (Date.now() < expiry) {

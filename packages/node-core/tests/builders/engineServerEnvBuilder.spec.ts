@@ -2,6 +2,7 @@
 // Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { ContextIdKeys } from "@3sixty/context";
+import { DurationConstants } from "@3sixty/core";
 import type { IEngineCoreConfig } from "@3sixty/engine-models";
 import {
 	AuthenticationComponentType,
@@ -59,7 +60,7 @@ describe("buildEngineServerConfiguration - auth header processors", () => {
 			expect(
 				(processor?.options as { config?: { tokenCacheMutexTimeoutMs?: number } })?.config
 					?.tokenCacheMutexTimeoutMs
-			).toBe(60000);
+			).toBe(DurationConstants.MsPerMinute);
 		}
 	});
 
@@ -419,7 +420,9 @@ describe("buildEngineServerConfiguration - custom web config", () => {
 			SERVER_INFO
 		);
 
-		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: 30000 });
+		expect(config.web?.customWebConfig).toEqual({
+			pluginTimeout: 30 * DurationConstants.MsPerSecond
+		});
 	});
 
 	test("uses the Fastify plugin timeout from the env var when set", async () => {
@@ -430,7 +433,7 @@ describe("buildEngineServerConfiguration - custom web config", () => {
 			SERVER_INFO
 		);
 
-		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: 60000 });
+		expect(config.web?.customWebConfig).toEqual({ pluginTimeout: DurationConstants.MsPerMinute });
 	});
 
 	test("throws when the Fastify plugin timeout is not an integer", async () => {

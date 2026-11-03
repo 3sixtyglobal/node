@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import type { IServerInfo, IWebServerOptions } from "@3sixty/api-models";
 import { ContextIdKeys } from "@3sixty/context";
-import { Coerce, EnvHelper, GeneralError, Is, StringHelper } from "@3sixty/core";
+import { Coerce, DurationConstants, EnvHelper, GeneralError, Is, StringHelper } from "@3sixty/core";
 import type { IEngineCoreConfig } from "@3sixty/engine-models";
 import { addDefaultRestPaths, addDefaultSocketPaths } from "@3sixty/engine-server";
 import {
@@ -75,7 +75,11 @@ export async function buildEngineServerConfiguration(
 		bodyLimits: EnvHelper.envKeyIntegerPairs(envVars, "httpBodyLimits"),
 		publicOrigin: Coerce.string(envVars.publicOrigin),
 		customWebConfig: {
-			pluginTimeout: EnvHelper.envMs(envVars, "fastifyPluginTimeout", 30000)
+			pluginTimeout: EnvHelper.envMs(
+				envVars,
+				"fastifyPluginTimeout",
+				30 * DurationConstants.MsPerSecond
+			)
 		}
 	};
 

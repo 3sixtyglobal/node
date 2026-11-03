@@ -3,7 +3,7 @@
 import type { IPlatformComponent } from "@3sixty/api-models";
 import type { IAuthorizationComponent } from "@3sixty/authorization-models";
 import { ContextIdStore } from "@3sixty/context";
-import { ComponentFactory, Factory } from "@3sixty/core";
+import { ComponentFactory, DurationConstants, Factory } from "@3sixty/core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
 	AuthenticationAdminComponentType,
@@ -101,379 +101,417 @@ describe("seedAuthorizationDefaults", () => {
 		TWIN_AUTH_PASSWORD_RESET_URL: "https://app.example.org/reset"
 	};
 
-	test("seeds route-derived policies for all routes with defaultAuthorization on startup", async () => {
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
+	test(
+		"seeds route-derived policies for all routes with defaultAuthorization on startup",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString()
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
 
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
 
-		const routes = startResult.server.getRestRoutes();
-		const protectedRoutes = routes.filter(r => r.defaultAuthorization && r.operationId);
-		expect(protectedRoutes.length).toBeGreaterThan(0);
+			const routes = startResult.server.getRestRoutes();
+			const protectedRoutes = routes.filter(r => r.defaultAuthorization && r.operationId);
+			expect(protectedRoutes.length).toBeGreaterThan(0);
 
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(
-					AUTHORIZATION_MODEL_ID,
-					undefined,
-					undefined,
-					1000
-				);
-				for (const route of protectedRoutes) {
-					const auth = route.defaultAuthorization;
-					const operationId = route.operationId;
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						undefined,
+						undefined,
+						1000
+					);
+					for (const route of protectedRoutes) {
+						const auth = route.defaultAuthorization;
+						const operationId = route.operationId;
+						if (auth && operationId) {
+							const hasPolicy = policies.some(
+								p =>
+									p.subject === auth.permission &&
+									p.object === operationId &&
+									p.action === "execute"
+							);
+							expect(hasPolicy).toBe(true);
+						}
+					}
+				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
+
+	test(
+		"global-admin inherits all roles derived from route defaultAuthorization",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString()
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
+
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
+
+			const routes = startResult.server.getRestRoutes();
+			const uniqueRoles = new Set<string>();
+			for (const route of routes) {
+				const role = route.defaultAuthorization?.role;
+				if (role) {
+					uniqueRoles.add(role);
+				}
+			}
+			expect(uniqueRoles.size).toBeGreaterThan(0);
+
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const parentRoles = await authComponent.getParentRoles(
+						AUTHORIZATION_MODEL_ID,
+						DEFAULT_ESCALATED_PRIVILEGE_ROLE
+					);
+					for (const role of uniqueRoles) {
+						expect(parentRoles).toContain(role);
+					}
+				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
+
+	test(
+		"non-user roles derived from route defaultAuthorization inherit the user role",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString()
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
+
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
+
+			const routes = startResult.server.getRestRoutes();
+			const nonUserRoles = new Set<string>();
+			for (const route of routes) {
+				const role = route.defaultAuthorization?.role;
+				if (role && role !== DEFAULT_USER_ROLE) {
+					nonUserRoles.add(role);
+				}
+			}
+			expect(nonUserRoles.size).toBeGreaterThan(0);
+
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					for (const role of nonUserRoles) {
+						const parentRoles = await authComponent.getParentRoles(AUTHORIZATION_MODEL_ID, role);
+						expect(parentRoles).toContain(DEFAULT_USER_ROLE);
+					}
+				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
+
+	test(
+		"seeds only custom rules when authorizationModelMode is replace",
+		async () => {
+			const customRules = {
+				policies: [{ subject: "custom-role", object: "custom-op", action: "execute" }],
+				roleInheritances: []
+			};
+
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString(),
+				TWIN_AUTHORIZATION_MODEL: JSON.stringify(customRules),
+				TWIN_AUTHORIZATION_MODEL_MODE: "replace"
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
+
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
+
+			const routes = startResult.server.getRestRoutes();
+			const protectedRoute = routes.find(r => r.defaultAuthorization && r.operationId);
+			expect(protectedRoute).toBeDefined();
+			if (!protectedRoute) {
+				return;
+			}
+
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						undefined,
+						undefined,
+						1000
+					);
+
+					const hasCustomPolicy = policies.some(
+						p => p.subject === "custom-role" && p.object === "custom-op"
+					);
+					expect(hasCustomPolicy).toBe(true);
+
+					const auth = protectedRoute.defaultAuthorization;
+					const operationId = protectedRoute.operationId;
 					if (auth && operationId) {
+						const hasRoutePolicy = policies.some(
+							p => p.subject === auth.permission && p.object === operationId
+						);
+						expect(hasRoutePolicy).toBe(false);
+					}
+				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
+
+	test(
+		"auto-derives user:read policy for GET routes without explicit defaultAuthorization",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString()
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
+
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
+
+			const routes = startResult.server.getRestRoutes();
+			const fallbackGetRoutes = routes.filter(
+				r =>
+					r.requiresAuthorization !== false &&
+					!r.skipAuth &&
+					!r.defaultAuthorization &&
+					r.method.toUpperCase() === "GET"
+			);
+
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						"user:read",
+						undefined,
+						1000
+					);
+					for (const route of fallbackGetRoutes) {
 						const hasPolicy = policies.some(
 							p =>
-								p.subject === auth.permission && p.object === operationId && p.action === "execute"
+								p.subject === "user:read" &&
+								p.object === route.operationId &&
+								p.action === "execute"
+						);
+						expect(
+							hasPolicy,
+							`Expected user:read policy for route ${route.operationId} (method: ${route.method})`
+						).toBe(true);
+					}
+				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
+
+	test(
+		"auto-derives user:write policy for PUT/POST/PATCH/DELETE routes without explicit defaultAuthorization",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString()
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
+
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
+
+			const routes = startResult.server.getRestRoutes();
+			const fallbackWriteRoutes = routes.filter(r => {
+				const method = r.method.toUpperCase();
+				return (
+					r.requiresAuthorization !== false &&
+					!r.skipAuth &&
+					!r.defaultAuthorization &&
+					(method === "PUT" || method === "POST" || method === "PATCH" || method === "DELETE")
+				);
+			});
+
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						"user:write",
+						undefined,
+						1000
+					);
+					for (const route of fallbackWriteRoutes) {
+						const hasPolicy = policies.some(
+							p =>
+								p.subject === "user:write" &&
+								p.object === route.operationId &&
+								p.action === "execute"
 						);
 						expect(hasPolicy).toBe(true);
 					}
-				}
+				});
 			});
-		});
 
-		await startResult.shutdown();
-	}, 30000);
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
 
-	test("global-admin inherits all roles derived from route defaultAuthorization", async () => {
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
-
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const uniqueRoles = new Set<string>();
-		for (const route of routes) {
-			const role = route.defaultAuthorization?.role;
-			if (role) {
-				uniqueRoles.add(role);
+	test(
+		"does not seed policy for route with requiresAuthorization false and no defaultAuthorization",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString()
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
 			}
-		}
-		expect(uniqueRoles.size).toBeGreaterThan(0);
 
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const parentRoles = await authComponent.getParentRoles(
-					AUTHORIZATION_MODEL_ID,
-					DEFAULT_ESCALATED_PRIVILEGE_ROLE
-				);
-				for (const role of uniqueRoles) {
-					expect(parentRoles).toContain(role);
-				}
-			});
-		});
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
 
-		await startResult.shutdown();
-	}, 30000);
-
-	test("non-user roles derived from route defaultAuthorization inherit the user role", async () => {
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
-
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const nonUserRoles = new Set<string>();
-		for (const route of routes) {
-			const role = route.defaultAuthorization?.role;
-			if (role && role !== DEFAULT_USER_ROLE) {
-				nonUserRoles.add(role);
-			}
-		}
-		expect(nonUserRoles.size).toBeGreaterThan(0);
-
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				for (const role of nonUserRoles) {
-					const parentRoles = await authComponent.getParentRoles(AUTHORIZATION_MODEL_ID, role);
-					expect(parentRoles).toContain(DEFAULT_USER_ROLE);
-				}
-			});
-		});
-
-		await startResult.shutdown();
-	}, 30000);
-
-	test("seeds only custom rules when authorizationModelMode is replace", async () => {
-		const customRules = {
-			policies: [{ subject: "custom-role", object: "custom-op", action: "execute" }],
-			roleInheritances: []
-		};
-
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString(),
-			TWIN_AUTHORIZATION_MODEL: JSON.stringify(customRules),
-			TWIN_AUTHORIZATION_MODEL_MODE: "replace"
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
-
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const protectedRoute = routes.find(r => r.defaultAuthorization && r.operationId);
-		expect(protectedRoute).toBeDefined();
-		if (!protectedRoute) {
-			return;
-		}
-
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(
-					AUTHORIZATION_MODEL_ID,
-					undefined,
-					undefined,
-					1000
-				);
-
-				const hasCustomPolicy = policies.some(
-					p => p.subject === "custom-role" && p.object === "custom-op"
-				);
-				expect(hasCustomPolicy).toBe(true);
-
-				const auth = protectedRoute.defaultAuthorization;
-				const operationId = protectedRoute.operationId;
-				if (auth && operationId) {
-					const hasRoutePolicy = policies.some(
-						p => p.subject === auth.permission && p.object === operationId
-					);
-					expect(hasRoutePolicy).toBe(false);
-				}
-			});
-		});
-
-		await startResult.shutdown();
-	}, 30000);
-
-	test("auto-derives user:read policy for GET routes without explicit defaultAuthorization", async () => {
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
-
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const fallbackGetRoutes = routes.filter(
-			r =>
-				r.requiresAuthorization !== false &&
-				!r.skipAuth &&
-				!r.defaultAuthorization &&
-				r.method.toUpperCase() === "GET"
-		);
-
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(
-					AUTHORIZATION_MODEL_ID,
-					"user:read",
-					undefined,
-					1000
-				);
-				for (const route of fallbackGetRoutes) {
-					const hasPolicy = policies.some(
-						p =>
-							p.subject === "user:read" && p.object === route.operationId && p.action === "execute"
-					);
-					expect(
-						hasPolicy,
-						`Expected user:read policy for route ${route.operationId} (method: ${route.method})`
-					).toBe(true);
-				}
-			});
-		});
-
-		await startResult.shutdown();
-	}, 30000);
-
-	test("auto-derives user:write policy for PUT/POST/PATCH/DELETE routes without explicit defaultAuthorization", async () => {
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
-
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const fallbackWriteRoutes = routes.filter(r => {
-			const method = r.method.toUpperCase();
-			return (
-				r.requiresAuthorization !== false &&
-				!r.skipAuth &&
-				!r.defaultAuthorization &&
-				(method === "PUT" || method === "POST" || method === "PATCH" || method === "DELETE")
+			const routes = startResult.server.getRestRoutes();
+			const skippedRoutes = routes.filter(
+				r => r.requiresAuthorization === false && !r.defaultAuthorization
 			);
-		});
 
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(
-					AUTHORIZATION_MODEL_ID,
-					"user:write",
-					undefined,
-					1000
-				);
-				for (const route of fallbackWriteRoutes) {
-					const hasPolicy = policies.some(
-						p =>
-							p.subject === "user:write" && p.object === route.operationId && p.action === "execute"
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						undefined,
+						undefined,
+						1000
 					);
-					expect(hasPolicy).toBe(true);
-				}
+					for (const route of skippedRoutes) {
+						const hasPolicy = policies.some(p => p.object === route.operationId);
+						expect(hasPolicy).toBe(false);
+					}
+				});
 			});
-		});
 
-		await startResult.shutdown();
-	}, 30000);
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
 
-	test("does not seed policy for route with requiresAuthorization false and no defaultAuthorization", async () => {
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString()
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
+	test(
+		"merges custom rules with route-derived policies when authorizationModelMode is merge",
+		async () => {
+			const customRules = {
+				policies: [{ subject: "custom-role", object: "custom-op", action: "execute" }],
+				roleInheritances: []
+			};
 
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const skippedRoutes = routes.filter(
-			r => r.requiresAuthorization === false && !r.defaultAuthorization
-		);
-
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(
-					AUTHORIZATION_MODEL_ID,
-					undefined,
-					undefined,
-					1000
-				);
-				for (const route of skippedRoutes) {
-					const hasPolicy = policies.some(p => p.object === route.operationId);
-					expect(hasPolicy).toBe(false);
-				}
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString(),
+				TWIN_AUTHORIZATION_MODEL: JSON.stringify(customRules),
+				TWIN_AUTHORIZATION_MODEL_MODE: "merge"
 			});
-		});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
 
-		await startResult.shutdown();
-	}, 30000);
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
 
-	test("merges custom rules with route-derived policies when authorizationModelMode is merge", async () => {
-		const customRules = {
-			policies: [{ subject: "custom-role", object: "custom-op", action: "execute" }],
-			roleInheritances: []
-		};
+			const routes = startResult.server.getRestRoutes();
+			const protectedRoute = routes.find(r => r.defaultAuthorization && r.operationId);
+			expect(protectedRoute).toBeDefined();
+			if (!protectedRoute) {
+				return;
+			}
 
-		const startResult = await startServer({
-			...baseAuthEnvVars,
-			TWIN_PORT: port.toString(),
-			TWIN_AUTHORIZATION_MODEL: JSON.stringify(customRules),
-			TWIN_AUTHORIZATION_MODEL_MODE: "merge"
-		});
-		expect(startResult).toBeDefined();
-		if (!startResult) {
-			return;
-		}
-
-		const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
-		const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
-		const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
-		const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
-		const nodeContextIds = startResult.engine.getContextIds() ?? {};
-
-		const routes = startResult.server.getRestRoutes();
-		const protectedRoute = routes.find(r => r.defaultAuthorization && r.operationId);
-		expect(protectedRoute).toBeDefined();
-		if (!protectedRoute) {
-			return;
-		}
-
-		await ContextIdStore.run(nodeContextIds, async () => {
-			await platformComponent.execute(async () => {
-				const { entities: policies } = await authComponent.getAllPolicies(
-					AUTHORIZATION_MODEL_ID,
-					undefined,
-					undefined,
-					1000
-				);
-
-				const hasCustomPolicy = policies.some(
-					p => p.subject === "custom-role" && p.object === "custom-op"
-				);
-				expect(hasCustomPolicy).toBe(true);
-
-				const auth = protectedRoute.defaultAuthorization;
-				const operationId = protectedRoute.operationId;
-				if (auth && operationId) {
-					const hasRoutePolicy = policies.some(
-						p => p.subject === auth.permission && p.object === operationId
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						undefined,
+						undefined,
+						1000
 					);
-					expect(hasRoutePolicy).toBe(true);
-				}
-			});
-		});
 
-		await startResult.shutdown();
-	}, 30000);
+					const hasCustomPolicy = policies.some(
+						p => p.subject === "custom-role" && p.object === "custom-op"
+					);
+					expect(hasCustomPolicy).toBe(true);
+
+					const auth = protectedRoute.defaultAuthorization;
+					const operationId = protectedRoute.operationId;
+					if (auth && operationId) {
+						const hasRoutePolicy = policies.some(
+							p => p.subject === auth.permission && p.object === operationId
+						);
+						expect(hasRoutePolicy).toBe(true);
+					}
+				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
 });
