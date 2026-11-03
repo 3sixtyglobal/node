@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0-next.6](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.5...node-v0.20.0-next.6) (2026-11-03)
+
+
+### Features
+
+* task scheduler and e-mail delivery interval settings ([#98](https://github.com/3sixtyglobal/node/issues/98)) ([da1a3ad](https://github.com/3sixtyglobal/node/commit/da1a3adf725add0ba47c13cb5071709e2e1b04d0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @3sixty/node-core bumped from 0.20.0-next.5 to 0.20.0-next.6
+
 ## [0.20.0-next.5](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.4...node-v0.20.0-next.5) (2026-11-02)
 
 
