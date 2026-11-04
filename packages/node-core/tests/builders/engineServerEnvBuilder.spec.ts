@@ -382,6 +382,28 @@ describe("buildEngineServerConfiguration - auth context keys", () => {
 		const keys = contextKeys.map(k => k.key);
 		expect(keys).not.toContain(ContextIdKeys.User);
 		expect(config.types.authenticationComponent).toBeUndefined();
+		expect(config.types.featureComponent).toBeUndefined();
+	});
+
+	test("registers the feature component with the authorization model for entity storage auth", async () => {
+		const config = await buildEngineServerConfiguration(
+			{
+				...BASE_VARS,
+				...ENTITY_STORAGE_AUTH_VARS,
+				authorizationModelId: "custom-model"
+			},
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
+
+		expect(config.types.featureComponent).toEqual([
+			{
+				type: "service",
+				options: { config: { authorizationModelId: "custom-model" } },
+				restPath: "/features"
+			}
+		]);
 	});
 
 	test("registers the organization request admin with the trust verification method", async () => {

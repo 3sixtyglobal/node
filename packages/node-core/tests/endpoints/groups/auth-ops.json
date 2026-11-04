@@ -92,6 +92,12 @@
 			"method": "GET",
 			"path": "/authentication/audit",
 			"expectedStatus": 200
+		},
+		{
+			"description": "GET /features - the features the signed in account can use",
+			"method": "GET",
+			"path": "/features",
+			"expectedStatus": 200
 		}
 	]
 }

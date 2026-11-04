@@ -1,11 +1,14 @@
 // Copyright 2024 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import { FeatureFactory, type IFeatureDefinition } from "@3sixty/api-auth-models";
 import { CLIDisplay } from "@3sixty/cli-core";
-import { EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
+import { BaseError, EnvHelper, GeneralError, I18n, Is } from "@3sixty/core";
 import type { IEngineCore, IEngineServer } from "@3sixty/engine-models";
 import { ModuleHelper } from "@3sixty/modules";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
 import type { INodeEngineConfig } from "../models/INodeEngineConfig.js";
+import type { NodeExtensionFeaturesMethod } from "../models/nodeExtensionFeaturesMethod.js";
 import type { NodeExtensionInitialiseEngineMethod } from "../models/nodeExtensionInitialiseEngineMethod.js";
 import type { NodeExtensionInitialiseEngineServerMethod } from "../models/nodeExtensionInitialiseEngineServerMethod.js";
 import type { NodeExtensionInitialiseMethod } from "../models/nodeExtensionInitialiseMethod.js";
@@ -14,10 +17,12 @@ import type { NodeExtensionShutdownMethod } from "../models/nodeExtensionShutdow
 const extensionState: { [id: string]: { initialised: boolean } } = {};
 
 /**
- * Handles the configuration of the extensions.
+ * Handles the configuration of the extensions, and registers the features they provide with the feature factory.
  * @param envVars The environment variables for the node.
  * @param nodeEngineConfig The node engine config.
  * @returns The config for the core and the server.
+ * @throws GeneralError if an extension cannot be loaded, two extensions provide a feature with the same
+ * name, or extensions provide features without a feature component to list them.
  */
 export async function extensionsConfiguration(
 	envVars: IEnvironmentVariables,
@@ -25,6 +30,7 @@ export async function extensionsConfiguration(
 ): Promise<INodeEngineConfig> {
 	if (Is.stringValue(envVars.extensions)) {
 		const extensions = EnvHelper.commaSeparatedListToArray<string>(envVars.extensions);
+		const features: IFeatureDefinition[] = [];
 
 		for (const extension of extensions) {
 			let initialiseConfigMethod: NodeExtensionInitialiseMethod | undefined;
@@ -41,6 +47,39 @@ export async function extensionsConfiguration(
 
 			if (Is.function(initialiseConfigMethod)) {
 				await initialiseConfigMethod(envVars, nodeEngineConfig);
+			}
+
+			try {
+				const featuresMethod = await ModuleHelper.getModuleMethod<NodeExtensionFeaturesMethod>(
+					extension,
+					"extensionFeatures"
+				);
+
+				for (const feature of await featuresMethod(envVars)) {
+					if (features.some(existing => existing.name === feature.name)) {
+						throw new GeneralError("node", "extensionFeatureDuplicate", {
+							extension,
+							feature: feature.name
+						});
+					}
+					features.push(feature);
+				}
+			} catch (err) {
+				// The method is optional, so only an extension without it provides no features.
+				if (!BaseError.isErrorMessage(err, /\.entryNotFound$/)) {
+					throw new GeneralError("node", "extensionLoadingError", { extension }, err);
+				}
+			}
+		}
+
+		if (features.length > 0) {
+			if (!Is.arrayValue(nodeEngineConfig.types.featureComponent)) {
+				throw new GeneralError("node", "extensionFeaturesUnavailable", {
+					features: features.map(feature => feature.name).join(", ")
+				});
+			}
+			for (const feature of features) {
+				FeatureFactory.register(feature.name, () => feature);
 			}
 		}
 	}

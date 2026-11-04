@@ -296,6 +296,13 @@
 			"expectedStatus": 401
 		},
 		{
+			"description": "GET /features - refused without a session",
+			"method": "GET",
+			"path": "/features",
+			"anonymous": true,
+			"expectedStatus": 401
+		},
+		{
 			"description": "GET /authorization/:modelId/policy - refused without a session",
 			"method": "GET",
 			"path": "/authorization/fake/policy",

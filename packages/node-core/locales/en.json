@@ -7,6 +7,8 @@
 			"schemaAliasInvalid": "The schema alias \"{alias}\" is invalid, it must be in the form from=to",
 			"storageFileRootNotSet": "{storageFileRoot} is not set, the server will not start without it, please set it in the shell or create a .env file",
 			"extensionLoadingError": "Failed to load extension \"{extension}\"",
+			"extensionFeatureDuplicate": "Extension \"{extension}\" provides the feature \"{feature}\", which another extension already provides",
+			"extensionFeaturesUnavailable": "The extensions provide the features \"{features}\", but entity storage authentication is needed to list them",
 			"cliCommandMissing": "CLI command \"{command}\" is not recognised",
 			"cliCommandParamMissing": "Parameter \"{param}\" is required for command \"{command}\"",
 			"cliCommandParamExtra": "Parameter(s) \"{params}\" are not recognised for command \"{command}\"",

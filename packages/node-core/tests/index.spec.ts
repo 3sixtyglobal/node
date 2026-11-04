@@ -1,4 +1,5 @@
 // Copyright 2025 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import type { IServerInfo } from "@3sixty/api-models";
@@ -695,6 +696,7 @@ describe("node-core", () => {
 			"entity-storage-authentication-admin-service",
 			"entity-storage-authentication-service",
 			"o-auth-service",
+			"feature-service",
 			"information-service"
 		]);
 
@@ -736,6 +738,7 @@ describe("node-core", () => {
 			"PUT      /authentication/audit/:id",
 			"DELETE   /authentication/audit/:id",
 			"GET      /authentication/audit",
+			"GET      /features",
 			"GET      /authentication/oauth/:authProviderId/start",
 			"GET      /authentication/oauth/:authProviderId/callback",
 			"POST     /authentication/account/identity",
