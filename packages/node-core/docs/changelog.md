@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0-next.8](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.7...node-core-v0.20.0-next.8) (2026-11-04)
+
+
+### Features
+
+* serve the features of node extensions ([#103](https://github.com/3sixtyglobal/node/issues/103)) ([2327002](https://github.com/3sixtyglobal/node/commit/2327002e19c83568281a05c7eac7f09b311f212c))
+
 ## [0.20.0-next.7](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.6...node-core-v0.20.0-next.7) (2026-11-03)
 
 
