@@ -35,6 +35,7 @@
 		"@3sixty/api-auth-entity-storage-models": "next",
 		"@3sixty/api-auth-entity-storage-service": "next",
 		"@3sixty/api-auth-models": "next",
+		"@3sixty/api-auth-oauth-connector-microsoft": "next",
 		"@3sixty/api-models": "next",
 		"@3sixty/api-tenant-processor": "next",
 		"@3sixty/auditable-item-graph-service": "next",

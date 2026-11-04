@@ -1,8 +1,11 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import path from "node:path";
+import type { IFeatureComponent } from "@3sixty/api-auth-models";
 import type { IPlatformComponent } from "@3sixty/api-models";
 import type { IAuthorizationComponent } from "@3sixty/authorization-models";
-import { ContextIdStore } from "@3sixty/context";
+import { ContextIdKeys, ContextIdStore } from "@3sixty/context";
 import { ComponentFactory, DurationConstants, Factory } from "@3sixty/core";
 import { MemoryStateStorage } from "@3sixty/engine-core";
 import {
@@ -508,6 +511,73 @@ describe("seedAuthorizationDefaults", () => {
 						expect(hasRoutePolicy).toBe(true);
 					}
 				});
+			});
+
+			await startResult.shutdown();
+		},
+		30 * DurationConstants.MsPerSecond
+	);
+
+	test(
+		"seeds a policy for each role of the features the extensions provide",
+		async () => {
+			const startResult = await startServer({
+				...baseAuthEnvVars,
+				TWIN_PORT: port.toString(),
+				TWIN_EXTENSIONS: path.resolve("./tests/fixtures/featuresExtension.js")
+			});
+			expect(startResult).toBeDefined();
+			if (!startResult) {
+				return;
+			}
+
+			const authType = startResult.engine.getRegisteredInstanceType("authorizationComponent");
+			const authComponent = ComponentFactory.get<IAuthorizationComponent>(authType);
+			const platformType = startResult.engine.getRegisteredInstanceType("platformComponent");
+			const platformComponent = ComponentFactory.get<IPlatformComponent>(platformType);
+			const featureType = startResult.engine.getRegisteredInstanceType("featureComponent");
+			const featureComponent = ComponentFactory.get<IFeatureComponent>(featureType);
+			const nodeContextIds = startResult.engine.getContextIds() ?? {};
+
+			await ContextIdStore.run(nodeContextIds, async () => {
+				await platformComponent.execute(async () => {
+					const { entities: policies } = await authComponent.getAllPolicies(
+						AUTHORIZATION_MODEL_ID,
+						undefined,
+						undefined,
+						1000
+					);
+					expect(policies).toEqual(
+						expect.arrayContaining([
+							{ subject: DEFAULT_USER_ROLE, object: "feature:supply-chain", action: "execute" },
+							{
+								subject: DEFAULT_ESCALATED_PRIVILEGE_ROLE,
+								object: "feature:reports",
+								action: "execute"
+							}
+						])
+					);
+
+					await authComponent.addRoleForSubject(
+						AUTHORIZATION_MODEL_ID,
+						"feature-user",
+						DEFAULT_USER_ROLE
+					);
+					await authComponent.addRoleForSubject(
+						AUTHORIZATION_MODEL_ID,
+						"feature-admin",
+						DEFAULT_ESCALATED_PRIVILEGE_ROLE
+					);
+				});
+
+				const listAs = async (accountId: string): Promise<string[]> =>
+					ContextIdStore.run({ ...nodeContextIds, [ContextIdKeys.Account]: accountId }, async () =>
+						(await featureComponent.list()).map(feature => feature.name)
+					);
+
+				expect(await listAs("feature-user")).toEqual(["supply-chain"]);
+				expect(await listAs("feature-admin")).toEqual(["supply-chain", "reports"]);
+				expect(await listAs("feature-nobody")).toEqual([]);
 			});
 
 			await startResult.shutdown();

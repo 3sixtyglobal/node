@@ -17,8 +17,23 @@ Node reads the `extensions` environment variable (from `INodeEnvironmentVariable
 - `extensionInitialiseEngine(engineCore)`
 - `extensionInitialiseEngineServer(engineCore, engineServer)`
 - `extensionShutdown()`
+- `extensionFeatures(envVars)`
 
 These are orchestrated in `packages/node-core/src/builders/extensionsBuilder.ts`.
+
+## Features
+
+An extension can provide features, such as a part of a user interface, by exporting `extensionFeatures(envVars)`. It returns an array of feature definitions, each with:
+
+- `name`: unique across the node, Node refuses to start if two extensions provide the same name
+- `roles`: the roles that can use the feature, an account needs one of them, held directly or inherited
+- `config`: optional settings the user interface needs to display the feature, never secrets, as anyone holding one of the roles can read them
+
+Node registers the features with `FeatureFactory` from `@3sixty/api-auth-models` while the extensions are configured. Any other component or extension can register a feature with the factory too, keyed by its name. The feature component, which entity storage authentication registers, lists the features from the factory on each request, and features without that component stop the node from starting.
+
+When the authorization defaults are seeded, in `merge` mode, each role of every feature then registered is given a policy to `execute` the object `feature:<name>`, and the role takes part in the usual inheritance, so `global-admin` can use every feature and every role inherits `user`. A feature registered after the node has started needs its policies added to the authorization component by whatever registers it.
+
+`GET /features` lists the features the signed in account can use. The feature component checks each feature against the authorization component, as the route processor checks routes, and returns only the name and config of each feature it allows, never its roles.
 
 ## Lifecycle Timing
 
@@ -106,6 +121,10 @@ export async function extensionInitialiseEngineServer(engineCore, engineServer) 
 
 export async function extensionShutdown() {
   // cleanup resources
+}
+
+export async function extensionFeatures(envVars) {
+  return [{ name: 'supply-chain', roles: ['user'], config: { title: 'Supply chain' } }];
 }
 ```
 

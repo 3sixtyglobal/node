@@ -1,5 +1,7 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import { FeatureAuthorization, FeatureFactory } from "@3sixty/api-auth-models";
 import {
 	TenantEventType,
 	type IBaseRoute,
@@ -121,6 +123,20 @@ export async function seedAuthorizationDefaults(
 				inheritanceKeys,
 				roles
 			);
+		}
+
+		// Each role of a registered feature may execute it, checked by the feature component as routes are.
+		for (const name of FeatureFactory.names()) {
+			const feature = FeatureFactory.get(name);
+			const object = `${FeatureAuthorization.ObjectPrefix}${feature.name}`;
+			for (const role of feature.roles) {
+				const policyKey = `${role}|${object}`;
+				if (!policyKeys.has(policyKey)) {
+					policyKeys.add(policyKey);
+					policies.push({ subject: role, object, action: FeatureAuthorization.Action });
+				}
+				roles.add(role);
+			}
 		}
 
 		for (const role of roles) {

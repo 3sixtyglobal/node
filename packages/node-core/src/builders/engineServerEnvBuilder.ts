@@ -1,6 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
+import { MicrosoftMultiTenantName } from "@3sixty/api-auth-oauth-connector-microsoft";
 import type { IServerInfo, IWebServerOptions } from "@3sixty/api-models";
 import { ContextIdKeys } from "@3sixty/context";
 import { Coerce, DurationConstants, EnvHelper, GeneralError, Is, StringHelper } from "@3sixty/core";
@@ -14,6 +15,7 @@ import {
 	AuthenticationComponentType,
 	AuthenticationProviderType,
 	AuthenticationRateComponentType,
+	FeatureComponentType,
 	type IEngineServerConfig,
 	InformationComponentType,
 	type MimeTypeProcessorType,
@@ -39,11 +41,6 @@ import {
 	isTracingEnabled
 } from "./engineEnvBuilder.js";
 import type { IEnvironmentVariables } from "../models/IEnvironmentVariables.js";
-
-/**
- * The Microsoft tenant names that accept accounts from any tenant.
- */
-const MICROSOFT_MULTI_TENANT_NAMES: string[] = ["common", "organizations", "consumers"];
 
 /**
  * Handles the configuration of the server.
@@ -410,6 +407,17 @@ export async function buildEngineServerConfiguration(
 		});
 		configureAuthenticationProviders(serverConfig, envVars, passwordHashOptions);
 
+		// The features of the extensions are added when the extensions are configured.
+		serverConfig.types.featureComponent ??= [];
+		serverConfig.types.featureComponent.push({
+			type: FeatureComponentType.Service,
+			options: {
+				config: {
+					authorizationModelId
+				}
+			}
+		});
+
 		serverConfig.types.authenticationAccountComponent ??= [];
 		serverConfig.types.authenticationAccountComponent.push({
 			type: AuthenticationAccountComponentType.EntityStorage,
@@ -672,7 +680,10 @@ function configureAuthenticationProviders(
 			);
 			// A tenant id limits sign in to that tenant, the shared tenant names accept any tenant.
 			if (
-				MICROSOFT_MULTI_TENANT_NAMES.includes(envVars.authMicrosoftTenant.toLowerCase()) &&
+				Is.arrayOneOf<string>(
+					envVars.authMicrosoftTenant.toLowerCase(),
+					Object.values(MicrosoftMultiTenantName)
+				) &&
 				!Is.arrayValue(allowedTenants) &&
 				!openRegistration
 			) {

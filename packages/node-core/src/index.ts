@@ -22,6 +22,7 @@ export * from "./models/INodeEngineState.js";
 export * from "./models/IMessagingTemplate.js";
 export * from "./models/INodeEnvironmentVariables.js";
 export * from "./models/INodeOptions.js";
+export * from "./models/nodeExtensionFeaturesMethod.js";
 export * from "./models/nodeExtensionInitialiseEngineMethod.js";
 export * from "./models/nodeExtensionInitialiseEngineServerMethod.js";
 export * from "./models/nodeExtensionInitialiseMethod.js";
