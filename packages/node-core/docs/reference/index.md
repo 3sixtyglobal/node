@@ -20,6 +20,7 @@
 - [IEnvironmentVariables](type-aliases/IEnvironmentVariables.md)
 - [AuthorizationModelMode](type-aliases/AuthorizationModelMode.md)
 - [CliCommandParamType](type-aliases/CliCommandParamType.md)
+- [NodeExtensionFeaturesMethod](type-aliases/NodeExtensionFeaturesMethod.md)
 - [NodeExtensionInitialiseEngineMethod](type-aliases/NodeExtensionInitialiseEngineMethod.md)
 - [NodeExtensionInitialiseEngineServerMethod](type-aliases/NodeExtensionInitialiseEngineServerMethod.md)
 - [NodeExtensionInitialiseMethod](type-aliases/NodeExtensionInitialiseMethod.md)

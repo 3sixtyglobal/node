@@ -36,6 +36,10 @@
 			"description": "Authentication audit endpoints for the REST server."
 		},
 		{
+			"name": "Features",
+			"description": "The features of the node's extensions."
+		},
+		{
 			"name": "Identity",
 			"description": "Service to provide all features related to digital identity."
 		},
@@ -3596,6 +3600,102 @@
 				"responses": {
 					"204": {
 						"description": "The rest request ended in success with no data."
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/features": {
+			"get": {
+				"operationId": "featureList",
+				"summary": "List the features the signed in account can use",
+				"tags": [
+					"Features"
+				],
+				"security": [
+					{
+						"jwtBearerAuthScheme": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The features the signed in account can use.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FeatureListResponse"
+								},
+								"examples": {
+									"featureListResponseExample": {
+										"summary": "The features the signed in account can use.",
+										"value": {
+											"features": [
+												{
+													"name": "supply-chain",
+													"config": {}
+												}
+											]
+										}
+									}
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "The server cannot process the request, see the content for more details.",
@@ -29067,6 +29167,40 @@
 					"name",
 					"message"
 				]
+			},
+			"Feature": {
+				"description": "A feature a node extension provides, such as a part of the user interface.",
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The name of the feature, unique across the node."
+					},
+					"config": {
+						"type": "object",
+						"additionalProperties": {},
+						"description": "Settings the user interface needs to display the feature, never secrets."
+					}
+				},
+				"required": [
+					"name"
+				]
+			},
+			"FeatureListResponse": {
+				"type": "object",
+				"properties": {
+					"features": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Feature"
+						},
+						"description": "The features."
+					}
+				},
+				"required": [
+					"features"
+				],
+				"description": "The response body."
 			},
 			"FilteringQuery": {
 				"description": "A query over a data asset that to be processed by a Dataspace Data Plane App.",
