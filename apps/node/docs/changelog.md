@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0-next.8](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.7...node-v0.20.0-next.8) (2026-11-04)
+
+
+### Miscellaneous Chores
+
+* **node:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @3sixty/node-core bumped from 0.20.0-next.7 to 0.20.0-next.8
+
 ## [0.20.0-next.7](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.6...node-v0.20.0-next.7) (2026-11-03)
 
 
