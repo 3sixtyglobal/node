@@ -58,19 +58,19 @@ export interface StepDefinition {
 	 * Spec strings:
 	 * "location-last-segment" - decodeURIComponent of last path segment of Location header
 	 * "header.location" - raw Location header value
-	 * "cookie:<name>" - named cookie from Set-Cookie header
+	 * "cookie:&lt;name&gt;" - named cookie from Set-Cookie header
 	 * "body" - entire JSON response body (serialised; re-parsed as object when used in body fields)
-	 * "body.<dot.path>" - dot-path into JSON response (supports [n] array indexing)
-	 * "body.<dot.path>|last-colon" - as above, then takes the last colon-delimited segment
+	 * "body.&lt;dot.path&gt;" - dot-path into JSON response (supports [n] array indexing)
+	 * "body.&lt;dot.path&gt;|last-colon" - as above, then takes the last colon-delimited segment
 	 * "response-text" - full response as plain text
-	 * "jwt-claim:<name>" - decodes the current authToken JWT and returns the named payload claim
+	 * "jwt-claim:&lt;name&gt;" - decodes the current authToken JWT and returns the named payload claim
 	 */
 	capture?: { [key: string]: string };
 
 	/**
 	 * Assert values after capture.
-	 * Key: "body.<dot.path>" | "body" | "text" | "header.<name>"
-	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | "contains:<text>" | literal
+	 * Key: "body.&lt;dot.path&gt;" | "body" | "text" | "header.&lt;name&gt;"
+	 * Value: "isDefined" | "{{varName}}" (compare to captured var) | "contains:&lt;text&gt;" | literal
 	 */
 	assert?: { [key: string]: unknown };
 
@@ -93,7 +93,7 @@ export interface StepDefinition {
 	skip?: string | false;
 
 	/**
-	 * Controls whether ?organization=<orgDid> is appended to this step's URL.
+	 * Controls whether ?organization=&lt;orgDid&gt; is appended to this step's URL.
 	 * The runner appends it automatically for all non-apiKey requests when ctx.appendOrgParam
 	 * is not false and an organizationId is captured. Set to false to explicitly suppress the
 	 * organization param on steps that test missing-tenant-token error cases.

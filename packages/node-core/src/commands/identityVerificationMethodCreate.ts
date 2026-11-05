@@ -212,7 +212,9 @@ export async function identityVerificationMethodCreate(
 					DocumentHelper.joinId(params.identity, params.verificationMethodId),
 					params.verificationMethodType
 				);
-			} catch {}
+			} catch {
+				// The verification method does not exist yet.
+			}
 
 			if (Is.notEmpty(verificationMethod)) {
 				if (params.overwriteMode === "error") {
@@ -232,7 +234,9 @@ export async function identityVerificationMethodCreate(
 					const keyParts = DocumentHelper.parseId(verificationMethod.id);
 					await vaultConnector.getKey(`${params.identity}/${keyParts.fragment}`);
 					vaultKeyExists = true;
-				} catch {}
+				} catch {
+					// The vault key does not exist.
+				}
 
 				if (vaultKeyExists) {
 					createMethod = false;

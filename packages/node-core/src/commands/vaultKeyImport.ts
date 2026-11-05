@@ -120,7 +120,9 @@ export async function vaultKeyImport(
 		if (Is.notEmpty(existingKey)) {
 			await vaultConnector.removeKey(fullKeyId);
 		}
-	} catch {}
+	} catch {
+		// The key may not exist, so there is nothing to remove.
+	}
 
 	CLIDisplay.task(I18n.formatMessage("node.cli.commands.vault-key-import.labels.importing"));
 	CLIDisplay.spinnerStart();

@@ -116,7 +116,9 @@ export async function extensionsInitialiseEngine(
 							extension,
 							"extensionInitialiseEngine"
 						);
-				} catch {}
+				} catch {
+					// The extension does not provide this method.
+				}
 
 				if (Is.function(initialiseEngineMethod)) {
 					await initialiseEngineMethod(engineCore);
@@ -152,7 +154,9 @@ export async function extensionsInitialiseEngineServer(
 						extension,
 						"extensionInitialiseEngineServer"
 					);
-			} catch {}
+			} catch {
+				// The extension does not provide this method.
+			}
 
 			if (Is.function(initialiseEngineServerMethod)) {
 				await initialiseEngineServerMethod(engineCore, engineServer);
@@ -186,7 +190,9 @@ export async function shutdownExtensions(
 						extension,
 						"extensionShutdown"
 					);
-				} catch {}
+				} catch {
+					// The extension does not provide this method.
+				}
 
 				if (Is.function(shutdownMethod)) {
 					await shutdownMethod();

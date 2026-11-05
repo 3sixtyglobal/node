@@ -8,6 +8,7 @@ export type { GroupDefinition } from "./models/groupDefinition.js";
 export type { ProbedStep } from "./models/probedStep.js";
 export type { RunnerContext } from "./models/runnerContext.js";
 export type { StepDefinition } from "./models/stepDefinition.js";
+import { MimeTypes } from "@3sixty/web";
 import type { GroupDefinition } from "./models/groupDefinition.js";
 import type { ProbedStep } from "./models/probedStep.js";
 import type { RunnerContext } from "./models/runnerContext.js";
@@ -185,7 +186,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 	}
 	const hasBody = step.body !== undefined && step.body !== null;
 	if (hasBody) {
-		headers["content-type"] = "application/json";
+		headers["content-type"] = MimeTypes.Json;
 	}
 
 	const fetchOptions: RequestInit = { method: step.method, headers };

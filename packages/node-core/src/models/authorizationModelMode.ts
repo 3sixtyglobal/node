@@ -4,7 +4,6 @@
 /**
  * The protocol types for modules.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const AuthorizationModelMode = {
 	/**
 	 * Merge the roles with the defaults.

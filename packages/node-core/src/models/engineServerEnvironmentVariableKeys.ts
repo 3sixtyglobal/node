@@ -82,7 +82,7 @@ const engineServerEnvironmentVariableKeysInternal: {
  * The set of camelCase property names (and wildcard patterns ending with *) that are valid
  * IEngineServerEnvironmentVariables keys.
  * Used at startup to detect unrecognised TWIN_* environment variables (typos, stale names).
- * The "restPath*" entry covers dynamic TWIN_REST_PATH_<COMPONENT_TYPE> variables.
+ * The "restPath*" entry covers dynamic TWIN_REST_PATH_&lt;COMPONENT_TYPE&gt; variables.
  */
 export const ENGINE_SERVER_ENVIRONMENT_VARIABLE_KEYS: ReadonlySet<string> = new Set([
 	...Object.keys(engineServerEnvironmentVariableKeysInternal),

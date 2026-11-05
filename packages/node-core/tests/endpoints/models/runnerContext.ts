@@ -37,7 +37,7 @@ export interface RunnerContext {
 	serverStartTime: number;
 
 	/**
-	 * When false, the ?organization=<orgDid> query parameter is not appended to requests.
+	 * When false, the ?organization=&lt;orgDid&gt; query parameter is not appended to requests.
 	 * Defaults to true (appended) when omitted. Both multi-tenant and single-tenant nodes
 	 * accept ?organization=; set this to false only in steps or contexts that explicitly
 	 * test the absence of the parameter.

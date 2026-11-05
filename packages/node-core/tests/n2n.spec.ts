@@ -18,6 +18,7 @@ import {
 } from "@3sixty/identity-models";
 import type { ITrustComponent } from "@3sixty/trust-models";
 import { VaultConnectorFactory } from "@3sixty/vault-models";
+import { MimeTypes } from "@3sixty/web";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import type { INodeEngineState } from "../src/models/INodeEngineState.js";
 import { run } from "../src/node.js";
@@ -139,7 +140,7 @@ describe("node-core n2n", () => {
 			const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
 				method: "POST",
 				headers: {
-					"content-type": "application/json",
+					"content-type": MimeTypes.Json,
 					authorization: `Bearer ${String(catalogueTrustToken)}`
 				},
 				body: JSON.stringify({
@@ -227,7 +228,7 @@ describe("node-core n2n", () => {
 				const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
 					method: "POST",
 					headers: {
-						"content-type": "application/json",
+						"content-type": MimeTypes.Json,
 						authorization: `Bearer ${String(proxyTrustToken)}`
 					},
 					body: JSON.stringify({
@@ -324,7 +325,7 @@ describe("node-core n2n", () => {
 			const seedRes = await fetch(`http://localhost:${CATALOGUE_PORT}/catalog/datasets`, {
 				method: "POST",
 				headers: {
-					"content-type": "application/json",
+					"content-type": MimeTypes.Json,
 					authorization: `Bearer ${String(catalogueTrustToken)}`
 				},
 				body: JSON.stringify({
@@ -441,7 +442,7 @@ describe("node-core n2n", () => {
 				const requestRes = await fetch(`http://localhost:${PROXY_PORT}/catalog/request`, {
 					method: "POST",
 					headers: {
-						"content-type": "application/json",
+						"content-type": MimeTypes.Json,
 						authorization: `Bearer ${String(proxyTrustToken)}`
 					},
 					body: JSON.stringify({

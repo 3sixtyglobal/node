@@ -251,7 +251,9 @@ export async function userCreate(
 			let existingUser: IAuthenticationUser | undefined;
 			try {
 				existingUser = await authenticationAdminComponent.get(paramsEmail);
-			} catch {}
+			} catch {
+				// The user does not exist yet.
+			}
 
 			if (Is.notEmpty(existingUser)) {
 				if (params.overwriteMode === "error") {

@@ -186,7 +186,9 @@ export async function identityVerificationMethodImport(
 
 	try {
 		vaultKey = await vaultConnector.getKey(vaultKeyId);
-	} catch {}
+	} catch {
+		// The vault key does not exist yet.
+	}
 
 	if (Is.empty(vaultKey)) {
 		const privateKeyBytes = Converter.hexToBytes(HexHelper.stripPrefix(params.privateKeyHex));

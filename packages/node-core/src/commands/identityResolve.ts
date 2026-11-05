@@ -94,7 +94,9 @@ export async function identityResolve(
 	let identityDocument: IDidDocument | undefined;
 	try {
 		identityDocument = await identityResolverConnector.resolveDocument(params.identity);
-	} catch {}
+	} catch {
+		// The identity could not be resolved, reported below.
+	}
 
 	if (!Is.objectValue(identityDocument)) {
 		throw new GeneralError("identityResolve", "identityNotFound", {

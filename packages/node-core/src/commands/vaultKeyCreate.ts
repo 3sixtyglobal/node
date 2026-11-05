@@ -159,7 +159,9 @@ export async function vaultKeyCreate(
 	let existingKey;
 	try {
 		existingKey = await vaultConnector.getKey(fullKeyId);
-	} catch {}
+	} catch {
+		// The vault key does not exist yet.
+	}
 
 	if (Is.notEmpty(existingKey)) {
 		if (params.overwriteMode === "error") {

@@ -435,7 +435,9 @@ async function identityGenerate(
 				);
 			}
 		}
-	} catch {}
+	} catch {
+		// The identity could not be resolved, it is created below.
+	}
 
 	if (Is.empty(identityDocument)) {
 		CLIDisplay.task(I18n.formatMessage("node.cli.commands.identity-create.labels.noIdentityFound"));
