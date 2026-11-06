@@ -742,10 +742,12 @@ function configureAuthenticationProviders(
 		if (providerCreatesAccounts && !isAuthorizationRequired(envVars)) {
 			throw new GeneralError("node", "authOAuthAuthorizationRequired");
 		}
-		if (
-			!Is.stringValue(envVars.authOAuthSuccessRedirectUrl) ||
-			!Is.stringValue(envVars.authOAuthFailureRedirectUrl)
-		) {
+		// The addresses are also read under the names they had before, TWIN_AUTH_O_AUTH_...
+		const successRedirectUrl =
+			envVars.authOauthSuccessRedirectUrl ?? envVars.authOAuthSuccessRedirectUrl;
+		const failureRedirectUrl =
+			envVars.authOauthFailureRedirectUrl ?? envVars.authOAuthFailureRedirectUrl;
+		if (!Is.stringValue(successRedirectUrl) || !Is.stringValue(failureRedirectUrl)) {
 			throw new GeneralError("node", "authOAuthRedirectMissing");
 		}
 		serverConfig.types.oauthComponent ??= [];
@@ -753,8 +755,8 @@ function configureAuthenticationProviders(
 			type: OAuthComponentType.Service,
 			options: {
 				config: {
-					successRedirectUrl: envVars.authOAuthSuccessRedirectUrl,
-					failureRedirectUrl: envVars.authOAuthFailureRedirectUrl,
+					successRedirectUrl,
+					failureRedirectUrl,
 					signingKeyName: envVars.authSigningKeyId
 				}
 			}

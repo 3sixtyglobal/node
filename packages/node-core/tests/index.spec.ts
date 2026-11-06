@@ -599,8 +599,8 @@ describe("node-core", () => {
 			TWIN_AUTH_PROVIDERS: "3sixty,google",
 			TWIN_AUTH_GOOGLE_CLIENT_ID: "google-client",
 			TWIN_AUTH_GOOGLE_CLIENT_SECRET: "google-secret",
-			TWIN_AUTH_O_AUTH_SUCCESS_REDIRECT_URL: "https://app.example.org/signed-in",
-			TWIN_AUTH_O_AUTH_FAILURE_REDIRECT_URL: "https://app.example.org/login",
+			TWIN_AUTH_OAUTH_SUCCESS_REDIRECT_URL: "https://app.example.org/signed-in",
+			TWIN_AUTH_OAUTH_FAILURE_REDIRECT_URL: "https://app.example.org/login",
 			TWIN_HEALTH_ENABLED: "true",
 			TWIN_SCHEMA_MIGRATION_ENABLED: "false",
 			TWIN_EXTENSIONS: "./tests/fixtures/testApp.js"
