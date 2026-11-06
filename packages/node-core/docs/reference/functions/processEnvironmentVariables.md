@@ -1,6 +1,6 @@
 # Function: processEnvironmentVariables()
 
-> **processEnvironmentVariables**(`processEnv`, `options`): `Promise`\<[`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`\>
+> **processEnvironmentVariables**(`processEnv`, `options`): `Promise`\<[`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & [`IEngineServerDeprecatedEnvironmentVariables`](../interfaces/IEngineServerDeprecatedEnvironmentVariables.md) & `object`\>
 
 Process the loaded environment variables for the 3Sixty Node.
 
@@ -20,7 +20,7 @@ The options for running the server.
 
 ## Returns
 
-`Promise`\<[`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & `object`\>
+`Promise`\<[`IBootstrapDevEnvironmentVariables`](../interfaces/IBootstrapDevEnvironmentVariables.md) & [`INodeEnvironmentVariables`](../interfaces/INodeEnvironmentVariables.md) & [`IEngineEnvironmentVariables`](../interfaces/IEngineEnvironmentVariables.md) & [`IEngineServerEnvironmentVariables`](../interfaces/IEngineServerEnvironmentVariables.md) & [`IEngineServerDeprecatedEnvironmentVariables`](../interfaces/IEngineServerDeprecatedEnvironmentVariables.md) & `object`\>
 
 A promise that resolves to the environment variables for the node.
 

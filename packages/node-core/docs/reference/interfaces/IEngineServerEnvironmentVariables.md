@@ -317,17 +317,17 @@ https://account.live.com/password/Change
 
 ***
 
-### authOAuthSuccessRedirectUrl? {#authoauthsuccessredirecturl}
+### authOauthSuccessRedirectUrl? {#authoauthsuccessredirecturl}
 
-> `optional` **authOAuthSuccessRedirectUrl?**: `string`
+> `optional` **authOauthSuccessRedirectUrl?**: `string`
 
 The address to send the browser to after a successful OAuth sign in, required when an OAuth provider is enabled.
 
 ***
 
-### authOAuthFailureRedirectUrl? {#authoauthfailureredirecturl}
+### authOauthFailureRedirectUrl? {#authoauthfailureredirecturl}
 
-> `optional` **authOAuthFailureRedirectUrl?**: `string`
+> `optional` **authOauthFailureRedirectUrl?**: `string`
 
 The address to send the browser to when an OAuth sign in fails, required when an OAuth provider is enabled.
 

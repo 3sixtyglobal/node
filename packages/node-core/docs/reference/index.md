@@ -8,6 +8,7 @@
 - [ICliCommandDefinition](interfaces/ICliCommandDefinition.md)
 - [ICliCommandDefinitionParam](interfaces/ICliCommandDefinitionParam.md)
 - [IEngineEnvironmentVariables](interfaces/IEngineEnvironmentVariables.md)
+- [IEngineServerDeprecatedEnvironmentVariables](interfaces/IEngineServerDeprecatedEnvironmentVariables.md)
 - [IEngineServerEnvironmentVariables](interfaces/IEngineServerEnvironmentVariables.md)
 - [IMessagingTemplate](interfaces/IMessagingTemplate.md)
 - [INodeEngineConfig](interfaces/INodeEngineConfig.md)
