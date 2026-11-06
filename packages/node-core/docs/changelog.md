@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0-next.9](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.8...node-core-v0.20.0-next.9) (2026-11-06)
+
+
+### Features
+
+* configure the 3sixty and 3sixty-oauth authentication providers ([#106](https://github.com/3sixtyglobal/node/issues/106)) ([66ba670](https://github.com/3sixtyglobal/node/commit/66ba6701e038ce3cce09efa264a34cab71d8a966))
+
 ## [0.20.0-next.8](https://github.com/3sixtyglobal/node/compare/node-core-v0.20.0-next.7...node-core-v0.20.0-next.8) (2026-11-04)
 
 
