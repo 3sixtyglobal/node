@@ -1,12 +1,13 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
-import type { ProbedStep } from "./probedStep.js";
+import type { IProbedStep } from "./IProbedStep.js";
 
 /**
  * Shared mutable state threaded through every step in a test run.
  * Variables captured by one step are immediately available to subsequent steps.
  */
-export interface RunnerContext {
+export interface IRunnerContext {
 	/**
 	 * Root URL of the server under test (e.g. "http://localhost:3000").
 	 */
@@ -55,5 +56,5 @@ export interface RunnerContext {
 	 * When given, each request a step sends is recorded here, so a test can check that every
 	 * route was reached with both a success and a failure response.
 	 */
-	probed?: ProbedStep[];
+	probed?: IProbedStep[];
 }

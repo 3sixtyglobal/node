@@ -5,7 +5,7 @@
 /**
  * Defines a test step with request details, expected outcomes, and variable capture/assertion rules.
  */
-export interface StepDefinition {
+export interface IStepDefinition {
 	/**
 	 * A brief description of the step, used in logs and error messages.
 	 */

@@ -4,7 +4,7 @@
 /**
  * A request a step sent, recorded so the routes it reached can be checked.
  */
-export interface ProbedStep {
+export interface IProbedStep {
 	/**
 	 * The HTTP method.
 	 */

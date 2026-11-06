@@ -4,31 +4,31 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { Converter, Is } from "@3sixty/core";
-export type { GroupDefinition } from "./models/groupDefinition.js";
-export type { ProbedStep } from "./models/probedStep.js";
-export type { RunnerContext } from "./models/runnerContext.js";
-export type { StepDefinition } from "./models/stepDefinition.js";
+export type { IGroupDefinition } from "./models/IGroupDefinition.js";
+export type { IProbedStep } from "./models/IProbedStep.js";
+export type { IRunnerContext } from "./models/IRunnerContext.js";
+export type { IStepDefinition } from "./models/IStepDefinition.js";
 import { MimeTypes } from "@3sixty/web";
-import type { GroupDefinition } from "./models/groupDefinition.js";
-import type { ProbedStep } from "./models/probedStep.js";
-import type { RunnerContext } from "./models/runnerContext.js";
-import type { StepDefinition } from "./models/stepDefinition.js";
+import type { IGroupDefinition } from "./models/IGroupDefinition.js";
+import type { IProbedStep } from "./models/IProbedStep.js";
+import type { IRunnerContext } from "./models/IRunnerContext.js";
+import type { IStepDefinition } from "./models/IStepDefinition.js";
 
 /**
  * Reads an index file that lists group filenames, loads each group JSON from the groups/
  * subdirectory alongside the index, and runs them in order.
- * Groups share the same RunnerContext so variables captured in one group are available in all
+ * Groups share the same IRunnerContext so variables captured in one group are available in all
  * subsequent groups.
  * @param indexFile Absolute path to the index JSON file listing group names.
  * @param ctx The shared runner context providing variables and auth state.
  */
-export async function loadAndRunGroups(indexFile: string, ctx: RunnerContext): Promise<void> {
+export async function loadAndRunGroups(indexFile: string, ctx: IRunnerContext): Promise<void> {
 	const groupDir = path.dirname(indexFile);
 	const groupNames = JSON.parse(await readFile(indexFile, "utf8")) as string[];
 
 	for (const groupName of groupNames) {
 		const groupFile = path.join(groupDir, "groups", `${groupName}.json`);
-		const group = JSON.parse(await readFile(groupFile, "utf8")) as GroupDefinition;
+		const group = JSON.parse(await readFile(groupFile, "utf8")) as IGroupDefinition;
 		await runGroup(group, ctx);
 	}
 }
@@ -38,7 +38,7 @@ export async function loadAndRunGroups(indexFile: string, ctx: RunnerContext): P
  * @param group The group definition containing the ordered steps.
  * @param ctx The shared runner context providing variables and auth state.
  */
-export async function runGroup(group: GroupDefinition, ctx: RunnerContext): Promise<void> {
+export async function runGroup(group: IGroupDefinition, ctx: IRunnerContext): Promise<void> {
 	console.debug(`\n=== ${group.group} ===`);
 	for (const step of group.steps) {
 		if (step.skip) {
@@ -137,7 +137,7 @@ function getNestedValue(obj: unknown, dotPath: string): unknown {
  * @param step The step definition to execute.
  * @param ctx The shared runner context providing variables and auth state.
  */
-async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> {
+async function runStep(step: IStepDefinition, ctx: IRunnerContext): Promise<void> {
 	// Honour the time barrier - some steps must not run until the server has had a chance to
 	// fully initialise (e.g. health checks that depend on background indexing).
 	if (step.timeBarrier) {
@@ -358,7 +358,7 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
  */
 export function findUnprobedRoutes(
 	routes: { method: string; path: string }[],
-	probed: ProbedStep[],
+	probed: IProbedStep[],
 	withoutFailure: string[]
 ): { unreached: string[]; noSuccess: string[]; noFailure: string[] } {
 	const statuses = new Map<string, number[]>();

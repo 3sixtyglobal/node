@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { rm } from "node:fs/promises";
 import path from "node:path";
@@ -40,8 +41,8 @@ import {
 	findUnprobedRoutes,
 	loadAndRunGroups,
 	runGroup,
-	type ProbedStep,
-	type RunnerContext
+	type IProbedStep,
+	type IRunnerContext
 } from "./endpoints/runner.js";
 import { CI_ENV_VARS, getFreePort } from "./setupTestEnv.js";
 import {
@@ -365,7 +366,7 @@ describe("node-core", () => {
 		// Phase 3: Exercise endpoints as a client, using the test definitions in tests/endpoints.
 		// The rights-negotiations-agreement group runs the full DSP negotiation flow to create
 		// a real ODRL Agreement and captures its ID into dataspaceAgreementId for the transfer tests.
-		const probed: ProbedStep[] = [];
+		const probed: IProbedStep[] = [];
 		try {
 			await loadAndRunGroups(path.resolve("tests/endpoints/index.json"), {
 				probed,
@@ -646,7 +647,7 @@ describe("node-core", () => {
 			throw new Error(`No link was sent to ${recipient}`);
 		};
 
-		const ctx: RunnerContext = {
+		const ctx: IRunnerContext = {
 			baseUrl: `http://localhost:${TEST_PORT_EM}`,
 			apiKeyQuery: "",
 			authToken: "",

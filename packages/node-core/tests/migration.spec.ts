@@ -2016,14 +2016,14 @@ describe("migration - scope to roles multi-tenant", () => {
 });
 
 describe("migration - accounts", () => {
-	interface UserV1 {
+	interface IUserV1 {
 		email: string;
 		password: string;
 		salt: string;
 		identity: string;
 		organization: string;
 	}
-	interface Row {
+	interface IRow {
 		id: string;
 		accountId: string;
 		type: string;
@@ -2078,9 +2078,9 @@ describe("migration - accounts", () => {
 	// Starts a node, back-dates AuthenticationUser to v1 and seeds the v1 users, the role
 	// assignments and any account data, ready for the next start to migrate them.
 	const prepare = async (
-		users: UserV1[],
+		users: IUserV1[],
 		roles: { subject: string; role: string; modelId?: string }[],
-		accountData: Row[],
+		accountData: IRow[],
 		extraEnv: { [id: string]: string } = {},
 		identityProfiles: {
 			identity: string;
@@ -2138,7 +2138,7 @@ describe("migration - accounts", () => {
 			});
 		}
 
-		const seedConnector = new MemoryEntityStorageConnector<UserV1>({
+		const seedConnector = new MemoryEntityStorageConnector<IUserV1>({
 			entitySchema: "AuthenticationUserV1",
 			partitionContextIds: ["node"],
 			config: { storageKey: "authentication-user" }
@@ -2157,7 +2157,7 @@ describe("migration - accounts", () => {
 		) as { email: string; accountId: string }[];
 	};
 
-	const accountRows = async (accountId: string, type: string): Promise<Row[]> => {
+	const accountRows = async (accountId: string, type: string): Promise<IRow[]> => {
 		const { entities } = await EntityStorageConnectorFactory.get("account-data").query({
 			conditions: [
 				{ property: "accountId", value: accountId, comparison: ComparisonOperator.Equals },
@@ -2165,7 +2165,7 @@ describe("migration - accounts", () => {
 			],
 			logicalOperator: LogicalOperator.And
 		});
-		return (entities ?? []) as Row[];
+		return (entities ?? []) as IRow[];
 	};
 
 	const rolesOf = async (subject: string, modelId: string = "system"): Promise<string[]> => {
@@ -2247,7 +2247,7 @@ describe("migration - accounts", () => {
 				// Only one account holds the DID, the other is migrated without an identity.
 				const accountData = EntityStorageConnectorFactory.get("account-data");
 				const holder = (await accountData.get(AccountDataHelper.identityId("did:twin:shared"))) as
-					Row | undefined;
+					IRow | undefined;
 				expect(users.map(u => u.accountId)).toContain(holder?.accountId);
 				const other = users.find(u => u.accountId !== holder?.accountId);
 				expect(await accountRows(other?.accountId ?? "", "identity")).toHaveLength(0);
@@ -2772,7 +2772,7 @@ describe("migration - accounts", () => {
 				return {
 					users: (await migratedUsers()).filter(u => u.email === "again@test.com").length,
 					accountId,
-					items: ((entities ?? []) as Row[])
+					items: ((entities ?? []) as IRow[])
 						.map(
 							item =>
 								`${item.type}|${

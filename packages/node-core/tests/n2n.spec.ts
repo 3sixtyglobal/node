@@ -1,4 +1,5 @@
 // Copyright 2026 IOTA Stiftung.
+// Copyright 2026 3Sixty Trade Ltd.
 // SPDX-License-Identifier: Apache-2.0.
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -30,21 +31,21 @@ const TMP_N2N = "./tests/.tmp/n2n/";
 const CATALOGUE_DB = path.resolve(`${TMP_N2N}catalogue/db`);
 const PROXY_DB = path.resolve(`${TMP_N2N}proxy/db`);
 
-interface IdentityStoreEntry {
+interface IIdentityStoreEntry {
 	id: string;
 }
 
-async function readIdentityStore(dbRoot: string): Promise<IdentityStoreEntry[]> {
+async function readIdentityStore(dbRoot: string): Promise<IIdentityStoreEntry[]> {
 	try {
 		return JSON.parse(
 			await readFile(path.join(dbRoot, "identity-document", "store.json"), "utf8")
-		) as IdentityStoreEntry[];
+		) as IIdentityStoreEntry[];
 	} catch {
 		return [];
 	}
 }
 
-async function writeIdentityStore(dbRoot: string, entries: IdentityStoreEntry[]): Promise<void> {
+async function writeIdentityStore(dbRoot: string, entries: IIdentityStoreEntry[]): Promise<void> {
 	await mkdir(path.join(dbRoot, "identity-document"), { recursive: true });
 	await writeFile(
 		path.join(dbRoot, "identity-document", "store.json"),

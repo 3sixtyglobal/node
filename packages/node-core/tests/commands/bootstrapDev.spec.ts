@@ -244,24 +244,24 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterFirst.nodeOrganizationId).toBeUndefined();
 
 		// Verify tenant record contains the explicitly configured values
-		interface TenantRecord {
+		interface ITenantRecord {
 			id: string;
 			apiKey: string;
 			label: string;
 			organizationId: string;
 		}
-		const tenants = await readStoreRecords<TenantRecord>(dbDir, "tenant");
+		const tenants = await readStoreRecords<ITenantRecord>(dbDir, "tenant");
 		expect(tenants).toHaveLength(1);
 		expect(tenants[0].id).toBe("019eba0000000000000000000000cafe");
 		expect(tenants[0].apiKey).toBe("019eba0000000000000000000000babe");
 		expect(tenants[0].label).toBe("Tenant");
 
 		// Verify admin user record contains expected values for multi-tenant mode
-		interface AuthUserRecord {
+		interface IAuthUserRecord {
 			email: string;
 			accountId: string;
 		}
-		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
+		const authUsers = await readStoreRecords<IAuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@tenant");
 
@@ -279,10 +279,10 @@ describe("bootstrap-dev", () => {
 		]);
 
 		// Verify identity documents include the node DID
-		interface IdentityDocRecord {
+		interface IIdentityDocRecord {
 			id: string;
 		}
-		const identityDocs = await readStoreRecords<IdentityDocRecord>(dbDir, "identity-document");
+		const identityDocs = await readStoreRecords<IIdentityDocRecord>(dbDir, "identity-document");
 		expect(identityDocs.some(doc => doc.id === stateAfterFirst.nodeId)).toBe(true);
 		const identityProfiles = await readStoreRecords(dbDir, "account-data");
 
@@ -319,10 +319,10 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterFirst.nodeOrganizationId).toBeDefined();
 
 		// Verify admin user record contains expected values for single-tenant mode
-		interface AuthUserRecord {
+		interface IAuthUserRecord {
 			email: string;
 		}
-		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
+		const authUsers = await readStoreRecords<IAuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@node");
 
@@ -339,19 +339,19 @@ describe("bootstrap-dev", () => {
 		]);
 
 		// Verify identity documents contain both node and org DIDs stored in state
-		interface IdentityDocRecord {
+		interface IIdentityDocRecord {
 			id: string;
 		}
-		const identityDocs = await readStoreRecords<IdentityDocRecord>(dbDir, "identity-document");
+		const identityDocs = await readStoreRecords<IIdentityDocRecord>(dbDir, "identity-document");
 		expect(identityDocs.some(doc => doc.id === stateAfterFirst.nodeId)).toBe(true);
 		expect(identityDocs.some(doc => doc.id === stateAfterFirst.nodeOrganizationId)).toBe(true);
 
 		// Verify identity profile reflects single-tenant defaults
-		interface AccountDataRecord {
+		interface IAccountDataRecord {
 			type: string;
 			data: { givenName: string; familyName: string; email: string };
 		}
-		const identityProfiles = await readStoreRecords<AccountDataRecord>(dbDir, "account-data");
+		const identityProfiles = await readStoreRecords<IAccountDataRecord>(dbDir, "account-data");
 		const profiles = identityProfiles.filter(d => d.type === "profile");
 		expect(profiles).toHaveLength(1);
 		expect(profiles[0].data.givenName).toBe("Node");
@@ -434,10 +434,10 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterFirst.nodeOrganizationId).toBeUndefined();
 
 		// Snapshot DB state after run 1
-		interface TenantRecord {
+		interface ITenantRecord {
 			organizationId: string;
 		}
-		const tenants = await readStoreRecords<TenantRecord>(dbDir, "tenant");
+		const tenants = await readStoreRecords<ITenantRecord>(dbDir, "tenant");
 		expect(tenants).toHaveLength(1);
 		const identityDocs = await readStoreRecords(dbDir, "identity-document");
 		const authUsers = await readStoreRecords(dbDir, "authentication-user");
@@ -475,10 +475,10 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterFirst.nodeId).toBeDefined();
 		expect(stateAfterFirst.nodeOrganizationId).toBeDefined();
 
-		interface AuthUserRecord {
+		interface IAuthUserRecord {
 			email: string;
 		}
-		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
+		const authUsers = await readStoreRecords<IAuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
 
@@ -494,11 +494,11 @@ describe("bootstrap-dev", () => {
 			"user-admin"
 		]);
 
-		interface ProfileRecord {
+		interface IProfileRecord {
 			type: string;
 			data: { givenName: string; familyName: string; email: string };
 		}
-		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "account-data");
+		const identityProfiles = await readStoreRecords<IProfileRecord>(dbDir, "account-data");
 		const profiles = identityProfiles.filter(d => d.type === "profile");
 		expect(profiles).toHaveLength(1);
 		expect(profiles[0].data.givenName).toBe("Node");
@@ -537,10 +537,10 @@ describe("bootstrap-dev", () => {
 		);
 		expect(stateAfterFirst.nodeId).toBeDefined();
 
-		interface AuthUserRecord {
+		interface IAuthUserRecord {
 			email: string;
 		}
-		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
+		const authUsers = await readStoreRecords<IAuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 		expect(authUsers[0].email).toBe("admin@acme.com");
 
@@ -557,11 +557,11 @@ describe("bootstrap-dev", () => {
 			"user-admin"
 		]);
 
-		interface ProfileRecord {
+		interface IProfileRecord {
 			type: string;
 			data: { givenName: string; familyName: string; email: string };
 		}
-		const identityProfiles = await readStoreRecords<ProfileRecord>(dbDir, "account-data");
+		const identityProfiles = await readStoreRecords<IProfileRecord>(dbDir, "account-data");
 		const profiles = identityProfiles.filter(d => d.type === "profile");
 		expect(profiles).toHaveLength(1);
 		expect(profiles[0].data.givenName).toBe("Tenant");
@@ -601,11 +601,11 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterFirst.nodeId).toBeDefined();
 		expect(stateAfterFirst.nodeOrganizationId).toBeDefined();
 
-		interface AuthUserRecord {
+		interface IAuthUserRecord {
 			email: string;
 			identity: string;
 		}
-		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
+		const authUsers = await readStoreRecords<IAuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 
 		// Snapshot DB state after run 1
@@ -643,11 +643,11 @@ describe("bootstrap-dev", () => {
 		expect(stateAfterFirst.nodeId).toBeDefined();
 		expect(stateAfterFirst.nodeOrganizationId).toBeUndefined();
 
-		interface AuthUserRecord {
+		interface IAuthUserRecord {
 			email: string;
 			identity: string;
 		}
-		const authUsers = await readStoreRecords<AuthUserRecord>(dbDir, "authentication-user");
+		const authUsers = await readStoreRecords<IAuthUserRecord>(dbDir, "authentication-user");
 		expect(authUsers).toHaveLength(1);
 
 		// Snapshot DB state after run 1
