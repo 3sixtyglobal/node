@@ -556,7 +556,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 
 		expect(config.types.authenticationProvider).toEqual([
 			{
-				type: AuthenticationProviderType.EntityStorage,
+				type: AuthenticationProviderType.ThreeSixty,
 				options: { config: { passwordHashOptions: {} } }
 			}
 		]);
@@ -568,7 +568,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 			{
 				...OAUTH_VARS,
 				authSigningKeyId: "auth-signing",
-				authProviders: "entity-storage,google,microsoft",
+				authProviders: "3sixty,google,microsoft",
 				authGoogleClientId: "google-client",
 				authGoogleClientSecret: "google-secret",
 				authGoogleAllowedDomains: "example.com,example.org",
@@ -584,7 +584,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 
 		expect(config.types.authenticationProvider).toEqual([
 			{
-				type: AuthenticationProviderType.EntityStorage,
+				type: AuthenticationProviderType.ThreeSixty,
 				options: { config: { passwordHashOptions: {} } }
 			},
 			{
@@ -704,10 +704,60 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		]);
 	});
 
+	test("enables the entity storage OAuth provider and the OAuth service without authorization", async () => {
+		const config = await buildEngineServerConfiguration(
+			{
+				...OAUTH_VARS,
+				authorizationConnector: undefined,
+				authProviders: "3sixty,3sixty-oauth",
+				authLoginPageUrl: "https://app.example.com/login",
+				authAuthorizationRedirectUris:
+					"https://app.example.com/callback,https://app.example.com/cb2",
+				authAuthorizationCodeExpirySeconds: "30"
+			},
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
+
+		expect(config.types.authenticationProvider).toEqual([
+			{
+				type: AuthenticationProviderType.ThreeSixty,
+				options: { config: { passwordHashOptions: {} } }
+			},
+			{
+				type: AuthenticationProviderType.ThreeSixtyOAuth,
+				options: { config: { loginPageUrl: "https://app.example.com/login" } }
+			}
+		]);
+		expect(config.types.oauthComponent?.map(c => c.type)).toEqual([OAuthComponentType.Service]);
+		expect(config.types.authenticationComponent?.[0].options).toMatchObject({
+			config: {
+				authorizationEndpoint: "https://app.example.com/login",
+				authorizationRedirectUris: [
+					"https://app.example.com/callback",
+					"https://app.example.com/cb2"
+				],
+				authorizationCodeExpirySeconds: 30
+			}
+		});
+	});
+
+	test("throws when the entity storage OAuth provider has no login page", async () => {
+		await expect(
+			buildEngineServerConfiguration(
+				{ ...OAUTH_VARS, authProviders: "3sixty-oauth" },
+				[],
+				emailCoreConfig(),
+				SERVER_INFO
+			)
+		).rejects.toThrow("authLoginPageUrlMissing");
+	});
+
 	test("throws for an unknown provider", async () => {
 		await expect(
 			buildEngineServerConfiguration(
-				{ ...AUTH_VARS, authProviders: "entity-storage,github" },
+				{ ...AUTH_VARS, authProviders: "3sixty,github" },
 				[],
 				emailCoreConfig(),
 				SERVER_INFO
@@ -1076,7 +1126,7 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 		});
 		expect(config.types.authenticationProvider).toEqual([
 			{
-				type: AuthenticationProviderType.EntityStorage,
+				type: AuthenticationProviderType.ThreeSixty,
 				options: { config: { passwordHashOptions } }
 			}
 		]);

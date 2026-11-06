@@ -136,12 +136,12 @@ E-mail addresses of migrated users are stored in lower case. When two users diff
 
 ## Sign Up Verification and Sign In Security
 
-People sign up for a password account when the `entity-storage` provider is in `TWIN_AUTH_PROVIDERS`, which it is by default. A sign up sends a verification link by e-mail, and `POST /authentication/register` returns `202 Accepted` with no body whether or not the e-mail address is already taken. The account signs in once `POST /authentication/register/verify` has been called with the token from the link. Leave `entity-storage` out of `TWIN_AUTH_PROVIDERS` to turn password sign up and sign in off.
+People sign up for a password account when the `3sixty` provider is in `TWIN_AUTH_PROVIDERS`, which it is by default. A sign up sends a verification link by e-mail, and `POST /authentication/register` returns `202 Accepted` with no body whether or not the e-mail address is already taken. The account signs in once `POST /authentication/register/verify` has been called with the token from the link. Leave `3sixty` out of `TWIN_AUTH_PROVIDERS` to turn password sign up and sign in off.
 
 ```typescript
 const processEnv: Record<string, string> = {
   TWIN_AUTH_PROCESSOR_TYPE: 'entity-storage',
-  TWIN_AUTH_PROVIDERS: 'entity-storage',
+  TWIN_AUTH_PROVIDERS: '3sixty',
   TWIN_AUTH_REGISTRATION_VERIFICATION_URL: 'https://app.example.org/verify',
   TWIN_AUTH_REGISTRATION_VERIFICATION_EMAIL_TEMPLATE_ID: 'registration-verify',
   TWIN_AUTH_REGISTRATION_EXISTS_EMAIL_TEMPLATE_ID: 'registration-exists',

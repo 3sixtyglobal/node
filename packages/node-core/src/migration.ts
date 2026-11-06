@@ -8,10 +8,11 @@ import {
 	OrganizationHelper,
 	OrganizationMembershipHelper
 } from "@3sixty/api-auth-account-service";
-import type {
-	AuthenticationUser,
-	AuthenticationUserV0,
-	AuthenticationUserV1
+import {
+	type AuthenticationUser,
+	type AuthenticationUserV0,
+	type AuthenticationUserV1,
+	EntityStorageAuthenticationAdminService
 } from "@3sixty/api-auth-entity-storage-service";
 import {
 	AuthenticationAccountDataType,
@@ -818,7 +819,7 @@ function migrationAuthenticationUserAccounts(): void {
 				return {
 					...entity,
 					accountId: record.accountId,
-					authProviderId: "entity-storage",
+					authProviderId: EntityStorageAuthenticationAdminService.AUTH_PROVIDER_ID,
 					providerAccountId: entity.email,
 					dateDisabled: now,
 					dateCreated: now,
@@ -830,7 +831,7 @@ function migrationAuthenticationUserAccounts(): void {
 				...entity,
 				email,
 				accountId: record.accountId,
-				authProviderId: "entity-storage",
+				authProviderId: EntityStorageAuthenticationAdminService.AUTH_PROVIDER_ID,
 				providerAccountId: email,
 				dateCreated: now,
 				dateModified: now

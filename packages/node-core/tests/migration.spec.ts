@@ -1590,7 +1590,7 @@ describe("migration - scope to roles", () => {
 				}[]) {
 					expect(user.scope).toBeUndefined();
 					expect(user.accountId).toEqual(expect.any(String));
-					expect(user.authProviderId).toBe("entity-storage");
+					expect(user.authProviderId).toBe("3sixty");
 					expect(user.providerAccountId).toBe(user.email);
 					expect(user.identity).toBeUndefined();
 					expect(user.organization).toBeUndefined();
@@ -2724,7 +2724,7 @@ describe("migration - accounts", () => {
 				]);
 
 				// The legacy hash signs in, by the address in any case, and is replaced on the way.
-				const provider = AuthenticationProviderFactory.get("entity-storage");
+				const provider = AuthenticationProviderFactory.get("3sixty");
 				await expect(
 					provider.authenticate({ email: "LEGACY@test.com", password: "Wrong@Password123!" })
 				).rejects.toThrow("loginFailed");

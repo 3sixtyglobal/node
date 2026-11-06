@@ -377,6 +377,15 @@ export async function buildEngineServerConfiguration(
 						"authPasswordResetExpiryMinutes"
 					),
 					passwordResetEmailTemplateId: envVars.authPasswordResetEmailTemplateId,
+					authorizationCodeExpirySeconds: EnvHelper.envInteger(
+						envVars,
+						"authAuthorizationCodeExpirySeconds"
+					),
+					authorizationRedirectUris: EnvHelper.commaSeparatedListToArray<string>(
+						envVars.authAuthorizationRedirectUris,
+						undefined
+					),
+					authorizationEndpoint: envVars.authLoginPageUrl,
 					passwordHashOptions,
 					registrationVerificationUrl: envVars.authRegistrationVerificationUrl,
 					registrationVerificationExpiryMinutes: EnvHelper.envInteger(
@@ -623,22 +632,37 @@ function configureAuthenticationProviders(
 ): void {
 	const openRegistration = EnvHelper.envBoolean(envVars, "authProviderOpenRegistration", true);
 	const authProviders = EnvHelper.commaSeparatedListToArray<string>(
-		envVars.authProviders ?? AuthenticationProviderType.EntityStorage
+		envVars.authProviders ?? AuthenticationProviderType.ThreeSixty
 	);
 
 	serverConfig.types.authenticationProvider ??= [];
 	let oauthEnabled = false;
+	let providerCreatesAccounts = false;
 
 	for (const authProvider of authProviders) {
-		if (authProvider === AuthenticationProviderType.EntityStorage) {
+		if (authProvider === AuthenticationProviderType.ThreeSixty) {
 			serverConfig.types.authenticationProvider.push({
-				type: AuthenticationProviderType.EntityStorage,
+				type: AuthenticationProviderType.ThreeSixty,
 				options: {
 					config: {
 						passwordHashOptions
 					}
 				}
 			});
+		} else if (authProvider === AuthenticationProviderType.ThreeSixtyOAuth) {
+			if (!Is.stringValue(envVars.authLoginPageUrl)) {
+				throw new GeneralError("node", "authLoginPageUrlMissing", { authProvider });
+			}
+			// The password accounts sign in through the OAuth service, but no account is created.
+			serverConfig.types.authenticationProvider.push({
+				type: AuthenticationProviderType.ThreeSixtyOAuth,
+				options: {
+					config: {
+						loginPageUrl: envVars.authLoginPageUrl
+					}
+				}
+			});
+			oauthEnabled = true;
 		} else if (authProvider === AuthenticationProviderType.Google) {
 			if (
 				!Is.stringValue(envVars.authGoogleClientId) ||
@@ -666,6 +690,7 @@ function configureAuthenticationProviders(
 				}
 			});
 			oauthEnabled = true;
+			providerCreatesAccounts = true;
 		} else if (authProvider === AuthenticationProviderType.Microsoft) {
 			if (
 				!Is.stringValue(envVars.authMicrosoftClientId) ||
@@ -705,15 +730,16 @@ function configureAuthenticationProviders(
 				}
 			});
 			oauthEnabled = true;
+			providerCreatesAccounts = true;
 		} else {
 			throw new GeneralError("node", "authProviderUnknown", { authProvider });
 		}
 	}
 
 	if (oauthEnabled) {
-		// A provider login creates an account for anyone the provider signs in, so authorization
-		// must be enabled to limit what those accounts can do.
-		if (!isAuthorizationRequired(envVars)) {
+		// A Google or Microsoft login creates an account for anyone the provider signs in, so
+		// authorization must be enabled to limit what those accounts can do.
+		if (providerCreatesAccounts && !isAuthorizationRequired(envVars)) {
 			throw new GeneralError("node", "authOAuthAuthorizationRequired");
 		}
 		if (
