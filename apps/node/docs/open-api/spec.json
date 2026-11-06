@@ -747,6 +747,298 @@
 				}
 			}
 		},
+		"/authentication/authorize": {
+			"post": {
+				"operationId": "authenticationAuthorize",
+				"summary": "Check the e-mail address and password of a password account and issue an OAuth 2.0 authorization code",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "Check the e-mail address and password of a password account and issue an OAuth 2.0 authorization code.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthorizeRequest"
+							},
+							"examples": {
+								"authorizeRequestExample": {
+									"summary": "The request to issue an authorization code for a password account.",
+									"value": {
+										"email": "user@example.com",
+										"password": "MyPassword123!",
+										"state": "3c9e1b7a5d2f",
+										"nonce": "n-0S6_WzA2Mj",
+										"codeChallenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+										"codeChallengeMethod": "S256",
+										"redirectUri": "https://example.com/authentication/oauth/3sixty-oauth/callback"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The address to send the browser to with the authorization code.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthorizeResponse"
+								},
+								"examples": {
+									"authorizeResponseExample": {
+										"summary": "The address to send the browser to with the code.",
+										"value": {
+											"location": "https://example.com/authentication/oauth/3sixty-oauth/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=3c9e1b7a5d2f"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "You are not authorized to use the API or no credentials were supplied, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnauthorizedError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"422": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "UnprocessableError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/authentication/token": {
+			"post": {
+				"operationId": "authenticationToken",
+				"summary": "Exchange an OAuth 2.0 authorization code for an access token, the token endpoint of RFC 6749",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "Exchange an OAuth 2.0 authorization code for an access token, with the field names RFC 6749 gives\nthem, sent as a form or as JSON.",
+					"required": true,
+					"content": {
+						"application/x-www-form-urlencoded": {
+							"schema": {
+								"$ref": "#/components/schemas/TokenRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "A token request that was refused, with the error codes RFC 6749 gives them.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TokenErrorResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/.well-known/oauth-authorization-server": {
+			"get": {
+				"operationId": "authenticationAuthorizationServerMetadata",
+				"summary": "Get the OAuth 2.0 authorization server metadata of the node, as RFC 8414 describes",
+				"tags": [
+					"Authentication"
+				],
+				"requestBody": {
+					"description": "A REST request with no input parameters.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NoContentRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The OAuth 2.0 authorization server metadata of the node.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthorizationServerMetadata"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "The server cannot process the request, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "GeneralError",
+											"message": "errorMessage",
+											"properties": {
+												"foo": "bar"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "The resource you tried to access does not exist, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NotFoundResponse"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "NotFoundError",
+											"message": "errorMessage",
+											"properties": {
+												"notFoundId": "1"
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The server has encountered a situation it does not know how to handle, see the content for more details.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Error"
+								},
+								"examples": {
+									"exampleResponse": {
+										"value": {
+											"name": "InternalServerError",
+											"message": "errorMessage"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/authentication/login/{authProviderId}": {
 			"post": {
 				"operationId": "authenticationLoginWithProvider",
@@ -1990,17 +2282,18 @@
 				"tags": [
 					"Authentication"
 				],
-				"requestBody": {
-					"description": "A REST request with no input parameters.",
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/NoContentRequest"
-							}
-						}
+				"parameters": [
+					{
+						"name": "types",
+						"description": "A comma separated list of the provider types to include, all types when left out.",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						},
+						"example": "oauth2"
 					}
-				},
+				],
 				"responses": {
 					"200": {
 						"description": "The authentication providers enabled on the server.",
@@ -2015,13 +2308,15 @@
 										"value": {
 											"providers": [
 												{
-													"authProviderId": "entity-storage",
+													"authProviderId": "3sixty",
+													"type": "basic",
 													"signInMethod": "password",
 													"passwordChange": "api",
 													"profileReadOnly": false
 												},
 												{
 													"authProviderId": "google",
+													"type": "oauth2",
 													"signInMethod": "redirect",
 													"passwordChange": "external",
 													"passwordChangeUrl": "https://myaccount.google.com/signinoptions/password",
@@ -2229,7 +2524,7 @@
 						"schema": {
 							"type": "string"
 						},
-						"example": "entity-storage"
+						"example": "3sixty"
 					},
 					{
 						"name": "cursor",
@@ -2271,7 +2566,7 @@
 												{
 													"email": "user@example.com",
 													"accountId": "6f1c2c0e-4b7a-4f0e-9c1a-2d3e4f5a6b7c",
-													"authProviderId": "entity-storage",
+													"authProviderId": "3sixty",
 													"dateCreated": "2026-01-12T09:05:23.123Z"
 												}
 											]
@@ -16421,7 +16716,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the streams, JSON stringified `EntityCondition<IAuditableItemStream>`.",
+						"description": "The conditions to filter the streams, JSON stringified `EntityCondition&lt;IAuditableItemStream&gt;`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -17449,7 +17744,7 @@
 					},
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition&lt;IAuditableItemStreamEntry&gt;`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -18298,7 +18593,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition&lt;IAuditableItemStreamEntry&gt;`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -18559,7 +18854,7 @@
 					},
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition&lt;IAuditableItemStreamEntry&gt;`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -18742,7 +19037,7 @@
 				"parameters": [
 					{
 						"name": "conditions",
-						"description": "The conditions to filter the stream, JSON stringified `EntityCondition<IAuditableItemStreamEntry>`.",
+						"description": "The conditions to filter the stream, JSON stringified `EntityCondition&lt;IAuditableItemStreamEntry&gt;`.",
 						"in": "query",
 						"required": false,
 						"schema": {
@@ -28191,6 +28486,9 @@
 				"description": "What an authentication provider supports, so a client knows how to present it.",
 				"type": "object",
 				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/AuthenticationProviderType"
+					},
 					"signInMethod": {
 						"anyOf": [
 							{
@@ -28227,6 +28525,7 @@
 					}
 				},
 				"required": [
+					"type",
 					"signInMethod",
 					"passwordChange",
 					"profileReadOnly"
@@ -28247,6 +28546,19 @@
 				"allOf": [
 					{
 						"$ref": "#/components/schemas/AuthenticationProviderCapabilities"
+					}
+				]
+			},
+			"AuthenticationProviderType": {
+				"description": "The protocol an authentication provider signs accounts in with.",
+				"anyOf": [
+					{
+						"const": "basic",
+						"description": "The e-mail address and password are sent to the node directly."
+					},
+					{
+						"const": "oauth2",
+						"description": "The browser is sent through an OAuth 2.0 authorization code flow."
 					}
 				]
 			},
@@ -28410,6 +28722,7 @@
 				],
 				"description": "The response body."
 			},
+			"AuthorizationCodeRequest": {},
 			"AuthorizationGetAllPoliciesResponse": {
 				"type": "object",
 				"properties": {
@@ -28639,6 +28952,97 @@
 					"object",
 					"action"
 				]
+			},
+			"AuthorizationServerMetadata": {
+				"description": "The OAuth 2.0 authorization server metadata of the node, with the field names RFC 8414 gives them.",
+				"type": "object",
+				"properties": {
+					"issuer": {
+						"type": "string",
+						"description": "The issuer, the public origin of the node."
+					},
+					"authorization_endpoint": {
+						"type": "string",
+						"description": "The address of the login page that takes the authorization request."
+					},
+					"token_endpoint": {
+						"type": "string",
+						"description": "The address the authorization code is exchanged at."
+					},
+					"response_types_supported": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The response types supported, only code."
+					},
+					"grant_types_supported": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The grant types supported, only authorization_code."
+					},
+					"code_challenge_methods_supported": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The PKCE code challenge methods supported, only S256."
+					},
+					"token_endpoint_auth_methods_supported": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "How clients authenticate at the token endpoint, only none as clients are public and use PKCE."
+					}
+				},
+				"required": [
+					"issuer",
+					"authorization_endpoint",
+					"token_endpoint",
+					"response_types_supported",
+					"grant_types_supported",
+					"code_challenge_methods_supported",
+					"token_endpoint_auth_methods_supported"
+				]
+			},
+			"AuthorizeRequest": {
+				"type": "object",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The e-mail address of the account."
+					},
+					"password": {
+						"type": "string",
+						"description": "The password of the account."
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/AuthorizationCodeRequest"
+					}
+				],
+				"description": "The body of the request."
+			},
+			"AuthorizeResponse": {
+				"type": "object",
+				"properties": {
+					"location": {
+						"type": "string",
+						"description": "The redirect address with the code and state added."
+					}
+				},
+				"required": [
+					"location"
+				],
+				"description": "The response details."
 			},
 			"AutomationActionCreateRequest": {
 				"description": "The body parameters for the request.",
@@ -31320,6 +31724,51 @@
 					}
 				],
 				"description": "Transfer Process (DSP compliant) with state TERMINATED, or error."
+			},
+			"TokenErrorResponse": {
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"description": "The error code, such as invalid_grant, invalid_request or unsupported_grant_type."
+					}
+				},
+				"required": [
+					"error"
+				],
+				"description": "The response details."
+			},
+			"TokenRequest": {
+				"type": "object",
+				"properties": {
+					"grant_type": {
+						"type": "string",
+						"description": "The grant type, only authorization_code."
+					},
+					"code": {
+						"type": "string",
+						"description": "The authorization code."
+					},
+					"redirect_uri": {
+						"type": "string",
+						"description": "The redirect address the code was sent to."
+					},
+					"code_verifier": {
+						"type": "string",
+						"description": "The PKCE code verifier the code challenge was made from."
+					},
+					"client_id": {
+						"type": "string",
+						"description": "The id of the client, not checked as clients are public."
+					}
+				},
+				"required": [
+					"grant_type",
+					"code",
+					"redirect_uri",
+					"code_verifier"
+				],
+				"description": "The body of the request."
 			},
 			"TracingGetTraceResponse": {
 				"type": "object",
