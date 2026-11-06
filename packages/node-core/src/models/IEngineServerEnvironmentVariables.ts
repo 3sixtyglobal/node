@@ -188,12 +188,12 @@ export interface IEngineServerEnvironmentVariables {
 	/**
 	 * The address to send the browser to after a successful OAuth sign in, required when an OAuth provider is enabled.
 	 */
-	authOAuthSuccessRedirectUrl?: string;
+	authOauthSuccessRedirectUrl?: string;
 
 	/**
 	 * The address to send the browser to when an OAuth sign in fails, required when an OAuth provider is enabled.
 	 */
-	authOAuthFailureRedirectUrl?: string;
+	authOauthFailureRedirectUrl?: string;
 
 	/**
 	 * The address of the login page that takes an OAuth 2.0 authorization request for a password

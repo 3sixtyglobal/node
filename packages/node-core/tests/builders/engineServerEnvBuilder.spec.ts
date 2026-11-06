@@ -519,8 +519,8 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 	const OAUTH_VARS = {
 		...AUTH_VARS,
 		authorizationConnector: AuthorizationConnectorType.EntityStorage,
-		authOAuthSuccessRedirectUrl: "https://app.example.com/",
-		authOAuthFailureRedirectUrl: "https://app.example.com/login"
+		authOauthSuccessRedirectUrl: "https://app.example.com/",
+		authOauthFailureRedirectUrl: "https://app.example.com/login"
 	};
 
 	test("throws without an e-mail connector", async () => {
@@ -752,6 +752,29 @@ describe("buildEngineServerConfiguration - authentication providers", () => {
 				SERVER_INFO
 			)
 		).rejects.toThrow("authLoginPageUrlMissing");
+	});
+
+	test("still reads the OAuth redirect addresses under their earlier names", async () => {
+		const config = await buildEngineServerConfiguration(
+			{
+				...AUTH_VARS,
+				authorizationConnector: AuthorizationConnectorType.EntityStorage,
+				authOAuthSuccessRedirectUrl: "https://app.example.com/earlier",
+				authOAuthFailureRedirectUrl: "https://app.example.com/earlier-login",
+				authProviders: "3sixty,3sixty-oauth",
+				authLoginPageUrl: "https://app.example.com/login"
+			},
+			[],
+			emailCoreConfig(),
+			SERVER_INFO
+		);
+
+		expect(config.types.oauthComponent?.[0].options).toMatchObject({
+			config: {
+				successRedirectUrl: "https://app.example.com/earlier",
+				failureRedirectUrl: "https://app.example.com/earlier-login"
+			}
+		});
 	});
 
 	test("throws for an unknown provider", async () => {

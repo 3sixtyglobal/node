@@ -15,6 +15,7 @@ export * from "./models/ICliCommand.js";
 export * from "./models/ICliCommandDefinition.js";
 export * from "./models/ICliCommandDefinitionParam.js";
 export * from "./models/IEngineEnvironmentVariables.js";
+export * from "./models/IEngineServerDeprecatedEnvironmentVariables.js";
 export * from "./models/IEngineServerEnvironmentVariables.js";
 export * from "./models/IEnvironmentVariables.js";
 export * from "./models/INodeEngineConfig.js";
