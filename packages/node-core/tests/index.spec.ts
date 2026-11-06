@@ -596,7 +596,7 @@ describe("node-core", () => {
 			TWIN_AUTOMATION_ACTION_TYPES: "fetch",
 			// Tenants and an OAuth provider are enabled so every route the node can serve is built.
 			TWIN_TENANT_ENABLED: "true",
-			TWIN_AUTH_PROVIDERS: "entity-storage,google",
+			TWIN_AUTH_PROVIDERS: "3sixty,google",
 			TWIN_AUTH_GOOGLE_CLIENT_ID: "google-client",
 			TWIN_AUTH_GOOGLE_CLIENT_SECRET: "google-secret",
 			TWIN_AUTH_O_AUTH_SUCCESS_REDIRECT_URL: "https://app.example.org/signed-in",
@@ -712,6 +712,9 @@ describe("node-core", () => {
 			"GET      /spec",
 			"GET      /health",
 			"POST     /authentication/login",
+			"POST     /authentication/authorize",
+			"POST     /authentication/token",
+			"GET      /.well-known/oauth-authorization-server",
 			"POST     /authentication/login/:authProviderId",
 			"POST     /authentication/register",
 			"POST     /authentication/register/verify",

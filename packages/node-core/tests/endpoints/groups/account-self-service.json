@@ -120,7 +120,7 @@
 			"expectedStatus": 200,
 			"assert": {
 				"body.accountId": "{{profileAccountId}}",
-				"body.authProviderId": "entity-storage",
+				"body.authProviderId": "3sixty",
 				"body.identity": "{{profileUserDid}}"
 			}
 		},
@@ -248,12 +248,12 @@
 			"method": "GET",
 			"path": "/authentication/providers",
 			"expectedStatus": 200,
-			"assert": { "body.providers.0.authProviderId": "entity-storage" }
+			"assert": { "body.providers.0.authProviderId": "3sixty" }
 		},
 		{
 			"description": "POST /authentication/login/:authProviderId - 401 as password accounts use the login route",
 			"method": "POST",
-			"path": "/authentication/login/entity-storage",
+			"path": "/authentication/login/3sixty",
 			"body": { "nonce": "endpoint-test-nonce", "code": "not-a-code" },
 			"expectedStatus": 401,
 			"assert": { "body.message": "entityStorageAuthenticationService.usePasswordLogin" }

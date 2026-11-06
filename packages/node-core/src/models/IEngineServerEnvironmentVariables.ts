@@ -106,8 +106,9 @@ export interface IEngineServerEnvironmentVariables {
 	authMaxPasswordLength?: string;
 
 	/**
-	 * The authentication providers to enable, comma separated: entity-storage, google, microsoft.
-	 * @default entity-storage
+	 * The authentication providers to enable, comma separated: 3sixty, 3sixty-oauth,
+	 * google, microsoft.
+	 * @default 3sixty
 	 */
 	authProviders?: string;
 
@@ -193,6 +194,25 @@ export interface IEngineServerEnvironmentVariables {
 	 * The address to send the browser to when an OAuth sign in fails, required when an OAuth provider is enabled.
 	 */
 	authOAuthFailureRedirectUrl?: string;
+
+	/**
+	 * The address of the login page that takes an OAuth 2.0 authorization request for a password
+	 * account, required when the 3sixty-oauth provider is enabled, and published as the
+	 * authorization endpoint at /.well-known/oauth-authorization-server.
+	 */
+	authLoginPageUrl?: string;
+
+	/**
+	 * The redirect addresses, besides those on the node's public origin, an authorization code for
+	 * a password account may be sent to, comma separated and matched exactly.
+	 */
+	authAuthorizationRedirectUris?: string;
+
+	/**
+	 * How long an authorization code for a password account can be used for, in seconds.
+	 * @default 60
+	 */
+	authAuthorizationCodeExpirySeconds?: string;
 
 	/**
 	 * The roles given to accounts created by a provider login or a sign up, comma separated.

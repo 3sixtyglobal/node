@@ -123,6 +123,8 @@ const SHARED_ENV_VARS: { [id: string]: string } = {
 	TWIN_AUTH_EMAIL_SENDER: "no-reply@example.org",
 	TWIN_AUTH_REGISTRATION_VERIFICATION_URL: "https://app.example.org/verify",
 	TWIN_AUTH_PASSWORD_RESET_URL: "https://app.example.org/reset",
+	// Publishes the OAuth 2.0 authorization server metadata of the node.
+	TWIN_AUTH_LOGIN_PAGE_URL: "https://app.example.org/login",
 	TWIN_DATASPACE_ENABLED: "true",
 	TWIN_TRUST_GENERATORS: "jwt-verifiable-credential",
 	TWIN_TRUST_VERIFIERS: "jwt-verifiable-credential",
@@ -408,6 +410,7 @@ describe("node-core", () => {
 					"GET /spec",
 					"GET /authentication/policy",
 					"GET /authentication/providers",
+					"GET /.well-known/oauth-authorization-server",
 					"POST /authentication/logout"
 				])
 			).toEqual({

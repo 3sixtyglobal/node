@@ -64,6 +64,7 @@ export interface StepDefinition {
 	 * "body.&lt;dot.path&gt;|last-colon" - as above, then takes the last colon-delimited segment
 	 * "response-text" - full response as plain text
 	 * "jwt-claim:&lt;name&gt;" - decodes the current authToken JWT and returns the named payload claim
+	 * "body.&lt;path&gt;|query:&lt;name&gt;" - the named query parameter of the address at the body path
 	 */
 	capture?: { [key: string]: string };
 

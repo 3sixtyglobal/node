@@ -250,14 +250,23 @@ async function runStep(step: StepDefinition, ctx: RunnerContext): Promise<void> 
 					captured = JSON.stringify(responseJson);
 				}
 			} else if (spec.startsWith("body.")) {
-				const colonTransform = spec.endsWith("|last-colon");
-				const dotPath = colonTransform ? spec.slice(5, -11) : spec.slice(5);
+				const [bodySpec, queryParam] = spec.split("|query:");
+				const colonTransform = bodySpec.endsWith("|last-colon");
+				const dotPath = colonTransform ? bodySpec.slice(5, -11) : bodySpec.slice(5);
 				const val = getNestedValue(responseJson, dotPath);
 				if (Is.notEmpty(val)) {
 					const raw = Is.string(val) ? val : JSON.stringify(val);
-					// |last-colon extracts the final segment of a colon-delimited URN, e.g.
-					// "aig:uuid:changeset:changesetUUID" → "changesetUUID".
-					captured = colonTransform ? raw.split(":").pop() : raw;
+					if (Is.stringValue(queryParam)) {
+						// |query:<name> reads a query parameter of an address, such as the code in a
+						// redirect location.
+						captured = URL.canParse(raw)
+							? (new URL(raw).searchParams.get(queryParam) ?? undefined)
+							: undefined;
+					} else {
+						// |last-colon extracts the final segment of a colon-delimited URN, e.g.
+						// "aig:uuid:changeset:changesetUUID" → "changesetUUID".
+						captured = colonTransform ? raw.split(":").pop() : raw;
+					}
 				}
 			} else if (spec === "response-text") {
 				captured = responseText;

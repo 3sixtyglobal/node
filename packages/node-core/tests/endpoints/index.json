@@ -1,6 +1,7 @@
 [
 	"public",
 	"login",
+	"authorization-server",
 	"logging",
 	"telemetry",
 	"tracing",

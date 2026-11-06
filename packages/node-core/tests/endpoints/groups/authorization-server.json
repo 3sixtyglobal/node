@@ -1,0 +1,87 @@
+{
+	"group": "Authentication - OAuth 2.0 authorization server",
+	"steps": [
+		{
+			"description": "POST /authentication/authorize - wrong password",
+			"method": "POST",
+			"path": "/authentication/authorize",
+			"body": {
+				"email": "{{adminEmail}}",
+				"password": "not-the-password",
+				"state": "state-1",
+				"nonce": "nonce-1",
+				"codeChallenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+				"codeChallengeMethod": "S256",
+				"redirectUri": "{{baseUrl}}/authentication/oauth/3sixty-oauth/callback"
+			},
+			"expectedStatus": 401,
+			"assert": {
+				"body.message": "entityStorageAuthenticationService.loginFailed"
+			}
+		},
+		{
+			"description": "POST /authentication/authorize",
+			"method": "POST",
+			"path": "/authentication/authorize",
+			"body": {
+				"email": "{{adminEmail}}",
+				"password": "{{adminPassword}}",
+				"state": "state-1",
+				"nonce": "nonce-1",
+				"codeChallenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+				"codeChallengeMethod": "S256",
+				"redirectUri": "{{baseUrl}}/authentication/oauth/3sixty-oauth/callback"
+			},
+			"expectedStatus": 200,
+			"capture": {
+				"authorizationCode": "body.location|query:code"
+			},
+			"assert": {
+				"body.location": "contains:state=state-1"
+			}
+		},
+		{
+			"description": "POST /authentication/token - the code verifier of RFC 7636 appendix B",
+			"method": "POST",
+			"path": "/authentication/token",
+			"body": {
+				"grant_type": "authorization_code",
+				"code": "{{authorizationCode}}",
+				"redirect_uri": "{{baseUrl}}/authentication/oauth/3sixty-oauth/callback",
+				"code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+			},
+			"expectedStatus": 200,
+			"assert": {
+				"body.token_type": "Bearer",
+				"body.access_token": "isDefined"
+			}
+		},
+		{
+			"description": "POST /authentication/token - the code was already used",
+			"method": "POST",
+			"path": "/authentication/token",
+			"body": {
+				"grant_type": "authorization_code",
+				"code": "{{authorizationCode}}",
+				"redirect_uri": "{{baseUrl}}/authentication/oauth/3sixty-oauth/callback",
+				"code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+			},
+			"expectedStatus": 400,
+			"assert": {
+				"body.error": "invalid_grant"
+			}
+		},
+		{
+			"description": "GET /.well-known/oauth-authorization-server",
+			"method": "GET",
+			"path": "/.well-known/oauth-authorization-server",
+			"auth": false,
+			"appendOrgParam": false,
+			"expectedStatus": 200,
+			"assert": {
+				"body.authorization_endpoint": "https://app.example.org/login",
+				"body.token_endpoint": "contains:/authentication/token"
+			}
+		}
+	]
+}
