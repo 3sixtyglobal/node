@@ -164,12 +164,13 @@ The maximum password length for new password validation.
 
 > `optional` **authProviders?**: `string`
 
-The authentication providers to enable, comma separated: entity-storage, google, microsoft.
+The authentication providers to enable, comma separated: 3sixty, 3sixty-oauth,
+google, microsoft.
 
 #### Default
 
 ```ts
-entity-storage
+3sixty
 ```
 
 ***
@@ -329,6 +330,39 @@ The address to send the browser to after a successful OAuth sign in, required wh
 > `optional` **authOAuthFailureRedirectUrl?**: `string`
 
 The address to send the browser to when an OAuth sign in fails, required when an OAuth provider is enabled.
+
+***
+
+### authLoginPageUrl? {#authloginpageurl}
+
+> `optional` **authLoginPageUrl?**: `string`
+
+The address of the login page that takes an OAuth 2.0 authorization request for a password
+account, required when the 3sixty-oauth provider is enabled, and published as the
+authorization endpoint at /.well-known/oauth-authorization-server.
+
+***
+
+### authAuthorizationRedirectUris? {#authauthorizationredirecturis}
+
+> `optional` **authAuthorizationRedirectUris?**: `string`
+
+The redirect addresses, besides those on the node's public origin, an authorization code for
+a password account may be sent to, comma separated and matched exactly.
+
+***
+
+### authAuthorizationCodeExpirySeconds? {#authauthorizationcodeexpiryseconds}
+
+> `optional` **authAuthorizationCodeExpirySeconds?**: `string`
+
+How long an authorization code for a password account can be used for, in seconds.
+
+#### Default
+
+```ts
+60
+```
 
 ***
 
