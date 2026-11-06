@@ -242,7 +242,7 @@ importers:
   apps/node:
     dependencies:
       '@3sixty/node-core':
-        specifier: 0.20.0-next.9
+        specifier: 0.20.0-next.10
         version: link:../../packages/node-core
     devDependencies:
       '@3sixty/merge-locales':
@@ -286,19 +286,19 @@ importers:
     dependencies:
       '@3sixty/api-auth-account-service':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/api-auth-entity-storage-models':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/api-auth-entity-storage-service':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/api-auth-models':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/api-auth-oauth-connector-microsoft':
         specifier: next
-        version: 0.20.0-next.8
+        version: 0.20.0-next.9
       '@3sixty/api-models':
         specifier: next
         version: 0.20.0-next.10
@@ -497,60 +497,60 @@ packages:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0 || ^6.0.0
 
-  '@3sixty/api-auth-account-rest-client@0.20.0-next.8':
-    resolution: {integrity: sha512-I+C1iByPt9GIwzseTTuDM2NPnyC665qYOARX96arp0kW8IMS4QJiwPPM4eadCBSAELDcRGhUSOglsWc/0kXGTw==}
+  '@3sixty/api-auth-account-rest-client@0.20.0-next.9':
+    resolution: {integrity: sha512-yMP/qMehfxVsRT2EE7XfcMCCdadpV+ci1CcaXmTqMVScAhITnudXdl++ofgdXQMv7B6y8nFHCBboVDQqMq7IOQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-account-service@0.20.0-next.8':
-    resolution: {integrity: sha512-Da0sEupZWzI8yz2UrkJpYK1d4gTU4MuGNoXBJjf6zSP8OZB3cH9drTgu2BAOYDDn9mofpeHffWr0i87LzVvdOw==}
+  '@3sixty/api-auth-account-service@0.20.0-next.9':
+    resolution: {integrity: sha512-VS0GYZUkb7jN/H9OiuwkzZkPwWGXaqy0g6uXlGjdRJ0Ug3HF6Xv+/Dn6zQeao96qZuVKcTa+Z0uJfoODB3fQrg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.8':
-    resolution: {integrity: sha512-J+Si7K2As86mX9I8fdKnhadsGybsoPf1Q/t7vf40z8kqZ94iIizixXeBc0YD6aRaawqWglrqpvY3cJSuSuEndA==}
+  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.9':
+    resolution: {integrity: sha512-Ey29PY7RODniyfegb9rjS0ty9RhYBbJqQVqm461mc4BsFlvrcBtqSDDad3i7xDGihjHEjci1ZSG57J+vQdQVHA==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-entity-storage-models@0.20.0-next.8':
-    resolution: {integrity: sha512-SRW15YPFY+Ok48mudFIFpfFWEqicwAT4YLzAM90hDSOGGV3fATvIxQB3S2NyMK9zIze1m6+g+d8Y4w2zywIYVg==}
+  '@3sixty/api-auth-entity-storage-models@0.20.0-next.9':
+    resolution: {integrity: sha512-6of02JiCxUnZn5bGlmgalgz1O6lJZbIxUJPutSumef376mqq+usovrNEl136JcKfJI1Fz85xclYZJ2QzWpP/fg==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.8':
-    resolution: {integrity: sha512-+zQFYrbIIhD6DmLuK3Mkr8WnhRpj4kpd3FksOW8tN02mEWOyW8QRTH8NdPFSomAYoEFsNZip9GAFPZ86G2LOZw==}
+  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.9':
+    resolution: {integrity: sha512-gv1ss+aqjAGVLNnrWOVI3TRSwixM8DwZYDT2ug5GHq0iE8eeFc5bhhumPvhoYuSqlJW8BGpCDgjK143UUCfi1Q==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-entity-storage-service@0.20.0-next.8':
-    resolution: {integrity: sha512-w766hgqlrZlSaNLG1ZbR61mwRlRyXeZ8YWmGfSFA1rvwABkBPOVIRZaA5uNOpG1fD0jQA8bbIvlbaK5TQAj8DA==}
+  '@3sixty/api-auth-entity-storage-service@0.20.0-next.9':
+    resolution: {integrity: sha512-36lzxvgCFTRSBXOamA/1ipw18xffdLBABe9MmnFOQ8OYg5WprEzt163cDJXsPVU/E7SDG0pWVcHPYy/cewqlww==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-models@0.20.0-next.8':
-    resolution: {integrity: sha512-JMItIwaVxhYsSXGie6oKpdBf7cYvRAGlExtI+0iwwTV9xcY/2IiQaayRiSc85SBDetrIwZIRTGomP30Mcy7RKw==}
+  '@3sixty/api-auth-models@0.20.0-next.9':
+    resolution: {integrity: sha512-uGTphjzErwm8vX9Xn2HzzwOJHGG+O8xmNmJ7QBQAGYFm1GcQYtWdqKOELbVpecIFt01BFDWX1M6q7gYIkcEcxQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-connector-entity-storage@0.0.1':
-    resolution: {integrity: sha512-xxC0w6b+fKro1y6463ZdKwLjnys+bzi/+mn6ubSwK7Z3xK3hih+8I7MFW2dE8EK0RVCvjadxbO9Nu9iqqNPohQ==}
+  '@3sixty/api-auth-oauth-connector-entity-storage@0.20.0-next.9':
+    resolution: {integrity: sha512-oqE85zx7OG29tZPdPovVmDbRSf3B2ncLhU2nIPVy3Dza8t8TgN6sUL1LyAjakxP5fwmTWttmnYyYa9PABEXsDQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.8':
-    resolution: {integrity: sha512-PmJiFeaSrZ0iTwpi9MY1OJHhWm2AlC/WalNyvmphndR8kgKrjQWd9baOxtlDVxRh6dleIaHPQxfzQDSmOJBX3g==}
+  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.9':
+    resolution: {integrity: sha512-1Qez5otk/NckYKIREHpc4vUjK2XvxjbZhxNnKvu1Z3I1YhjMjxzIvzh3Uw1r5RsTJgaFj5zHvRoPmNCQRIlMRw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.8':
-    resolution: {integrity: sha512-kIA2TQDD+FG3LuO4HaNRBy3B0WRZaiDLdX2rlUj6XUym/KI/9TDgZXhb8qEBiQKove+EumXGhRN6trNZka1FOg==}
+  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.9':
+    resolution: {integrity: sha512-I97yIZPLPqejJHntMc5bWR3WMK4HlUJo1kRbVllQD3byVta23RvgA037FSSMNBuYHi+EVjcbbAtU/Sq3SwclnQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-models@0.20.0-next.8':
-    resolution: {integrity: sha512-cifUr9XHvhC1VPIYOUmRceGo4k+28M3JwLl7BkNQomzdp8GhsRjZGzviRtFj5M153lTq3E/3gylHQhaaCj8Xmw==}
+  '@3sixty/api-auth-oauth-models@0.20.0-next.9':
+    resolution: {integrity: sha512-6E7O2Llm6Z/h1tbiu+tULXoD/+mGoL01tfRrCOOJbJFufyASNLsyCV/y5So+3PoAQL63Jz1XvhqMJCCUVZ/W8A==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-oauth-service@0.20.0-next.8':
-    resolution: {integrity: sha512-VKknWOqcBWMjbSMsH4zTC//T0NFc6lszGnucKHyBuXQCeXU5YEIx4xfuE50S7PZ5PF1rnRcLfITzikMT4ELscQ==}
+  '@3sixty/api-auth-oauth-service@0.20.0-next.9':
+    resolution: {integrity: sha512-JwmIvWYpgaTPpwBQ+754XPeY4nW7xiq0IjmfKfJHKhfrdoStHbQOJIaQBkR0uLPMj8U1b6DMpZR1tn7fjnCBaw==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-rest-client@0.20.0-next.8':
-    resolution: {integrity: sha512-/kMQo+lIKNVB+QPiPIfeTB0Ukhi5Iplen/3f8bdYbsoO5/JtrQnDRnqd8n6GSskOHwFtdM7jYOxC7tFVFuHr/w==}
+  '@3sixty/api-auth-rest-client@0.20.0-next.9':
+    resolution: {integrity: sha512-e1Fow0rUuDXultSjSfGD03WzqIjnkxQdlSAkLJNiQQdsN5gpCutyWltJPGhtULSrpZMDmXjFjH8ZXKIzxKSfhQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
-  '@3sixty/api-auth-service@0.20.0-next.8':
-    resolution: {integrity: sha512-JTUDwWCcNZCxDKJe7nhMnuL9nxsKcE5BPlmnRf+6izoMtE5/KfmIMx3lLE0IsxifrPFb/tg9GZZbr32Sro3lMA==}
+  '@3sixty/api-auth-service@0.20.0-next.9':
+    resolution: {integrity: sha512-mU57FoJUH58StwQ9dhZ/jCWmCF+AbEW27XSVvG64ZR7p8FrdDWLB/SIVf4Xy1v+/hmuEJRe+4dQgZJM8oohjyQ==}
     engines: {bun: '>=1.4.4', node: '>=24.0.0'}
 
   '@3sixty/api-core-server@0.20.0-next.10':
@@ -5857,9 +5857,9 @@ snapshots:
       graphql: 16.14.2
       typescript: 6.0.3
 
-  '@3sixty/api-auth-account-rest-client@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-auth-account-rest-client@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/api-core': 0.20.0-next.10(supports-color@10.2.2)
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.12
@@ -5872,9 +5872,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-auth-account-service@0.20.0-next.8':
+  '@3sixty/api-auth-account-service@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/context': 0.20.0-next.12
@@ -5889,27 +5889,27 @@ snapshots:
       '@3sixty/standards-w3c-did': 0.20.0-next.3
       '@3sixty/web': 0.20.0-next.12
 
-  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.8':
+  '@3sixty/api-auth-connector-entity-storage@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.8
-      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.9
+      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/crypto': 0.20.0-next.12
       '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.12
 
-  '@3sixty/api-auth-entity-storage-models@0.20.0-next.8':
+  '@3sixty/api-auth-entity-storage-models@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/web': 0.20.0-next.12
 
-  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-auth-entity-storage-rest-client@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/api-core': 0.20.0-next.10(supports-color@10.2.2)
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.12
@@ -5920,10 +5920,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-auth-entity-storage-service@0.20.0-next.8':
+  '@3sixty/api-auth-entity-storage-service@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/background-task-models': 0.20.0-next.3
@@ -5938,7 +5938,7 @@ snapshots:
       '@3sixty/vault-models': 0.20.0-next.2
       '@3sixty/web': 0.20.0-next.12
 
-  '@3sixty/api-auth-models@0.20.0-next.8':
+  '@3sixty/api-auth-models@0.20.0-next.9':
     dependencies:
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/crypto': 0.20.0-next.12
@@ -5950,36 +5950,36 @@ snapshots:
       '@3sixty/web': 0.20.0-next.12
       schema-dts: 2.1.0
 
-  '@3sixty/api-auth-oauth-connector-entity-storage@0.0.1':
+  '@3sixty/api-auth-oauth-connector-entity-storage@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.8
-      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.9
+      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/entity-storage-models': 0.20.0-next.4
       '@3sixty/nameof': 0.20.0-next.12
 
-  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.8':
+  '@3sixty/api-auth-oauth-connector-google@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.12
 
-  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.8':
+  '@3sixty/api-auth-oauth-connector-microsoft@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/logging-models': 0.20.0-next.2
       '@3sixty/nameof': 0.20.0-next.12
 
-  '@3sixty/api-auth-oauth-models@0.20.0-next.8':
+  '@3sixty/api-auth-oauth-models@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/core': 0.20.0-next.12
       '@3sixty/data-json-ld': 0.20.0-next.5
       '@3sixty/logging-models': 0.20.0-next.2
@@ -5988,11 +5988,11 @@ snapshots:
       '@3sixty/web': 0.20.0-next.12
       schema-dts: 2.1.0
 
-  '@3sixty/api-auth-oauth-service@0.20.0-next.8':
+  '@3sixty/api-auth-oauth-service@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-models': 0.20.0-next.8
+      '@3sixty/api-auth-entity-storage-models': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-models': 0.20.0-next.9
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/context': 0.20.0-next.12
       '@3sixty/core': 0.20.0-next.12
@@ -6002,9 +6002,9 @@ snapshots:
       '@3sixty/vault-models': 0.20.0-next.2
       '@3sixty/web': 0.20.0-next.12
 
-  '@3sixty/api-auth-rest-client@0.20.0-next.8(supports-color@10.2.2)':
+  '@3sixty/api-auth-rest-client@0.20.0-next.9(supports-color@10.2.2)':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/api-core': 0.20.0-next.10(supports-color@10.2.2)
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/core': 0.20.0-next.12
@@ -6015,9 +6015,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@3sixty/api-auth-service@0.20.0-next.8':
+  '@3sixty/api-auth-service@0.20.0-next.9':
     dependencies:
-      '@3sixty/api-auth-models': 0.20.0-next.8
+      '@3sixty/api-auth-models': 0.20.0-next.9
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/authorization-models': 0.20.0-next.3
       '@3sixty/background-task-models': 0.20.0-next.3
@@ -6808,18 +6808,18 @@ snapshots:
 
   '@3sixty/engine-server-types@0.20.0-next.8(@iota/iota-sdk@1.15.0(typescript@6.0.3))(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(buffer@6.0.3)(socks@2.8.10)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@3sixty/api-auth-account-rest-client': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-auth-account-service': 0.20.0-next.8
-      '@3sixty/api-auth-connector-entity-storage': 0.20.0-next.8
-      '@3sixty/api-auth-entity-storage-rest-client': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.8
-      '@3sixty/api-auth-models': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-connector-entity-storage': 0.0.1
-      '@3sixty/api-auth-oauth-connector-google': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-connector-microsoft': 0.20.0-next.8
-      '@3sixty/api-auth-oauth-service': 0.20.0-next.8
-      '@3sixty/api-auth-rest-client': 0.20.0-next.8(supports-color@10.2.2)
-      '@3sixty/api-auth-service': 0.20.0-next.8
+      '@3sixty/api-auth-account-rest-client': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-auth-account-service': 0.20.0-next.9
+      '@3sixty/api-auth-connector-entity-storage': 0.20.0-next.9
+      '@3sixty/api-auth-entity-storage-rest-client': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-auth-entity-storage-service': 0.20.0-next.9
+      '@3sixty/api-auth-models': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-connector-entity-storage': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-connector-google': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-connector-microsoft': 0.20.0-next.9
+      '@3sixty/api-auth-oauth-service': 0.20.0-next.9
+      '@3sixty/api-auth-rest-client': 0.20.0-next.9(supports-color@10.2.2)
+      '@3sixty/api-auth-service': 0.20.0-next.9
       '@3sixty/api-models': 0.20.0-next.10
       '@3sixty/api-processors': 0.20.0-next.10
       '@3sixty/api-rest-client': 0.20.0-next.10(supports-color@10.2.2)

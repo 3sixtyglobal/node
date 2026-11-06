@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.0-next.10](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.9...node-v0.20.0-next.10) (2026-11-06)
+
+
+### Bug Fixes
+
+* read the oauth redirect addresses from their documented names ([#109](https://github.com/3sixtyglobal/node/issues/109)) ([1925426](https://github.com/3sixtyglobal/node/commit/192542603ad7640438c852714a17876012b00bb4))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @3sixty/node-core bumped from 0.20.0-next.9 to 0.20.0-next.10
+
 ## [0.20.0-next.9](https://github.com/3sixtyglobal/node/compare/node-v0.20.0-next.8...node-v0.20.0-next.9) (2026-11-06)
 
 

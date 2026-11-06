@@ -60,7 +60,7 @@ export async function run(
 
 		const serverInfo: IServerInfo = {
 			name: nodeOptions?.serverName ?? "3Sixty Node",
-			version: nodeOptions?.serverVersion ?? "0.20.0-next.9" // x-release-please-version
+			version: nodeOptions?.serverVersion ?? "0.20.0-next.10" // x-release-please-version
 		};
 
 		nodeOptions.envPrefix ??= "TWIN_";
